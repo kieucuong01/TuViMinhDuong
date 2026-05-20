@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { APP_URL } from "@/lib/env";
 import { getArticleBySlug, listArticles } from "@/lib/data";
@@ -57,9 +58,9 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
       <script id="breadcrumb-jsonld" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
       <article className="article-shell mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
         <nav className="article-breadcrumb" aria-label="Breadcrumb">
-          <a href="/">Trang chủ</a>
+          <Link href="/">Trang chủ</Link>
           <span>/</span>
-          <a href="/kien-thuc-tu-vi">Kiến thức tử vi</a>
+          <Link href="/kien-thuc-tu-vi">Kiến thức tử vi</Link>
         </nav>
         <p className="eyebrow">Kiến thức tử vi</p>
         <h1 className="text-balance text-4xl font-black leading-tight text-stone-950 sm:text-5xl">{article.title}</h1>

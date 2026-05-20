@@ -1,32 +1,44 @@
-# AItuvi - Web tra cứu tử vi AI
+# Tử Vi Minh Đường
 
-MVP full-stack bằng Next.js App Router, TypeScript, Prisma/PostgreSQL, PayOS/VietQR, AI SDK fallback, CMS SEO và engine lá số tử vi phổ thông.
+Web tra cứu tử vi AI dùng Next.js App Router, TypeScript, Tailwind CSS, Prisma/PostgreSQL, PayOS/VietQR, CMS SEO và engine lá số tử vi phổ thông Việt Nam.
+
+## Tính năng chính
+
+- Trang chủ mobile-first với form lập lá số và thẻ xem ngày cát hung.
+- Lập lá số 12 cung, xem lịch sử lá số theo tài khoản, trang luận giải miễn phí và nâng cao.
+- Các tab luận cung, đại vận, tiểu vận, nguyệt vận, nhật vận, chuyên đề.
+- Xem ngày với thẻ ngày tốt xấu, gói mở khóa tạm thời đang để full chức năng.
+- Đăng ký/đăng nhập chung bằng email và mật khẩu; Google OAuth bật khi có env.
+- CMS admin cho bài viết, ảnh minh họa, metadata SEO, schema và chấm điểm SEO.
+- Seed bài viết kiến thức tử vi có internal link, outbound reference, Article JSON-LD và BreadcrumbList.
+- Xu, gói nạp, PayOS checkout/webhook và demo fallback.
 
 ## Chạy local
 
-Runtime hệ thống trong máy này đang thấp hơn yêu cầu Next.js 16. Khi chạy qua Codex, dùng Node bundled:
+Next.js 16 cần Node mới. Trên máy này, khi chạy qua Codex nên dùng Node bundled:
 
 ```powershell
 $env:PATH="C:\Users\ASUS\.cache\codex-runtimes\codex-primary-runtime\dependencies\node\bin;$env:PATH"
 npm run dev
 ```
 
-Tạo `.env` từ `.env.example`. Nếu chưa có `DATABASE_URL`, app vẫn chạy bằng demo in-memory để xem UI, tạo lá số, auth demo và nạp xu demo. Khi có PostgreSQL:
+Mặc định app chạy ở `http://localhost:3000`. Nếu muốn dùng port 4000:
+
+```powershell
+$env:PATH="C:\Users\ASUS\.cache\codex-runtimes\codex-primary-runtime\dependencies\node\bin;$env:PATH"
+npx next dev --webpack -p 4000
+```
+
+Tạo `.env` từ `.env.example`. Nếu chưa có `DATABASE_URL`, app vẫn chạy bằng demo in-memory để xem UI, tạo lá số, đăng nhập demo và nạp xu demo.
+
+## Database
+
+Khi có PostgreSQL:
 
 ```powershell
 npm run db:generate
 npm run db:migrate
 ```
-
-## Tính năng đã có
-
-- Home mobile-first, form lập lá số và các section SEO-friendly.
-- Lá số 12 cung desktop, mobile có accordion để đọc rõ.
-- Auth email/password chung đăng ký/đăng nhập, Google OAuth optional.
-- Xu, gói nạp, PayOS checkout/webhook và demo fallback.
-- AI luận giải lưu cache, fallback template khi chưa có Vercel AI Gateway.
-- CMS admin, bài viết, metadata SEO và chấm điểm SEO.
-- `robots.ts`, `sitemap.ts`, JSON-LD Article/Breadcrumb.
 
 ## Kiểm tra
 
@@ -36,37 +48,21 @@ npm test
 npm run build
 ```
 
-## Getting Started
+## Deploy
 
-First, run the development server:
+Target deploy là Vercel + Postgres. Các env quan trọng:
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- `DATABASE_URL`
+- `NEXT_PUBLIC_APP_URL`
+- `AUTH_SECRET`
+- `ADMIN_EMAIL`
+- `PAYOS_CLIENT_ID`
+- `PAYOS_API_KEY`
+- `PAYOS_CHECKSUM_KEY`
+- `GOOGLE_CLIENT_ID`
+- `GOOGLE_CLIENT_SECRET`
+- `AI_GATEWAY_API_KEY` hoặc provider AI tương ứng
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Ghi chú sản phẩm
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Giai đoạn hiện tại đang để mở khóa/full chức năng theo yêu cầu thử nghiệm. Khi chuyển sang production cần bật lại chặn xu, kiểm thử webhook PayOS bằng môi trường thật, bổ sung chính sách thanh toán/hoàn tiền và rà soát nội dung pháp lý.
