@@ -3,14 +3,14 @@
   <circle cx="928" cy="126" r="180" fill="#dcfce7"/>
   <circle cx="190" cy="538" r="230" fill="#fed7aa" opacity=".75"/>
   <rect x="90" y="88" width="520" height="438" rx="36" fill="#fff" stroke="#fed7aa" stroke-width="3"/>
-  <text x="145" y="178" fill="#9a3412" font-family="Arial, sans-serif" font-size="38" font-weight="800">Tử vi hằng ngày</text>
-  <text x="145" y="260" fill="#c2410c" font-family="Arial, sans-serif" font-size="132" font-weight="900">20</text>
-  <text x="318" y="254" fill="#7c2d12" font-family="Arial, sans-serif" font-size="42" font-weight="800">Tháng 5</text>
-  <text x="145" y="340" fill="#57534e" font-family="Arial, sans-serif" font-size="31">Can chi · tiết khí · cát hung</text>
-  <rect x="145" y="396" width="130" height="48" rx="24" fill="#dcfce7"/>
-  <text x="178" y="429" fill="#047857" font-family="Arial, sans-serif" font-size="24" font-weight="800">Cát</text>
-  <rect x="298" y="396" width="150" height="48" rx="24" fill="#ffe4e6"/>
-  <text x="331" y="429" fill="#be123c" font-family="Arial, sans-serif" font-size="24" font-weight="800">Lưu ý</text>
+  <text x="145" y="166" fill="#9a3412" font-family="Arial, sans-serif" font-size="34" font-weight="800">Tử vi hằng ngày</text>
+  <text x="145" y="304" fill="#c2410c" font-family="Arial, sans-serif" font-size="132" font-weight="900">20</text>
+  <text x="318" y="296" fill="#7c2d12" font-family="Arial, sans-serif" font-size="42" font-weight="800">Tháng 5</text>
+  <text x="145" y="378" fill="#57534e" font-family="Arial, sans-serif" font-size="31">Can chi · tiết khí · cát hung</text>
+  <rect x="145" y="426" width="130" height="48" rx="24" fill="#dcfce7"/>
+  <text x="178" y="459" fill="#047857" font-family="Arial, sans-serif" font-size="24" font-weight="800">Cát</text>
+  <rect x="298" y="426" width="150" height="48" rx="24" fill="#ffe4e6"/>
+  <text x="331" y="459" fill="#be123c" font-family="Arial, sans-serif" font-size="24" font-weight="800">Lưu ý</text>
   <circle cx="875" cy="346" r="148" fill="#fffaf0" stroke="#34d399" stroke-width="28"/>
   <path d="M875 198a148 148 0 0 1 0 296 74 74 0 0 0 0-148 74 74 0 0 1 0-148Z" fill="#fb923c"/>
   <circle cx="875" cy="272" r="18" fill="#fffaf0"/>

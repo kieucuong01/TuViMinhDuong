@@ -25,18 +25,27 @@ export function verifyPayOSWebhook(data: Record<string, unknown>, signature?: st
   return signPayOSData(data) === signature;
 }
 
-export async function createPayOSCheckout(packageKey: string, user: SessionUser) {
+function normalizeReturnPath(returnPath?: string) {
+  if (!returnPath || !returnPath.startsWith("/") || returnPath.startsWith("//")) return "/nap-xu";
+  return returnPath;
+}
+
+export async function createPayOSCheckout(packageKey: string, user: SessionUser, returnPath?: string) {
   const pack = COIN_PACKAGES.find((item) => item.key === packageKey) || COIN_PACKAGES[1];
   const orderCode = Number(`${Date.now()}${Math.floor(Math.random() * 90 + 10)}`.slice(-12));
   const coins = pack.coins + pack.bonusCoins;
+  const safeReturnPath = normalizeReturnPath(returnPath);
+  const statusJoin = safeReturnPath.includes("?") ? "&" : "?";
+  const successUrl = `${APP_URL}${safeReturnPath}${statusJoin}status=success&orderCode=${orderCode}`;
+  const cancelUrl = `${APP_URL}${safeReturnPath}${statusJoin}status=cancelled&orderCode=${orderCode}`;
   const body = {
     orderCode,
     amount: pack.priceVnd,
     description: `Nap ${coins} xu`,
     buyerName: user.name,
     buyerEmail: user.email,
-    returnUrl: `${APP_URL}/nap-xu?status=success&orderCode=${orderCode}`,
-    cancelUrl: `${APP_URL}/nap-xu?status=cancelled&orderCode=${orderCode}`,
+    returnUrl: successUrl,
+    cancelUrl,
     items: [{ name: pack.label, quantity: 1, price: pack.priceVnd }],
   };
   const signature = signPayOSData({
@@ -52,7 +61,7 @@ export async function createPayOSCheckout(packageKey: string, user: SessionUser)
       orderCode,
       coins,
       amountVnd: pack.priceVnd,
-      checkoutUrl: `${APP_URL}/nap-xu?status=demo-paid&orderCode=${orderCode}`,
+      checkoutUrl: `${APP_URL}${safeReturnPath}${statusJoin}status=demo-paid&orderCode=${orderCode}`,
       paymentLinkId: `demo-${orderCode}`,
       raw: { ...body, signature, mode: "demo" },
     };

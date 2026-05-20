@@ -135,7 +135,7 @@ export default async function ChartHistoryPage() {
 
           <label className="mt-6 block">
             <span className="sr-only">Tìm kiếm lá số</span>
-            <span className="relative block">
+            <span className="chart-history-search relative block">
               <Search className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-stone-400" size={22} />
               <input className="pl-12" placeholder="Tìm kiếm lá số" />
             </span>

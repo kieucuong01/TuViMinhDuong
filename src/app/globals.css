@@ -260,6 +260,123 @@ textarea:focus {
   color: #9a3412;
 }
 
+.paywall-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 95;
+  display: grid;
+  place-items: center;
+  background: rgb(28 25 23 / 0.34);
+  padding: 1rem;
+  backdrop-filter: blur(8px);
+  animation: scale-in 180ms ease both;
+}
+
+.paywall-modal {
+  position: relative;
+  width: min(100%, 49rem);
+  max-height: min(90vh, 48rem);
+  overflow: auto;
+  border: 1px solid rgb(253 186 116 / 0.8);
+  border-radius: 1.25rem;
+  background: #fffaf0;
+  padding: clamp(1rem, 3vw, 1.45rem);
+  box-shadow: 0 34px 90px rgb(28 25 23 / 0.26);
+}
+
+.paywall-modal-close {
+  position: absolute;
+  right: 0.9rem;
+  top: 0.9rem;
+  display: grid;
+  width: 2.2rem;
+  height: 2.2rem;
+  place-items: center;
+  border-radius: 999px;
+  color: #78716c;
+  transition: background 160ms ease, color 160ms ease;
+}
+
+.paywall-modal-close:hover {
+  background: #fff7ed;
+  color: #9a3412;
+}
+
+.paywall-modal-head {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.9rem;
+  padding-right: 2.5rem;
+}
+
+.paywall-modal h2 {
+  color: #1c1917;
+  font-size: clamp(1.55rem, 4vw, 2.25rem);
+  font-weight: 950;
+  letter-spacing: 0;
+}
+
+.paywall-modal-head p:not(.eyebrow) {
+  margin-top: 0.35rem;
+  color: #57534e;
+  line-height: 1.65;
+}
+
+.paywall-package-grid {
+  display: grid;
+  gap: 0.85rem;
+  margin-top: 1.25rem;
+}
+
+.paywall-package-card {
+  display: grid;
+  gap: 0.45rem;
+  border: 1px solid #fed7aa;
+  border-radius: 1rem;
+  background: rgb(255 255 255 / 0.92);
+  padding: 1rem;
+  box-shadow: 0 12px 30px rgb(120 53 15 / 0.07);
+}
+
+.paywall-package-card strong {
+  color: #1c1917;
+  font-size: 1.05rem;
+  font-weight: 950;
+}
+
+.paywall-package-card span {
+  color: #ea580c;
+  font-size: 1.65rem;
+  font-weight: 950;
+}
+
+.paywall-package-card p {
+  color: #78716c;
+  font-size: 0.9rem;
+}
+
+.paywall-modal-secondary {
+  margin-top: 1rem;
+  display: inline-flex;
+  color: #9a3412;
+  font-size: 0.9rem;
+  font-weight: 850;
+}
+
+.chart-history-search svg {
+  z-index: 1;
+}
+
+.chart-history-search input {
+  padding-left: 3.25rem;
+}
+
+@media (min-width: 760px) {
+  .paywall-package-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
 .user-header-badge {
   display: flex;
   align-items: center;

@@ -33,6 +33,12 @@ function withReadingParam(path: string, readingId: string) {
   return `${path}${path.includes("?") ? "&" : "?"}reading=${encodeURIComponent(readingId)}`;
 }
 
+function withQueryParams(path: string, params: Record<string, string | number>) {
+  const [withoutHash, hash] = path.split("#");
+  const query = new URLSearchParams(Object.entries(params).map(([key, value]) => [key, String(value)]));
+  return `${withoutHash}${withoutHash.includes("?") ? "&" : "?"}${query}${hash ? `#${hash}` : ""}`;
+}
+
 export async function createChartAction(formData: FormData) {
   const user = await getCurrentUser();
   const chart = await saveChart(
@@ -112,7 +118,7 @@ export async function requestReadingAction(formData: FormData) {
   const shouldCharge = !TEMPORARY_FULL_ACCESS && user.role !== "ADMIN";
   const balance = shouldCharge ? await getUserBalance(user) : 0;
   if (shouldCharge && balance < price.priceCoins) {
-    redirect(`/nap-xu?need=${price.priceCoins - balance}&paywall=coins`);
+    redirect(withQueryParams(nextPath, { paywall: "coins", need: price.priceCoins - balance }));
   }
 
   let debited = false;
@@ -154,7 +160,8 @@ export async function createCheckoutAction(formData: FormData) {
   const user = await getCurrentUser();
   if (!user) redirect("/dang-nhap?next=/nap-xu");
   const packageKey = String(formData.get("packageKey") || "full-reading");
-  const checkout = await createPayOSCheckout(packageKey, user);
+  const returnTo = safeNextPath(formData.get("returnTo"), "/nap-xu");
+  const checkout = await createPayOSCheckout(packageKey, user, returnTo);
   const pack = COIN_PACKAGES.find((item) => item.key === packageKey) || COIN_PACKAGES[1];
   const db = getDb();
 
@@ -191,7 +198,7 @@ export async function createCheckoutAction(formData: FormData) {
     });
   } else if (checkout.raw && typeof checkout.raw === "object" && "mode" in checkout.raw) {
     await adjustCoins(user, checkout.coins, "Demo nạp xu", String(checkout.orderCode));
-    redirect(`/nap-xu?status=demo-paid&orderCode=${checkout.orderCode}`);
+    redirect(withQueryParams(returnTo, { status: "demo-paid", orderCode: checkout.orderCode }));
   }
 
   redirect(checkout.checkoutUrl);
