@@ -11,7 +11,7 @@ export const revalidate = 300;
 export default async function Home() {
   const articles = (await listArticles()).slice(0, 3);
   const trustSignals = [
-    ["Miễn phí thử nghiệm", "Mở toàn bộ luận giải, chưa cần nạp xu."],
+    ["Lập lá số miễn phí", "Xem tổng quan cơ bản miễn phí, mở chuyên sâu bằng xu."],
     ["Chuẩn phổ thông", "An sao và hiển thị lá số theo quy ước Việt Nam."],
     ["Lưu lịch sử", "Mỗi tài khoản có thể tra nhiều lá số và xem lại."],
   ];
@@ -50,7 +50,7 @@ export default async function Home() {
             </div>
             <div className="mt-8 grid max-w-2xl grid-cols-2 gap-3 sm:grid-cols-4">
               {[
-                ["Miễn phí", "Full chức năng thử nghiệm"],
+                ["Miễn phí", "Lập lá số cơ bản"],
                 ["12 cung", "Lá số chuẩn phổ thông"],
                 ["Mobile", "Đọc rõ từng cung"],
                 ["Lịch sử", "Lưu nhiều lá số"],
@@ -153,7 +153,7 @@ export default async function Home() {
             </div>
             <div className="journey-note">
               <Coins size={18} />
-              <span>Giai đoạn hiện tại đang mở khóa tạm thời để người dùng trải nghiệm đủ trước khi bật nạp xu.</span>
+              <span>Luận giải chuyên sâu dùng xu minh bạch: mua một lần, lưu lại trong tài khoản và xem lại miễn phí.</span>
             </div>
           </div>
         </div>
@@ -242,7 +242,7 @@ export default async function Home() {
         <div className="mx-auto grid max-w-7xl gap-6 px-4 sm:px-6 md:grid-cols-[1fr_auto] md:items-center lg:px-8">
           <div>
             <p className="eyebrow text-orange-300">Bắt đầu miễn phí</p>
-            <h2 className="text-balance text-3xl font-black">Tạo lá số đầu tiên, xem miễn phí toàn bộ luận giải trong giai đoạn thử nghiệm</h2>
+            <h2 className="text-balance text-3xl font-black">Tạo lá số đầu tiên miễn phí, mở luận giải chuyên sâu khi bạn cần</h2>
           </div>
           <Link href="/#lap-la-so" className="btn btn-primary">
             <Coins size={18} /> Lập lá số ngay

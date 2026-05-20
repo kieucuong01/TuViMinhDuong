@@ -39,7 +39,7 @@ const contextActions = {
   ],
   home: [
     "vừa lập lá số tử vi AI",
-    "vừa xem luận giải miễn phí",
+    "vừa mở luận giải chuyên sâu",
     "vừa tạo lá số mới",
   ],
 };
@@ -124,7 +124,7 @@ export function SocialProofPopup() {
       <div className="min-w-0 flex-1">
         <p className="truncate text-sm font-black text-orange-950 sm:text-base">{event.email}</p>
         <p className="mt-1 text-sm font-medium text-stone-600 sm:text-base">
-          {event.action} <strong className="font-black text-stone-700">miễn phí</strong>
+          {event.action} <strong className="font-black text-stone-700">bằng xu</strong>
         </p>
         <Link className="social-proof-cta" href={getHref(context)} onClick={() => setVisible(false)}>
           Xem ngay

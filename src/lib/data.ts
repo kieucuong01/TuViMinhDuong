@@ -111,16 +111,16 @@ export async function getChart(id: string) {
     : null;
 }
 
-export async function listUserCharts(userId: string): Promise<ChartHistoryItem[]> {
+export async function listUserCharts(userId: string, includeAll = false): Promise<ChartHistoryItem[]> {
   const db = getDb();
   if (!db || usesInMemoryUser(userId)) {
     const userCharts = Array.from(charts().values())
-      .filter((chart) => chart.userId === userId)
+      .filter((chart) => includeAll || chart.userId === userId)
       .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
 
     return userCharts.map((chart) => {
       const advanced = Array.from(readings().values()).find(
-        (reading) => reading.userId === userId && reading.chartId === chart.id && reading.type === "FULL" && reading.scopeKey === "all",
+        (reading) => (includeAll || reading.userId === userId) && reading.chartId === chart.id && reading.type === "FULL" && reading.scopeKey === "all",
       );
       return {
         ...chart,
@@ -131,10 +131,10 @@ export async function listUserCharts(userId: string): Promise<ChartHistoryItem[]
   }
 
   const userCharts = await db.chart.findMany({
-    where: { userId },
+    where: includeAll ? {} : { userId },
     include: {
       readings: {
-        where: { userId, type: "FULL", scopeKey: "all", status: "COMPLETED" },
+        where: { ...(includeAll ? {} : { userId }), type: "FULL", scopeKey: "all", status: "COMPLETED" },
         orderBy: { createdAt: "desc" },
         take: 1,
       },
@@ -215,6 +215,31 @@ export async function getCachedReading(userId: string, chartId: string, type: Re
         chartId,
         type,
         scopeKey,
+        priceCoins: reading.priceCoins,
+        content: reading.content,
+        createdAt: reading.createdAt,
+      }
+    : null;
+}
+
+export async function getAnyCompletedReading(chartId: string, type: ReadingKey, scopeKey: string) {
+  const db = getDb();
+  if (!db) {
+    return Array.from(readings().values()).find(
+      (reading) => reading.chartId === chartId && reading.type === type && reading.scopeKey === scopeKey,
+    ) || null;
+  }
+  const reading = await db.reading.findFirst({
+    where: { chartId, type, scopeKey, status: "COMPLETED" },
+    orderBy: { createdAt: "desc" },
+  });
+  return reading?.content
+    ? {
+        id: reading.id,
+        userId: reading.userId,
+        chartId: reading.chartId,
+        type: reading.type as ReadingKey,
+        scopeKey: reading.scopeKey,
         priceCoins: reading.priceCoins,
         content: reading.content,
         createdAt: reading.createdAt,

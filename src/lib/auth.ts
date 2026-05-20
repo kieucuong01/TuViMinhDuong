@@ -2,7 +2,7 @@ import "server-only";
 
 import { cookies } from "next/headers";
 import { createHmac, randomBytes, scryptSync, timingSafeEqual } from "node:crypto";
-import { ADMIN_EMAIL } from "@/lib/env";
+import { ADMIN_EMAIL, ADMIN_PASSWORD } from "@/lib/env";
 import { getDb } from "@/lib/db";
 
 export type SessionUser = {
@@ -108,7 +108,9 @@ export async function loginOrRegister(email: string, password: string, name?: st
   }
 
   const db = getDb();
-  const role = normalizedEmail === ADMIN_EMAIL ? "ADMIN" : "USER";
+  const isAdminEmail = normalizedEmail === ADMIN_EMAIL;
+  const isConfiguredAdminLogin = isAdminEmail && Boolean(ADMIN_PASSWORD) && password === ADMIN_PASSWORD;
+  const role = isConfiguredAdminLogin ? "ADMIN" : "USER";
 
   if (!db) {
     const user: SessionUser = {
@@ -116,7 +118,7 @@ export async function loginOrRegister(email: string, password: string, name?: st
       email: normalizedEmail,
       name: name?.trim() || normalizedEmail.split("@")[0],
       role,
-      coinBalance: role === "ADMIN" ? 9999 : 30,
+      coinBalance: role === "ADMIN" ? 999999 : 30,
     };
     await setSession(user);
     return user;
@@ -124,15 +126,29 @@ export async function loginOrRegister(email: string, password: string, name?: st
 
   const existing = await db.user.findUnique({ where: { email: normalizedEmail } });
   if (existing) {
-    if (!verifyPassword(password, existing.passwordHash)) {
+    const passwordMatches = verifyPassword(password, existing.passwordHash);
+    if (!passwordMatches && !isConfiguredAdminLogin) {
       throw new Error("Mật khẩu không đúng.");
     }
+    const needsAdminSync =
+      isConfiguredAdminLogin &&
+      (existing.role !== "ADMIN" || !passwordMatches || existing.coinBalance < 999999);
+    const synced = needsAdminSync
+      ? await db.user.update({
+          where: { id: existing.id },
+          data: {
+            role: "ADMIN",
+            passwordHash: hashPassword(ADMIN_PASSWORD),
+            coinBalance: Math.max(existing.coinBalance, 999999),
+          },
+        })
+      : existing;
     const user: SessionUser = {
-      id: existing.id,
-      email: existing.email,
-      name: existing.name || existing.email.split("@")[0],
-      role: existing.role,
-      coinBalance: existing.coinBalance,
+      id: synced.id,
+      email: synced.email,
+      name: synced.name || synced.email.split("@")[0],
+      role: synced.role,
+      coinBalance: synced.coinBalance,
     };
     await setSession(user);
     return user;
@@ -142,9 +158,9 @@ export async function loginOrRegister(email: string, password: string, name?: st
     data: {
       email: normalizedEmail,
       name: name?.trim() || normalizedEmail.split("@")[0],
-      passwordHash: hashPassword(password),
+      passwordHash: hashPassword(isConfiguredAdminLogin ? ADMIN_PASSWORD : password),
       role,
-      coinBalance: role === "ADMIN" ? 9999 : 30,
+      coinBalance: role === "ADMIN" ? 999999 : 30,
     },
   });
   const user: SessionUser = {

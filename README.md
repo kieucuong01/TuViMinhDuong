@@ -56,6 +56,7 @@ Target deploy là Vercel + Postgres. Các env quan trọng:
 - `NEXT_PUBLIC_APP_URL`
 - `AUTH_SECRET`
 - `ADMIN_EMAIL`
+- `ADMIN_PASSWORD`
 - `PAYOS_CLIENT_ID`
 - `PAYOS_API_KEY`
 - `PAYOS_CHECKSUM_KEY`

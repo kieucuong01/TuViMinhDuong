@@ -1,7 +1,8 @@
 import { Sparkles } from "lucide-react";
 import { requestReadingAction } from "@/app/actions";
-import { TEMPORARY_FULL_ACCESS, type ReadingKey } from "@/lib/pricing";
+import { FEATURE_PRICES, TEMPORARY_FULL_ACCESS, type ReadingKey } from "@/lib/pricing";
 import type { TuViChart } from "@/lib/chart";
+import { formatCoins } from "@/lib/format";
 
 const tabCards: { type: ReadingKey; scopeKey: string; title: string; body: string }[] = [
   {
@@ -61,7 +62,7 @@ export function ReadingTabs({ chartId, chart }: { chartId: string; chart: TuViCh
                 {TEMPORARY_FULL_ACCESS ? "Miễn phí" : "Cần xu"}
               </span>
               <button className="btn btn-primary btn-small" type="submit">
-                Xem ngay
+                {TEMPORARY_FULL_ACCESS ? "Xem ngay" : formatCoins(FEATURE_PRICES[card.type].priceCoins)}
               </button>
             </div>
             <p className="mt-3 text-xs text-stone-400">Áp dụng cho lá số {chart.input.fullName}</p>

@@ -7,7 +7,10 @@ export const APP_URL =
 export const APP_NAME = "Tử Vi Minh Đường";
 
 export const ADMIN_EMAIL =
-  process.env.ADMIN_EMAIL?.toLowerCase() || "admin@tuvi.local";
+  process.env.ADMIN_EMAIL?.toLowerCase() || "kieucuong01@gmail.com";
+
+export const ADMIN_PASSWORD =
+  process.env.ADMIN_PASSWORD || "";
 
 export function hasDatabaseUrl() {
   const value = process.env.DATABASE_URL;

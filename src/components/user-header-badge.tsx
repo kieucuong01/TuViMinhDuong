@@ -15,7 +15,7 @@ type HeaderUser = {
 
 export function UserHeaderBadge() {
   const [user, setUser] = useState<HeaderUser | null>(null);
-  const [temporaryFullAccess, setTemporaryFullAccess] = useState(true);
+  const [temporaryFullAccess, setTemporaryFullAccess] = useState(false);
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {

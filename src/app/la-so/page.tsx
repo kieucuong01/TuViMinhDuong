@@ -117,7 +117,7 @@ function ChartListItem({ chart }: { chart: ChartHistoryItem }) {
 export default async function ChartHistoryPage() {
   const user = await getCurrentUser();
   if (!user) redirect("/dang-nhap?next=/la-so");
-  const charts = await listUserCharts(user.id);
+  const charts = await listUserCharts(user.id, user.role === "ADMIN");
   const primary = charts[0];
 
   return (

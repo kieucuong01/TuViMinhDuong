@@ -5,7 +5,7 @@ import { ChartBoard } from "@/components/chart-board";
 import { FeedbackActions } from "@/components/feedback-actions";
 import { ReadingPanel } from "@/components/reading-panel";
 import { getCurrentUser } from "@/lib/auth";
-import { getCachedReading, getChart } from "@/lib/data";
+import { getAnyCompletedReading, getCachedReading, getChart } from "@/lib/data";
 
 export const metadata = {
   title: "Luận giải nâng cao",
@@ -28,7 +28,9 @@ export default async function AdvancedReadingPage({
     notFound();
   }
 
-  const fullReading = await getCachedReading(user.id, id, "FULL", "all");
+  const fullReading =
+    (await getCachedReading(user.id, id, "FULL", "all")) ||
+    (user.role === "ADMIN" ? await getAnyCompletedReading(id, "FULL", "all") : null);
   if (!fullReading) redirect(`/la-so/${id}`);
 
   return (

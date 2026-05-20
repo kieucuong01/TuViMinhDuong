@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import { SiteHeader } from "@/components/site-header";
 import { DeferredSocialProof } from "@/components/deferred-social-proof";
 import { GlobalLoadingToast } from "@/components/global-loading-toast";
+import { PaywallPopup } from "@/components/paywall-popup";
 import { APP_NAME, APP_URL } from "@/lib/env";
 import "./globals.css";
 
@@ -55,6 +56,9 @@ export default function RootLayout({
         {children}
         <Suspense fallback={null}>
           <GlobalLoadingToast />
+        </Suspense>
+        <Suspense fallback={null}>
+          <PaywallPopup />
         </Suspense>
         <DeferredSocialProof />
       </body>

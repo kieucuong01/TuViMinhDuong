@@ -55,7 +55,9 @@ export async function createChartAction(formData: FormData) {
 async function getReadingUser(chartId: string): Promise<SessionUser> {
   const user = await getCurrentUser();
   if (user) return user;
-  if (!TEMPORARY_FULL_ACCESS) redirect(`/dang-nhap?next=${encodeURIComponent(`/la-so/${chartId}`)}`);
+  if (!TEMPORARY_FULL_ACCESS) {
+    redirect(`/dang-nhap?next=${encodeURIComponent(`/la-so/${chartId}`)}&paywall=login`);
+  }
 
   const db = getDb();
   if (db) {
@@ -110,7 +112,7 @@ export async function requestReadingAction(formData: FormData) {
   const shouldCharge = !TEMPORARY_FULL_ACCESS && user.role !== "ADMIN";
   const balance = shouldCharge ? await getUserBalance(user) : 0;
   if (shouldCharge && balance < price.priceCoins) {
-    redirect(`/nap-xu?need=${price.priceCoins - balance}`);
+    redirect(`/nap-xu?need=${price.priceCoins - balance}&paywall=coins`);
   }
 
   let debited = false;

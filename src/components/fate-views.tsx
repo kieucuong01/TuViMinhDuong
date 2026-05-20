@@ -2,7 +2,8 @@ import { BarChart3, CheckCircle2 } from "lucide-react";
 import { requestReadingAction } from "@/app/actions";
 import { analyzeDate, formatDate, monthDays, toInputDate } from "@/lib/date-fortune";
 import type { TuViChart } from "@/lib/chart";
-import type { ReadingKey } from "@/lib/pricing";
+import { FEATURE_PRICES, type ReadingKey } from "@/lib/pricing";
+import { formatCoins } from "@/lib/format";
 
 function pseudoScore(seed: number, offset = 0) {
   return 24 + Math.abs(Math.sin(seed * 1.73 + offset) * 68);
@@ -21,7 +22,7 @@ function OpenButton({
   type,
   scopeKey,
   nextPath,
-  label = "Mở miễn phí",
+  label,
 }: {
   chartId: string;
   type: ReadingKey;
@@ -29,13 +30,15 @@ function OpenButton({
   nextPath: string;
   label?: string;
 }) {
+  const buttonLabel = label || `Mở - ${formatCoins(FEATURE_PRICES[type].priceCoins)}`;
+
   return (
     <form action={requestReadingAction}>
       <input type="hidden" name="chartId" value={chartId} />
       <input type="hidden" name="type" value={type} />
       <input type="hidden" name="scopeKey" value={scopeKey} />
       <input type="hidden" name="next" value={nextPath} />
-      <button className="fate-open-button" type="submit">{label}</button>
+      <button className="fate-open-button" type="submit">{buttonLabel}</button>
     </form>
   );
 }

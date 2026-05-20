@@ -27,7 +27,7 @@ export default async function CoinsPage({ searchParams }: { searchParams: Promis
               : "1 xu = 1.000đ. Thanh toán thật qua PayOS/VietQR khi cấu hình env; local dev có fallback demo."}
           </p>
         </div>
-        {params.need ? <p className="alert mx-auto mb-6 max-w-2xl">Tính năng này hiện đang được mở miễn phí, bạn chưa cần nạp thêm xu.</p> : null}
+        {params.need ? <p className="alert mx-auto mb-6 max-w-2xl">Bạn cần nạp thêm {params.need} xu để mở khóa luận giải vừa chọn.</p> : null}
         {params.status === "disabled" ? <p className="success mx-auto mb-6 max-w-2xl">Nạp xu đang tạm dừng vì hệ thống đang mở miễn phí toàn bộ luận giải.</p> : null}
         {params.status === "demo-paid" ? <p className="success mx-auto mb-6 max-w-2xl">Demo đã cộng xu vào phiên hiện tại.</p> : null}
         <div className="grid gap-4 md:grid-cols-3">

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ChartBoard, MobileChartReader } from "@/components/chart-board";
 import { requestReadingAction } from "@/app/actions";
-import { getCachedReading, getChart, getReadingById } from "@/lib/data";
+import { getAnyCompletedReading, getCachedReading, getChart, getReadingById } from "@/lib/data";
 import { getCurrentUser } from "@/lib/auth";
 import { FEATURE_PRICES, TEMPORARY_FULL_ACCESS } from "@/lib/pricing";
 import { formatCoins } from "@/lib/format";
@@ -43,7 +43,10 @@ export default async function ChartPage({
 
   const user = await getCurrentUser();
   const selectedReading = user && query.reading ? await getReadingById(user.id, query.reading) : null;
-  const fullReading = user ? await getCachedReading(user.id, id, "FULL", "all") : null;
+  const fullReading = user
+    ? (await getCachedReading(user.id, id, "FULL", "all")) ||
+      (user.role === "ADMIN" ? await getAnyCompletedReading(id, "FULL", "all") : null)
+    : null;
   const activeReading = selectedReading || fullReading;
   const activeLabel = activeReading ? readingLabels[activeReading.type] : "Luận giải tổng quan";
 

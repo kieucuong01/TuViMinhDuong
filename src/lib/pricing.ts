@@ -1,7 +1,7 @@
 export type ReadingKey = "FULL" | "PALACE" | "DAI_VAN" | "NGUYET_VAN" | "NHAT_VAN";
 
-// Temporary product mode: keep coin/payment code in place, but let users use all reading features freely.
-export const TEMPORARY_FULL_ACCESS = true;
+// Production paywall mode: paid readings require coins unless the user is an admin.
+export const TEMPORARY_FULL_ACCESS = false;
 
 export const FEATURE_PRICES: Record<ReadingKey, { label: string; priceCoins: number }> = {
   FULL: { label: "Luận giải toàn bộ", priceCoins: 199 },
