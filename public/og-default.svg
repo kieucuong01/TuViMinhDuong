@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-label="Tử Vi Minh Đường">
+  <rect width="1200" height="630" fill="#fff7ed"/>
+  <circle cx="258" cy="314" r="184" fill="#fed7aa"/>
+  <circle cx="258" cy="314" r="138" fill="#fffaf0" stroke="#fed7aa" stroke-width="18"/>
+  <path d="M258 176a138 138 0 0 1 0 276 69 69 0 0 0 0-138 69 69 0 0 1 0-138Z" fill="#f97316"/>
+  <path d="M258 190a124 124 0 0 1 0 248 62 62 0 0 0 0-124 62 62 0 0 1 0-124Z" fill="#fffaf0"/>
+  <circle cx="258" cy="245" r="21" fill="#f97316"/>
+  <circle cx="258" cy="383" r="21" fill="#10b981"/>
+  <text x="500" y="245" fill="#1c1917" font-family="Arial, sans-serif" font-size="70" font-weight="800">Tử Vi Minh Đường</text>
+  <text x="500" y="325" fill="#9a3412" font-family="Arial, sans-serif" font-size="34" font-weight="700">Lập lá số tử vi AI chuẩn phổ thông</text>
+  <text x="500" y="386" fill="#57534e" font-family="Arial, sans-serif" font-size="28">tuviminhduong.com · Xem ngày · Luận giải có cấu trúc</text>
+</svg>

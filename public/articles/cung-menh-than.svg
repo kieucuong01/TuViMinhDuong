@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-label="Cung Mệnh và Cung Thân trong lá số tử vi">
+  <rect width="1200" height="675" fill="#fffaf0"/>
+  <rect x="86" y="76" width="1028" height="523" rx="42" fill="#fff" stroke="#fed7aa" stroke-width="3"/>
+  <circle cx="600" cy="338" r="216" fill="#fff7ed" stroke="#f97316" stroke-width="8" opacity=".9"/>
+  <path d="M600 122a216 216 0 0 1 0 432 108 108 0 0 0 0-216 108 108 0 0 1 0-216Z" fill="#f97316"/>
+  <path d="M600 146a192 192 0 0 1 0 384 96 96 0 0 0 0-192 96 96 0 0 1 0-192Z" fill="#fffaf0"/>
+  <circle cx="600" cy="242" r="24" fill="#f97316"/>
+  <circle cx="600" cy="434" r="24" fill="#10b981"/>
+  <text x="148" y="174" fill="#9a3412" font-family="Arial, sans-serif" font-size="40" font-weight="900">Cung Mệnh</text>
+  <text x="804" y="174" fill="#047857" font-family="Arial, sans-serif" font-size="40" font-weight="900">Cung Thân</text>
+  <text x="148" y="230" fill="#57534e" font-family="Arial, sans-serif" font-size="27">Gốc tính cách</text>
+  <text x="804" y="230" fill="#57534e" font-family="Arial, sans-serif" font-size="27">Cách nhập cuộc</text>
+  <path d="M270 286 C382 220 456 220 530 290" fill="none" stroke="#fb923c" stroke-width="10" stroke-linecap="round"/>
+  <path d="M670 386 C744 455 836 455 948 390" fill="none" stroke="#34d399" stroke-width="10" stroke-linecap="round"/>
+</svg>

@@ -1,0 +1,214 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  CANCELLED
+  EXPIRED
+  FAILED
+}
+
+enum ReadingStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+enum ReadingType {
+  FULL
+  PALACE
+  DAI_VAN
+  NGUYET_VAN
+  NHAT_VAN
+}
+
+enum LedgerType {
+  CREDIT
+  DEBIT
+  REFUND
+  ADJUSTMENT
+}
+
+model User {
+  id           String       @id @default(cuid())
+  email        String       @unique
+  name         String?
+  passwordHash String?
+  avatarUrl    String?
+  coinBalance  Int          @default(0)
+  role         Role         @default(USER)
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  accounts     Account[]
+  sessions     Session[]
+  charts       Chart[]
+  readings     Reading[]
+  ledgers      CoinLedger[]
+  payments     PaymentOrder[]
+  auditLogs    AuditLog[]
+}
+
+model Account {
+  id                String   @id @default(cuid())
+  userId            String
+  provider          String
+  providerAccountId String
+  accessToken       String?
+  refreshToken      String?
+  expiresAt         DateTime?
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Chart {
+  id        String    @id @default(cuid())
+  userId    String?
+  title     String
+  input     Json
+  chart     Json
+  isPrivate Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  user      User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  readings  Reading[]
+}
+
+model Reading {
+  id          String        @id @default(cuid())
+  userId      String
+  chartId     String
+  type        ReadingType
+  scopeKey    String
+  status      ReadingStatus @default(PENDING)
+  priceCoins  Int
+  content     String?
+  promptMeta  Json?
+  model       String?
+  error       String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  chart       Chart         @relation(fields: [chartId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, chartId, type, scopeKey])
+}
+
+model CoinLedger {
+  id          String     @id @default(cuid())
+  userId      String
+  type        LedgerType
+  amount      Int
+  balance     Int
+  reason      String
+  referenceId String?
+  createdAt   DateTime   @default(now())
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model CoinPackage {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  label       String
+  coins       Int
+  priceVnd    Int
+  bonusCoins  Int      @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  payments    PaymentOrder[]
+}
+
+model FeaturePrice {
+  key        String   @id
+  label      String
+  priceCoins Int
+  isActive   Boolean  @default(true)
+  updatedAt  DateTime @updatedAt
+}
+
+model PaymentOrder {
+  id            String        @id @default(cuid())
+  userId        String
+  packageId     String?
+  orderCode     BigInt        @unique
+  paymentLinkId String?       @unique
+  amountVnd     Int
+  coins         Int
+  status        PaymentStatus @default(PENDING)
+  checkoutUrl   String?
+  rawPayload    Json?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  paidAt        DateTime?
+  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  package       CoinPackage?  @relation(fields: [packageId], references: [id], onDelete: SetNull)
+}
+
+model ArticleCategory {
+  id          String    @id @default(cuid())
+  name        String
+  slug        String    @unique
+  description String?
+  articles    Article[]
+}
+
+model Article {
+  id              String           @id @default(cuid())
+  categoryId      String?
+  title           String
+  slug            String           @unique
+  excerpt         String
+  content         String
+  status          String           @default("draft")
+  coverImage      String?
+  coverAlt        String?
+  focusKeyword    String?
+  metaTitle       String?
+  metaDescription String?
+  canonicalUrl    String?
+  robots          String           @default("index,follow")
+  ogImage         String?
+  ogTitle         String?
+  ogDescription   String?
+  schemaType      String           @default("Article")
+  seoScore        Int              @default(0)
+  seoChecklist    Json?
+  publishedAt     DateTime?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  category        ArticleCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  action    String
+  entity    String
+  entityId  String?
+  metadata  Json?
+  createdAt DateTime @default(now())
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+}

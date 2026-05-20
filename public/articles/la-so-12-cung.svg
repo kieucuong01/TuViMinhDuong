@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-label="Bàn lá số tử vi 12 cung">
+  <rect width="1200" height="675" fill="#fff7ed"/>
+  <rect x="118" y="68" width="964" height="540" fill="#fffdf8" stroke="#d8d1c7" stroke-width="4"/>
+  <g stroke="#ded8ce" stroke-width="3">
+    <path d="M118 203h964M118 338h964M118 473h964M359 68v540M600 68v540M841 68v540"/>
+  </g>
+  <rect x="359" y="203" width="482" height="270" fill="#fffaf0" stroke="#fed7aa" stroke-width="3"/>
+  <circle cx="600" cy="338" r="98" fill="none" stroke="#fed7aa" stroke-width="14"/>
+  <path d="M600 240a98 98 0 0 1 0 196 49 49 0 0 0 0-98 49 49 0 0 1 0-98Z" fill="#f97316"/>
+  <circle cx="600" cy="289" r="13" fill="#fffaf0"/>
+  <circle cx="600" cy="387" r="13" fill="#10b981"/>
+  <text x="446" y="331" fill="#1c1917" font-family="Arial, sans-serif" font-size="34" font-weight="900">12 cung tử vi</text>
+  <text x="446" y="376" fill="#7c2d12" font-family="Arial, sans-serif" font-size="24">Mệnh · Tài · Quan · Phu Thê</text>
+  <g fill="#9a3412" font-family="Arial, sans-serif" font-size="20" font-weight="800">
+    <text x="156" y="146">Phúc Đức</text><text x="397" y="146">Điền Trạch</text><text x="646" y="146">Quan Lộc</text><text x="892" y="146">Nô Bộc</text>
+    <text x="900" y="282">Thiên Di</text><text x="900" y="416">Tật Ách</text><text x="900" y="552">Tài Bạch</text>
+    <text x="654" y="552">Tử Tức</text><text x="408" y="552">Phu Thê</text><text x="154" y="552">Huynh Đệ</text><text x="170" y="416">Mệnh</text><text x="156" y="282">Phụ Mẫu</text>
+  </g>
+</svg>

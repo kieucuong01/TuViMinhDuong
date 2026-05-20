@@ -1,4 +1,40 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# AItuvi - Web tra cứu tử vi AI
+
+MVP full-stack bằng Next.js App Router, TypeScript, Prisma/PostgreSQL, PayOS/VietQR, AI SDK fallback, CMS SEO và engine lá số tử vi phổ thông.
+
+## Chạy local
+
+Runtime hệ thống trong máy này đang thấp hơn yêu cầu Next.js 16. Khi chạy qua Codex, dùng Node bundled:
+
+```powershell
+$env:PATH="C:\Users\ASUS\.cache\codex-runtimes\codex-primary-runtime\dependencies\node\bin;$env:PATH"
+npm run dev
+```
+
+Tạo `.env` từ `.env.example`. Nếu chưa có `DATABASE_URL`, app vẫn chạy bằng demo in-memory để xem UI, tạo lá số, auth demo và nạp xu demo. Khi có PostgreSQL:
+
+```powershell
+npm run db:generate
+npm run db:migrate
+```
+
+## Tính năng đã có
+
+- Home mobile-first, form lập lá số và các section SEO-friendly.
+- Lá số 12 cung desktop, mobile có accordion để đọc rõ.
+- Auth email/password chung đăng ký/đăng nhập, Google OAuth optional.
+- Xu, gói nạp, PayOS checkout/webhook và demo fallback.
+- AI luận giải lưu cache, fallback template khi chưa có Vercel AI Gateway.
+- CMS admin, bài viết, metadata SEO và chấm điểm SEO.
+- `robots.ts`, `sitemap.ts`, JSON-LD Article/Breadcrumb.
+
+## Kiểm tra
+
+```powershell
+npm run lint
+npm test
+npm run build
+```
 
 ## Getting Started
 
