@@ -1,9 +1,12 @@
 import { type TuViChart } from "@/lib/chart";
-import { generateWithLlmRouter } from "@/lib/llm-router";
+import { generateWithLlmRouter, hasExternalLlmProvider } from "@/lib/llm-router";
 import { FEATURE_PRICES, type ReadingKey } from "@/lib/pricing";
 
-export const FREE_OVERVIEW_MIN_WORDS = 500;
-export const FREE_OVERVIEW_VERSION = "free-overview-llm-v2";
+export const FREE_OVERVIEW_MIN_WORDS = 1200;
+export const FREE_OVERVIEW_MAX_WORDS = 2000;
+export const FREE_OVERVIEW_MAX_TOKENS = 7000;
+export const PAID_READING_CHAPTER_MAX_TOKENS = 6000;
+export const FREE_OVERVIEW_VERSION = "free-overview-llm-v3";
 
 export function countWords(content: string) {
   return content.trim().split(/\s+/).filter(Boolean).length;
@@ -182,6 +185,14 @@ function freeOverviewPrompt(chart: TuViChart) {
     thanPalace ? `Cung Thân: ${starsWithStates(chart, thanPalace.mainStars, thanPalace.name, "vô chính diệu")}` : "",
     `Tóm tắt engine: ${chart.summary.join(" ")}`,
   ].filter(Boolean);
+  const finalLengthRule = `
+
+QUY TẮC ĐỘ DÀI BẮT BUỘC GHI ĐÈ MỌI DÒNG KHÁC:
+- Viết từ ${FREE_OVERVIEW_MIN_WORDS} đến ${FREE_OVERVIEW_MAX_WORDS} từ tiếng Việt.
+- Không vượt quá ${FREE_OVERVIEW_MAX_WORDS} từ.
+- Mỗi mục chính tối thiểu 220 từ, có nội dung thực tế dựa trên lá số.
+- Không kết thúc khi chưa đủ ${FREE_OVERVIEW_MIN_WORDS} từ.
+- Nếu các dòng trước có nhắc mốc ngắn hơn, bỏ qua mốc đó và tuân theo quy tắc này.`;
 
   return `Bạn là chuyên gia tử vi Việt Nam. Viết phần luận giải tổng quan MIỄN PHÍ cho người đọc 30-60 tuổi, rõ ràng, nhẹ nhàng, không mê tín cực đoan.
 
@@ -198,7 +209,7 @@ Yêu cầu:
 - Không tự tính lại lá số, chỉ dùng dữ liệu trên.
 - Đây là 1 prompt duy nhất cho bản miễn phí; hãy tự tổng hợp đủ thông tin từ dữ liệu đã cấp, không yêu cầu gọi thêm API.
 - Không hứa chắc kết quả, không dọa nạt.
-- BẮT BUỘC viết từ 500 đến 800 chữ tiếng Việt, không được trả lời ngắn. Mỗi mục bên dưới phải có nội dung thật, không chỉ chào hỏi.
+- BẮT BUỘC viết từ ${FREE_OVERVIEW_MIN_WORDS} đến ${FREE_OVERVIEW_MAX_WORDS} từ tiếng Việt, không được trả lời ngắn và không vượt quá ${FREE_OVERVIEW_MAX_WORDS} từ. Mỗi mục bên dưới phải có nội dung thật, không chỉ chào hỏi.
 - Đây là bản miễn phí: chỉ nêu tổng quan và gợi ý đọc lá số, không luận chi tiết đủ 12 cung, không thay thế bản chuyên sâu.
 - Markdown đúng thứ tự:
   ## Tổng quan miễn phí
@@ -206,7 +217,7 @@ Yêu cầu:
   ## Điểm mạnh dễ phát huy
   ## Điều nên lưu ý
   ## Gợi ý cho năm ${chart.input.viewYear}
-Mỗi mục tối thiểu 90 chữ, dùng 1-2 đoạn ngắn hoặc 2-3 bullet. Không kết thúc khi chưa đủ 500 chữ.`;
+Mỗi mục tối thiểu 220 từ, dùng 2-3 đoạn ngắn hoặc 4-6 bullet. Không kết thúc khi chưa đủ ${FREE_OVERVIEW_MIN_WORDS} từ.${finalLengthRule}`;
 }
 
 function fallbackFreeOverview(chart: TuViChart) {
@@ -244,12 +255,12 @@ ${chart.summary.join(" ")}
 
 export async function generateFreeOverview(chart: TuViChart) {
   const prompt = freeOverviewPrompt(chart);
-  const routed = await generateWithLlmRouter({ prompt, maxTokens: 2600, temperature: 0.55 });
+  const routed = await generateWithLlmRouter({ prompt, maxTokens: FREE_OVERVIEW_MAX_TOKENS, temperature: 0.55 });
   if (routed) return { content: routed.text, model: routed.model, prompt };
   return { content: fallbackFreeOverview(chart), model: "template-fallback", prompt };
 }
 
-export async function generateReading(chart: TuViChart, type: ReadingKey, scopeKey: string) {
+async function generateReadingSinglePromptFallback(chart: TuViChart, type: ReadingKey, scopeKey: string) {
   const model = process.env.AI_MODEL || "openai/gpt-5.4";
   const focus = getFocusData(chart, type, scopeKey);
   const prompt = `Bạn là chuyên gia tử vi Việt Nam. Viết luận giải tiếng Việt rõ ràng, dễ hiểu cho người đọc 30-60 tuổi, có trách nhiệm, không mê tín cực đoan.
@@ -297,4 +308,187 @@ Yêu cầu bắt buộc:
   } catch {
     return { content: fallbackReading(chart, type, scopeKey), model: "template-fallback", prompt };
   }
+}
+
+type PaidReadingChapter = {
+  key: string;
+  title: string;
+  headings: string[];
+  instruction: string;
+  targetWords: string;
+};
+
+function paidReadingChapters(chart: TuViChart, type: ReadingKey): PaidReadingChapter[] {
+  const year = chart.input.viewYear;
+
+  if (type !== "FULL") {
+    return [
+      {
+        key: "context",
+        title: "Chương 1: Dữ kiện và trọng tâm",
+        headings: ["## Thông tin lá số đã dùng", "## Tổng quan"],
+        instruction: "Giải thích phạm vi đang mở khóa, dữ kiện đã dùng, các sao/trạng thái nổi bật và ý nghĩa tổng quan của phần luận này.",
+        targetWords: "700-1200 từ",
+      },
+      {
+        key: "analysis",
+        title: "Chương 2: Phân tích chính",
+        headings: ["## Điểm mạnh", "## Điều cần lưu ý", "## Công việc", "## Tài chính"],
+        instruction: "Đi sâu vào điểm thuận lợi, điểm cần quản trị, công việc và tiền bạc. Luôn bám vào cung/sao/vận hạn liên quan.",
+        targetWords: "900-1500 từ",
+      },
+      {
+        key: "advice",
+        title: "Chương 3: Ứng dụng thực tế",
+        headings: ["## Tình cảm", "## Sức khỏe", `## Vận hạn năm ${year}`],
+        instruction: "Viết lời khuyên dễ hiểu, có trách nhiệm, không hù dọa. Nêu việc nên làm, nên tránh và cách dùng thông tin này trong đời sống.",
+        targetWords: "800-1300 từ",
+      },
+    ];
+  }
+
+  return [
+    {
+      key: "overview",
+      title: "Chương 1: Tổng quan lá số",
+      headings: ["## Thông tin lá số đã dùng", "## Tổng quan"],
+      instruction: "Mở đầu báo cáo toàn bộ. Tóm tắt Mệnh, Thân, Cục, âm dương, cân lượng, đại vận hiện tại và các tín hiệu nổi bật nhất.",
+      targetWords: "900-1500 từ",
+    },
+    {
+      key: "menh-than",
+      title: "Chương 2: Mệnh, Thân và điểm phát huy",
+      headings: ["## Điểm mạnh", "## Điều cần lưu ý"],
+      instruction: "Phân tích Mệnh/Thân, chính tinh, phụ tinh, trạng thái Miếu/Vượng/Đắc/Bình/Hãm và các sao lưu đáng chú ý. Nói rõ điểm mạnh và rủi ro.",
+      targetWords: "1000-1600 từ",
+    },
+    {
+      key: "career-money",
+      title: "Chương 3: Công việc và tài chính",
+      headings: ["## Công việc", "## Tài chính"],
+      instruction: "Luận về khuynh hướng nghề nghiệp, cách làm việc, cơ hội thăng tiến, quản lý tiền, đầu tư, tích lũy và các cảnh báo thực tế.",
+      targetWords: "1000-1600 từ",
+    },
+    {
+      key: "relationship-health",
+      title: "Chương 4: Tình cảm và sức khỏe",
+      headings: ["## Tình cảm", "## Sức khỏe"],
+      instruction: "Luận về quan hệ gia đình, hôn nhân, giao tiếp, cảm xúc, nhịp nghỉ ngơi và sức khỏe tinh thần/thể chất. Không thay thế tư vấn y tế.",
+      targetWords: "900-1400 từ",
+    },
+    {
+      key: "yearly-advice",
+      title: `Chương 5: Vận hạn năm ${year} và lời khuyên`,
+      headings: [`## Vận hạn năm ${year}`],
+      instruction: "Tổng hợp vận hạn năm xem, đại vận hiện tại, sao lưu niên và lời khuyên hành động. Nêu ưu tiên 30-90 ngày và việc nên tránh.",
+      targetWords: "900-1500 từ",
+    },
+  ];
+}
+
+function paidReadingChapterPrompt(
+  chart: TuViChart,
+  type: ReadingKey,
+  scopeKey: string,
+  focus: ReturnType<typeof getFocusData>,
+  chapter: PaidReadingChapter,
+  index: number,
+  total: number,
+) {
+  return `Bạn là chuyên gia tử vi Việt Nam. Hãy viết ${chapter.title} (${index + 1}/${total}) cho báo cáo trả phí.
+
+Loại luận: ${FEATURE_PRICES[type].label}
+Phạm vi: ${scopeKey}
+Người xem: ${chart.input.fullName}
+Năm xem: ${chart.input.viewYear}
+Trọng tâm dữ liệu: ${focus.title}
+
+Dữ liệu nổi bật:
+- ${focus.evidence.join("\n- ")}
+
+Dữ liệu lá số JSON:
+${JSON.stringify(chart, null, 2)}
+
+Yêu cầu bắt buộc:
+- Chỉ viết chương này, không viết lại các chương khác.
+- Không tự tính lại lá số; chỉ dùng JSON và dữ liệu nổi bật.
+- Khi sao có trạng thái (H), sát tinh hoặc lưu sát tinh như L.Kình Dương/L.Đà La/L.Tang Môn/L.Bạch Hổ/L.Thiên Khốc/L.Thiên Hư, phải xem là tín hiệu rủi ro cần quản trị.
+- Văn phong rõ ràng cho người đọc 30-60 tuổi, câu ngắn, đoạn ngắn, không hù dọa, không hứa chắc kết quả.
+- Độ dài mục tiêu của riêng chương này: ${chapter.targetWords}. Có thể viết tối đa trong giới hạn token, nhưng không lan man.
+- Markdown đúng các heading sau, đúng thứ tự:
+${chapter.headings.join("\n")}
+
+Trọng tâm chương:
+${chapter.instruction}`;
+}
+
+async function generateViaGateway(prompt: string, model: string) {
+  if (!process.env.VERCEL_OIDC_TOKEN && !process.env.AI_GATEWAY_API_KEY) return null;
+
+  try {
+    const { generateText } = await import("ai");
+    const result = await generateText({
+      model,
+      prompt,
+      temperature: 0.55,
+      maxOutputTokens: PAID_READING_CHAPTER_MAX_TOKENS,
+    });
+    return { content: result.text, model };
+  } catch {
+    return null;
+  }
+}
+
+async function generatePaidChapter(prompt: string, gatewayModel: string) {
+  const routed = await generateWithLlmRouter({
+    prompt,
+    maxTokens: PAID_READING_CHAPTER_MAX_TOKENS,
+    temperature: 0.55,
+  });
+  if (routed) return { content: routed.text, model: routed.model };
+  return generateViaGateway(prompt, gatewayModel);
+}
+
+export async function generateReading(chart: TuViChart, type: ReadingKey, scopeKey: string) {
+  const gatewayModel = process.env.AI_MODEL || "openai/gpt-5.4";
+  const focus = getFocusData(chart, type, scopeKey);
+  const chapters = paidReadingChapters(chart, type);
+
+  if (!hasExternalLlmProvider() && !process.env.VERCEL_OIDC_TOKEN && !process.env.AI_GATEWAY_API_KEY) {
+    return generateReadingSinglePromptFallback(chart, type, scopeKey);
+  }
+
+  const outputs: Array<{ key: string; title: string; content: string; model: string; prompt: string }> = [];
+
+  for (const [index, chapter] of chapters.entries()) {
+    const prompt = paidReadingChapterPrompt(chart, type, scopeKey, focus, chapter, index, chapters.length);
+    const generated = await generatePaidChapter(prompt, gatewayModel);
+
+    if (!generated?.content) {
+      return generateReadingSinglePromptFallback(chart, type, scopeKey);
+    }
+
+    outputs.push({
+      key: chapter.key,
+      title: chapter.title,
+      content: generated.content,
+      model: generated.model,
+      prompt,
+    });
+  }
+
+  return {
+    content: outputs.map((chapter) => chapter.content.trim()).join("\n\n"),
+    model: Array.from(new Set(outputs.map((chapter) => chapter.model))).join(" + "),
+    prompt: JSON.stringify({
+      strategy: "paid-reading-chapters-v1",
+      maxTokensPerChapter: PAID_READING_CHAPTER_MAX_TOKENS,
+      chapters: outputs.map((chapter) => ({
+        key: chapter.key,
+        title: chapter.title,
+        model: chapter.model,
+        prompt: chapter.prompt,
+      })),
+    }),
+  };
 }

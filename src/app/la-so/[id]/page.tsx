@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { ChartBoard, MobileChartReader } from "@/components/chart-board";
-import { getAnyCompletedReading, getCachedReading, getChart, getOrCreateFreeOverview, getReadingById } from "@/lib/data";
+import { getAnyCompletedReading, getCachedReading, getChart, getReadingById } from "@/lib/data";
 import { getCurrentUser } from "@/lib/auth";
 import { FeedbackActions } from "@/components/feedback-actions";
 import { PromptChips } from "@/components/prompt-chips";
@@ -14,6 +14,7 @@ import { DailyFateView, MajorFateView, MinorFateView, MonthlyFateView, PalaceFat
 import { PremiumReadingCta } from "@/components/premium-reading-cta";
 import { ChartActionPanel } from "@/components/chart-action-panel";
 import { PaywallPopup } from "@/components/paywall-popup";
+import { FreeOverviewLoader } from "@/components/free-overview-loader";
 
 export const metadata: Metadata = {
   title: "Lá số tử vi",
@@ -50,7 +51,6 @@ export default async function ChartPage({
     : null;
   const activeReading = selectedReading || fullReading;
   const hasAdvancedReading = Boolean(fullReading);
-  const freeOverview = activeReading ? null : await getOrCreateFreeOverview(id, record.chart);
   const activeLabel = activeReading ? readingLabels[activeReading.type] : "Luận giải tổng quan";
 
   return (
@@ -93,7 +93,7 @@ export default async function ChartPage({
               </>
             ) : (
               <>
-                <article className="prose-content free-reading-summary whitespace-pre-wrap">{freeOverview}</article>
+                <FreeOverviewLoader chartId={id} />
               </>
             )}
           </section>

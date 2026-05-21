@@ -2,8 +2,16 @@
 
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { LockKeyhole, X } from "lucide-react";
+import { Coins, LockKeyhole, X } from "lucide-react";
 import { useMemo, useState } from "react";
+
+type PaywallNotice = {
+  icon: "lock" | "coins";
+  title: string;
+  body: string;
+  href: string;
+  cta: string;
+};
 
 export function PaywallPopup() {
   const router = useRouter();
@@ -23,25 +31,41 @@ export function PaywallPopup() {
     router.replace(cleanReturnTo, { scroll: false });
   }
 
-  const notice = useMemo(() => {
+  const notice = useMemo<PaywallNotice | null>(() => {
     const reason = searchParams.get("paywall");
     if (reason === "login") {
       return {
+        icon: "lock",
         title: "Đăng nhập để mở luận giải",
         body: "Phần luận giải chuyên sâu cần tài khoản để lưu lịch sử lá số, trừ xu một lần và xem lại bất cứ lúc nào.",
         href: "/dang-nhap",
         cta: "Đăng nhập",
       };
     }
+
+    if (reason === "coins") {
+      const need = Number(searchParams.get("need") || 0);
+      return {
+        icon: "coins",
+        title: "Chưa đủ xu để mở luận giải",
+        body:
+          need > 0
+            ? `Bạn cần nạp thêm ${need} xu để mở phần luận giải này.`
+            : "Số dư xu hiện tại chưa đủ để mở phần luận giải này.",
+        href: `/nap-xu?returnTo=${encodeURIComponent(cleanReturnTo)}`,
+        cta: "Nạp xu ngay",
+      };
+    }
+
     return null;
-  }, [searchParams]);
+  }, [cleanReturnTo, searchParams]);
 
   if (!notice || dismissed) return null;
 
   return (
     <aside className="paywall-popup" role="status" aria-live="polite" data-testid="paywall-popup">
       <span className="paywall-popup-icon" aria-hidden="true">
-        <LockKeyhole size={20} />
+        {notice.icon === "coins" ? <Coins size={20} /> : <LockKeyhole size={20} />}
       </span>
       <div>
         <strong>{notice.title}</strong>
