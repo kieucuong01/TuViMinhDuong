@@ -2,14 +2,15 @@
 
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { clearSession, getCurrentUser, loginOrRegister, setSession, type SessionUser } from "@/lib/auth";
-import { getCachedReading, getChart, getFeaturePrice, getUserBalance, saveArticleFromForm, saveChart, saveReading, adjustCoins } from "@/lib/data";
+import { clearSession, createMagicSession, getCurrentUser, getOrCreateEmailUser, loginOrRegister, setSession, type SessionUser } from "@/lib/auth";
+import { getCachedReading, getChart, getFeaturePrice, getUserBalance, saveArticleFromForm, saveChart, saveReading, adjustCoins, deleteUserChart } from "@/lib/data";
 import { generateReading } from "@/lib/ai";
 import { getDb } from "@/lib/db";
-import { createPayOSCheckout } from "@/lib/payos";
+import { createPayOSCheckout, createPayOSCustomCheckout } from "@/lib/payos";
 import type { CalendarType, Gender } from "@/lib/chart";
 import { COIN_PACKAGES, TEMPORARY_FULL_ACCESS } from "@/lib/pricing";
 import type { ReadingKey } from "@/lib/pricing";
+import { isPayOSEnabled } from "@/lib/env";
 
 export async function loginAction(formData: FormData) {
   const email = String(formData.get("email") || "");
@@ -39,23 +40,99 @@ function withQueryParams(path: string, params: Record<string, string | number>) 
   return `${withoutHash}${withoutHash.includes("?") ? "&" : "?"}${query}${hash ? `#${hash}` : ""}`;
 }
 
+function chartInputFromForm(formData: FormData) {
+  return {
+    fullName: String(formData.get("fullName") || ""),
+    gender: String(formData.get("gender") || "male") as Gender,
+    calendarType: String(formData.get("calendarType") || "solar") as CalendarType,
+    day: Number(formData.get("day") || 1),
+    month: Number(formData.get("month") || 1),
+    year: Number(formData.get("year") || 1990),
+    birthHour: Number(formData.get("birthHour") || 0),
+    birthMinute: Number(formData.get("birthMinute") || 0),
+    viewYear: Number(formData.get("viewYear") || new Date().getFullYear()),
+    timezone: "Asia/Bangkok",
+  };
+}
+
 export async function createChartAction(formData: FormData) {
   const user = await getCurrentUser();
-  const chart = await saveChart(
-    {
-      fullName: String(formData.get("fullName") || ""),
-      gender: String(formData.get("gender") || "male") as Gender,
-      calendarType: String(formData.get("calendarType") || "solar") as CalendarType,
-      day: Number(formData.get("day") || 1),
-      month: Number(formData.get("month") || 1),
-      year: Number(formData.get("year") || 1990),
-      birthHour: Number(formData.get("birthHour") || 0),
-      viewYear: Number(formData.get("viewYear") || new Date().getFullYear()),
-      timezone: "Asia/Bangkok",
-    },
-    user,
-  );
+  const chart = await saveChart(chartInputFromForm(formData), user);
   redirect(`/la-so/${chart.id}`);
+}
+
+export async function quickReadingCheckoutAction(formData: FormData) {
+  const input = chartInputFromForm(formData);
+  const email = String(formData.get("email") || "");
+  const user = await getOrCreateEmailUser(email, input.fullName);
+  await setSession(user);
+
+  const chart = await saveChart(input, user);
+  const price = await getFeaturePrice("FULL");
+  const amountVnd = price.priceCoins * 1000;
+  const token = await createMagicSession(user);
+  const successNext = `/la-so/${chart.id}/nang-cao`;
+  const magicPath = `/api/auth/magic?token=${encodeURIComponent(token)}&next=${encodeURIComponent(successNext)}`;
+  const cancelPath = `/la-so/${chart.id}?status=cancelled`;
+  const checkout = await createPayOSCustomCheckout({
+    amountVnd,
+    description: "Luan giai la so",
+    itemName: price.label,
+    buyerName: user.name,
+    buyerEmail: user.email,
+    returnPath: magicPath,
+    cancelPath,
+  });
+
+  const db = getDb();
+  const isDemoCheckout = checkout.raw && typeof checkout.raw === "object" && "mode" in checkout.raw;
+  if (db) {
+    await db.paymentOrder.create({
+      data: {
+        userId: user.id,
+        orderCode: BigInt(checkout.orderCode),
+        paymentLinkId: checkout.paymentLinkId,
+        amountVnd,
+        coins: 0,
+        status: isDemoCheckout ? "PAID" : "PENDING",
+        paidAt: isDemoCheckout ? new Date() : undefined,
+        checkoutUrl: checkout.checkoutUrl,
+        rawPayload: {
+          raw: checkout.raw,
+          quickReading: {
+            chartId: chart.id,
+            type: "FULL",
+            scopeKey: "all",
+            email: user.email,
+            token,
+          },
+        },
+      },
+    });
+  }
+
+  if (!isPayOSEnabled()) {
+    const result = await generateReading(chart.chart, "FULL", "all");
+    await saveReading(user, chart.id, "FULL", "all", price.priceCoins, result.content, {
+      type: "FULL",
+      scopeKey: "all",
+      model: result.model,
+      source: "quick-email-demo",
+    });
+    revalidatePath(`/la-so/${chart.id}`);
+    redirect(`/la-so/${chart.id}/nang-cao?status=demo-paid`);
+  }
+
+  redirect(checkout.checkoutUrl);
+}
+
+export async function deleteChartAction(formData: FormData) {
+  const user = await getCurrentUser();
+  if (!user) redirect("/dang-nhap?next=/la-so");
+  const chartId = String(formData.get("chartId") || "");
+  if (chartId) await deleteUserChart(user, chartId);
+  revalidatePath("/la-so");
+  redirect("/la-so");
 }
 
 async function getReadingUser(chartId: string): Promise<SessionUser> {
@@ -68,10 +145,10 @@ async function getReadingUser(chartId: string): Promise<SessionUser> {
   const db = getDb();
   if (db) {
     const created = await db.user.upsert({
-      where: { email: `guest-${chartId}@tuviminhduong.local` },
+      where: { email: `guest-${chartId}@lasotinhhoa.local` },
       update: {},
       create: {
-        email: `guest-${chartId}@tuviminhduong.local`,
+        email: `guest-${chartId}@lasotinhhoa.local`,
         name: "Khách xem lá số",
         coinBalance: 0,
       },
@@ -89,7 +166,7 @@ async function getReadingUser(chartId: string): Promise<SessionUser> {
 
   const guest: SessionUser = {
     id: `guest-${chartId}`,
-    email: "guest@tuviminhduong.local",
+    email: "guest@lasotinhhoa.local",
     name: "Khách xem lá số",
     role: "USER",
     coinBalance: 0,

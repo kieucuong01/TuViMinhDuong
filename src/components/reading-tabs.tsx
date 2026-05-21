@@ -1,6 +1,6 @@
 import { Sparkles } from "lucide-react";
 import { requestReadingAction } from "@/app/actions";
-import { FEATURE_PRICES, TEMPORARY_FULL_ACCESS, type ReadingKey } from "@/lib/pricing";
+import { FEATURE_PRICES, type ReadingKey } from "@/lib/pricing";
 import type { TuViChart } from "@/lib/chart";
 import { formatCoins } from "@/lib/format";
 
@@ -36,13 +36,11 @@ export function ReadingTabs({ chartId, chart }: { chartId: string; chart: TuViCh
     <section className="mt-8">
       <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="eyebrow">{TEMPORARY_FULL_ACCESS ? "Đang mở miễn phí" : "Mở khóa theo nhu cầu"}</p>
+          <p className="eyebrow">Mở khóa theo nhu cầu</p>
           <h2 className="text-2xl font-black text-stone-950">Các lớp luận giải chuyên sâu</h2>
         </div>
         <p className="max-w-lg text-sm leading-6 text-stone-600">
-          {TEMPORARY_FULL_ACCESS
-            ? "Tạm thời tất cả phần luận giải đều dùng được ngay, chưa cần đăng nhập hay nạp xu."
-            : "Mỗi mục chỉ trừ xu một lần và được lưu lại trong tài khoản của bạn."}
+          Mỗi mục chỉ trừ xu một lần và được lưu lại trong tài khoản của bạn.
         </p>
       </div>
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
@@ -59,10 +57,10 @@ export function ReadingTabs({ chartId, chart }: { chartId: string; chart: TuViCh
             <p>{card.body}</p>
             <div className="mt-5 flex items-center justify-between gap-3">
               <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-3 py-1 text-sm font-bold text-emerald-700">
-                {TEMPORARY_FULL_ACCESS ? "Miễn phí" : "Cần xu"}
+                Cần xu
               </span>
               <button className="btn btn-primary btn-small" type="submit">
-                {TEMPORARY_FULL_ACCESS ? "Xem ngay" : formatCoins(FEATURE_PRICES[card.type].priceCoins)}
+                {formatCoins(FEATURE_PRICES[card.type].priceCoins)}
               </button>
             </div>
             <p className="mt-3 text-xs text-stone-400">Áp dụng cho lá số {chart.input.fullName}</p>

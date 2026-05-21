@@ -32,17 +32,18 @@ export async function GET(request: Request) {
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              background: "linear-gradient(135deg, #fed7aa, #f59e0b)",
+              background: "linear-gradient(135deg, #fed7aa, #fff7ed 42%, #d1fae5)",
+              border: "3px solid #fdba74",
               color: "#7c2d12",
-              fontSize: 42,
+              fontSize: 30,
               fontWeight: 900,
             }}
           >
-            ☯
+            TH
           </div>
           <div style={{ display: "flex", flexDirection: "column" }}>
             <div style={{ fontSize: 34, fontWeight: 900 }}>{APP_NAME}</div>
-            <div style={{ fontSize: 22, color: "#9a3412", fontWeight: 700 }}>Tử vi AI cho người Việt</div>
+            <div style={{ fontSize: 22, color: "#9a3412", fontWeight: 700 }}>Tinh tuyển lá số cho người Việt</div>
           </div>
         </div>
 

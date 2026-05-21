@@ -1,12 +1,13 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-label="Tử Vi Minh Đường">
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-label="Lá số tinh hoa">
   <rect width="1200" height="630" fill="#fff7ed"/>
   <circle cx="258" cy="314" r="184" fill="#fed7aa"/>
-  <circle cx="258" cy="314" r="138" fill="#fffaf0" stroke="#fed7aa" stroke-width="18"/>
-  <path d="M258 176a138 138 0 0 1 0 276 69 69 0 0 0 0-138 69 69 0 0 1 0-138Z" fill="#f97316"/>
-  <path d="M258 190a124 124 0 0 1 0 248 62 62 0 0 0 0-124 62 62 0 0 1 0-124Z" fill="#fffaf0"/>
-  <circle cx="258" cy="245" r="21" fill="#f97316"/>
-  <circle cx="258" cy="383" r="21" fill="#10b981"/>
-  <text x="500" y="245" fill="#1c1917" font-family="Arial, sans-serif" font-size="70" font-weight="800">Tử Vi Minh Đường</text>
+  <circle cx="258" cy="314" r="138" fill="#fffaf0" stroke="#fdba74" stroke-width="18"/>
+  <path d="M258 176a138 138 0 1 1 0 276 138 138 0 0 1 0-276Zm0 34a104 104 0 1 0 0 208 104 104 0 0 0 0-208Z" fill="#f97316"/>
+  <path d="M180 325c43-78 112-99 164-47-60-18-105 8-130 78l-28 76c-19-31-22-67-6-107Z" fill="#fb923c"/>
+  <path d="M337 303c-43 78-112 99-164 47 60 18 105-8 130-78l28-76c19 31 22 67 6 107Z" fill="#10b981"/>
+  <circle cx="258" cy="314" r="24" fill="#fffaf0" stroke="#fdba74" stroke-width="8"/>
+  <text x="258" y="333" text-anchor="middle" fill="#7c2d12" font-family="Arial, sans-serif" font-size="72" font-weight="900">TH</text>
+  <text x="500" y="245" fill="#1c1917" font-family="Arial, sans-serif" font-size="70" font-weight="800">Lá số tinh hoa</text>
   <text x="500" y="325" fill="#9a3412" font-family="Arial, sans-serif" font-size="34" font-weight="700">Lập lá số tử vi AI chuẩn phổ thông</text>
-  <text x="500" y="386" fill="#57534e" font-family="Arial, sans-serif" font-size="28">tuviminhduong.com · Xem ngày · Luận giải có cấu trúc</text>
+  <text x="500" y="386" fill="#57534e" font-family="Arial, sans-serif" font-size="28">lasotinhhoa.vn · Xem ngày · Luận giải có cấu trúc</text>
 </svg>

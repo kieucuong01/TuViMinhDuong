@@ -1,7 +1,7 @@
 import { Coins, CreditCard, ShieldCheck } from "lucide-react";
 import { createCheckoutAction } from "@/app/actions";
 import { getCurrentUser } from "@/lib/auth";
-import { COIN_PACKAGES, TEMPORARY_FULL_ACCESS } from "@/lib/pricing";
+import { COIN_PACKAGES } from "@/lib/pricing";
 import { formatCoins, formatVnd } from "@/lib/format";
 import { isPayOSEnabled } from "@/lib/env";
 
@@ -20,15 +20,12 @@ export default async function CoinsPage({ searchParams }: { searchParams: Promis
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="section-heading">
           <p className="eyebrow">Nạp xu</p>
-          <h1>{TEMPORARY_FULL_ACCESS ? "Nạp xu đang tạm tắt" : "Mở khóa luận giải chuyên sâu"}</h1>
+          <h1>Mở khóa luận giải chuyên sâu</h1>
           <p>
-            {TEMPORARY_FULL_ACCESS
-              ? "Giai đoạn thử nghiệm đang mở full chức năng miễn phí, nên thanh toán và trừ xu đang được chặn tạm thời."
-              : "1 xu = 1.000đ. Thanh toán thật qua PayOS/VietQR khi cấu hình env; local dev có fallback demo."}
+            1 xu = 1.000đ. Thanh toán qua PayOS/VietQR khi cấu hình env; local dev có fallback demo.
           </p>
         </div>
         {params.need ? <p className="alert mx-auto mb-6 max-w-2xl">Bạn cần nạp thêm {params.need} xu để mở khóa luận giải vừa chọn.</p> : null}
-        {params.status === "disabled" ? <p className="success mx-auto mb-6 max-w-2xl">Nạp xu đang tạm dừng vì hệ thống đang mở miễn phí toàn bộ luận giải.</p> : null}
         {params.status === "demo-paid" ? <p className="success mx-auto mb-6 max-w-2xl">Demo đã cộng xu vào phiên hiện tại.</p> : null}
         <div className="grid gap-4 md:grid-cols-3">
           {COIN_PACKAGES.map((pack) => (
@@ -40,10 +37,10 @@ export default async function CoinsPage({ searchParams }: { searchParams: Promis
               <p className="text-stone-600">
                 {formatCoins(pack.coins + pack.bonusCoins)} {pack.bonusCoins ? `(gồm ${pack.bonusCoins} xu bonus)` : ""}
               </p>
-              <button className={TEMPORARY_FULL_ACCESS ? "btn btn-disabled w-full" : "btn btn-primary w-full"} type="submit" disabled={TEMPORARY_FULL_ACCESS || !user}>
-                {TEMPORARY_FULL_ACCESS ? "Tạm dừng nạp xu" : "Nạp bằng PayOS"}
+              <button className="btn btn-primary w-full" type="submit" disabled={!user}>
+                Nạp bằng PayOS
               </button>
-              {!user && !TEMPORARY_FULL_ACCESS ? <p className="text-xs text-stone-500">Đăng nhập để nạp xu.</p> : null}
+              {!user ? <p className="text-xs text-stone-500">Đăng nhập để nạp xu.</p> : null}
             </form>
           ))}
         </div>

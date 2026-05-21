@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { CalendarDays, Clock3, Mars, Plus, Search, Sparkles, Star, Trash2, Upload, Venus } from "lucide-react";
+import { CalendarDays, Clock3, Mars, Plus, Sparkles, Star, Venus } from "lucide-react";
 import { getCurrentUser } from "@/lib/auth";
 import { listUserCharts, type ChartHistoryItem } from "@/lib/data";
+import { ChartHistoryList, type ChartHistoryViewItem } from "@/components/chart-history-list";
 
 export const metadata = {
   title: "Lịch sử lá số",
@@ -77,41 +78,18 @@ function PrimaryChartCard({ chart }: { chart: ChartHistoryItem }) {
   );
 }
 
-function ChartListItem({ chart }: { chart: ChartHistoryItem }) {
-  return (
-    <article className="chart-history-item">
-      <div className="min-w-0 flex-1">
-        <h2 className="truncate text-xl font-black text-stone-950">{chart.chart.input.fullName}</h2>
-        <div className="mt-3 grid gap-2 text-sm font-semibold text-stone-700 sm:grid-cols-2">
-          <span className="inline-flex items-center gap-2"><CalendarDays size={19} /> {solarDate(chart)} <span className="text-stone-400">(Âm lịch: {lunarDate(chart)})</span></span>
-          <span className="inline-flex items-center gap-2"><Clock3 size={19} /> {hourLabel(chart.chart.input.birthHour)}</span>
-          <span className="inline-flex items-center gap-2"><GenderIcon gender={chart.chart.input.gender} /> {genderLabel(chart.chart.input.gender)}</span>
-          <span className="inline-flex items-center gap-2"><Sparkles size={19} /> {chart.chart.canChi.year}</span>
-        </div>
-        <div className="mt-5 flex flex-wrap gap-3">
-          <Link href={`/la-so/${chart.id}`} className={chart.hasAdvancedReading ? "btn btn-ghost btn-small" : "btn btn-primary btn-small"}>
-            Luận giải miễn phí
-          </Link>
-          {chart.hasAdvancedReading ? (
-            <Link href={`/la-so/${chart.id}/nang-cao`} className="btn btn-primary btn-small">
-              Luận giải nâng cao
-            </Link>
-          ) : null}
-        </div>
-      </div>
-      <div className="flex items-start gap-2 text-stone-400">
-        <button className="icon-button" type="button" aria-label="Lưu lá số" title="Lưu lá số">
-          <Star size={17} />
-        </button>
-        <button className="icon-button" type="button" aria-label="Chia sẻ lá số" title="Chia sẻ lá số">
-          <Upload size={17} />
-        </button>
-        <button className="icon-button" type="button" aria-label="Xóa lá số" title="Xóa lá số">
-          <Trash2 size={17} />
-        </button>
-      </div>
-    </article>
-  );
+function toHistoryViewItem(chart: ChartHistoryItem): ChartHistoryViewItem {
+  return {
+    id: chart.id,
+    fullName: chart.chart.input.fullName,
+    solarDate: solarDate(chart),
+    lunarDate: lunarDate(chart),
+    hourLabel: hourLabel(chart.chart.input.birthHour),
+    gender: chart.chart.input.gender,
+    genderLabel: genderLabel(chart.chart.input.gender),
+    yearCanChi: chart.chart.canChi.year,
+    hasAdvancedReading: chart.hasAdvancedReading,
+  };
 }
 
 export default async function ChartHistoryPage() {
@@ -133,20 +111,8 @@ export default async function ChartHistoryPage() {
             </Link>
           </div>
 
-          <label className="mt-6 block">
-            <span className="sr-only">Tìm kiếm lá số</span>
-            <span className="chart-history-search relative block">
-              <Search className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-stone-400" size={22} />
-              <input className="pl-12" placeholder="Tìm kiếm lá số" />
-            </span>
-          </label>
-
           {charts.length ? (
-            <div className="mt-8 grid gap-4">
-              {charts.map((chart) => (
-                <ChartListItem key={chart.id} chart={chart} />
-              ))}
-            </div>
+            <ChartHistoryList charts={charts.map(toHistoryViewItem)} />
           ) : (
             <div className="panel mt-8 text-center">
               <h2 className="text-2xl font-black text-stone-950">Bạn chưa có lá số nào</h2>

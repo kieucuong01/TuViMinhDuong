@@ -1,10 +1,10 @@
 const DEFAULT_APP_URL =
-  process.env.NODE_ENV === "production" ? "https://tuviminhduong.com" : "http://localhost:4000";
+  process.env.NODE_ENV === "production" ? "https://lasotinhhoa.vn" : "http://localhost:4000";
 
 export const APP_URL =
   process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") || DEFAULT_APP_URL;
 
-export const APP_NAME = "Tử Vi Minh Đường";
+export const APP_NAME = "Lá số tinh hoa";
 
 export const ADMIN_EMAIL =
   process.env.ADMIN_EMAIL?.toLowerCase() || "kieucuong01@gmail.com";

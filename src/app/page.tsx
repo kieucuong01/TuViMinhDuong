@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ChartForm } from "@/components/chart-form";
 import { DayFortuneCard } from "@/components/day-fortune-card";
+import { QuickReadingForm } from "@/components/quick-reading-form";
 import { listArticles } from "@/lib/data";
 import { APP_NAME } from "@/lib/env";
 
@@ -43,6 +44,9 @@ export default async function Home() {
             <div className="mt-7 flex flex-wrap gap-3">
               <a href="#lap-la-so" className="btn btn-primary">
                 Khởi tạo lá số <ArrowRight size={18} />
+              </a>
+              <a href="#mua-nhanh" className="btn btn-ghost">
+                Mua nhanh qua email
               </a>
               <Link href="/kien-thuc-tu-vi" className="btn btn-ghost">
                 Đọc kiến thức
@@ -156,6 +160,12 @@ export default async function Home() {
               <span>Luận giải chuyên sâu dùng xu minh bạch: mua một lần, lưu lại trong tài khoản và xem lại miễn phí.</span>
             </div>
           </div>
+        </div>
+      </section>
+
+      <section className="section">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <QuickReadingForm />
         </div>
       </section>
 

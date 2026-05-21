@@ -4,7 +4,7 @@ import { ChartBoard, MobileChartReader } from "@/components/chart-board";
 import { requestReadingAction } from "@/app/actions";
 import { getAnyCompletedReading, getCachedReading, getChart, getReadingById } from "@/lib/data";
 import { getCurrentUser } from "@/lib/auth";
-import { FEATURE_PRICES, TEMPORARY_FULL_ACCESS } from "@/lib/pricing";
+import { FEATURE_PRICES } from "@/lib/pricing";
 import { formatCoins } from "@/lib/format";
 import { FeedbackActions } from "@/components/feedback-actions";
 import { PromptChips } from "@/components/prompt-chips";
@@ -70,16 +70,10 @@ export default async function ChartPage({
             <input type="hidden" name="scopeKey" value="all" />
             <input type="hidden" name="next" value={`/la-so/${id}`} />
             <button className="chart-reading-button" type="submit">
-              {TEMPORARY_FULL_ACCESS ? "Luận giải toàn bộ miễn phí" : `Luận giải toàn bộ - ${formatCoins(FEATURE_PRICES.FULL.priceCoins)}`}
+              {`Luận giải toàn bộ - ${formatCoins(FEATURE_PRICES.FULL.priceCoins)}`}
             </button>
           </form>
         </div>
-
-        {TEMPORARY_FULL_ACCESS ? (
-          <div className="mb-5 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-800">
-            Đang mở full chức năng trong giai đoạn thử nghiệm: xem luận giải không cần đăng nhập, nạp xu hay mở khóa.
-          </div>
-        ) : null}
 
         <ChartQuickInsights chart={record.chart} chartId={id} />
 
@@ -108,9 +102,7 @@ export default async function ChartPage({
                 ))}
                 <div className="rounded-2xl border border-orange-100 bg-orange-50/70 p-4">
                   <p className="font-semibold text-stone-800">
-                    {TEMPORARY_FULL_ACCESS
-                      ? "Bấm xem toàn bộ để hệ thống sinh bản luận giải AI đầy đủ cho lá số này."
-                      : "Đọc miễn phí phần tóm tắt. Mở khóa bản toàn bộ để xem phân tích 12 cung, vận hạn và gợi ý hành động."}
+                    Đọc miễn phí phần tóm tắt. Mở khóa bản toàn bộ để xem phân tích 12 cung, vận hạn và gợi ý hành động.
                   </p>
                   <form action={requestReadingAction} className="mt-4">
                     <input type="hidden" name="chartId" value={id} />
@@ -118,7 +110,7 @@ export default async function ChartPage({
                     <input type="hidden" name="scopeKey" value="all" />
                     <input type="hidden" name="next" value={`/la-so/${id}`} />
                     <button className="btn btn-primary" type="submit">
-                      {TEMPORARY_FULL_ACCESS ? "Xem toàn bộ miễn phí" : `Mở khóa toàn bộ - ${formatCoins(FEATURE_PRICES.FULL.priceCoins)}`}
+                      {`Mở khóa toàn bộ - ${formatCoins(FEATURE_PRICES.FULL.priceCoins)}`}
                     </button>
                   </form>
                 </div>

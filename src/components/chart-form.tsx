@@ -54,6 +54,10 @@ export function ChartForm({ compact = false }: { compact?: boolean }) {
           </select>
         </label>
         <label>
+          <span>Phút sinh</span>
+          <input name="birthMinute" type="number" min="0" max="59" defaultValue="0" required />
+        </label>
+        <label>
           <span>Năm xem</span>
           <input name="viewYear" type="number" min="1900" max="2100" defaultValue={now.getFullYear()} required />
         </label>

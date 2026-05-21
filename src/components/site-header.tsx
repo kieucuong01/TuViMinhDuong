@@ -24,7 +24,7 @@ export function SiteHeader() {
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <Link href="/" className="group flex min-w-0 items-center gap-2 font-semibold text-stone-950" prefetch={false}>
           <span className="grid h-10 w-10 place-items-center overflow-hidden rounded-2xl bg-orange-50 shadow-inner shadow-white ring-1 ring-orange-200/70 transition-transform group-hover:-rotate-6 group-hover:scale-105">
-            <Image src="/brand/tuvi-minhduong-mark.svg" alt="" width={40} height={40} priority />
+            <Image src="/brand/laso-tinhhoa-mark.svg" alt="" width={40} height={40} priority />
           </span>
           <span className="min-w-0 leading-tight">
             <span className="inline-block max-w-[10.5rem] truncate align-middle sm:max-w-none">{APP_NAME}</span>{" "}

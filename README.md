@@ -1,6 +1,20 @@
-# Tử Vi Minh Đường
+# Lá số tinh hoa
 
 Web tra cứu tử vi AI dùng Next.js App Router, TypeScript, Tailwind CSS, Prisma/PostgreSQL, PayOS/VietQR, CMS SEO và engine lá số tử vi phổ thông Việt Nam.
+
+## Tech stack hiện tại
+
+- Frontend/web framework: `Next.js 16` (App Router), `React 19`, `TypeScript`
+- UI: `Tailwind CSS v4`, `lucide-react`
+- Server side: Next.js `Server Actions` + `Route Handlers`
+- ORM: `Prisma` (`@prisma/client`, `prisma`)
+- Database: `PostgreSQL` (Prisma datasource provider: `postgresql`)
+- Authentication: email/password nội bộ, hỗ trợ Google OAuth theo env
+- Thanh toán: `PayOS` / `VietQR` (checkout + webhook)
+- AI luận giải: SDK `ai` + fallback template
+- SEO: Next Metadata API, `robots`, `sitemap`, OG image route
+- Quality: `Vitest`, `ESLint`, `TypeScript`
+- Deploy target: `Vercel`
 
 ## Tính năng chính
 
@@ -40,6 +54,27 @@ npm run db:generate
 npm run db:migrate
 ```
 
+Production dùng migration đã commit:
+
+```powershell
+npm run db:deploy
+npm run db:seed
+```
+
+Hoặc chạy gộp:
+
+```powershell
+npm run db:setup
+```
+
+`db:seed` sẽ tạo/cập nhật:
+
+- admin từ `ADMIN_EMAIL` và `ADMIN_PASSWORD`
+- gói xu mặc định
+- giá tính năng mặc định
+- một số bài viết SEO nền tảng
+```
+
 ## Kiểm tra
 
 ```powershell
@@ -64,6 +99,21 @@ Target deploy là Vercel + Postgres. Các env quan trọng:
 - `GOOGLE_CLIENT_SECRET`
 - `AI_GATEWAY_API_KEY` hoặc provider AI tương ứng
 
+### Checklist production tối thiểu
+
+1. Tạo Postgres thật, ưu tiên Neon qua Vercel Marketplace.
+2. Set `DATABASE_URL` trên Vercel cho Production.
+3. Set `AUTH_SECRET`, `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `NEXT_PUBLIC_APP_URL`.
+4. Pull env production về local nếu cần chạy migration từ máy:
+
+```powershell
+npx vercel env pull .env.local --environment=production --yes
+npm run db:setup
+```
+
+5. Deploy lại production sau khi DB đã migrate.
+6. Test luồng login admin, tạo lá số, lưu lịch sử, đọc lại sau restart/deploy mới.
+
 ## Ghi chú sản phẩm
 
-Giai đoạn hiện tại đang để mở khóa/full chức năng theo yêu cầu thử nghiệm. Khi chuyển sang production cần bật lại chặn xu, kiểm thử webhook PayOS bằng môi trường thật, bổ sung chính sách thanh toán/hoàn tiền và rà soát nội dung pháp lý.
+Giai đoạn hiện tại đã bật lại chặn xu cho user thường; admin vẫn có toàn quyền xem. Trước khi chạy thu tiền thật cần kiểm thử webhook PayOS bằng môi trường thật, bổ sung chính sách thanh toán/hoàn tiền và rà soát nội dung pháp lý.

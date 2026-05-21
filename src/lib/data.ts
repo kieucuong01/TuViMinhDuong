@@ -1,6 +1,6 @@
 import "server-only";
 
-import { generateTuViChart, type ChartInput, type TuViChart } from "@/lib/chart";
+import { CHART_ENGINE_VERSION, generateTuViChart, type ChartInput, type TuViChart } from "@/lib/chart";
 import { articleWithScore, seedArticles, type ArticleView } from "@/lib/content";
 import { getDb } from "@/lib/db";
 import { FEATURE_PRICES, COIN_PACKAGES, type ReadingKey } from "@/lib/pricing";
@@ -64,9 +64,40 @@ function usesInMemoryUser(userId: string) {
   return userId.startsWith("demo-") || userId.startsWith("guest-");
 }
 
+function chartTitle(chart: TuViChart) {
+  return `${chart.input.fullName} - ${chart.canChi.year}`;
+}
+
+function shouldRegenerateChartPayload(chart: TuViChart | null | undefined) {
+  if (!chart) return true;
+  if (chart.engine?.version !== CHART_ENGINE_VERSION) return true;
+  if (chart.engine?.starProfile !== "tracuutuvi-compatible") return true;
+  if (!chart.laiNhan || chart.laiNhan === "Đang cập nhật") return true;
+  if (!chart.boneWeight?.label || chart.boneWeight.label === "Đang cập nhật") return true;
+  if (!Array.isArray(chart.palaces) || chart.palaces.length !== 12) return true;
+
+  const yearlyStars = chart.palaces.flatMap((palace) => palace.yearlyStars || []);
+  if (yearlyStars.some((star) => star.startsWith("L.Hóa"))) return true;
+  if (yearlyStars.some((star) => /\s\([MVĐBH]\)$/.test(star))) return true;
+
+  return false;
+}
+
+function upgradeStoredChart(record: StoredChart) {
+  if (!shouldRegenerateChartPayload(record.chart)) return record;
+  const sourceInput = { ...(record.chart?.input || {}), ...record.input } as ChartInput;
+  const chart = generateTuViChart(sourceInput);
+  return {
+    ...record,
+    title: chartTitle(chart),
+    input: chart.input,
+    chart,
+  };
+}
+
 export async function saveChart(input: ChartInput, user: SessionUser | null) {
   const chart = generateTuViChart(input);
-  const title = `${chart.input.fullName} - ${chart.canChi.year}`;
+  const title = chartTitle(chart);
   const db = getDb();
 
   if (!db) {
@@ -97,24 +128,46 @@ export async function saveChart(input: ChartInput, user: SessionUser | null) {
 
 export async function getChart(id: string) {
   const db = getDb();
-  if (!db) return charts().get(id) || null;
+  if (!db) {
+    const chart = charts().get(id) || null;
+    if (!chart) return null;
+    const upgraded = upgradeStoredChart(chart);
+    if (upgraded !== chart) charts().set(id, upgraded);
+    return upgraded;
+  }
   const chart = await db.chart.findUnique({ where: { id } });
-  return chart
-    ? {
-        id: chart.id,
-        title: chart.title,
-        input: chart.input as ChartInput,
-        chart: chart.chart as TuViChart,
-        userId: chart.userId || undefined,
-        createdAt: chart.createdAt,
-      }
-    : null;
+  if (!chart) return null;
+  const stored = {
+    id: chart.id,
+    title: chart.title,
+    input: chart.input as ChartInput,
+    chart: chart.chart as TuViChart,
+    userId: chart.userId || undefined,
+    createdAt: chart.createdAt,
+  };
+  const upgraded = upgradeStoredChart(stored);
+  if (upgraded !== stored) {
+    await db.chart.update({
+      where: { id },
+      data: {
+        title: upgraded.title,
+        input: upgraded.input,
+        chart: upgraded.chart,
+      },
+    });
+  }
+  return upgraded;
 }
 
 export async function listUserCharts(userId: string, includeAll = false): Promise<ChartHistoryItem[]> {
   const db = getDb();
   if (!db || usesInMemoryUser(userId)) {
     const userCharts = Array.from(charts().values())
+      .map((chart) => {
+        const upgraded = upgradeStoredChart(chart);
+        if (upgraded !== chart) charts().set(chart.id, upgraded);
+        return upgraded;
+      })
       .filter((chart) => includeAll || chart.userId === userId)
       .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
 
@@ -142,16 +195,39 @@ export async function listUserCharts(userId: string, includeAll = false): Promis
     orderBy: { createdAt: "desc" },
   });
 
-  return userCharts.map((chart) => ({
-    id: chart.id,
-    title: chart.title,
-    input: chart.input as ChartInput,
-    chart: chart.chart as TuViChart,
-    userId: chart.userId || undefined,
-    createdAt: chart.createdAt,
-    hasAdvancedReading: chart.readings.length > 0,
-    advancedReadingId: chart.readings[0]?.id,
-  }));
+  return userCharts.map((chart) => {
+    const upgraded = upgradeStoredChart({
+      id: chart.id,
+      title: chart.title,
+      input: chart.input as ChartInput,
+      chart: chart.chart as TuViChart,
+      userId: chart.userId || undefined,
+      createdAt: chart.createdAt,
+    });
+    return {
+      ...upgraded,
+      hasAdvancedReading: chart.readings.length > 0,
+      advancedReadingId: chart.readings[0]?.id,
+    };
+  });
+}
+
+export async function deleteUserChart(user: SessionUser, chartId: string) {
+  const db = getDb();
+  if (!db || usesInMemoryUser(user.id)) {
+    const chart = charts().get(chartId);
+    if (!chart || (user.role !== "ADMIN" && chart.userId !== user.id)) return false;
+    charts().delete(chartId);
+    for (const [key, reading] of readings()) {
+      if (reading.chartId === chartId) readings().delete(key);
+    }
+    return true;
+  }
+
+  const chart = await db.chart.findUnique({ where: { id: chartId }, select: { userId: true } });
+  if (!chart || (user.role !== "ADMIN" && chart.userId !== user.id)) return false;
+  await db.chart.delete({ where: { id: chartId } });
+  return true;
 }
 
 export async function getFeaturePrice(type: ReadingKey) {

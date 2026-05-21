@@ -1,8 +1,16 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 96 96">
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 96 96" role="img" aria-label="Lá số tinh hoa">
+  <defs>
+    <linearGradient id="lth-ring" x1="14" y1="13" x2="82" y2="83" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fb923c"/>
+      <stop offset=".5" stop-color="#f97316"/>
+      <stop offset="1" stop-color="#10b981"/>
+    </linearGradient>
+  </defs>
   <rect width="96" height="96" rx="24" fill="#fff7ed"/>
-  <circle cx="48" cy="48" r="35" fill="#fffaf0" stroke="#fed7aa" stroke-width="4"/>
-  <path d="M48 15a33 33 0 1 1-23.3 56.3 33 33 0 0 0 46.6-46.6A32.9 32.9 0 0 1 48 15Z" fill="#f97316"/>
-  <path d="M48 23a25 25 0 0 1 0 50 12.5 12.5 0 0 0 0-25 12.5 12.5 0 0 1 0-25Z" fill="#fff7ed"/>
-  <circle cx="48" cy="35.5" r="4.6" fill="#f97316"/>
-  <circle cx="48" cy="60.5" r="4.6" fill="#10b981"/>
+  <circle cx="48" cy="48" r="34" fill="#fffaf0" stroke="#fed7aa" stroke-width="3"/>
+  <path d="M48 16a32 32 0 1 1 0 64 32 32 0 0 1 0-64Zm0 8a24 24 0 1 0 0 48 24 24 0 0 0 0-48Z" fill="url(#lth-ring)"/>
+  <path d="M30 50c10-18 26-23 38-11-14-4-24 2-30 18l-7 18c-4-7-5-15-1-25Z" fill="#f97316"/>
+  <path d="M66 46c-10 18-26 23-38 11 14 4 24-2 30-18l7-18c4 7 5 15 1 25Z" fill="#10b981"/>
+  <circle cx="48" cy="48" r="5.5" fill="#fffaf0" stroke="#fdba74" stroke-width="2"/>
+  <text x="48" y="53.5" text-anchor="middle" fill="#7c2d12" font-family="Arial, sans-serif" font-size="17" font-weight="900" letter-spacing=".5">TH</text>
 </svg>

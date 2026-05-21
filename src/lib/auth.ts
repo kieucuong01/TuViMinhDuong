@@ -78,6 +78,80 @@ export async function clearSession() {
   jar.delete(COOKIE_NAME);
 }
 
+export async function createMagicSession(user: SessionUser) {
+  const db = getDb();
+  const token = randomBytes(32).toString("base64url");
+  if (!db || user.id.startsWith("demo-") || user.id.startsWith("guest-")) return token;
+
+  await db.session.create({
+    data: {
+      userId: user.id,
+      token,
+      expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30),
+    },
+  });
+  return token;
+}
+
+export async function signInWithMagicToken(token: string) {
+  const db = getDb();
+  if (!db || !token) return null;
+
+  const session = await db.session.findUnique({
+    where: { token },
+    include: { user: true },
+  });
+  if (!session || session.expiresAt < new Date()) return null;
+
+  const user: SessionUser = {
+    id: session.user.id,
+    email: session.user.email,
+    name: session.user.name || session.user.email.split("@")[0],
+    role: session.user.role,
+    coinBalance: session.user.coinBalance,
+  };
+  await setSession(user);
+  return user;
+}
+
+export async function getOrCreateEmailUser(email: string, name?: string): Promise<SessionUser> {
+  const normalizedEmail = email.trim().toLowerCase();
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) {
+    throw new Error("Email nhận kết quả không hợp lệ.");
+  }
+
+  const db = getDb();
+  if (!db) {
+    return {
+      id: `demo-${normalizedEmail}`,
+      email: normalizedEmail,
+      name: name?.trim() || normalizedEmail.split("@")[0],
+      role: normalizedEmail === ADMIN_EMAIL ? "ADMIN" : "USER",
+      coinBalance: normalizedEmail === ADMIN_EMAIL ? 999999 : 0,
+    };
+  }
+
+  const user = await db.user.upsert({
+    where: { email: normalizedEmail },
+    update: {
+      name: name?.trim() || undefined,
+    },
+    create: {
+      email: normalizedEmail,
+      name: name?.trim() || normalizedEmail.split("@")[0],
+      coinBalance: 0,
+    },
+  });
+
+  return {
+    id: user.id,
+    email: user.email,
+    name: user.name || user.email.split("@")[0],
+    role: user.role,
+    coinBalance: user.coinBalance,
+  };
+}
+
 export async function getCurrentUser(): Promise<SessionUser | null> {
   const jar = await cookies();
   const user = parseSession(jar.get(COOKIE_NAME)?.value);
@@ -126,6 +200,24 @@ export async function loginOrRegister(email: string, password: string, name?: st
 
   const existing = await db.user.findUnique({ where: { email: normalizedEmail } });
   if (existing) {
+    if (!existing.passwordHash && !isConfiguredAdminLogin) {
+      const synced = await db.user.update({
+        where: { id: existing.id },
+        data: {
+          passwordHash: hashPassword(password),
+          name: name?.trim() || existing.name || normalizedEmail.split("@")[0],
+        },
+      });
+      const user: SessionUser = {
+        id: synced.id,
+        email: synced.email,
+        name: synced.name || synced.email.split("@")[0],
+        role: synced.role,
+        coinBalance: synced.coinBalance,
+      };
+      await setSession(user);
+      return user;
+    }
     const passwordMatches = verifyPassword(password, existing.passwordHash);
     if (!passwordMatches && !isConfiguredAdminLogin) {
       throw new Error("Mật khẩu không đúng.");

@@ -1,15 +1,24 @@
 import { type TuViChart } from "@/lib/chart";
 import { FEATURE_PRICES, type ReadingKey } from "@/lib/pricing";
 
+function starsWithStates(chart: TuViChart, stars: string[], palaceName: string, fallback: string) {
+  const palace = chart.palaces.find((item) => item.name === palaceName);
+  if (!stars.length) return fallback;
+  return stars.map((star) => {
+    const state = palace?.starStates?.[star];
+    return state ? `${star} (${state})` : star;
+  }).join(", ");
+}
+
 function getFocusData(chart: TuViChart, type: ReadingKey, scopeKey: string) {
   const palace = chart.palaces.find((item) => item.name === scopeKey || item.branch === scopeKey);
   if (palace) {
     return {
       title: `${palace.name} tại ${palace.branch}`,
       evidence: [
-        `Chính tinh: ${palace.mainStars.join(", ") || "không có"}`,
-        `Phụ tinh: ${palace.supportStars.join(", ") || "bình hòa"}`,
-        `Lưu niên: ${palace.yearlyStars.join(", ") || "không nổi bật"}`,
+        `Chính tinh: ${starsWithStates(chart, palace.mainStars, palace.name, "không có")}`,
+        `Phụ tinh: ${starsWithStates(chart, palace.supportStars, palace.name, "bình hòa")}`,
+        `Lưu niên: ${starsWithStates(chart, palace.yearlyStars, palace.name, "không nổi bật")}`,
         `Vòng trường sinh: ${palace.lifecycle}`,
       ],
     };
@@ -27,6 +36,8 @@ function getFocusData(chart: TuViChart, type: ReadingKey, scopeKey: string) {
       `Mệnh: ${chart.menh}`,
       `Thân: ${chart.than}`,
       `Cục: ${chart.cuc}`,
+      `Cân lượng cốt: ${chart.boneWeight?.label || "đang cập nhật"}`,
+      `Lai nhân: ${chart.laiNhan || "đang cập nhật"}`,
       `Âm dương: ${chart.amDuong}`,
       currentDecade ? `Đại vận hiện tại: ${currentDecade.range} tuổi tại cung ${currentDecade.palace}` : `Năm xem: ${chart.input.viewYear}`,
     ],
@@ -87,6 +98,7 @@ ${JSON.stringify(chart, null, 2)}
 Yêu cầu bắt buộc:
 - Không tự tính lại lá số, chỉ dùng dữ liệu JSON và nguồn dữ liệu nổi bật.
 - Không khẳng định tuyệt đối, không dọa nạt, không hứa chắc kết quả.
+- Khi sao có trạng thái (H), sát tinh hoặc lưu sát tinh như L.Kình Dương/L.Đà La/L.Tang Môn/L.Bạch Hổ/L.Thiên Khốc/L.Thiên Hư, phải xem là tín hiệu rủi ro cần quản trị; không được bỏ qua trong luận vận hạn.
 - Viết theo đúng Markdown với các mục theo thứ tự:
   1. # ${FEATURE_PRICES[type].label} cho ${chart.input.fullName}
   2. ## Nguồn dữ liệu sử dụng
