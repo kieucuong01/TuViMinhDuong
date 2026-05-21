@@ -6,7 +6,7 @@ This version has breaking changes - APIs, conventions, and file structure may di
 
 # Agent Router
 
-This repo is the production app for **Lá số tinh hoa** (`lasotinhhoa.vn`): a Vietnamese tử vi website with chart creation, paid readings, date fortune, CMS/SEO, PayOS/VietQR, and admin tooling.
+This repo is the production app for **Lá số tinh hoa** (`tu-vi-minh-duong.vercel.app` for now; `lasotinhhoa.vn` is planned after DNS is stable): a Vietnamese tử vi website with chart creation, paid readings, date fortune, CMS/SEO, PayOS/VietQR, and admin tooling.
 
 Use this file as the map, not the encyclopedia. Load only the docs and files needed for the current task.
 

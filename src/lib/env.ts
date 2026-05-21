@@ -1,8 +1,11 @@
 const DEFAULT_APP_URL =
   process.env.NODE_ENV === "production" ? "https://tu-vi-minh-duong.vercel.app" : "http://localhost:4000";
 
+const configuredAppUrl = process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "");
+const pendingCustomDomains = new Set(["https://lasotinhhoa.vn", "https://www.lasotinhhoa.vn"]);
+
 export const APP_URL =
-  process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") || DEFAULT_APP_URL;
+  configuredAppUrl && !pendingCustomDomains.has(configuredAppUrl) ? configuredAppUrl : DEFAULT_APP_URL;
 
 export const APP_NAME = "Lá số tinh hoa";
 
