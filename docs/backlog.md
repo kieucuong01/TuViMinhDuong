@@ -1,5 +1,11 @@
 # Backlog
 
+## Recently Completed
+
+- Added integration-style unit coverage for the paid reading unlock flow in `src/lib/reading-unlock.test.ts`.
+- Covered insufficient coins, admin bypass, cached reading no second charge, normal paid debit, and refund when AI generation fails.
+- Next P0 focus should move to Playwright smoke for topup modal/CMS/payment and PayOS webhook idempotency/signature tests.
+
 Backlog này dùng để quyết định "làm tiếp cái gì" khi không có chỉ định chi tiết. Ưu tiên theo P0 -> P1 -> P2.
 
 ## P0: Trước khi bán thật

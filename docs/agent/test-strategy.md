@@ -1,5 +1,11 @@
 # Test Strategy
 
+## Current Coverage Added
+
+- `src/lib/reading-unlock.test.ts` exercises the paid reading unlock core without Next cookies or a live database.
+- Covered cases: insufficient coins, cached reading reuse, normal debit, admin bypass, and refund after generation failure.
+- Remaining payment-risk tests: PayOS webhook signature, duplicate webhook idempotency, and return URL not crediting coins.
+
 Tài liệu này định nghĩa cách test cho dự án **Lá số tinh hoa**. Mục tiêu là hỗ trợ TDD thực dụng: phần logic quan trọng có test trước hoặc test đi kèm ngay trong cùng lượt, UI có smoke test đủ bắt lỗi vỡ luồng chính.
 
 ## Test pyramid

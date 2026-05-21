@@ -11,6 +11,7 @@ import type { CalendarType, Gender } from "@/lib/chart";
 import { COIN_PACKAGES, TEMPORARY_FULL_ACCESS } from "@/lib/pricing";
 import type { ReadingKey } from "@/lib/pricing";
 import { isPayOSEnabled } from "@/lib/env";
+import { unlockReadingForUser } from "@/lib/reading-unlock";
 
 export async function loginAction(formData: FormData) {
   const email = String(formData.get("email") || "");
@@ -176,50 +177,31 @@ async function getReadingUser(chartId: string): Promise<SessionUser> {
 }
 
 export async function requestReadingAction(formData: FormData) {
-
   const chartId = String(formData.get("chartId") || "");
   const type = String(formData.get("type") || "FULL") as ReadingKey;
   const scopeKey = String(formData.get("scopeKey") || "all");
   const nextPath = safeNextPath(formData.get("next"), `/la-so/${chartId}`);
   const user = await getReadingUser(chartId);
-  const chartRecord = await getChart(chartId);
-  if (!chartRecord) throw new Error("Không tìm thấy lá số.");
 
-  const cached = await getCachedReading(user.id, chartId, type, scopeKey);
-  if (cached) {
-    revalidatePath(`/la-so/${chartId}`);
-    redirect(withReadingParam(nextPath, cached.id));
+  const result = await unlockReadingForUser(
+    {
+      getChart,
+      getCachedReading,
+      getFeaturePrice,
+      getUserBalance,
+      adjustCoins,
+      generateReading,
+      saveReading,
+    },
+    { user, chartId, type, scopeKey, temporaryFullAccess: TEMPORARY_FULL_ACCESS },
+  );
+
+  if (result.status === "insufficient_coins") {
+    redirect(withQueryParams(nextPath, { paywall: "coins", need: result.needCoins }));
   }
 
-  const price = await getFeaturePrice(type);
-  const shouldCharge = !TEMPORARY_FULL_ACCESS && user.role !== "ADMIN";
-  const balance = shouldCharge ? await getUserBalance(user) : 0;
-  if (shouldCharge && balance < price.priceCoins) {
-    redirect(withQueryParams(nextPath, { paywall: "coins", need: price.priceCoins - balance }));
-  }
-
-  let debited = false;
-  let readingId = "";
-  try {
-    if (shouldCharge) {
-      await adjustCoins(user, -price.priceCoins, price.label, `${chartId}:${type}:${scopeKey}`);
-      debited = true;
-    }
-    const result = await generateReading(chartRecord.chart, type, scopeKey);
-    const reading = await saveReading(user, chartId, type, scopeKey, shouldCharge ? price.priceCoins : 0, result.content, {
-      type,
-      scopeKey,
-      model: result.model,
-    });
-    readingId = reading.id;
-  } catch (error) {
-    if (debited) {
-      await adjustCoins(user, price.priceCoins, "Hoàn xu do AI lỗi", `${chartId}:${type}:${scopeKey}`);
-    }
-    throw error;
-  }
   revalidatePath(`/la-so/${chartId}`);
-  redirect(withReadingParam(nextPath, readingId));
+  redirect(withReadingParam(nextPath, result.readingId));
 }
 
 export async function saveArticleAction(formData: FormData) {

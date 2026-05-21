@@ -1,5 +1,12 @@
 # Current State
 
+## Recent Update: Reading Unlock Tests
+
+- Added `src/lib/reading-unlock.ts` as the testable core for paid reading unlocks.
+- `requestReadingAction` now delegates coin checks, cached reading reuse, admin bypass, debit, save, and refund-on-generation-failure to that service.
+- `src/lib/reading-unlock.test.ts` covers: insufficient coins, cached reading no second charge, normal paid debit, admin free bypass, and refund when generation fails.
+- Next highest P0 remains Playwright smoke for topup modal/CMS/payment and PayOS webhook tests.
+
 Tài liệu này là ảnh chụp nhanh trạng thái dự án **Lá số tinh hoa** để agent mới không phải đọc lại toàn bộ lịch sử chat. Nếu trạng thái thay đổi lớn, cập nhật file này cùng lượt code.
 
 ## Product
