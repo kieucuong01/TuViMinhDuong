@@ -1,0 +1,18 @@
+<svg width="1200" height="675" viewBox="0 0 1200 675" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="675" rx="42" fill="#FFF7ED"/>
+  <rect x="150" y="92" width="900" height="490" rx="26" fill="#FFFFFF" stroke="#FED7AA" stroke-width="4"/>
+  <path d="M150 255h900M150 420h900M450 92v490M750 92v490" stroke="#FED7AA" stroke-width="3"/>
+  <g font-family="Arial, sans-serif" font-weight="900">
+    <rect x="392" y="240" width="118" height="38" rx="8" fill="#1F2937"/>
+    <text x="421" y="267" fill="#FFFFFF" font-size="24">Triệt</text>
+    <rect x="764" y="405" width="118" height="38" rx="8" fill="#1F2937"/>
+    <text x="795" y="432" fill="#FFFFFF" font-size="24">Tuần</text>
+  </g>
+  <text x="220" y="170" fill="#C2410C" font-family="Arial, sans-serif" font-size="36" font-weight="900">Mệnh</text>
+  <text x="530" y="170" fill="#EA580C" font-family="Arial, sans-serif" font-size="30" font-weight="800">Quan Lộc</text>
+  <text x="824" y="170" fill="#EA580C" font-family="Arial, sans-serif" font-size="30" font-weight="800">Tài Bạch</text>
+  <text x="215" y="332" fill="#57534E" font-family="Arial, sans-serif" font-size="28">Đọc chậm lại</text>
+  <text x="508" y="332" fill="#57534E" font-family="Arial, sans-serif" font-size="28">Kiểm tra kỹ</text>
+  <text x="820" y="332" fill="#57534E" font-family="Arial, sans-serif" font-size="28">Không vội</text>
+  <text x="86" y="625" fill="#1C1917" font-family="Arial, sans-serif" font-size="48" font-weight="900">Tuần Triệt trong lá số tử vi</text>
+</svg>

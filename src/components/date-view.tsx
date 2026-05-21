@@ -69,7 +69,7 @@ export function DateView() {
   const starHits = [...fortune.goodStars, ...fortune.badStars];
 
   return (
-    <div className="date-view-shell">
+    <div className="date-view-shell" data-testid="date-view">
       <section className="date-hero-panel">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
           <div>
@@ -82,7 +82,7 @@ export function DateView() {
           <div className="date-picker-card">
             <label>
               <span>Chọn ngày</span>
-              <input type="date" value={selectedDate} onChange={(event) => setSelectedDate(event.target.value)} />
+              <input type="date" value={selectedDate} onChange={(event) => setSelectedDate(event.target.value)} data-testid="date-input" />
             </label>
             <label className="mt-3 block">
               <span>Năm sinh để xét tuổi</span>
@@ -94,6 +94,7 @@ export function DateView() {
                 placeholder="Ví dụ 1994"
                 value={birthYear}
                 onChange={(event) => setBirthYear(event.target.value)}
+                data-testid="birth-year-input"
               />
             </label>
             <div className="mt-3 grid grid-cols-3 gap-2">

@@ -8,18 +8,19 @@ export function ChartForm({ compact = false }: { compact?: boolean }) {
     <form
       action={createChartAction}
       className={compact ? "chart-form compact" : "chart-form"}
+      data-testid="chart-form"
       data-loading-message="Đang lập lá số..."
       data-loading-label="Đang lập lá số..."
     >
       <div className="form-grid">
         <label className="md:col-span-2">
           <span>Họ và tên</span>
-          <input name="fullName" placeholder="Ví dụ: Nguyễn Minh Anh" required />
+          <input name="fullName" placeholder="Ví dụ: Nguyễn Minh Anh" required data-testid="chart-full-name" />
         </label>
 
         <label>
           <span>Giới tính</span>
-          <select name="gender" defaultValue="male">
+          <select name="gender" defaultValue="male" data-testid="chart-gender">
             <option value="male">Nam giới</option>
             <option value="female">Nữ giới</option>
           </select>
@@ -27,7 +28,7 @@ export function ChartForm({ compact = false }: { compact?: boolean }) {
 
         <label>
           <span>Lịch sinh</span>
-          <select name="calendarType" defaultValue="solar">
+          <select name="calendarType" defaultValue="solar" data-testid="chart-calendar-type">
             <option value="solar">Dương lịch</option>
             <option value="lunar">Âm lịch</option>
           </select>
@@ -38,22 +39,22 @@ export function ChartForm({ compact = false }: { compact?: boolean }) {
           <div className="birth-date-grid">
             <label>
               <span>Ngày</span>
-              <input name="day" type="number" min="1" max="31" defaultValue="1" required />
+              <input name="day" type="number" min="1" max="31" defaultValue="1" required data-testid="chart-day" />
             </label>
             <label>
               <span>Tháng</span>
-              <input name="month" type="number" min="1" max="12" defaultValue="1" required />
+              <input name="month" type="number" min="1" max="12" defaultValue="1" required data-testid="chart-month" />
             </label>
             <label>
               <span>Năm</span>
-              <input name="year" type="number" min="1900" max={now.getFullYear()} defaultValue="1990" required />
+              <input name="year" type="number" min="1900" max={now.getFullYear()} defaultValue="1990" required data-testid="chart-year" />
             </label>
           </div>
         </fieldset>
 
         <label>
           <span>Giờ sinh</span>
-          <select name="birthHour" defaultValue="0">
+          <select name="birthHour" defaultValue="0" data-testid="chart-birth-hour">
             <option value="0">Tý: 23h - 00h59</option>
             <option value="2">Sửu: 01h - 02h59</option>
             <option value="4">Dần: 03h - 04h59</option>
@@ -71,7 +72,7 @@ export function ChartForm({ compact = false }: { compact?: boolean }) {
 
         <label>
           <span>Năm muốn xem</span>
-          <input name="viewYear" type="number" min="1900" max="2100" defaultValue={now.getFullYear()} required />
+          <input name="viewYear" type="number" min="1900" max="2100" defaultValue={now.getFullYear()} required data-testid="chart-view-year" />
         </label>
       </div>
 

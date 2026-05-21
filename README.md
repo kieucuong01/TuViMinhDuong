@@ -87,6 +87,36 @@ npm test
 npm run build
 ```
 
+Playwright smoke suite:
+
+```powershell
+npm run test:e2e:install
+npm run test:e2e
+```
+
+Mặc định Playwright tự bật dev server tại `http://127.0.0.1:4000`. Nếu muốn smoke một site đã chạy sẵn:
+
+```powershell
+$env:PLAYWRIGHT_BASE_URL="https://lasotinhhoa.vn"
+npm run test:e2e
+```
+
+Admin smoke sẽ tự skip nếu chưa có `PLAYWRIGHT_ADMIN_EMAIL` và `PLAYWRIGHT_ADMIN_PASSWORD`.
+
+Kiểm tra tốc độ phản hồi các trang public sau deploy:
+
+```powershell
+$env:PERF_BASE_URL="https://lasotinhhoa.vn"
+npm run perf:smoke
+```
+
+Nếu muốn kiểm tra thêm một trang lá số cụ thể, truyền thêm `PERF_CHART_PATH`:
+
+```powershell
+$env:PERF_CHART_PATH="/la-so/<id>"
+npm run perf:smoke
+```
+
 ## Deploy
 
 Target deploy là Vercel + Postgres. Các env quan trọng:
@@ -102,6 +132,14 @@ Target deploy là Vercel + Postgres. Các env quan trọng:
 - `GOOGLE_CLIENT_ID`
 - `GOOGLE_CLIENT_SECRET`
 - `AI_GATEWAY_API_KEY` hoặc provider AI tương ứng
+- `ERROR_WEBHOOK_URL` nếu muốn chuyển tiếp lỗi client ra hệ thống ngoài; để trống thì lỗi vẫn được ghi trong Vercel Runtime Logs.
+
+### Theo dõi sau deploy
+
+- Vercel Web Analytics và Speed Insights đã được gắn ở root layout.
+- Lỗi client được gửi về `/api/telemetry/error`, rút gọn payload và ghi vào runtime logs.
+- Sau deploy, chạy `npm run perf:smoke` với `PERF_BASE_URL` là domain production.
+- Khi cần rà lỗi nhanh trên Vercel, dùng `npx vercel logs <deployment-url> --level error --since 1h`.
 
 ### Checklist production tối thiểu
 

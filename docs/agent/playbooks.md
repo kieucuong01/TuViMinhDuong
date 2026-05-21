@@ -47,6 +47,8 @@ Rules:
 - Preserve structured chart JSON for readings.
 - If changing a rule, add a named fixture or assertion that explains the convention.
 - UI may be modern, but core labels should keep Vietnamese tử vi terminology.
+- AI/fallback reading output must keep this fixed order: `Tổng quan`, `Điểm mạnh`, `Điều cần lưu ý`, `Công việc`, `Tài chính`, `Tình cảm`, `Sức khỏe`, `Vận hạn năm`.
+- Reading sections should be short, scannable, and practical for mobile readers age 30-60.
 
 Done:
 
@@ -125,6 +127,8 @@ Rules:
 - Public article URLs are `/kien-thuc-tu-vi/[slug]`.
 - Include natural visible copy first; metadata and schema support it, not the reverse.
 - Keep personal chart pages `noindex` unless explicitly changed.
+- Seed evergreen articles should create an internal link cluster back to `/#lap-la-so`, `/xem-ngay`, and related knowledge articles.
+- Use FAQ schema only when the page has visible FAQ content.
 - When brand/domain changes, update visible UI, metadata base, canonical, sitemap, robots, JSON-LD, favicon/logo assets, and seeded content references.
 - SEO score is editorial guidance, not a Google ranking promise.
 
@@ -152,6 +156,7 @@ Rules:
 - Required envs: `DATABASE_URL`, `NEXT_PUBLIC_APP_URL`, `AUTH_SECRET`, `ADMIN_EMAIL`, `ADMIN_PASSWORD`.
 - PayOS and Google OAuth only work when their envs exist.
 - Run migrations before trusting production data flows.
+- For post-deploy health, use Vercel Web Analytics, Speed Insights, runtime logs, and `npm run perf:smoke`.
 
 Done:
 
@@ -180,8 +185,10 @@ Rules:
 - Use `next/image` for real images when practical.
 - Avoid client components around static content unless interaction requires it.
 - Run `npm run build`; use `npm run analyze` only when bundle analysis is needed.
+- For production speed checks, run `PERF_BASE_URL=https://lasotinhhoa.vn npm run perf:smoke` and pass `PERF_CHART_PATH` for a real chart page when available.
 
 Done:
 
 - Build passes.
 - Above-the-fold content loads without relying on heavy client JS.
+- Analytics and Speed Insights are mounted once in the root layout.

@@ -65,7 +65,7 @@ export function ChartActionPanel({ chartId, chart }: ChartActionPanelProps) {
   };
 
   return (
-    <section className="chart-action-panel" aria-label="Thao tác với lá số">
+    <section className="chart-action-panel" aria-label="Thao tác với lá số" data-testid="chart-action-panel">
       <div className="chart-action-row">
         <Link className="chart-action-button" href="/#lap-la-so">
           <Pencil size={18} />

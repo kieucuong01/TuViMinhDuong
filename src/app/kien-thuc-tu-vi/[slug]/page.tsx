@@ -4,7 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { APP_URL } from "@/lib/env";
 import { getArticleBySlug, listArticles } from "@/lib/data";
-import { articleJsonLd, breadcrumbJsonLd } from "@/lib/seo";
+import { articleJsonLd, breadcrumbJsonLd, faqJsonLd } from "@/lib/seo";
 import { MarkdownContent } from "@/components/markdown-content";
 
 export const revalidate = 300;
@@ -19,7 +19,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const article = await getArticleBySlug(slug);
   if (!article) return {};
-  const ogImage = article.ogImage || article.coverImage || `/api/og?title=${encodeURIComponent(article.ogTitle || article.metaTitle || article.title)}&subtitle=${encodeURIComponent(article.ogDescription || article.metaDescription || article.excerpt)}`;
+  const ogImage = article.ogImage || `/api/og?title=${encodeURIComponent(article.ogTitle || article.metaTitle || article.title)}&subtitle=${encodeURIComponent(article.ogDescription || article.metaDescription || article.excerpt)}`;
   return {
     title: article.metaTitle || article.title,
     description: article.metaDescription || article.excerpt,
@@ -51,11 +51,13 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
     { name: "Kiến thức tử vi", url: `${APP_URL}/kien-thuc-tu-vi` },
     { name: article.title, url: `${APP_URL}/kien-thuc-tu-vi/${article.slug}` },
   ]);
+  const faqLd = article.faqs?.length ? faqJsonLd(article.faqs) : null;
 
   return (
     <main className="section">
       <script id="article-jsonld" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleLd) }} />
       <script id="breadcrumb-jsonld" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
+      {faqLd ? <script id="faq-jsonld" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }} /> : null}
       <article className="article-shell mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
         <nav className="article-breadcrumb" aria-label="Breadcrumb">
           <Link href="/">Trang chủ</Link>
@@ -84,6 +86,19 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
           </figure>
         ) : null}
         <MarkdownContent content={article.content} />
+        {article.faqs?.length ? (
+          <section className="article-faq" aria-labelledby="article-faq-heading">
+            <h2 id="article-faq-heading">Câu hỏi thường gặp</h2>
+            <div className="article-faq-list">
+              {article.faqs.map((item) => (
+                <details key={item.question}>
+                  <summary>{item.question}</summary>
+                  <p>{item.answer}</p>
+                </details>
+              ))}
+            </div>
+          </section>
+        ) : null}
       </article>
     </main>
   );

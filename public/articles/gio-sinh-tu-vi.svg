@@ -1,0 +1,17 @@
+<svg width="1200" height="675" viewBox="0 0 1200 675" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="675" rx="42" fill="#FFF7ED"/>
+  <circle cx="600" cy="338" r="206" fill="#FFEDD5" stroke="#FDBA74" stroke-width="4"/>
+  <circle cx="600" cy="338" r="138" fill="#FFFFFF" stroke="#FED7AA" stroke-width="3"/>
+  <path d="M600 214v124l82 58" stroke="#C2410C" stroke-width="18" stroke-linecap="round"/>
+  <circle cx="600" cy="338" r="18" fill="#EA580C"/>
+  <g fill="#9A3412" font-family="Arial, sans-serif" font-weight="700" font-size="28">
+    <text x="584" y="188">Tý</text><text x="704" y="223">Sửu</text><text x="782" y="323">Dần</text>
+    <text x="774" y="454">Mão</text><text x="682" y="548">Thìn</text><text x="585" y="580">Tỵ</text>
+    <text x="464" y="548">Ngọ</text><text x="382" y="454">Mùi</text><text x="382" y="323">Thân</text>
+    <text x="456" y="223">Dậu</text>
+  </g>
+  <text x="88" y="136" fill="#C2410C" font-family="Arial, sans-serif" font-size="52" font-weight="900">Giờ sinh trong tử vi</text>
+  <text x="90" y="196" fill="#57534E" font-family="Arial, sans-serif" font-size="30">Chọn đúng khung giờ để lá số rõ hơn</text>
+  <rect x="88" y="500" width="335" height="70" rx="35" fill="#EA580C"/>
+  <text x="126" y="545" fill="#FFF" font-family="Arial, sans-serif" font-size="28" font-weight="800">12 giờ địa chi</text>
+</svg>

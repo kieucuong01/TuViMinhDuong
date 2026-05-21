@@ -55,30 +55,44 @@ function fallbackReading(chart: TuViChart, type: ReadingKey, scopeKey: string) {
 - Phần luận giải dựa trên lá số đã lập, không tự ý đổi ngày giờ hay cung sao.
 
 ## Tổng quan
-Trọng tâm của phần này là ${focus.title}. Lá số cho thấy ${chart.summary.join(" ")} Vì vậy, phần luận giải nên được đọc như một bản định hướng: giúp nhận diện xu hướng, điểm mạnh, điểm cần thận trọng và nhịp hành động phù hợp trong năm ${chart.input.viewYear}.
+Trọng tâm của phần này là ${focus.title}. Lá số cho thấy ${chart.summary.join(" ")}
+
+Nên đọc phần này như bản định hướng: hiểu xu hướng chính, biết việc nên ưu tiên và tránh quyết định vội trong năm ${chart.input.viewYear}.
 
 ## Điểm mạnh
-- Có nền tảng để phát triển theo hướng bền bỉ, tích lũy qua từng giai đoạn.
-- Các cung/sao hỗ trợ nên được xem là vùng thuận lợi để chủ động mở rộng.
-- Khi có kế hoạch rõ ràng, lá số này dễ phát huy tốt hơn so với hành động theo cảm xúc nhất thời.
+- Có khả năng tích lũy từng bước, hợp với cách đi chắc và có kế hoạch.
+- Khi mục tiêu rõ ràng, bạn dễ phát huy năng lực ổn định hơn là chạy theo cảm xúc nhất thời.
+- Các cung/sao thuận lợi nên được xem là vùng có thể chủ động mở rộng.
 
-## Điểm cần lưu ý
-- Không nên hiểu luận giải như một kết luận tuyệt đối; các sao khó nên được dùng như tín hiệu quản trị rủi ro.
-- Cần tránh quyết định vội trong tài chính, quan hệ hoặc công việc khi dữ liệu thực tế chưa đủ rõ.
-- Nếu gặp giai đoạn áp lực, nên ưu tiên nhịp ổn định, sức khỏe và khả năng phục hồi.
+## Điều cần lưu ý
+- Không nên xem luận giải như kết luận tuyệt đối; các sao khó là tín hiệu để quản trị rủi ro.
+- Tránh quyết định vội khi thông tin về tiền bạc, quan hệ hoặc công việc chưa đủ rõ.
+- Khi áp lực tăng, nên giữ nhịp sinh hoạt ổn định trước khi mở rộng việc lớn.
 
-## Gợi ý hành động
-1. Chọn một mục tiêu chính trong 30 ngày tới và chia thành các bước nhỏ có thể đo lường.
-2. Với việc quan trọng, nên đối chiếu giữa mong muốn cá nhân, điều kiện thực tế và lời khuyên từ người có kinh nghiệm.
-3. Ghi lại các dấu hiệu thuận lợi/khó khăn trong tháng để điều chỉnh nhịp hành động thay vì phản ứng vội.
+## Công việc
+- Nên chọn một mục tiêu chính trong 30 ngày tới và chia thành các bước nhỏ.
+- Việc quan trọng nên có lịch kiểm tra lại, tránh làm theo cảm hứng rồi bỏ dở.
+- Nếu đang đổi hướng nghề nghiệp, hãy ưu tiên học kỹ năng và xây uy tín trước.
 
-## Mốc thời gian nên chú ý
-- Ngắn hạn: tập trung xử lý việc tồn đọng và làm rõ ưu tiên.
-- Trung hạn: củng cố kỹ năng, quan hệ hỗ trợ và kế hoạch tài chính.
-- Dài hạn: xây nền ổn định trước khi mở rộng mạnh.
+## Tài chính
+- Hợp với cách quản lý tiền có kế hoạch, ghi rõ thu chi và hạn mức rủi ro.
+- Không nên đầu tư hoặc mua sắm lớn khi chỉ dựa vào cảm xúc nhất thời.
+- Nếu có cơ hội mới, hãy kiểm tra dòng tiền và phương án dự phòng trước.
 
-## Kết luận ngắn
-Lá số này phù hợp với cách đi chắc, biết chọn thời điểm và tránh cực đoan. Bạn nên dùng bản luận giải như một phần tham khảo để hiểu mình hơn và ra quyết định tỉnh táo hơn.`;
+## Tình cảm
+- Nên nói rõ nhu cầu và kỳ vọng, tránh để im lặng kéo dài thành hiểu nhầm.
+- Với gia đình hoặc người thân, sự ổn định và trách nhiệm vẫn là điểm cần giữ.
+- Khi có mâu thuẫn, nên xử lý bằng trao đổi chậm rãi hơn là phản ứng ngay.
+
+## Sức khỏe
+- Cần chú ý nhịp nghỉ ngơi, giấc ngủ và mức căng thẳng tinh thần.
+- Nếu đang làm việc quá tải, nên giảm bớt việc phụ trước khi cơ thể lên tiếng.
+- Luận giải chỉ mang tính tham khảo, không thay thế tư vấn y tế chuyên môn.
+
+## Vận hạn năm
+- Năm ${chart.input.viewYear} nên ưu tiên việc có nền tảng, có kiểm chứng và có người hỗ trợ.
+- Các sao hãm, sát tinh hoặc lưu sát tinh nếu xuất hiện cần được xem là lời nhắc cẩn trọng, không phải điều để lo sợ.
+- Cách tốt nhất là đi đều, kiểm tra rủi ro sớm và giữ một kế hoạch dự phòng.`;
 }
 
 export async function generateReading(chart: TuViChart, type: ReadingKey, scopeKey: string) {
@@ -104,11 +118,14 @@ Yêu cầu bắt buộc:
   2. ## Thông tin lá số đã dùng
   3. ## Tổng quan
   4. ## Điểm mạnh
-  5. ## Điểm cần lưu ý
-  6. ## Gợi ý hành động
-  7. ## Mốc thời gian nên chú ý
-  8. ## Kết luận ngắn
-- Mỗi mục 1-3 đoạn ngắn hoặc 3-5 bullet, ưu tiên lời khuyên thực tế, dễ đọc trên điện thoại.
+  5. ## Điều cần lưu ý
+  6. ## Công việc
+  7. ## Tài chính
+  8. ## Tình cảm
+  9. ## Sức khỏe
+  10. ## Vận hạn năm
+- Mỗi mục 2-4 bullet hoặc 1-2 đoạn ngắn, mỗi đoạn tối đa 3 dòng khi đọc trên điện thoại.
+- Tránh viết thành một khối văn dài. Ưu tiên câu ngắn, rõ, thực tế, dễ hiểu cho người đọc 30-60 tuổi.
 - Với luận cung, liên hệ rõ cung đang xét với sao chính/phụ tinh.
 - Với đại vận/nguyệt vận/nhật vận, nêu rõ nhịp thời gian và việc nên ưu tiên.`;
 

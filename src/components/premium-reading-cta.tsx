@@ -45,6 +45,7 @@ function PremiumCtaAction({
       action={requestReadingAction}
       className={className}
       aria-label={`Mở luận giải toàn bộ của ${fullName}`}
+      data-testid={`premium-reading-cta-${placement}`}
       data-loading-message="Đang mở luận giải..."
       data-loading-label="Đang mở..."
     >

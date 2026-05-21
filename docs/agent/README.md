@@ -70,3 +70,11 @@ This folder keeps the high-signal context for future AI agents. It is inspired b
 4. Edit with `apply_patch`.
 5. Run the smallest verification ladder that proves the requested behavior.
 6. Update these docs when a major flow, route, brand, payment rule, or engine invariant changes.
+
+## Planning And Test Docs
+
+- `docs/agent/current-state.md`: latest project snapshot, known stable areas, risky areas, and next recommended work.
+- `docs/roadmap.md`: module roadmap, priorities, and what "done" means before selling harder.
+- `docs/backlog.md`: prioritized P0/P1/P2 task queue for "làm tiếp đi" style requests.
+- `docs/agent/test-strategy.md`: test pyramid, TDD rules by module, E2E smoke plan, and production smoke checklist.
+- `docs/agent/task-template.md`: compact task format for scoping future work.

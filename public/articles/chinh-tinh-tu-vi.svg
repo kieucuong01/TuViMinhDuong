@@ -1,0 +1,26 @@
+<svg width="1200" height="675" viewBox="0 0 1200 675" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="675" rx="42" fill="#FFF7ED"/>
+  <g opacity=".55" stroke="#FED7AA" stroke-width="2">
+    <circle cx="760" cy="337" r="220"/><circle cx="760" cy="337" r="170"/><circle cx="760" cy="337" r="115"/>
+    <path d="M540 337h440M760 117v440M604 181l312 312M916 181 604 493"/>
+  </g>
+  <g font-family="Arial, sans-serif" font-weight="800" font-size="24">
+    <rect x="140" y="120" width="250" height="80" rx="20" fill="#FFEDD5" stroke="#FDBA74"/>
+    <text x="178" y="170" fill="#C2410C">Tử Vi</text>
+    <rect x="430" y="110" width="250" height="80" rx="20" fill="#FFF" stroke="#FED7AA"/>
+    <text x="474" y="160" fill="#166534">Thiên Cơ</text>
+    <rect x="760" y="130" width="250" height="80" rx="20" fill="#FFF" stroke="#FED7AA"/>
+    <text x="804" y="180" fill="#1D4ED8">Thái Dương</text>
+    <rect x="185" y="250" width="250" height="80" rx="20" fill="#FFF" stroke="#FED7AA"/>
+    <text x="230" y="300" fill="#9A3412">Vũ Khúc</text>
+    <rect x="515" y="255" width="250" height="80" rx="20" fill="#FFEDD5" stroke="#FDBA74"/>
+    <text x="548" y="305" fill="#C2410C">Thiên Phủ</text>
+    <rect x="825" y="270" width="250" height="80" rx="20" fill="#FFF" stroke="#FED7AA"/>
+    <text x="872" y="320" fill="#166534">Thái Âm</text>
+    <rect x="320" y="415" width="250" height="80" rx="20" fill="#FFF" stroke="#FED7AA"/>
+    <text x="365" y="465" fill="#C2410C">Cự Môn</text>
+    <rect x="650" y="430" width="250" height="80" rx="20" fill="#FFF" stroke="#FED7AA"/>
+    <text x="690" y="480" fill="#9A3412">Thiên Tướng</text>
+  </g>
+  <text x="92" y="600" fill="#1C1917" font-family="Arial, sans-serif" font-size="48" font-weight="900">14 chính tinh tử vi</text>
+</svg>

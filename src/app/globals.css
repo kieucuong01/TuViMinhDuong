@@ -2593,6 +2593,47 @@ button.is-loading:not(.icon-button)::before {
   margin-top: 1.75rem;
 }
 
+.article-faq {
+  margin-top: 2.2rem;
+  border-top: 1px solid #fed7aa;
+  padding-top: 1.5rem;
+}
+
+.article-faq h2 {
+  color: #1c1917;
+  font-size: clamp(1.45rem, 3vw, 2rem);
+  font-weight: 900;
+  line-height: 1.2;
+}
+
+.article-faq-list {
+  margin-top: 1rem;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.article-faq details {
+  border: 1px solid #fed7aa;
+  border-radius: 1rem;
+  background: #fffaf0;
+  padding: 0.95rem 1rem;
+  box-shadow: 0 12px 34px rgb(120 53 15 / 0.06);
+}
+
+.article-faq summary {
+  cursor: pointer;
+  color: #1c1917;
+  font-size: 1.05rem;
+  font-weight: 850;
+}
+
+.article-faq p {
+  margin-top: 0.65rem;
+  color: #57534e;
+  font-size: 1rem;
+  line-height: 1.75;
+}
+
 .feedback-button {
   display: inline-grid;
   width: 2.25rem;

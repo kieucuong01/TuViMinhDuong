@@ -53,7 +53,7 @@ export default async function ChartPage({
   const activeLabel = activeReading ? readingLabels[activeReading.type] : "Luận giải tổng quan";
 
   return (
-    <main className="chart-page">
+    <main className="chart-page" data-testid="chart-page">
       <FateTabs chartId={id} active={activeView} />
 
       <div className="mx-auto max-w-6xl px-3 pb-10 sm:px-6 lg:px-8">
@@ -83,7 +83,7 @@ export default async function ChartPage({
         <PromptChips chartId={id} chart={record.chart} />
 
         <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_360px]">
-          <section className="panel" id="luan-giai">
+          <section className="panel" id="luan-giai" data-testid="free-reading-panel">
             <p className="eyebrow">{activeLabel}</p>
             {activeReading ? (
               <>

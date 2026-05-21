@@ -39,7 +39,7 @@ export function PaywallPopup() {
   if (!notice || dismissed) return null;
 
   return (
-    <aside className="paywall-popup" role="status" aria-live="polite">
+    <aside className="paywall-popup" role="status" aria-live="polite" data-testid="paywall-popup">
       <span className="paywall-popup-icon" aria-hidden="true">
         <LockKeyhole size={20} />
       </span>

@@ -134,11 +134,21 @@ export function articleJsonLd(article: {
     headline: article.title,
     description: article.excerpt,
     url,
+    mainEntityOfPage: { "@type": "WebPage", "@id": url },
+    inLanguage: "vi-VN",
+    isAccessibleForFree: true,
     image: image ? [image] : undefined,
     datePublished: article.publishedAt || undefined,
     dateModified: article.updatedAt || article.publishedAt || undefined,
     author: { "@type": "Organization", name: APP_NAME },
-    publisher: { "@type": "Organization", name: APP_NAME },
+    publisher: {
+      "@type": "Organization",
+      name: APP_NAME,
+      logo: {
+        "@type": "ImageObject",
+        url: `${APP_URL}/brand/laso-tinhhoa-mark.svg`,
+      },
+    },
   };
 }
 

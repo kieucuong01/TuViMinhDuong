@@ -51,7 +51,7 @@ export function CoinTopupModal() {
     <div className="paywall-modal-backdrop" role="presentation" onMouseDown={(event) => {
       if (event.target === event.currentTarget) close();
     }}>
-      <section className="paywall-modal coin-topup-modal" role="dialog" aria-modal="true" aria-labelledby="coin-topup-title">
+      <section className="paywall-modal coin-topup-modal" role="dialog" aria-modal="true" aria-labelledby="coin-topup-title" data-testid="coin-topup-modal">
         <button className="paywall-modal-close" type="button" onClick={close} aria-label="Đóng nạp xu" disabled={isPending}>
           <X size={18} />
         </button>
