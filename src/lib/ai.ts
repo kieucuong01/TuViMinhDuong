@@ -2,6 +2,25 @@ import { type TuViChart } from "@/lib/chart";
 import { generateWithLlmRouter } from "@/lib/llm-router";
 import { FEATURE_PRICES, type ReadingKey } from "@/lib/pricing";
 
+export const FREE_OVERVIEW_MIN_WORDS = 500;
+export const FREE_OVERVIEW_VERSION = "free-overview-llm-v2";
+
+export function countWords(content: string) {
+  return content.trim().split(/\s+/).filter(Boolean).length;
+}
+
+export function isCompleteFreeOverview(content: string) {
+  const requiredHeadings = [
+    "## Tổng quan miễn phí",
+    "## Mệnh và Thân nói gì",
+    "## Điểm mạnh dễ phát huy",
+    "## Điều nên lưu ý",
+    "## Gợi ý cho năm",
+  ];
+
+  return countWords(content) >= FREE_OVERVIEW_MIN_WORDS && requiredHeadings.every((heading) => content.includes(heading));
+}
+
 function starsWithStates(chart: TuViChart, stars: string[], palaceName: string, fallback: string) {
   const palace = chart.palaces.find((item) => item.name === palaceName);
   if (!stars.length) return fallback;
@@ -179,7 +198,7 @@ Yêu cầu:
 - Không tự tính lại lá số, chỉ dùng dữ liệu trên.
 - Đây là 1 prompt duy nhất cho bản miễn phí; hãy tự tổng hợp đủ thông tin từ dữ liệu đã cấp, không yêu cầu gọi thêm API.
 - Không hứa chắc kết quả, không dọa nạt.
-- Viết khoảng 500-800 chữ, dễ đọc trên điện thoại.
+- BẮT BUỘC viết từ 500 đến 800 chữ tiếng Việt, không được trả lời ngắn. Mỗi mục bên dưới phải có nội dung thật, không chỉ chào hỏi.
 - Đây là bản miễn phí: chỉ nêu tổng quan và gợi ý đọc lá số, không luận chi tiết đủ 12 cung, không thay thế bản chuyên sâu.
 - Markdown đúng thứ tự:
   ## Tổng quan miễn phí
@@ -187,7 +206,7 @@ Yêu cầu:
   ## Điểm mạnh dễ phát huy
   ## Điều nên lưu ý
   ## Gợi ý cho năm ${chart.input.viewYear}
-Mỗi mục 1-2 đoạn ngắn hoặc 2-3 bullet.`;
+Mỗi mục tối thiểu 90 chữ, dùng 1-2 đoạn ngắn hoặc 2-3 bullet. Không kết thúc khi chưa đủ 500 chữ.`;
 }
 
 function fallbackFreeOverview(chart: TuViChart) {
@@ -225,7 +244,7 @@ ${chart.summary.join(" ")}
 
 export async function generateFreeOverview(chart: TuViChart) {
   const prompt = freeOverviewPrompt(chart);
-  const routed = await generateWithLlmRouter({ prompt, maxTokens: 1500, temperature: 0.55 });
+  const routed = await generateWithLlmRouter({ prompt, maxTokens: 2600, temperature: 0.55 });
   if (routed) return { content: routed.text, model: routed.model, prompt };
   return { content: fallbackFreeOverview(chart), model: "template-fallback", prompt };
 }

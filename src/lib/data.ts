@@ -4,6 +4,7 @@ import { CHART_ENGINE_VERSION, generateTuViChart, type ChartInput, type TuViChar
 import { articleWithScore, seedArticles, type ArticleView } from "@/lib/content";
 import { getDb } from "@/lib/db";
 import { FEATURE_PRICES, COIN_PACKAGES, type ReadingKey } from "@/lib/pricing";
+import { FREE_OVERVIEW_MIN_WORDS, FREE_OVERVIEW_VERSION, countWords } from "@/lib/ai";
 import { scoreArticleSeo } from "@/lib/seo";
 import { slugify } from "@/lib/format";
 import type { SessionUser } from "@/lib/auth";
@@ -33,6 +34,7 @@ type ChartWithFreeOverview = TuViChart & {
     content: string;
     model: string;
     generatedAt: string;
+    version?: string;
   };
 };
 
@@ -169,7 +171,13 @@ export async function getChart(id: string) {
 
 export async function getOrCreateFreeOverview(chartId: string, chart: TuViChart) {
   const chartWithOverview = chart as ChartWithFreeOverview;
-  if (chartWithOverview.freeOverview?.content) return chartWithOverview.freeOverview.content;
+  if (
+    chartWithOverview.freeOverview?.content &&
+    chartWithOverview.freeOverview.version === FREE_OVERVIEW_VERSION &&
+    countWords(chartWithOverview.freeOverview.content) >= FREE_OVERVIEW_MIN_WORDS
+  ) {
+    return chartWithOverview.freeOverview.content;
+  }
 
   const { generateFreeOverview } = await import("@/lib/ai");
   const result = await generateFreeOverview(chart);
@@ -179,6 +187,7 @@ export async function getOrCreateFreeOverview(chartId: string, chart: TuViChart)
       content: result.content,
       model: result.model,
       generatedAt: new Date().toISOString(),
+      version: FREE_OVERVIEW_VERSION,
     },
   };
 
