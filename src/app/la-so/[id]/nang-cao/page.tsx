@@ -34,7 +34,7 @@ export default async function AdvancedReadingPage({
   if (!fullReading) redirect(`/la-so/${id}`);
 
   return (
-    <main className="chart-page">
+    <main className="chart-page" data-testid="advanced-reading-page">
       <div className="mx-auto max-w-6xl px-3 py-8 sm:px-6 lg:px-8">
         <Link href="/la-so" className="mb-5 inline-flex items-center gap-2 text-sm font-bold text-orange-700 hover:text-orange-900">
           <ArrowLeft size={17} /> Quay lại lịch sử lá số
@@ -59,7 +59,7 @@ export default async function AdvancedReadingPage({
           </div>
         </div>
 
-        <section className="panel mt-8">
+        <section className="panel mt-8" data-testid="advanced-reading-panel">
           <p className="eyebrow">Bản luận giải toàn bộ</p>
           <article className="prose-content whitespace-pre-wrap">{fullReading.content}</article>
           <FeedbackActions label="luận giải nâng cao" />

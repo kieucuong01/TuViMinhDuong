@@ -98,13 +98,13 @@ export function DateView() {
               />
             </label>
             <div className="mt-3 grid grid-cols-3 gap-2">
-              <button type="button" className="btn btn-ghost btn-small" onClick={() => setSelectedDate(shiftDate(selectedDate, -1))}>
+              <button type="button" className="btn btn-ghost btn-small" onClick={() => setSelectedDate(shiftDate(selectedDate, -1))} data-testid="date-prev-button">
                 <ChevronLeft size={16} /> Trước
               </button>
-              <button type="button" className="btn btn-ghost btn-small" onClick={() => setSelectedDate(toInputDate(new Date()))}>
+              <button type="button" className="btn btn-ghost btn-small" onClick={() => setSelectedDate(toInputDate(new Date()))} data-testid="date-today-button">
                 Hôm nay
               </button>
-              <button type="button" className="btn btn-ghost btn-small" onClick={() => setSelectedDate(shiftDate(selectedDate, 1))}>
+              <button type="button" className="btn btn-ghost btn-small" onClick={() => setSelectedDate(shiftDate(selectedDate, 1))} data-testid="date-next-button">
                 Sau <ChevronRight size={16} />
               </button>
             </div>

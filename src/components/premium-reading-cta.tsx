@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { LockKeyhole, Sparkles, X } from "lucide-react";
-import { useState } from "react";
 import { requestReadingAction } from "@/app/actions";
 import { LoadingSubmitButton } from "@/components/loading-submit-button";
 import { FEATURE_PRICES } from "@/lib/pricing";
@@ -33,8 +32,8 @@ function PremiumCtaAction({
   fullName,
   hasAdvancedReading,
   placement,
-  onOpen,
-}: PremiumReadingCtaProps & { placement: "floating" | "bottom"; onOpen: () => void }) {
+  modalId,
+}: PremiumReadingCtaProps & { placement: "floating" | "bottom"; modalId: string }) {
   const className = `premium-reading-cta premium-reading-cta-${placement} ${hasAdvancedReading ? "premium-reading-cta-unlocked" : ""}`;
 
   if (hasAdvancedReading) {
@@ -51,7 +50,7 @@ function PremiumCtaAction({
       className={className}
       aria-label={`Mở luận giải toàn bộ của ${fullName}`}
       data-testid={`premium-reading-cta-${placement}`}
-      onClick={onOpen}
+      popoverTarget={modalId}
     >
       <PremiumCtaContent hasAdvancedReading={false} />
     </button>
@@ -61,26 +60,23 @@ function PremiumCtaAction({
 function PremiumReadingConfirmModal({
   chartId,
   fullName,
-  open,
-  onClose,
+  modalId,
 }: {
   chartId: string;
   fullName: string;
-  open: boolean;
-  onClose: () => void;
+  modalId: string;
 }) {
-  if (!open) return null;
-
   return (
-    <div className="premium-confirm-backdrop" role="presentation" onMouseDown={onClose}>
       <section
-        className="premium-confirm-modal"
+        id={modalId}
+        className="premium-confirm-modal premium-confirm-popover"
         role="dialog"
         aria-modal="true"
         aria-labelledby="premium-confirm-title"
-        onMouseDown={(event) => event.stopPropagation()}
+        popover="auto"
+        data-testid="premium-reading-confirm-modal"
       >
-        <button type="button" className="premium-confirm-close" onClick={onClose} aria-label="Đóng">
+        <button type="button" className="premium-confirm-close" aria-label="Đóng" popoverTarget={modalId} popoverTargetAction="hide">
           <X size={18} />
         </button>
 
@@ -107,30 +103,28 @@ function PremiumReadingConfirmModal({
           <input type="hidden" name="type" value="FULL" />
           <input type="hidden" name="scopeKey" value="all" />
           <input type="hidden" name="next" value={`/la-so/${chartId}`} />
-          <button type="button" className="btn btn-ghost" onClick={onClose}>
+          <button type="button" className="btn btn-ghost" popoverTarget={modalId} popoverTargetAction="hide">
             Để sau
           </button>
-          <LoadingSubmitButton className="btn btn-primary" loadingText="Đang mở...">
+          <LoadingSubmitButton className="btn btn-primary" loadingText="Đang mở..." data-testid="premium-reading-confirm-submit">
             Xác nhận mở khóa
           </LoadingSubmitButton>
         </form>
       </section>
-    </div>
   );
 }
 
 export function PremiumReadingCta(props: PremiumReadingCtaProps) {
-  const [confirmOpen, setConfirmOpen] = useState(false);
+  const modalId = `premium-confirm-${props.chartId}`;
 
   return (
     <>
-      <PremiumCtaAction {...props} placement="floating" onOpen={() => setConfirmOpen(true)} />
-      <PremiumCtaAction {...props} placement="bottom" onOpen={() => setConfirmOpen(true)} />
+      <PremiumCtaAction {...props} placement="floating" modalId={modalId} />
+      <PremiumCtaAction {...props} placement="bottom" modalId={modalId} />
       <PremiumReadingConfirmModal
         chartId={props.chartId}
         fullName={props.fullName}
-        open={confirmOpen}
-        onClose={() => setConfirmOpen(false)}
+        modalId={modalId}
       />
     </>
   );

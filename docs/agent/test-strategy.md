@@ -5,6 +5,9 @@
 - `src/lib/reading-unlock.test.ts` exercises the paid reading unlock core without Next cookies or a live database.
 - Covered cases: insufficient coins, cached reading reuse, normal debit, admin bypass, and refund after generation failure.
 - Remaining payment-risk tests: PayOS webhook signature, duplicate webhook idempotency, and return URL not crediting coins.
+- `src/app/api/webhooks/payos/route.test.ts` now covers invalid signatures, paid topup credit, duplicate webhook idempotency, failed statuses, and quick email readings.
+- `tests/e2e/smoke.spec.ts` now covers the P0 browser paths: home chart creation, paid CTA confirmation, insufficient-coin topup modal, admin dashboard, admin full-reading access, and admin CMS publish-to-public.
+- Current remaining payment-risk test: real PayOS sandbox/production checkout smoke. Return URL still must not be treated as a source of coin credit.
 
 Tài liệu này định nghĩa cách test cho dự án **Lá số tinh hoa**. Mục tiêu là hỗ trợ TDD thực dụng: phần logic quan trọng có test trước hoặc test đi kèm ngay trong cùng lượt, UI có smoke test đủ bắt lỗi vỡ luồng chính.
 

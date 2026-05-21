@@ -5,6 +5,10 @@
 - Added integration-style unit coverage for the paid reading unlock flow in `src/lib/reading-unlock.test.ts`.
 - Covered insufficient coins, admin bypass, cached reading no second charge, normal paid debit, and refund when AI generation fails.
 - Next P0 focus should move to Playwright smoke for topup modal/CMS/payment and PayOS webhook idempotency/signature tests.
+- Completed next P0 smoke coverage: homepage chart creation, paid CTA confirmation, insufficient-coin topup modal, admin full reading access, and admin CMS publish-to-public flow.
+- Completed PayOS webhook tests: invalid signature, paid credit, duplicate webhook idempotency, failed statuses, and quick email readings.
+- Completed first SEO content cluster: added beginner hub/articles for "lá số tử vi là gì", "cách đọc lá số tử vi", Cung Phu Thê, Cung Tật Ách, Cung Thiên Di, plus knowledge-page reading path and tests for internal links/SEO score.
+- Current next P0 focus: real PayOS sandbox/production checkout smoke and stronger chart-engine golden fixtures.
 
 Backlog này dùng để quyết định "làm tiếp cái gì" khi không có chỉ định chi tiết. Ưu tiên theo P0 -> P1 -> P2.
 

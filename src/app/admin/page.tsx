@@ -14,7 +14,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
   const [overview, articles, params] = await Promise.all([getAdminOverview(), listArticles(), searchParams]);
 
   return (
-    <main className="section">
+    <main className="section" data-testid="admin-page">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mb-6">
           <p className="eyebrow">Admin CMS</p>
@@ -40,18 +40,18 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
           <section className="panel">
             <p className="eyebrow">CMS bài viết</p>
             <h2 className="text-2xl font-bold">Tạo hoặc cập nhật bài SEO</h2>
-            <form action={saveArticleAction} className="mt-5 grid gap-4" data-loading-message="Đang lưu bài viết..." data-loading-label="Đang lưu...">
-              <label><span>Tiêu đề</span><input name="title" defaultValue="Cách đọc cung Mệnh trong tử vi" required /></label>
-              <label><span>Slug</span><input name="slug" defaultValue="cach-doc-cung-menh-trong-tu-vi" /></label>
-              <label><span>Excerpt</span><textarea name="excerpt" rows={3} defaultValue="Hướng dẫn cách đọc cung Mệnh trong lá số tử vi theo hướng ứng dụng, dễ hiểu và không mê tín cực đoan." /></label>
-              <label><span>Focus keyword</span><input name="focusKeyword" defaultValue="cung mệnh tử vi" /></label>
-              <label><span>Meta title</span><input name="metaTitle" defaultValue="Cách đọc cung Mệnh trong tử vi cho người mới" /></label>
-              <label><span>Meta description</span><textarea name="metaDescription" rows={2} defaultValue="Tìm hiểu cách đọc cung Mệnh trong tử vi, các yếu tố cần xem cùng Cung Thân, chính tinh, phụ tinh và vận hạn." /></label>
-              <label><span>Canonical URL</span><input name="canonicalUrl" defaultValue="/kien-thuc-tu-vi/cach-doc-cung-menh-trong-tu-vi" /></label>
-              <label><span>Ảnh đại diện</span><input name="coverImage" defaultValue="/articles/la-so-12-cung.svg" /></label>
-              <label><span>Alt ảnh đại diện</span><input name="coverAlt" defaultValue="Minh họa bàn lá số tử vi 12 cung" /></label>
-              <label><span>Nội dung Markdown</span><textarea name="content" rows={10} defaultValue={`Cung mệnh tử vi là điểm bắt đầu khi đọc một lá số.\n\n## Cung Mệnh cho biết điều gì\n\nCung Mệnh phản ánh khí chất, xu hướng hành động và cách một người phản ứng với hoàn cảnh.\n\n## Cần đọc cùng Cung Thân\n\nKhi kết hợp với [Cung Thân](/kien-thuc-tu-vi/cung-menh-cung-than), phần luận giải sẽ sát đời sống hơn.\n\n## Ứng dụng thực tế\n\nKhông nên xem cung Mệnh như một kết luận cố định. Hãy dùng nó như một bản đồ tham khảo để hiểu bản thân và lựa chọn tốt hơn.`} /></label>
-              <button className="btn btn-primary" type="submit">Lưu bài và chấm SEO</button>
+            <form action={saveArticleAction} className="mt-5 grid gap-4" data-testid="admin-article-form" data-loading-message="Đang lưu bài viết..." data-loading-label="Đang lưu...">
+              <label><span>Tiêu đề</span><input name="title" defaultValue="Cách đọc cung Mệnh trong tử vi" required data-testid="admin-article-title" /></label>
+              <label><span>Slug</span><input name="slug" defaultValue="cach-doc-cung-menh-trong-tu-vi" data-testid="admin-article-slug" /></label>
+              <label><span>Excerpt</span><textarea name="excerpt" rows={3} defaultValue="Hướng dẫn cách đọc cung Mệnh trong lá số tử vi theo hướng ứng dụng, dễ hiểu và không mê tín cực đoan." data-testid="admin-article-excerpt" /></label>
+              <label><span>Focus keyword</span><input name="focusKeyword" defaultValue="cung mệnh tử vi" data-testid="admin-article-focus-keyword" /></label>
+              <label><span>Meta title</span><input name="metaTitle" defaultValue="Cách đọc cung Mệnh trong tử vi cho người mới" data-testid="admin-article-meta-title" /></label>
+              <label><span>Meta description</span><textarea name="metaDescription" rows={2} defaultValue="Tìm hiểu cách đọc cung Mệnh trong tử vi, các yếu tố cần xem cùng Cung Thân, chính tinh, phụ tinh và vận hạn." data-testid="admin-article-meta-description" /></label>
+              <label><span>Canonical URL</span><input name="canonicalUrl" defaultValue="/kien-thuc-tu-vi/cach-doc-cung-menh-trong-tu-vi" data-testid="admin-article-canonical" /></label>
+              <label><span>Ảnh đại diện</span><input name="coverImage" defaultValue="/articles/la-so-12-cung.svg" data-testid="admin-article-cover-image" /></label>
+              <label><span>Alt ảnh đại diện</span><input name="coverAlt" defaultValue="Minh họa bàn lá số tử vi 12 cung" data-testid="admin-article-cover-alt" /></label>
+              <label><span>Nội dung Markdown</span><textarea name="content" rows={10} defaultValue={`Cung mệnh tử vi là điểm bắt đầu khi đọc một lá số.\n\n## Cung Mệnh cho biết điều gì\n\nCung Mệnh phản ánh khí chất, xu hướng hành động và cách một người phản ứng với hoàn cảnh.\n\n## Cần đọc cùng Cung Thân\n\nKhi kết hợp với [Cung Thân](/kien-thuc-tu-vi/cung-menh-cung-than), phần luận giải sẽ sát đời sống hơn.\n\n## Ứng dụng thực tế\n\nKhông nên xem cung Mệnh như một kết luận cố định. Hãy dùng nó như một bản đồ tham khảo để hiểu bản thân và lựa chọn tốt hơn.`} data-testid="admin-article-content" /></label>
+              <button className="btn btn-primary" type="submit" data-testid="admin-article-submit">Lưu bài và chấm SEO</button>
             </form>
           </section>
 

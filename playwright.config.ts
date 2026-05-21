@@ -1,4 +1,9 @@
+import "dotenv/config";
 import { defineConfig, devices } from "@playwright/test";
+
+if (!process.env.PLAYWRIGHT_BASE_URL) {
+  process.env.PLAYWRIGHT_DISABLE_LLM ||= "1";
+}
 
 const port = Number(process.env.PLAYWRIGHT_PORT || 4000);
 const baseURL = process.env.PLAYWRIGHT_BASE_URL || `http://127.0.0.1:${port}`;
@@ -23,6 +28,10 @@ export default defineConfig({
     ? undefined
     : {
         command: "npm run dev:e2e",
+        env: {
+          ...process.env,
+          PLAYWRIGHT_DISABLE_LLM: "1",
+        },
         url: baseURL,
         reuseExistingServer: !process.env.CI,
         timeout: 120_000,

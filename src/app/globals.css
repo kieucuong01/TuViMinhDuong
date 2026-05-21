@@ -1622,6 +1622,19 @@ button.is-loading:not(.icon-button)::before {
   box-shadow: 0 24px 70px rgb(28 25 23 / 0.25);
 }
 
+.premium-confirm-popover {
+  position: fixed;
+  inset: 0;
+  max-height: calc(100dvh - 2rem);
+  margin: auto;
+  overflow: auto;
+}
+
+.premium-confirm-popover::backdrop {
+  background: rgb(28 25 23 / 0.48);
+  backdrop-filter: blur(8px);
+}
+
 .premium-confirm-close {
   position: absolute;
   top: 0.85rem;

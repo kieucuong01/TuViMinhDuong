@@ -8,6 +8,10 @@ export const FREE_OVERVIEW_MAX_TOKENS = 7000;
 export const PAID_READING_CHAPTER_MAX_TOKENS = 6000;
 export const FREE_OVERVIEW_VERSION = "free-overview-llm-v3";
 
+function isLlmDisabledForSmoke() {
+  return process.env.PLAYWRIGHT_DISABLE_LLM === "1";
+}
+
 export function countWords(content: string) {
   return content.trim().split(/\s+/).filter(Boolean).length;
 }
@@ -255,6 +259,7 @@ ${chart.summary.join(" ")}
 
 export async function generateFreeOverview(chart: TuViChart) {
   const prompt = freeOverviewPrompt(chart);
+  if (isLlmDisabledForSmoke()) return { content: fallbackFreeOverview(chart), model: "template-fallback", prompt };
   const routed = await generateWithLlmRouter({ prompt, maxTokens: FREE_OVERVIEW_MAX_TOKENS, temperature: 0.55 });
   if (routed) return { content: routed.text, model: routed.model, prompt };
   return { content: fallbackFreeOverview(chart), model: "template-fallback", prompt };
@@ -454,7 +459,7 @@ export async function generateReading(chart: TuViChart, type: ReadingKey, scopeK
   const focus = getFocusData(chart, type, scopeKey);
   const chapters = paidReadingChapters(chart, type);
 
-  if (!hasExternalLlmProvider() && !process.env.VERCEL_OIDC_TOKEN && !process.env.AI_GATEWAY_API_KEY) {
+  if (isLlmDisabledForSmoke() || (!hasExternalLlmProvider() && !process.env.VERCEL_OIDC_TOKEN && !process.env.AI_GATEWAY_API_KEY)) {
     return generateReadingSinglePromptFallback(chart, type, scopeKey);
   }
 
