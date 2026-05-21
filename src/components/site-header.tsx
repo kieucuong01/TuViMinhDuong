@@ -3,6 +3,7 @@ import Image from "next/image";
 import { Menu } from "lucide-react";
 import { TEMPORARY_FULL_ACCESS } from "@/lib/pricing";
 import { UserHeaderBadge } from "@/components/user-header-badge";
+import { CoinTopupLink } from "@/components/coin-topup-link";
 import { APP_NAME } from "@/lib/env";
 
 const nav = [
@@ -14,7 +15,7 @@ const nav = [
     ? []
     : [
         { href: "/pricing", label: "Bảng giá" },
-        { href: "/nap-xu", label: "Nạp xu" },
+        { href: "/nap-xu", label: "Nạp xu", modal: true },
       ]),
 ];
 
@@ -33,11 +34,17 @@ export function SiteHeader() {
         </Link>
 
         <nav className="hidden items-center rounded-full border border-orange-100 bg-white/70 p-1 text-sm font-semibold text-stone-600 shadow-sm lg:flex">
-          {nav.map((item) => (
-            <Link key={item.href} href={item.href} className="rounded-full px-3.5 py-2 transition hover:bg-orange-50 hover:text-orange-700" prefetch={false}>
-              {item.label}
-            </Link>
-          ))}
+          {nav.map((item) =>
+            "modal" in item && item.modal ? (
+              <CoinTopupLink key={item.href} className="rounded-full px-3.5 py-2 transition hover:bg-orange-50 hover:text-orange-700">
+                {item.label}
+              </CoinTopupLink>
+            ) : (
+              <Link key={item.href} href={item.href} className="rounded-full px-3.5 py-2 transition hover:bg-orange-50 hover:text-orange-700" prefetch={false}>
+                {item.label}
+              </Link>
+            )
+          )}
         </nav>
 
         <div className="flex items-center gap-2">
@@ -48,11 +55,17 @@ export function SiteHeader() {
               <Menu size={20} />
             </summary>
             <div className="absolute right-0 mt-3 grid w-60 gap-1 rounded-2xl border border-orange-100 bg-white/95 p-2 shadow-2xl shadow-orange-950/10 backdrop-blur-xl">
-              {nav.map((item) => (
-                <Link key={item.href} href={item.href} className="rounded-xl px-3 py-2.5 text-sm font-semibold text-stone-700 transition hover:bg-orange-50 hover:text-orange-700" prefetch={false}>
-                  {item.label}
-                </Link>
-              ))}
+              {nav.map((item) =>
+                "modal" in item && item.modal ? (
+                  <CoinTopupLink key={item.href} className="rounded-xl px-3 py-2.5 text-sm font-semibold text-stone-700 transition hover:bg-orange-50 hover:text-orange-700">
+                    {item.label}
+                  </CoinTopupLink>
+                ) : (
+                  <Link key={item.href} href={item.href} className="rounded-xl px-3 py-2.5 text-sm font-semibold text-stone-700 transition hover:bg-orange-50 hover:text-orange-700" prefetch={false}>
+                    {item.label}
+                  </Link>
+                )
+              )}
             </div>
           </details>
         </div>

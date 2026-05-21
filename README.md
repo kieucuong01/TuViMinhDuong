@@ -27,6 +27,10 @@ Web tra cứu tử vi AI dùng Next.js App Router, TypeScript, Tailwind CSS, Pri
 - Seed bài viết kiến thức tử vi có internal link, outbound reference, Article JSON-LD và BreadcrumbList.
 - Xu, gói nạp, PayOS checkout/webhook và demo fallback.
 
+## Làm việc với AI Agent
+
+Agent mới nên bắt đầu từ `AGENTS.md`, sau đó đọc `docs/agent/README.md` và chỉ mở playbook liên quan trong `docs/agent/playbooks.md`. Bộ docs này giữ ngữ cảnh sản phẩm, kiến trúc, quy tắc domain và checklist kiểm chứng ở dạng ngắn để giảm token khi bàn giao giữa các session.
+
 ## Chạy local
 
 Next.js 16 cần Node `>=20.9.0`. Trên máy này, khi chạy qua Codex nên dùng Node bundled:

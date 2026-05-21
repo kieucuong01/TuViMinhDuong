@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 
 type LoadingKind = "route" | "form";
+type LoadingState = { kind: LoadingKind; message?: string };
 
 const messages: Record<LoadingKind, string> = {
   route: "Đang mở trang...",
@@ -27,28 +28,76 @@ function isSameHashNavigation(href: string) {
 export function GlobalLoadingToast() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const [kind, setKind] = useState<LoadingKind | null>(null);
+  const [loading, setLoading] = useState<LoadingState | null>(null);
   const timeoutRef = useRef<number | null>(null);
   const latestUrlRef = useRef("");
+  const activeControlsRef = useRef<HTMLElement[]>([]);
 
   const clearTimer = useCallback(() => {
     if (timeoutRef.current) window.clearTimeout(timeoutRef.current);
     timeoutRef.current = null;
   }, []);
 
-  const show = useCallback((nextKind: LoadingKind) => {
-    clearTimer();
-    setKind(nextKind);
-    timeoutRef.current = window.setTimeout(() => setKind(null), nextKind === "form" ? 14000 : 7000);
-  }, [clearTimer]);
+  const clearActiveControls = useCallback(() => {
+    for (const element of activeControlsRef.current) {
+      element.classList.remove("is-loading");
+      element.removeAttribute("aria-busy");
+
+      if (element instanceof HTMLButtonElement && element.dataset.loadingDisabled === "true") {
+        element.disabled = false;
+        delete element.dataset.loadingDisabled;
+      }
+    }
+    activeControlsRef.current = [];
+  }, []);
+
+  const show = useCallback(
+    (nextKind: LoadingKind, message?: string) => {
+      clearTimer();
+      setLoading({ kind: nextKind, message });
+      timeoutRef.current = window.setTimeout(
+        () => {
+          setLoading(null);
+          clearActiveControls();
+        },
+        nextKind === "form" ? 14000 : 7000,
+      );
+    },
+    [clearActiveControls, clearTimer],
+  );
+
+  const markFormLoading = useCallback(
+    (form: HTMLFormElement, submitter: HTMLElement | null) => {
+      clearActiveControls();
+      form.setAttribute("aria-busy", "true");
+      form.classList.add("is-loading");
+      activeControlsRef.current.push(form);
+
+      const button = submitter?.closest("button") as HTMLButtonElement | null;
+      if (!button) return;
+
+      button.classList.add("is-loading");
+      button.setAttribute("aria-busy", "true");
+      if (!button.disabled) {
+        button.disabled = true;
+        button.dataset.loadingDisabled = "true";
+      }
+
+      activeControlsRef.current.push(button);
+    },
+    [clearActiveControls],
+  );
 
   useEffect(() => {
     const currentUrl = `${pathname}?${searchParams.toString()}`;
     if (latestUrlRef.current && latestUrlRef.current !== currentUrl) {
-      window.setTimeout(() => setKind(null), 180);
+      window.setTimeout(() => {
+        setLoading(null);
+        clearActiveControls();
+      }, 180);
     }
     latestUrlRef.current = currentUrl;
-  }, [pathname, searchParams]);
+  }, [clearActiveControls, pathname, searchParams]);
 
   useEffect(() => {
     function onClick(event: MouseEvent) {
@@ -57,33 +106,37 @@ export function GlobalLoadingToast() {
       if (!anchor || anchor.target || anchor.hasAttribute("download") || anchor.dataset.noLoadingToast === "true") return;
       if (!isInternalUrl(anchor.href) || isSameHashNavigation(anchor.href)) return;
       if (anchor.href === window.location.href) return;
-      show("route");
+      show("route", anchor.dataset.loadingMessage);
     }
 
     function onSubmit(event: SubmitEvent) {
       const form = event.target as HTMLFormElement | null;
       if (!form || form.dataset.noLoadingToast === "true") return;
+      const submitter = event.submitter instanceof HTMLElement ? event.submitter : null;
+
       window.setTimeout(() => {
         if (event.defaultPrevented) return;
-        if ((form.method || "get").toLowerCase() === "post") show("form");
+        markFormLoading(form, submitter);
+        show("form", form.dataset.loadingMessage);
       }, 0);
     }
 
     document.addEventListener("click", onClick, true);
-    document.addEventListener("submit", onSubmit);
+    document.addEventListener("submit", onSubmit, true);
     return () => {
       document.removeEventListener("click", onClick, true);
-      document.removeEventListener("submit", onSubmit);
+      document.removeEventListener("submit", onSubmit, true);
       clearTimer();
+      clearActiveControls();
     };
-  }, [clearTimer, show]);
+  }, [clearActiveControls, clearTimer, markFormLoading, show]);
 
-  if (!kind) return null;
+  if (!loading) return null;
 
   return (
     <div className="global-loading-toast" role="status" aria-live="polite" aria-atomic="true">
       <span className="global-loading-spinner" aria-hidden="true" />
-      <span>{messages[kind]}</span>
+      <span>{loading.message || messages[loading.kind]}</span>
       <i aria-hidden="true" />
     </div>
   );

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { SiteHeader } from "@/components/site-header";
 import { GlobalLoadingToast } from "@/components/global-loading-toast";
+import { CoinTopupModal } from "@/components/coin-topup-modal";
 import { APP_NAME, APP_URL } from "@/lib/env";
 import "./globals.css";
 
@@ -54,6 +55,9 @@ export default function RootLayout({
         {children}
         <Suspense fallback={null}>
           <GlobalLoadingToast />
+        </Suspense>
+        <Suspense fallback={null}>
+          <CoinTopupModal />
         </Suspense>
       </body>
     </html>

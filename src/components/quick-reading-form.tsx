@@ -22,7 +22,12 @@ export function QuickReadingForm() {
         </div>
       </div>
 
-      <form action={quickReadingCheckoutAction} className="quick-reading-form">
+      <form
+        action={quickReadingCheckoutAction}
+        className="quick-reading-form"
+        data-loading-message="Đang tạo đơn luận giải..."
+        data-loading-label="Đang tạo đơn..."
+      >
         <div className="form-grid">
           <label className="md:col-span-2">
             <span>Email nhận kết quả</span>
@@ -90,7 +95,7 @@ export function QuickReadingForm() {
             <input name="viewYear" type="number" min="1900" max="2100" defaultValue={now.getFullYear()} required />
           </label>
         </div>
-        <button className="btn btn-primary btn-large w-full" type="submit">
+        <button className="btn btn-primary btn-large w-full" type="submit" data-loading-label="Đang tạo đơn...">
           Mua luận giải toàn bộ - {formatVnd(price)}
         </button>
         <p className="text-center text-sm leading-6 text-stone-500">

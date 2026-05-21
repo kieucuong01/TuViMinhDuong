@@ -40,7 +40,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
           <section className="panel">
             <p className="eyebrow">CMS bài viết</p>
             <h2 className="text-2xl font-bold">Tạo hoặc cập nhật bài SEO</h2>
-            <form action={saveArticleAction} className="mt-5 grid gap-4">
+            <form action={saveArticleAction} className="mt-5 grid gap-4" data-loading-message="Đang lưu bài viết..." data-loading-label="Đang lưu...">
               <label><span>Tiêu đề</span><input name="title" defaultValue="Cách đọc cung Mệnh trong tử vi" required /></label>
               <label><span>Slug</span><input name="slug" defaultValue="cach-doc-cung-menh-trong-tu-vi" /></label>
               <label><span>Excerpt</span><textarea name="excerpt" rows={3} defaultValue="Hướng dẫn cách đọc cung Mệnh trong lá số tử vi theo hướng ứng dụng, dễ hiểu và không mê tín cực đoan." /></label>

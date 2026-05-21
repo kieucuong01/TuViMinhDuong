@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Coins, LogOut, ShieldCheck, UserCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 import { logoutAction } from "@/app/actions";
+import { CoinTopupLink } from "@/components/coin-topup-link";
 
 type HeaderUser = {
   id: string;
@@ -57,9 +58,9 @@ export function UserHeaderBadge() {
       {temporaryFullAccess ? (
         <span className="user-coin-pill free"><Coins size={15} /> Miễn phí</span>
       ) : (
-        <Link href="/nap-xu" className="user-coin-pill" prefetch={false}>
+        <CoinTopupLink className="user-coin-pill" aria-label="Nạp xu nhanh">
           <Coins size={15} /> {user.coinBalance} xu
-        </Link>
+        </CoinTopupLink>
       )}
       {user.role === "ADMIN" ? (
         <Link href="/admin" className="user-admin-pill" title="Admin" prefetch={false}>
@@ -71,7 +72,7 @@ export function UserHeaderBadge() {
         <span className="user-account-label">Tài khoản</span>
         <span className="user-account-value">{user.name || user.email}</span>
       </Link>
-      <form action={logoutAction}>
+      <form action={logoutAction} data-loading-message="Đang đăng xuất...">
         <button className="icon-button" type="submit" aria-label="Đăng xuất" title="Đăng xuất">
           <LogOut size={17} />
         </button>

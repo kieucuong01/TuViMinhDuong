@@ -45,7 +45,13 @@ export function ReadingTabs({ chartId, chart }: { chartId: string; chart: TuViCh
       </div>
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         {tabCards.map((card) => (
-          <form key={card.title} action={requestReadingAction} className="unlock-card">
+          <form
+            key={card.title}
+            action={requestReadingAction}
+            className="unlock-card"
+            data-loading-message="Đang mở phần luận giải..."
+            data-loading-label="Đang mở..."
+          >
             <input type="hidden" name="chartId" value={chartId} />
             <input type="hidden" name="type" value={card.type} />
             <input type="hidden" name="scopeKey" value={card.scopeKey} />

@@ -33,7 +33,7 @@ function OpenButton({
   const buttonLabel = label || `Mở - ${formatCoins(FEATURE_PRICES[type].priceCoins)}`;
 
   return (
-    <form action={requestReadingAction}>
+    <form action={requestReadingAction} data-loading-message="Đang mở phần luận giải..." data-loading-label="Đang mở...">
       <input type="hidden" name="chartId" value={chartId} />
       <input type="hidden" name="type" value={type} />
       <input type="hidden" name="scopeKey" value={scopeKey} />

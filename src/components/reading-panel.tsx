@@ -27,7 +27,13 @@ export function ReadingPanel({ chartId, chart }: { chartId: string; chart: TuViC
         {options.map((option) => {
           const price = FEATURE_PRICES[option.type].priceCoins;
           return (
-            <form key={`${option.type}-${option.scopeKey}`} action={requestReadingAction} className="rounded-2xl border border-orange-100 bg-orange-50/50 p-4 transition hover:-translate-y-1 hover:bg-white hover:shadow-lg">
+            <form
+              key={`${option.type}-${option.scopeKey}`}
+              action={requestReadingAction}
+              className="rounded-2xl border border-orange-100 bg-orange-50/50 p-4 transition hover:-translate-y-1 hover:bg-white hover:shadow-lg"
+              data-loading-message="Đang mở phần luận giải..."
+              data-loading-label="Đang mở..."
+            >
               <input type="hidden" name="chartId" value={chartId} />
               <input type="hidden" name="type" value={option.type} />
               <input type="hidden" name="scopeKey" value={option.scopeKey} />

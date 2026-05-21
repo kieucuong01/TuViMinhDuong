@@ -31,7 +31,7 @@ export default async function CoinsPage({ searchParams }: { searchParams: Promis
         {params.status === "demo-paid" ? <p className="success mx-auto mb-6 max-w-2xl">Đã cộng xu vào phiên hiện tại.</p> : null}
         <div className="grid gap-4 md:grid-cols-3">
           {COIN_PACKAGES.map((pack) => (
-            <form key={pack.key} action={createCheckoutAction} className="pricing-card">
+            <form key={pack.key} action={createCheckoutAction} className="pricing-card" data-loading-message="Đang tạo link thanh toán..." data-loading-label="Đang tạo link...">
               <input type="hidden" name="packageKey" value={pack.key} />
               <Coins className="text-orange-600" size={30} />
               <h2>{pack.label}</h2>

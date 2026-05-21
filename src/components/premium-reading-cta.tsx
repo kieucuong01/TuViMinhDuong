@@ -41,7 +41,13 @@ function PremiumCtaAction({
   }
 
   return (
-    <form action={requestReadingAction} className={className} aria-label={`Mở luận giải toàn bộ của ${fullName}`}>
+    <form
+      action={requestReadingAction}
+      className={className}
+      aria-label={`Mở luận giải toàn bộ của ${fullName}`}
+      data-loading-message="Đang mở luận giải..."
+      data-loading-label="Đang mở..."
+    >
       <input type="hidden" name="chartId" value={chartId} />
       <input type="hidden" name="type" value="FULL" />
       <input type="hidden" name="scopeKey" value="all" />

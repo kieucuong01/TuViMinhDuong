@@ -39,7 +39,7 @@ export default function PricingPage() {
                 1 xu = 1.000đ. Bạn có thể nạp theo gói, rồi dùng xu cho phần luận giải mình cần.
               </p>
               <div className="mt-6 flex flex-wrap gap-3">
-                <Link href="/nap-xu" className="btn btn-primary btn-large">
+                <Link href="/pricing?topup=1" className="btn btn-primary btn-large" prefetch={false}>
                   <Coins size={20} /> Nạp xu
                 </Link>
                 <Link href="/#lap-la-so" className="btn btn-ghost btn-large">
@@ -60,7 +60,7 @@ export default function PricingPage() {
               </div>
               <p className="mt-3 text-lg leading-8 text-stone-600">Phù hợp khi bạn muốn xem đầy đủ trước, sau đó đọc sâu từng phần khi cần.</p>
               <p className="mt-5 text-4xl font-black text-orange-700">{formatCoins(FEATURE_PRICES.FULL.priceCoins)}</p>
-              <Link href="/nap-xu" className="btn btn-primary btn-large mt-5 w-full">
+              <Link href="/pricing?topup=1" className="btn btn-primary btn-large mt-5 w-full" prefetch={false}>
                 Chọn gói phù hợp
               </Link>
             </aside>
@@ -91,7 +91,7 @@ export default function PricingPage() {
 
           <div className="grid gap-4">
             {COIN_PACKAGES.map((pack) => (
-              <Link key={pack.key} href="/nap-xu" className="pricing-card block">
+              <Link key={pack.key} href="/pricing?topup=1" className="pricing-card block" prefetch={false}>
                 <div className="flex items-start justify-between gap-4">
                   <div>
                     <h2>{pack.label}</h2>

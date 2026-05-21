@@ -1,10 +1,16 @@
 import { createChartAction } from "@/app/actions";
+import { LoadingSubmitButton } from "@/components/loading-submit-button";
 
 export function ChartForm({ compact = false }: { compact?: boolean }) {
   const now = new Date();
 
   return (
-    <form action={createChartAction} className={compact ? "chart-form compact" : "chart-form"}>
+    <form
+      action={createChartAction}
+      className={compact ? "chart-form compact" : "chart-form"}
+      data-loading-message="Đang lập lá số..."
+      data-loading-label="Đang lập lá số..."
+    >
       <div className="form-grid">
         <label className="md:col-span-2">
           <span>Họ và tên</span>
@@ -69,9 +75,9 @@ export function ChartForm({ compact = false }: { compact?: boolean }) {
         </label>
       </div>
 
-      <button className="btn btn-primary btn-large w-full" type="submit">
+      <LoadingSubmitButton className="btn btn-primary btn-large w-full" loadingText="Đang lập lá số...">
         Xem lá số miễn phí
-      </button>
+      </LoadingSubmitButton>
       <p className="text-center text-sm leading-6 text-stone-500">
         Chỉ cần chọn đúng khung giờ sinh. Nếu không chắc, hãy chọn khung giờ gần nhất.
       </p>

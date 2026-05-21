@@ -192,6 +192,34 @@ textarea:focus {
   animation: loading-spinner 680ms linear infinite;
 }
 
+form.is-loading {
+  pointer-events: none;
+}
+
+button.is-loading,
+a.is-loading {
+  cursor: wait;
+  opacity: 0.86;
+}
+
+button.is-loading:not(.icon-button) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+}
+
+button.is-loading:not(.icon-button)::before {
+  width: 1rem;
+  height: 1rem;
+  flex: 0 0 auto;
+  border: 2px solid rgb(255 255 255 / 0.5);
+  border-top-color: #fff;
+  border-radius: 999px;
+  content: "";
+  animation: loading-spinner 680ms linear infinite;
+}
+
 .paywall-popup {
   position: fixed;
   right: 1.25rem;
@@ -288,6 +316,10 @@ textarea:focus {
   box-shadow: 0 34px 90px rgb(28 25 23 / 0.26);
 }
 
+.coin-topup-modal {
+  width: min(100%, 54rem);
+}
+
 .paywall-modal-close {
   position: absolute;
   right: 0.9rem;
@@ -333,6 +365,7 @@ textarea:focus {
 }
 
 .paywall-package-card {
+  position: relative;
   display: grid;
   gap: 0.45rem;
   border: 1px solid #fed7aa;
@@ -340,6 +373,12 @@ textarea:focus {
   background: rgb(255 255 255 / 0.92);
   padding: 1rem;
   box-shadow: 0 12px 30px rgb(120 53 15 / 0.07);
+}
+
+.paywall-package-card.recommended {
+  border-color: #fb923c;
+  background: linear-gradient(180deg, #fff7ed, #fff);
+  box-shadow: 0 18px 42px rgb(234 88 12 / 0.14);
 }
 
 .paywall-package-card strong {
@@ -365,6 +404,60 @@ textarea:focus {
   color: #9a3412;
   font-size: 0.9rem;
   font-weight: 850;
+}
+
+.coin-topup-note {
+  display: flex;
+  gap: 0.55rem;
+  align-items: center;
+  margin-top: 1rem;
+  border: 1px solid #bbf7d0;
+  border-radius: 0.9rem;
+  background: #ecfdf5;
+  padding: 0.75rem 0.9rem;
+  color: #047857;
+  font-size: 0.95rem;
+  font-weight: 800;
+  line-height: 1.45;
+}
+
+.coin-topup-badge {
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  gap: 0.25rem;
+  border-radius: 999px;
+  background: #ffedd5;
+  padding: 0.25rem 0.55rem;
+  color: #c2410c;
+  font-size: 0.75rem !important;
+  font-weight: 950;
+}
+
+.coin-topup-footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 1rem;
+  color: #9a3412;
+  font-size: 0.95rem;
+  font-weight: 850;
+}
+
+.coin-topup-footer button,
+.coin-topup-footer a {
+  min-height: 2.45rem;
+  border-radius: 0.75rem;
+  padding: 0 0.85rem;
+  transition: background 160ms ease, color 160ms ease;
+}
+
+.coin-topup-footer button:hover,
+.coin-topup-footer a:hover {
+  background: #fff7ed;
+  color: #7c2d12;
 }
 
 .chart-history-search svg {

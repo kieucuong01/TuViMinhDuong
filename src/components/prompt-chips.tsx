@@ -20,7 +20,12 @@ export function PromptChips({ chartId, chart }: { chartId: string; chart: TuViCh
       </div>
       <div className="mt-4 grid gap-2 md:grid-cols-2">
         {prompts.map((prompt) => (
-          <form key={prompt.label} action={requestReadingAction}>
+          <form
+            key={prompt.label}
+            action={requestReadingAction}
+            data-loading-message="Đang mở phần luận giải..."
+            data-loading-label="Đang mở..."
+          >
             <input type="hidden" name="chartId" value={chartId} />
             <input type="hidden" name="type" value={prompt.type} />
             <input type="hidden" name="scopeKey" value={prompt.scopeKey} />

@@ -234,10 +234,12 @@ export async function saveArticleAction(formData: FormData) {
 export async function createCheckoutAction(formData: FormData) {
   if (TEMPORARY_FULL_ACCESS) redirect("/nap-xu?status=disabled");
 
-  const user = await getCurrentUser();
-  if (!user) redirect("/dang-nhap?next=/nap-xu");
   const packageKey = String(formData.get("packageKey") || "full-reading");
   const returnTo = safeNextPath(formData.get("returnTo"), "/nap-xu");
+  const user = await getCurrentUser();
+  if (!user) {
+    redirect(`/dang-nhap?next=${encodeURIComponent(withQueryParams(returnTo, { topup: "1" }))}&paywall=login`);
+  }
   const checkout = await createPayOSCheckout(packageKey, user, returnTo);
   const pack = COIN_PACKAGES.find((item) => item.key === packageKey) || COIN_PACKAGES[1];
   const db = getDb();

@@ -67,6 +67,8 @@ function ChartListItem({ chart }: { chart: ChartHistoryViewItem }) {
           action={(formData) => {
             startTransition(() => deleteChartAction(formData));
           }}
+          data-loading-message="Đang xóa lá số..."
+          data-loading-label="Đang xóa..."
         >
           <input type="hidden" name="chartId" value={chart.id} />
           <button className="icon-button" type="submit" aria-label="Xóa lá số" title="Xóa lá số" disabled={isPending}>
