@@ -9,7 +9,8 @@ This folder keeps the high-signal context for future AI agents. It is inspired b
 ## Product Snapshot
 
 - Brand: **Lá số tinh hoa**
-- Domain: `lasotinhhoa.vn`
+- Domain tạm thời: `tu-vi-minh-duong.vercel.app`
+- Domain dự kiến sau khi DNS ổn định: `lasotinhhoa.vn`
 - Audience: Vietnamese adults, mostly 30-60, who want a clear tử vi chart and plain-language readings.
 - Main conversion: create a free chart first, then open paid full readings.
 - UX tone: calm, readable, trustworthy, less "AI/SaaS", more "easy tử vi tool".

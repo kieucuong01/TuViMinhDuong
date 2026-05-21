@@ -97,7 +97,7 @@ npm run test:e2e
 Mặc định Playwright tự bật dev server tại `http://127.0.0.1:4000`. Nếu muốn smoke một site đã chạy sẵn:
 
 ```powershell
-$env:PLAYWRIGHT_BASE_URL="https://lasotinhhoa.vn"
+$env:PLAYWRIGHT_BASE_URL="https://tu-vi-minh-duong.vercel.app"
 npm run test:e2e
 ```
 
@@ -106,7 +106,7 @@ Admin smoke sẽ tự skip nếu chưa có `PLAYWRIGHT_ADMIN_EMAIL` và `PLAYWRI
 Kiểm tra tốc độ phản hồi các trang public sau deploy:
 
 ```powershell
-$env:PERF_BASE_URL="https://lasotinhhoa.vn"
+$env:PERF_BASE_URL="https://tu-vi-minh-duong.vercel.app"
 npm run perf:smoke
 ```
 

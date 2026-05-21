@@ -322,7 +322,7 @@ export function ChartBoard({ chart }: { chart: TuViChart }) {
             <strong>{APP_NAME}</strong>
           </Link>
           <p className="center-kicker">TRA CỨU TỬ VI CHÍNH XÁC NHẤT VIỆT NAM</p>
-          <Link href="/" className="center-link">https://lasotinhhoa.vn</Link>
+          <Link href="/" className="center-link">https://tu-vi-minh-duong.vercel.app</Link>
           <dl>
             <div><dt>Họ tên</dt><dd>{chart.input.fullName}</dd></div>
             <div><dt>Năm sinh</dt><dd>{chart.solar.year} - {chart.canChi.year}</dd></div>

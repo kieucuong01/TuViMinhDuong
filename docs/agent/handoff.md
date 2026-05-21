@@ -7,7 +7,7 @@ Use this when starting a new AI-agent session. Paste the short bootstrap plus th
 ```text
 You are working in C:\Users\ASUS\Documents\Claude\Projects\Tu vi.
 Start by reading AGENTS.md, then docs/agent/README.md, then only the relevant playbook in docs/agent/playbooks.md.
-This is the Lá số tinh hoa Next.js 16 app for lasotinhhoa.vn.
+This is the Lá số tinh hoa Next.js 16 app. The temporary production URL is tu-vi-minh-duong.vercel.app; lasotinhhoa.vn is planned after DNS is stable.
 Follow existing patterns, preserve unrelated dirty changes, and verify with the smallest sufficient ladder from docs/agent/verification.md.
 ```
 

@@ -1,5 +1,5 @@
 const DEFAULT_APP_URL =
-  process.env.NODE_ENV === "production" ? "https://lasotinhhoa.vn" : "http://localhost:4000";
+  process.env.NODE_ENV === "production" ? "https://tu-vi-minh-duong.vercel.app" : "http://localhost:4000";
 
 export const APP_URL =
   process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") || DEFAULT_APP_URL;
