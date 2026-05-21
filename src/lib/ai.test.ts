@@ -4,6 +4,10 @@ import { generateTuViChart } from "@/lib/chart";
 
 const oldGatewayKey = process.env.AI_GATEWAY_API_KEY;
 const oldOidcToken = process.env.VERCEL_OIDC_TOKEN;
+const oldGeminiKey = process.env.GEMINI_API_KEY;
+const oldGeminiKeys = process.env.GEMINI_API_KEYS;
+const oldGroqKey = process.env.GROQ_API_KEY;
+const oldGroqKeys = process.env.GROQ_API_KEYS;
 
 afterEach(() => {
   if (oldGatewayKey === undefined) delete process.env.AI_GATEWAY_API_KEY;
@@ -11,12 +15,28 @@ afterEach(() => {
 
   if (oldOidcToken === undefined) delete process.env.VERCEL_OIDC_TOKEN;
   else process.env.VERCEL_OIDC_TOKEN = oldOidcToken;
+
+  if (oldGeminiKey === undefined) delete process.env.GEMINI_API_KEY;
+  else process.env.GEMINI_API_KEY = oldGeminiKey;
+
+  if (oldGeminiKeys === undefined) delete process.env.GEMINI_API_KEYS;
+  else process.env.GEMINI_API_KEYS = oldGeminiKeys;
+
+  if (oldGroqKey === undefined) delete process.env.GROQ_API_KEY;
+  else process.env.GROQ_API_KEY = oldGroqKey;
+
+  if (oldGroqKeys === undefined) delete process.env.GROQ_API_KEYS;
+  else process.env.GROQ_API_KEYS = oldGroqKeys;
 });
 
 describe("AI reading format", () => {
   it("uses the fixed mobile-friendly section order for fallback readings", async () => {
     delete process.env.AI_GATEWAY_API_KEY;
     delete process.env.VERCEL_OIDC_TOKEN;
+    delete process.env.GEMINI_API_KEY;
+    delete process.env.GEMINI_API_KEYS;
+    delete process.env.GROQ_API_KEY;
+    delete process.env.GROQ_API_KEYS;
 
     const chart = generateTuViChart({
       fullName: "Nguyễn Minh Anh",

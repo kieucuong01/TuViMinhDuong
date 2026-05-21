@@ -28,6 +28,14 @@ type StoredReading = {
   createdAt: Date;
 };
 
+type ChartWithFreeOverview = TuViChart & {
+  freeOverview?: {
+    content: string;
+    model: string;
+    generatedAt: string;
+  };
+};
+
 export type ChartHistoryItem = StoredChart & {
   hasAdvancedReading: boolean;
   advancedReadingId?: string;
@@ -157,6 +165,35 @@ export async function getChart(id: string) {
     });
   }
   return upgraded;
+}
+
+export async function getOrCreateFreeOverview(chartId: string, chart: TuViChart) {
+  const chartWithOverview = chart as ChartWithFreeOverview;
+  if (chartWithOverview.freeOverview?.content) return chartWithOverview.freeOverview.content;
+
+  const { generateFreeOverview } = await import("@/lib/ai");
+  const result = await generateFreeOverview(chart);
+  const updatedChart: ChartWithFreeOverview = {
+    ...chart,
+    freeOverview: {
+      content: result.content,
+      model: result.model,
+      generatedAt: new Date().toISOString(),
+    },
+  };
+
+  const db = getDb();
+  if (!db) {
+    const record = charts().get(chartId);
+    if (record) charts().set(chartId, { ...record, chart: updatedChart });
+    return result.content;
+  }
+
+  await db.chart.update({
+    where: { id: chartId },
+    data: { chart: updatedChart },
+  });
+  return result.content;
 }
 
 export async function listUserCharts(userId: string, includeAll = false): Promise<ChartHistoryItem[]> {

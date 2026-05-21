@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { ChartBoard, MobileChartReader } from "@/components/chart-board";
-import { getAnyCompletedReading, getCachedReading, getChart, getReadingById } from "@/lib/data";
+import { getAnyCompletedReading, getCachedReading, getChart, getOrCreateFreeOverview, getReadingById } from "@/lib/data";
 import { getCurrentUser } from "@/lib/auth";
 import { FeedbackActions } from "@/components/feedback-actions";
 import { PromptChips } from "@/components/prompt-chips";
@@ -50,6 +50,7 @@ export default async function ChartPage({
     : null;
   const activeReading = selectedReading || fullReading;
   const hasAdvancedReading = Boolean(fullReading);
+  const freeOverview = activeReading ? null : await getOrCreateFreeOverview(id, record.chart);
   const activeLabel = activeReading ? readingLabels[activeReading.type] : "Luận giải tổng quan";
 
   return (
@@ -91,16 +92,9 @@ export default async function ChartPage({
                 <FeedbackActions label={activeLabel.toLowerCase()} />
               </>
             ) : (
-              <div className="space-y-4 text-stone-700">
-                <div className="free-reading-summary">
-                  <h2>Tổng quan miễn phí</h2>
-                  <p>{record.chart.summary[0]}</p>
-                  <h3>Điểm mạnh</h3>
-                  <p>{record.chart.summary[1] || "Lá số có những điểm nổi bật riêng, nên đọc cùng toàn bộ 12 cung để hiểu rõ hơn."}</p>
-                  <h3>Điều nên lưu ý</h3>
-                  <p>{record.chart.summary[2] || "Nên xem tử vi như bản tham khảo để cân nhắc, không dùng thay cho quyết định quan trọng."}</p>
-                </div>
-              </div>
+              <>
+                <article className="prose-content free-reading-summary whitespace-pre-wrap">{freeOverview}</article>
+              </>
             )}
           </section>
           <aside className="panel">
