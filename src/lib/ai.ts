@@ -50,9 +50,9 @@ function fallbackReading(chart: TuViChart, type: ReadingKey, scopeKey: string) {
 
   return `# ${feature.label} cho ${chart.input.fullName}
 
-## Nguồn dữ liệu sử dụng
+## Thông tin lá số đã dùng
 - ${focus.evidence.join("\n- ")}
-- Hệ thống chỉ dùng dữ liệu lá số đã an sao, không tự tính lại ngày giờ hay cung sao.
+- Phần luận giải dựa trên lá số đã lập, không tự ý đổi ngày giờ hay cung sao.
 
 ## Tổng quan
 Trọng tâm của phần này là ${focus.title}. Lá số cho thấy ${chart.summary.join(" ")} Vì vậy, phần luận giải nên được đọc như một bản định hướng: giúp nhận diện xu hướng, điểm mạnh, điểm cần thận trọng và nhịp hành động phù hợp trong năm ${chart.input.viewYear}.
@@ -78,13 +78,13 @@ Trọng tâm của phần này là ${focus.title}. Lá số cho thấy ${chart.s
 - Dài hạn: xây nền ổn định trước khi mở rộng mạnh.
 
 ## Kết luận ngắn
-Lá số này phù hợp với cách đi chắc, biết chọn thời điểm và tránh cực đoan. Luận giải nên được dùng như một bản đồ tham khảo để ra quyết định tỉnh táo hơn.`;
+Lá số này phù hợp với cách đi chắc, biết chọn thời điểm và tránh cực đoan. Bạn nên dùng bản luận giải như một phần tham khảo để hiểu mình hơn và ra quyết định tỉnh táo hơn.`;
 }
 
 export async function generateReading(chart: TuViChart, type: ReadingKey, scopeKey: string) {
   const model = process.env.AI_MODEL || "openai/gpt-5.4";
   const focus = getFocusData(chart, type, scopeKey);
-  const prompt = `Bạn là chuyên gia tử vi Việt Nam. Viết luận giải tiếng Việt rõ ràng, có trách nhiệm, không mê tín cực đoan.
+  const prompt = `Bạn là chuyên gia tử vi Việt Nam. Viết luận giải tiếng Việt rõ ràng, dễ hiểu cho người đọc 30-60 tuổi, có trách nhiệm, không mê tín cực đoan.
 
 Loại luận: ${FEATURE_PRICES[type].label}
 Phạm vi: ${scopeKey}
@@ -99,16 +99,16 @@ Yêu cầu bắt buộc:
 - Không tự tính lại lá số, chỉ dùng dữ liệu JSON và nguồn dữ liệu nổi bật.
 - Không khẳng định tuyệt đối, không dọa nạt, không hứa chắc kết quả.
 - Khi sao có trạng thái (H), sát tinh hoặc lưu sát tinh như L.Kình Dương/L.Đà La/L.Tang Môn/L.Bạch Hổ/L.Thiên Khốc/L.Thiên Hư, phải xem là tín hiệu rủi ro cần quản trị; không được bỏ qua trong luận vận hạn.
-- Viết theo đúng Markdown với các mục theo thứ tự:
+- Viết theo đúng Markdown với các mục theo thứ tự, đoạn văn ngắn, tránh thuật ngữ kỹ thuật:
   1. # ${FEATURE_PRICES[type].label} cho ${chart.input.fullName}
-  2. ## Nguồn dữ liệu sử dụng
+  2. ## Thông tin lá số đã dùng
   3. ## Tổng quan
   4. ## Điểm mạnh
   5. ## Điểm cần lưu ý
   6. ## Gợi ý hành động
   7. ## Mốc thời gian nên chú ý
   8. ## Kết luận ngắn
-- Mỗi mục 2-4 đoạn hoặc 3-5 bullet, ưu tiên lời khuyên thực tế.
+- Mỗi mục 1-3 đoạn ngắn hoặc 3-5 bullet, ưu tiên lời khuyên thực tế, dễ đọc trên điện thoại.
 - Với luận cung, liên hệ rõ cung đang xét với sao chính/phụ tinh.
 - Với đại vận/nguyệt vận/nhật vận, nêu rõ nhịp thời gian và việc nên ưu tiên.`;
 

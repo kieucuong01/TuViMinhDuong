@@ -9,7 +9,7 @@ const AssistantWidget = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="fixed bottom-5 right-4 z-50 sm:right-6">
+      <div className="assistant-widget fixed bottom-5 right-4 z-50 sm:right-6">
         <button className="assistant-fab" type="button" disabled>
           <Bot size={22} />
           Trợ lý Tử Vi

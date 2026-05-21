@@ -5,8 +5,8 @@ export const runtime = "edge";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  const title = searchParams.get("title") || "Lập lá số tử vi AI";
-  const subtitle = searchParams.get("subtitle") || "Tra cứu tử vi, xem ngày và luận giải có cấu trúc";
+  const title = searchParams.get("title") || "Lập lá số tử vi miễn phí";
+  const subtitle = searchParams.get("subtitle") || "Xem lá số, xem ngày và luận giải dễ hiểu";
 
   return new ImageResponse(
     (

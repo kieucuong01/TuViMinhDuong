@@ -1,94 +1,70 @@
-import { ArrowRight, BarChart3, BookOpenText, Coins, ShieldCheck, Sparkles, Star } from "lucide-react";
+import { ArrowRight, BookOpenText, CheckCircle2, Coins, Eye, FileText, History, ShieldCheck, Sparkles, Star } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { ChartForm } from "@/components/chart-form";
 import { DayFortuneCard } from "@/components/day-fortune-card";
+import { DeferredSocialProof } from "@/components/deferred-social-proof";
 import { QuickReadingForm } from "@/components/quick-reading-form";
 import { listArticles } from "@/lib/data";
 import { APP_NAME } from "@/lib/env";
+import { routeMetadata } from "@/lib/metadata";
+import { organizationJsonLd, websiteJsonLd } from "@/lib/seo";
 
 export const revalidate = 300;
+
+export const metadata = routeMetadata({
+  title: "Lập lá số tử vi miễn phí",
+  description: "Lập lá số tử vi miễn phí, xem lá số 12 cung, xem ngày tốt xấu và mở luận giải dễ hiểu khi muốn đọc sâu hơn.",
+  path: "/",
+  imageSubtitle: "Nhập ngày giờ sinh để xem lá số cơ bản ngay",
+});
 
 export default async function Home() {
   const articles = (await listArticles()).slice(0, 3);
   const trustSignals = [
-    ["Lập lá số miễn phí", "Xem tổng quan cơ bản miễn phí, mở chuyên sâu bằng xu."],
-    ["Chuẩn phổ thông", "An sao và hiển thị lá số theo quy ước Việt Nam."],
-    ["Lưu lịch sử", "Mỗi tài khoản có thể tra nhiều lá số và xem lại."],
+    ["Miễn phí lập lá số", "Nhập ngày giờ sinh và xem ngay phần cơ bản."],
+    ["Dễ đọc trên điện thoại", "Mỗi cung được chia rõ, không phải căng mắt đọc chữ nhỏ."],
+    ["Mua một lần, xem lại", "Luận giải đã mở sẽ được lưu trong tài khoản."],
   ];
   const previewItems = [
-    ["Mệnh & Thân", "Tóm tắt khí chất, thế mạnh, điểm cần tiết chế."],
-    ["Vận trình", "Đọc đại vận, tiểu vận, tháng và ngày theo từng lớp."],
-    ["Gợi ý hành động", "Chuyển luận giải thành việc nên làm, nên tránh."],
+    ["Tổng quan", "Nắm nhanh Mệnh, Thân và điểm nổi bật của lá số."],
+    ["Điểm mạnh", "Biết phần nên phát huy trong công việc, tài lộc, gia đạo."],
+    ["Điều nên lưu ý", "Nhìn rõ các giai đoạn cần thận trọng hơn."],
   ];
   const steps = [
-    ["01", "Nhập ngày giờ sinh", "Chọn dương/âm lịch, giờ sinh và năm muốn xem."],
-    ["02", "Nhận lá số rõ ràng", "Desktop có bàn 12 cung, mobile có bản đọc từng cung."],
-    ["03", "Đọc luận giải AI", "Nội dung được chia mục, dễ đọc và xem lại trong lịch sử."],
+    ["01", "Nhập ngày giờ sinh", "Chọn ngày sinh, giờ sinh, giới tính và năm muốn xem."],
+    ["02", "Xem lá số miễn phí", "Nhận bàn lá số 12 cung và phần tóm tắt cơ bản."],
+    ["03", "Mở luận giải khi cần", "Bản đầy đủ được chia mục rõ ràng, dễ đọc lại sau."],
   ];
 
   return (
     <main>
+      <script id="website-jsonld" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd()) }} />
+      <script id="organization-jsonld" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd()) }} />
       <section className="hero-band">
-        <div className="mx-auto grid max-w-7xl gap-8 px-4 py-10 sm:px-6 lg:px-8 lg:py-18">
-          <div className="mx-auto flex max-w-4xl flex-col items-center text-center">
-            <p className="eyebrow inline-flex w-fit rounded-full border border-orange-200 bg-white/70 px-3 py-1.5 shadow-sm backdrop-blur">
-              Tử vi AI cho người Việt
-            </p>
-            <h1 className="max-w-4xl text-balance text-4xl font-black leading-tight text-stone-950 sm:text-5xl lg:text-6xl">
-              Lập lá số tử vi, đọc vận trình và quản lý luận giải bằng xu
-            </h1>
-            <p className="mt-5 max-w-3xl text-pretty text-base leading-8 text-stone-700 sm:text-lg">
-              {APP_NAME} tạo lá số theo chuẩn phổ thông, lưu dữ liệu có cấu trúc và dùng AI để viết luận giải dễ hiểu, thực tế, không khẳng định cực đoan.
-            </p>
-            <div className="mt-7 flex flex-wrap gap-3">
-              <a href="#lap-la-so" className="btn btn-primary">
-                Khởi tạo lá số <ArrowRight size={18} />
-              </a>
-              <a href="#mua-nhanh" className="btn btn-ghost">
-                Mua nhanh qua email
-              </a>
-              <Link href="/kien-thuc-tu-vi" className="btn btn-ghost">
-                Đọc kiến thức
-              </Link>
-            </div>
-            <div className="mt-8 grid max-w-2xl grid-cols-2 gap-3 sm:grid-cols-4">
-              {[
-                ["Miễn phí", "Lập lá số cơ bản"],
-                ["12 cung", "Lá số chuẩn phổ thông"],
-                ["Mobile", "Đọc rõ từng cung"],
-                ["Lịch sử", "Lưu nhiều lá số"],
-              ].map(([value, label]) => (
-                <div key={label} className="metric-card">
-                  <strong>{value}</strong>
-                  <span>{label}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="grid gap-6 lg:grid-cols-[1.15fr_0.85fr] lg:items-stretch">
-            <DayFortuneCard />
-
+        <div className="mx-auto grid max-w-7xl gap-6 px-4 py-5 sm:px-6 lg:px-8 lg:py-8">
+          <div className="grid gap-6 lg:grid-cols-[1.02fr_0.98fr] lg:items-stretch">
             <div id="lap-la-so" className="hero-form-card ring-1 ring-white/70">
               <div className="mb-5 text-center">
-                <p className="eyebrow">Khởi tạo lá số</p>
-                <h2 className="text-3xl font-black tracking-tight text-stone-950">Khám phá vận mệnh</h2>
-                <p className="mt-2 text-sm font-medium text-stone-500">Định hướng tương lai từ dữ liệu lá số</p>
+                <p className="eyebrow">Lập lá số miễn phí</p>
+                <h1 className="text-balance text-3xl font-black tracking-tight text-stone-950 sm:text-4xl">Lập lá số tử vi miễn phí</h1>
+                <p className="mt-2 text-base font-medium text-stone-600">Nhập thông tin sinh bên dưới để xem lá số cơ bản ngay.</p>
               </div>
               <ChartForm />
               <div className="form-assurance">
-                <span><ShieldCheck size={15} /> Không cần nạp xu</span>
-                <span><Sparkles size={15} /> Có luận giải mẫu ngay</span>
-                <span><BarChart3 size={15} /> Lưu hồ sơ lá số</span>
+                <span><ShieldCheck size={17} /> Không cần thanh toán để lập lá số</span>
+                <span><Eye size={17} /> Có bản đọc rõ trên điện thoại</span>
+                <span><History size={17} /> Đăng nhập để lưu và xem lại</span>
               </div>
             </div>
+
+            <DayFortuneCard />
           </div>
 
           <div className="hero-trust-row" aria-label={`Điểm mạnh chính của ${APP_NAME}`}>
             {trustSignals.map(([title, body]) => (
               <article key={title}>
-                <ShieldCheck size={18} />
+                <CheckCircle2 size={20} />
                 <div>
                   <strong>{title}</strong>
                   <span>{body}</span>
@@ -105,7 +81,7 @@ export default async function Home() {
             <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
               <div>
                 <p className="eyebrow">Sau khi lập lá số</p>
-                <h2 className="section-title">Thấy ngay phần đáng đọc nhất của vận trình</h2>
+                <h2 className="section-title">Đọc phần quan trọng trước, không bị rối</h2>
               </div>
               <a href="#lap-la-so" className="btn btn-primary btn-small">
                 Thử ngay <ArrowRight size={17} />
@@ -118,10 +94,10 @@ export default async function Home() {
             </div>
             <div className="reading-preview-card">
               <div className="reading-preview-head">
-                <span><Sparkles size={18} /></span>
+                <span><FileText size={19} /></span>
                 <div>
-                  <strong>Tổng quan luận giải</strong>
-                  <p>Được chia thành ý chính, điểm sáng, lưu ý và gợi ý hành động.</p>
+                  <strong>Bản luận giải chia mục</strong>
+                  <p>Mỗi phần có tiêu đề rõ, đoạn ngắn, dễ đọc trên cả máy tính và điện thoại.</p>
                 </div>
               </div>
               <div className="reading-preview-bars" aria-hidden="true">
@@ -132,7 +108,7 @@ export default async function Home() {
               <div className="preview-item-grid">
                 {previewItems.map(([title, body]) => (
                   <article key={title}>
-                    <Star size={16} />
+                    <Star size={17} />
                     <strong>{title}</strong>
                     <p>{body}</p>
                   </article>
@@ -143,7 +119,7 @@ export default async function Home() {
 
           <div className="journey-panel">
             <p className="eyebrow">Dễ bắt đầu</p>
-            <h2 className="text-balance text-3xl font-black tracking-tight text-stone-950">Từ thông tin sinh đến bản luận giải chỉ trong 3 bước</h2>
+            <h2 className="text-balance text-3xl font-black tracking-tight text-stone-950">Từ ngày sinh đến bản luận giải trong 3 bước</h2>
             <div className="journey-steps">
               {steps.map(([number, title, body]) => (
                 <article key={number}>
@@ -156,8 +132,8 @@ export default async function Home() {
               ))}
             </div>
             <div className="journey-note">
-              <Coins size={18} />
-              <span>Luận giải chuyên sâu dùng xu minh bạch: mua một lần, lưu lại trong tài khoản và xem lại miễn phí.</span>
+              <Coins size={20} />
+              <span>Giá hiển thị rõ trước khi mở khóa. Mua một lần, xem lại trong tài khoản.</span>
             </div>
           </div>
         </div>
@@ -172,18 +148,18 @@ export default async function Home() {
       <section className="section">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="section-heading">
-            <p className="eyebrow">Truyền thống không mất đi</p>
-            <h2>Chỉ được nâng tầm bằng dữ liệu và trải nghiệm tốt hơn</h2>
+            <p className="eyebrow">Vì sao dễ dùng</p>
+            <h2>Thiết kế cho người muốn xem nhanh, đọc rõ, không cần biết kỹ thuật</h2>
           </div>
           <div className="grid gap-4 md:grid-cols-3">
             {[
-              [Sparkles, "Giải pháp luận giải AI", "Lá số được an sao thành dữ liệu có cấu trúc, AI chỉ giải thích từ dữ liệu đó."],
-              [ShieldCheck, "Xu minh bạch", "Coin ledger ghi nhận từng giao dịch, mua luận giải một lần và xem lại miễn phí."],
-              [BarChart3, "SEO & tốc độ", "CMS có chấm điểm SEO, metadata, sitemap và tối ưu Core Web Vitals."],
+              [FileText, "Lá số rõ ràng", "Bàn 12 cung giữ đủ thông tin chính, mobile có bản đọc từng cung."],
+              [Sparkles, "Luận giải dễ hiểu", "Nội dung trình bày theo mục ngắn, tránh đoạn văn quá dài."],
+              [ShieldCheck, "Thanh toán minh bạch", "Giá mở khóa hiện ngay trên nút, không trừ xu khi xem lại."],
             ].map(([Icon, title, body]) => (
               <article key={String(title)} className="feature-card group">
-                <span className="grid h-11 w-11 place-items-center rounded-2xl bg-orange-100 text-orange-700 ring-1 ring-orange-200 transition group-hover:scale-105 group-hover:bg-orange-600 group-hover:text-white">
-                  <Icon size={24} />
+                <span className="grid h-12 w-12 place-items-center rounded-2xl bg-orange-100 text-orange-700 ring-1 ring-orange-200 transition group-hover:scale-105 group-hover:bg-orange-600 group-hover:text-white">
+                  <Icon size={25} />
                 </span>
                 <h3>{String(title)}</h3>
                 <p>{String(body)}</p>
@@ -196,10 +172,10 @@ export default async function Home() {
       <section className="section bg-gradient-to-b from-[#fff7e5] to-white">
         <div className="mx-auto grid max-w-7xl gap-8 px-4 sm:px-6 lg:grid-cols-[0.9fr_1.1fr] lg:px-8">
           <div>
-            <p className="eyebrow">Nhìn thấu tiềm năng</p>
-            <h2 className="section-title">Biểu đồ vận trình được thiết kế để đọc nhanh</h2>
-            <p className="mt-4 text-pretty text-stone-700">
-              Giao diện ưu tiên mobile, desktop có bàn lá số 12 cung, mobile có accordion để không phải căng mắt đọc chữ nhỏ.
+            <p className="eyebrow">Xem vận trình</p>
+            <h2 className="section-title">Biểu đồ và thẻ thông tin giúp đọc nhanh hơn</h2>
+            <p className="mt-4 text-pretty text-lg leading-8 text-stone-700">
+              Bạn có thể xem tổng quan, rồi mở từng phần như Đại vận, Nguyệt vận hoặc Nhật vận khi cần.
             </p>
           </div>
           <div className="analytics-card">
@@ -223,10 +199,10 @@ export default async function Home() {
           <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <p className="eyebrow">Kiến thức tử vi</p>
-              <h2 className="section-title">Bài viết nền tảng, tối ưu SEO từ CMS</h2>
+              <h2 className="section-title">Bài viết ngắn, dễ đọc cho người mới bắt đầu</h2>
             </div>
             <Link href="/kien-thuc-tu-vi" className="btn btn-ghost">
-              Xem tất cả <BookOpenText size={18} />
+              Xem bài viết <BookOpenText size={18} />
             </Link>
           </div>
           <div className="mt-6 grid gap-4 md:grid-cols-3">
@@ -241,7 +217,6 @@ export default async function Home() {
                 </span>
                 <h3>{article.title}</h3>
                 <p>{article.excerpt}</p>
-                <span className="seo-pill">SEO {article.seoScore || 0}/100</span>
               </Link>
             ))}
           </div>
@@ -252,13 +227,14 @@ export default async function Home() {
         <div className="mx-auto grid max-w-7xl gap-6 px-4 sm:px-6 md:grid-cols-[1fr_auto] md:items-center lg:px-8">
           <div>
             <p className="eyebrow text-orange-300">Bắt đầu miễn phí</p>
-            <h2 className="text-balance text-3xl font-black">Tạo lá số đầu tiên miễn phí, mở luận giải chuyên sâu khi bạn cần</h2>
+            <h2 className="text-balance text-3xl font-black">Tạo lá số đầu tiên, xem phần cơ bản rồi quyết định có mở bản đầy đủ hay không</h2>
           </div>
-          <Link href="/#lap-la-so" className="btn btn-primary">
-            <Coins size={18} /> Lập lá số ngay
+          <Link href="/#lap-la-so" className="btn btn-primary btn-large">
+            <Coins size={20} /> Lập lá số ngay
           </Link>
         </div>
       </section>
+      <DeferredSocialProof />
     </main>
   );
 }

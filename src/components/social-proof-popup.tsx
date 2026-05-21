@@ -38,7 +38,7 @@ const contextActions = {
     "vừa lưu bài viết tử vi ứng dụng",
   ],
   home: [
-    "vừa lập lá số tử vi AI",
+    "vừa lập lá số tử vi",
     "vừa mở luận giải chuyên sâu",
     "vừa tạo lá số mới",
   ],

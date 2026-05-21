@@ -29,7 +29,7 @@ Web tra cứu tử vi AI dùng Next.js App Router, TypeScript, Tailwind CSS, Pri
 
 ## Chạy local
 
-Next.js 16 cần Node mới. Trên máy này, khi chạy qua Codex nên dùng Node bundled:
+Next.js 16 cần Node `>=20.9.0`. Trên máy này, khi chạy qua Codex nên dùng Node bundled:
 
 ```powershell
 $env:PATH="C:\Users\ASUS\.cache\codex-runtimes\codex-primary-runtime\dependencies\node\bin;$env:PATH"

@@ -65,11 +65,11 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
         <p className="eyebrow">Kiến thức tử vi</p>
         <h1 className="text-balance text-4xl font-black leading-tight text-stone-950 sm:text-5xl">{article.title}</h1>
         <p className="mt-4 text-pretty text-lg leading-8 text-stone-700">{article.excerpt}</p>
-        <div className="mt-5 flex flex-wrap gap-2">
-          <span className="seo-pill">SEO {article.seoScore || 0}/100</span>
-          {article.focusKeyword ? <span className="tag">Từ khóa: {article.focusKeyword}</span> : null}
-          {article.publishedAt ? <span className="tag tag-soft">Cập nhật {new Date(article.publishedAt).toLocaleDateString("vi-VN")}</span> : null}
-        </div>
+        {article.publishedAt ? (
+          <div className="mt-5 flex flex-wrap gap-2">
+            <span className="tag tag-soft">Cập nhật {new Date(article.publishedAt).toLocaleDateString("vi-VN")}</span>
+          </div>
+        ) : null}
         {article.coverImage ? (
           <figure className="article-cover">
             <Image

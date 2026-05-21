@@ -1,14 +1,16 @@
 import Link from "next/link";
 import Image from "next/image";
 import { listArticles } from "@/lib/data";
+import { routeMetadata } from "@/lib/metadata";
 
 export const revalidate = 300;
 
-export const metadata = {
-  title: "Kiến thức tử vi",
-  description: "Bài viết kiến thức tử vi, cách lập lá số, cung mệnh, vận hạn và ứng dụng tử vi trong đời sống.",
-  alternates: { canonical: "/kien-thuc-tu-vi" },
-};
+export const metadata = routeMetadata({
+  title: "Kiến thức tử vi cho người mới",
+  description: "Bài viết kiến thức tử vi dễ đọc về cách lập lá số, cung mệnh, vận hạn, xem ngày và ứng dụng trong đời sống.",
+  path: "/kien-thuc-tu-vi",
+  imageSubtitle: "Học cách đọc lá số, 12 cung, đại vận, nguyệt vận và nhật vận",
+});
 
 export default async function KnowledgePage() {
   const articles = await listArticles();
@@ -18,7 +20,7 @@ export default async function KnowledgePage() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="section-heading">
           <p className="eyebrow">Kiến thức tử vi</p>
-          <h1>Các bài viết nền tảng, dễ đọc và tối ưu SEO</h1>
+          <h1>Bài viết dễ đọc cho người mới bắt đầu</h1>
         </div>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {articles.map((article) => (
@@ -28,7 +30,6 @@ export default async function KnowledgePage() {
                   <Image src={article.coverImage} alt={article.coverAlt || article.title} width={600} height={338} sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw" />
                 </span>
               ) : null}
-              <span className="seo-pill">SEO {article.seoScore || 0}/100</span>
               <h2>{article.title}</h2>
               <p>{article.excerpt}</p>
             </Link>

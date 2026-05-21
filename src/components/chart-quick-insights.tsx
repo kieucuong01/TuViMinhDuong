@@ -31,14 +31,14 @@ export function ChartQuickInsights({ chart, chartId }: { chart: TuViChart; chart
       <div className="quick-insights-head">
         <p className="eyebrow">Kết quả nhanh</p>
         <h2>3 điểm nên xem trước trong lá số này</h2>
-        <p>Lớp tóm tắt giúp người dùng không bị ngợp trước bàn lá số 12 cung.</p>
+        <p>Phần tóm tắt giúp bạn biết nên đọc mục nào trước.</p>
       </div>
 
       <div className="quick-insight-grid">
         <article>
           <span><Sparkles size={18} /></span>
           <h3>Nền mệnh</h3>
-          <p>{chart.menh}, {chart.cuc}. {menh ? `Cung Mệnh nằm tại ${menh.branch}.` : "Cung Mệnh đã được an theo dữ liệu đầu vào."}</p>
+          <p>{chart.menh}, {chart.cuc}. {menh ? `Cung Mệnh nằm tại ${menh.branch}.` : "Cung Mệnh đã được an theo thông tin sinh."}</p>
         </article>
         <article>
           <span><Compass size={18} /></span>

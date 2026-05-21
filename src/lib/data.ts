@@ -396,13 +396,22 @@ export async function saveReading(
 export async function listArticles() {
   const db = getDb();
   if (!db) return Array.from(demoArticles().values()).sort((a, b) => (b.publishedAt?.getTime() || 0) - (a.publishedAt?.getTime() || 0));
-  const articles = await db.article.findMany({
-    where: { status: "published" },
-    orderBy: [{ publishedAt: "desc" }, { createdAt: "desc" }],
-  });
+  let articles: ArticleView[] = [];
+  try {
+    articles = (await db.article.findMany({
+      where: { status: "published" },
+      orderBy: [{ publishedAt: "desc" }, { createdAt: "desc" }],
+    })) as ArticleView[];
+  } catch {
+    return seedArticles.map(articleWithScore).sort((a, b) => {
+      const bDate = b.publishedAt?.getTime() || b.updatedAt?.getTime() || 0;
+      const aDate = a.publishedAt?.getTime() || a.updatedAt?.getTime() || 0;
+      return bDate - aDate;
+    });
+  }
   const bySlug = new Map(seedArticles.map((article) => [article.slug, articleWithScore(article)]));
   for (const article of articles) {
-    bySlug.set(article.slug, articleWithScore(article as ArticleView));
+    bySlug.set(article.slug, articleWithScore(article));
   }
   return Array.from(bySlug.values()).sort((a, b) => {
     const bDate = b.publishedAt?.getTime() || b.updatedAt?.getTime() || 0;
@@ -414,8 +423,12 @@ export async function listArticles() {
 export async function getArticleBySlug(slug: string) {
   const db = getDb();
   if (!db) return demoArticles().get(slug) || null;
-  const article = await db.article.findUnique({ where: { slug } });
-  return article ? articleWithScore(article as ArticleView) : seedArticles.map(articleWithScore).find((item) => item.slug === slug) || null;
+  try {
+    const article = await db.article.findUnique({ where: { slug } });
+    return article ? articleWithScore(article as ArticleView) : seedArticles.map(articleWithScore).find((item) => item.slug === slug) || null;
+  } catch {
+    return seedArticles.map(articleWithScore).find((item) => item.slug === slug) || null;
+  }
 }
 
 export async function saveArticleFromForm(formData: FormData) {

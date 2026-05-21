@@ -3,13 +3,15 @@ import { createCheckoutAction } from "@/app/actions";
 import { getCurrentUser } from "@/lib/auth";
 import { COIN_PACKAGES } from "@/lib/pricing";
 import { formatCoins, formatVnd } from "@/lib/format";
-import { isPayOSEnabled } from "@/lib/env";
+import { routeMetadata } from "@/lib/metadata";
 
-export const metadata = {
-  title: "Nạp xu",
-  description: "Nạp xu để mở khóa luận giải tử vi AI qua PayOS/VietQR.",
-  alternates: { canonical: "/nap-xu" },
-};
+export const metadata = routeMetadata({
+  title: "Nạp xu mở luận giải tử vi",
+  description: "Nạp xu để mở khóa luận giải tử vi qua PayOS/VietQR, xem lại nội dung đã mua trong tài khoản.",
+  path: "/nap-xu",
+  imageSubtitle: "Chọn gói xu, thanh toán nhanh và mở phần luận giải cần xem",
+  robots: { index: false, follow: true },
+});
 
 export default async function CoinsPage({ searchParams }: { searchParams: Promise<{ status?: string; need?: string }> }) {
   const user = await getCurrentUser();
@@ -22,32 +24,32 @@ export default async function CoinsPage({ searchParams }: { searchParams: Promis
           <p className="eyebrow">Nạp xu</p>
           <h1>Mở khóa luận giải chuyên sâu</h1>
           <p>
-            1 xu = 1.000đ. Thanh toán qua PayOS/VietQR khi cấu hình env; local dev có fallback demo.
+            1 xu = 1.000đ. Chọn gói phù hợp, thanh toán xong có thể dùng xu để mở các phần luận giải.
           </p>
         </div>
-        {params.need ? <p className="alert mx-auto mb-6 max-w-2xl">Bạn cần nạp thêm {params.need} xu để mở khóa luận giải vừa chọn.</p> : null}
-        {params.status === "demo-paid" ? <p className="success mx-auto mb-6 max-w-2xl">Demo đã cộng xu vào phiên hiện tại.</p> : null}
+        {params.need ? <p className="alert mx-auto mb-6 max-w-2xl">Bạn cần nạp thêm {params.need} xu để mở phần vừa chọn.</p> : null}
+        {params.status === "demo-paid" ? <p className="success mx-auto mb-6 max-w-2xl">Đã cộng xu vào phiên hiện tại.</p> : null}
         <div className="grid gap-4 md:grid-cols-3">
           {COIN_PACKAGES.map((pack) => (
             <form key={pack.key} action={createCheckoutAction} className="pricing-card">
               <input type="hidden" name="packageKey" value={pack.key} />
-              <Coins className="text-orange-600" size={28} />
+              <Coins className="text-orange-600" size={30} />
               <h2>{pack.label}</h2>
               <p className="text-3xl font-bold text-stone-950">{formatVnd(pack.priceVnd)}</p>
               <p className="text-stone-600">
-                {formatCoins(pack.coins + pack.bonusCoins)} {pack.bonusCoins ? `(gồm ${pack.bonusCoins} xu bonus)` : ""}
+                Nhận {formatCoins(pack.coins + pack.bonusCoins)} {pack.bonusCoins ? `(tặng thêm ${pack.bonusCoins} xu)` : ""}
               </p>
-              <button className="btn btn-primary w-full" type="submit" disabled={!user}>
-                Nạp bằng PayOS
+              <button className="btn btn-primary btn-large w-full" type="submit" disabled={!user}>
+                Nạp xu
               </button>
-              {!user ? <p className="text-xs text-stone-500">Đăng nhập để nạp xu.</p> : null}
+              {!user ? <p className="text-sm leading-6 text-stone-500">Bạn cần đăng nhập để nạp xu và lưu lịch sử.</p> : null}
             </form>
           ))}
         </div>
         <div className="mt-8 grid gap-4 md:grid-cols-3">
-          <div className="feature-card"><CreditCard size={24} /><h3>PayOS/VietQR</h3><p>{isPayOSEnabled() ? "Đã bật cấu hình PayOS." : "Chưa có env PayOS, đang chạy chế độ demo."}</p></div>
-          <div className="feature-card"><ShieldCheck size={24} /><h3>Webhook idempotent</h3><p>Chỉ cộng xu khi webhook hợp lệ, không cộng trùng order.</p></div>
-          <div className="feature-card"><Coins size={24} /><h3>Coin ledger</h3><p>Mọi cộng/trừ xu được ghi nhận để kiểm tra lại khi bật lại paywall.</p></div>
+          <div className="feature-card"><CreditCard size={26} /><h3>Thanh toán rõ ràng</h3><p>Giá gói và số xu nhận được hiển thị trước khi thanh toán.</p></div>
+          <div className="feature-card"><ShieldCheck size={26} /><h3>Không trừ lại khi xem</h3><p>Nội dung đã mở sẽ được lưu để bạn xem lại trong tài khoản.</p></div>
+          <div className="feature-card"><Coins size={26} /><h3>Dùng đúng nhu cầu</h3><p>Bạn có thể mở toàn bộ hoặc chỉ mở từng phần như Đại vận, Nguyệt vận, Nhật vận.</p></div>
         </div>
       </div>
     </main>

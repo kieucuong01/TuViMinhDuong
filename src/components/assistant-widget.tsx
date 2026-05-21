@@ -48,7 +48,7 @@ export function AssistantWidget({ chartId }: { chartId: string }) {
   }
 
   return (
-    <div className="fixed bottom-5 right-4 z-50 sm:right-6">
+    <div className="assistant-widget fixed bottom-5 right-4 z-50 sm:right-6">
       {open ? (
         <section className="assistant-panel">
           <header className="flex items-center justify-between border-b border-orange-100 p-4">

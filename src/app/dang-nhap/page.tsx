@@ -1,7 +1,9 @@
 import { redirect } from "next/navigation";
+import { Suspense } from "react";
 import { loginAction } from "@/app/actions";
 import { getCurrentUser } from "@/lib/auth";
 import { isGoogleOAuthEnabled } from "@/lib/env";
+import { PaywallPopup } from "@/components/paywall-popup";
 
 export const metadata = {
   title: "Đăng nhập",
@@ -40,6 +42,9 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
           Tiếp tục với Google
         </a>
       </section>
+      <Suspense fallback={null}>
+        <PaywallPopup />
+      </Suspense>
     </main>
   );
 }

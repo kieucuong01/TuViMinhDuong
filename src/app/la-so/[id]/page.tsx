@@ -1,11 +1,9 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 import { ChartBoard, MobileChartReader } from "@/components/chart-board";
-import { requestReadingAction } from "@/app/actions";
 import { getAnyCompletedReading, getCachedReading, getChart, getReadingById } from "@/lib/data";
 import { getCurrentUser } from "@/lib/auth";
-import { FEATURE_PRICES } from "@/lib/pricing";
-import { formatCoins } from "@/lib/format";
 import { FeedbackActions } from "@/components/feedback-actions";
 import { PromptChips } from "@/components/prompt-chips";
 import { ReadingTabs } from "@/components/reading-tabs";
@@ -13,6 +11,9 @@ import { DeferredAssistantWidget } from "@/components/deferred-assistant-widget"
 import { ChartQuickInsights } from "@/components/chart-quick-insights";
 import { FateTabs, type FateView } from "@/components/fate-tabs";
 import { DailyFateView, MajorFateView, MinorFateView, MonthlyFateView, PalaceFateView } from "@/components/fate-views";
+import { PremiumReadingCta } from "@/components/premium-reading-cta";
+import { ChartActionPanel } from "@/components/chart-action-panel";
+import { PaywallPopup } from "@/components/paywall-popup";
 
 export const metadata: Metadata = {
   title: "Lá số tử vi",
@@ -48,6 +49,7 @@ export default async function ChartPage({
       (user.role === "ADMIN" ? await getAnyCompletedReading(id, "FULL", "all") : null)
     : null;
   const activeReading = selectedReading || fullReading;
+  const hasAdvancedReading = Boolean(fullReading);
   const activeLabel = activeReading ? readingLabels[activeReading.type] : "Luận giải tổng quan";
 
   return (
@@ -64,15 +66,6 @@ export default async function ChartPage({
         <>
         <div className="chart-titlebar">
           <h1>Tổng quan lá số của {record.chart.input.fullName}</h1>
-          <form action={requestReadingAction}>
-            <input type="hidden" name="chartId" value={id} />
-            <input type="hidden" name="type" value="FULL" />
-            <input type="hidden" name="scopeKey" value="all" />
-            <input type="hidden" name="next" value={`/la-so/${id}`} />
-            <button className="chart-reading-button" type="submit">
-              {`Luận giải toàn bộ - ${formatCoins(FEATURE_PRICES.FULL.priceCoins)}`}
-            </button>
-          </form>
         </div>
 
         <ChartQuickInsights chart={record.chart} chartId={id} />
@@ -85,10 +78,12 @@ export default async function ChartPage({
           </div>
         </div>
 
+        <ChartActionPanel chartId={id} chart={record.chart} />
+
         <PromptChips chartId={id} chart={record.chart} />
 
         <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_360px]">
-          <section className="panel">
+          <section className="panel" id="luan-giai">
             <p className="eyebrow">{activeLabel}</p>
             {activeReading ? (
               <>
@@ -97,22 +92,13 @@ export default async function ChartPage({
               </>
             ) : (
               <div className="space-y-4 text-stone-700">
-                {record.chart.summary.map((item) => (
-                  <p key={item}>{item}</p>
-                ))}
-                <div className="rounded-2xl border border-orange-100 bg-orange-50/70 p-4">
-                  <p className="font-semibold text-stone-800">
-                    Đọc miễn phí phần tóm tắt. Mở khóa bản toàn bộ để xem phân tích 12 cung, vận hạn và gợi ý hành động.
-                  </p>
-                  <form action={requestReadingAction} className="mt-4">
-                    <input type="hidden" name="chartId" value={id} />
-                    <input type="hidden" name="type" value="FULL" />
-                    <input type="hidden" name="scopeKey" value="all" />
-                    <input type="hidden" name="next" value={`/la-so/${id}`} />
-                    <button className="btn btn-primary" type="submit">
-                      {`Mở khóa toàn bộ - ${formatCoins(FEATURE_PRICES.FULL.priceCoins)}`}
-                    </button>
-                  </form>
+                <div className="free-reading-summary">
+                  <h2>Tổng quan miễn phí</h2>
+                  <p>{record.chart.summary[0]}</p>
+                  <h3>Điểm mạnh</h3>
+                  <p>{record.chart.summary[1] || "Lá số có những điểm nổi bật riêng, nên đọc cùng toàn bộ 12 cung để hiểu rõ hơn."}</p>
+                  <h3>Điều nên lưu ý</h3>
+                  <p>{record.chart.summary[2] || "Nên xem tử vi như bản tham khảo để cân nhắc, không dùng thay cho quyết định quan trọng."}</p>
                 </div>
               </div>
             )}
@@ -130,9 +116,13 @@ export default async function ChartPage({
         </div>
 
         <ReadingTabs chartId={id} chart={record.chart} />
+        <PremiumReadingCta chartId={id} fullName={record.chart.input.fullName} hasAdvancedReading={hasAdvancedReading} />
         </>
         )}
       </div>
+      <Suspense fallback={null}>
+        <PaywallPopup />
+      </Suspense>
       <DeferredAssistantWidget chartId={id} />
     </main>
   );

@@ -67,7 +67,9 @@ export function UserHeaderBadge() {
         </Link>
       ) : null}
       <Link href="/la-so" className="user-name-pill" prefetch={false}>
-        <UserCircle size={16} /> {user.name || user.email}
+        <UserCircle size={16} />
+        <span className="user-account-label">Tài khoản</span>
+        <span className="user-account-value">{user.name || user.email}</span>
       </Link>
       <form action={logoutAction}>
         <button className="icon-button" type="submit" aria-label="Đăng xuất" title="Đăng xuất">
