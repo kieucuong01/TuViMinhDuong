@@ -1,4 +1,4 @@
-import { ArrowRight, BookOpenText, CheckCircle2, Coins, Eye, FileText, History, ShieldCheck, Sparkles, Star } from "lucide-react";
+import { BookOpenText, CheckCircle2, Coins, Eye, FileText, History, ShieldCheck, Sparkles, Star } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { ChartForm } from "@/components/chart-form";
@@ -26,15 +26,13 @@ export default async function Home() {
     ["Dễ đọc trên điện thoại", "Mỗi cung được chia rõ, không phải căng mắt đọc chữ nhỏ."],
     ["Mua một lần, xem lại", "Luận giải đã mở sẽ được lưu trong tài khoản."],
   ];
-  const previewItems = [
-    ["Tổng quan", "Nắm nhanh Mệnh, Thân và điểm nổi bật của lá số."],
-    ["Điểm mạnh", "Biết phần nên phát huy trong công việc, tài lộc, gia đạo."],
-    ["Điều nên lưu ý", "Nhìn rõ các giai đoạn cần thận trọng hơn."],
-  ];
-  const steps = [
-    ["01", "Nhập ngày giờ sinh", "Chọn ngày sinh, giờ sinh, giới tính và năm muốn xem."],
-    ["02", "Xem lá số miễn phí", "Nhận bàn lá số 12 cung và phần tóm tắt cơ bản."],
-    ["03", "Mở luận giải khi cần", "Bản đầy đủ được chia mục rõ ràng, dễ đọc lại sau."],
+  const palaceHighlights = [
+    ["Cung Mệnh", "Tử Vi Độc Tọa", "Nhìn nhanh khí chất, thế mạnh và cách dùng năng lượng chủ đạo của lá số."],
+    ["Cung Phụ Mẫu", "Thiên Đồng", "Gợi ý cách đọc nền gia đạo, sự nâng đỡ và điểm cần thấu hiểu trong quan hệ thân tộc."],
+    ["Cung Phúc Đức", "Thất Sát", "Tóm lược phần phúc khí, nền họ hàng và những điều nên gìn giữ về lâu dài."],
+    ["Cung Quan Lộc", "Vũ Khúc", "Đọc trọng tâm nghề nghiệp, cách làm việc và khuynh hướng tạo thành tựu."],
+    ["Cung Tài Bạch", "Thiên Phủ", "Nắm cách quản tiền, cơ hội tích lũy và điểm cần thận trọng khi quyết định tài chính."],
+    ["Cung Phu Thê", "Thái Âm", "Xem góc nhìn tình cảm, cách hòa hợp và điều nên chăm sóc trong mối quan hệ."],
   ];
 
   return (
@@ -51,20 +49,6 @@ export default async function Home() {
                 <p className="mt-2 text-base font-medium text-stone-600">Nhập thông tin sinh bên dưới để xem lá số cơ bản ngay.</p>
               </div>
               <ChartForm />
-              <div className="hero-value-strip" aria-label="Giá trị nhận được sau khi lập lá số">
-                <span>
-                  <strong>30 giây</strong>
-                  <small>có lá số cơ bản</small>
-                </span>
-                <span>
-                  <strong>12 cung</strong>
-                  <small>đọc theo từng phần</small>
-                </span>
-                <span>
-                  <strong>Mở sâu</strong>
-                  <small>khi thật sự cần</small>
-                </span>
-              </div>
               <div className="form-assurance">
                 <span><ShieldCheck size={17} /> Không cần thanh toán để lập lá số</span>
                 <span><Eye size={17} /> Có bản đọc rõ trên điện thoại</span>
@@ -89,66 +73,24 @@ export default async function Home() {
         </div>
       </section>
 
-      <section className="section home-preview-section">
-        <div className="mx-auto grid max-w-7xl gap-6 px-4 sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:px-8">
-          <div className="result-preview-panel">
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-              <div>
-                <p className="eyebrow">Sau khi lập lá số</p>
-                <h2 className="section-title">Đọc phần quan trọng trước, không bị rối</h2>
-              </div>
-              <a href="#lap-la-so" className="btn btn-primary btn-small">
-                Thử ngay <ArrowRight size={17} />
-              </a>
-            </div>
-            <div className="preview-tabs" aria-hidden="true">
-              {["Lá số", "Luận cung", "Đại vận", "Nguyệt vận", "Nhật vận"].map((tab, index) => (
-                <span key={tab} className={index === 0 ? "active" : ""}>{tab}</span>
-              ))}
-            </div>
-            <div className="reading-preview-card">
-              <div className="reading-preview-head">
-                <span><FileText size={19} /></span>
-                <div>
-                  <strong>Bản luận giải chia mục</strong>
-                  <p>Mỗi phần có tiêu đề rõ, đoạn ngắn, dễ đọc trên cả máy tính và điện thoại.</p>
-                </div>
-              </div>
-              <div className="reading-preview-bars" aria-hidden="true">
-                {[72, 46, 84, 58, 66].map((width, index) => (
-                  <i key={index} style={{ width: `${width}%` }} />
-                ))}
-              </div>
-              <div className="preview-item-grid">
-                {previewItems.map(([title, body]) => (
-                  <article key={title}>
-                    <Star size={17} />
-                    <strong>{title}</strong>
-                    <p>{body}</p>
-                  </article>
-                ))}
-              </div>
-            </div>
+      <section className="section editorial-preview-section">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="editorial-preview-head">
+            <p className="eyebrow">Sau khi lập lá số</p>
+            <h2>Đọc <em>phần quan trọng</em> trước, không bị rối.</h2>
+            <p>Mỗi cung có tiêu đề rõ, đoạn ngắn, dễ đọc trên cả máy tính và điện thoại. Bạn xem theo từng phần, không phải cuộn một bản dài dằng dặc.</p>
           </div>
-
-          <div className="journey-panel">
-            <p className="eyebrow">Dễ bắt đầu</p>
-            <h2 className="text-balance text-3xl font-black tracking-tight text-stone-950">Từ ngày sinh đến bản luận giải trong 3 bước</h2>
-            <div className="journey-steps">
-              {steps.map(([number, title, body]) => (
-                <article key={number}>
-                  <b>{number}</b>
-                  <div>
-                    <strong>{title}</strong>
-                    <p>{body}</p>
-                  </div>
-                </article>
-              ))}
-            </div>
-            <div className="journey-note">
-              <Coins size={20} />
-              <span>Giá hiển thị rõ trước khi mở khóa. Mua một lần, xem lại trong tài khoản.</span>
-            </div>
+          <div className="palace-preview-grid">
+            {palaceHighlights.map(([label, title, body]) => (
+              <article key={label} className="palace-preview-card">
+                <div>
+                  <span>{label}</span>
+                  <Star size={18} />
+                </div>
+                <h3>{title}</h3>
+                <p>{body}</p>
+              </article>
+            ))}
           </div>
         </div>
       </section>
@@ -179,31 +121,6 @@ export default async function Home() {
                 <p>{String(body)}</p>
               </article>
             ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="section bg-gradient-to-b from-[#fff7e5] to-white">
-        <div className="mx-auto grid max-w-7xl gap-8 px-4 sm:px-6 lg:grid-cols-[0.9fr_1.1fr] lg:px-8">
-          <div>
-            <p className="eyebrow">Xem vận trình</p>
-            <h2 className="section-title">Biểu đồ và thẻ thông tin giúp đọc nhanh hơn</h2>
-            <p className="mt-4 text-pretty text-lg leading-8 text-stone-700">
-              Bạn có thể xem tổng quan, rồi mở từng phần như Đại vận, Nguyệt vận hoặc Nhật vận khi cần.
-            </p>
-          </div>
-          <div className="analytics-card">
-            <div className="bar-chart" aria-hidden="true">
-              {[38, 54, 28, 76, 46, 62, 88, 40].map((height, index) => (
-                <span key={index} style={{ height: `${height}%` }} />
-              ))}
-            </div>
-            <div className="line-chart" aria-hidden="true">
-              <svg viewBox="0 0 360 140" role="img" aria-label="Biểu đồ mô phỏng vận trình">
-                <path d="M0 92 C35 42 60 118 96 70 C130 22 150 122 188 66 C228 10 248 116 282 74 C316 36 334 44 360 28" fill="none" stroke="#10b981" strokeWidth="10" strokeLinecap="round" />
-                <path d="M0 104 C40 60 76 132 118 82 C156 36 170 130 210 76 C248 28 270 122 306 88 C330 70 342 58 360 50" fill="none" stroke="#a8a29e" strokeWidth="7" strokeLinecap="round" opacity=".55" />
-              </svg>
-            </div>
           </div>
         </div>
       </section>

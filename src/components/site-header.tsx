@@ -8,7 +8,6 @@ import { APP_NAME } from "@/lib/env";
 
 const nav = [
   { href: "/", label: "Lập lá số tử vi" },
-  { href: "/la-so", label: "Lá số" },
   { href: "/xem-ngay", label: "Xem ngày" },
   { href: "/kien-thuc-tu-vi", label: "Kiến thức" },
   ...(TEMPORARY_FULL_ACCESS

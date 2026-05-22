@@ -1,5 +1,6 @@
 import { createChartAction } from "@/app/actions";
 import { LoadingSubmitButton } from "@/components/loading-submit-button";
+import { Sparkles } from "lucide-react";
 
 export function ChartForm({ compact = false }: { compact?: boolean }) {
   const now = new Date();
@@ -77,7 +78,7 @@ export function ChartForm({ compact = false }: { compact?: boolean }) {
       </div>
 
       <LoadingSubmitButton className="btn btn-primary btn-large w-full" loadingText="Đang lập lá số...">
-        Xem lá số miễn phí
+        <Sparkles size={19} /> An Lá Số Tử Vi
       </LoadingSubmitButton>
       <p className="text-center text-sm leading-6 text-stone-500">
         Chỉ cần chọn đúng khung giờ sinh. Nếu không chắc, hãy chọn khung giờ gần nhất.

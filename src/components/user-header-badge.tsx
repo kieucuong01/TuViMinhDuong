@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Coins, LogOut, ShieldCheck, UserCircle } from "lucide-react";
+import { Coins, FileText, LogOut, ShieldCheck, UserCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 import { logoutAction } from "@/app/actions";
 import { CoinTopupLink } from "@/components/coin-topup-link";
@@ -71,6 +71,10 @@ export function UserHeaderBadge() {
         <UserCircle size={16} />
         <span className="user-account-label">Tài khoản</span>
         <span className="user-account-value">{user.name || user.email}</span>
+      </Link>
+      <Link href="/la-so" className="user-charts-pill" prefetch={false}>
+        <FileText size={15} />
+        Lá số của tôi
       </Link>
       <form action={logoutAction} data-loading-message="Đang đăng xuất...">
         <button className="icon-button" type="submit" aria-label="Đăng xuất" title="Đăng xuất">

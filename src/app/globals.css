@@ -492,7 +492,8 @@ button.is-loading:not(.icon-button)::before {
 
 .user-coin-pill,
 .user-admin-pill,
-.user-name-pill {
+.user-name-pill,
+.user-charts-pill {
   display: inline-flex;
   min-height: 2.15rem;
   align-items: center;
@@ -528,6 +529,12 @@ button.is-loading:not(.icon-button)::before {
   background: #f5f5f4;
   color: #57534e;
   text-overflow: ellipsis;
+}
+
+.user-charts-pill {
+  border: 1px solid #fed7aa;
+  background: #fff7ed;
+  color: #9a3412;
 }
 
 .user-account-label {
@@ -694,9 +701,105 @@ button.is-loading:not(.icon-button)::before {
 
 .hero-form-card {
   position: relative;
-  border-radius: 1.5rem;
-  padding: 1.25rem;
-  @apply rounded-[1.75rem] p-5 sm:p-6;
+  border-color: #e8c98f;
+  border-radius: 0.35rem;
+  background: #fffefb;
+  padding: clamp(1.25rem, 3vw, 2rem);
+  box-shadow: 0 10px 24px rgb(120 53 15 / 0.08);
+}
+
+.hero-form-card .eyebrow {
+  color: #a91624;
+}
+
+.hero-form-card h1 {
+  font-family: "Times New Roman", Cambria, serif;
+  font-weight: 700;
+}
+
+.hero-form-card .chart-form {
+  gap: 1.25rem;
+}
+
+.hero-form-card .form-grid {
+  gap: 1.15rem 1.25rem;
+}
+
+.hero-form-card .chart-form label,
+.hero-form-card .birth-date-group {
+  gap: 0.45rem;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  padding: 0;
+  box-shadow: none;
+}
+
+.hero-form-card .chart-form label > span,
+.hero-form-card .birth-date-group legend {
+  color: #a91624;
+  font-size: 0.78rem;
+  font-weight: 950;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.hero-form-card .chart-form input,
+.hero-form-card .chart-form select {
+  min-height: 3.35rem;
+  border: 0;
+  border-bottom: 1px solid #d9b877;
+  border-radius: 0;
+  background: transparent;
+  padding: 0.7rem 0.2rem;
+  color: #292524;
+  font-size: 1.12rem;
+  box-shadow: none;
+}
+
+.hero-form-card .chart-form input:focus,
+.hero-form-card .chart-form select:focus {
+  border-color: #a91624;
+  box-shadow: 0 2px 0 rgb(169 22 36 / 0.18);
+}
+
+.hero-form-card .birth-date-grid {
+  gap: 0.85rem;
+}
+
+.hero-form-card .birth-date-grid label > span {
+  color: #a8a29e;
+  font-size: 0.74rem;
+  letter-spacing: 0.16em;
+}
+
+.hero-form-card .birth-date-grid input {
+  min-height: 3.45rem;
+  border: 1px solid #e8c98f;
+  padding-inline: 0.75rem;
+  text-align: center;
+  font-family: "Times New Roman", Cambria, serif;
+  font-size: 1.08rem;
+  font-weight: 500;
+}
+
+.hero-form-card .chart-form .btn-primary {
+  min-height: 4rem;
+  border-radius: 0;
+  background: #a91624;
+  box-shadow: 0 14px 30px rgb(169 22 36 / 0.18);
+  font-family: "Times New Roman", Cambria, serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.hero-form-card .chart-form .btn-primary:hover {
+  background: #8f111d;
+}
+
+.hero-form-card .chart-form > p {
+  color: #9b8d83;
+  font-style: italic;
 }
 
 .hero-value-strip {
@@ -1064,6 +1167,28 @@ button.is-loading:not(.icon-button)::before {
   flex: 0 0 auto;
 }
 
+.hero-form-card .form-assurance {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.85rem;
+  margin-top: 1.35rem;
+}
+
+.hero-form-card .form-assurance span {
+  min-height: 3.25rem;
+  justify-content: center;
+  border: 1px solid #e8c98f;
+  border-radius: 0;
+  background: #fffefb;
+  padding: 0.65rem 0.85rem;
+  color: #6b625d;
+  font-size: 0.95rem;
+  text-align: center;
+}
+
+.hero-form-card .form-assurance svg {
+  color: #a91624;
+}
+
 .metric-card,
 .feature-card,
 .pricing-card,
@@ -1091,6 +1216,95 @@ button.is-loading:not(.icon-button)::before {
 .metric-card span {
   font-size: 0.95rem;
   color: #78716c;
+}
+
+.editorial-preview-section {
+  background: #fffdf7;
+  border-top: 1px solid rgb(232 201 143 / 0.45);
+}
+
+.editorial-preview-head {
+  margin: 0 auto 3rem;
+  max-width: 62rem;
+  text-align: center;
+}
+
+.editorial-preview-head h2 {
+  color: #1c1917;
+  font-family: "Times New Roman", Cambria, serif;
+  font-size: clamp(2.6rem, 5.2vw, 4.6rem);
+  font-weight: 500;
+  line-height: 1.02;
+}
+
+.editorial-preview-head h2 em {
+  color: #991b1b;
+  font-style: italic;
+}
+
+.editorial-preview-head p:not(.eyebrow) {
+  margin: 1rem auto 0;
+  max-width: 48rem;
+  color: #57534e;
+  font-size: clamp(1.05rem, 1.8vw, 1.28rem);
+  line-height: 1.55;
+}
+
+.palace-preview-grid {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.palace-preview-card {
+  display: grid;
+  min-height: 12.7rem;
+  align-content: start;
+  gap: 1rem;
+  border: 1px solid #e8c98f;
+  background: #fffefb;
+  padding: clamp(1.15rem, 3vw, 1.8rem);
+  transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+}
+
+.palace-preview-card:hover {
+  border-color: #c08457;
+  box-shadow: 0 18px 44px rgb(120 53 15 / 0.08);
+  transform: translateY(-2px);
+}
+
+.palace-preview-card > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.palace-preview-card span {
+  color: #c26b00;
+  font-size: 0.82rem;
+  font-weight: 950;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.palace-preview-card svg {
+  color: #d6a650;
+  flex: 0 0 auto;
+}
+
+.palace-preview-card h3 {
+  color: #171717;
+  font-family: "Times New Roman", Cambria, serif;
+  font-size: clamp(1.8rem, 2.4vw, 2.35rem);
+  font-weight: 500;
+  line-height: 1.12;
+}
+
+.palace-preview-card p {
+  color: #57534e;
+  font-size: 1.05rem;
+  line-height: 1.55;
 }
 
 .home-preview-section {
@@ -2003,6 +2217,10 @@ button.is-loading:not(.icon-button)::before {
   .auth-layout,
   .knowledge-cta-band {
     grid-template-columns: 1fr;
+  }
+
+  .palace-preview-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .auth-card {
@@ -4276,6 +4494,39 @@ button.is-loading:not(.icon-button)::before {
     padding: 1rem;
   }
 
+  .hero-form-card .form-grid,
+  .hero-form-card .form-assurance,
+  .palace-preview-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hero-form-card .birth-date-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.55rem;
+  }
+
+  .hero-form-card .chart-form input,
+  .hero-form-card .chart-form select {
+    min-height: 3.15rem;
+  }
+
+  .hero-form-card .chart-form .btn-primary {
+    min-height: 3.85rem;
+  }
+
+  .editorial-preview-head {
+    margin-bottom: 1.75rem;
+    text-align: left;
+  }
+
+  .editorial-preview-head h2 {
+    font-size: clamp(2.25rem, 12vw, 3.4rem);
+  }
+
+  .palace-preview-card {
+    min-height: auto;
+  }
+
   .hero-value-strip {
     grid-template-columns: 1fr;
   }
@@ -4484,6 +4735,13 @@ button.is-loading:not(.icon-button)::before {
     display: inline-flex;
     max-width: 7rem;
     padding: 0 0.65rem;
+  }
+
+  .user-header-badge .user-charts-pill {
+    min-height: 2.8rem;
+    border-radius: 0.85rem;
+    padding: 0 0.65rem;
+    font-size: 0.82rem;
   }
 
   .user-header-badge .user-account-value,
