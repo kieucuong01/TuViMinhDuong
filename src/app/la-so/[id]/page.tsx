@@ -83,22 +83,12 @@ export default async function ChartPage({
 
         <ChartActionPanel chartId={id} chart={record.chart} />
 
-        <PromptChips chartId={id} chart={record.chart} />
-
-        <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_360px]">
-          <section className="panel" id="luan-giai" data-testid="free-reading-panel">
-            <p className="eyebrow">{activeLabel}</p>
-            {activeReading ? (
-              <>
-                <article className="prose-content whitespace-pre-wrap">{activeReading.content}</article>
-                <FeedbackActions label={activeLabel.toLowerCase()} />
-              </>
-            ) : (
-              <>
-                <FreeOverviewLoader chartId={id} />
-              </>
-            )}
-          </section>
+        <div className="mt-8 grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_260px] lg:pr-40 min-[1481px]:pr-0 xl:grid-cols-[minmax(0,1fr)_280px]">
+          <PromptChips
+            chartId={id}
+            chart={record.chart}
+            className="rounded-2xl border border-orange-100 bg-white/85 p-4 shadow-sm backdrop-blur"
+          />
           <aside className="panel">
             <p className="eyebrow">Thông tin nhanh</p>
             <dl className="info-list">
@@ -110,6 +100,20 @@ export default async function ChartPage({
             </dl>
           </aside>
         </div>
+
+        <section className="panel mt-8" id="luan-giai" data-testid="free-reading-panel">
+          <p className="eyebrow">{activeLabel}</p>
+          {activeReading ? (
+            <>
+              <article className="prose-content whitespace-pre-wrap">{activeReading.content}</article>
+              <FeedbackActions label={activeLabel.toLowerCase()} />
+            </>
+          ) : (
+            <>
+              <FreeOverviewLoader chartId={id} />
+            </>
+          )}
+        </section>
 
         <ReadingTabs chartId={id} chart={record.chart} />
         <PremiumReadingCta chartId={id} fullName={record.chart.input.fullName} hasAdvancedReading={hasAdvancedReading} />

@@ -1838,11 +1838,11 @@ button.is-loading:not(.icon-button)::before {
 
 @media (max-width: 1480px) and (min-width: 1181px) {
   .chart-page {
-    padding-bottom: 5.75rem;
+    padding-bottom: 0;
   }
 
   .premium-reading-cta-floating {
-    display: none;
+    display: grid !important;
   }
 
   .premium-reading-cta-bottom {
@@ -1851,7 +1851,7 @@ button.is-loading:not(.icon-button)::before {
     bottom: calc(1.25rem + env(safe-area-inset-bottom));
     left: 1.25rem;
     z-index: 46;
-    display: block;
+    display: none !important;
     max-width: 34rem;
     min-height: 4.4rem;
     margin-inline: auto;
@@ -1891,7 +1891,7 @@ button.is-loading:not(.icon-button)::before {
   }
 }
 
-@media (min-width: 1181px) {
+@media (min-width: 1481px) {
   .chart-page {
     padding-bottom: 0;
   }

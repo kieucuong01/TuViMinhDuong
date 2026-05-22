@@ -8,9 +8,11 @@ const prompts = [
   { label: "Tháng này nên làm gì?", type: "NGUYET_VAN", scopeKey: "current-month" },
 ];
 
-export function PromptChips({ chartId, chart }: { chartId: string; chart: TuViChart }) {
+const defaultShellClassName = "mt-8 rounded-2xl border border-orange-100 bg-white/85 p-4 shadow-sm backdrop-blur";
+
+export function PromptChips({ chartId, chart, className = defaultShellClassName }: { chartId: string; chart: TuViChart; className?: string }) {
   return (
-    <section className="mt-8 rounded-2xl border border-orange-100 bg-white/85 p-4 shadow-sm backdrop-blur">
+    <section className={className}>
       <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="eyebrow mb-1">Gợi ý hỏi nhanh</p>
