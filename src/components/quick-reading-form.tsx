@@ -59,15 +59,15 @@ export function QuickReadingForm() {
             <div className="birth-date-grid">
               <label>
                 <span>Ngày</span>
-                <input name="day" type="number" min="1" max="31" defaultValue="1" required />
+                <input name="day" type="number" inputMode="numeric" min="1" max="31" defaultValue="1" required />
               </label>
               <label>
                 <span>Tháng</span>
-                <input name="month" type="number" min="1" max="12" defaultValue="1" required />
+                <input name="month" type="number" inputMode="numeric" min="1" max="12" defaultValue="1" required />
               </label>
               <label>
                 <span>Năm</span>
-                <input name="year" type="number" min="1900" max={now.getFullYear()} defaultValue="1990" required />
+                <input name="year" type="number" inputMode="numeric" min="1900" max={now.getFullYear()} defaultValue="1990" required />
               </label>
             </div>
           </fieldset>
@@ -92,7 +92,7 @@ export function QuickReadingForm() {
 
           <label>
             <span>Năm muốn xem</span>
-            <input name="viewYear" type="number" min="1900" max="2100" defaultValue={now.getFullYear()} required />
+            <input name="viewYear" type="number" inputMode="numeric" min="1900" max="2100" defaultValue={now.getFullYear()} required />
           </label>
         </div>
         <button className="btn btn-primary btn-large w-full" type="submit" data-loading-label="Đang tạo đơn...">

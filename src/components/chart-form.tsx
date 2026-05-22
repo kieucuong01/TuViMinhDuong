@@ -39,15 +39,15 @@ export function ChartForm({ compact = false }: { compact?: boolean }) {
           <div className="birth-date-grid">
             <label>
               <span>Ngày</span>
-              <input name="day" type="number" min="1" max="31" defaultValue="1" required data-testid="chart-day" />
+              <input name="day" type="number" inputMode="numeric" min="1" max="31" defaultValue="1" required data-testid="chart-day" />
             </label>
             <label>
               <span>Tháng</span>
-              <input name="month" type="number" min="1" max="12" defaultValue="1" required data-testid="chart-month" />
+              <input name="month" type="number" inputMode="numeric" min="1" max="12" defaultValue="1" required data-testid="chart-month" />
             </label>
             <label>
               <span>Năm</span>
-              <input name="year" type="number" min="1900" max={now.getFullYear()} defaultValue="1990" required data-testid="chart-year" />
+              <input name="year" type="number" inputMode="numeric" min="1900" max={now.getFullYear()} defaultValue="1990" required data-testid="chart-year" />
             </label>
           </div>
         </fieldset>
@@ -72,7 +72,7 @@ export function ChartForm({ compact = false }: { compact?: boolean }) {
 
         <label>
           <span>Năm muốn xem</span>
-          <input name="viewYear" type="number" min="1900" max="2100" defaultValue={now.getFullYear()} required data-testid="chart-view-year" />
+          <input name="viewYear" type="number" inputMode="numeric" min="1900" max="2100" defaultValue={now.getFullYear()} required data-testid="chart-view-year" />
         </label>
       </div>
 

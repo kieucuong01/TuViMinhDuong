@@ -53,13 +53,20 @@ function parseBirthYear(value: string) {
   return Number.isInteger(parsed) && parsed >= 1900 && parsed <= 2100 ? parsed : undefined;
 }
 
+function safeInputDate(value: string | string[] | null | undefined) {
+  if (Array.isArray(value)) return safeInputDate(value[0]);
+  if (!value || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return toInputDate(new Date());
+  const parsed = parseInputDate(value);
+  return Number.isNaN(parsed.getTime()) ? toInputDate(new Date()) : value;
+}
+
 function TaskIcon({ type }: { type: DateTaskKey }) {
   const Icon = taskIcons[type];
   return <Icon size={19} className="date-task-icon" />;
 }
 
-export function DateView() {
-  const [selectedDate, setSelectedDate] = useState(() => toInputDate(new Date()));
+export function DateView({ initialDate }: { initialDate?: string | string[] }) {
+  const [selectedDate, setSelectedDate] = useState(() => safeInputDate(initialDate));
   const [birthYear, setBirthYear] = useState("");
   const parsedBirthYear = parseBirthYear(birthYear);
   const date = useMemo(() => parseInputDate(selectedDate), [selectedDate]);

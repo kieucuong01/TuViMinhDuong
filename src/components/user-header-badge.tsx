@@ -47,7 +47,7 @@ export function UserHeaderBadge() {
 
   if (!user) {
     return (
-      <Link href="/dang-nhap" className="btn btn-small btn-ghost" prefetch={false}>
+      <Link href="/dang-nhap" className="login-link btn btn-small btn-ghost" prefetch={false}>
         Đăng nhập
       </Link>
     );

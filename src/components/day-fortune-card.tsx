@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { CalendarDays, ChevronRight, Sparkles } from "lucide-react";
+import Link from "next/link";
 
 const stems = ["Giáp", "Ất", "Bính", "Đinh", "Mậu", "Kỷ", "Canh", "Tân", "Nhâm", "Quý"];
 const branches = ["Tý", "Sửu", "Dần", "Mão", "Thìn", "Tỵ", "Ngọ", "Mùi", "Thân", "Dậu", "Tuất", "Hợi"];
@@ -120,15 +121,15 @@ export function DayFortuneCard() {
         </div>
       </div>
 
-      <form className="relative mt-5 flex flex-col gap-3 sm:flex-row">
+      <div className="relative mt-5 flex flex-col gap-3 sm:flex-row">
         <label className="flex-1">
           <span>Chọn ngày</span>
           <input type="date" value={selectedDate} onChange={(event) => setSelectedDate(event.target.value)} />
         </label>
-        <button type="button" className="btn btn-ghost self-end">
+        <Link href={`/xem-ngay?date=${selectedDate}`} className="btn btn-ghost self-end">
           Xem chi tiết <ChevronRight size={17} />
-        </button>
-      </form>
+        </Link>
+      </div>
 
       <p className="relative mt-3 flex items-start gap-2 text-sm leading-6 text-stone-600">
         <Sparkles className="mt-0.5 shrink-0 text-orange-500" size={16} />

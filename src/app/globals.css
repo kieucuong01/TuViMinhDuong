@@ -543,6 +543,52 @@ button.is-loading:not(.icon-button)::before {
   text-overflow: ellipsis;
 }
 
+@media (max-width: 520px) {
+  .site-header > div {
+    height: 4.25rem;
+    padding-inline: 0.75rem;
+    gap: 0.45rem;
+  }
+
+  .site-brand {
+    gap: 0.45rem;
+  }
+
+  .site-brand-mark {
+    width: 2.65rem;
+    height: 2.65rem;
+    border-radius: 1rem;
+  }
+
+  .site-brand-copy > span:first-child {
+    max-width: 9.4rem;
+    font-size: 1.08rem;
+  }
+
+  .login-link.btn-small {
+    min-height: 2.8rem;
+    padding: 0.62rem 0.82rem;
+    border-radius: 0.85rem;
+    font-size: 0.92rem;
+  }
+
+  .site-header .icon-button {
+    width: 2.8rem;
+    height: 2.8rem;
+    border-radius: 0.95rem;
+  }
+}
+
+@media (max-width: 390px) {
+  .site-brand-copy > span:first-child {
+    max-width: 7.7rem;
+  }
+
+  .site-brand-beta {
+    display: none;
+  }
+}
+
 .hero-band {
   position: relative;
   overflow: hidden;
@@ -4020,7 +4066,18 @@ button.is-loading:not(.icon-button)::before {
   }
 
   .chart-page {
-    padding-bottom: 5.75rem;
+    padding-bottom: 6.6rem;
+  }
+
+  .hero-form-card h1,
+  .date-hero-panel h1,
+  .chart-titlebar h1 {
+    font-size: clamp(2rem, 10vw, 2.7rem) !important;
+    line-height: 1.12;
+  }
+
+  .hero-form-card {
+    padding: 1rem;
   }
 
   .form-grid,
@@ -4106,7 +4163,7 @@ button.is-loading:not(.icon-button)::before {
   }
 
   .premium-reading-cta-floating {
-    display: none;
+    display: none !important;
   }
 
   .premium-reading-cta-bottom {
@@ -4116,7 +4173,7 @@ button.is-loading:not(.icon-button)::before {
     left: 0.85rem;
     z-index: 46;
     display: block;
-    min-height: 4.45rem;
+    min-height: 4.25rem;
     border-radius: 1.35rem;
     animation: premiumCtaEnter 520ms ease both 900ms;
   }
@@ -4133,7 +4190,7 @@ button.is-loading:not(.icon-button)::before {
     align-items: center;
     justify-content: center;
     gap: 0.85rem;
-    padding: 0.75rem 1rem;
+    padding: 0.65rem 0.85rem;
   }
 
   .premium-reading-cta-bottom .premium-reading-cta-orb {
@@ -4150,12 +4207,17 @@ button.is-loading:not(.icon-button)::before {
   }
 
   .premium-reading-cta-bottom .premium-reading-cta-copy strong {
-    font-size: 0.98rem;
+    font-size: 0.95rem;
   }
 
   .premium-reading-cta-bottom .premium-reading-cta-copy small {
     width: fit-content;
     margin-top: 0.16rem;
+  }
+
+  .day-fortune-card .btn,
+  .date-picker-card .btn {
+    width: 100%;
   }
 
   .quick-insight-grid {
