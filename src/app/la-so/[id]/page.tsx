@@ -10,7 +10,8 @@ import { ReadingTabs } from "@/components/reading-tabs";
 import { DeferredAssistantWidget } from "@/components/deferred-assistant-widget";
 import { ChartQuickInsights } from "@/components/chart-quick-insights";
 import { FateTabs, type FateView } from "@/components/fate-tabs";
-import { DailyFateView, MajorFateView, MinorFateView, MonthlyFateView, PalaceFateView } from "@/components/fate-views";
+import { DailyFateView, MajorFateView, MinorFateView, MonthlyFateView } from "@/components/fate-views";
+import { PalaceFateView } from "@/components/palace-fate-view";
 import { PremiumReadingCta } from "@/components/premium-reading-cta";
 import { ChartActionPanel } from "@/components/chart-action-panel";
 import { PaywallPopup } from "@/components/paywall-popup";
@@ -58,11 +59,11 @@ export default async function ChartPage({
       <FateTabs chartId={id} active={activeView} />
 
       <div className="mx-auto max-w-6xl px-3 pb-10 sm:px-6 lg:px-8">
-        {activeView === "dai-van" ? <MajorFateView chartId={id} chart={record.chart} /> : null}
-        {activeView === "luan-cung" ? <PalaceFateView chartId={id} chart={record.chart} /> : null}
-        {activeView === "tieu-van" ? <MinorFateView chartId={id} chart={record.chart} /> : null}
-        {activeView === "nguyet-van" ? <MonthlyFateView chartId={id} chart={record.chart} /> : null}
-        {activeView === "nhat-van" ? <DailyFateView chartId={id} chart={record.chart} /> : null}
+        {activeView === "dai-van" ? <MajorFateView chartId={id} chart={record.chart} user={user} /> : null}
+        {activeView === "luan-cung" ? <PalaceFateView chartId={id} chart={record.chart} user={user} /> : null}
+        {activeView === "tieu-van" ? <MinorFateView chartId={id} chart={record.chart} user={user} /> : null}
+        {activeView === "nguyet-van" ? <MonthlyFateView chartId={id} chart={record.chart} user={user} /> : null}
+        {activeView === "nhat-van" ? <DailyFateView chartId={id} chart={record.chart} user={user} /> : null}
         {["luan-cung", "dai-van", "tieu-van", "nguyet-van", "nhat-van"].includes(activeView) ? null : (
         <>
         <div className="chart-titlebar">

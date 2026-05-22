@@ -1,5 +1,14 @@
 import { afterEach, describe, expect, it } from "vitest";
-import { FREE_OVERVIEW_MAX_WORDS, FREE_OVERVIEW_MIN_WORDS, generateFreeOverview, generateReading } from "@/lib/ai";
+import {
+  FREE_OVERVIEW_MAX_WORDS,
+  FREE_OVERVIEW_MIN_WORDS,
+  PAID_FULL_WORD_TARGET,
+  generateFreeOverview,
+  generateReading,
+  getDeepReadingSummary,
+  paidReadingChapterPrompt,
+  paidReadingChapters,
+} from "@/lib/ai";
 import { generateTuViChart } from "@/lib/chart";
 
 const oldGatewayKey = process.env.AI_GATEWAY_API_KEY;
@@ -9,48 +18,48 @@ const oldGeminiKeys = process.env.GEMINI_API_KEYS;
 const oldGroqKey = process.env.GROQ_API_KEY;
 const oldGroqKeys = process.env.GROQ_API_KEYS;
 
+function clearProviderEnv() {
+  delete process.env.AI_GATEWAY_API_KEY;
+  delete process.env.VERCEL_OIDC_TOKEN;
+  delete process.env.GEMINI_API_KEY;
+  delete process.env.GEMINI_API_KEYS;
+  delete process.env.GROQ_API_KEY;
+  delete process.env.GROQ_API_KEYS;
+}
+
+function restore(name: string, value: string | undefined) {
+  if (value === undefined) delete process.env[name];
+  else process.env[name] = value;
+}
+
+function sampleChart(gender: "male" | "female" = "female") {
+  return generateTuViChart({
+    fullName: gender === "female" ? "Nguyễn Minh Anh" : "Kiều Tấn Cường",
+    gender,
+    calendarType: "solar",
+    day: 19,
+    month: 5,
+    year: gender === "female" ? 1990 : 1968,
+    birthHour: 8,
+    viewYear: 2026,
+    timezone: "Asia/Bangkok",
+  });
+}
+
 afterEach(() => {
-  if (oldGatewayKey === undefined) delete process.env.AI_GATEWAY_API_KEY;
-  else process.env.AI_GATEWAY_API_KEY = oldGatewayKey;
-
-  if (oldOidcToken === undefined) delete process.env.VERCEL_OIDC_TOKEN;
-  else process.env.VERCEL_OIDC_TOKEN = oldOidcToken;
-
-  if (oldGeminiKey === undefined) delete process.env.GEMINI_API_KEY;
-  else process.env.GEMINI_API_KEY = oldGeminiKey;
-
-  if (oldGeminiKeys === undefined) delete process.env.GEMINI_API_KEYS;
-  else process.env.GEMINI_API_KEYS = oldGeminiKeys;
-
-  if (oldGroqKey === undefined) delete process.env.GROQ_API_KEY;
-  else process.env.GROQ_API_KEY = oldGroqKey;
-
-  if (oldGroqKeys === undefined) delete process.env.GROQ_API_KEYS;
-  else process.env.GROQ_API_KEYS = oldGroqKeys;
+  restore("AI_GATEWAY_API_KEY", oldGatewayKey);
+  restore("VERCEL_OIDC_TOKEN", oldOidcToken);
+  restore("GEMINI_API_KEY", oldGeminiKey);
+  restore("GEMINI_API_KEYS", oldGeminiKeys);
+  restore("GROQ_API_KEY", oldGroqKey);
+  restore("GROQ_API_KEYS", oldGroqKeys);
 });
 
 describe("AI reading format", () => {
   it("asks the free overview LLM prompt for a long single-request reading", async () => {
-    delete process.env.AI_GATEWAY_API_KEY;
-    delete process.env.VERCEL_OIDC_TOKEN;
-    delete process.env.GEMINI_API_KEY;
-    delete process.env.GEMINI_API_KEYS;
-    delete process.env.GROQ_API_KEY;
-    delete process.env.GROQ_API_KEYS;
+    clearProviderEnv();
 
-    const chart = generateTuViChart({
-      fullName: "Nguyá»…n Minh Anh",
-      gender: "female",
-      calendarType: "solar",
-      day: 19,
-      month: 5,
-      year: 1990,
-      birthHour: 8,
-      viewYear: 2026,
-      timezone: "Asia/Bangkok",
-    });
-
-    const { prompt } = await generateFreeOverview(chart);
+    const { prompt } = await generateFreeOverview(sampleChart());
 
     expect(prompt).toContain(String(FREE_OVERVIEW_MIN_WORDS));
     expect(prompt).toContain(String(FREE_OVERVIEW_MAX_WORDS));
@@ -58,46 +67,73 @@ describe("AI reading format", () => {
     expect(prompt).toContain("QUY TẮC ĐỘ DÀI");
   });
 
-  it("uses the fixed mobile-friendly section order for fallback readings", async () => {
-    delete process.env.AI_GATEWAY_API_KEY;
-    delete process.env.VERCEL_OIDC_TOKEN;
-    delete process.env.GEMINI_API_KEY;
-    delete process.env.GEMINI_API_KEYS;
-    delete process.env.GROQ_API_KEY;
-    delete process.env.GROQ_API_KEYS;
+  it("defines the full paid reading as 8 fixed chapters", () => {
+    const chart = sampleChart();
+    const chapters = paidReadingChapters(chart, "FULL");
 
-    const chart = generateTuViChart({
-      fullName: "Nguyễn Minh Anh",
-      gender: "female",
-      calendarType: "solar",
-      day: 19,
-      month: 5,
-      year: 1990,
-      birthHour: 8,
-      viewYear: 2026,
-      timezone: "Asia/Bangkok",
-    });
+    expect(chapters).toHaveLength(8);
+    expect(chapters.map((chapter) => chapter.title)).toEqual([
+      "Chương 1: Tổng quan lá số",
+      "Chương 2: Mệnh, Thân và khí chất cốt lõi",
+      "Chương 3: 12 cung trọng yếu",
+      "Chương 4: Công việc và định hướng sự nghiệp",
+      "Chương 5: Tài chính và cách quản trị tiền bạc",
+      "Chương 6: Tình cảm, hôn nhân, gia đình",
+      "Chương 7: Sức khỏe, tinh thần, nhịp sống",
+      "Chương 8: Vận hạn năm 2026 và gợi ý theo từng tháng",
+    ]);
+    expect(chapters.every((chapter) => chapter.requiredSections.includes("Dữ kiện lá số đã dùng"))).toBe(true);
+    expect(chapters.every((chapter) => chapter.requiredSections.includes("Gợi ý hành động"))).toBe(true);
+  });
 
-    const { content } = await generateReading(chart, "FULL", "overview");
-    const headings = [
-      "## Tổng quan",
-      "## Điểm mạnh",
-      "## Điều cần lưu ý",
-      "## Công việc",
-      "## Tài chính",
-      "## Tình cảm",
-      "## Sức khỏe",
-      "## Vận hạn năm",
-    ];
+  it("builds paid prompts with word target, address, star states and yearly-star requirements", () => {
+    const chart = sampleChart("male");
+    const chapters = paidReadingChapters(chart, "FULL");
+    const yearlyChapter = chapters.at(-1);
+    expect(yearlyChapter).toBeDefined();
 
-    let lastIndex = -1;
-    for (const heading of headings) {
-      const index = content.indexOf(heading);
-      expect(index).toBeGreaterThan(lastIndex);
-      lastIndex = index;
+    const prompt = paidReadingChapterPrompt(
+      chart,
+      "FULL",
+      "all",
+      { title: "Luận giải toàn bộ", evidence: ["Mệnh: Sơn đầu Hỏa", "Lưu niên: L.Kình Dương (H)"] },
+      yearlyChapter!,
+      7,
+      chapters.length,
+    );
+
+    expect(prompt).toContain(PAID_FULL_WORD_TARGET);
+    expect(prompt).toContain("Xưng hô ưu tiên");
+    expect(prompt).toContain("chú");
+    expect(prompt).toContain("(M/V/Đ/B/H)");
+    expect(prompt).toContain("sao lưu niên");
+    expect(prompt).toContain("đủ 12 tháng");
+    expect(prompt).toContain("Không tự tính lại lá số");
+  });
+
+  it("returns a structured 8-chapter fallback when no LLM provider is configured", async () => {
+    clearProviderEnv();
+
+    const { content, prompt, model } = await generateReading(sampleChart(), "FULL", "all");
+    const chapters = paidReadingChapters(sampleChart(), "FULL");
+
+    expect(model).toBe("template-fallback");
+    for (const chapter of chapters) {
+      expect(content).toContain(`# ${chapter.title}`);
     }
+    expect(content).toContain("## Dữ kiện lá số đã dùng");
+    expect(content).toContain("## Luận giải chính");
+    expect(content).toContain("## Điều nên lưu ý");
+    expect(content).toContain("## Gợi ý hành động");
+    expect(content).toContain("Gợi ý 12 tháng");
+    expect(prompt).toContain("paid-reading-chapters-v2");
+  });
 
-    expect(content).not.toContain("## Gợi ý hành động");
-    expect(content).not.toContain("## Mốc thời gian nên chú ý");
+  it("computes 5 directional score groups for the advanced report header", () => {
+    const summary = getDeepReadingSummary(sampleChart());
+
+    expect(summary.scores).toHaveLength(5);
+    expect(summary.scores.map((score) => score.label)).toEqual(["Công việc", "Tài chính", "Tình cảm", "Sức khỏe", "Vận năm"]);
+    expect(summary.scores.every((score) => score.value >= 35 && score.value <= 92)).toBe(true);
   });
 });

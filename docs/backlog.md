@@ -8,6 +8,7 @@
 - Completed next P0 smoke coverage: homepage chart creation, paid CTA confirmation, insufficient-coin topup modal, admin full reading access, and admin CMS publish-to-public flow.
 - Completed PayOS webhook tests: invalid signature, paid credit, duplicate webhook idempotency, failed statuses, and quick email readings.
 - Completed first SEO content cluster: added beginner hub/articles for "lá số tử vi là gì", "cách đọc lá số tử vi", Cung Phu Thê, Cung Tật Ách, Cung Thiên Di, plus knowledge-page reading path and tests for internal links/SEO score.
+- Added PayOS production/sandbox smoke tooling and evidence runbook: create checkout, inspect order/ledger, and document paid-reading unlock evidence.
 - Current next P0 focus: real PayOS sandbox/production checkout smoke and stronger chart-engine golden fixtures.
 
 Backlog này dùng để quyết định "làm tiếp cái gì" khi không có chỉ định chi tiết. Ưu tiên theo P0 -> P1 -> P2.

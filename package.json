@@ -22,7 +22,8 @@
     "db:seed": "node scripts/seed-production.mjs",
     "db:setup": "npm run db:deploy && npm run db:seed",
     "analyze": "ANALYZE=true next build",
-    "perf:smoke": "node scripts/smoke-performance.mjs"
+    "perf:smoke": "node scripts/smoke-performance.mjs",
+    "smoke:payos": "node scripts/smoke-payos-checkout.mjs"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.8.0",

@@ -145,6 +145,22 @@ describe("reading unlock paywall flow", () => {
     });
   });
 
+  it("allows paid readings only when the user balance covers the full price", async () => {
+    const harness = createDeps({ balance: 199, priceCoins: 199 });
+
+    const result = await unlockReadingForUser(harness.deps, {
+      user: user({ coinBalance: 199 }),
+      chartId: harness.chartId,
+      type: "FULL",
+      scopeKey: "all",
+    });
+
+    expect(result).toEqual({ status: "created", readingId: "reading-1", chargedCoins: 199 });
+    expect(harness.getBalance()).toBe(0);
+    expect(harness.adjustments).toEqual([-199]);
+    expect(harness.deps.generateReading).toHaveBeenCalledTimes(1);
+  });
+
   it("lets admins create paid readings without spending coins", async () => {
     const harness = createDeps({ balance: 0, priceCoins: 199 });
 

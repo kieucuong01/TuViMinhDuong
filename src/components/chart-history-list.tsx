@@ -43,10 +43,18 @@ function ChartListItem({ chart }: { chart: ChartHistoryViewItem }) {
       <div className="min-w-0 flex-1">
         <h2 className="truncate text-xl font-black text-stone-950">{chart.fullName}</h2>
         <div className="mt-3 grid gap-2 text-sm font-semibold text-stone-700 sm:grid-cols-2">
-          <span className="inline-flex items-center gap-2"><CalendarDays size={19} /> {chart.solarDate} <span className="text-stone-400">(Âm lịch: {chart.lunarDate})</span></span>
-          <span className="inline-flex items-center gap-2"><Clock3 size={19} /> {chart.hourLabel}</span>
-          <span className="inline-flex items-center gap-2"><GenderIcon gender={chart.gender} /> {chart.genderLabel}</span>
-          <span className="inline-flex items-center gap-2"><Sparkles size={19} /> {chart.yearCanChi}</span>
+          <span className="inline-flex items-center gap-2">
+            <CalendarDays size={19} /> {chart.solarDate} <span className="text-stone-400">(Âm lịch: {chart.lunarDate})</span>
+          </span>
+          <span className="inline-flex items-center gap-2">
+            <Clock3 size={19} /> {chart.hourLabel}
+          </span>
+          <span className="inline-flex items-center gap-2">
+            <GenderIcon gender={chart.gender} /> {chart.genderLabel}
+          </span>
+          <span className="inline-flex items-center gap-2">
+            <Sparkles size={19} /> {chart.yearCanChi}
+          </span>
         </div>
         <div className="mt-5 flex flex-wrap gap-3">
           <Link href={chartPath} className={chart.hasAdvancedReading ? "btn btn-ghost btn-small" : "btn btn-primary btn-small"}>
@@ -54,7 +62,7 @@ function ChartListItem({ chart }: { chart: ChartHistoryViewItem }) {
           </Link>
           {chart.hasAdvancedReading ? (
             <Link href={`${chartPath}/nang-cao`} className="btn btn-primary btn-small">
-              Luận giải nâng cao
+              Xem lại luận giải nâng cao
             </Link>
           ) : null}
         </div>

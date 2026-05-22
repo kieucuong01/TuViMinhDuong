@@ -4,6 +4,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { COIN_PACKAGES } from "@/lib/pricing";
 import { formatCoins, formatVnd } from "@/lib/format";
 import { routeMetadata } from "@/lib/metadata";
+import { paymentReturnNotice } from "@/lib/payment-status";
 
 export const metadata = routeMetadata({
   title: "Nạp xu mở luận giải tử vi",
@@ -13,9 +14,10 @@ export const metadata = routeMetadata({
   robots: { index: false, follow: true },
 });
 
-export default async function CoinsPage({ searchParams }: { searchParams: Promise<{ status?: string; need?: string }> }) {
+export default async function CoinsPage({ searchParams }: { searchParams: Promise<{ status?: string; need?: string; orderCode?: string }> }) {
   const user = await getCurrentUser();
   const params = await searchParams;
+  const notice = paymentReturnNotice(params.status, params.orderCode);
 
   return (
     <main className="section">
@@ -28,7 +30,7 @@ export default async function CoinsPage({ searchParams }: { searchParams: Promis
           </p>
         </div>
         {params.need ? <p className="alert mx-auto mb-6 max-w-2xl">Bạn cần nạp thêm {params.need} xu để mở phần vừa chọn.</p> : null}
-        {params.status === "demo-paid" ? <p className="success mx-auto mb-6 max-w-2xl">Đã cộng xu vào phiên hiện tại.</p> : null}
+        {notice ? <p className={`${notice.tone === "success" ? "success" : "alert"} mx-auto mb-6 max-w-2xl`}>{notice.message}</p> : null}
         <div className="grid gap-4 md:grid-cols-3">
           {COIN_PACKAGES.map((pack) => (
             <form key={pack.key} action={createCheckoutAction} className="pricing-card" data-loading-message="Đang tạo link thanh toán..." data-loading-label="Đang tạo link...">

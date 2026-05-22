@@ -141,12 +141,16 @@ describe("PayOS webhook", () => {
     expect(db.user.update).toHaveBeenCalledTimes(1);
   });
 
-  it("marks non-paid webhook payloads as failed without crediting coins", async () => {
+  it.each([
+    { status: "CANCELLED", code: "01" },
+    { status: "FAILED", code: "02" },
+    { status: "EXPIRED", code: "03" },
+  ])("marks $status webhook payloads as failed without crediting coins", async (data) => {
     const { db } = createDb();
     mocks.getDb.mockReturnValue(db);
 
     const response = await postWebhook({
-      data: { orderCode: 123456, status: "CANCELLED", code: "01" },
+      data: { orderCode: 123456, ...data },
       signature: "valid-signature",
     });
 
@@ -155,6 +159,21 @@ describe("PayOS webhook", () => {
       where: { id: "order-1" },
       data: expect.objectContaining({ status: "FAILED" }),
     });
+    expect(db.user.update).not.toHaveBeenCalled();
+    expect(db.coinLedger.create).not.toHaveBeenCalled();
+  });
+
+  it("does not downgrade or double-credit a paid order when a later failed webhook arrives", async () => {
+    const { db } = createDb({ status: "PAID" });
+    mocks.getDb.mockReturnValue(db);
+
+    const response = await postWebhook({
+      data: { orderCode: 123456, status: "FAILED", code: "02" },
+      signature: "valid-signature",
+    });
+
+    expect(response.status).toBe(200);
+    expect(db.paymentOrder.update).not.toHaveBeenCalled();
     expect(db.user.update).not.toHaveBeenCalled();
     expect(db.coinLedger.create).not.toHaveBeenCalled();
   });

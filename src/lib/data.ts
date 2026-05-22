@@ -78,6 +78,61 @@ function chartTitle(chart: TuViChart) {
   return `${chart.input.fullName} - ${chart.canChi.year}`;
 }
 
+function chartInputKey(input: ChartInput) {
+  return [
+    input.fullName.trim().toLowerCase().normalize("NFD").replace(/\p{Diacritic}/gu, ""),
+    input.gender,
+    input.calendarType,
+    input.day,
+    input.month,
+    input.year,
+    input.birthHour,
+    input.birthMinute || 0,
+    input.viewYear,
+    input.timezone || "Asia/Bangkok",
+  ].join("|");
+}
+
+async function findPurchasedDuplicateChart(user: SessionUser | null, input: ChartInput) {
+  if (!user) return null;
+  const inputKey = chartInputKey(input);
+  const db = getDb();
+
+  if (!db || usesInMemoryUser(user.id)) {
+    for (const chart of charts().values()) {
+      if (chart.userId !== user.id || chartInputKey(chart.input) !== inputKey) continue;
+      const hasPurchasedReading = Array.from(readings().values()).some(
+        (reading) => reading.userId === user.id && reading.chartId === chart.id && reading.type === "FULL" && reading.scopeKey === "all",
+      );
+      if (hasPurchasedReading) return upgradeStoredChart(chart);
+    }
+    return null;
+  }
+
+  const candidates = await db.chart.findMany({
+    where: { userId: user.id },
+    include: {
+      readings: {
+        where: { userId: user.id, type: "FULL", scopeKey: "all", status: "COMPLETED" },
+        take: 1,
+      },
+    },
+    orderBy: { createdAt: "desc" },
+  });
+
+  const duplicate = candidates.find((candidate) => candidate.readings.length > 0 && chartInputKey(candidate.input as ChartInput) === inputKey);
+  if (!duplicate) return null;
+
+  return upgradeStoredChart({
+    id: duplicate.id,
+    title: duplicate.title,
+    input: duplicate.input as ChartInput,
+    chart: duplicate.chart as TuViChart,
+    userId: duplicate.userId || undefined,
+    createdAt: duplicate.createdAt,
+  });
+}
+
 function shouldRegenerateChartPayload(chart: TuViChart | null | undefined) {
   if (!chart) return true;
   if (chart.engine?.version !== CHART_ENGINE_VERSION) return true;
@@ -109,6 +164,8 @@ export async function saveChart(input: ChartInput, user: SessionUser | null) {
   const chart = generateTuViChart(input);
   const title = chartTitle(chart);
   const db = getDb();
+  const duplicate = await findPurchasedDuplicateChart(user, chart.input);
+  if (duplicate) return duplicate;
 
   if (!db) {
     const id = `demo-chart-${Date.now()}`;

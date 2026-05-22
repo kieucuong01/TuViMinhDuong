@@ -4,8 +4,8 @@ import Link from "next/link";
 import { LockKeyhole, Sparkles, X } from "lucide-react";
 import { requestReadingAction } from "@/app/actions";
 import { LoadingSubmitButton } from "@/components/loading-submit-button";
-import { FEATURE_PRICES } from "@/lib/pricing";
 import { formatCoins } from "@/lib/format";
+import { FEATURE_PRICES } from "@/lib/pricing";
 
 type PremiumReadingCtaProps = {
   chartId: string;
@@ -20,7 +20,7 @@ function PremiumCtaContent({ hasAdvancedReading }: { hasAdvancedReading: boolean
         {hasAdvancedReading ? <Sparkles size={22} /> : <LockKeyhole size={22} />}
       </span>
       <span className="premium-reading-cta-copy">
-        <strong>{hasAdvancedReading ? "Xem nâng cao" : "Mở luận giải toàn bộ"}</strong>
+        <strong>{hasAdvancedReading ? "Xem lại luận giải nâng cao" : "Mở luận giải toàn bộ"}</strong>
         <small>{hasAdvancedReading ? "Đã mở khóa" : formatCoins(FEATURE_PRICES.FULL.priceCoins)}</small>
       </span>
     </>
@@ -38,7 +38,7 @@ function PremiumCtaAction({
 
   if (hasAdvancedReading) {
     return (
-      <Link href={`/la-so/${chartId}/nang-cao`} className={className} aria-label={`Xem luận giải nâng cao của ${fullName}`}>
+      <Link href={`/la-so/${chartId}/nang-cao`} className={className} aria-label={`Xem lại luận giải nâng cao của ${fullName}`}>
         <PremiumCtaContent hasAdvancedReading />
       </Link>
     );
@@ -67,50 +67,50 @@ function PremiumReadingConfirmModal({
   modalId: string;
 }) {
   return (
-      <section
-        id={modalId}
-        className="premium-confirm-modal premium-confirm-popover"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="premium-confirm-title"
-        popover="auto"
-        data-testid="premium-reading-confirm-modal"
-      >
-        <button type="button" className="premium-confirm-close" aria-label="Đóng" popoverTarget={modalId} popoverTargetAction="hide">
-          <X size={18} />
+    <section
+      id={modalId}
+      className="premium-confirm-modal premium-confirm-popover"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="premium-confirm-title"
+      popover="auto"
+      data-testid="premium-reading-confirm-modal"
+    >
+      <button type="button" className="premium-confirm-close" aria-label="Đóng" popoverTarget={modalId} popoverTargetAction="hide">
+        <X size={18} />
+      </button>
+
+      <span className="premium-confirm-icon" aria-hidden="true">
+        <Sparkles size={26} />
+      </span>
+      <p className="eyebrow">Xác nhận mở khóa</p>
+      <h2 id="premium-confirm-title">Mở luận giải toàn bộ</h2>
+      <p>
+        Lá số của <strong>{fullName}</strong> sẽ được mở bản chuyên sâu và lưu lại để xem bất cứ lúc nào.
+      </p>
+
+      <div className="premium-confirm-price">
+        <span>Chi phí</span>
+        <strong>{formatCoins(FEATURE_PRICES.FULL.priceCoins)}</strong>
+      </div>
+
+      <p className="premium-confirm-note">
+        Hệ thống sẽ kiểm tra số xu trong tài khoản. Nếu đủ xu, phần luận giải sẽ được mở và lưu lại; nếu chưa đủ, bạn sẽ được nhắc nạp thêm xu.
+      </p>
+
+      <form action={requestReadingAction} className="premium-confirm-actions" data-loading-message="Đang mở luận giải...">
+        <input type="hidden" name="chartId" value={chartId} />
+        <input type="hidden" name="type" value="FULL" />
+        <input type="hidden" name="scopeKey" value="all" />
+        <input type="hidden" name="next" value={`/la-so/${chartId}`} />
+        <button type="button" className="btn btn-ghost" popoverTarget={modalId} popoverTargetAction="hide">
+          Để sau
         </button>
-
-        <span className="premium-confirm-icon" aria-hidden="true">
-          <Sparkles size={26} />
-        </span>
-        <p className="eyebrow">Xác nhận mở khóa</p>
-        <h2 id="premium-confirm-title">Mở luận giải toàn bộ</h2>
-        <p>
-          Lá số của <strong>{fullName}</strong> sẽ được mở bản chuyên sâu và lưu lại để xem bất cứ lúc nào.
-        </p>
-
-        <div className="premium-confirm-price">
-          <span>Chi phí</span>
-          <strong>{formatCoins(FEATURE_PRICES.FULL.priceCoins)}</strong>
-        </div>
-
-        <p className="premium-confirm-note">
-          Hệ thống sẽ kiểm tra số xu trong tài khoản. Nếu đủ xu, phần luận giải sẽ được mở và lưu lại; nếu chưa đủ, bạn sẽ được nhắc nạp thêm xu.
-        </p>
-
-        <form action={requestReadingAction} className="premium-confirm-actions" data-loading-message="Đang mở luận giải...">
-          <input type="hidden" name="chartId" value={chartId} />
-          <input type="hidden" name="type" value="FULL" />
-          <input type="hidden" name="scopeKey" value="all" />
-          <input type="hidden" name="next" value={`/la-so/${chartId}`} />
-          <button type="button" className="btn btn-ghost" popoverTarget={modalId} popoverTargetAction="hide">
-            Để sau
-          </button>
-          <LoadingSubmitButton className="btn btn-primary" loadingText="Đang mở..." data-testid="premium-reading-confirm-submit">
-            Xác nhận mở khóa
-          </LoadingSubmitButton>
-        </form>
-      </section>
+        <LoadingSubmitButton className="btn btn-primary" loadingText="Đang mở..." data-testid="premium-reading-confirm-submit">
+          Xác nhận mở khóa
+        </LoadingSubmitButton>
+      </form>
+    </section>
   );
 }
 
@@ -121,11 +121,7 @@ export function PremiumReadingCta(props: PremiumReadingCtaProps) {
     <>
       <PremiumCtaAction {...props} placement="floating" modalId={modalId} />
       <PremiumCtaAction {...props} placement="bottom" modalId={modalId} />
-      <PremiumReadingConfirmModal
-        chartId={props.chartId}
-        fullName={props.fullName}
-        modalId={modalId}
-      />
+      <PremiumReadingConfirmModal chartId={props.chartId} fullName={props.fullName} modalId={modalId} />
     </>
   );
 }

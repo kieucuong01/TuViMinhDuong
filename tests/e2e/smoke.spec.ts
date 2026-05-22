@@ -92,7 +92,11 @@ test.describe("core smoke flows", () => {
 
     await page.goto(`/la-so/${id}/nang-cao`);
     await expect(page.getByTestId("advanced-reading-page")).toBeVisible();
+    await expect(page.getByTestId("advanced-reading-summary")).toBeVisible();
+    await expect(page.getByTestId("advanced-reading-toc")).toBeVisible();
     await expect(page.getByTestId("advanced-reading-panel")).toBeVisible();
+    await expect(page.getByTestId("advanced-reading-score")).toHaveCount(5);
+    await expect(page.getByTestId("advanced-reading-chapter-list").getByText("Chương")).toHaveCount(8);
   });
 
   test("admin can create an article and the public page renders it", async ({ page }) => {

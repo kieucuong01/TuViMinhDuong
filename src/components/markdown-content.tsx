@@ -31,6 +31,15 @@ function renderInline(text: string) {
   return parts;
 }
 
+function headingId(text: string) {
+  return text
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/\p{Diacritic}/gu, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+}
+
 export function MarkdownContent({ content }: { content: string }) {
   const blocks = content.trim().split(/\n{2,}/);
   const nodes: React.ReactNode[] = [];
@@ -48,13 +57,33 @@ export function MarkdownContent({ content }: { content: string }) {
       return;
     }
 
+    if (text.startsWith("# ")) {
+      const title = text.slice(2);
+      nodes.push(
+        <h1 key={index} id={headingId(title)}>
+          {renderInline(title)}
+        </h1>,
+      );
+      return;
+    }
+
     if (text.startsWith("### ")) {
-      nodes.push(<h3 key={index}>{renderInline(text.slice(4))}</h3>);
+      const title = text.slice(4);
+      nodes.push(
+        <h3 key={index} id={headingId(title)}>
+          {renderInline(title)}
+        </h3>,
+      );
       return;
     }
 
     if (text.startsWith("## ")) {
-      nodes.push(<h2 key={index}>{renderInline(text.slice(3))}</h2>);
+      const title = text.slice(3);
+      nodes.push(
+        <h2 key={index} id={headingId(title)}>
+          {renderInline(title)}
+        </h2>,
+      );
       return;
     }
 
