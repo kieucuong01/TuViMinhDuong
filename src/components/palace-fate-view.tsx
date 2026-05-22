@@ -1,7 +1,8 @@
 import { CheckCircle2, LockKeyhole, Sparkles } from "lucide-react";
 import { requestReadingAction } from "@/app/actions";
+import { LoadingSubmitButton } from "@/components/loading-submit-button";
 import { MarkdownContent } from "@/components/markdown-content";
-import { getAnyCompletedReading, getCachedReading } from "@/lib/data";
+import { getCompletedReadingsForScopes } from "@/lib/data";
 import { formatCoins } from "@/lib/format";
 import { getPalaceReadingItems } from "@/lib/palace-analysis";
 import { FEATURE_PRICES } from "@/lib/pricing";
@@ -12,6 +13,7 @@ type PalaceFateViewProps = {
   chartId: string;
   chart: TuViChart;
   user: SessionUser | null;
+  activeReadingId?: string;
 };
 
 function anchorForPalace(name: string) {
@@ -30,6 +32,7 @@ function scoreTone(score: number) {
 }
 
 function UnlockPalaceButton({ chartId, palaceName }: { chartId: string; palaceName: string }) {
+  const anchor = anchorForPalace(palaceName);
   return (
     <form
       action={requestReadingAction}
@@ -40,27 +43,26 @@ function UnlockPalaceButton({ chartId, palaceName }: { chartId: string; palaceNa
       <input type="hidden" name="chartId" value={chartId} />
       <input type="hidden" name="type" value="PALACE" />
       <input type="hidden" name="scopeKey" value={palaceName} />
-      <input type="hidden" name="next" value={`/la-so/${chartId}?view=luan-cung#${anchorForPalace(palaceName)}`} />
-      <button className="btn btn-primary w-full sm:w-auto" type="submit" data-testid={`unlock-palace-${palaceName}`}>
+      <input type="hidden" name="next" value={`/la-so/${chartId}?view=luan-cung#${anchor}-reading`} />
+      <LoadingSubmitButton className="btn btn-primary w-full sm:w-auto" loadingText="Đang mở..." data-testid={`unlock-palace-${palaceName}`}>
         <LockKeyhole size={18} /> Mở cung này - {formatCoins(FEATURE_PRICES.PALACE.priceCoins)}
-      </button>
+      </LoadingSubmitButton>
     </form>
   );
 }
 
-export async function PalaceFateView({ chartId, chart, user }: PalaceFateViewProps) {
+function palaceReadingHref(chartId: string, readingId: string, anchor: string) {
+  return `/la-so/${chartId}?view=luan-cung&reading=${encodeURIComponent(readingId)}#${anchor}-reading`;
+}
+
+export async function PalaceFateView({ chartId, chart, user, activeReadingId }: PalaceFateViewProps) {
   const items = getPalaceReadingItems(chart);
-  const readingPairs = await Promise.all(
-    items.map(async (item) => {
-      if (!user) return [item.palace.name, null] as const;
-      const reading =
-        (await getCachedReading(user.id, chartId, "PALACE", item.palace.name)) ||
-        (user.role === "ADMIN" ? await getAnyCompletedReading(chartId, "PALACE", item.palace.name) : null);
-      return [item.palace.name, reading] as const;
-    }),
+  const completedReadings = await getCompletedReadingsForScopes(
+    user,
+    chartId,
+    items.map((item) => ({ type: "PALACE", scopeKey: item.palace.name })),
   );
-  const readings = new Map(readingPairs);
-  const unlockedCount = readingPairs.filter(([, reading]) => Boolean(reading)).length;
+  const unlockedCount = completedReadings.size;
 
   return (
     <section className="fate-page" data-testid="palace-fate-view">
@@ -88,18 +90,19 @@ export async function PalaceFateView({ chartId, chart, user }: PalaceFateViewPro
 
       <div className="mt-6 grid gap-4">
         {items.map((item) => {
-          const reading = readings.get(item.palace.name);
+          const reading = completedReadings.get(`PALACE:${item.palace.name}`);
           const anchor = anchorForPalace(item.palace.name);
+          const isActiveReading = Boolean(reading && reading.id === activeReadingId);
           return (
-            <article key={item.palace.name} id={anchor} className="rounded-3xl border border-orange-100 bg-white/90 p-5 shadow-lg shadow-orange-950/5" data-testid="palace-reading-card">
+            <article key={item.palace.name} id={anchor} className="palace-reading-card" data-testid="palace-reading-card">
               <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-3">
-                    <span className={`grid h-14 w-14 place-items-center rounded-full border text-lg font-black ${scoreTone(item.score)}`}>
+                    <span className={`grid h-12 w-12 place-items-center rounded-full border text-base font-black ${scoreTone(item.score)}`}>
                       {item.score}
                     </span>
                     <div>
-                      <h2 className="text-2xl font-black text-stone-950">{item.title}</h2>
+                      <h2 className="text-xl font-black text-stone-950">{item.title}</h2>
                       <p className="mt-1 text-sm font-bold text-stone-500">
                         {item.level} · {item.palace.branch} · {item.palace.lifecycle}
                       </p>
@@ -142,7 +145,7 @@ export async function PalaceFateView({ chartId, chart, user }: PalaceFateViewPro
 
                 <div className="w-full shrink-0 lg:w-52">
                   {reading ? (
-                    <a href={`#${anchor}-reading`} className="btn btn-ghost w-full">
+                    <a href={palaceReadingHref(chartId, reading.id, anchor)} className="btn btn-ghost w-full">
                       Xem lại luận cung
                     </a>
                   ) : (
@@ -151,9 +154,9 @@ export async function PalaceFateView({ chartId, chart, user }: PalaceFateViewPro
                 </div>
               </div>
 
-              {reading ? (
-                <details id={`${anchor}-reading`} className="mt-5 rounded-2xl border border-emerald-100 bg-emerald-50/40 p-4" open>
-                  <summary className="cursor-pointer text-base font-black text-emerald-800">Nội dung luận cung đã mở</summary>
+              {reading && isActiveReading ? (
+                <details id={`${anchor}-reading`} className="unlocked-reading" open={isActiveReading}>
+                  <summary>Nội dung luận cung đã mở</summary>
                   <MarkdownContent content={reading.content} />
                 </details>
               ) : null}
@@ -169,4 +172,3 @@ export async function PalaceFateView({ chartId, chart, user }: PalaceFateViewPro
     </section>
   );
 }
-

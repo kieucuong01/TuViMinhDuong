@@ -1,7 +1,9 @@
 import { BarChart3, CheckCircle2, LockKeyhole } from "lucide-react";
 import { requestReadingAction } from "@/app/actions";
+import { LoadingSubmitButton } from "@/components/loading-submit-button";
 import { MarkdownContent } from "@/components/markdown-content";
-import { getAnyCompletedReading, getCachedReading } from "@/lib/data";
+import { getCompletedReadingsForScopes } from "@/lib/data";
+import type { StoredReading } from "@/lib/data";
 import { formatCoins } from "@/lib/format";
 import { getDailyFateItem, getDailyMonthTrend, getMajorFateItems, getMinorFateItems, getMonthlyFateItems, type FateReadingItem } from "@/lib/fate-analysis";
 import { FEATURE_PRICES } from "@/lib/pricing";
@@ -12,6 +14,7 @@ type FateViewProps = {
   chartId: string;
   chart: TuViChart;
   user: SessionUser | null;
+  activeReadingId?: string;
 };
 
 function anchorId(value: string) {
@@ -24,15 +27,16 @@ function anchorId(value: string) {
 }
 
 function OpenButton({ chartId, item, nextPath }: { chartId: string; item: FateReadingItem; nextPath: string }) {
+  const anchor = anchorId(item.scopeKey);
   return (
     <form action={requestReadingAction} data-loading-message="Đang mở phần luận giải..." data-loading-label="Đang mở...">
       <input type="hidden" name="chartId" value={chartId} />
       <input type="hidden" name="type" value={item.type} />
       <input type="hidden" name="scopeKey" value={item.scopeKey} />
-      <input type="hidden" name="next" value={`${nextPath}#${anchorId(item.scopeKey)}`} />
-      <button className="fate-open-button" type="submit">
+      <input type="hidden" name="next" value={`${nextPath}#${anchor}-reading`} />
+      <LoadingSubmitButton className="fate-open-button" loadingText="Đang mở...">
         <LockKeyhole size={16} /> Mở - {formatCoins(FEATURE_PRICES[item.type].priceCoins)}
-      </button>
+      </LoadingSubmitButton>
     </form>
   );
 }
@@ -97,16 +101,19 @@ function TrendArea({ items, currentIndex, markerLabel }: { items: { label: strin
 }
 
 async function readingMap(user: SessionUser | null, chartId: string, items: FateReadingItem[]) {
-  const pairs = await Promise.all(
-    items.map(async (item) => {
-      if (!user) return [item.scopeKey, null] as const;
-      const reading =
-        (await getCachedReading(user.id, chartId, item.type, item.scopeKey)) ||
-        (user.role === "ADMIN" ? await getAnyCompletedReading(chartId, item.type, item.scopeKey) : null);
-      return [item.scopeKey, reading] as const;
-    }),
+  return getCompletedReadingsForScopes(
+    user,
+    chartId,
+    items.map((item) => ({ type: item.type, scopeKey: item.scopeKey })),
   );
-  return new Map(pairs);
+}
+
+function fateReadingMapKey(item: FateReadingItem) {
+  return `${item.type}:${item.scopeKey}`;
+}
+
+function readingHref(nextPath: string, readingId: string, anchor: string) {
+  return `${nextPath}${nextPath.includes("?") ? "&" : "?"}reading=${encodeURIComponent(readingId)}#${anchor}-reading`;
 }
 
 function ExplainBox({ title = "Biểu đồ của bạn nói gì" }: { title?: string }) {
@@ -145,13 +152,16 @@ function FateRow({
   item,
   nextPath,
   reading,
+  activeReadingId,
 }: {
   chartId: string;
   item: FateReadingItem;
   nextPath: string;
-  reading: Awaited<ReturnType<typeof getCachedReading>> | null;
+  reading: StoredReading | null;
+  activeReadingId?: string;
 }) {
   const anchor = anchorId(item.scopeKey);
+  const isActiveReading = Boolean(reading && reading.id === activeReadingId);
   return (
     <article id={anchor} className="fate-row">
       <div className="min-w-0">
@@ -166,16 +176,16 @@ function FateRow({
       </div>
       <div className="shrink-0">
         {reading ? (
-          <a className="fate-open-button" href={`#${anchor}-reading`}>
+          <a className="fate-open-button" href={readingHref(nextPath, reading.id, anchor)}>
             <CheckCircle2 size={16} /> Xem lại
           </a>
         ) : (
           <OpenButton chartId={chartId} item={item} nextPath={nextPath} />
         )}
       </div>
-      {reading ? (
-        <details id={`${anchor}-reading`} className="mt-4 w-full rounded-2xl border border-emerald-100 bg-emerald-50/40 p-4" open>
-          <summary className="cursor-pointer text-base font-black text-emerald-800">Nội dung đã mở</summary>
+      {reading && isActiveReading ? (
+        <details id={`${anchor}-reading`} className="unlocked-reading" open={isActiveReading}>
+          <summary>Nội dung đã mở</summary>
           <MarkdownContent content={reading.content} />
         </details>
       ) : null}
@@ -183,7 +193,7 @@ function FateRow({
   );
 }
 
-export async function MajorFateView({ chartId, chart, user }: FateViewProps) {
+export async function MajorFateView({ chartId, chart, user, activeReadingId }: FateViewProps) {
   const items = getMajorFateItems(chart);
   const readings = await readingMap(user, chartId, items);
   const currentIndex = items.findIndex((item) => item.isCurrent);
@@ -196,14 +206,14 @@ export async function MajorFateView({ chartId, chart, user }: FateViewProps) {
       <ExplainBox />
       <div className="fate-list">
         {items.map((item) => (
-          <FateRow key={item.scopeKey} chartId={chartId} item={item} nextPath={`/la-so/${chartId}?view=dai-van`} reading={readings.get(item.scopeKey) || null} />
+          <FateRow key={item.scopeKey} chartId={chartId} item={item} nextPath={`/la-so/${chartId}?view=dai-van`} reading={readings.get(fateReadingMapKey(item)) || null} activeReadingId={activeReadingId} />
         ))}
       </div>
     </section>
   );
 }
 
-export async function MinorFateView({ chartId, chart, user }: FateViewProps) {
+export async function MinorFateView({ chartId, chart, user, activeReadingId }: FateViewProps) {
   const items = getMinorFateItems(chart);
   const readings = await readingMap(user, chartId, items);
   const currentIndex = items.findIndex((item) => item.isCurrent);
@@ -216,14 +226,14 @@ export async function MinorFateView({ chartId, chart, user }: FateViewProps) {
       <ExplainBox />
       <div className="fate-list">
         {items.map((item) => (
-          <FateRow key={item.scopeKey} chartId={chartId} item={item} nextPath={`/la-so/${chartId}?view=tieu-van`} reading={readings.get(item.scopeKey) || null} />
+          <FateRow key={item.scopeKey} chartId={chartId} item={item} nextPath={`/la-so/${chartId}?view=tieu-van`} reading={readings.get(fateReadingMapKey(item)) || null} activeReadingId={activeReadingId} />
         ))}
       </div>
     </section>
   );
 }
 
-export async function MonthlyFateView({ chartId, chart, user }: FateViewProps) {
+export async function MonthlyFateView({ chartId, chart, user, activeReadingId }: FateViewProps) {
   const items = getMonthlyFateItems(chart);
   const readings = await readingMap(user, chartId, items);
 
@@ -233,7 +243,7 @@ export async function MonthlyFateView({ chartId, chart, user }: FateViewProps) {
       <p className="mt-3 text-base leading-7 text-stone-600">Mỗi tháng có preview miễn phí. Khi cần đọc kỹ, bạn có thể mở riêng từng tháng.</p>
       <div className="fate-list">
         {items.map((item) => (
-          <FateRow key={item.scopeKey} chartId={chartId} item={item} nextPath={`/la-so/${chartId}?view=nguyet-van`} reading={readings.get(item.scopeKey) || null} />
+          <FateRow key={item.scopeKey} chartId={chartId} item={item} nextPath={`/la-so/${chartId}?view=nguyet-van`} reading={readings.get(fateReadingMapKey(item)) || null} activeReadingId={activeReadingId} />
         ))}
       </div>
     </section>
@@ -265,12 +275,12 @@ function DailyPlans() {
   );
 }
 
-export async function DailyFateView({ chartId, chart, user }: FateViewProps) {
+export async function DailyFateView({ chartId, chart, user, activeReadingId }: FateViewProps) {
   const item = getDailyFateItem(chart);
   const trends = getDailyMonthTrend(chart);
   const readings = await readingMap(user, chartId, [item]);
   const currentIndex = trends.findIndex((trend) => trend.label === String(new Date(item.date).getDate()));
-  const reading = readings.get(item.scopeKey) || null;
+  const reading = readings.get(fateReadingMapKey(item)) || null;
 
   return (
     <section className="fate-page narrow" data-testid="daily-fate-view">
@@ -303,9 +313,9 @@ export async function DailyFateView({ chartId, chart, user }: FateViewProps) {
         <p>{item.summary}</p>
         <EvidenceList item={item} />
         <AdviceList item={item} />
-        {reading ? (
-          <details className="mt-4 rounded-2xl border border-emerald-100 bg-emerald-50/40 p-4" open>
-            <summary className="cursor-pointer text-base font-black text-emerald-800">Nội dung nhật vận đã mở</summary>
+        {reading && reading.id === activeReadingId ? (
+          <details id={`${anchorId(item.scopeKey)}-reading`} className="unlocked-reading text-left" open={reading.id === activeReadingId}>
+            <summary>Nội dung nhật vận đã mở</summary>
             <MarkdownContent content={reading.content} />
           </details>
         ) : (
@@ -317,4 +327,3 @@ export async function DailyFateView({ chartId, chart, user }: FateViewProps) {
     </section>
   );
 }
-

@@ -2629,6 +2629,15 @@ button.is-loading:not(.icon-button)::before {
   line-height: 1.88;
 }
 
+.prose-content h1 {
+  margin-top: 0.35rem;
+  color: #1c1917;
+  font-size: clamp(1.45rem, 3vw, 2rem);
+  font-weight: 850;
+  line-height: 1.22;
+  letter-spacing: 0;
+}
+
 .prose-content h2,
 .prose-content h3 {
   margin-top: 1.6rem;
@@ -2637,12 +2646,12 @@ button.is-loading:not(.icon-button)::before {
 }
 
 .prose-content h2 {
-  font-size: clamp(1.45rem, 3vw, 2rem);
+  font-size: clamp(1.2rem, 2.6vw, 1.55rem);
   line-height: 1.2;
 }
 
 .prose-content h3 {
-  font-size: 1.2rem;
+  font-size: 1.08rem;
   line-height: 1.35;
 }
 
@@ -2772,6 +2781,54 @@ button.is-loading:not(.icon-button)::before {
   padding: 0.65rem 0.9rem;
   color: #78716c;
   font-size: 0.86rem;
+}
+
+.unlocked-reading {
+  margin-top: 1.1rem;
+  width: 100%;
+  scroll-margin-top: 8rem;
+  border: 1px solid #bbf7d0;
+  border-radius: 1rem;
+  background: linear-gradient(180deg, rgb(240 253 244 / 0.72), rgb(255 255 255 / 0.92));
+  padding: 1rem;
+  box-shadow: 0 14px 34px rgb(22 101 52 / 0.06);
+}
+
+.unlocked-reading summary {
+  cursor: pointer;
+  color: #047857;
+  font-size: 0.98rem;
+  font-weight: 900;
+  line-height: 1.35;
+}
+
+.unlocked-reading .prose-content {
+  margin-top: 1rem;
+  color: #44403c;
+  font-size: 1rem;
+  line-height: 1.78;
+}
+
+.unlocked-reading .prose-content h1 {
+  font-size: clamp(1.18rem, 2.5vw, 1.45rem);
+  font-weight: 850;
+}
+
+.unlocked-reading .prose-content h2 {
+  margin-top: 1.15rem;
+  font-size: 1.08rem;
+  font-weight: 850;
+}
+
+.unlocked-reading .prose-content h3 {
+  margin-top: 1rem;
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+.unlocked-reading .prose-content p,
+.unlocked-reading .prose-content ul {
+  margin-top: 0.72rem;
 }
 
 .article-shell {
@@ -3559,8 +3616,11 @@ button.is-loading:not(.icon-button)::before {
   display: grid;
   grid-template-columns: 1fr auto;
   gap: 1rem;
+  scroll-margin-top: 8rem;
   border-bottom: 1px solid #e7e5e4;
   padding: 1.45rem 0;
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 18rem;
 }
 
 .fate-row h2 {
@@ -3627,9 +3687,34 @@ button.is-loading:not(.icon-button)::before {
   gap: 0.55rem;
 }
 
+.palace-reading-card {
+  scroll-margin-top: 8rem;
+  border: 1px solid rgb(254 215 170 / 0.85);
+  border-radius: 1.25rem;
+  background: rgb(255 255 255 / 0.92);
+  padding: clamp(1rem, 2.5vw, 1.25rem);
+  box-shadow: 0 14px 36px rgb(120 53 15 / 0.07);
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 24rem;
+}
+
+.palace-reading-card + .palace-reading-card {
+  margin-top: 0.25rem;
+}
+
+.palace-reading-card p {
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
 .fate-open-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
   min-width: 6.8rem;
   min-height: 2.5rem;
+  border-radius: 0.35rem;
   background: #fb8c00;
   padding: 0 0.9rem;
   color: #fff;

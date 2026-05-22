@@ -18,7 +18,7 @@ type StoredChart = {
   createdAt: Date;
 };
 
-type StoredReading = {
+export type StoredReading = {
   id: string;
   userId: string;
   chartId: string;
@@ -27,6 +27,11 @@ type StoredReading = {
   priceCoins: number;
   content: string;
   createdAt: Date;
+};
+
+export type ReadingScopeKey = {
+  type: ReadingKey;
+  scopeKey: string;
 };
 
 type ChartWithFreeOverview = TuViChart & {
@@ -424,6 +429,62 @@ export async function getAnyCompletedReading(chartId: string, type: ReadingKey, 
         createdAt: reading.createdAt,
       }
     : null;
+}
+
+function readingMapKey(type: ReadingKey, scopeKey: string) {
+  return `${type}:${scopeKey}`;
+}
+
+export async function getCompletedReadingsForScopes(user: SessionUser | null, chartId: string, keys: ReadingScopeKey[]) {
+  const result = new Map<string, StoredReading>();
+  const uniqueKeys = Array.from(new Map(keys.map((key) => [readingMapKey(key.type, key.scopeKey), key])).values());
+  if (!user || uniqueKeys.length === 0) return result;
+
+  const db = getDb();
+  if (!db || usesInMemoryUser(user.id)) {
+    const candidates = Array.from(readings().values())
+      .filter((reading) => {
+        if (reading.chartId !== chartId) return false;
+        if (user.role !== "ADMIN" && reading.userId !== user.id) return false;
+        return uniqueKeys.some((key) => key.type === reading.type && key.scopeKey === reading.scopeKey);
+      })
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+
+    for (const reading of candidates) {
+      const key = readingMapKey(reading.type, reading.scopeKey);
+      if (!result.has(key)) result.set(key, reading);
+    }
+    return result;
+  }
+
+  const rows = await db.reading.findMany({
+    where: {
+      chartId,
+      status: "COMPLETED",
+      content: { not: null },
+      ...(user.role === "ADMIN" ? {} : { userId: user.id }),
+      OR: uniqueKeys.map((key) => ({ type: key.type, scopeKey: key.scopeKey })),
+    },
+    orderBy: { createdAt: "desc" },
+  });
+
+  for (const reading of rows) {
+    if (!reading.content) continue;
+    const key = readingMapKey(reading.type as ReadingKey, reading.scopeKey);
+    if (result.has(key)) continue;
+    result.set(key, {
+      id: reading.id,
+      userId: reading.userId,
+      chartId: reading.chartId,
+      type: reading.type as ReadingKey,
+      scopeKey: reading.scopeKey,
+      priceCoins: reading.priceCoins,
+      content: reading.content,
+      createdAt: reading.createdAt,
+    });
+  }
+
+  return result;
 }
 
 export async function getReadingById(userId: string, readingId: string) {

@@ -32,7 +32,9 @@ function safeNextPath(value: FormDataEntryValue | null, fallback: string) {
 }
 
 function withReadingParam(path: string, readingId: string) {
-  return `${path}${path.includes("?") ? "&" : "?"}reading=${encodeURIComponent(readingId)}`;
+  const [withoutHash, hash] = path.split("#");
+  const separator = withoutHash.includes("?") ? "&" : "?";
+  return `${withoutHash}${separator}reading=${encodeURIComponent(readingId)}${hash ? `#${hash}` : ""}`;
 }
 
 function withQueryParams(path: string, params: Record<string, string | number>) {

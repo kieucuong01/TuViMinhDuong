@@ -43,10 +43,11 @@ export default async function ChartPage({
   if (!record) notFound();
   const fateViews: FateView[] = ["la-so", "luan-cung", "dai-van", "tieu-van", "nguyet-van", "nhat-van", "chuyen-de"];
   const activeView: FateView = fateViews.includes(query.view as FateView) ? (query.view as FateView) : "la-so";
+  const isScopedReadingView = ["luan-cung", "dai-van", "tieu-van", "nguyet-van", "nhat-van"].includes(activeView);
 
   const user = await getCurrentUser();
-  const selectedReading = user && query.reading ? await getReadingById(user.id, query.reading) : null;
-  const fullReading = user
+  const selectedReading = user && query.reading && !isScopedReadingView ? await getReadingById(user.id, query.reading) : null;
+  const fullReading = user && !isScopedReadingView
     ? (await getCachedReading(user.id, id, "FULL", "all")) ||
       (user.role === "ADMIN" ? await getAnyCompletedReading(id, "FULL", "all") : null)
     : null;
@@ -59,12 +60,12 @@ export default async function ChartPage({
       <FateTabs chartId={id} active={activeView} />
 
       <div className="mx-auto max-w-6xl px-3 pb-10 sm:px-6 lg:px-8">
-        {activeView === "dai-van" ? <MajorFateView chartId={id} chart={record.chart} user={user} /> : null}
-        {activeView === "luan-cung" ? <PalaceFateView chartId={id} chart={record.chart} user={user} /> : null}
-        {activeView === "tieu-van" ? <MinorFateView chartId={id} chart={record.chart} user={user} /> : null}
-        {activeView === "nguyet-van" ? <MonthlyFateView chartId={id} chart={record.chart} user={user} /> : null}
-        {activeView === "nhat-van" ? <DailyFateView chartId={id} chart={record.chart} user={user} /> : null}
-        {["luan-cung", "dai-van", "tieu-van", "nguyet-van", "nhat-van"].includes(activeView) ? null : (
+        {activeView === "dai-van" ? <MajorFateView chartId={id} chart={record.chart} user={user} activeReadingId={query.reading} /> : null}
+        {activeView === "luan-cung" ? <PalaceFateView chartId={id} chart={record.chart} user={user} activeReadingId={query.reading} /> : null}
+        {activeView === "tieu-van" ? <MinorFateView chartId={id} chart={record.chart} user={user} activeReadingId={query.reading} /> : null}
+        {activeView === "nguyet-van" ? <MonthlyFateView chartId={id} chart={record.chart} user={user} activeReadingId={query.reading} /> : null}
+        {activeView === "nhat-van" ? <DailyFateView chartId={id} chart={record.chart} user={user} activeReadingId={query.reading} /> : null}
+        {isScopedReadingView ? null : (
         <>
         <div className="chart-titlebar">
           <h1>Tổng quan lá số của {record.chart.input.fullName}</h1>

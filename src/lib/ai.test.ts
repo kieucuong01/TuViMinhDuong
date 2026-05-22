@@ -111,6 +111,26 @@ describe("AI reading format", () => {
     expect(prompt).toContain("Không tự tính lại lá số");
   });
 
+  it("uses focused section format for palace and fate item readings", () => {
+    const chart = sampleChart();
+    const chapters = paidReadingChapters(chart, "PALACE");
+    const prompt = paidReadingChapterPrompt(
+      chart,
+      "PALACE",
+      "Mệnh",
+      { title: "Cung Mệnh", evidence: ["Mệnh có Thiên Tướng (H)"] },
+      chapters[0],
+      0,
+      chapters.length,
+    );
+
+    expect(chapters).toHaveLength(1);
+    expect(chapters[0].title).not.toContain("Chương");
+    expect(chapters[0].requiredSections).toEqual(["Tóm tắt dễ hiểu", "Dữ kiện tử vi đã dùng", "Luận giải theo đời sống", "Điều cần lưu ý", "Gợi ý nên làm"]);
+    expect(prompt).toContain("# Luận cung: Mệnh");
+    expect(prompt).toContain("phần luận giải");
+  });
+
   it("returns a structured 8-chapter fallback when no LLM provider is configured", async () => {
     clearProviderEnv();
 

@@ -368,27 +368,41 @@ export function paidReadingChapters(chart: TuViChart, type: ReadingKey): PaidRea
   const year = chart.input.viewYear;
 
   if (type !== "FULL") {
+    const scopeTitles: Record<ReadingKey, { title: string; instruction: string; targetWords: string }> = {
+      FULL: { title: "Luận giải toàn bộ", instruction: "", targetWords: "" },
+      PALACE: {
+        title: "Luận sâu theo từng cung",
+        instruction:
+          "Viết như một bài tư vấn riêng cho cung đang mở. Giải thích điểm số/cung/sao theo ngôn ngữ đời sống hiện đại, nhưng vẫn dẫn chứng bằng thuật ngữ tử vi. Tập trung vào ý nghĩa của cung đó, ảnh hưởng thực tế, điểm nên phát huy và điểm cần quản trị.",
+        targetWords: "900-1300 từ",
+      },
+      DAI_VAN: {
+        title: "Luận giai đoạn đại vận",
+        instruction:
+          "Viết về giai đoạn 10 năm đang mở khóa: bối cảnh, cơ hội, thách thức, việc nên ưu tiên, cách quản trị rủi ro. Nêu rõ đây là định hướng dài hạn, không kết luận cứng.",
+        targetWords: "1000-1500 từ",
+      },
+      NGUYET_VAN: {
+        title: "Luận nguyệt vận",
+        instruction:
+          "Viết về tháng đang mở khóa: trọng tâm tháng, công việc, tài chính, tình cảm/gia đình, sức khỏe/tinh thần và việc nên tránh. Bám vào dữ kiện lá số, sao lưu/vận hạn và lịch ngày nếu có.",
+        targetWords: "800-1200 từ",
+      },
+      NHAT_VAN: {
+        title: "Luận nhật vận cá nhân hóa",
+        instruction:
+          "Viết về ngày đang xem theo lá số cá nhân: mức thuận lợi, việc hợp để làm, việc nên chậm lại, giờ/nhịp hành động nên ưu tiên. Giữ giọng mềm, thực tế, không hù dọa.",
+        targetWords: "700-1000 từ",
+      },
+    };
+    const config = scopeTitles[type];
     return [
       {
-        key: "context",
-        title: "Chương 1: Dữ kiện và trọng tâm",
-        requiredSections: ["Dữ kiện lá số đã dùng", "Luận giải chính", "Điều nên lưu ý", "Gợi ý hành động"],
-        instruction: "Giải thích phạm vi đang mở khóa, dữ kiện đã dùng, các sao/trạng thái nổi bật và ý nghĩa tổng quan của phần luận này.",
-        targetWords: "700-1200 từ",
-      },
-      {
-        key: "analysis",
-        title: "Chương 2: Phân tích chính",
-        requiredSections: ["Dữ kiện lá số đã dùng", "Luận giải chính", "Điều nên lưu ý", "Gợi ý hành động"],
-        instruction: "Đi sâu vào điểm thuận lợi, điểm cần quản trị, công việc và tiền bạc. Luôn bám vào cung/sao/vận hạn liên quan.",
-        targetWords: "900-1500 từ",
-      },
-      {
-        key: "advice",
-        title: "Chương 3: Ứng dụng thực tế",
-        requiredSections: ["Dữ kiện lá số đã dùng", "Luận giải chính", "Điều nên lưu ý", "Gợi ý hành động"],
-        instruction: "Viết lời khuyên dễ hiểu, có trách nhiệm, không hù dọa. Nêu việc nên làm, nên tránh và cách dùng thông tin này trong đời sống.",
-        targetWords: "800-1300 từ",
+        key: "focused-reading",
+        title: config.title,
+        requiredSections: ["Tóm tắt dễ hiểu", "Dữ kiện tử vi đã dùng", "Luận giải theo đời sống", "Điều cần lưu ý", "Gợi ý nên làm"],
+        instruction: config.instruction,
+        targetWords: config.targetWords,
       },
     ];
   }
@@ -465,8 +479,11 @@ export function paidReadingChapterPrompt(
   const summary = getDeepReadingSummary(chart);
   const scoreLines = summary.scores.map((score) => `${score.label}: ${score.value}/100`).join("; ");
   const sectionLines = chapter.requiredSections.map((section) => `## ${section}`).join("\n");
+  const isFullReport = type === "FULL";
+  const unitName = isFullReport ? "chương" : "phần luận giải";
+  const startLine = isFullReport ? `# ${chapter.title}` : `# ${FEATURE_PRICES[type].label}: ${scopeKey}`;
 
-  return `Bạn là chuyên gia tử vi Việt Nam. Hãy viết ${chapter.title} (${index + 1}/${total}) cho báo cáo trả phí.
+  return `Bạn là chuyên gia tử vi Việt Nam. Hãy viết ${unitName} ${isFullReport ? `${chapter.title} (${index + 1}/${total})` : "đang mở khóa"} cho báo cáo trả phí.
 
 Loại luận: ${FEATURE_PRICES[type].label}
 Phạm vi: ${scopeKey}
@@ -493,21 +510,22 @@ Dữ liệu lá số JSON đầy đủ, chỉ dùng để đối chiếu bằng 
 ${JSON.stringify(chart, null, 2)}
 
 Yêu cầu bắt buộc:
-- Chỉ viết chương này, không viết lại các chương khác.
+- Chỉ viết ${unitName} này, không viết lan sang phạm vi khác.
 - Không tự tính lại lá số, không đổi ngày giờ, không tự thêm sao ngoài JSON.
-- Báo cáo toàn bộ phải tạo cảm giác an tâm, rõ ràng, đáng tiền cho người đọc 30-60 tuổi.
+- Nội dung phải tạo cảm giác an tâm, rõ ràng, đáng tiền cho người đọc 30-60 tuổi.
 - Xưng hô tự nhiên theo dữ liệu: dùng "${summary.viewerAddress}" khi cần gọi trực tiếp người xem.
-- Bắt đầu chương bằng đúng dòng Markdown: # ${chapter.title}
-- Mỗi chương phải có đúng 4 heading dưới đây, đúng thứ tự:
+- Bắt đầu bằng đúng dòng Markdown: ${startLine}
+- Phải có đúng các heading dưới đây, đúng thứ tự:
 ${sectionLines}
-- Trong "Dữ kiện lá số đã dùng": ghi ngắn cung/sao/trạng thái sao (M/V/Đ/B/H) và sao lưu niên/vận hạn liên quan.
-- Trong "Luận giải chính": giải thích sâu, nhưng mỗi đoạn tối đa 3-4 dòng khi đọc trên điện thoại.
-- Trong "Điều nên lưu ý": mọi sao hãm, sát tinh, lưu sát tinh phải chuyển thành lời khuyên quản trị rủi ro; không dọa, không kết luận tuyệt đối.
-- Trong "Gợi ý hành động": dùng bullet rõ việc nên làm, nên tránh, nhịp kiểm tra lại.
+- Ở phần dữ kiện: ghi ngắn cung/sao/trạng thái sao (M/V/Đ/B/H) và sao lưu niên/vận hạn liên quan.
+- Ở phần luận giải: giải thích sâu, nhưng mỗi đoạn tối đa 3-4 dòng khi đọc trên điện thoại.
+- Ở phần lưu ý: mọi sao hãm, sát tinh, lưu sát tinh phải chuyển thành lời khuyên quản trị rủi ro; không dọa, không kết luận tuyệt đối.
+- Ở phần gợi ý: dùng bullet rõ việc nên làm, nên tránh, nhịp kiểm tra lại.
+- Nếu là vận năm hoặc nguyệt/nhật vận, hãy nêu trọng tâm thời gian đang mở khóa thật cụ thể.
 - Nếu chương là vận năm, bắt buộc có đủ 12 tháng trong năm ${chart.input.viewYear}, mỗi tháng có trọng tâm, ưu tiên, điều nên tránh.
 - Không dùng từ ngữ quá kỹ thuật hoặc quá mê tín. Viết như một chuyên gia đang tư vấn bình tĩnh cho người trưởng thành.
 
-Trọng tâm chương:
+Trọng tâm nội dung:
 ${chapter.instruction}`;
 }
 
@@ -515,6 +533,33 @@ function fallbackChapterBody(chart: TuViChart, chapter: PaidReadingChapter, focu
   const summary = getDeepReadingSummary(chart);
   const focusPalaces = compactImportantPalaces(chart).split("\n").slice(0, 4).join("\n- ");
   const focusEvidence = focus ? focus.evidence.join("\n- ") : focusPalaces;
+  if (chapter.key === "focused-reading") {
+    return `# ${focus?.title || chapter.title}
+
+## Tóm tắt dễ hiểu
+Phần này đọc riêng ${focus?.title || "phạm vi đang mở khóa"} cho ${summary.viewerAddress} ${chart.input.fullName}. Nội dung chỉ dùng dữ liệu lá số đã tính sẵn, tập trung vào ý nghĩa thực tế, điểm nên phát huy và điều cần quản trị trong đời sống.
+
+## Dữ kiện tử vi đã dùng
+- Mệnh: ${chart.menh}; Thân: ${chart.than}; Cục: ${chart.cuc}; năm xem ${chart.input.viewYear}.
+- Trọng tâm mở khóa: ${focus?.title || chapter.title}.
+- Dữ kiện nổi bật:
+- ${focusEvidence}
+
+## Luận giải theo đời sống
+Các tín hiệu tử vi trong phần này nên được hiểu như bản định hướng. Điểm thuận lợi giúp ${summary.viewerAddress} biết vùng nào có thể chủ động phát huy; điểm khó là lời nhắc để đi chậm, kiểm tra kỹ và có kế hoạch dự phòng.
+
+Với phạm vi đang mở, nên ưu tiên cách làm rõ ràng, tránh quyết định theo cảm xúc nhất thời. Nếu có sao hãm, sát tinh hoặc sao lưu gây áp lực, ý nghĩa chính là quản trị rủi ro chứ không phải một kết luận chắc chắn.
+
+## Điều cần lưu ý
+- Không nên dùng phần luận này để thay thế quyết định chuyên môn về tài chính, pháp lý hoặc y tế.
+- Khi có nhiều tín hiệu căng, hãy giảm tốc độ, kiểm tra giấy tờ, tiền bạc và các cam kết quan trọng.
+- Giữ nhịp sinh hoạt ổn định sẽ giúp giảm tác động của các giai đoạn dễ dao động.
+
+## Gợi ý nên làm
+- Chọn 1 việc quan trọng nhất trong 7-30 ngày tới và làm từng bước có kiểm tra.
+- Tránh hứa quá nhiều hoặc mở rộng việc mới khi nguồn lực chưa rõ.
+- Ghi lại các quyết định lớn để sau này đối chiếu lại với thực tế.`;
+  }
   const monthAdvice =
     chapter.key === "yearly-months"
       ? `\n\nGợi ý 12 tháng trong năm ${chart.input.viewYear}:\n${Array.from({ length: 12 }, (_, month) => {
