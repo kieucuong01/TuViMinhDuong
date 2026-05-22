@@ -71,6 +71,20 @@ export default async function KnowledgePage() {
             </Link>
           </aside>
         </section>
+        <section className="knowledge-cta-band" aria-label="Lập lá số sau khi đọc kiến thức">
+          <div>
+            <p className="eyebrow">Đọc theo đúng lá số của bạn</p>
+            <h2>Lập lá số miễn phí để đối chiếu kiến thức với 12 cung của chính mình</h2>
+          </div>
+          <div className="knowledge-cta-actions">
+            <Link href="/#lap-la-so" className="btn btn-primary">
+              Lập lá số miễn phí
+            </Link>
+            <Link href="/xem-ngay" className="btn btn-ghost">
+              Xem ngày tốt xấu
+            </Link>
+          </div>
+        </section>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {articles.map((article) => (
             <Link key={article.slug} href={`/kien-thuc-tu-vi/${article.slug}`} className="article-card">

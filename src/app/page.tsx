@@ -51,6 +51,20 @@ export default async function Home() {
                 <p className="mt-2 text-base font-medium text-stone-600">Nhập thông tin sinh bên dưới để xem lá số cơ bản ngay.</p>
               </div>
               <ChartForm />
+              <div className="hero-value-strip" aria-label="Giá trị nhận được sau khi lập lá số">
+                <span>
+                  <strong>30 giây</strong>
+                  <small>có lá số cơ bản</small>
+                </span>
+                <span>
+                  <strong>12 cung</strong>
+                  <small>đọc theo từng phần</small>
+                </span>
+                <span>
+                  <strong>Mở sâu</strong>
+                  <small>khi thật sự cần</small>
+                </span>
+              </div>
               <div className="form-assurance">
                 <span><ShieldCheck size={17} /> Không cần thanh toán để lập lá số</span>
                 <span><Eye size={17} /> Có bản đọc rõ trên điện thoại</span>

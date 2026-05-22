@@ -38,6 +38,11 @@ export default function PricingPage() {
               <p className="mt-5 max-w-2xl text-lg leading-8 text-stone-600">
                 1 xu = 1.000đ. Bạn có thể nạp theo gói, rồi dùng xu cho phần luận giải mình cần.
               </p>
+              <div className="pricing-trust-list" aria-label="Cam kết khi mở luận giải">
+                <span><Check size={17} /> Không trừ lại khi xem lại</span>
+                <span><Check size={17} /> Giá hiện rõ trước khi mở</span>
+                <span><Check size={17} /> Lưu lịch sử xu trong tài khoản</span>
+              </div>
               <div className="mt-6 flex flex-wrap gap-3">
                 <Link href="/pricing?topup=1" className="btn btn-primary btn-large" prefetch={false}>
                   <Coins size={20} /> Nạp xu
@@ -61,7 +66,7 @@ export default function PricingPage() {
               <p className="mt-3 text-lg leading-8 text-stone-600">Phù hợp khi bạn muốn xem đầy đủ trước, sau đó đọc sâu từng phần khi cần.</p>
               <p className="mt-5 text-4xl font-black text-orange-700">{formatCoins(FEATURE_PRICES.FULL.priceCoins)}</p>
               <Link href="/pricing?topup=1" className="btn btn-primary btn-large mt-5 w-full" prefetch={false}>
-                Chọn gói phù hợp
+                Nạp xu để mở luận giải
               </Link>
             </aside>
           </div>

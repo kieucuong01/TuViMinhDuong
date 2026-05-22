@@ -1,4 +1,4 @@
-import { Coins, CreditCard, ShieldCheck } from "lucide-react";
+import { Check, Coins, CreditCard, ShieldCheck } from "lucide-react";
 import { createCheckoutAction } from "@/app/actions";
 import { getCurrentUser } from "@/lib/auth";
 import { COIN_PACKAGES } from "@/lib/pricing";
@@ -31,6 +31,11 @@ export default async function CoinsPage({ searchParams }: { searchParams: Promis
         </div>
         {params.need ? <p className="alert mx-auto mb-6 max-w-2xl">Bạn cần nạp thêm {params.need} xu để mở phần vừa chọn.</p> : null}
         {notice ? <p className={`${notice.tone === "success" ? "success" : "alert"} mx-auto mb-6 max-w-2xl`}>{notice.message}</p> : null}
+        <div className="checkout-trust-band" aria-label="Lý do nên đăng nhập và nạp xu">
+          <span><Check size={17} /> Xu vào tài khoản sau khi thanh toán thành công</span>
+          <span><Check size={17} /> Mở phần nào dùng phần đó, không ép mua gói lớn</span>
+          <span><Check size={17} /> Nội dung đã mở được lưu để xem lại</span>
+        </div>
         <div className="grid gap-4 md:grid-cols-3">
           {COIN_PACKAGES.map((pack) => (
             <form key={pack.key} action={createCheckoutAction} className="pricing-card" data-loading-message="Đang tạo link thanh toán..." data-loading-label="Đang tạo link...">

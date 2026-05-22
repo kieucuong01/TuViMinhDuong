@@ -33,14 +33,14 @@ export function SiteHeader() {
           </span>
         </Link>
 
-        <nav className="hidden items-center rounded-full border border-orange-100 bg-white/70 p-1 text-sm font-semibold text-stone-600 shadow-sm lg:flex">
-          {nav.map((item) =>
+        <nav className="site-nav hidden items-center rounded-full border border-orange-100 bg-white/70 p-1 text-sm font-semibold text-stone-600 shadow-sm lg:flex">
+          {nav.map((item, index) =>
             "modal" in item && item.modal ? (
-              <CoinTopupLink key={item.href} className="rounded-full px-3.5 py-2 transition hover:bg-orange-50 hover:text-orange-700">
+              <CoinTopupLink key={item.href} className={`site-nav-link rounded-full px-3.5 py-2 transition hover:bg-orange-50 hover:text-orange-700 ${index === 0 ? "site-nav-primary" : ""}`}>
                 {item.label}
               </CoinTopupLink>
             ) : (
-              <Link key={item.href} href={item.href} className="rounded-full px-3.5 py-2 transition hover:bg-orange-50 hover:text-orange-700" prefetch={false}>
+              <Link key={item.href} href={item.href} className={`site-nav-link rounded-full px-3.5 py-2 transition hover:bg-orange-50 hover:text-orange-700 ${index === 0 ? "site-nav-primary" : ""}`} prefetch={false}>
                 {item.label}
               </Link>
             )
