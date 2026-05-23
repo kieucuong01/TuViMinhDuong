@@ -42,6 +42,7 @@ export default async function AdminArticlePreviewPage({ params }: { params: Prom
         <h1 className="text-balance text-4xl font-black leading-tight text-stone-950 sm:text-5xl">{article.title}</h1>
         <p className="mt-4 text-pretty text-lg leading-8 text-stone-700">{article.excerpt}</p>
         <div className="mt-5 flex flex-wrap gap-2">
+          {article.category ? <span className="tag tag-soft">{article.category.name}</span> : null}
           <span className={`admin-status ${article.status === "published" ? "published" : article.status === "archived" ? "archived" : "draft"}`}>
             {article.status === "published" ? "Xuất bản" : article.status === "archived" ? "Lưu trữ" : "Nháp"}
           </span>

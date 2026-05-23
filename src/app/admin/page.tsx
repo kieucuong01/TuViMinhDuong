@@ -1,9 +1,9 @@
 import Link from "next/link";
 import { Eye, FilePenLine, Plus, SearchCheck } from "lucide-react";
 import { redirect } from "next/navigation";
-import { saveArticleAction } from "@/app/actions";
+import { saveArticleAction, saveArticleCategoryAction } from "@/app/actions";
 import { getCurrentUser } from "@/lib/auth";
-import { getAdminArticleBySlug, getAdminOverview, listAdminArticles } from "@/lib/data";
+import { getAdminArticleBySlug, getAdminOverview, listAdminArticles, listArticleCategories } from "@/lib/data";
 import type { ArticleView } from "@/lib/content";
 
 export const metadata = {
@@ -14,6 +14,7 @@ export const metadata = {
 function emptyArticle(): ArticleView {
   return {
     id: "new",
+    categoryId: null,
     title: "",
     slug: "",
     excerpt: "",
@@ -27,6 +28,7 @@ function emptyArticle(): ArticleView {
     canonicalUrl: "",
     robots: "index,follow",
     schemaType: "Article",
+    faqs: [],
     seoScore: 0,
     seoChecklist: [],
     publishedAt: null,
@@ -65,18 +67,20 @@ function seoChecks(article: ArticleView) {
     .filter(Boolean) as Array<{ label: string; passed: boolean; hint: string }>;
 }
 
-export default async function AdminPage({ searchParams }: { searchParams: Promise<{ saved?: string; edit?: string }> }) {
+export default async function AdminPage({ searchParams }: { searchParams: Promise<{ saved?: string; edit?: string; categorySaved?: string }> }) {
   const user = await getCurrentUser();
   if (user?.role !== "ADMIN") redirect("/dang-nhap?next=/admin");
 
   const params = await searchParams;
-  const [overview, articles, editingArticle] = await Promise.all([
+  const [overview, articles, categories, editingArticle] = await Promise.all([
     getAdminOverview(),
     listAdminArticles(),
+    listArticleCategories(),
     params.edit ? getAdminArticleBySlug(params.edit) : Promise.resolve(null),
   ]);
   const article = editingArticle || emptyArticle();
   const checks = seoChecks(article);
+  const faqRows = [...(article.faqs || []), ...Array.from({ length: 5 }, () => ({ question: "", answer: "" }))].slice(0, 5);
 
   return (
     <main className="section" data-testid="admin-page">
@@ -93,6 +97,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
         </div>
 
         {params.saved ? <p className="success mt-4">Đã lưu bài viết: {params.saved}</p> : null}
+        {params.categorySaved ? <p className="success mt-4">Đã lưu danh mục: {params.categorySaved}</p> : null}
 
         <div className="mt-6 grid gap-4 md:grid-cols-5">
           {[
@@ -143,6 +148,18 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
                 </label>
               </div>
 
+              <label>
+                <span>Danh mục</span>
+                <select name="categoryId" defaultValue={article.categoryId || ""} data-testid="admin-article-category">
+                  <option value="">Chưa chọn danh mục</option>
+                  {categories.map((category) => (
+                    <option key={category.id} value={category.id}>
+                      {category.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+
               <div className="admin-form-row">
                 <label><span>Slug</span><input name="slug" defaultValue={article.slug} placeholder="tu-khoa-bai-viet" data-testid="admin-article-slug" /></label>
                 <label><span>Focus keyword</span><input name="focusKeyword" defaultValue={article.focusKeyword || ""} data-testid="admin-article-focus-keyword" /></label>
@@ -164,6 +181,17 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
 
               <label><span>Nội dung Markdown</span><textarea name="content" rows={16} defaultValue={article.content} data-testid="admin-article-content" /></label>
 
+              <fieldset className="admin-faq-editor">
+                <legend>FAQ trong bài viết</legend>
+                <p>Chỉ những cặp câu hỏi và câu trả lời đầy đủ mới hiện ngoài public và sinh FAQ schema.</p>
+                {faqRows.map((faq, index) => (
+                  <div key={index} className="admin-faq-row">
+                    <label><span>Câu hỏi {index + 1}</span><input name="faqQuestion[]" defaultValue={faq.question} data-testid={`admin-faq-question-${index}`} /></label>
+                    <label><span>Câu trả lời {index + 1}</span><textarea name="faqAnswer[]" rows={2} defaultValue={faq.answer} data-testid={`admin-faq-answer-${index}`} /></label>
+                  </div>
+                ))}
+              </fieldset>
+
               <div className="admin-submit-row">
                 <button className="btn btn-primary" type="submit" data-testid="admin-article-submit">
                   <FilePenLine size={18} /> Lưu bài và chấm SEO
@@ -174,6 +202,31 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
           </section>
 
           <aside className="grid gap-6">
+            <section className="panel">
+              <div className="admin-panel-head">
+                <div>
+                  <p className="eyebrow">Danh mục</p>
+                  <h2>Nhóm bài viết</h2>
+                </div>
+              </div>
+              <form action={saveArticleCategoryAction} className="admin-category-form" data-loading-message="Đang lưu danh mục..." data-loading-label="Đang lưu...">
+                <label><span>Tên danh mục</span><input name="name" placeholder="Nhập môn tử vi" required data-testid="admin-category-name" /></label>
+                <label><span>Slug</span><input name="slug" placeholder="nhap-mon-tu-vi" data-testid="admin-category-slug" /></label>
+                <label><span>Mô tả ngắn</span><textarea name="description" rows={2} placeholder="Nhóm bài cho người mới..." data-testid="admin-category-description" /></label>
+                <button className="btn btn-ghost w-full justify-center" type="submit" data-testid="admin-category-submit">
+                  <Plus size={17} /> Lưu danh mục
+                </button>
+              </form>
+              <div className="admin-category-list">
+                {categories.map((category) => (
+                  <div key={category.id}>
+                    <strong>{category.name}</strong>
+                    <span>/{category.slug}</span>
+                  </div>
+                ))}
+              </div>
+            </section>
+
             <section className="panel">
               <div className="admin-panel-head">
                 <div>
@@ -242,6 +295,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
                       <p>/{item.slug}</p>
                       <div className="admin-row-meta">
                         <span className={`admin-status ${item.status === "published" ? "published" : item.status === "archived" ? "archived" : "draft"}`}>{statusLabel(item.status)}</span>
+                        {item.category ? <span>{item.category.name}</span> : null}
                         <span className={`admin-seo-mini ${seoTone(item.seoScore)}`}>SEO {item.seoScore || 0}</span>
                         <span>{readableDate(item.publishedAt || item.updatedAt)}</span>
                       </div>

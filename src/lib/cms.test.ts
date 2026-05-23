@@ -18,6 +18,14 @@ function articleForm(slug: string, status: "draft" | "published" | "archived") {
   return form;
 }
 
+function categoryForm(name: string, slug: string) {
+  const form = new FormData();
+  form.set("name", name);
+  form.set("slug", slug);
+  form.set("description", "Nhom bai viet giup nguoi moi doc tu vi de hon.");
+  return form;
+}
+
 describe("admin article CMS", () => {
   it("keeps draft articles visible to admins but hidden from public article readers", async () => {
     const { getArticleBySlug, listAdminArticles, saveArticleFromForm } = await import("@/lib/data");
@@ -52,5 +60,42 @@ describe("admin article CMS", () => {
     await expect(getAdminArticleBySlug(slug)).resolves.toEqual(expect.objectContaining({ slug, status: "archived" }));
     await expect(listAdminArticles()).resolves.toEqual(expect.arrayContaining([expect.objectContaining({ slug, status: "archived" })]));
     await expect(listArticles()).resolves.not.toEqual(expect.arrayContaining([expect.objectContaining({ slug })]));
+  });
+
+  it("saves article FAQs from the editor and exposes them on public articles", async () => {
+    const { getArticleBySlug, saveArticleFromForm } = await import("@/lib/data");
+    const slug = `cms-faq-${Date.now()}`;
+    const form = articleForm(slug, "published");
+    form.set("faqQuestion[]", "Lap la so mien phi co can dang nhap khong?");
+    form.set("faqAnswer[]", "Khong can dang nhap de xem ban tom tat, nhung nen dang nhap de luu lai.");
+    form.append("faqQuestion[]", "FAQ trong bai viet co tao schema khong?");
+    form.append("faqAnswer[]", "Co, khi cau hoi va cau tra loi duoc hien thi tren trang public.");
+
+    await saveArticleFromForm(form);
+
+    await expect(getArticleBySlug(slug)).resolves.toEqual(
+      expect.objectContaining({
+        faqs: [
+          expect.objectContaining({ question: "Lap la so mien phi co can dang nhap khong?" }),
+          expect.objectContaining({ answer: "Co, khi cau hoi va cau tra loi duoc hien thi tren trang public." }),
+        ],
+      }),
+    );
+  });
+
+  it("saves article categories and attaches a selected category to an article", async () => {
+    const { listArticleCategories, saveArticleCategoryFromForm, saveArticleFromForm } = await import("@/lib/data");
+    const categorySlug = `nhap-mon-${Date.now()}`;
+    const articleSlug = `cms-category-${Date.now()}`;
+
+    const category = await saveArticleCategoryFromForm(categoryForm("Nhap mon tu vi", categorySlug));
+    const form = articleForm(articleSlug, "published");
+    form.set("categoryId", category.id);
+
+    const saved = await saveArticleFromForm(form);
+
+    expect(saved.categoryId).toBe(category.id);
+    expect(saved.category?.slug).toBe(categorySlug);
+    await expect(listArticleCategories()).resolves.toEqual(expect.arrayContaining([expect.objectContaining({ slug: categorySlug })]));
   });
 });

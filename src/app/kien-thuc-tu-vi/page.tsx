@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { listArticles } from "@/lib/data";
+import { listArticleCategories, listArticles } from "@/lib/data";
 import { routeMetadata } from "@/lib/metadata";
 
 export const revalidate = 300;
@@ -12,8 +12,9 @@ export const metadata = routeMetadata({
   imageSubtitle: "Học cách đọc lá số, 12 cung, đại vận, nguyệt vận và nhật vận",
 });
 
-export default async function KnowledgePage() {
-  const articles = await listArticles();
+export default async function KnowledgePage({ searchParams }: { searchParams: Promise<{ category?: string }> }) {
+  const [{ category }, articles, categories] = await Promise.all([searchParams, listArticles(), listArticleCategories()]);
+  const visibleArticles = category ? articles.filter((article) => article.category?.slug === category) : articles;
   const bySlug = new Map(articles.map((article) => [article.slug, article]));
   const beginnerPath = [
     "la-so-tu-vi-la-gi",
@@ -85,19 +86,34 @@ export default async function KnowledgePage() {
             </Link>
           </div>
         </section>
+        <nav className="knowledge-category-nav" aria-label="Danh mục kiến thức">
+          <Link href="/kien-thuc-tu-vi" className={!category ? "active" : ""}>Tất cả</Link>
+          {categories.map((item) => (
+            <Link key={item.id} href={`/kien-thuc-tu-vi?category=${item.slug}`} className={category === item.slug ? "active" : ""}>
+              {item.name}
+            </Link>
+          ))}
+        </nav>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {articles.map((article) => (
+          {visibleArticles.map((article) => (
             <Link key={article.slug} href={`/kien-thuc-tu-vi/${article.slug}`} className="article-card">
               {article.coverImage ? (
                 <span className="article-thumb image">
                   <Image src={article.coverImage} alt={article.coverAlt || article.title} width={600} height={338} sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw" />
                 </span>
               ) : null}
+              {article.category ? <span className="article-category-label">{article.category.name}</span> : null}
               <h2>{article.title}</h2>
               <p>{article.excerpt}</p>
             </Link>
           ))}
         </div>
+        {visibleArticles.length === 0 ? (
+          <div className="knowledge-empty-state">
+            <h2>Chưa có bài trong danh mục này</h2>
+            <p>Hãy chọn “Tất cả” để xem toàn bộ bài đang xuất bản.</p>
+          </div>
+        ) : null}
       </div>
     </main>
   );

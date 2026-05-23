@@ -2,6 +2,7 @@ import { scoreArticleSeo } from "@/lib/seo";
 
 export type ArticleView = {
   id: string;
+  categoryId?: string | null;
   title: string;
   slug: string;
   excerpt: string;
@@ -19,10 +20,18 @@ export type ArticleView = {
   ogDescription?: string | null;
   schemaType?: string | null;
   faqs?: { question: string; answer: string }[];
+  category?: ArticleCategoryView | null;
   seoScore?: number;
   seoChecklist?: unknown;
   publishedAt?: Date | null;
   updatedAt?: Date | null;
+};
+
+export type ArticleCategoryView = {
+  id: string;
+  name: string;
+  slug: string;
+  description?: string | null;
 };
 
 function article(input: Omit<ArticleView, "id" | "status" | "robots" | "schemaType" | "publishedAt" | "updatedAt"> & { date: string }): ArticleView {

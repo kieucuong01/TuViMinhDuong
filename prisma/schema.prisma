@@ -194,6 +194,7 @@ model Article {
   ogTitle         String?
   ogDescription   String?
   schemaType      String           @default("Article")
+  faqs            Json?
   seoScore        Int              @default(0)
   seoChecklist    Json?
   publishedAt     DateTime?

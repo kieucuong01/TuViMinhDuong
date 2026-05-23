@@ -69,6 +69,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
         <p className="mt-4 text-pretty text-lg leading-8 text-stone-700">{article.excerpt}</p>
         {article.publishedAt ? (
           <div className="mt-5 flex flex-wrap gap-2">
+            {article.category ? <Link href={`/kien-thuc-tu-vi?category=${article.category.slug}`} className="tag tag-soft">{article.category.name}</Link> : null}
             <span className="tag tag-soft">Cập nhật {new Date(article.publishedAt).toLocaleDateString("vi-VN")}</span>
           </div>
         ) : null}

@@ -1,7 +1,7 @@
 import "server-only";
 
 import { CHART_ENGINE_VERSION, generateTuViChart, type ChartInput, type TuViChart } from "@/lib/chart";
-import { articleWithScore, seedArticles, type ArticleView } from "@/lib/content";
+import { articleWithScore, seedArticles, type ArticleCategoryView, type ArticleView } from "@/lib/content";
 import { getDb } from "@/lib/db";
 import { FEATURE_PRICES, COIN_PACKAGES, type ReadingKey } from "@/lib/pricing";
 import { FREE_OVERVIEW_MIN_WORDS, FREE_OVERVIEW_VERSION, countWords } from "@/lib/ai";
@@ -43,6 +43,10 @@ type ChartWithFreeOverview = TuViChart & {
   };
 };
 
+type ArticleRecord = Omit<ArticleView, "faqs"> & {
+  faqs?: unknown;
+};
+
 export type ChartHistoryItem = StoredChart & {
   hasAdvancedReading: boolean;
   advancedReadingId?: string;
@@ -53,7 +57,14 @@ const globalStore = globalThis as unknown as {
   demoReadings?: Map<string, StoredReading>;
   demoBalances?: Map<string, number>;
   demoArticles?: Map<string, ArticleView>;
+  demoArticleCategories?: Map<string, ArticleCategoryView>;
 };
+
+const seedArticleCategories: ArticleCategoryView[] = [
+  { id: "cat-nhap-mon", name: "Nhập môn tử vi", slug: "nhap-mon-tu-vi", description: "Bài nền tảng cho người mới bắt đầu đọc lá số." },
+  { id: "cat-12-cung", name: "12 cung", slug: "12-cung", description: "Kiến thức về từng cung trong lá số tử vi." },
+  { id: "cat-van-han", name: "Vận hạn", slug: "van-han", description: "Đại vận, tiểu vận, nguyệt vận và nhịp vận theo thời gian." },
+];
 
 function charts() {
   globalStore.demoCharts ||= new Map();
@@ -75,6 +86,11 @@ function demoArticles() {
   return globalStore.demoArticles;
 }
 
+function demoArticleCategories() {
+  globalStore.demoArticleCategories ||= new Map(seedArticleCategories.map((category) => [category.id, category]));
+  return globalStore.demoArticleCategories;
+}
+
 function articleSortValue(article: ArticleView) {
   return article.updatedAt?.getTime() || article.publishedAt?.getTime() || 0;
 }
@@ -86,6 +102,36 @@ function sortArticlesNewestFirst(articles: ArticleView[]) {
 function articleStatusFromForm(formData: FormData) {
   const status = String(formData.get("status") || "published");
   return status === "draft" || status === "archived" ? status : "published";
+}
+
+function normalizeFaqs(value: unknown): { question: string; answer: string }[] {
+  if (!Array.isArray(value)) return [];
+  return value
+    .map((item) => {
+      if (!item || typeof item !== "object") return null;
+      const record = item as { question?: unknown; answer?: unknown };
+      const question = String(record.question || "").trim();
+      const answer = String(record.answer || "").trim();
+      return question && answer ? { question, answer } : null;
+    })
+    .filter(Boolean) as { question: string; answer: string }[];
+}
+
+function faqsFromForm(formData: FormData) {
+  const questions = formData.getAll("faqQuestion[]").map((item) => String(item || "").trim());
+  const answers = formData.getAll("faqAnswer[]").map((item) => String(item || "").trim());
+  return questions
+    .map((question, index) => ({ question, answer: answers[index] || "" }))
+    .filter((item) => item.question && item.answer)
+    .slice(0, 8);
+}
+
+function articleWithNormalizedRelations(article: ArticleRecord): ArticleView {
+  return articleWithScore({
+    ...article,
+    faqs: normalizeFaqs(article.faqs),
+    category: article.category || null,
+  });
 }
 
 function usesInMemoryUser(userId: string) {
@@ -572,37 +618,39 @@ export async function saveReading(
 
 export async function listArticles() {
   const db = getDb();
-  if (!db) return sortArticlesNewestFirst(Array.from(demoArticles().values()).filter((article) => article.status === "published"));
-  let articles: ArticleView[] = [];
+  if (!db) return sortArticlesNewestFirst(Array.from(demoArticles().values()).filter((article) => article.status === "published").map(articleWithNormalizedRelations));
+  let articles: ArticleRecord[] = [];
   try {
     articles = (await db.article.findMany({
       where: { status: "published" },
+      include: { category: true },
       orderBy: [{ publishedAt: "desc" }, { createdAt: "desc" }],
-    })) as ArticleView[];
+    })) as unknown as ArticleRecord[];
   } catch {
-    return sortArticlesNewestFirst(seedArticles.map(articleWithScore));
+    return sortArticlesNewestFirst(seedArticles.map(articleWithNormalizedRelations));
   }
-  const bySlug = new Map(seedArticles.map((article) => [article.slug, articleWithScore(article)]));
+  const bySlug = new Map(seedArticles.map((article) => [article.slug, articleWithNormalizedRelations(article)]));
   for (const article of articles) {
-    bySlug.set(article.slug, articleWithScore(article));
+    bySlug.set(article.slug, articleWithNormalizedRelations(article));
   }
   return sortArticlesNewestFirst(Array.from(bySlug.values()));
 }
 
 export async function listAdminArticles() {
   const db = getDb();
-  if (!db) return sortArticlesNewestFirst(Array.from(demoArticles().values()).map(articleWithScore));
+  if (!db) return sortArticlesNewestFirst(Array.from(demoArticles().values()).map(articleWithNormalizedRelations));
   try {
     const articles = (await db.article.findMany({
+      include: { category: true },
       orderBy: [{ updatedAt: "desc" }, { createdAt: "desc" }],
-    })) as ArticleView[];
-    const bySlug = new Map(seedArticles.map((article) => [article.slug, articleWithScore(article)]));
+    })) as unknown as ArticleRecord[];
+    const bySlug = new Map(seedArticles.map((article) => [article.slug, articleWithNormalizedRelations(article)]));
     for (const article of articles) {
-      bySlug.set(article.slug, articleWithScore(article));
+      bySlug.set(article.slug, articleWithNormalizedRelations(article));
     }
     return sortArticlesNewestFirst(Array.from(bySlug.values()));
   } catch {
-    return sortArticlesNewestFirst(seedArticles.map(articleWithScore));
+    return sortArticlesNewestFirst(seedArticles.map(articleWithNormalizedRelations));
   }
 }
 
@@ -610,17 +658,17 @@ export async function getArticleBySlug(slug: string) {
   const db = getDb();
   if (!db) {
     const article = demoArticles().get(slug);
-    return article?.status === "published" ? articleWithScore(article) : null;
+    return article?.status === "published" ? articleWithNormalizedRelations(article) : null;
   }
   try {
-    const article = await db.article.findUnique({ where: { slug } });
+    const article = await db.article.findUnique({ where: { slug }, include: { category: true } });
     if (article) {
-      const scored = articleWithScore(article as ArticleView);
+      const scored = articleWithNormalizedRelations(article as unknown as ArticleRecord);
       return scored.status === "published" ? scored : null;
     }
-    return seedArticles.map(articleWithScore).find((item) => item.slug === slug) || null;
+    return seedArticles.map(articleWithNormalizedRelations).find((item) => item.slug === slug) || null;
   } catch {
-    return seedArticles.map(articleWithScore).find((item) => item.slug === slug) || null;
+    return seedArticles.map(articleWithNormalizedRelations).find((item) => item.slug === slug) || null;
   }
 }
 
@@ -628,14 +676,53 @@ export async function getAdminArticleBySlug(slug: string) {
   const db = getDb();
   if (!db) {
     const article = demoArticles().get(slug);
-    return article ? articleWithScore(article) : null;
+    return article ? articleWithNormalizedRelations(article) : null;
   }
   try {
-    const article = await db.article.findUnique({ where: { slug } });
-    return article ? articleWithScore(article as ArticleView) : seedArticles.map(articleWithScore).find((item) => item.slug === slug) || null;
+    const article = await db.article.findUnique({ where: { slug }, include: { category: true } });
+    return article ? articleWithNormalizedRelations(article as unknown as ArticleRecord) : seedArticles.map(articleWithNormalizedRelations).find((item) => item.slug === slug) || null;
   } catch {
-    return seedArticles.map(articleWithScore).find((item) => item.slug === slug) || null;
+    return seedArticles.map(articleWithNormalizedRelations).find((item) => item.slug === slug) || null;
   }
+}
+
+export async function listArticleCategories() {
+  const db = getDb();
+  if (!db) return Array.from(demoArticleCategories().values()).sort((a, b) => a.name.localeCompare(b.name, "vi"));
+  try {
+    return (await db.articleCategory.findMany({ orderBy: { name: "asc" } })) as ArticleCategoryView[];
+  } catch {
+    return Array.from(demoArticleCategories().values()).sort((a, b) => a.name.localeCompare(b.name, "vi"));
+  }
+}
+
+export async function saveArticleCategoryFromForm(formData: FormData) {
+  const name = String(formData.get("name") || "").trim();
+  const slug = slugify(String(formData.get("slug") || name));
+  const description = String(formData.get("description") || "").trim();
+  const originalCategoryId = String(formData.get("originalCategoryId") || "");
+  const category: ArticleCategoryView = {
+    id: originalCategoryId || `cat-${slug}`,
+    name,
+    slug,
+    description,
+  };
+
+  const db = getDb();
+  if (!db) {
+    demoArticleCategories().set(category.id, category);
+    return category;
+  }
+
+  const existing = originalCategoryId ? await db.articleCategory.findUnique({ where: { id: originalCategoryId } }) : null;
+  const saved = existing
+    ? await db.articleCategory.update({ where: { id: originalCategoryId }, data: { name, slug, description } })
+    : await db.articleCategory.upsert({
+        where: { slug },
+        update: { name, description },
+        create: { name, slug, description },
+      });
+  return saved as ArticleCategoryView;
 }
 
 export async function saveArticleFromForm(formData: FormData) {
@@ -647,6 +734,9 @@ export async function saveArticleFromForm(formData: FormData) {
   const originalSlug = slugify(String(formData.get("originalSlug") || slug));
   const status = articleStatusFromForm(formData);
   const publishedAt = status === "published" ? new Date() : null;
+  const categoryId = String(formData.get("categoryId") || "") || null;
+  const category = categoryId ? demoArticleCategories().get(categoryId) || null : null;
+  const faqs = faqsFromForm(formData);
   const metaTitle = String(formData.get("metaTitle") || title);
   const metaDescription = String(formData.get("metaDescription") || excerpt);
   const canonicalUrl = String(formData.get("canonicalUrl") || `/kien-thuc-tu-vi/${slug}`);
@@ -667,6 +757,8 @@ export async function saveArticleFromForm(formData: FormData) {
 
   const article: ArticleView = {
     id: `article-${slug}`,
+    categoryId,
+    category,
     title,
     slug,
     excerpt,
@@ -680,6 +772,7 @@ export async function saveArticleFromForm(formData: FormData) {
     canonicalUrl,
     robots: "index,follow",
     schemaType: "Article",
+    faqs,
     seoScore: seo.score,
     seoChecklist: seo.checks,
     publishedAt,
@@ -694,6 +787,7 @@ export async function saveArticleFromForm(formData: FormData) {
   }
 
   const articleData = {
+    categoryId,
     title,
     excerpt,
     content,
@@ -704,6 +798,7 @@ export async function saveArticleFromForm(formData: FormData) {
     coverImage,
     coverAlt,
     status,
+    faqs,
     seoScore: seo.score,
     seoChecklist: seo.checks,
     publishedAt,
@@ -714,6 +809,7 @@ export async function saveArticleFromForm(formData: FormData) {
     ? await db.article.update({
         where: { id: existing.id },
         data: { ...articleData, slug },
+        include: { category: true },
       })
     : await db.article.upsert({
         where: { slug },
@@ -723,8 +819,9 @@ export async function saveArticleFromForm(formData: FormData) {
           slug,
           schemaType: "Article",
         },
+        include: { category: true },
       });
-  return articleWithScore(saved as ArticleView);
+  return articleWithNormalizedRelations(saved as unknown as ArticleRecord);
 }
 
 export async function getAdminOverview() {
