@@ -7,7 +7,7 @@ export const FREE_OVERVIEW_MAX_WORDS = 2000;
 export const FREE_OVERVIEW_MAX_TOKENS = 7000;
 export const PAID_READING_CHAPTER_MAX_TOKENS = 7000;
 export const FREE_OVERVIEW_VERSION = "free-overview-llm-v3";
-export const PAID_READING_VERSION = "paid-reading-chapters-v2";
+export const PAID_READING_VERSION = "paid-reading-chapters-v3";
 export const PAID_FULL_WORD_TARGET = "8.000-12.000 từ";
 
 const IMPORTANT_PALACES = ["Mệnh", "Thân", "Quan Lộc", "Tài Bạch", "Phu Thê", "Tật Ách", "Thiên Di"];
@@ -36,6 +36,34 @@ function isLlmDisabledForSmoke() {
 
 export function countWords(content: string) {
   return content.trim().split(/\s+/).filter(Boolean).length;
+}
+
+function normalizedText(content: string) {
+  return content
+    .normalize("NFD")
+    .replace(/\p{Diacritic}/gu, "")
+    .toLowerCase();
+}
+
+function paidChapterMinimumWords(chapter: PaidReadingChapter) {
+  const lowerTarget = Number(chapter.targetWords.replace(/\./g, "").match(/\d+/)?.[0] || 650);
+  return Math.min(650, Math.max(360, Math.floor(lowerTarget * 0.55)));
+}
+
+export function isCompletePaidChapter(content: string, chapter: PaidReadingChapter) {
+  const trimmed = content.trim();
+  if (!trimmed) return false;
+
+  const hasStartLine = chapter.key === "focused-reading" ? /^#\s+\S/.test(trimmed) : trimmed.includes(`# ${chapter.title}`);
+  const hasRequiredSections = chapter.requiredSections.every((section) => trimmed.includes(`## ${section}`));
+  const hasEnoughWords = countWords(trimmed) >= paidChapterMinimumWords(chapter);
+  const actionBulletCount = (trimmed.match(/^\s*[-*]\s+\S/gm) || []).length;
+  const hasEnoughActionBullets = actionBulletCount >= 3;
+  const hasYearlyMonths =
+    chapter.key !== "yearly-months" ||
+    Array.from({ length: 12 }, (_, index) => `thang ${index + 1}`).every((month) => normalizedText(trimmed).includes(month));
+
+  return hasStartLine && hasRequiredSections && hasEnoughWords && hasEnoughActionBullets && hasYearlyMonths;
 }
 
 export function isCompleteFreeOverview(content: string) {
@@ -519,6 +547,7 @@ Yêu cầu bắt buộc:
 - Chỉ viết ${unitName} này, không viết lan sang phạm vi khác.
 - Không tự tính lại lá số, không đổi ngày giờ, không tự thêm sao ngoài JSON.
 - Nội dung phải tạo cảm giác an tâm, rõ ràng, đáng tiền cho người đọc 30-60 tuổi.
+- BẮT BUỘC độ dài riêng phần này: ${chapter.targetWords}; không trả lời ngắn hơn mốc dưới của phạm vi này.
 - Xưng hô tự nhiên theo dữ liệu: dùng "${summary.viewerAddress}" khi cần gọi trực tiếp người xem.
 - Bắt đầu bằng đúng dòng Markdown: ${startLine}
 - Phải có đúng các heading dưới đây, đúng thứ tự:
@@ -526,7 +555,7 @@ ${sectionLines}
 - Ở phần dữ kiện: ghi ngắn cung/sao/trạng thái sao (M/V/Đ/B/H) và sao lưu niên/vận hạn liên quan.
 - Ở phần luận giải: giải thích sâu, nhưng mỗi đoạn tối đa 3-4 dòng khi đọc trên điện thoại.
 - Ở phần lưu ý: mọi sao hãm, sát tinh, lưu sát tinh phải chuyển thành lời khuyên quản trị rủi ro; không dọa, không kết luận tuyệt đối.
-- Ở phần gợi ý: dùng bullet rõ việc nên làm, nên tránh, nhịp kiểm tra lại.
+- Ở phần gợi ý: dùng ít nhất 3 bullet hành động rõ việc nên làm, nên tránh, nhịp kiểm tra lại.
 - Nếu là vận năm hoặc nguyệt/nhật vận, hãy nêu trọng tâm thời gian đang mở khóa thật cụ thể.
 - Nếu chương là vận năm, bắt buộc có đủ 12 tháng trong năm ${chart.input.viewYear}, mỗi tháng có trọng tâm, ưu tiên, điều nên tránh.
 - Không dùng từ ngữ quá kỹ thuật hoặc quá mê tín. Viết như một chuyên gia đang tư vấn bình tĩnh cho người trưởng thành.
@@ -556,6 +585,10 @@ Các tín hiệu tử vi trong phần này nên được hiểu như bản đị
 
 Với phạm vi đang mở, nên ưu tiên cách làm rõ ràng, tránh quyết định theo cảm xúc nhất thời. Nếu có sao hãm, sát tinh hoặc sao lưu gây áp lực, ý nghĩa chính là quản trị rủi ro chứ không phải một kết luận chắc chắn.
 
+Nếu đây là cung, hãy đọc cung đó như một vùng đời sống cần quản trị: đâu là điểm sáng có thể dùng, đâu là điểm dễ quá tay, và khi nào nên hỏi thêm người có chuyên môn. Nếu đây là vận hạn theo năm, tháng hoặc ngày, hãy đặt nó vào nền đại vận và bối cảnh năm xem để người đọc không hiểu rời rạc. Mục tiêu là giúp ${summary.viewerAddress} biết nên ưu tiên điều gì trước, điều gì nên trì hoãn và dấu hiệu nào cần theo dõi lại.
+
+Một phần luận giải có giá trị không nên chỉ nói tốt xấu. Nó cần chỉ ra vì sao lá số gợi ý như vậy, liên hệ với công việc, tài chính, quan hệ, sức khỏe tinh thần và nhịp sống. Khi tín hiệu thuận mạnh, lời khuyên vẫn cần điều kiện đi kèm; khi tín hiệu căng, lời khuyên phải chuyển thành kế hoạch giảm rủi ro, không tạo cảm giác sợ hãi.
+
 ## Điều cần lưu ý
 - Không nên dùng phần luận này để thay thế quyết định chuyên môn về tài chính, pháp lý hoặc y tế.
 - Khi có nhiều tín hiệu căng, hãy giảm tốc độ, kiểm tra giấy tờ, tiền bạc và các cam kết quan trọng.
@@ -564,7 +597,9 @@ Với phạm vi đang mở, nên ưu tiên cách làm rõ ràng, tránh quyết 
 ## Gợi ý nên làm
 - Chọn 1 việc quan trọng nhất trong 7-30 ngày tới và làm từng bước có kiểm tra.
 - Tránh hứa quá nhiều hoặc mở rộng việc mới khi nguồn lực chưa rõ.
-- Ghi lại các quyết định lớn để sau này đối chiếu lại với thực tế.`;
+- Ghi lại các quyết định lớn để sau này đối chiếu lại với thực tế.
+- Nếu đang cân nhắc việc lớn, hãy chia thành 2-3 bước nhỏ, mỗi bước có tiêu chí dừng rõ ràng.
+- Khi thấy áp lực tăng, ưu tiên ngủ nghỉ, sức khỏe, giấy tờ và dòng tiền trước khi nhận thêm cam kết.`;
   }
   const monthAdvice =
     chapter.key === "yearly-months"
@@ -659,18 +694,31 @@ export async function generateReading(chart: TuViChart, type: ReadingKey, scopeK
     };
   }
 
-  const outputs: Array<{ key: string; title: string; content: string; model: string; prompt: string }> = [];
+  const outputs: Array<{
+    key: string;
+    title: string;
+    content: string;
+    model: string;
+    prompt: string;
+    wordCount: number;
+    formatGuarded: boolean;
+  }> = [];
 
   for (const [index, chapter] of chapters.entries()) {
     const prompt = paidReadingChapterPrompt(chart, type, scopeKey, focus, chapter, index, chapters.length);
     const generated = await generatePaidChapter(prompt, gatewayModel);
+    const generatedContent = generated?.content?.trim() || "";
+    const hasCompleteContent = generatedContent ? isCompletePaidChapter(generatedContent, chapter) : false;
+    const content = hasCompleteContent ? generatedContent : fallbackChapterBody(chart, chapter, focus);
 
     outputs.push({
       key: chapter.key,
       title: chapter.title,
-      content: generated?.content?.trim() || fallbackChapterBody(chart, chapter, focus),
-      model: generated?.content ? generated.model : "template-fallback",
+      content,
+      model: hasCompleteContent ? generated!.model : generatedContent ? `${generated!.model} + format-guard` : "template-fallback",
       prompt,
+      wordCount: countWords(content),
+      formatGuarded: !hasCompleteContent,
     });
   }
 
@@ -692,6 +740,8 @@ export async function generateReading(chart: TuViChart, type: ReadingKey, scopeK
         key: chapter.key,
         title: chapter.title,
         model: chapter.model,
+        wordCount: chapter.wordCount,
+        formatGuarded: chapter.formatGuarded,
         prompt: chapter.prompt,
       })),
     }),

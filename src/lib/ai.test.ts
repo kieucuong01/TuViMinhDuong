@@ -6,6 +6,7 @@ import {
   generateFreeOverview,
   generateReading,
   getDeepReadingSummary,
+  isCompletePaidChapter,
   paidReadingChapterPrompt,
   paidReadingChapters,
 } from "@/lib/ai";
@@ -149,6 +150,37 @@ describe("AI reading format", () => {
     expect(chapters[0].instruction).toContain("năm đang mở khóa");
     expect(prompt).toContain("# Luận tiểu vận: tieu-2026");
     expect(prompt).toContain("Tiểu vận năm 2026");
+    expect(prompt).toContain("BẮT BUỘC độ dài riêng phần này");
+    expect(prompt).toContain("ít nhất 3 bullet hành động");
+  });
+
+  it("rejects paid chapters that are too short or miss required sections", () => {
+    const chart = sampleChart();
+    const chapter = paidReadingChapters(chart, "TIEU_VAN")[0];
+    const filler = Array.from({ length: 560 }, (_, index) => `ý-${index}`).join(" ");
+    const complete = `# Luận tiểu vận: tieu-2026
+
+## Tóm tắt dễ hiểu
+${filler}
+
+## Dữ kiện tử vi đã dùng
+- Mệnh, Thân, đại vận và sao lưu năm đã được đối chiếu.
+
+## Luận giải theo đời sống
+${filler}
+
+## Điều cần lưu ý
+- Không kết luận tuyệt đối.
+- Quản trị giấy tờ, tiền bạc và sức khỏe.
+
+## Gợi ý nên làm
+- Chọn một việc quan trọng nhất trong quý tới.
+- Tránh mở rộng khi nguồn lực chưa rõ.
+- Kiểm tra lại kế hoạch sau mỗi tháng.`;
+
+    expect(isCompletePaidChapter("# Luận tiểu vận\n\n## Tóm tắt dễ hiểu\nQuá ngắn.", chapter)).toBe(false);
+    expect(isCompletePaidChapter(complete.replace("## Điều cần lưu ý", "## Lưu ý"), chapter)).toBe(false);
+    expect(isCompletePaidChapter(complete, chapter)).toBe(true);
   });
 
   it("returns a structured 8-chapter fallback when no LLM provider is configured", async () => {
@@ -166,7 +198,7 @@ describe("AI reading format", () => {
     expect(content).toContain("## Điều nên lưu ý");
     expect(content).toContain("## Gợi ý hành động");
     expect(content).toContain("Gợi ý 12 tháng");
-    expect(prompt).toContain("paid-reading-chapters-v2");
+    expect(prompt).toContain("paid-reading-chapters-v3");
   });
 
   it("computes 5 directional score groups for the advanced report header", () => {

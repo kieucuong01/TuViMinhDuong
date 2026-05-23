@@ -16,6 +16,7 @@ import { PremiumReadingCta } from "@/components/premium-reading-cta";
 import { ChartActionPanel } from "@/components/chart-action-panel";
 import { PaywallPopup } from "@/components/paywall-popup";
 import { FreeOverviewLoader } from "@/components/free-overview-loader";
+import { MarkdownContent } from "@/components/markdown-content";
 
 export const metadata: Metadata = {
   title: "Lá số tử vi",
@@ -106,7 +107,7 @@ export default async function ChartPage({
           <p className="eyebrow">{activeLabel}</p>
           {activeReading ? (
             <>
-              <article className="prose-content whitespace-pre-wrap">{activeReading.content}</article>
+              <MarkdownContent content={activeReading.content} />
               <FeedbackActions label={activeLabel.toLowerCase()} />
             </>
           ) : (

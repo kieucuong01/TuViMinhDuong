@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { MarkdownContent } from "@/components/markdown-content";
 
 type FreeOverviewState =
   | { status: "loading"; content?: undefined; error?: undefined }
@@ -37,7 +38,11 @@ export function FreeOverviewLoader({ chartId }: { chartId: string }) {
   }, [chartId]);
 
   if (state.status === "ready") {
-    return <article className="prose-content free-reading-summary whitespace-pre-wrap">{state.content}</article>;
+    return (
+      <article className="free-reading-summary">
+        <MarkdownContent content={state.content} />
+      </article>
+    );
   }
 
   if (state.status === "error") {

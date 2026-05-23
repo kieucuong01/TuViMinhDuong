@@ -13,6 +13,10 @@ function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value));
 }
 
+function roundSvgNumber(value: number) {
+  return Number(value.toFixed(3));
+}
+
 function palaceScore(palace: Palace) {
   const states = Object.values(palace.starStates);
   const stateScore = states.reduce((total, state) => {
@@ -31,8 +35,8 @@ function polarPoint(index: number, total: number, radius: number, score = 100) {
   const angle = -Math.PI / 2 + (index * Math.PI * 2) / total;
   const scaled = radius * (score / 100);
   return {
-    x: 170 + Math.cos(angle) * scaled,
-    y: 170 + Math.sin(angle) * scaled,
+    x: roundSvgNumber(170 + Math.cos(angle) * scaled),
+    y: roundSvgNumber(170 + Math.sin(angle) * scaled),
   };
 }
 
