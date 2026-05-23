@@ -32,6 +32,7 @@ const featurePrices = [
   ["FULL", "Luận giải toàn bộ", 199],
   ["PALACE", "Luận cung", 29],
   ["DAI_VAN", "Luận đại vận", 49],
+  ["TIEU_VAN", "Luận tiểu vận", 39],
   ["NGUYET_VAN", "Luận nguyệt vận", 19],
   ["NHAT_VAN", "Luận nhật vận", 9],
 ];

@@ -1,4 +1,4 @@
-export type ReadingKey = "FULL" | "PALACE" | "DAI_VAN" | "NGUYET_VAN" | "NHAT_VAN";
+export type ReadingKey = "FULL" | "PALACE" | "DAI_VAN" | "TIEU_VAN" | "NGUYET_VAN" | "NHAT_VAN";
 
 // Production paywall mode: paid readings require coins unless the user is an admin.
 export const TEMPORARY_FULL_ACCESS = false;
@@ -7,6 +7,7 @@ export const FEATURE_PRICES: Record<ReadingKey, { label: string; priceCoins: num
   FULL: { label: "Luận giải toàn bộ", priceCoins: 199 },
   PALACE: { label: "Luận cung", priceCoins: 29 },
   DAI_VAN: { label: "Luận đại vận", priceCoins: 49 },
+  TIEU_VAN: { label: "Luận tiểu vận", priceCoins: 39 },
   NGUYET_VAN: { label: "Luận nguyệt vận", priceCoins: 19 },
   NHAT_VAN: { label: "Luận nhật vận", priceCoins: 9 },
 };

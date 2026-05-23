@@ -10,12 +10,7 @@ const nav = [
   { href: "/", label: "Lập lá số tử vi" },
   { href: "/xem-ngay", label: "Xem ngày" },
   { href: "/kien-thuc-tu-vi", label: "Kiến thức" },
-  ...(TEMPORARY_FULL_ACCESS
-    ? []
-    : [
-        { href: "/pricing", label: "Bảng giá" },
-        { href: "/nap-xu", label: "Nạp xu", modal: true },
-      ]),
+  ...(TEMPORARY_FULL_ACCESS ? [] : [{ href: "/nap-xu", label: "Nạp xu", modal: true }]),
 ];
 
 export function SiteHeader() {

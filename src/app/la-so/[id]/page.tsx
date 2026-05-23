@@ -26,6 +26,7 @@ const readingLabels = {
   FULL: "Luận giải toàn bộ",
   PALACE: "Luận cung",
   DAI_VAN: "Đại vận",
+  TIEU_VAN: "Tiểu vận",
   NGUYET_VAN: "Nguyệt vận",
   NHAT_VAN: "Nhật vận",
 } as const;

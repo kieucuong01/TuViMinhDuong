@@ -63,18 +63,17 @@ export function UserHeaderBadge() {
         </CoinTopupLink>
       )}
       {user.role === "ADMIN" ? (
-        <Link href="/admin" className="user-admin-pill" title="Admin" prefetch={false}>
+        <Link href="/admin" className="user-admin-pill" title="Admin" aria-label="Mở trang quản trị" prefetch={false}>
           <ShieldCheck size={15} /> Admin
         </Link>
       ) : null}
-      <Link href="/la-so" className="user-name-pill" prefetch={false}>
+      <Link href="/la-so" className="user-name-pill" title={user.name || user.email} aria-label={`Tài khoản ${user.name || user.email}`} prefetch={false}>
         <UserCircle size={16} />
-        <span className="user-account-label">Tài khoản</span>
         <span className="user-account-value">{user.name || user.email}</span>
       </Link>
-      <Link href="/la-so" className="user-charts-pill" prefetch={false}>
+      <Link href="/la-so" className="user-charts-pill" title="Lá số của tôi" aria-label="Lá số của tôi" prefetch={false}>
         <FileText size={15} />
-        Lá số của tôi
+        Lá số
       </Link>
       <form action={logoutAction} data-loading-message="Đang đăng xuất...">
         <button className="icon-button" type="submit" aria-label="Đăng xuất" title="Đăng xuất">

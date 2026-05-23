@@ -38,15 +38,16 @@ function UnlockPalaceButton({ chartId, palaceName }: { chartId: string; palaceNa
       action={requestReadingAction}
       data-loading-message="Đang mở luận cung..."
       data-loading-label="Đang mở..."
-      className="mt-5"
+      className="unlock-palace-action mt-5"
     >
       <input type="hidden" name="chartId" value={chartId} />
       <input type="hidden" name="type" value="PALACE" />
       <input type="hidden" name="scopeKey" value={palaceName} />
       <input type="hidden" name="next" value={`/la-so/${chartId}?view=luan-cung#${anchor}-reading`} />
       <LoadingSubmitButton className="btn btn-primary w-full sm:w-auto" loadingText="Đang mở..." data-testid={`unlock-palace-${palaceName}`}>
-        <LockKeyhole size={18} /> Mở cung này - {formatCoins(FEATURE_PRICES.PALACE.priceCoins)}
+        <LockKeyhole size={18} /> Đọc luận chi tiết - {formatCoins(FEATURE_PRICES.PALACE.priceCoins)}
       </LoadingSubmitButton>
+      <p className="unlock-microcopy">Mở một lần, lưu lại để xem lại khi cần.</p>
     </form>
   );
 }
@@ -66,27 +67,22 @@ export async function PalaceFateView({ chartId, chart, user, activeReadingId }: 
 
   return (
     <section className="fate-page" data-testid="palace-fate-view">
-      <div className="rounded-3xl border border-orange-100 bg-white/90 p-5 shadow-xl shadow-orange-950/5">
-        <p className="eyebrow">Luận cung từng phần</p>
-        <div className="mt-2 grid gap-4 lg:grid-cols-[1fr_320px] lg:items-end">
-          <div>
-            <h1 className="text-3xl font-black text-stone-950">Luận cung lá số {chart.input.fullName}</h1>
-            <p className="mt-3 max-w-3xl text-base leading-7 text-stone-600">
-              Mỗi cung có phần xem miễn phí để hiểu nhanh điểm mạnh, điểm cần lưu ý và bằng chứng tử vi. Khi cần đọc sâu, bạn có thể mở riêng từng cung.
-            </p>
-          </div>
-          <div className="rounded-2xl border border-orange-100 bg-orange-50/70 p-4 text-sm font-bold text-stone-700">
-            <p className="flex items-center justify-between gap-3">
-              <span>Đã mở khóa</span>
-              <strong className="text-xl text-orange-700">{unlockedCount}/12</strong>
-            </p>
-            <p className="mt-2 flex items-center justify-between gap-3">
-              <span>Giá từng cung</span>
-              <strong className="text-orange-700">{formatCoins(FEATURE_PRICES.PALACE.priceCoins)}</strong>
-            </p>
+      <header className="fate-hero palace">
+        <div className="fate-hero-copy">
+          <h1>Luận cung lá số {chart.input.fullName}</h1>
+          <p>Mỗi cung có preview miễn phí để hiểu nhanh điểm mạnh, điểm cần lưu ý và bằng chứng tử vi. Khi cần đọc sâu, bạn mở riêng đúng cung mình quan tâm.</p>
+          <div className="fate-hero-points" aria-label="Trạng thái luận cung">
+            <span><CheckCircle2 size={15} /> Đã mở {unlockedCount}/12 cung</span>
+            <span><LockKeyhole size={15} /> Giá từng cung {formatCoins(FEATURE_PRICES.PALACE.priceCoins)}</span>
+            <span><Sparkles size={15} /> Nên đọc Mệnh, Quan Lộc, Tài Bạch trước</span>
           </div>
         </div>
-      </div>
+        <div className="fate-hero-visual palace-stat-card">
+          <strong>{unlockedCount}</strong>
+          <span>/12 cung đã mở</span>
+          <p>Mở từng phần, lưu lại để đọc lại khi cần.</p>
+        </div>
+      </header>
 
       <div className="mt-6 grid gap-4">
         {items.map((item) => {
@@ -95,7 +91,7 @@ export async function PalaceFateView({ chartId, chart, user, activeReadingId }: 
           const isActiveReading = Boolean(reading && reading.id === activeReadingId);
           return (
             <article key={item.palace.name} id={anchor} className="palace-reading-card" data-testid="palace-reading-card">
-              <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+              <div className="palace-card-grid">
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-3">
                     <span className={`grid h-12 w-12 place-items-center rounded-full border text-base font-black ${scoreTone(item.score)}`}>
@@ -114,20 +110,20 @@ export async function PalaceFateView({ chartId, chart, user, activeReadingId }: 
                     ) : null}
                   </div>
 
-                  <p className="mt-4 text-base leading-7 text-stone-700">{item.summary}</p>
+                  <p className="palace-card-summary">{item.summary}</p>
 
-                  <div className="mt-4 grid gap-3 lg:grid-cols-2">
-                    <div className="rounded-2xl bg-stone-50 p-4">
-                      <p className="text-sm font-black uppercase tracking-[0.14em] text-orange-800">Dữ kiện tử vi</p>
-                      <ul className="mt-3 grid gap-2 text-sm leading-6 text-stone-700">
+                  <div className="palace-preview-grid">
+                    <div className="palace-preview-panel">
+                      <p>Dữ kiện tử vi</p>
+                      <ul>
                         {item.evidence.map((line) => (
                           <li key={line}>- {line}</li>
                         ))}
                       </ul>
                     </div>
-                    <div className="rounded-2xl bg-orange-50/70 p-4">
-                      <p className="text-sm font-black uppercase tracking-[0.14em] text-orange-800">Xem miễn phí</p>
-                      <ul className="mt-3 grid gap-2 text-sm leading-6 text-stone-700">
+                    <div className="palace-preview-panel warm">
+                      <p>Xem miễn phí</p>
+                      <ul>
                         {item.strengths.slice(0, 2).map((line) => (
                           <li key={line} className="flex gap-2">
                             <Sparkles className="mt-1 shrink-0 text-orange-500" size={15} /> {line}
@@ -143,10 +139,10 @@ export async function PalaceFateView({ chartId, chart, user, activeReadingId }: 
                   </div>
                 </div>
 
-                <div className="w-full shrink-0 lg:w-52">
+                <div className="palace-unlock-panel">
                   {reading ? (
                     <a href={palaceReadingHref(chartId, reading.id, anchor)} className="btn btn-ghost w-full">
-                      Xem lại luận cung
+                      Xem lại nội dung đã mở
                     </a>
                   ) : (
                     <UnlockPalaceButton chartId={chartId} palaceName={item.palace.name} />

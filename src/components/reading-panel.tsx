@@ -1,14 +1,15 @@
-import { requestReadingAction } from "@/app/actions";
+import Link from "next/link";
 import { FEATURE_PRICES, type ReadingKey } from "@/lib/pricing";
 import { formatCoins } from "@/lib/format";
 import type { TuViChart } from "@/lib/chart";
 
-const options: { type: ReadingKey; scopeKey: string; label: string; description: string }[] = [
-  { type: "FULL", scopeKey: "all", label: "Luận giải toàn bộ", description: "Xem tổng quan, 12 cung và vận trình chính." },
-  { type: "PALACE", scopeKey: "Mệnh", label: "Luận cung Mệnh", description: "Đọc kỹ hơn về tính cách, thế mạnh và điều cần lưu ý." },
-  { type: "DAI_VAN", scopeKey: "24-33", label: "Luận đại vận", description: "Xem giai đoạn 10 năm, cơ hội và thử thách nổi bật." },
-  { type: "NGUYET_VAN", scopeKey: "current-month", label: "Luận nguyệt vận", description: "Gợi ý trọng tâm trong tháng hiện tại." },
-  { type: "NHAT_VAN", scopeKey: "today", label: "Luận nhật vận", description: "Xem nhanh năng lượng và việc nên chú ý hôm nay." },
+const options: { type: ReadingKey; href: (chartId: string) => string; label: string; description: string; cta: string }[] = [
+  { type: "FULL", href: (chartId) => `/la-so/${chartId}/nang-cao`, label: "Luận giải toàn bộ", description: "Xem lại bản chuyên sâu, các chương chính và gợi ý hành động.", cta: "Đọc bản toàn bộ" },
+  { type: "PALACE", href: (chartId) => `/la-so/${chartId}?view=luan-cung`, label: "Luận cung", description: "Chọn từng cung như Mệnh, Tài Bạch, Quan Lộc để mở đúng phần cần đọc.", cta: "Chọn cung" },
+  { type: "DAI_VAN", href: (chartId) => `/la-so/${chartId}?view=dai-van`, label: "Luận đại vận", description: "Chọn đúng giai đoạn 10 năm, nhìn cơ hội và rủi ro dài hạn.", cta: "Chọn đại vận" },
+  { type: "TIEU_VAN", href: (chartId) => `/la-so/${chartId}?view=tieu-van`, label: "Luận tiểu vận", description: "Đọc từng năm trong nền đại vận để biết việc nên chuẩn bị.", cta: "Chọn năm" },
+  { type: "NGUYET_VAN", href: (chartId) => `/la-so/${chartId}?view=nguyet-van`, label: "Luận nguyệt vận", description: "Chọn từng tháng, đọc trọng tâm công việc, tiền bạc và quan hệ.", cta: "Chọn tháng" },
+  { type: "NHAT_VAN", href: (chartId) => `/la-so/${chartId}?view=nhat-van`, label: "Luận nhật vận", description: "Xem ngày đang quan tâm với gợi ý việc nên làm và giờ tốt.", cta: "Xem ngày" },
 ];
 
 export function ReadingPanel({ chartId, chart }: { chartId: string; chart: TuViChart }) {
@@ -23,31 +24,23 @@ export function ReadingPanel({ chartId, chart }: { chartId: string; chart: TuViC
           Mỗi phần đều hiển thị giá rõ ràng. Mua một lần, nội dung sẽ được lưu lại để xem sau.
         </p>
       </div>
-      <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-5">
+      <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
         {options.map((option) => {
           const price = FEATURE_PRICES[option.type].priceCoins;
           return (
-            <form
-              key={`${option.type}-${option.scopeKey}`}
-              action={requestReadingAction}
+            <Link
+              key={option.type}
+              href={option.href(chartId)}
               className="rounded-2xl border border-orange-100 bg-orange-50/50 p-4 transition hover:-translate-y-1 hover:bg-white hover:shadow-lg"
-              data-loading-message="Đang mở phần luận giải..."
-              data-loading-label="Đang mở..."
             >
-              <input type="hidden" name="chartId" value={chartId} />
-              <input type="hidden" name="type" value={option.type} />
-              <input type="hidden" name="scopeKey" value={option.scopeKey} />
-              <input type="hidden" name="next" value={`/la-so/${chartId}`} />
               <h3 className="text-lg font-black text-stone-950">{option.label}</h3>
               <p className="mt-2 min-h-14 text-base leading-7 text-stone-600">{option.description}</p>
               <p className="mt-4 text-xl font-black text-orange-700">
-                {formatCoins(price)}
+                {option.type === "FULL" ? "Đã mở trong bản này" : `Từ ${formatCoins(price)}`}
               </p>
-              <button className="btn btn-primary mt-4 w-full" type="submit">
-                Mở phần này
-              </button>
+              <span className="btn btn-primary mt-4 w-full">{option.cta}</span>
               <p className="mt-2 text-sm text-stone-400">{chart.input.fullName}</p>
-            </form>
+            </Link>
           );
         })}
       </div>

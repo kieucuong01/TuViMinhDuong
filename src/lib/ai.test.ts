@@ -131,6 +131,26 @@ describe("AI reading format", () => {
     expect(prompt).toContain("phần luận giải");
   });
 
+  it("builds a focused paid prompt for yearly minor fate readings", () => {
+    const chart = sampleChart();
+    const chapters = paidReadingChapters(chart, "TIEU_VAN");
+    const prompt = paidReadingChapterPrompt(
+      chart,
+      "TIEU_VAN",
+      "tieu-2026",
+      { title: "Tiểu vận năm 2026", evidence: ["Nền đại vận: 34-43 tuổi tại cung Quan Lộc"] },
+      chapters[0],
+      0,
+      chapters.length,
+    );
+
+    expect(chapters).toHaveLength(1);
+    expect(chapters[0].title).toBe("Luận tiểu vận");
+    expect(chapters[0].instruction).toContain("năm đang mở khóa");
+    expect(prompt).toContain("# Luận tiểu vận: tieu-2026");
+    expect(prompt).toContain("Tiểu vận năm 2026");
+  });
+
   it("returns a structured 8-chapter fallback when no LLM provider is configured", async () => {
     clearProviderEnv();
 

@@ -382,6 +382,12 @@ export function paidReadingChapters(chart: TuViChart, type: ReadingKey): PaidRea
           "Viết về giai đoạn 10 năm đang mở khóa: bối cảnh, cơ hội, thách thức, việc nên ưu tiên, cách quản trị rủi ro. Nêu rõ đây là định hướng dài hạn, không kết luận cứng.",
         targetWords: "1000-1500 từ",
       },
+      TIEU_VAN: {
+        title: "Luận tiểu vận",
+        instruction:
+          "Viết về năm đang mở khóa trong nền đại vận 10 năm: trọng tâm năm, cơ hội thực tế, áp lực cần quản trị, các việc nên làm theo quý và cách đọc năm này mà không tách khỏi bối cảnh dài hạn.",
+        targetWords: "900-1300 từ",
+      },
       NGUYET_VAN: {
         title: "Luận nguyệt vận",
         instruction:

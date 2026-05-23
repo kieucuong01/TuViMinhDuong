@@ -16,6 +16,7 @@ const featureRows = [
   { label: "Luận giải toàn bộ", detail: "Tổng quan, 12 cung, vận hạn và gợi ý hành động", price: FEATURE_PRICES.FULL.priceCoins },
   { label: "Luận cung", detail: "Xem sâu một cung như Mệnh, Quan Lộc, Tài Bạch", price: FEATURE_PRICES.PALACE.priceCoins },
   { label: "Đại vận", detail: "Giai đoạn 10 năm, cơ hội và điều cần thận trọng", price: FEATURE_PRICES.DAI_VAN.priceCoins },
+  { label: "Tiểu vận", detail: "Từng năm trong nền đại vận, việc nên chuẩn bị", price: FEATURE_PRICES.TIEU_VAN.priceCoins },
   { label: "Nguyệt vận", detail: "Trọng tâm tháng hiện tại theo lá số", price: FEATURE_PRICES.NGUYET_VAN.priceCoins },
   { label: "Nhật vận", detail: "Gợi ý nhanh cho một ngày cụ thể", price: FEATURE_PRICES.NHAT_VAN.priceCoins },
 ];

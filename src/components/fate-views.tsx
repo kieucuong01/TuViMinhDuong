@@ -1,4 +1,5 @@
-import { BarChart3, CheckCircle2, LockKeyhole } from "lucide-react";
+import { BarChart3, CheckCircle2, LockKeyhole, Sparkles } from "lucide-react";
+import type { ReactNode } from "react";
 import { requestReadingAction } from "@/app/actions";
 import { LoadingSubmitButton } from "@/components/loading-submit-button";
 import { MarkdownContent } from "@/components/markdown-content";
@@ -29,15 +30,43 @@ function anchorId(value: string) {
 function OpenButton({ chartId, item, nextPath }: { chartId: string; item: FateReadingItem; nextPath: string }) {
   const anchor = anchorId(item.scopeKey);
   return (
-    <form action={requestReadingAction} data-loading-message="Đang mở phần luận giải..." data-loading-label="Đang mở...">
+    <form className="fate-open-action" action={requestReadingAction} data-loading-message="Đang mở phần luận giải..." data-loading-label="Đang mở...">
       <input type="hidden" name="chartId" value={chartId} />
       <input type="hidden" name="type" value={item.type} />
       <input type="hidden" name="scopeKey" value={item.scopeKey} />
       <input type="hidden" name="next" value={`${nextPath}#${anchor}-reading`} />
       <LoadingSubmitButton className="fate-open-button" loadingText="Đang mở...">
-        <LockKeyhole size={16} /> Mở - {formatCoins(FEATURE_PRICES[item.type].priceCoins)}
+        <LockKeyhole size={16} /> Đọc chi tiết - {formatCoins(FEATURE_PRICES[item.type].priceCoins)}
       </LoadingSubmitButton>
+      <small>Mở một lần, xem lại trong tài khoản.</small>
     </form>
+  );
+}
+
+function FateHero({
+  title,
+  description,
+  price,
+  children,
+}: {
+  title: string;
+  description: string;
+  price: string;
+  children?: ReactNode;
+}) {
+  return (
+    <header className={children ? "fate-hero" : "fate-hero compact"}>
+      <div className="fate-hero-copy">
+        <h1>{title}</h1>
+        <p>{description}</p>
+        <div className="fate-hero-points" aria-label="Giá trị khi mở khóa">
+          <span><Sparkles size={15} /> Có preview miễn phí trước khi mở</span>
+          <span><CheckCircle2 size={15} /> Mua một lần, xem lại sau</span>
+          <span><LockKeyhole size={15} /> Giá từ {price}</span>
+        </div>
+      </div>
+      {children ? <div className="fate-hero-visual">{children}</div> : null}
+    </header>
   );
 }
 
@@ -121,7 +150,7 @@ function ExplainBox({ title = "Biểu đồ của bạn nói gì" }: { title?: s
     <section className="fate-explain">
       <h2>{title}</h2>
       <p>
-        Biểu đồ chỉ là lớp định hướng miễn phí. Phần mở khóa sẽ giải thích kỹ hơn dữ kiện tử vi, cơ hội, điểm cần quản trị và việc nên làm theo từng giai đoạn.
+        Biểu đồ và preview miễn phí giúp bạn biết hướng chính trước khi mua. Phần mở khóa sẽ giải thích dữ kiện tử vi đã dùng, cơ hội, điểm cần quản trị và các việc nên làm theo đúng cung, năm, tháng hoặc ngày bạn chọn.
       </p>
     </section>
   );
@@ -129,21 +158,27 @@ function ExplainBox({ title = "Biểu đồ của bạn nói gì" }: { title?: s
 
 function EvidenceList({ item }: { item: FateReadingItem }) {
   return (
-    <div className="mt-3 grid gap-2 text-sm leading-6 text-stone-600">
-      {item.evidence.slice(0, 4).map((line) => (
-        <p key={line}>- {line}</p>
-      ))}
-    </div>
+    <section className="fate-preview-panel">
+      <h3>Dữ kiện miễn phí</h3>
+      <div>
+        {item.evidence.slice(0, 4).map((line) => (
+          <p key={line}>{line}</p>
+        ))}
+      </div>
+    </section>
   );
 }
 
 function AdviceList({ item }: { item: FateReadingItem }) {
   return (
-    <ul className="mt-3 grid gap-2 text-sm leading-6 text-stone-700">
-      {item.advice.map((line) => (
-        <li key={line}>- {line}</li>
-      ))}
-    </ul>
+    <section className="fate-preview-panel warm">
+      <h3>Gợi ý nhanh</h3>
+      <ul>
+        {item.advice.map((line) => (
+          <li key={line}>{line}</li>
+        ))}
+      </ul>
+    </section>
   );
 }
 
@@ -164,21 +199,35 @@ function FateRow({
   const isActiveReading = Boolean(reading && reading.id === activeReadingId);
   return (
     <article id={anchor} className="fate-row">
-      <div className="min-w-0">
-        <h2>
-          <span className="fate-token" /> {item.title}
-          {item.isCurrent ? <b>Hiện tại</b> : null}
-        </h2>
-        {item.range ? <small>{item.range}</small> : null}
-        <p>{item.summary}</p>
-        <EvidenceList item={item} />
-        <AdviceList item={item} />
+      <div className="fate-row-main">
+        <div className="fate-row-head">
+          <span className="fate-score-badge">{item.good}</span>
+          <div>
+            <h2>
+              {item.title}
+              {item.isCurrent ? <b>Hiện tại</b> : null}
+            </h2>
+            <div className="fate-row-meta">
+              {item.range ? <span>{item.range}</span> : null}
+              {item.palace ? <span>Cung {item.palace}</span> : null}
+              {item.branch ? <span>{item.branch}</span> : null}
+            </div>
+          </div>
+        </div>
+        <p className="fate-summary">{item.summary}</p>
+        <div className="fate-preview-grid">
+          <EvidenceList item={item} />
+          <AdviceList item={item} />
+        </div>
       </div>
-      <div className="shrink-0">
+      <div className="fate-row-action">
         {reading ? (
-          <a className="fate-open-button" href={readingHref(nextPath, reading.id, anchor)}>
-            <CheckCircle2 size={16} /> Xem lại
-          </a>
+          <div className="fate-open-action">
+            <a className="fate-open-button" href={readingHref(nextPath, reading.id, anchor)}>
+              <CheckCircle2 size={16} /> Xem lại nội dung đã mở
+            </a>
+            <small>Không trừ xu lần nữa.</small>
+          </div>
         ) : (
           <OpenButton chartId={chartId} item={item} nextPath={nextPath} />
         )}
@@ -200,9 +249,13 @@ export async function MajorFateView({ chartId, chart, user, activeReadingId }: F
 
   return (
     <section className="fate-page" data-testid="major-fate-view">
-      <h1>Đại vận của {chart.input.fullName}</h1>
-      <span className="fate-kicker">Mỗi giai đoạn 10 năm có thể mở khóa riêng</span>
-      <TrendBars items={items.map((item) => ({ label: item.label, good: item.good, challenge: item.challenge }))} currentIndex={currentIndex === -1 ? undefined : currentIndex} />
+      <FateHero
+        title={`Đại vận của ${chart.input.fullName}`}
+        description="Nhìn toàn cảnh từng giai đoạn 10 năm trước, rồi chỉ mở đúng đại vận bạn muốn đọc sâu."
+        price={formatCoins(FEATURE_PRICES.DAI_VAN.priceCoins)}
+      >
+        <TrendBars items={items.map((item) => ({ label: item.label, good: item.good, challenge: item.challenge }))} currentIndex={currentIndex === -1 ? undefined : currentIndex} />
+      </FateHero>
       <ExplainBox />
       <div className="fate-list">
         {items.map((item) => (
@@ -220,9 +273,13 @@ export async function MinorFateView({ chartId, chart, user, activeReadingId }: F
 
   return (
     <section className="fate-page" data-testid="minor-fate-view">
-      <h1>Tiểu vận của {chart.input.fullName}</h1>
-      <span className="fate-kicker">Hiển thị nhiều năm xung quanh, mở khóa từng năm</span>
-      <TrendArea items={items.map((item) => ({ label: item.label, good: item.good, challenge: item.challenge }))} currentIndex={currentIndex === -1 ? undefined : currentIndex} markerLabel="Năm xem" />
+      <FateHero
+        title={`Tiểu vận của ${chart.input.fullName}`}
+        description="So sánh các năm gần nhau để biết năm nào nên tiến, năm nào nên giữ nhịp, rồi mở riêng năm cần quyết định."
+        price={formatCoins(FEATURE_PRICES.TIEU_VAN.priceCoins)}
+      >
+        <TrendArea items={items.map((item) => ({ label: item.label, good: item.good, challenge: item.challenge }))} currentIndex={currentIndex === -1 ? undefined : currentIndex} markerLabel="Năm xem" />
+      </FateHero>
       <ExplainBox />
       <div className="fate-list">
         {items.map((item) => (
@@ -239,8 +296,11 @@ export async function MonthlyFateView({ chartId, chart, user, activeReadingId }:
 
   return (
     <section className="fate-page narrow" data-testid="monthly-fate-view">
-      <h1>Nguyệt vận của {chart.input.fullName} năm {chart.input.viewYear}</h1>
-      <p className="mt-3 text-base leading-7 text-stone-600">Mỗi tháng có preview miễn phí. Khi cần đọc kỹ, bạn có thể mở riêng từng tháng.</p>
+      <FateHero
+        title={`Nguyệt vận của ${chart.input.fullName} năm ${chart.input.viewYear}`}
+        description="Mỗi tháng có preview miễn phí để bạn nhìn trọng tâm trước, sau đó mở riêng tháng cần đọc kỹ."
+        price={formatCoins(FEATURE_PRICES.NGUYET_VAN.priceCoins)}
+      />
       <div className="fate-list">
         {items.map((item) => (
           <FateRow key={item.scopeKey} chartId={chartId} item={item} nextPath={`/la-so/${chartId}?view=nguyet-van`} reading={readings.get(fateReadingMapKey(item)) || null} activeReadingId={activeReadingId} />
@@ -318,6 +378,13 @@ export async function DailyFateView({ chartId, chart, user, activeReadingId }: F
             <summary>Nội dung nhật vận đã mở</summary>
             <MarkdownContent content={reading.content} />
           </details>
+        ) : reading ? (
+          <div className="fate-open-action">
+            <a className="fate-open-button" href={readingHref(`/la-so/${chartId}?view=nhat-van`, reading.id, anchorId(item.scopeKey))}>
+              <CheckCircle2 size={16} /> Xem lại nội dung đã mở
+            </a>
+            <small>Không trừ xu lần nữa.</small>
+          </div>
         ) : (
           <OpenButton chartId={chartId} item={item} nextPath={`/la-so/${chartId}?view=nhat-van`} />
         )}

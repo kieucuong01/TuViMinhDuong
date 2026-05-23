@@ -7,7 +7,7 @@ export type FateReadingItem = {
   kind: FateReadingKind;
   title: string;
   scopeKey: string;
-  type: "DAI_VAN" | "NGUYET_VAN" | "NHAT_VAN";
+  type: "DAI_VAN" | "TIEU_VAN" | "NGUYET_VAN" | "NHAT_VAN";
   label: string;
   range?: string;
   palace?: string;
@@ -108,7 +108,7 @@ export function getMinorFateItems(chart: TuViChart): FateReadingItem[] {
     const isCurrent = year === chart.input.viewYear;
     return {
       kind: "minor",
-      type: "DAI_VAN",
+      type: "TIEU_VAN",
       title: `Tiểu vận năm ${year}`,
       label: String(year),
       scopeKey: `tieu-${year}`,
