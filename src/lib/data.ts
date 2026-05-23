@@ -75,6 +75,19 @@ function demoArticles() {
   return globalStore.demoArticles;
 }
 
+function articleSortValue(article: ArticleView) {
+  return article.updatedAt?.getTime() || article.publishedAt?.getTime() || 0;
+}
+
+function sortArticlesNewestFirst(articles: ArticleView[]) {
+  return articles.sort((a, b) => articleSortValue(b) - articleSortValue(a));
+}
+
+function articleStatusFromForm(formData: FormData) {
+  const status = String(formData.get("status") || "published");
+  return status === "draft" || status === "archived" ? status : "published";
+}
+
 function usesInMemoryUser(userId: string) {
   return userId.startsWith("demo-") || userId.startsWith("guest-");
 }
@@ -559,7 +572,7 @@ export async function saveReading(
 
 export async function listArticles() {
   const db = getDb();
-  if (!db) return Array.from(demoArticles().values()).sort((a, b) => (b.publishedAt?.getTime() || 0) - (a.publishedAt?.getTime() || 0));
+  if (!db) return sortArticlesNewestFirst(Array.from(demoArticles().values()).filter((article) => article.status === "published"));
   let articles: ArticleView[] = [];
   try {
     articles = (await db.article.findMany({
@@ -567,26 +580,56 @@ export async function listArticles() {
       orderBy: [{ publishedAt: "desc" }, { createdAt: "desc" }],
     })) as ArticleView[];
   } catch {
-    return seedArticles.map(articleWithScore).sort((a, b) => {
-      const bDate = b.publishedAt?.getTime() || b.updatedAt?.getTime() || 0;
-      const aDate = a.publishedAt?.getTime() || a.updatedAt?.getTime() || 0;
-      return bDate - aDate;
-    });
+    return sortArticlesNewestFirst(seedArticles.map(articleWithScore));
   }
   const bySlug = new Map(seedArticles.map((article) => [article.slug, articleWithScore(article)]));
   for (const article of articles) {
     bySlug.set(article.slug, articleWithScore(article));
   }
-  return Array.from(bySlug.values()).sort((a, b) => {
-    const bDate = b.publishedAt?.getTime() || b.updatedAt?.getTime() || 0;
-    const aDate = a.publishedAt?.getTime() || a.updatedAt?.getTime() || 0;
-    return bDate - aDate;
-  });
+  return sortArticlesNewestFirst(Array.from(bySlug.values()));
+}
+
+export async function listAdminArticles() {
+  const db = getDb();
+  if (!db) return sortArticlesNewestFirst(Array.from(demoArticles().values()).map(articleWithScore));
+  try {
+    const articles = (await db.article.findMany({
+      orderBy: [{ updatedAt: "desc" }, { createdAt: "desc" }],
+    })) as ArticleView[];
+    const bySlug = new Map(seedArticles.map((article) => [article.slug, articleWithScore(article)]));
+    for (const article of articles) {
+      bySlug.set(article.slug, articleWithScore(article));
+    }
+    return sortArticlesNewestFirst(Array.from(bySlug.values()));
+  } catch {
+    return sortArticlesNewestFirst(seedArticles.map(articleWithScore));
+  }
 }
 
 export async function getArticleBySlug(slug: string) {
   const db = getDb();
-  if (!db) return demoArticles().get(slug) || null;
+  if (!db) {
+    const article = demoArticles().get(slug);
+    return article?.status === "published" ? articleWithScore(article) : null;
+  }
+  try {
+    const article = await db.article.findUnique({ where: { slug } });
+    if (article) {
+      const scored = articleWithScore(article as ArticleView);
+      return scored.status === "published" ? scored : null;
+    }
+    return seedArticles.map(articleWithScore).find((item) => item.slug === slug) || null;
+  } catch {
+    return seedArticles.map(articleWithScore).find((item) => item.slug === slug) || null;
+  }
+}
+
+export async function getAdminArticleBySlug(slug: string) {
+  const db = getDb();
+  if (!db) {
+    const article = demoArticles().get(slug);
+    return article ? articleWithScore(article) : null;
+  }
   try {
     const article = await db.article.findUnique({ where: { slug } });
     return article ? articleWithScore(article as ArticleView) : seedArticles.map(articleWithScore).find((item) => item.slug === slug) || null;
@@ -601,6 +644,9 @@ export async function saveArticleFromForm(formData: FormData) {
   const excerpt = String(formData.get("excerpt") || "");
   const focusKeyword = String(formData.get("focusKeyword") || "");
   const slug = slugify(String(formData.get("slug") || title));
+  const originalSlug = slugify(String(formData.get("originalSlug") || slug));
+  const status = articleStatusFromForm(formData);
+  const publishedAt = status === "published" ? new Date() : null;
   const metaTitle = String(formData.get("metaTitle") || title);
   const metaDescription = String(formData.get("metaDescription") || excerpt);
   const canonicalUrl = String(formData.get("canonicalUrl") || `/kien-thuc-tu-vi/${slug}`);
@@ -625,7 +671,7 @@ export async function saveArticleFromForm(formData: FormData) {
     slug,
     excerpt,
     content,
-    status: "published",
+    status,
     coverImage,
     coverAlt,
     focusKeyword,
@@ -636,51 +682,48 @@ export async function saveArticleFromForm(formData: FormData) {
     schemaType: "Article",
     seoScore: seo.score,
     seoChecklist: seo.checks,
-    publishedAt: new Date(),
+    publishedAt,
     updatedAt: new Date(),
   };
 
   const db = getDb();
   if (!db) {
+    if (originalSlug !== slug) demoArticles().delete(originalSlug);
     demoArticles().set(slug, article);
     return article;
   }
 
-  const saved = await db.article.upsert({
-    where: { slug },
-    update: {
-      title,
-      excerpt,
-      content,
-      focusKeyword,
-      metaTitle,
-      metaDescription,
-      canonicalUrl,
-      coverImage,
-      coverAlt,
-      status: "published",
-      seoScore: seo.score,
-      seoChecklist: seo.checks,
-      publishedAt: new Date(),
-    },
-    create: {
-      title,
-      slug,
-      excerpt,
-      content,
-      focusKeyword,
-      metaTitle,
-      metaDescription,
-      canonicalUrl,
-      coverAlt,
-      coverImage,
-      status: "published",
-      schemaType: "Article",
-      seoScore: seo.score,
-      seoChecklist: seo.checks,
-      publishedAt: new Date(),
-    },
-  });
+  const articleData = {
+    title,
+    excerpt,
+    content,
+    focusKeyword,
+    metaTitle,
+    metaDescription,
+    canonicalUrl,
+    coverImage,
+    coverAlt,
+    status,
+    seoScore: seo.score,
+    seoChecklist: seo.checks,
+    publishedAt,
+  };
+
+  const existing = originalSlug ? await db.article.findUnique({ where: { slug: originalSlug } }) : null;
+  const saved = existing
+    ? await db.article.update({
+        where: { id: existing.id },
+        data: { ...articleData, slug },
+      })
+    : await db.article.upsert({
+        where: { slug },
+        update: articleData,
+        create: {
+          ...articleData,
+          slug,
+          schemaType: "Article",
+        },
+      });
   return articleWithScore(saved as ArticleView);
 }
 

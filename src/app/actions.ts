@@ -209,10 +209,12 @@ export async function requestReadingAction(formData: FormData) {
 export async function saveArticleAction(formData: FormData) {
   const user = await getCurrentUser();
   if (user?.role !== "ADMIN") redirect("/dang-nhap?next=/admin");
+  const originalSlug = String(formData.get("originalSlug") || "");
   const article = await saveArticleFromForm(formData);
   revalidatePath("/kien-thuc-tu-vi");
+  if (originalSlug && originalSlug !== article.slug) revalidatePath(`/kien-thuc-tu-vi/${originalSlug}`);
   revalidatePath(`/kien-thuc-tu-vi/${article.slug}`);
-  redirect(`/admin?saved=${article.slug}`);
+  redirect(`/admin?edit=${article.slug}&saved=${article.slug}`);
 }
 
 export async function createCheckoutAction(formData: FormData) {
