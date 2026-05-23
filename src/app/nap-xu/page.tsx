@@ -5,6 +5,7 @@ import { COIN_PACKAGES } from "@/lib/pricing";
 import { formatCoins, formatVnd } from "@/lib/format";
 import { routeMetadata } from "@/lib/metadata";
 import { paymentReturnNotice } from "@/lib/payment-status";
+import { LoadingSubmitButton } from "@/components/loading-submit-button";
 
 export const metadata = routeMetadata({
   title: "Nạp xu mở luận giải tử vi",
@@ -46,9 +47,9 @@ export default async function CoinsPage({ searchParams }: { searchParams: Promis
               <p className="text-stone-600">
                 Nhận {formatCoins(pack.coins + pack.bonusCoins)} {pack.bonusCoins ? `(tặng thêm ${pack.bonusCoins} xu)` : ""}
               </p>
-              <button className="btn btn-primary btn-large w-full" type="submit" disabled={!user}>
+              <LoadingSubmitButton className="btn btn-primary btn-large w-full" loadingText="Đang tạo link..." disabled={!user}>
                 Nạp xu
-              </button>
+              </LoadingSubmitButton>
               {!user ? <p className="text-sm leading-6 text-stone-500">Bạn cần đăng nhập để nạp xu và lưu lịch sử.</p> : null}
             </form>
           ))}

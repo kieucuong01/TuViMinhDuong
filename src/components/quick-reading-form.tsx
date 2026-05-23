@@ -2,6 +2,7 @@ import { Mail, ShieldCheck, Sparkles } from "lucide-react";
 import { quickReadingCheckoutAction } from "@/app/actions";
 import { FEATURE_PRICES } from "@/lib/pricing";
 import { formatVnd } from "@/lib/format";
+import { LoadingSubmitButton } from "@/components/loading-submit-button";
 
 export function QuickReadingForm() {
   const now = new Date();
@@ -95,9 +96,9 @@ export function QuickReadingForm() {
             <input name="viewYear" type="number" inputMode="numeric" min="1900" max="2100" defaultValue={now.getFullYear()} required />
           </label>
         </div>
-        <button className="btn btn-primary btn-large w-full" type="submit" data-loading-label="Đang tạo đơn...">
+        <LoadingSubmitButton className="btn btn-primary btn-large w-full" loadingText="Đang tạo đơn...">
           Mua luận giải toàn bộ - {formatVnd(price)}
-        </button>
+        </LoadingSubmitButton>
         <p className="text-center text-sm leading-6 text-stone-500">
           Sau khi mua, bạn có thể đăng nhập bằng email này để xem lại.
         </p>

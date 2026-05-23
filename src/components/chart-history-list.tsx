@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useMemo, useState, useTransition } from "react";
-import { CalendarDays, Clock3, Copy, Mars, Search, Sparkles, Trash2, Venus } from "lucide-react";
+import { CalendarDays, Clock3, Copy, Loader2, Mars, Search, Sparkles, Trash2, Venus } from "lucide-react";
 import { deleteChartAction } from "@/app/actions";
 
 export type ChartHistoryViewItem = {
@@ -80,7 +80,7 @@ function ChartListItem({ chart }: { chart: ChartHistoryViewItem }) {
         >
           <input type="hidden" name="chartId" value={chart.id} />
           <button className="icon-button" type="submit" aria-label="Xóa lá số" title="Xóa lá số" disabled={isPending}>
-            <Trash2 size={17} />
+            {isPending ? <Loader2 className="animate-spin" size={17} /> : <Trash2 size={17} />}
           </button>
         </form>
       </div>

@@ -30,6 +30,8 @@ function calculateFortune(date: Date) {
   const daySeed = Math.floor(date.getTime() / 86400000);
   const score = clamp(18 + ((daySeed * 37 + date.getMonth() * 11 + date.getDate() * 7) % 73), 12, 92);
   const monthSeed = date.getFullYear() * 12 + date.getMonth();
+  const branchIndex = ((daySeed % 12) + 12) % 12;
+  const goodHours = [branchIndex, branchIndex + 4, branchIndex + 8].map((index) => branches[index % 12]).join(", ");
   const status = score >= 68 ? "Ngày tốt" : score >= 42 ? "Trung bình" : "Ngày xấu";
   const statusClass =
     score >= 68
@@ -55,6 +57,9 @@ function calculateFortune(date: Date) {
         : score >= 42
           ? "Nên làm việc quen thuộc, tránh quyết định vội."
           : "Ưu tiên giữ nhịp ổn định, hạn chế việc lớn.",
+    goodThings: score >= 68 ? "Gặp gỡ, ký việc nhẹ" : score >= 42 ? "Sắp xếp, rà soát" : "Hoàn tất việc cũ",
+    avoidThings: score >= 68 ? "Ôm quá nhiều việc" : score >= 42 ? "Quyết định vội" : "Khởi sự lớn",
+    goodHours,
   };
 }
 
@@ -135,6 +140,21 @@ export function DayFortuneCard() {
         <Sparkles className="mt-0.5 shrink-0 text-orange-500" size={16} />
         {fortune.note}
       </p>
+
+      <div className="day-fortune-tips">
+        <article>
+          <span>Nên làm</span>
+          <strong>{fortune.goodThings}</strong>
+        </article>
+        <article>
+          <span>Nên tránh</span>
+          <strong>{fortune.avoidThings}</strong>
+        </article>
+        <article>
+          <span>Giờ tốt</span>
+          <strong>{fortune.goodHours}</strong>
+        </article>
+      </div>
     </section>
   );
 }

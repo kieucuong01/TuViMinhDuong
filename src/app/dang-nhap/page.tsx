@@ -4,6 +4,7 @@ import { Coins, History, ShieldCheck } from "lucide-react";
 import { loginAction } from "@/app/actions";
 import { getCurrentUser } from "@/lib/auth";
 import { isGoogleOAuthEnabled } from "@/lib/env";
+import { LoadingSubmitButton } from "@/components/loading-submit-button";
 import { PaywallPopup } from "@/components/paywall-popup";
 
 export const metadata = {
@@ -34,7 +35,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
               <span>Mật khẩu</span>
               <input name="password" type="password" minLength={6} placeholder="Tối thiểu 6 ký tự" required data-testid="login-password" />
             </label>
-            <button className="btn btn-primary w-full" type="submit">Tiếp tục</button>
+            <LoadingSubmitButton className="btn btn-primary w-full" loadingText="Đang đăng nhập...">Tiếp tục</LoadingSubmitButton>
           </form>
           <a
             className={`btn mt-3 w-full ${isGoogleOAuthEnabled() ? "btn-ghost" : "btn-disabled"}`}

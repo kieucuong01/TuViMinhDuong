@@ -81,7 +81,7 @@ export function AssistantWidget({ chartId }: { chartId: string }) {
 
           <div className="grid gap-2 px-4 pb-3">
             {starterQuestions.map((item) => (
-              <button key={item} type="button" className="assistant-suggestion" onClick={() => ask(item)}>
+              <button key={item} type="button" className="assistant-suggestion" onClick={() => ask(item)} disabled={isPending}>
                 {item}
               </button>
             ))}
@@ -95,9 +95,9 @@ export function AssistantWidget({ chartId }: { chartId: string }) {
               ask(question);
             }}
           >
-            <input value={question} onChange={(event) => setQuestion(event.target.value)} placeholder="Nhập câu hỏi của bạn..." />
-            <button className="btn btn-primary aspect-square px-0" type="submit" aria-label="Gửi câu hỏi">
-              <Send size={17} />
+            <input value={question} onChange={(event) => setQuestion(event.target.value)} placeholder="Nhập câu hỏi của bạn..." disabled={isPending} />
+            <button className="btn btn-primary aspect-square px-0" type="submit" aria-label="Gửi câu hỏi" disabled={isPending || !question.trim()}>
+              {isPending ? <Loader2 className="animate-spin" size={17} /> : <Send size={17} />}
             </button>
           </form>
         </section>

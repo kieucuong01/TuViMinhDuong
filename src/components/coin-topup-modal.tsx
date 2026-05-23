@@ -7,6 +7,7 @@ import { useMemo, useTransition } from "react";
 import { createCheckoutAction } from "@/app/actions";
 import { COIN_PACKAGES } from "@/lib/pricing";
 import { formatCoins, formatVnd } from "@/lib/format";
+import { LoadingSubmitButton } from "@/components/loading-submit-button";
 
 function cleanPath(pathname: string, searchParams: URLSearchParams) {
   const params = new URLSearchParams(searchParams.toString());
@@ -95,7 +96,7 @@ export function CoinTopupModal() {
               <strong>{pack.label}</strong>
               <span>{formatCoins(pack.totalCoins)}</span>
               <p>{formatVnd(pack.priceVnd)}{pack.bonusCoins ? ` - tặng ${pack.bonusCoins} xu` : ""}</p>
-              <button className="btn btn-primary w-full" type="submit">Nạp gói này</button>
+              <LoadingSubmitButton className="btn btn-primary w-full" loadingText="Đang tạo link...">Nạp gói này</LoadingSubmitButton>
             </form>
           ))}
         </div>

@@ -1,5 +1,6 @@
 import { requestReadingAction } from "@/app/actions";
 import type { TuViChart } from "@/lib/chart";
+import { LoadingSubmitButton } from "@/components/loading-submit-button";
 
 const prompts = [
   { label: "Tìm hiểu Cung Mệnh", type: "PALACE", scopeKey: "Mệnh" },
@@ -32,9 +33,9 @@ export function PromptChips({ chartId, chart, className = defaultShellClassName 
             <input type="hidden" name="type" value={prompt.type} />
             <input type="hidden" name="scopeKey" value={prompt.scopeKey} />
             <input type="hidden" name="next" value={`/la-so/${chartId}`} />
-            <button className="prompt-chip w-full" type="submit">
+            <LoadingSubmitButton className="prompt-chip w-full" loadingText="Đang mở...">
               {prompt.label}
-            </button>
+            </LoadingSubmitButton>
           </form>
         ))}
       </div>

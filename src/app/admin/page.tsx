@@ -5,6 +5,7 @@ import { saveArticleAction, saveArticleCategoryAction } from "@/app/actions";
 import { getCurrentUser } from "@/lib/auth";
 import { getAdminArticleBySlug, getAdminOverview, listAdminArticles, listArticleCategories } from "@/lib/data";
 import type { ArticleView } from "@/lib/content";
+import { LoadingSubmitButton } from "@/components/loading-submit-button";
 
 export const metadata = {
   title: "Admin",
@@ -193,9 +194,9 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
               </fieldset>
 
               <div className="admin-submit-row">
-                <button className="btn btn-primary" type="submit" data-testid="admin-article-submit">
+                <LoadingSubmitButton className="btn btn-primary" loadingText="Đang lưu..." data-testid="admin-article-submit">
                   <FilePenLine size={18} /> Lưu bài và chấm SEO
-                </button>
+                </LoadingSubmitButton>
                 <span>Chỉ trạng thái “Xuất bản” hiện ngoài public. Nháp và Lưu trữ chỉ xem được trong admin preview.</span>
               </div>
             </form>
@@ -213,9 +214,9 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
                 <label><span>Tên danh mục</span><input name="name" placeholder="Nhập môn tử vi" required data-testid="admin-category-name" /></label>
                 <label><span>Slug</span><input name="slug" placeholder="nhap-mon-tu-vi" data-testid="admin-category-slug" /></label>
                 <label><span>Mô tả ngắn</span><textarea name="description" rows={2} placeholder="Nhóm bài cho người mới..." data-testid="admin-category-description" /></label>
-                <button className="btn btn-ghost w-full justify-center" type="submit" data-testid="admin-category-submit">
+                <LoadingSubmitButton className="btn btn-ghost w-full justify-center" loadingText="Đang lưu..." data-testid="admin-category-submit">
                   <Plus size={17} /> Lưu danh mục
-                </button>
+                </LoadingSubmitButton>
               </form>
               <div className="admin-category-list">
                 {categories.map((category) => (
