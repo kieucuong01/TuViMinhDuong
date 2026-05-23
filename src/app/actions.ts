@@ -16,9 +16,33 @@ import { unlockReadingForUser } from "@/lib/reading-unlock";
 export async function loginAction(formData: FormData) {
   const email = String(formData.get("email") || "");
   const password = String(formData.get("password") || "");
-  const next = String(formData.get("next") || "/");
-  await loginOrRegister(email, password);
-  redirect(next.startsWith("/") ? next : "/");
+  const next = safeNextPath(formData.get("next"), "/");
+
+  try {
+    await loginOrRegister(email, password);
+  } catch (error) {
+    const rawMessage = error instanceof Error ? error.message : "";
+    const isExpectedAuthError =
+      rawMessage.includes("Email") ||
+      rawMessage.includes("Mật khẩu") ||
+      rawMessage.includes("mat khau") ||
+      rawMessage.includes("password");
+    const message = isExpectedAuthError
+      ? rawMessage
+      : "Chưa đăng nhập được. Bạn kiểm tra lại email, mật khẩu rồi thử lần nữa nhé.";
+
+    if (!isExpectedAuthError) {
+      console.error(JSON.stringify({
+        level: "error",
+        event: "login_action_failed",
+        message: rawMessage || "Unknown login error",
+      }));
+    }
+
+    redirect(`/dang-nhap?next=${encodeURIComponent(next)}&error=${encodeURIComponent(message)}`);
+  }
+
+  redirect(next);
 }
 
 export async function logoutAction() {
