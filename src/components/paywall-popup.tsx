@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Coins, LockKeyhole, X } from "lucide-react";
 import { useMemo, useState } from "react";
+import { loginModalHref } from "@/components/login-modal-link";
 
 type PaywallNotice = {
   icon: "lock" | "coins";
@@ -21,7 +22,7 @@ export function PaywallPopup() {
 
   const cleanReturnTo = useMemo(() => {
     const params = new URLSearchParams(searchParams.toString());
-    ["paywall", "need", "status", "orderCode"].forEach((key) => params.delete(key));
+    ["paywall", "need", "status", "orderCode", "login", "next", "authError"].forEach((key) => params.delete(key));
     const query = params.toString();
     return `${pathname}${query ? `?${query}` : ""}`;
   }, [pathname, searchParams]);
@@ -38,7 +39,7 @@ export function PaywallPopup() {
         icon: "lock",
         title: "Đăng nhập để mở luận giải",
         body: "Phần luận giải chuyên sâu cần tài khoản để lưu lịch sử lá số, trừ xu một lần và xem lại bất cứ lúc nào.",
-        href: "/dang-nhap",
+        href: loginModalHref(pathname, searchParams, cleanReturnTo),
         cta: "Đăng nhập",
       };
     }
@@ -58,7 +59,7 @@ export function PaywallPopup() {
     }
 
     return null;
-  }, [cleanReturnTo, searchParams]);
+  }, [cleanReturnTo, pathname, searchParams]);
 
   if (!notice || dismissed) return null;
 

@@ -110,8 +110,6 @@ export default async function Home() {
           <div className="reader-comments-head">
             <div>
               <p className="eyebrow">Bình luận độc giả</p>
-              <h2>Nhiều người xem xong đã biết nên đọc phần nào trước</h2>
-              <p>Phản hồi thật đời hơn giúp bạn hình dung trải nghiệm trước khi lập lá số hoặc mở luận giải chuyên sâu.</p>
             </div>
             <Link href="#lap-la-so" className="btn btn-ghost">
               Lập lá số để xem thử <MessageCircle size={18} />
@@ -119,12 +117,6 @@ export default async function Home() {
           </div>
 
           <div className="reader-comments-layout">
-            <aside className="reader-comments-summary">
-              <strong>4.9/5</strong>
-              <span>đánh giá trải nghiệm đọc</span>
-              <p>Độc giả thường bắt đầu từ bản tổng quan miễn phí, sau đó mở Luận cung, Đại vận hoặc bản đầy đủ khi muốn đào sâu.</p>
-            </aside>
-
             <div className="reader-comment-list">
               {readerComments.map((comment) => (
                 <article key={`${comment.name}-${comment.date}`} className="reader-comment-card">

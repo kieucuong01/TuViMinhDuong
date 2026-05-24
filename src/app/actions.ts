@@ -17,6 +17,7 @@ export async function loginAction(formData: FormData) {
   const email = String(formData.get("email") || "");
   const password = String(formData.get("password") || "");
   const next = safeNextPath(formData.get("next"), "/");
+  const mode = String(formData.get("mode") || "page");
 
   try {
     await loginOrRegister(email, password);
@@ -39,6 +40,9 @@ export async function loginAction(formData: FormData) {
       }));
     }
 
+    if (mode === "modal") {
+      redirect(withQueryParams(next, { login: "1", next, authError: message }));
+    }
     redirect(`/dang-nhap?next=${encodeURIComponent(next)}&error=${encodeURIComponent(message)}`);
   }
 
@@ -61,10 +65,19 @@ function withReadingParam(path: string, readingId: string) {
   return `${withoutHash}${separator}reading=${encodeURIComponent(readingId)}${hash ? `#${hash}` : ""}`;
 }
 
-function withQueryParams(path: string, params: Record<string, string | number>) {
+function withQueryParams(path: string, params: Record<string, string | number | null | undefined>) {
   const [withoutHash, hash] = path.split("#");
-  const query = new URLSearchParams(Object.entries(params).map(([key, value]) => [key, String(value)]));
-  return `${withoutHash}${withoutHash.includes("?") ? "&" : "?"}${query}${hash ? `#${hash}` : ""}`;
+  const [basePath, existingQuery] = withoutHash.split("?");
+  const query = new URLSearchParams(existingQuery || "");
+  Object.entries(params).forEach(([key, value]) => {
+    if (value === null || value === undefined || value === "") {
+      query.delete(key);
+      return;
+    }
+    query.set(key, String(value));
+  });
+  const qs = query.toString();
+  return `${basePath}${qs ? `?${qs}` : ""}${hash ? `#${hash}` : ""}`;
 }
 
 function chartInputFromForm(formData: FormData) {
@@ -162,11 +175,11 @@ export async function deleteChartAction(formData: FormData) {
   redirect("/la-so");
 }
 
-async function getReadingUser(chartId: string): Promise<SessionUser> {
+async function getReadingUser(chartId: string, nextPath: string): Promise<SessionUser> {
   const user = await getCurrentUser();
   if (user) return user;
   if (!TEMPORARY_FULL_ACCESS) {
-    redirect(`/dang-nhap?next=${encodeURIComponent(`/la-so/${chartId}`)}&paywall=login`);
+    redirect(withQueryParams(nextPath, { paywall: "login", login: "1", next: nextPath }));
   }
 
   const db = getDb();
@@ -207,7 +220,7 @@ export async function requestReadingAction(formData: FormData) {
   const type = String(formData.get("type") || "FULL") as ReadingKey;
   const scopeKey = String(formData.get("scopeKey") || "all");
   const nextPath = safeNextPath(formData.get("next"), `/la-so/${chartId}`);
-  const user = await getReadingUser(chartId);
+  const user = await getReadingUser(chartId, nextPath);
 
   const result = await unlockReadingForUser(
     {

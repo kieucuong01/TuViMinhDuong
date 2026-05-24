@@ -1,11 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { ChevronDown, Coins, FileText, LogOut, ShieldCheck, UserCircle } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { logoutAction } from "@/app/actions";
 import { CoinTopupLink } from "@/components/coin-topup-link";
+import { loginModalHref } from "@/components/login-modal-link";
 import { LoadingSubmitButton } from "@/components/loading-submit-button";
 
 type HeaderUser = {
@@ -18,6 +19,7 @@ type HeaderUser = {
 
 export function UserHeaderBadge() {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const [user, setUser] = useState<HeaderUser | null>(null);
   const [temporaryFullAccess, setTemporaryFullAccess] = useState(false);
   const [loaded, setLoaded] = useState(false);
@@ -37,7 +39,7 @@ export function UserHeaderBadge() {
     return () => {
       controller.abort();
     };
-  }, [pathname]);
+  }, [pathname, searchParams]);
 
   useEffect(() => {
     function refreshUser() {
@@ -65,6 +67,14 @@ export function UserHeaderBadge() {
     };
   }, []);
 
+  const loginHref = useMemo(() => {
+    if (pathname.startsWith("/dang-nhap")) return "/dang-nhap";
+    const params = new URLSearchParams(searchParams.toString());
+    ["login", "next", "authError"].forEach((key) => params.delete(key));
+    const returnTo = `${pathname}${params.toString() ? `?${params}` : ""}`;
+    return loginModalHref(pathname, searchParams, returnTo);
+  }, [pathname, searchParams]);
+
   if (!loaded) {
     return (
       <div className="user-header-skeleton" aria-hidden="true">
@@ -75,7 +85,7 @@ export function UserHeaderBadge() {
 
   if (!user) {
     return (
-      <Link href="/dang-nhap" className="login-link btn btn-small btn-ghost" prefetch={false}>
+      <Link href={loginHref} className="login-link btn btn-small btn-ghost" prefetch={false}>
         Đăng nhập
       </Link>
     );

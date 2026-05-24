@@ -5,6 +5,7 @@ import { Suspense } from "react";
 import { SiteHeader } from "@/components/site-header";
 import { GlobalLoadingToast } from "@/components/global-loading-toast";
 import { CoinTopupModal } from "@/components/coin-topup-modal";
+import { LoginModal } from "@/components/login-modal";
 import { ClientErrorReporter } from "@/components/client-error-reporter";
 import { APP_NAME, APP_URL } from "@/lib/env";
 import "./globals.css";
@@ -61,6 +62,9 @@ export default function RootLayout({
         </Suspense>
         <Suspense fallback={null}>
           <CoinTopupModal />
+        </Suspense>
+        <Suspense fallback={null}>
+          <LoginModal />
         </Suspense>
         <ClientErrorReporter />
         <Analytics />
