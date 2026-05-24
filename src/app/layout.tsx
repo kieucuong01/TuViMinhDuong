@@ -7,7 +7,8 @@ import { GlobalLoadingToast } from "@/components/global-loading-toast";
 import { CoinTopupModal } from "@/components/coin-topup-modal";
 import { LoginModal } from "@/components/login-modal";
 import { ClientErrorReporter } from "@/components/client-error-reporter";
-import { APP_NAME, APP_URL } from "@/lib/env";
+import { GoogleAnalytics } from "@/components/google-analytics";
+import { APP_NAME, APP_URL, GOOGLE_SITE_VERIFICATION } from "@/lib/env";
 import "./globals.css";
 
 const defaultOgImage = `/api/og?title=${encodeURIComponent("Lập lá số tử vi miễn phí")}&subtitle=${encodeURIComponent("Xem lá số, xem ngày và luận giải dễ hiểu")}`;
@@ -42,6 +43,13 @@ export const metadata: Metadata = {
     icon: [{ url: "/favicon.svg", type: "image/svg+xml" }],
     shortcut: "/favicon.svg",
   },
+  ...(GOOGLE_SITE_VERIFICATION
+    ? {
+        verification: {
+          google: GOOGLE_SITE_VERIFICATION,
+        },
+      }
+    : {}),
 };
 
 export default function RootLayout({
@@ -67,6 +75,7 @@ export default function RootLayout({
           <LoginModal />
         </Suspense>
         <ClientErrorReporter />
+        <GoogleAnalytics />
         <Analytics />
         <SpeedInsights />
       </body>
