@@ -75,17 +75,17 @@ export function DayFortuneCard() {
       <div className="pointer-events-none absolute -left-16 top-10 h-40 w-72 rotate-[-10deg] rounded-full bg-white/70 blur-xl" />
       <div className="pointer-events-none absolute -bottom-24 -right-20 h-52 w-52 rounded-full border-[22px] border-orange-200/30" />
 
-      <div className="relative grid gap-6 sm:grid-cols-[1fr_13rem] sm:items-center">
+      <div className="day-fortune-top relative grid gap-6 sm:grid-cols-[1fr_13rem] sm:items-center">
         <div>
           <div className="flex items-center gap-2 text-sm font-bold text-orange-900">
             <CalendarDays size={18} />
             <span>{fortune.weekday}</span>
           </div>
-          <div className="mt-4 flex items-end gap-3">
-            <strong className="text-7xl font-black leading-none text-orange-900">{fortune.day}</strong>
-            <span className="pb-2 text-xl font-black text-orange-900">Tháng {fortune.month} năm {fortune.year}</span>
+          <div className="day-fortune-date-row mt-4 flex items-end gap-3">
+            <strong className="day-fortune-day-number text-7xl font-black leading-none text-orange-900">{fortune.day}</strong>
+            <span className="day-fortune-date-label pb-2 text-xl font-black text-orange-900">Tháng {fortune.month} năm {fortune.year}</span>
           </div>
-          <div className="mt-5 flex flex-wrap items-center gap-2">
+          <div className="day-fortune-badges mt-5 flex flex-wrap items-center gap-2">
             {dateHighlight ? <span className="text-sm font-bold text-rose-600">{dateHighlight.label}</span> : null}
             <span className={`rounded-full px-3 py-1 text-sm font-bold ring-1 ${fortune.statusClass}`}>
               {fortune.status}
@@ -113,7 +113,7 @@ export function DayFortuneCard() {
         </div>
       </div>
 
-      <div className="relative mt-6 grid gap-3 border-t border-white/80 pt-5 sm:grid-cols-3">
+      <div className="day-fortune-metrics relative mt-6 grid gap-3 border-t border-white/80 pt-5 sm:grid-cols-3">
         <div className="rounded-2xl bg-white/60 p-3 text-center ring-1 ring-orange-100">
           <p className="text-xs font-medium text-stone-500">Ngày</p>
           <strong className="mt-1 block text-lg text-orange-900">{fortune.dayCanChi}</strong>
@@ -128,7 +128,7 @@ export function DayFortuneCard() {
         </div>
       </div>
 
-      <div className="relative mt-5 flex flex-col gap-3 sm:flex-row">
+      <div className="day-fortune-controls relative mt-5 flex flex-col gap-3 sm:flex-row">
         <label className="flex-1">
           <span>Chọn ngày</span>
           <input type="date" value={selectedDate} onChange={(event) => setSelectedDate(event.target.value)} />
@@ -138,7 +138,7 @@ export function DayFortuneCard() {
         </Link>
       </div>
 
-      <p className="relative mt-3 flex items-start gap-2 text-sm leading-6 text-stone-600">
+      <p className="day-fortune-note relative mt-3 flex items-start gap-2 text-sm leading-6 text-stone-600">
         <Sparkles className="mt-0.5 shrink-0 text-orange-500" size={16} />
         {fortune.note}
       </p>
