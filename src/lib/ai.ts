@@ -338,6 +338,12 @@ Yêu cầu:
 - BẮT BUỘC viết từ ${FREE_OVERVIEW_MIN_WORDS} đến ${FREE_OVERVIEW_MAX_WORDS} từ tiếng Việt, không được trả lời ngắn và không vượt quá ${FREE_OVERVIEW_MAX_WORDS} từ.
 - Mỗi mục chính tối thiểu 220 từ, có nội dung thực tế dựa trên lá số.
 - Đây là bản miễn phí: chỉ nêu tổng quan và gợi ý đọc lá số, không luận chi tiết đủ 12 cung.
+- Ngay sau heading "## Tổng quan miễn phí", viết một cụm "Tóm tắt nhanh" gồm đúng 3 bullet sau, dùng đúng nhãn Markdown:
+  - **Điểm nổi bật:** nêu 1 điểm sáng chính của lá số, có dẫn chứng từ Mệnh/Thân/cục hoặc đại vận.
+  - **Nên ưu tiên:** nêu việc người đọc nên đọc hoặc làm trước để có giá trị thực tế.
+  - **Cần lưu ý:** nêu 1 rủi ro cần quản trị bằng giọng bình tĩnh, không dọa.
+- Trong toàn bài chỉ in đậm 15-20% ý quan trọng bằng cú pháp **...**; ưu tiên in đậm nhãn, thuật ngữ chính hoặc lời khuyên ngắn, không in đậm cả đoạn dài.
+- Mỗi mục còn lại nên có 1-2 cụm nhấn mạnh như **khí chất chính**, **điểm nên phát huy**, **điều cần quản trị**, **gợi ý đọc tiếp** để người đọc dễ quét trên điện thoại.
 - Markdown đúng thứ tự:
   ## Tổng quan miễn phí
   ## Mệnh và Thân nói gì
@@ -363,25 +369,30 @@ Lá số của ${chart.input.fullName} được lập theo năm xem ${chart.inpu
 
 ${chart.summary.join(" ")}
 
+Tóm tắt nhanh:
+- **Điểm nổi bật:** ${chart.summary[0] || `Mệnh ${chart.menh}, Thân ${chart.than} và ${chart.cuc} là trục chính cần đọc trước.`}
+- **Nên ưu tiên:** đọc Mệnh, Thân và đại vận hiện tại để hiểu nhịp hành động trong năm ${chart.input.viewYear}.
+- **Cần lưu ý:** dùng phần này như bản định hướng để quản trị rủi ro, không xem như kết luận tuyệt đối.
+
 ## Mệnh và Thân nói gì
-- Mệnh thuộc ${chart.menh}, cục là ${chart.cuc}, âm dương là ${chart.amDuong}.
-- Cung Mệnh có ${menhStars}. Đây là nhóm tín hiệu dùng để đọc khí chất, cách phản ứng và xu hướng phát triển ban đầu.
-- ${chart.than} có ${thanStars}. Thân thường cho thấy môi trường hành động rõ hơn khi trưởng thành.
+- **Khí chất chính:** Mệnh thuộc ${chart.menh}, cục là ${chart.cuc}, âm dương là ${chart.amDuong}.
+- **Cung Mệnh:** có ${menhStars}. Đây là nhóm tín hiệu dùng để đọc khí chất, cách phản ứng và xu hướng phát triển ban đầu.
+- **Cung Thân:** ${chart.than} có ${thanStars}. Thân thường cho thấy môi trường hành động rõ hơn khi trưởng thành.
 
 ## Điểm mạnh dễ phát huy
-- Nên phát huy những việc có kế hoạch rõ, làm từng bước và có kiểm chứng.
-- Khi đã chọn được hướng chính, bạn dễ ổn định hơn nếu giữ nhịp làm việc đều.
-- Các cung sáng trong lá số nên được xem như vùng có thể chủ động mở rộng.
+- **Điểm nên phát huy:** những việc có kế hoạch rõ, làm từng bước và có kiểm chứng.
+- **Nhịp làm việc:** khi đã chọn được hướng chính, bạn dễ ổn định hơn nếu giữ nhịp đều.
+- **Vùng có thể mở rộng:** các cung sáng trong lá số nên được xem như nơi có thể chủ động đầu tư thêm thời gian và nguồn lực.
 
 ## Điều nên lưu ý
-- Tử vi nên được dùng như bản tham khảo để quản trị rủi ro, không phải kết luận tuyệt đối.
-- Nếu gặp sao hãm, sát tinh hoặc vận khó, nên hiểu đó là lời nhắc để làm chậm lại, kiểm tra kỹ tiền bạc, giấy tờ và quan hệ.
-- Tránh quyết định lớn khi cảm xúc đang mạnh hoặc thông tin chưa đủ rõ.
+- **Điều cần quản trị:** tử vi nên được dùng như bản tham khảo để quản trị rủi ro, không phải kết luận tuyệt đối.
+- **Khi gặp sao hãm hoặc vận khó:** nên hiểu đó là lời nhắc để làm chậm lại, kiểm tra kỹ tiền bạc, giấy tờ và quan hệ.
+- **Trước quyết định lớn:** tránh hành động khi cảm xúc đang mạnh hoặc thông tin chưa đủ rõ.
 
 ## Gợi ý cho năm ${chart.input.viewYear}
-- Ưu tiên việc có nền tảng, có người hỗ trợ và có kế hoạch dự phòng.
-- Việc mới nên thử nhỏ trước, sau đó mới mở rộng.
-- Nếu muốn đọc sâu hơn, nên xem tiếp phần luận giải toàn bộ để nối Mệnh, Thân, 12 cung và vận hạn thành một bức tranh đầy đủ hơn.`;
+- **Ưu tiên:** việc có nền tảng, có người hỗ trợ và có kế hoạch dự phòng.
+- **Cách thử việc mới:** nên thử nhỏ trước, sau đó mới mở rộng.
+- **Gợi ý đọc tiếp:** nếu muốn đọc sâu hơn, nên xem tiếp phần luận giải toàn bộ để nối Mệnh, Thân, 12 cung và vận hạn thành một bức tranh đầy đủ hơn.`;
 }
 
 export async function generateFreeOverview(chart: TuViChart) {
@@ -501,6 +512,42 @@ export function paidReadingChapters(chart: TuViChart, type: ReadingKey): PaidRea
   ];
 }
 
+function paidReadingQualityRules() {
+  return `Khung chất lượng bắt buộc để bài trả phí có cảm giác "wow":
+- Tránh hiệu ứng Barnum: không viết lời phán ai đọc cũng thấy đúng. Mỗi luận điểm quan trọng phải gắn với một tình huống cụ thể trong đời sống, ví dụ cách làm việc, cách giữ tiền, cách chọn người hợp tác, kiểu xung đột dễ gặp hoặc phản ứng tâm lý khi bị áp lực.
+- Chuyển đặc tính thành vũ khí và cạm bẫy: với mỗi nét nổi bật, phải nói rõ nó giúp người đọc thắng ở đâu, và khi quá đà sẽ hại họ ở đâu. Không dừng lại ở mô tả tốt/xấu.
+- Văn phong uyên bác nhưng thấu cảm: thuật ngữ tử vi phải đi kèm diễn giải đời sống hiện đại ngay sau đó. Giữ thuật ngữ như Hóa Lộc, Tuần, Triệt, Kình Dương khi cần làm bằng chứng, nhưng không để danh sách sao lấn át trải nghiệm đọc.
+- Actionable Advice: cuối mỗi phần phải có lời khuyên rõ việc nên làm, nên tránh, môi trường nên chọn, kiểu người/đối tác nên thận trọng, và cách cân bằng nhược điểm.
+- Ẩn giàn giáo dữ liệu: không bê nguyên bảng sao dài vào thân bài. Phần dữ kiện chỉ chọn 3-5 bằng chứng mạnh nhất rồi chuyển ngay sang câu chuyện ứng dụng.
+- Luôn có một câu nối thời gian: Quá khứ -> nguyên nhân hiện tại -> định hướng tương lai, nhất là khi luận đại vận, tiểu vận, nguyệt vận hoặc nhật vận.`;
+}
+
+function paidTemporalGuidance(chart: TuViChart, type: ReadingKey, scopeKey: string) {
+  const viewYear = chart.input.viewYear;
+  const currentAge = chartAge(chart);
+  const yearFromScope =
+    Number(scopeKey.match(/^tieu-(\d{4})$/)?.[1]) ||
+    Number(scopeKey.match(/^(\d{4})-\d{2}(?:-\d{2})?$/)?.[1]) ||
+    (type === "FULL" ? viewYear : 0);
+  const range = scopeKey.match(/^(\d+)-(\d+)$/);
+  const rangeEnd = range ? Number(range[2]) : null;
+  const isPastYear = Boolean(yearFromScope && yearFromScope < viewYear);
+  const isPastAgeRange = rangeEnd !== null && rangeEnd < currentAge;
+
+  if (isPastYear || isPastAgeRange) {
+    return `Bối cảnh thời gian: Phạm vi này nằm trong quá khứ so với năm xem ${viewYear}.
+- không khuyên người đọc làm việc trong năm đã qua. Hãy đọc giai đoạn đó như nguyên nhân, vết hằn, tài sản ngầm hoặc bài học còn ảnh hưởng đến hiện tại.
+- Quá khứ -> nguyên nhân hiện tại -> định hướng tương lai: bắt buộc có một đoạn giải thích vì sao người đọc cần nhìn lại giai đoạn này vào lúc này.
+- Khi nói về chuyện đã qua, không dùng cụm "có thể bạn đã". Hãy dùng giọng khẳng định mềm và thấu cảm như "giai đoạn này thường để lại...", "dấu ấn này dễ khiến...", "bài học còn sót lại là...".
+- Phần gợi ý nên tập trung xử lý tàn dư của giai đoạn cũ: gỡ lớp phòng thủ, khai thác kỹ năng/tài sản ngầm, hàn gắn hoặc buông bỏ triệt để các mâu thuẫn còn kéo dài.`;
+  }
+
+  return `Bối cảnh thời gian: Phạm vi này thuộc hiện tại hoặc tương lai gần so với năm xem ${viewYear}.
+- Viết theo hướng tham vấn hành động: người đọc nên ưu tiên gì trước, nên trì hoãn gì, dấu hiệu nào cần theo dõi lại.
+- Nếu có rủi ro, chuyển thành kế hoạch quản trị: giảm tốc, kiểm tra giấy tờ/tiền bạc/sức khỏe/quan hệ, đặt mốc đánh giá lại.
+- Nếu có điểm sáng, chỉ rõ cách biến nó thành lợi thế thực tế trong công việc, tiền bạc, quan hệ hoặc nhịp sống.`;
+}
+
 export function paidReadingChapterPrompt(
   chart: TuViChart,
   type: ReadingKey,
@@ -516,6 +563,7 @@ export function paidReadingChapterPrompt(
   const isFullReport = type === "FULL";
   const unitName = isFullReport ? "chương" : "phần luận giải";
   const startLine = isFullReport ? `# ${chapter.title}` : `# ${FEATURE_PRICES[type].label}: ${scopeKey}`;
+  const temporalGuidance = paidTemporalGuidance(chart, type, scopeKey);
 
   return `Bạn là chuyên gia tử vi Việt Nam. Hãy viết ${unitName} ${isFullReport ? `${chapter.title} (${index + 1}/${total})` : "đang mở khóa"} cho báo cáo trả phí.
 
@@ -533,6 +581,10 @@ Trọng tâm dữ liệu: ${focus.title}
 
 Dữ liệu nổi bật:
 - ${focus.evidence.join("\n- ")}
+
+${paidReadingQualityRules()}
+
+${temporalGuidance}
 
 Dữ kiện các cung trọng yếu:
 ${compactImportantPalaces(chart)}
@@ -552,8 +604,8 @@ Yêu cầu bắt buộc:
 - Bắt đầu bằng đúng dòng Markdown: ${startLine}
 - Phải có đúng các heading dưới đây, đúng thứ tự:
 ${sectionLines}
-- Ở phần dữ kiện: ghi ngắn cung/sao/trạng thái sao (M/V/Đ/B/H) và sao lưu niên/vận hạn liên quan.
-- Ở phần luận giải: giải thích sâu, nhưng mỗi đoạn tối đa 3-4 dòng khi đọc trên điện thoại.
+- Ở phần dữ kiện: chỉ ghi 3-5 bằng chứng tử vi mạnh nhất, có thể nêu trạng thái sao (M/V/Đ/B/H), nhưng không liệt kê giàn giáo dữ liệu dài. Mỗi bằng chứng phải có một câu diễn giải đời sống đi kèm.
+- Ở phần luận giải: giải thích sâu bằng các tình huống cụ thể, nhưng mỗi đoạn tối đa 3-4 dòng khi đọc trên điện thoại.
 - Ở phần lưu ý: mọi sao hãm, sát tinh, lưu sát tinh phải chuyển thành lời khuyên quản trị rủi ro; không dọa, không kết luận tuyệt đối.
 - Ở phần gợi ý: dùng ít nhất 3 bullet hành động rõ việc nên làm, nên tránh, nhịp kiểm tra lại.
 - Nếu là vận năm hoặc nguyệt/nhật vận, hãy nêu trọng tâm thời gian đang mở khóa thật cụ thể.

@@ -65,6 +65,9 @@ describe("AI reading format", () => {
     expect(prompt).toContain(String(FREE_OVERVIEW_MIN_WORDS));
     expect(prompt).toContain(String(FREE_OVERVIEW_MAX_WORDS));
     expect(prompt).toContain("1 prompt");
+    expect(prompt).toContain("Tóm tắt nhanh");
+    expect(prompt).toContain("**Điểm nổi bật:**");
+    expect(prompt).toContain("**Cần lưu ý:**");
     expect(prompt).toContain("QUY TẮC ĐỘ DÀI");
   });
 
@@ -110,6 +113,47 @@ describe("AI reading format", () => {
     expect(prompt).toContain("sao lưu niên");
     expect(prompt).toContain("đủ 12 tháng");
     expect(prompt).toContain("Không tự tính lại lá số");
+  });
+
+  it("guides paid readings away from generic Barnum copy and toward concrete value", () => {
+    const chart = sampleChart("male");
+    const chapters = paidReadingChapters(chart, "PALACE");
+    const prompt = paidReadingChapterPrompt(
+      chart,
+      "PALACE",
+      "Mệnh",
+      { title: "Cung Mệnh", evidence: ["Mệnh có Thiên Tướng (H)", "Thân cư Mệnh"] },
+      chapters[0],
+      0,
+      chapters.length,
+    );
+
+    expect(prompt).toContain("Tránh hiệu ứng Barnum");
+    expect(prompt).toContain("tình huống cụ thể");
+    expect(prompt).toContain("vũ khí");
+    expect(prompt).toContain("cạm bẫy");
+    expect(prompt).toContain("thuật ngữ tử vi phải đi kèm diễn giải đời sống");
+    expect(prompt).toContain("Actionable Advice");
+  });
+
+  it("adapts past fate readings into present-cause and future-direction prompts", () => {
+    const chart = sampleChart();
+    const chapters = paidReadingChapters(chart, "TIEU_VAN");
+    const prompt = paidReadingChapterPrompt(
+      chart,
+      "TIEU_VAN",
+      "tieu-2023",
+      { title: "Tiểu vận năm 2023", evidence: ["Lưu niên có Kình Dương, Tuế Phá", "Văn Xương, Văn Khúc hội chiếu"] },
+      chapters[0],
+      0,
+      chapters.length,
+    );
+
+    expect(prompt).toContain("Phạm vi này nằm trong quá khứ so với năm xem 2026");
+    expect(prompt).toContain("không khuyên người đọc làm việc trong năm đã qua");
+    expect(prompt).toContain("Quá khứ -> nguyên nhân hiện tại -> định hướng tương lai");
+    expect(prompt).toContain('không dùng cụm "có thể bạn đã"');
+    expect(prompt).toContain("tàn dư của giai đoạn cũ");
   });
 
   it("uses focused section format for palace and fate item readings", () => {
