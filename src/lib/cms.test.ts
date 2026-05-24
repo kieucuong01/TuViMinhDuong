@@ -62,6 +62,21 @@ describe("admin article CMS", () => {
     await expect(listArticles()).resolves.not.toEqual(expect.arrayContaining([expect.objectContaining({ slug })]));
   });
 
+  it("deletes articles from admin and public CMS lists", async () => {
+    const { deleteArticleBySlug, getAdminArticleBySlug, getArticleBySlug, listAdminArticles, listArticles, saveArticleFromForm } = await import("@/lib/data");
+    const slug = `cms-delete-${Date.now()}`;
+
+    await saveArticleFromForm(articleForm(slug, "published"));
+    await expect(listAdminArticles()).resolves.toEqual(expect.arrayContaining([expect.objectContaining({ slug })]));
+
+    await expect(deleteArticleBySlug(slug)).resolves.toBe(true);
+
+    await expect(getArticleBySlug(slug)).resolves.toBeNull();
+    await expect(getAdminArticleBySlug(slug)).resolves.toBeNull();
+    await expect(listAdminArticles()).resolves.not.toEqual(expect.arrayContaining([expect.objectContaining({ slug })]));
+    await expect(listArticles()).resolves.not.toEqual(expect.arrayContaining([expect.objectContaining({ slug })]));
+  });
+
   it("saves article FAQs from the editor and exposes them on public articles", async () => {
     const { getArticleBySlug, saveArticleFromForm } = await import("@/lib/data");
     const slug = `cms-faq-${Date.now()}`;

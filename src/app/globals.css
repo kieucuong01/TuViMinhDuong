@@ -1171,6 +1171,20 @@ button.is-loading:not(.icon-button)::before {
   @apply border-orange-200 bg-white/80 text-orange-900 shadow-sm backdrop-blur hover:bg-orange-50;
 }
 
+.btn-danger {
+  border-color: #fecaca;
+  background: #fff;
+  color: #991b1b;
+  padding: 0.82rem 1.2rem;
+  box-shadow: 0 10px 24px rgb(153 27 27 / 0.08);
+}
+
+.btn-danger:hover {
+  background: #fef2f2;
+  border-color: #fca5a5;
+  box-shadow: 0 14px 30px rgb(153 27 27 / 0.12);
+}
+
 .btn-small {
   min-height: 2.8rem;
   padding: 0.62rem 0.95rem;

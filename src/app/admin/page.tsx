@@ -6,6 +6,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { getAdminArticleBySlug, getAdminOverview, listAdminArticles, listArticleCategories } from "@/lib/data";
 import type { ArticleView } from "@/lib/content";
 import { LoadingSubmitButton } from "@/components/loading-submit-button";
+import { AdminArticleDeleteForm } from "@/components/admin-article-delete-form";
 
 export const metadata = {
   title: "Admin",
@@ -68,7 +69,7 @@ function seoChecks(article: ArticleView) {
     .filter(Boolean) as Array<{ label: string; passed: boolean; hint: string }>;
 }
 
-export default async function AdminPage({ searchParams }: { searchParams: Promise<{ saved?: string; edit?: string; categorySaved?: string }> }) {
+export default async function AdminPage({ searchParams }: { searchParams: Promise<{ saved?: string; edit?: string; categorySaved?: string; deleted?: string }> }) {
   const user = await getCurrentUser();
   if (user?.role !== "ADMIN") redirect("/dang-nhap?next=/admin");
 
@@ -99,6 +100,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
 
         {params.saved ? <p className="success mt-4">Đã lưu bài viết: {params.saved}</p> : null}
         {params.categorySaved ? <p className="success mt-4">Đã lưu danh mục: {params.categorySaved}</p> : null}
+        {params.deleted ? <p className="success mt-4">Đã xóa bài viết: {params.deleted}</p> : null}
 
         <div className="mt-6 grid gap-4 md:grid-cols-5">
           {[
@@ -307,6 +309,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
                       {item.status === "published" ? (
                         <Link href={`/kien-thuc-tu-vi/${item.slug}`} className="btn btn-ghost btn-small" prefetch={false}>Xem</Link>
                       ) : null}
+                      <AdminArticleDeleteForm slug={item.slug} title={item.title} />
                     </div>
                   </article>
                 ))}

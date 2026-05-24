@@ -3,7 +3,7 @@
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { clearSession, createMagicSession, getCurrentUser, getOrCreateEmailUser, loginOrRegister, setSession, type SessionUser } from "@/lib/auth";
-import { getCachedReading, getChart, getFeaturePrice, getUserBalance, saveArticleCategoryFromForm, saveArticleFromForm, saveChart, saveReading, adjustCoins, deleteUserChart } from "@/lib/data";
+import { getCachedReading, getChart, getFeaturePrice, getUserBalance, saveArticleCategoryFromForm, saveArticleFromForm, saveChart, saveReading, adjustCoins, deleteArticleBySlug, deleteUserChart } from "@/lib/data";
 import { generateReading } from "@/lib/ai";
 import { getDb } from "@/lib/db";
 import { createPayOSCheckout, createPayOSCustomCheckout } from "@/lib/payos";
@@ -252,6 +252,19 @@ export async function saveArticleAction(formData: FormData) {
   if (originalSlug && originalSlug !== article.slug) revalidatePath(`/kien-thuc-tu-vi/${originalSlug}`);
   revalidatePath(`/kien-thuc-tu-vi/${article.slug}`);
   redirect(`/admin?edit=${article.slug}&saved=${article.slug}`);
+}
+
+export async function deleteArticleAction(formData: FormData) {
+  const user = await getCurrentUser();
+  if (user?.role !== "ADMIN") redirect("/dang-nhap?next=/admin");
+  const slug = String(formData.get("slug") || "");
+  if (slug) {
+    await deleteArticleBySlug(slug);
+    revalidatePath("/admin");
+    revalidatePath("/kien-thuc-tu-vi");
+    revalidatePath(`/kien-thuc-tu-vi/${slug}`);
+  }
+  redirect(`/admin${slug ? `?deleted=${encodeURIComponent(slug)}` : ""}`);
 }
 
 export async function saveArticleCategoryAction(formData: FormData) {

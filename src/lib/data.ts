@@ -47,6 +47,8 @@ type ArticleRecord = Omit<ArticleView, "faqs"> & {
   faqs?: unknown;
 };
 
+const DELETED_ARTICLE_STATUS = "deleted";
+
 export type ChartHistoryItem = StoredChart & {
   hasAdvancedReading: boolean;
   advancedReadingId?: string;
@@ -622,7 +624,7 @@ export async function listArticles() {
   let articles: ArticleRecord[] = [];
   try {
     articles = (await db.article.findMany({
-      where: { status: "published" },
+      where: { status: { in: ["published", DELETED_ARTICLE_STATUS] } },
       include: { category: true },
       orderBy: [{ publishedAt: "desc" }, { createdAt: "desc" }],
     })) as unknown as ArticleRecord[];
@@ -631,6 +633,10 @@ export async function listArticles() {
   }
   const bySlug = new Map(seedArticles.map((article) => [article.slug, articleWithNormalizedRelations(article)]));
   for (const article of articles) {
+    if (article.status === DELETED_ARTICLE_STATUS) {
+      bySlug.delete(article.slug);
+      continue;
+    }
     bySlug.set(article.slug, articleWithNormalizedRelations(article));
   }
   return sortArticlesNewestFirst(Array.from(bySlug.values()));
@@ -646,6 +652,10 @@ export async function listAdminArticles() {
     })) as unknown as ArticleRecord[];
     const bySlug = new Map(seedArticles.map((article) => [article.slug, articleWithNormalizedRelations(article)]));
     for (const article of articles) {
+      if (article.status === DELETED_ARTICLE_STATUS) {
+        bySlug.delete(article.slug);
+        continue;
+      }
       bySlug.set(article.slug, articleWithNormalizedRelations(article));
     }
     return sortArticlesNewestFirst(Array.from(bySlug.values()));
@@ -680,10 +690,63 @@ export async function getAdminArticleBySlug(slug: string) {
   }
   try {
     const article = await db.article.findUnique({ where: { slug }, include: { category: true } });
+    if (article?.status === DELETED_ARTICLE_STATUS) return null;
     return article ? articleWithNormalizedRelations(article as unknown as ArticleRecord) : seedArticles.map(articleWithNormalizedRelations).find((item) => item.slug === slug) || null;
   } catch {
     return seedArticles.map(articleWithNormalizedRelations).find((item) => item.slug === slug) || null;
   }
+}
+
+export async function deleteArticleBySlug(slug: string) {
+  const normalizedSlug = slugify(slug);
+  if (!normalizedSlug) return false;
+
+  const db = getDb();
+  if (!db) {
+    return demoArticles().delete(normalizedSlug);
+  }
+
+  const existing = await db.article.findUnique({ where: { slug: normalizedSlug } });
+  if (existing) {
+    await db.article.update({
+      where: { id: existing.id },
+      data: {
+        status: DELETED_ARTICLE_STATUS,
+        publishedAt: null,
+        robots: "noindex,nofollow",
+      },
+    });
+    return true;
+  }
+
+  const seed = seedArticles.find((article) => article.slug === normalizedSlug);
+  if (!seed) return false;
+
+  await db.article.create({
+    data: {
+      title: seed.title,
+      slug: seed.slug,
+      excerpt: seed.excerpt,
+      content: seed.content,
+      status: DELETED_ARTICLE_STATUS,
+      coverImage: seed.coverImage,
+      coverAlt: seed.coverAlt,
+      focusKeyword: seed.focusKeyword,
+      metaTitle: seed.metaTitle,
+      metaDescription: seed.metaDescription,
+      canonicalUrl: seed.canonicalUrl,
+      robots: "noindex,nofollow",
+      ogImage: seed.ogImage,
+      ogTitle: seed.ogTitle,
+      ogDescription: seed.ogDescription,
+      schemaType: seed.schemaType || "Article",
+      faqs: seed.faqs || [],
+      seoScore: seed.seoScore || 0,
+      seoChecklist: seed.seoChecklist || [],
+      publishedAt: null,
+    },
+  });
+  return true;
 }
 
 export async function listArticleCategories() {
@@ -841,7 +904,7 @@ export async function getAdminOverview() {
     db.user.count(),
     db.chart.count(),
     db.reading.count(),
-    db.article.count(),
+    db.article.count({ where: { status: { not: DELETED_ARTICLE_STATUS } } }),
     db.paymentOrder.count(),
     db.coinPackage.findMany({ orderBy: { priceVnd: "asc" } }),
     db.featurePrice.findMany(),
