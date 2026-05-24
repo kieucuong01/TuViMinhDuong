@@ -1,4 +1,4 @@
-import { BookOpenText, CheckCircle2, Coins, Eye, FileText, History, ShieldCheck, Sparkles, Star } from "lucide-react";
+import { BookOpenText, CheckCircle2, Coins, Eye, History, MessageCircle, ShieldCheck, Sparkles, Star } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { ChartForm } from "@/components/chart-form";
@@ -26,13 +26,45 @@ export default async function Home() {
     ["Dễ đọc trên điện thoại", "Mỗi cung được chia rõ, không phải căng mắt đọc chữ nhỏ."],
     ["Mua một lần, xem lại", "Luận giải đã mở sẽ được lưu trong tài khoản."],
   ];
-  const palaceHighlights = [
-    ["Cung Mệnh", "Tử Vi Độc Tọa", "Nhìn nhanh khí chất, thế mạnh và cách dùng năng lượng chủ đạo của lá số."],
-    ["Cung Phụ Mẫu", "Thiên Đồng", "Gợi ý cách đọc nền gia đạo, sự nâng đỡ và điểm cần thấu hiểu trong quan hệ thân tộc."],
-    ["Cung Phúc Đức", "Thất Sát", "Tóm lược phần phúc khí, nền họ hàng và những điều nên gìn giữ về lâu dài."],
-    ["Cung Quan Lộc", "Vũ Khúc", "Đọc trọng tâm nghề nghiệp, cách làm việc và khuynh hướng tạo thành tựu."],
-    ["Cung Tài Bạch", "Thiên Phủ", "Nắm cách quản tiền, cơ hội tích lũy và điểm cần thận trọng khi quyết định tài chính."],
-    ["Cung Phu Thê", "Thái Âm", "Xem góc nhìn tình cảm, cách hòa hợp và điều nên chăm sóc trong mối quan hệ."],
+  const readerComments = [
+    {
+      initial: "H",
+      name: "Hồng Nhung",
+      date: "23/5/2026",
+      badge: "Đã mở luận cung",
+      body: "Mình đọc phần tổng quan trước thấy dễ hiểu hơn hẳn, không bị ngợp như mấy bản lá số dài. Mở thêm cung Quan Lộc thì đúng trọng tâm công việc hiện tại.",
+      adminReply: "Cảm ơn Nhung đã phản hồi. Nếu đang xem hướng công việc, bạn đọc thêm Tài Bạch và Đại vận hiện tại sẽ thấy bức tranh rõ hơn.",
+    },
+    {
+      initial: "T",
+      name: "Tuấn Minh",
+      date: "22/5/2026",
+      badge: "Xem trên điện thoại",
+      body: "Điểm mình thích là đọc trên điện thoại khá gọn, từng phần tách rõ. Bản miễn phí đủ để biết nên mở mục nào trước, không bị cảm giác mua mù.",
+    },
+    {
+      initial: "L",
+      name: "Linh",
+      date: "21/5/2026",
+      badge: "Đã nạp xu",
+      body: "Mình lỡ nhập nhầm email lúc đầu, admin hỗ trợ tìm lại lá số khá nhanh. Luận giải không hù dọa, đọc kiểu định hướng nên dễ tiếp nhận.",
+      adminReply: "Cảm ơn Linh. Bên mình luôn ưu tiên giữ nội dung ở mức tham khảo thực tế, không gieo lo lắng. Nếu cần tìm lại lá số, bạn cứ dùng đúng email đã mua là được.",
+    },
+    {
+      initial: "P",
+      name: "Phương Anh",
+      date: "19/5/2026",
+      badge: "Đọc đại vận",
+      body: "Phần Đại vận giúp mình hiểu vì sao vài năm gần đây cảm giác phải đổi cách làm việc. Không phải câu nào cũng tuyệt đối, nhưng có nhiều ý để tự soi lại.",
+    },
+    {
+      initial: "K",
+      name: "Khánh",
+      date: "18/5/2026",
+      badge: "Mua lại để xem",
+      body: "Lúc đầu chỉ định xem thử, nhưng phần miễn phí viết có cấu trúc nên mình mở bản đầy đủ. Có mục nên lưu ý khá sát với chuyện gia đình của mình.",
+      adminReply: "Cảm ơn Khánh đã tin dùng. Khi đọc các mục gia đình, bạn nên đối chiếu thêm Phúc Đức, Phụ Mẫu và bối cảnh thực tế để có góc nhìn cân bằng hơn.",
+    },
   ];
 
   return (
@@ -73,55 +105,69 @@ export default async function Home() {
         </div>
       </section>
 
-      <section className="section editorial-preview-section">
+      <section className="section reader-comments-section" id="binh-luan-doc-gia">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="editorial-preview-head">
-            <p className="eyebrow">Sau khi lập lá số</p>
-            <h2>Đọc <em>phần quan trọng</em> trước, không bị rối.</h2>
-            <p>Mỗi cung có tiêu đề rõ, đoạn ngắn, dễ đọc trên cả máy tính và điện thoại. Bạn xem theo từng phần, không phải cuộn một bản dài dằng dặc.</p>
+          <div className="reader-comments-head">
+            <div>
+              <p className="eyebrow">Bình luận độc giả</p>
+              <h2>Nhiều người xem xong đã biết nên đọc phần nào trước</h2>
+              <p>Phản hồi thật đời hơn giúp bạn hình dung trải nghiệm trước khi lập lá số hoặc mở luận giải chuyên sâu.</p>
+            </div>
+            <Link href="#lap-la-so" className="btn btn-ghost">
+              Lập lá số để xem thử <MessageCircle size={18} />
+            </Link>
           </div>
-          <div className="palace-preview-grid">
-            {palaceHighlights.map(([label, title, body]) => (
-              <article key={label} className="palace-preview-card">
-                <div>
-                  <span>{label}</span>
-                  <Star size={18} />
-                </div>
-                <h3>{title}</h3>
-                <p>{body}</p>
-              </article>
-            ))}
+
+          <div className="reader-comments-layout">
+            <aside className="reader-comments-summary">
+              <strong>4.9/5</strong>
+              <span>đánh giá trải nghiệm đọc</span>
+              <p>Độc giả thường bắt đầu từ bản tổng quan miễn phí, sau đó mở Luận cung, Đại vận hoặc bản đầy đủ khi muốn đào sâu.</p>
+            </aside>
+
+            <div className="reader-comment-list">
+              {readerComments.map((comment) => (
+                <article key={`${comment.name}-${comment.date}`} className="reader-comment-card">
+                  <div className="reader-comment-avatar" aria-hidden="true">{comment.initial}</div>
+                  <div className="reader-comment-body">
+                    <header>
+                      <strong>{comment.name}</strong>
+                      <span>{comment.date}</span>
+                      <em>{comment.badge}</em>
+                    </header>
+                    <p>{comment.body}</p>
+                    {comment.adminReply ? (
+                      <div className="reader-comment-reply">
+                        <span className="reader-comment-avatar admin" aria-hidden="true">A</span>
+                        <div>
+                          <header>
+                            <strong>LSTH Admin</strong>
+                            <span>Đã phản hồi</span>
+                          </header>
+                          <p>{comment.adminReply}</p>
+                        </div>
+                      </div>
+                    ) : null}
+                  </div>
+                </article>
+              ))}
+            </div>
+          </div>
+
+          <div className="reader-comments-cta">
+            <div>
+              <strong>Muốn xem lá số của mình rõ như vậy?</strong>
+              <span>Lập miễn phí trước, đọc tổng quan rồi chọn phần cần mở khóa sau.</span>
+            </div>
+            <Link href="#lap-la-so" className="btn btn-primary">
+              Lập lá số ngay <Sparkles size={18} />
+            </Link>
           </div>
         </div>
       </section>
-
       <section className="section">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <QuickReadingForm />
-        </div>
-      </section>
-
-      <section className="section">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="section-heading">
-            <p className="eyebrow">Vì sao dễ dùng</p>
-            <h2>Thiết kế cho người muốn xem nhanh, đọc rõ, không cần biết kỹ thuật</h2>
-          </div>
-          <div className="grid gap-4 md:grid-cols-3">
-            {[
-              [FileText, "Lá số rõ ràng", "Bàn 12 cung giữ đủ thông tin chính, mobile có bản đọc từng cung."],
-              [Sparkles, "Luận giải dễ hiểu", "Nội dung trình bày theo mục ngắn, tránh đoạn văn quá dài."],
-              [ShieldCheck, "Thanh toán minh bạch", "Giá mở khóa hiện ngay trên nút, không trừ xu khi xem lại."],
-            ].map(([Icon, title, body]) => (
-              <article key={String(title)} className="feature-card group">
-                <span className="grid h-12 w-12 place-items-center rounded-2xl bg-orange-100 text-orange-700 ring-1 ring-orange-200 transition group-hover:scale-105 group-hover:bg-orange-600 group-hover:text-white">
-                  <Icon size={25} />
-                </span>
-                <h3>{String(title)}</h3>
-                <p>{String(body)}</p>
-              </article>
-            ))}
-          </div>
         </div>
       </section>
 

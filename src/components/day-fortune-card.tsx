@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { CalendarDays, ChevronRight, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { getVietnameseDateHighlight } from "@/lib/date-fortune";
+import { solarToLunar, type LunarDate } from "@/lib/lunar";
 
 const stems = ["Giáp", "Ất", "Bính", "Đinh", "Mậu", "Kỷ", "Canh", "Tân", "Nhâm", "Quý"];
 const branches = ["Tý", "Sửu", "Dần", "Mão", "Thìn", "Tỵ", "Ngọ", "Mùi", "Thân", "Dậu", "Tuất", "Hợi"];
@@ -27,12 +28,17 @@ function getCanChi(seed: number) {
   return `${stems[((seed % 10) + 10) % 10]} ${branches[((seed % 12) + 12) % 12]}`;
 }
 
+function formatLunarDate(lunar: LunarDate) {
+  return `${lunar.day} Tháng ${lunar.month}${lunar.leap ? " nhuận" : ""} âm`;
+}
+
 function calculateFortune(date: Date) {
   const daySeed = Math.floor(date.getTime() / 86400000);
   const score = clamp(18 + ((daySeed * 37 + date.getMonth() * 11 + date.getDate() * 7) % 73), 12, 92);
   const monthSeed = date.getFullYear() * 12 + date.getMonth();
   const branchIndex = ((daySeed % 12) + 12) % 12;
   const goodHours = [branchIndex, branchIndex + 4, branchIndex + 8].map((index) => branches[index % 12]).join(", ");
+  const lunar = solarToLunar(date.getDate(), date.getMonth() + 1, date.getFullYear(), 7);
   const status = score >= 68 ? "Ngày tốt" : score >= 42 ? "Trung bình" : "Ngày xấu";
   const statusClass =
     score >= 68
@@ -48,6 +54,7 @@ function calculateFortune(date: Date) {
     year: date.getFullYear(),
     dayCanChi: getCanChi(daySeed + 40),
     monthCanChi: getCanChi(monthSeed + 16),
+    lunar,
     term: solarTerms[date.getMonth()],
     score,
     status,
@@ -108,7 +115,8 @@ export function DayFortuneCard() {
             </div>
           </div>
           <p className="mt-3 text-center text-lg font-black text-orange-900">
-            {fortune.day} Tháng {fortune.month}, {fortune.dayCanChi}
+            {formatLunarDate(fortune.lunar)}
+            <span className="block text-sm text-orange-800/80">{fortune.dayCanChi}</span>
           </p>
         </div>
       </div>

@@ -1,10 +1,10 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Menu } from "lucide-react";
 import { TEMPORARY_FULL_ACCESS } from "@/lib/pricing";
 import { UserHeaderBadge } from "@/components/user-header-badge";
 import { CoinTopupLink } from "@/components/coin-topup-link";
 import { APP_NAME } from "@/lib/env";
+import { MobileSiteMenu } from "@/components/mobile-site-menu";
 
 const nav = [
   { href: "/", label: "Lập lá số tử vi" },
@@ -44,24 +44,7 @@ export function SiteHeader() {
         <div className="flex items-center gap-2">
           <UserHeaderBadge />
 
-          <details className="relative lg:hidden">
-            <summary className="icon-button list-none" aria-label="Mở menu">
-              <Menu size={20} />
-            </summary>
-            <div className="absolute right-0 mt-3 grid w-60 gap-1 rounded-2xl border border-orange-100 bg-white/95 p-2 shadow-2xl shadow-orange-950/10 backdrop-blur-xl">
-              {nav.map((item) =>
-                "modal" in item && item.modal ? (
-                  <CoinTopupLink key={item.href} className="rounded-xl px-3 py-2.5 text-sm font-semibold text-stone-700 transition hover:bg-orange-50 hover:text-orange-700">
-                    {item.label}
-                  </CoinTopupLink>
-                ) : (
-                  <Link key={item.href} href={item.href} className="rounded-xl px-3 py-2.5 text-sm font-semibold text-stone-700 transition hover:bg-orange-50 hover:text-orange-700" prefetch={false}>
-                    {item.label}
-                  </Link>
-                )
-              )}
-            </div>
-          </details>
+          <MobileSiteMenu items={nav} />
         </div>
       </div>
     </header>
