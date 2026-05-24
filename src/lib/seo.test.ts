@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { scoreArticleSeo } from "@/lib/seo";
+import { articleJsonLd, organizationJsonLd, scoreArticleSeo, websiteJsonLd } from "@/lib/seo";
 
 describe("SEO scoring", () => {
   it("rewards complete article metadata and structure", () => {
@@ -31,5 +31,33 @@ Xem thêm [Cung Thân](/kien-thuc-tu-vi/cung-menh-cung-than).`,
 
     expect(strong.score).toBeGreaterThan(weak.score);
     expect(strong.score).toBeGreaterThanOrEqual(70);
+  });
+});
+
+describe("Structured data", () => {
+  it("keeps site name signals aligned with the public brand", () => {
+    expect(websiteJsonLd()).toMatchObject({
+      "@type": "WebSite",
+      name: "Lá số tinh hoa",
+      alternateName: expect.arrayContaining(["La so tinh hoa", "Lá số"]),
+      url: expect.stringMatching(/^https?:\/\//),
+    });
+
+    expect(organizationJsonLd()).toMatchObject({
+      "@type": "Organization",
+      name: "Lá số tinh hoa",
+      alternateName: expect.arrayContaining(["La so tinh hoa", "Lá số"]),
+      logo: expect.stringContaining("/favicon-96x96.png"),
+    });
+  });
+
+  it("uses a crawl-friendly raster publisher logo for articles", () => {
+    const jsonLd = articleJsonLd({
+      title: "Cách đọc cung Mệnh tử vi",
+      slug: "cach-doc-cung-menh-tu-vi",
+      excerpt: "Hướng dẫn đọc cung Mệnh tử vi dễ hiểu.",
+    });
+
+    expect(jsonLd.publisher.logo.url).toContain("/favicon-96x96.png");
   });
 });

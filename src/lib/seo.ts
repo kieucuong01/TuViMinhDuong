@@ -146,7 +146,7 @@ export function articleJsonLd(article: {
       name: APP_NAME,
       logo: {
         "@type": "ImageObject",
-        url: `${APP_URL}/brand/laso-tinhhoa-mark.svg`,
+        url: `${APP_URL}/favicon-96x96.png`,
       },
     },
   };
@@ -170,6 +170,7 @@ export function websiteJsonLd() {
     "@context": "https://schema.org",
     "@type": "WebSite",
     name: APP_NAME,
+    alternateName: ["La so tinh hoa", "Lá số"],
     url: APP_URL,
     inLanguage: "vi-VN",
   };
@@ -180,8 +181,9 @@ export function organizationJsonLd() {
     "@context": "https://schema.org",
     "@type": "Organization",
     name: APP_NAME,
+    alternateName: ["La so tinh hoa", "Lá số"],
     url: APP_URL,
-    logo: `${APP_URL}/brand/laso-tinhhoa-mark.svg`,
+    logo: `${APP_URL}/favicon-96x96.png`,
   };
 }
 
