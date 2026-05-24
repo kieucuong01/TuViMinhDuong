@@ -3,7 +3,6 @@ import { Suspense } from "react";
 import { Coins, History, ShieldCheck } from "lucide-react";
 import { loginAction } from "@/app/actions";
 import { getCurrentUser } from "@/lib/auth";
-import { isGoogleOAuthEnabled } from "@/lib/env";
 import { LoadingSubmitButton } from "@/components/loading-submit-button";
 import { PaywallPopup } from "@/components/paywall-popup";
 
@@ -38,9 +37,8 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
             <LoadingSubmitButton className="btn btn-primary w-full" loadingText="Đang đăng nhập...">Tiếp tục</LoadingSubmitButton>
           </form>
           <a
-            className={`btn mt-3 w-full ${isGoogleOAuthEnabled() ? "btn-ghost" : "btn-disabled"}`}
-            href={isGoogleOAuthEnabled() ? `/api/oauth/google/start?next=${encodeURIComponent(params.next || "/")}` : "#"}
-            aria-disabled={!isGoogleOAuthEnabled()}
+            className="btn btn-ghost mt-3 w-full"
+            href={`/api/oauth/google/start?next=${encodeURIComponent(params.next || "/")}`}
           >
             Tiếp tục với Google
           </a>

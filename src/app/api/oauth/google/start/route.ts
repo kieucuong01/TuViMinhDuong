@@ -1,13 +1,15 @@
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
-import { APP_URL, isGoogleOAuthEnabled } from "@/lib/env";
+import { isGoogleOAuthEnabled } from "@/lib/env";
+import { googleOAuthCallbackUrl, googleOAuthErrorUrl, safeOAuthNextPath } from "@/lib/google-oauth";
 
 export async function GET(request: Request) {
-  if (!isGoogleOAuthEnabled()) {
-    return NextResponse.redirect(`${APP_URL}/dang-nhap?error=${encodeURIComponent("Google OAuth chưa được cấu hình.")}`);
-  }
   const url = new URL(request.url);
-  const next = url.searchParams.get("next") || "/";
+  const next = safeOAuthNextPath(url.searchParams.get("next"));
+  if (!isGoogleOAuthEnabled()) {
+    return NextResponse.redirect(googleOAuthErrorUrl("Google OAuth chưa được cấu hình.", next));
+  }
+
   const state = crypto.randomUUID();
   const jar = await cookies();
   jar.set("google_oauth_state", JSON.stringify({ state, next }), {
@@ -20,7 +22,7 @@ export async function GET(request: Request) {
 
   const params = new URLSearchParams({
     client_id: process.env.GOOGLE_CLIENT_ID || "",
-    redirect_uri: `${APP_URL}/api/oauth/google/callback`,
+    redirect_uri: googleOAuthCallbackUrl(),
     response_type: "code",
     scope: "openid email profile",
     state,

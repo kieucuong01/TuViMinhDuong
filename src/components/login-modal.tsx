@@ -7,7 +7,6 @@ import { Coins, History, ShieldCheck, X } from "lucide-react";
 import { loginAction } from "@/app/actions";
 import { LoadingSubmitButton } from "@/components/loading-submit-button";
 import { cleanLoginModalPath } from "@/components/login-modal-link";
-import { isGoogleOAuthEnabled } from "@/lib/env";
 
 function safeNext(path: string) {
   return path.startsWith("/") && !path.startsWith("//") ? path : "/";
@@ -70,9 +69,8 @@ export function LoginModal() {
         </form>
 
         <a
-          className={`btn mt-3 w-full ${isGoogleOAuthEnabled() ? "btn-ghost" : "btn-disabled"}`}
-          href={isGoogleOAuthEnabled() ? `/api/oauth/google/start?next=${encodeURIComponent(next)}` : "#"}
-          aria-disabled={!isGoogleOAuthEnabled()}
+          className="btn btn-ghost mt-3 w-full"
+          href={`/api/oauth/google/start?next=${encodeURIComponent(next)}`}
         >
           Tiếp tục với Google
         </a>

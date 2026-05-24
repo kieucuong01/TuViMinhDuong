@@ -3,6 +3,8 @@
 :root {
   --background: #fffaf0;
   --foreground: #1c1917;
+  --home-card-radius: 1.45rem;
+  --home-control-radius: 0.95rem;
 }
 
 @theme inline {
@@ -790,6 +792,7 @@ button.is-loading:not(.icon-button)::before {
 .day-fortune-card {
   animation-delay: 520ms;
   align-self: start;
+  border-radius: var(--home-card-radius);
 }
 
 .day-fortune-card .fortune-gauge {
@@ -825,10 +828,16 @@ button.is-loading:not(.icon-button)::before {
 
 .day-fortune-metrics > div {
   padding: 0.65rem;
+  border-radius: var(--home-control-radius);
 }
 
 .day-fortune-controls {
   margin-top: 0.95rem;
+}
+
+.day-fortune-controls input,
+.day-fortune-controls .btn {
+  border-radius: var(--home-control-radius);
 }
 
 .day-fortune-note {
@@ -855,7 +864,7 @@ button.is-loading:not(.icon-button)::before {
 .hero-form-card {
   position: relative;
   border-color: #e8c98f;
-  border-radius: 0.35rem;
+  border-radius: var(--home-card-radius);
   background: #fffefb;
   padding: clamp(1.25rem, 3vw, 2rem);
   box-shadow: 0 10px 24px rgb(120 53 15 / 0.08);
@@ -871,7 +880,7 @@ button.is-loading:not(.icon-button)::before {
 
 .day-fortune-tips article {
   border: 1px solid rgb(254 215 170 / 0.8);
-  border-radius: 1rem;
+  border-radius: var(--home-control-radius);
   background: rgb(255 255 255 / 0.62);
   padding: 0.75rem 0.8rem;
 }
@@ -933,20 +942,19 @@ button.is-loading:not(.icon-button)::before {
 .hero-form-card .chart-form input,
 .hero-form-card .chart-form select {
   min-height: 3.35rem;
-  border: 0;
-  border-bottom: 1px solid #d9b877;
-  border-radius: 0;
-  background: transparent;
-  padding: 0.7rem 0.2rem;
+  border: 1px solid #e8c98f;
+  border-radius: var(--home-control-radius);
+  background: rgb(255 255 255 / 0.72);
+  padding: 0.7rem 0.9rem;
   color: #292524;
   font-size: 1.12rem;
-  box-shadow: none;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.7);
 }
 
 .hero-form-card .chart-form input:focus,
 .hero-form-card .chart-form select:focus {
   border-color: #a91624;
-  box-shadow: 0 2px 0 rgb(169 22 36 / 0.18);
+  box-shadow: 0 0 0 4px rgb(169 22 36 / 0.1);
 }
 
 .hero-form-card .birth-date-grid {
@@ -962,6 +970,7 @@ button.is-loading:not(.icon-button)::before {
 .hero-form-card .birth-date-grid input {
   min-height: 3.45rem;
   border: 1px solid #e8c98f;
+  border-radius: var(--home-control-radius);
   padding-inline: 0.75rem;
   text-align: center;
   font-family: "Times New Roman", Cambria, serif;
@@ -971,7 +980,7 @@ button.is-loading:not(.icon-button)::before {
 
 .hero-form-card .chart-form .btn-primary {
   min-height: 4rem;
-  border-radius: 0;
+  border-radius: var(--home-control-radius);
   background: #a91624;
   box-shadow: 0 14px 30px rgb(169 22 36 / 0.18);
   font-family: "Times New Roman", Cambria, serif;
@@ -5666,8 +5675,12 @@ button.is-loading:not(.icon-button)::before {
     display: none;
   }
 
+  .hero-form-card,
   .day-fortune-card {
     border-radius: 1.25rem !important;
+  }
+
+  .day-fortune-card {
     padding: 0.9rem !important;
   }
 
@@ -5724,7 +5737,7 @@ button.is-loading:not(.icon-button)::before {
   }
 
   .day-fortune-metrics > div {
-    border-radius: 0.85rem;
+    border-radius: var(--home-control-radius);
     padding: 0.55rem 0.35rem;
   }
 
