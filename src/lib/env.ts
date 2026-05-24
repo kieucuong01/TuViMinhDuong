@@ -8,9 +8,6 @@ export const APP_URL = configuredAppUrl || DEFAULT_APP_URL;
 export const GOOGLE_ANALYTICS_ID =
   process.env.NEXT_PUBLIC_GA_ID || process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || "G-5JSNC2T5G0";
 
-export const GOOGLE_SITE_VERIFICATION =
-  process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || process.env.GOOGLE_SITE_VERIFICATION || "";
-
 export const APP_NAME = "Lá số tinh hoa";
 
 export const ADMIN_EMAIL =
