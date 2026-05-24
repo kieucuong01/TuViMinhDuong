@@ -6,7 +6,7 @@ Mục tiêu: kiểm chứng luồng nạp xu thật/sandbox từ lúc tạo chec
 
 - `DATABASE_URL` trỏ tới Postgres cần smoke.
 - `PAYOS_CLIENT_ID`, `PAYOS_API_KEY`, `PAYOS_CHECKSUM_KEY` đã set.
-- `NEXT_PUBLIC_APP_URL` trỏ tới domain đang smoke, ví dụ `https://tu-vi-minh-duong.vercel.app`.
+- `NEXT_PUBLIC_APP_URL` trỏ tới domain đang smoke, ví dụ `https://lasotinhhoa.vn`.
 - PayOS dashboard cấu hình webhook về:
 
 ```text
@@ -18,7 +18,7 @@ Không dùng return URL để cộng xu. Return URL chỉ đưa user quay về w
 ## 1. Tạo checkout thật/sandbox
 
 ```bash
-npm run smoke:payos -- create --package full-reading --app-url https://tu-vi-minh-duong.vercel.app
+npm run smoke:payos -- create --package full-reading --app-url https://lasotinhhoa.vn
 ```
 
 Script sẽ:

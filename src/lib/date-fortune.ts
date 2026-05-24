@@ -7,6 +7,11 @@ export const weekdays = ["Chủ Nhật", "Thứ Hai", "Thứ Ba", "Thứ Tư", "
 export type FortuneTone = "good" | "neutral" | "bad";
 export type DateTaskKey = "general" | "wedding" | "opening" | "contract" | "travel" | "groundbreaking";
 
+export type VietnameseDateHighlight = {
+  label: string;
+  tone: "national" | "cultural" | "memorial";
+};
+
 type RuleHit = {
   name: string;
   tone: FortuneTone;
@@ -32,6 +37,37 @@ const SOURCE_NOTES = {
   zodiac: "Hoàng đạo/Hắc đạo: bảng 12 thần Thanh Long, Minh Đường, Thiên Hình... luân theo cặp tháng âm 1/7, 2/8, 3/9, 4/10, 5/11, 6/12.",
   mansions: "Nhị thập bát tú: chu kỳ 28 sao, đối chiếu mốc 20/05/2026 là sao Sâm Thủy Viên.",
   ngocHap: "Sao tốt/xấu Ngọc Hạp: dùng nhóm quy tắc phổ biến như Tam Nương, Nguyệt Kỵ, Dương Công Kỵ, Nguyệt Phá, Thiên Xá, Tam Hợp, Lục Hợp.",
+};
+
+const vietnameseSolarDateHighlights: Record<string, VietnameseDateHighlight> = {
+  "01-01": { label: "Tết Dương lịch", tone: "national" },
+  "02-03": { label: "Ngày thành lập Đảng Cộng sản Việt Nam", tone: "national" },
+  "02-27": { label: "Ngày Thầy thuốc Việt Nam", tone: "cultural" },
+  "03-08": { label: "Ngày Quốc tế Phụ nữ", tone: "cultural" },
+  "03-26": { label: "Ngày thành lập Đoàn Thanh niên Cộng sản Hồ Chí Minh", tone: "cultural" },
+  "04-30": { label: "Ngày Giải phóng miền Nam, thống nhất đất nước", tone: "national" },
+  "05-01": { label: "Ngày Quốc tế Lao động", tone: "national" },
+  "05-07": { label: "Ngày Chiến thắng Điện Biên Phủ", tone: "national" },
+  "05-19": { label: "Ngày sinh Chủ tịch Hồ Chí Minh", tone: "memorial" },
+  "06-01": { label: "Ngày Quốc tế Thiếu nhi", tone: "cultural" },
+  "07-27": { label: "Ngày Thương binh Liệt sĩ", tone: "memorial" },
+  "08-19": { label: "Ngày Cách mạng tháng Tám", tone: "national" },
+  "09-02": { label: "Quốc khánh Việt Nam", tone: "national" },
+  "10-10": { label: "Ngày Giải phóng Thủ đô", tone: "national" },
+  "10-20": { label: "Ngày Phụ nữ Việt Nam", tone: "cultural" },
+  "11-20": { label: "Ngày Nhà giáo Việt Nam", tone: "cultural" },
+  "12-22": { label: "Ngày thành lập Quân đội Nhân dân Việt Nam", tone: "national" },
+};
+
+const vietnameseLunarDateHighlights: Record<string, VietnameseDateHighlight> = {
+  "01-01": { label: "Tết Nguyên đán", tone: "national" },
+  "01-15": { label: "Rằm tháng Giêng", tone: "cultural" },
+  "03-10": { label: "Giỗ Tổ Hùng Vương", tone: "national" },
+  "04-15": { label: "Lễ Phật Đản", tone: "cultural" },
+  "05-05": { label: "Tết Đoan Ngọ", tone: "cultural" },
+  "07-15": { label: "Lễ Vu Lan", tone: "cultural" },
+  "08-15": { label: "Tết Trung thu", tone: "cultural" },
+  "12-23": { label: "Ông Công Ông Táo", tone: "cultural" },
 };
 
 const directCycle = [
@@ -183,6 +219,16 @@ export function parseInputDate(value: string) {
 
 export function formatDate(date: Date) {
   return `${pad(date.getDate())}/${pad(date.getMonth() + 1)}/${date.getFullYear()}`;
+}
+
+export function getVietnameseDateHighlight(date: Date): VietnameseDateHighlight | null {
+  const solarKey = `${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+  const solarHighlight = vietnameseSolarDateHighlights[solarKey];
+  if (solarHighlight) return solarHighlight;
+
+  const lunar = solarToLunar(date.getDate(), date.getMonth() + 1, date.getFullYear(), 7);
+  const lunarKey = `${pad(lunar.month)}-${pad(lunar.day)}`;
+  return vietnameseLunarDateHighlights[lunarKey] || null;
 }
 
 function getHourRange(branchIndex: number) {

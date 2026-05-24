@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { Palace, TuViChart } from "@/lib/chart";
-import { APP_NAME } from "@/lib/env";
+import { APP_NAME, APP_URL } from "@/lib/env";
 
 const STEM_SHORT = ["G", "Ấ", "B", "Đ", "M", "K", "C", "T", "N", "Q"];
 const BRANCH_ORDER = ["Tý", "Sửu", "Dần", "Mão", "Thìn", "Tỵ", "Ngọ", "Mùi", "Thân", "Dậu", "Tuất", "Hợi"];
@@ -322,7 +322,7 @@ export function ChartBoard({ chart }: { chart: TuViChart }) {
             <strong>{APP_NAME}</strong>
           </Link>
           <p className="center-kicker">TRA CỨU TỬ VI CHÍNH XÁC NHẤT VIỆT NAM</p>
-          <Link href="/" className="center-link">https://tu-vi-minh-duong.vercel.app</Link>
+          <Link href="/" className="center-link">{APP_URL}</Link>
           <dl>
             <div><dt>Họ tên</dt><dd>{chart.input.fullName}</dd></div>
             <div><dt>Năm sinh</dt><dd>{chart.solar.year} - {chart.canChi.year}</dd></div>

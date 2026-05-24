@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { analyzeDate, monthDays } from "@/lib/date-fortune";
+import { analyzeDate, getVietnameseDateHighlight, monthDays } from "@/lib/date-fortune";
 
 describe("date fortune engine", () => {
   it("computes almanac layers for a known reference day", () => {
@@ -32,5 +32,17 @@ describe("date fortune engine", () => {
     expect(days).toHaveLength(31);
     expect(days[19].solar.day).toBe(20);
     expect(days[19].mansion.name).toBe("Sâm");
+  });
+
+  it("returns Vietnamese solar and lunar date highlights", () => {
+    expect(getVietnameseDateHighlight(new Date("2026-05-19T12:00:00+07:00"))).toMatchObject({
+      label: "Ngày sinh Chủ tịch Hồ Chí Minh",
+      tone: "memorial",
+    });
+
+    expect(getVietnameseDateHighlight(new Date("2026-04-26T12:00:00+07:00"))).toMatchObject({
+      label: "Giỗ Tổ Hùng Vương",
+      tone: "national",
+    });
   });
 });

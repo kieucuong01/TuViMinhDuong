@@ -185,7 +185,7 @@ Rules:
 - Use `next/image` for real images when practical.
 - Avoid client components around static content unless interaction requires it.
 - Run `npm run build`; use `npm run analyze` only when bundle analysis is needed.
-- For production speed checks, run `PERF_BASE_URL=https://tu-vi-minh-duong.vercel.app npm run perf:smoke` and pass `PERF_CHART_PATH` for a real chart page when available.
+- For production speed checks, run `PERF_BASE_URL=https://lasotinhhoa.vn npm run perf:smoke` and pass `PERF_CHART_PATH` for a real chart page when available.
 
 Done:
 

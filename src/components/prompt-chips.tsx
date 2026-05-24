@@ -19,7 +19,7 @@ export function PromptChips({ chartId, chart, className = defaultShellClassName 
           <p className="eyebrow mb-1">Gợi ý hỏi nhanh</p>
           <h2 className="text-lg font-black text-stone-950">Bạn muốn đào sâu phần nào của lá số?</h2>
         </div>
-        <p className="text-sm text-stone-500">{chart.input.fullName}</p>
+        <p className="max-w-full text-sm text-stone-500 sm:max-w-[14rem] sm:text-right">{chart.input.fullName}</p>
       </div>
       <div className="mt-4 grid gap-2 md:grid-cols-2">
         {prompts.map((prompt) => (

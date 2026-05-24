@@ -2145,7 +2145,7 @@ button.is-loading:not(.icon-button)::before {
   }
 
   .premium-reading-cta-floating {
-    display: grid !important;
+    display: none !important;
   }
 
   .premium-reading-cta-bottom {
@@ -3112,6 +3112,35 @@ button.is-loading:not(.icon-button)::before {
 
 .info-list dd {
   font-weight: 780;
+}
+
+.chart-quick-panels {
+  display: grid;
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.chart-quick-info {
+  align-self: stretch;
+}
+
+@media (min-width: 1024px) {
+  .chart-quick-panels {
+    grid-template-columns: minmax(0, 2.35fr) minmax(17rem, 0.95fr);
+    align-items: start;
+  }
+}
+
+@media (min-width: 1280px) {
+  .chart-quick-panels {
+    grid-template-columns: minmax(0, 2.45fr) minmax(18rem, 1fr);
+  }
+}
+
+@media (max-width: 1180px) {
+  .chart-quick-info {
+    padding-bottom: 5.35rem;
+  }
 }
 
 .admin-hero {
@@ -5239,7 +5268,16 @@ button.is-loading:not(.icon-button)::before {
   }
 
   .hero-form-card {
-    padding: 1rem;
+    padding: 0.75rem 0.85rem;
+  }
+
+  .hero-form-card > div:first-child {
+    margin-bottom: 0.65rem;
+  }
+
+  .hero-form-card .eyebrow {
+    font-size: 0.68rem;
+    letter-spacing: 0.16em;
   }
 
   .hero-form-card .form-grid,
@@ -5248,18 +5286,128 @@ button.is-loading:not(.icon-button)::before {
     grid-template-columns: 1fr;
   }
 
+  .hero-form-card h1 {
+    font-size: clamp(1.75rem, 9vw, 2.2rem) !important;
+    line-height: 1.02;
+  }
+
+  .hero-form-card > div:first-child p:not(.eyebrow) {
+    margin-top: 0.45rem;
+    font-size: 0.88rem;
+    line-height: 1.45;
+  }
+
+  .hero-form-card .chart-form {
+    gap: 0.65rem;
+  }
+
+  .hero-form-card .form-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.58rem 0.6rem;
+  }
+
+  .hero-form-card .chart-name-field,
+  .hero-form-card .chart-birth-field {
+    grid-column: 1 / -1;
+  }
+
+  .hero-form-card .chart-form label,
+  .hero-form-card .birth-date-group {
+    gap: 0.22rem;
+  }
+
+  .hero-form-card .chart-form label > span,
+  .hero-form-card .birth-date-group legend {
+    font-size: 0.68rem;
+    letter-spacing: 0.15em;
+  }
+
   .hero-form-card .birth-date-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 0.55rem;
+    gap: 0.42rem;
   }
 
   .hero-form-card .chart-form input,
   .hero-form-card .chart-form select {
-    min-height: 3.15rem;
+    min-height: 2.65rem;
+    padding-block: 0.4rem;
+    font-size: 0.98rem;
+  }
+
+  .hero-form-card .birth-date-grid label > span {
+    font-size: 0.63rem;
+  }
+
+  .hero-form-card .birth-date-grid input {
+    min-height: 2.75rem;
+    padding-inline: 0.45rem;
   }
 
   .hero-form-card .chart-form .btn-primary {
-    min-height: 3.85rem;
+    min-height: 3rem;
+    font-size: 1rem;
+  }
+
+  .hero-form-card .chart-form > p,
+  .hero-form-card .form-assurance {
+    display: none;
+  }
+
+  @media (max-height: 680px) {
+    .hero-shell {
+      gap: 0.5rem;
+      padding-top: 0.45rem;
+      padding-bottom: 0.45rem;
+    }
+
+    .hero-form-card {
+      padding: 0.55rem 0.65rem;
+    }
+
+    .hero-form-card > div:first-child {
+      margin-bottom: 0.38rem;
+    }
+
+    .hero-form-card h1 {
+      font-size: clamp(1.45rem, 7.7vw, 1.82rem) !important;
+      line-height: 0.98;
+    }
+
+    .hero-form-card > div:first-child p:not(.eyebrow) {
+      display: none;
+    }
+
+    .hero-form-card .chart-form {
+      gap: 0.45rem;
+    }
+
+    .hero-form-card .form-grid {
+      gap: 0.4rem 0.5rem;
+    }
+
+    .hero-form-card .chart-form label > span,
+    .hero-form-card .birth-date-group legend {
+      font-size: 0.62rem;
+    }
+
+    .hero-form-card .chart-form input,
+    .hero-form-card .chart-form select {
+      min-height: 2.3rem;
+      font-size: 0.92rem;
+    }
+
+    .hero-form-card .birth-date-grid {
+      gap: 0.34rem;
+    }
+
+    .hero-form-card .birth-date-grid input {
+      min-height: 2.35rem;
+    }
+
+    .hero-form-card .chart-form .btn-primary {
+      min-height: 2.65rem;
+      font-size: 0.96rem;
+    }
   }
 
   .editorial-preview-head {

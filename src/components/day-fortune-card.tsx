@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { CalendarDays, ChevronRight, Sparkles } from "lucide-react";
 import Link from "next/link";
+import { getVietnameseDateHighlight } from "@/lib/date-fortune";
 
 const stems = ["Giáp", "Ất", "Bính", "Đinh", "Mậu", "Kỷ", "Canh", "Tân", "Nhâm", "Quý"];
 const branches = ["Tý", "Sửu", "Dần", "Mão", "Thìn", "Tỵ", "Ngọ", "Mùi", "Thân", "Dậu", "Tuất", "Hợi"];
@@ -67,6 +68,7 @@ export function DayFortuneCard() {
   const [selectedDate, setSelectedDate] = useState(() => toInputDate(new Date()));
   const date = useMemo(() => new Date(`${selectedDate}T12:00:00+07:00`), [selectedDate]);
   const fortune = useMemo(() => calculateFortune(date), [date]);
+  const dateHighlight = useMemo(() => getVietnameseDateHighlight(date), [date]);
 
   return (
     <section className="day-fortune-card relative overflow-hidden rounded-[1.75rem] border border-white/70 bg-white/70 p-5 shadow-2xl shadow-orange-950/10 ring-1 ring-orange-100/70 backdrop-blur-xl sm:p-6">
@@ -84,7 +86,7 @@ export function DayFortuneCard() {
             <span className="pb-2 text-xl font-black text-orange-900">Tháng {fortune.month} năm {fortune.year}</span>
           </div>
           <div className="mt-5 flex flex-wrap items-center gap-2">
-            <span className="text-sm font-bold text-rose-600">Ngày sinh Chủ tịch Hồ Chí Minh</span>
+            {dateHighlight ? <span className="text-sm font-bold text-rose-600">{dateHighlight.label}</span> : null}
             <span className={`rounded-full px-3 py-1 text-sm font-bold ring-1 ${fortune.statusClass}`}>
               {fortune.status}
             </span>

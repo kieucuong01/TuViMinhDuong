@@ -12,8 +12,8 @@ Tài liệu này là ảnh chụp nhanh trạng thái dự án **Lá số tinh h
 ## Product
 
 - Brand: **Lá số tinh hoa**
-- Domain chính tạm thời: `tu-vi-minh-duong.vercel.app`
-- Domain dự kiến khi DNS ổn định: `lasotinhhoa.vn`
+- Domain chính: `lasotinhhoa.vn`
+- Domain Vercel dự phòng: `tu-vi-minh-duong.vercel.app`
 - Đối tượng chính: người Việt 30-60 tuổi, muốn lập lá số dễ hiểu, ít thuật ngữ kỹ thuật.
 - Hướng UX: form-first, chữ rõ, CTA dễ bấm, giải thích ngắn, không tạo cảm giác quá "AI/SaaS".
 - Conversion chính: lập lá số miễn phí trước, sau đó mở luận giải toàn bộ hoặc các phần trả phí.
@@ -102,7 +102,7 @@ npm run build
 Với deploy/production:
 
 ```powershell
-$env:PERF_BASE_URL="https://tu-vi-minh-duong.vercel.app"
+$env:PERF_BASE_URL="https://lasotinhhoa.vn"
 npm run perf:smoke
 ```
 

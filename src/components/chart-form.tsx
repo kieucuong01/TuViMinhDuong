@@ -14,7 +14,7 @@ export function ChartForm({ compact = false }: { compact?: boolean }) {
       data-loading-label="Đang lập lá số..."
     >
       <div className="form-grid">
-        <label className="md:col-span-2">
+        <label className="chart-name-field md:col-span-2">
           <span>Họ và tên</span>
           <input name="fullName" placeholder="Ví dụ: Nguyễn Minh Anh" required data-testid="chart-full-name" />
         </label>
@@ -35,7 +35,7 @@ export function ChartForm({ compact = false }: { compact?: boolean }) {
           </select>
         </label>
 
-        <fieldset className="birth-date-group md:col-span-2">
+        <fieldset className="birth-date-group chart-birth-field md:col-span-2">
           <legend>Ngày sinh</legend>
           <div className="birth-date-grid">
             <label>

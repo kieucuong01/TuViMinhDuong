@@ -85,13 +85,13 @@ export default async function ChartPage({
 
         <ChartActionPanel chartId={id} chart={record.chart} />
 
-        <div className="mt-8 grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_260px] lg:pr-40 min-[1481px]:pr-0 xl:grid-cols-[minmax(0,1fr)_280px]">
+        <div className="chart-quick-panels">
           <PromptChips
             chartId={id}
             chart={record.chart}
             className="rounded-2xl border border-orange-100 bg-white/85 p-4 shadow-sm backdrop-blur"
           />
-          <aside className="panel">
+          <aside className="panel chart-quick-info">
             <p className="eyebrow">Thông tin nhanh</p>
             <dl className="info-list">
               <div><dt>Âm lịch</dt><dd>{record.chart.lunar.day}/{record.chart.lunar.month}/{record.chart.lunar.year}</dd></div>

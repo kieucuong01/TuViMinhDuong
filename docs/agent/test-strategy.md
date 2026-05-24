@@ -53,7 +53,7 @@ Nếu task sửa UI quan trọng, thêm kiểm tra thủ công hoặc Playwright
 Nếu task sửa production/deploy, thêm:
 
 ```powershell
-$env:PERF_BASE_URL="https://tu-vi-minh-duong.vercel.app"
+$env:PERF_BASE_URL="https://lasotinhhoa.vn"
 npm run perf:smoke
 ```
 

@@ -40,7 +40,7 @@ export default async function Home() {
       <script id="website-jsonld" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd()) }} />
       <script id="organization-jsonld" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd()) }} />
       <section className="hero-band">
-        <div className="mx-auto grid max-w-7xl gap-6 px-4 py-5 sm:px-6 lg:px-8 lg:py-8">
+        <div className="hero-shell mx-auto grid max-w-7xl gap-6 px-4 py-5 sm:px-6 lg:px-8 lg:py-8">
           <div className="grid gap-6 lg:grid-cols-[1.02fr_0.98fr] lg:items-stretch">
             <div id="lap-la-so" className="hero-form-card ring-1 ring-white/70">
               <div className="mb-5 text-center">
