@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
+import { Suspense } from "react";
 import { TEMPORARY_FULL_ACCESS } from "@/lib/pricing";
 import { UserHeaderBadge } from "@/components/user-header-badge";
 import { CoinTopupLink } from "@/components/coin-topup-link";
@@ -42,7 +43,9 @@ export function SiteHeader() {
         </nav>
 
         <div className="flex items-center gap-2">
-          <UserHeaderBadge />
+          <Suspense fallback={<div className="user-header-skeleton" aria-hidden="true"><span /></div>}>
+            <UserHeaderBadge />
+          </Suspense>
 
           <MobileSiteMenu items={nav} />
         </div>
