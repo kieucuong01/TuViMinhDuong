@@ -38,6 +38,29 @@ export function countWords(content: string) {
   return content.trim().split(/\s+/).filter(Boolean).length;
 }
 
+export async function runReadingChapterTasks<TInput, TOutput>(
+  items: TInput[],
+  limit: number,
+  worker: (item: TInput, index: number) => Promise<TOutput>,
+) {
+  if (items.length === 0) return [] as TOutput[];
+  const concurrency = Math.max(1, Math.min(items.length, Math.floor(limit) || 1));
+  const results = new Array<TOutput>(items.length);
+  let nextIndex = 0;
+
+  await Promise.all(
+    Array.from({ length: concurrency }, async () => {
+      while (nextIndex < items.length) {
+        const index = nextIndex;
+        nextIndex += 1;
+        results[index] = await worker(items[index], index);
+      }
+    }),
+  );
+
+  return results;
+}
+
 function normalizedText(content: string) {
   return content
     .normalize("NFD")
@@ -154,6 +177,153 @@ export function getDeepReadingSummary(chart: TuViChart) {
   };
 }
 
+export type PaidReadingChapterOutput = {
+  key: string;
+  title: string;
+  content: string;
+  model: string;
+  prompt: string;
+  wordCount: number;
+  maxTokens: number;
+  formatGuarded: boolean;
+};
+
+export type PaidReadingGenerationProgress = {
+  chapter: PaidReadingChapterOutput;
+  completedChapters: PaidReadingChapterOutput[];
+  totalChapters: number;
+};
+
+function paidReadingConcurrencyLimit(type: ReadingKey) {
+  if (type !== "FULL") return 1;
+  const configured = Number(process.env.PAID_READING_CHAPTER_CONCURRENCY || 3);
+  return Math.max(1, Math.min(3, Number.isFinite(configured) ? Math.floor(configured) : 3));
+}
+
+function paidReadingPromptMeta(
+  chart: TuViChart,
+  type: ReadingKey,
+  summary: ReturnType<typeof getDeepReadingSummary>,
+  outputs: PaidReadingChapterOutput[],
+  fallbackReason?: string,
+) {
+  return {
+    strategy: PAID_READING_VERSION,
+    promptVersion: PAID_READING_VERSION,
+    ...(fallbackReason ? { fallback: true, reason: fallbackReason } : {}),
+    wordTarget: type === "FULL" ? PAID_FULL_WORD_TARGET : "theo phạm vi mở khóa",
+    maxTokensPerChapter: PAID_READING_CHAPTER_MAX_TOKENS,
+    concurrency: paidReadingConcurrencyLimit(type),
+    chartEngineVersion: chart.engine?.version,
+    chartEngineProfile: chart.engine?.starProfile,
+    viewYear: chart.input.viewYear,
+    viewerAddress: summary.viewerAddress,
+    age: summary.age,
+    scores: summary.scores,
+    chapters: outputs.map((chapter) => ({
+      key: chapter.key,
+      title: chapter.title,
+      model: chapter.model,
+      wordCount: chapter.wordCount,
+      maxTokens: chapter.maxTokens,
+      formatGuarded: chapter.formatGuarded,
+      prompt: chapter.prompt,
+    })),
+  };
+}
+
+export async function generateReadingWithProgress(
+  chart: TuViChart,
+  type: ReadingKey,
+  scopeKey: string,
+  onProgress?: (progress: PaidReadingGenerationProgress) => Promise<void> | void,
+) {
+  const gatewayModel = process.env.AI_MODEL || "openai/gpt-5.4";
+  const focus = getFocusData(chart, type, scopeKey);
+  const chapters = paidReadingChapters(chart, type);
+  const summary = getDeepReadingSummary(chart);
+  const completedByIndex = new Array<PaidReadingChapterOutput | undefined>(chapters.length);
+
+  const emitProgress = async (index: number, chapter: PaidReadingChapterOutput) => {
+    completedByIndex[index] = chapter;
+    await onProgress?.({
+      chapter,
+      completedChapters: completedByIndex.filter(Boolean) as PaidReadingChapterOutput[],
+      totalChapters: chapters.length,
+    });
+  };
+
+  if (isLlmDisabledForSmoke() || (!hasExternalLlmProvider() && !process.env.VERCEL_OIDC_TOKEN && !process.env.AI_GATEWAY_API_KEY)) {
+    const outputs: PaidReadingChapterOutput[] = [];
+    for (const [index, chapter] of chapters.entries()) {
+      const prompt = paidReadingChapterPrompt(chart, type, scopeKey, focus, chapter, index, chapters.length);
+      const maxTokens = paidReadingMaxTokens(type, chapter);
+      const content = fallbackChapterBody(chart, chapter, focus);
+      const output = {
+        key: chapter.key,
+        title: chapter.title,
+        content,
+        model: "template-fallback",
+        prompt,
+        wordCount: countWords(content),
+        maxTokens,
+        formatGuarded: false,
+      };
+      outputs.push(output);
+      await emitProgress(index, output);
+    }
+
+    return {
+      content: outputs.map((chapter) => chapter.content.trim()).join("\n\n"),
+      model: "template-fallback",
+      prompt: JSON.stringify(paidReadingPromptMeta(chart, type, summary, outputs, "no-provider")),
+    };
+  }
+
+  const outputs = await runReadingChapterTasks(chapters, paidReadingConcurrencyLimit(type), async (chapter, index) => {
+    const prompt = paidReadingChapterPrompt(chart, type, scopeKey, focus, chapter, index, chapters.length);
+    const maxTokens = paidReadingMaxTokens(type, chapter);
+    let generated: Awaited<ReturnType<typeof generatePaidChapter>> = null;
+    let chapterError: string | null = null;
+    try {
+      generated = await generatePaidChapter(prompt, gatewayModel, maxTokens);
+    } catch (error) {
+      chapterError = error instanceof Error ? error.message : String(error);
+    }
+    const generatedContent = generated?.content?.trim() || "";
+    const hasCompleteContent = generatedContent ? isCompletePaidChapter(generatedContent, chapter) : false;
+    const content = hasCompleteContent ? generatedContent : fallbackChapterBody(chart, chapter, focus);
+    const output = {
+      key: chapter.key,
+      title: chapter.title,
+      content,
+      model: hasCompleteContent
+        ? generated!.model
+        : generatedContent
+          ? `${generated!.model} + format-guard`
+          : chapterError
+            ? "template-fallback + error-guard"
+            : "template-fallback",
+      prompt,
+      wordCount: countWords(content),
+      maxTokens,
+      formatGuarded: !hasCompleteContent,
+    };
+    await emitProgress(index, output);
+    return output;
+  });
+
+  return {
+    content: outputs.map((chapter) => chapter.content.trim()).join("\n\n"),
+    model: Array.from(new Set(outputs.map((chapter) => chapter.model))).join(" + "),
+    prompt: JSON.stringify(paidReadingPromptMeta(chart, type, summary, outputs)),
+  };
+}
+
+export async function generateReading(chart: TuViChart, type: ReadingKey, scopeKey: string) {
+  return generateReadingWithProgress(chart, type, scopeKey);
+}
+
 function compactStars(chart: TuViChart, palaceName: string, stars: string[], fallback: string, limit = 10) {
   if (!stars.length) return fallback;
   const palace = chart.palaces.find((item) => item.name === palaceName);
@@ -201,6 +371,78 @@ function compactDecadeContext(chart: TuViChart) {
     current: current ? `${current.range} tuổi tại cung ${current.palace} (${current.branch})` : "không xác định",
     allPeriods,
   };
+}
+
+function focusedPalaceNames(chart: TuViChart, type: ReadingKey, scopeKey: string) {
+  const names = new Set<string>(["Mệnh"]);
+  const thanName = chart.than?.replace("Thân cư ", "");
+  if (thanName) names.add(thanName);
+
+  const focusPalace = chart.palaces.find((item) => item.name === scopeKey || item.branch === scopeKey);
+  if (focusPalace) names.add(focusPalace.name);
+
+  const majorPeriod = chart.daiVan.find((period) => period.range === scopeKey);
+  if (majorPeriod) names.add(majorPeriod.palace);
+
+  if (type === "PALACE") {
+    ["Quan Lộc", "Tài Bạch", "Phu Thê", "Tật Ách", "Thiên Di"].forEach((name) => names.add(name));
+  }
+  if (type === "DAI_VAN" || type === "TIEU_VAN") {
+    ["Quan Lộc", "Tài Bạch", "Phúc Đức", "Tật Ách", "Thiên Di"].forEach((name) => names.add(name));
+  }
+  if (type === "NGUYET_VAN" || type === "NHAT_VAN") {
+    ["Quan Lộc", "Tài Bạch", "Phu Thê", "Tật Ách"].forEach((name) => names.add(name));
+  }
+
+  return Array.from(names).filter(Boolean).slice(0, 8);
+}
+
+function compactFocusedPalaceContext(chart: TuViChart, type: ReadingKey, scopeKey: string) {
+  return focusedPalaceNames(chart, type, scopeKey)
+    .map((name) => {
+      const palace = palaceByName(chart, name);
+      if (!palace) return `${name}: chưa xác định`;
+      const labels = [palace.isMenh ? "Mệnh" : "", palace.isThan ? "Thân" : ""].filter(Boolean).join(", ");
+      return [
+        `${name}: cung ${palace.name}${labels ? ` [${labels}]` : ""} tại ${palace.branch}`,
+        `đại vận ${palace.ageRange}`,
+        `vòng ${palace.lifecycle}`,
+        `chính tinh ${compactStars(chart, palace.name, palace.mainStars, "vô chính diệu", 5)}`,
+        `phụ tinh nổi bật ${compactStars(chart, palace.name, palace.supportStars, "không nổi bật", 7)}`,
+        `sao lưu ${compactStars(chart, palace.name, palace.yearlyStars, "không nổi bật", 5)}`,
+      ].join("; ");
+    })
+    .join("\n");
+}
+
+function compactFocusedChartContext(chart: TuViChart, type: ReadingKey, scopeKey: string, focus: ReturnType<typeof getFocusData>) {
+  const decade = compactDecadeContext(chart);
+  return `Dữ liệu trọng tâm đã rút gọn:
+- Người xem: ${chart.input.fullName}; giới tính: ${chart.input.gender === "female" ? "Nữ" : "Nam"}; năm xem: ${chart.input.viewYear}; tuổi xem: ${decade.currentAge}.
+- Dương lịch: ${chart.solar.day}/${chart.solar.month}/${chart.solar.year}; âm lịch: ${chart.lunar.day}/${chart.lunar.month}/${chart.lunar.year}; Can chi: ${chart.canChi.year} / ${chart.canChi.month} / ${chart.canChi.day} / ${chart.canChi.hour}.
+- Mệnh/Thân/Cục: ${chart.menh} / ${chart.than} / ${chart.cuc}; bản mệnh: ${chart.banMenh}; âm dương: ${chart.amDuong}; đại vận hiện tại: ${decade.current}.
+- Trọng tâm mở khóa: ${focus.title}.
+- Bằng chứng bắt buộc phải dùng:
+  - ${focus.evidence.join("\n  - ")}
+
+Cung liên quan cần đối chiếu:
+${compactFocusedPalaceContext(chart, type, scopeKey)}
+
+Tóm tắt engine:
+- ${chart.summary.join("\n- ")}`;
+}
+
+function paidReadingDataContext(chart: TuViChart, type: ReadingKey, scopeKey: string, focus: ReturnType<typeof getFocusData>) {
+  if (type !== "FULL") return compactFocusedChartContext(chart, type, scopeKey, focus);
+
+  return `Dữ kiện các cung trọng yếu:
+${compactImportantPalaces(chart)}
+
+Dữ liệu 12 cung đã an sao:
+${compactPalaceContext(chart)}
+
+Dữ liệu lá số JSON đầy đủ, chỉ dùng để đối chiếu bằng chứng, KHÔNG tự an sao lại:
+${JSON.stringify(chart, null, 2)}`;
 }
 
 function getFocusData(chart: TuViChart, type: ReadingKey, scopeKey: string) {
@@ -548,6 +790,17 @@ function paidTemporalGuidance(chart: TuViChart, type: ReadingKey, scopeKey: stri
 - Nếu có điểm sáng, chỉ rõ cách biến nó thành lợi thế thực tế trong công việc, tiền bạc, quan hệ hoặc nhịp sống.`;
 }
 
+export function paidReadingMaxTokens(type: ReadingKey, chapter?: PaidReadingChapter) {
+  if (type === "FULL") return PAID_READING_CHAPTER_MAX_TOKENS;
+  if (type === "DAI_VAN") return 4600;
+  if (type === "PALACE" || type === "TIEU_VAN") return 4200;
+  if (type === "NGUYET_VAN") return 3400;
+  if (type === "NHAT_VAN") return 2600;
+
+  const target = Number(chapter?.targetWords.replace(/\./g, "").match(/\d+/)?.[0] || 900);
+  return Math.min(PAID_READING_CHAPTER_MAX_TOKENS, Math.max(2600, Math.ceil(target * 3.8)));
+}
+
 export function paidReadingChapterPrompt(
   chart: TuViChart,
   type: ReadingKey,
@@ -564,6 +817,7 @@ export function paidReadingChapterPrompt(
   const unitName = isFullReport ? "chương" : "phần luận giải";
   const startLine = isFullReport ? `# ${chapter.title}` : `# ${FEATURE_PRICES[type].label}: ${scopeKey}`;
   const temporalGuidance = paidTemporalGuidance(chart, type, scopeKey);
+  const dataContext = paidReadingDataContext(chart, type, scopeKey, focus);
 
   return `Bạn là chuyên gia tử vi Việt Nam. Hãy viết ${unitName} ${isFullReport ? `${chapter.title} (${index + 1}/${total})` : "đang mở khóa"} cho báo cáo trả phí.
 
@@ -586,18 +840,11 @@ ${paidReadingQualityRules()}
 
 ${temporalGuidance}
 
-Dữ kiện các cung trọng yếu:
-${compactImportantPalaces(chart)}
-
-Dữ liệu 12 cung đã an sao:
-${compactPalaceContext(chart)}
-
-Dữ liệu lá số JSON đầy đủ, chỉ dùng để đối chiếu bằng chứng, KHÔNG tự an sao lại:
-${JSON.stringify(chart, null, 2)}
+${dataContext}
 
 Yêu cầu bắt buộc:
 - Chỉ viết ${unitName} này, không viết lan sang phạm vi khác.
-- Không tự tính lại lá số, không đổi ngày giờ, không tự thêm sao ngoài JSON.
+- Không tự tính lại lá số, không đổi ngày giờ, không tự thêm sao ngoài dữ liệu đã cấp.
 - Nội dung phải tạo cảm giác an tâm, rõ ràng, đáng tiền cho người đọc 30-60 tuổi.
 - BẮT BUỘC độ dài riêng phần này: ${chapter.targetWords}; không trả lời ngắn hơn mốc dưới của phạm vi này.
 - Xưng hô tự nhiên theo dữ liệu: dùng "${summary.viewerAddress}" khi cần gọi trực tiếp người xem.
@@ -687,14 +934,7 @@ Với ${summary.viewerAddress} ${chart.input.fullName}, lá số nên được �
 - Với quan hệ, nên nói rõ nhu cầu bằng lời nhẹ, tránh im lặng kéo dài thành hiểu nhầm.${monthAdvice}`;
 }
 
-function fallbackPaidReading(chart: TuViChart, type: ReadingKey, scopeKey: string) {
-  const focus = getFocusData(chart, type, scopeKey);
-  return paidReadingChapters(chart, type)
-    .map((chapter) => fallbackChapterBody(chart, chapter, focus))
-    .join("\n\n");
-}
-
-async function generateViaGateway(prompt: string, model: string) {
+async function generateViaGateway(prompt: string, model: string, maxTokens: number) {
   if (!process.env.VERCEL_OIDC_TOKEN && !process.env.AI_GATEWAY_API_KEY) return null;
 
   try {
@@ -703,7 +943,7 @@ async function generateViaGateway(prompt: string, model: string) {
       model,
       prompt,
       temperature: 0.55,
-      maxOutputTokens: PAID_READING_CHAPTER_MAX_TOKENS,
+      maxOutputTokens: maxTokens,
     });
     return { content: result.text, model };
   } catch {
@@ -711,91 +951,12 @@ async function generateViaGateway(prompt: string, model: string) {
   }
 }
 
-async function generatePaidChapter(prompt: string, gatewayModel: string) {
+async function generatePaidChapter(prompt: string, gatewayModel: string, maxTokens: number) {
   const routed = await generateWithLlmRouter({
     prompt,
-    maxTokens: PAID_READING_CHAPTER_MAX_TOKENS,
+    maxTokens,
     temperature: 0.55,
   });
   if (routed) return { content: routed.text, model: routed.model };
-  return generateViaGateway(prompt, gatewayModel);
-}
-
-export async function generateReading(chart: TuViChart, type: ReadingKey, scopeKey: string) {
-  const gatewayModel = process.env.AI_MODEL || "openai/gpt-5.4";
-  const focus = getFocusData(chart, type, scopeKey);
-  const chapters = paidReadingChapters(chart, type);
-  const summary = getDeepReadingSummary(chart);
-
-  if (isLlmDisabledForSmoke() || (!hasExternalLlmProvider() && !process.env.VERCEL_OIDC_TOKEN && !process.env.AI_GATEWAY_API_KEY)) {
-    return {
-      content: fallbackPaidReading(chart, type, scopeKey),
-      model: "template-fallback",
-      prompt: JSON.stringify({
-        strategy: PAID_READING_VERSION,
-        fallback: true,
-        reason: "no-provider",
-        promptVersion: PAID_READING_VERSION,
-        wordTarget: PAID_FULL_WORD_TARGET,
-        chartEngineVersion: chart.engine?.version,
-        viewYear: chart.input.viewYear,
-        viewerAddress: summary.viewerAddress,
-        scores: summary.scores,
-        chapters: chapters.map((chapter) => ({ key: chapter.key, title: chapter.title, model: "template-fallback" })),
-      }),
-    };
-  }
-
-  const outputs: Array<{
-    key: string;
-    title: string;
-    content: string;
-    model: string;
-    prompt: string;
-    wordCount: number;
-    formatGuarded: boolean;
-  }> = [];
-
-  for (const [index, chapter] of chapters.entries()) {
-    const prompt = paidReadingChapterPrompt(chart, type, scopeKey, focus, chapter, index, chapters.length);
-    const generated = await generatePaidChapter(prompt, gatewayModel);
-    const generatedContent = generated?.content?.trim() || "";
-    const hasCompleteContent = generatedContent ? isCompletePaidChapter(generatedContent, chapter) : false;
-    const content = hasCompleteContent ? generatedContent : fallbackChapterBody(chart, chapter, focus);
-
-    outputs.push({
-      key: chapter.key,
-      title: chapter.title,
-      content,
-      model: hasCompleteContent ? generated!.model : generatedContent ? `${generated!.model} + format-guard` : "template-fallback",
-      prompt,
-      wordCount: countWords(content),
-      formatGuarded: !hasCompleteContent,
-    });
-  }
-
-  return {
-    content: outputs.map((chapter) => chapter.content.trim()).join("\n\n"),
-    model: Array.from(new Set(outputs.map((chapter) => chapter.model))).join(" + "),
-    prompt: JSON.stringify({
-      strategy: PAID_READING_VERSION,
-      promptVersion: PAID_READING_VERSION,
-      wordTarget: type === "FULL" ? PAID_FULL_WORD_TARGET : "theo phạm vi mở khóa",
-      maxTokensPerChapter: PAID_READING_CHAPTER_MAX_TOKENS,
-      chartEngineVersion: chart.engine?.version,
-      chartEngineProfile: chart.engine?.starProfile,
-      viewYear: chart.input.viewYear,
-      viewerAddress: summary.viewerAddress,
-      age: summary.age,
-      scores: summary.scores,
-      chapters: outputs.map((chapter) => ({
-        key: chapter.key,
-        title: chapter.title,
-        model: chapter.model,
-        wordCount: chapter.wordCount,
-        formatGuarded: chapter.formatGuarded,
-        prompt: chapter.prompt,
-      })),
-    }),
-  };
+  return generateViaGateway(prompt, gatewayModel, maxTokens);
 }

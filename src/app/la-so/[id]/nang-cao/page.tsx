@@ -3,11 +3,12 @@ import { notFound, redirect } from "next/navigation";
 import { ArrowLeft, BookOpen, Sparkles } from "lucide-react";
 import { ChartBoard } from "@/components/chart-board";
 import { FeedbackActions } from "@/components/feedback-actions";
+import { FullReadingJobPanel } from "@/components/full-reading-job-panel";
 import { MarkdownContent } from "@/components/markdown-content";
 import { ReadingPanel } from "@/components/reading-panel";
 import { getDeepReadingSummary, paidReadingChapters } from "@/lib/ai";
 import { getCurrentUser } from "@/lib/auth";
-import { getAnyCompletedReading, getCachedReading, getChart } from "@/lib/data";
+import { getAnyCompletedReading, getCachedReading, getChart, getReadingJobById, getReadingJobByScope } from "@/lib/data";
 
 export const metadata = {
   title: "Luận giải nâng cao",
@@ -25,10 +26,13 @@ function headingId(text: string) {
 
 export default async function AdvancedReadingPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ reading?: string }>;
 }) {
   const { id } = await params;
+  const query = await searchParams;
   const user = await getCurrentUser();
   if (!user) redirect(`/dang-nhap?next=/la-so/${id}/nang-cao`);
 
@@ -39,10 +43,19 @@ export default async function AdvancedReadingPage({
     notFound();
   }
 
+  const requestedReading = query.reading ? await getReadingJobById(user.id, query.reading) : null;
+  const currentFullJob = await getReadingJobByScope(user.id, id, "FULL", "all");
   const fullReading =
+    (requestedReading?.status === "COMPLETED" && requestedReading.content ? requestedReading : null) ||
     (await getCachedReading(user.id, id, "FULL", "all")) ||
     (user.role === "ADMIN" ? await getAnyCompletedReading(id, "FULL", "all") : null);
-  if (!fullReading) redirect(`/la-so/${id}`);
+  const pendingReading =
+    !fullReading && requestedReading?.type === "FULL" && requestedReading.scopeKey === "all"
+      ? requestedReading
+      : !fullReading && currentFullJob?.type === "FULL" && currentFullJob.scopeKey === "all"
+        ? currentFullJob
+        : null;
+  if (!fullReading && !pendingReading) redirect(`/la-so/${id}`);
 
   const summary = getDeepReadingSummary(record.chart);
   const chapters = paidReadingChapters(record.chart, "FULL");
@@ -60,11 +73,13 @@ export default async function AdvancedReadingPage({
               <p className="eyebrow">Luận giải nâng cao</p>
               <h1 className="text-3xl font-black text-stone-950">{record.chart.input.fullName}</h1>
               <p className="mt-2 max-w-3xl text-stone-600">
-                Bản phân tích chuyên sâu năm {record.chart.input.viewYear}, mục tiêu {summary.wordTarget}, đã lưu để xem lại bất cứ lúc nào.
+                {pendingReading
+                  ? "Bản luận giải đang được tạo theo từng chương. Trang này sẽ tự cập nhật khi hoàn tất."
+                  : `Bản phân tích chuyên sâu năm ${record.chart.input.viewYear}, mục tiêu ${summary.wordTarget}, đã lưu để xem lại bất cứ lúc nào.`}
               </p>
             </div>
-            <span className="inline-flex w-fit items-center gap-2 rounded-full bg-emerald-50 px-4 py-2 text-sm font-black text-emerald-700">
-              <Sparkles size={18} /> Đã mở nâng cao
+            <span className={`inline-flex w-fit items-center gap-2 rounded-full px-4 py-2 text-sm font-black ${pendingReading ? "bg-orange-50 text-orange-800" : "bg-emerald-50 text-emerald-700"}`}>
+              <Sparkles size={18} /> {pendingReading ? "Đang tạo bản FULL" : "Đã mở nâng cao"}
             </span>
           </div>
 
@@ -88,6 +103,16 @@ export default async function AdvancedReadingPage({
           </div>
         </section>
 
+        {pendingReading ? (
+          <FullReadingJobPanel
+            chartId={id}
+            readingId={pendingReading.id}
+            initialProgress={pendingReading.promptMeta}
+            initialStatus={pendingReading.status === "FAILED" || pendingReading.status === "REFUNDED" ? pendingReading.status : "PENDING"}
+            initialError={pendingReading.error}
+          />
+        ) : (
+        <>
         <div className="mt-6 chart-frame">
           <div className="min-w-[980px] md:min-w-0">
             <ChartBoard chart={record.chart} />
@@ -111,7 +136,7 @@ export default async function AdvancedReadingPage({
 
             <article data-testid="advanced-reading-chapter-list">
               <p className="eyebrow">Bản luận giải toàn bộ</p>
-              <MarkdownContent content={fullReading.content} />
+              <MarkdownContent content={fullReading?.content || ""} />
             </article>
           </div>
           <FeedbackActions label="luận giải nâng cao" />
@@ -120,6 +145,8 @@ export default async function AdvancedReadingPage({
         <div className="mt-8">
           <ReadingPanel chartId={id} chart={record.chart} />
         </div>
+        </>
+        )}
       </div>
     </main>
   );

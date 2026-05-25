@@ -1,16 +1,32 @@
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   FREE_OVERVIEW_MAX_WORDS,
   FREE_OVERVIEW_MIN_WORDS,
   PAID_FULL_WORD_TARGET,
+  PAID_READING_CHAPTER_MAX_TOKENS,
+  type PaidReadingChapter,
+  type PaidReadingGenerationProgress,
   generateFreeOverview,
   generateReading,
+  generateReadingWithProgress,
   getDeepReadingSummary,
   isCompletePaidChapter,
   paidReadingChapterPrompt,
   paidReadingChapters,
+  paidReadingMaxTokens,
+  runReadingChapterTasks,
 } from "@/lib/ai";
 import { generateTuViChart } from "@/lib/chart";
+
+const llmRouterMocks = vi.hoisted(() => ({
+  generateWithLlmRouter: vi.fn(),
+  hasExternalLlmProvider: vi.fn(() => false),
+}));
+
+vi.mock("@/lib/llm-router", () => ({
+  generateWithLlmRouter: llmRouterMocks.generateWithLlmRouter,
+  hasExternalLlmProvider: llmRouterMocks.hasExternalLlmProvider,
+}));
 
 const oldGatewayKey = process.env.AI_GATEWAY_API_KEY;
 const oldOidcToken = process.env.VERCEL_OIDC_TOKEN;
@@ -47,6 +63,38 @@ function sampleChart(gender: "male" | "female" = "female") {
   });
 }
 
+function completeGeneratedChapter(chapter: PaidReadingChapter, marker: string) {
+  const filler = Array.from({ length: 720 }, (_, index) => `${marker}-word-${index}`).join(" ");
+  const monthLines =
+    chapter.key === "yearly-months"
+      ? Array.from({ length: 12 }, (_, index) => `- Thang ${index + 1}: uu tien viec ro rang, tranh quyet dinh voi.`).join("\n")
+      : "";
+
+  return `# ${chapter.title}
+
+## ${chapter.requiredSections[0]}
+- ${marker} evidence.
+
+## ${chapter.requiredSections[1]}
+${filler}
+
+## ${chapter.requiredSections[2]}
+- ${marker} risk note.
+- Kiem tra tien bac va giay to.
+
+## ${chapter.requiredSections[3]}
+- ${marker} action one.
+- ${marker} action two.
+- ${marker} action three.
+${monthLines ? `\n${monthLines}` : ""}`;
+}
+
+beforeEach(() => {
+  llmRouterMocks.generateWithLlmRouter.mockReset();
+  llmRouterMocks.hasExternalLlmProvider.mockReset();
+  llmRouterMocks.hasExternalLlmProvider.mockReturnValue(false);
+});
+
 afterEach(() => {
   restore("AI_GATEWAY_API_KEY", oldGatewayKey);
   restore("VERCEL_OIDC_TOKEN", oldOidcToken);
@@ -57,6 +105,72 @@ afterEach(() => {
 });
 
 describe("AI reading format", () => {
+  it("runs paid reading chapter jobs with a bounded parallelism limit while preserving result order", async () => {
+    let active = 0;
+    let maxActive = 0;
+    const completionOrder: number[] = [];
+
+    const result = await runReadingChapterTasks([0, 1, 2, 3, 4, 5, 6, 7], 3, async (value) => {
+      active += 1;
+      maxActive = Math.max(maxActive, active);
+      await new Promise((resolve) => setTimeout(resolve, 10 - value));
+      completionOrder.push(value);
+      active -= 1;
+      return `chapter-${value}`;
+    });
+
+    expect(maxActive).toBeLessThanOrEqual(3);
+    expect(completionOrder).not.toEqual([0, 1, 2, 3, 4, 5, 6, 7]);
+    expect(result).toEqual(["chapter-0", "chapter-1", "chapter-2", "chapter-3", "chapter-4", "chapter-5", "chapter-6", "chapter-7"]);
+  });
+
+  it("falls back only the failed full-reading chapter while keeping bounded parallel progress", async () => {
+    clearProviderEnv();
+    llmRouterMocks.hasExternalLlmProvider.mockReturnValue(true);
+
+    const chart = sampleChart();
+    const chapters = paidReadingChapters(chart, "FULL");
+    const failedChapter = chapters[4];
+    const progressSnapshots: PaidReadingGenerationProgress[] = [];
+    let active = 0;
+    let maxActive = 0;
+
+    llmRouterMocks.generateWithLlmRouter.mockImplementation(async ({ prompt }: { prompt: string }) => {
+      const chapter = chapters.find((item) => prompt.includes(item.title));
+      if (!chapter) throw new Error("Unknown chapter prompt");
+
+      active += 1;
+      maxActive = Math.max(maxActive, active);
+      await new Promise((resolve) => setTimeout(resolve, chapter.key === failedChapter.key ? 5 : 15));
+      active -= 1;
+
+      if (chapter.key === failedChapter.key) throw new Error("chapter format exploded");
+      return {
+        text: completeGeneratedChapter(chapter, `generated-${chapter.key}`),
+        model: `mock-${chapter.key}`,
+        provider: "gemini",
+      };
+    });
+
+    const result = await generateReadingWithProgress(chart, "FULL", "all", (progress) => {
+      progressSnapshots.push(progress);
+    });
+    const promptMeta = JSON.parse(result.prompt);
+    const failedChapterMeta = promptMeta.chapters.find((chapter: { key: string }) => chapter.key === failedChapter.key);
+    const successfulChapterMeta = promptMeta.chapters.find((chapter: { key: string }) => chapter.key === chapters[0].key);
+
+    expect(maxActive).toBeLessThanOrEqual(3);
+    expect(llmRouterMocks.generateWithLlmRouter).toHaveBeenCalledTimes(8);
+    expect(result.content).toContain(`generated-${chapters[0].key}`);
+    expect(result.content).toContain(`# ${failedChapter.title}`);
+    expect(result.content).not.toContain(`generated-${failedChapter.key}`);
+    expect(failedChapterMeta).toMatchObject({ key: failedChapter.key, formatGuarded: true });
+    expect(String(failedChapterMeta.model)).toContain("template-fallback");
+    expect(successfulChapterMeta).toMatchObject({ key: chapters[0].key, formatGuarded: false });
+    expect(progressSnapshots).toHaveLength(8);
+    expect(progressSnapshots.at(-1)?.completedChapters).toHaveLength(8);
+  });
+
   it("asks the free overview LLM prompt for a long single-request reading", async () => {
     clearProviderEnv();
 
@@ -196,6 +310,41 @@ describe("AI reading format", () => {
     expect(prompt).toContain("Tiểu vận năm 2026");
     expect(prompt).toContain("BẮT BUỘC độ dài riêng phần này");
     expect(prompt).toContain("ít nhất 3 bullet hành động");
+  });
+
+  it("keeps focused unlock prompts compact without removing paid-quality guardrails", () => {
+    const chart = sampleChart("male");
+    const chapters = paidReadingChapters(chart, "PALACE");
+    const prompt = paidReadingChapterPrompt(
+      chart,
+      "PALACE",
+      "Mệnh",
+      { title: "Cung Mệnh", evidence: ["Mệnh có Thiên Tướng (H)", "Thân cư Mệnh"] },
+      chapters[0],
+      0,
+      chapters.length,
+    );
+
+    expect(prompt).not.toContain("Dữ liệu lá số JSON đầy đủ");
+    expect(prompt).not.toContain('"palaces"');
+    expect(prompt).toContain("Dữ liệu trọng tâm đã rút gọn");
+    expect(prompt).toContain("Tránh hiệu ứng Barnum");
+    expect(prompt).toContain("tình huống cụ thể");
+    expect(prompt).toContain("vũ khí");
+    expect(prompt).toContain("Actionable Advice");
+    expect(prompt).toContain("Mệnh");
+    expect(prompt).toContain("Thân");
+  });
+
+  it("uses smaller token budgets for focused readings while preserving deeper full chapters", () => {
+    const chart = sampleChart();
+    const fullYearChapter = paidReadingChapters(chart, "FULL").at(-1)!;
+    const palaceChapter = paidReadingChapters(chart, "PALACE")[0];
+    const dailyChapter = paidReadingChapters(chart, "NHAT_VAN")[0];
+
+    expect(paidReadingMaxTokens("FULL", fullYearChapter)).toBe(PAID_READING_CHAPTER_MAX_TOKENS);
+    expect(paidReadingMaxTokens("PALACE", palaceChapter)).toBeLessThan(PAID_READING_CHAPTER_MAX_TOKENS);
+    expect(paidReadingMaxTokens("NHAT_VAN", dailyChapter)).toBeLessThan(paidReadingMaxTokens("PALACE", palaceChapter));
   });
 
   it("rejects paid chapters that are too short or miss required sections", () => {

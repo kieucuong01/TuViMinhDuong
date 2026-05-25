@@ -24,9 +24,14 @@ export type StoredReading = {
   chartId: string;
   type: ReadingKey;
   scopeKey: string;
+  status?: "PENDING" | "COMPLETED" | "FAILED" | "REFUNDED";
   priceCoins: number;
   content: string;
+  promptMeta?: unknown;
+  model?: string | null;
+  error?: string | null;
   createdAt: Date;
+  updatedAt?: Date;
 };
 
 export type ReadingScopeKey = {
@@ -168,7 +173,12 @@ async function findPurchasedDuplicateChart(user: SessionUser | null, input: Char
     for (const chart of charts().values()) {
       if (chart.userId !== user.id || chartInputKey(chart.input) !== inputKey) continue;
       const hasPurchasedReading = Array.from(readings().values()).some(
-        (reading) => reading.userId === user.id && reading.chartId === chart.id && reading.type === "FULL" && reading.scopeKey === "all",
+        (reading) =>
+          reading.userId === user.id &&
+          reading.chartId === chart.id &&
+          reading.type === "FULL" &&
+          reading.scopeKey === "all" &&
+          (reading.status ?? "COMPLETED") === "COMPLETED",
       );
       if (hasPurchasedReading) return upgradeStoredChart(chart);
     }
@@ -342,7 +352,12 @@ export async function listUserCharts(userId: string, includeAll = false): Promis
 
     return userCharts.map((chart) => {
       const advanced = Array.from(readings().values()).find(
-        (reading) => (includeAll || reading.userId === userId) && reading.chartId === chart.id && reading.type === "FULL" && reading.scopeKey === "all",
+        (reading) =>
+          (includeAll || reading.userId === userId) &&
+          reading.chartId === chart.id &&
+          reading.type === "FULL" &&
+          reading.scopeKey === "all" &&
+          (reading.status ?? "COMPLETED") === "COMPLETED",
       );
       return {
         ...chart,
@@ -449,7 +464,10 @@ export async function adjustCoins(user: SessionUser, amount: number, reason: str
 
 export async function getCachedReading(userId: string, chartId: string, type: ReadingKey, scopeKey: string) {
   const db = getDb();
-  if (!db || usesInMemoryUser(userId)) return readings().get(`${userId}:${chartId}:${type}:${scopeKey}`) || null;
+  if (!db || usesInMemoryUser(userId)) {
+    const reading = readings().get(`${userId}:${chartId}:${type}:${scopeKey}`) || null;
+    return reading && (reading.status ?? "COMPLETED") === "COMPLETED" && reading.content ? reading : null;
+  }
   const reading = await db.reading.findUnique({
     where: { userId_chartId_type_scopeKey: { userId, chartId, type, scopeKey } },
   });
@@ -471,7 +489,12 @@ export async function getAnyCompletedReading(chartId: string, type: ReadingKey, 
   const db = getDb();
   if (!db) {
     return Array.from(readings().values()).find(
-      (reading) => reading.chartId === chartId && reading.type === type && reading.scopeKey === scopeKey,
+      (reading) =>
+        reading.chartId === chartId &&
+        reading.type === type &&
+        reading.scopeKey === scopeKey &&
+        (reading.status ?? "COMPLETED") === "COMPLETED" &&
+        reading.content,
     ) || null;
   }
   const reading = await db.reading.findFirst({
@@ -479,21 +502,182 @@ export async function getAnyCompletedReading(chartId: string, type: ReadingKey, 
     orderBy: { createdAt: "desc" },
   });
   return reading?.content
-    ? {
-        id: reading.id,
-        userId: reading.userId,
-        chartId: reading.chartId,
-        type: reading.type as ReadingKey,
-        scopeKey: reading.scopeKey,
-        priceCoins: reading.priceCoins,
-        content: reading.content,
-        createdAt: reading.createdAt,
-      }
+    ? storedReadingFromDb(reading)
     : null;
 }
 
 function readingMapKey(type: ReadingKey, scopeKey: string) {
   return `${type}:${scopeKey}`;
+}
+
+function storedReadingFromDb(reading: {
+  id: string;
+  userId: string;
+  chartId: string;
+  type: string;
+  scopeKey: string;
+  status: string;
+  priceCoins: number;
+  content: string | null;
+  promptMeta?: unknown;
+  model?: string | null;
+  error?: string | null;
+  createdAt: Date;
+  updatedAt?: Date;
+}): StoredReading {
+  return {
+    id: reading.id,
+    userId: reading.userId,
+    chartId: reading.chartId,
+    type: reading.type as ReadingKey,
+    scopeKey: reading.scopeKey,
+    status: reading.status as StoredReading["status"],
+    priceCoins: reading.priceCoins,
+    content: reading.content || "",
+    promptMeta: reading.promptMeta,
+    model: reading.model,
+    error: reading.error,
+    createdAt: reading.createdAt,
+    updatedAt: reading.updatedAt,
+  };
+}
+
+function updateDemoReadingById(readingId: string, patch: Partial<StoredReading>) {
+  for (const [key, reading] of readings()) {
+    if (reading.id !== readingId) continue;
+    const updated = { ...reading, ...patch, updatedAt: new Date() };
+    readings().set(key, updated);
+    return updated;
+  }
+  return null;
+}
+
+export async function getReadingJobByScope(userId: string, chartId: string, type: ReadingKey, scopeKey: string) {
+  const db = getDb();
+  if (!db || usesInMemoryUser(userId)) return readings().get(`${userId}:${chartId}:${type}:${scopeKey}`) || null;
+  const reading = await db.reading.findUnique({
+    where: { userId_chartId_type_scopeKey: { userId, chartId, type, scopeKey } },
+  });
+  return reading ? storedReadingFromDb(reading) : null;
+}
+
+export async function getReadingJobById(userId: string, readingId: string) {
+  const db = getDb();
+  if (!db || usesInMemoryUser(userId)) {
+    return Array.from(readings().values()).find((reading) => reading.id === readingId && reading.userId === userId) || null;
+  }
+  const reading = await db.reading.findFirst({ where: { id: readingId, userId } });
+  return reading ? storedReadingFromDb(reading) : null;
+}
+
+export async function createPendingReading(
+  user: SessionUser,
+  chartId: string,
+  type: ReadingKey,
+  scopeKey: string,
+  priceCoins: number,
+  promptMeta?: unknown,
+) {
+  const db = getDb();
+  if (!db || usesInMemoryUser(user.id)) {
+    const key = `${user.id}:${chartId}:${type}:${scopeKey}`;
+    const existing = readings().get(key);
+    const reading: StoredReading = {
+      id: existing?.id || `demo-reading-${Date.now()}`,
+      userId: user.id,
+      chartId,
+      type,
+      scopeKey,
+      status: "PENDING",
+      priceCoins,
+      content: "",
+      promptMeta,
+      model: null,
+      error: null,
+      createdAt: existing?.createdAt || new Date(),
+      updatedAt: new Date(),
+    };
+    readings().set(key, reading);
+    return reading;
+  }
+
+  const saved = await db.reading.upsert({
+    where: { userId_chartId_type_scopeKey: { userId: user.id, chartId, type, scopeKey } },
+    update: {
+      status: "PENDING",
+      content: "",
+      priceCoins,
+      promptMeta: promptMeta || undefined,
+      model: null,
+      error: null,
+    },
+    create: {
+      userId: user.id,
+      chartId,
+      type,
+      scopeKey,
+      priceCoins,
+      status: "PENDING",
+      content: "",
+      promptMeta: promptMeta || undefined,
+      model: null,
+      error: null,
+    },
+  });
+  return storedReadingFromDb(saved);
+}
+
+export async function updateReadingJobProgress(readingId: string, content: string, promptMeta?: unknown, model?: string) {
+  const demoUpdated = updateDemoReadingById(readingId, { status: "PENDING", content, promptMeta, model: model || null, error: null });
+  if (demoUpdated) return demoUpdated;
+  const db = getDb();
+  if (!db) return null;
+  const saved = await db.reading.update({
+    where: { id: readingId },
+    data: {
+      status: "PENDING",
+      content,
+      promptMeta: promptMeta || undefined,
+      model: model || undefined,
+      error: null,
+    },
+  });
+  return storedReadingFromDb(saved);
+}
+
+export async function completeReadingJob(readingId: string, content: string, promptMeta?: unknown, model?: string) {
+  const demoUpdated = updateDemoReadingById(readingId, { status: "COMPLETED", content, promptMeta, model: model || null, error: null });
+  if (demoUpdated) return demoUpdated;
+  const db = getDb();
+  if (!db) return null;
+  const saved = await db.reading.update({
+    where: { id: readingId },
+    data: {
+      status: "COMPLETED",
+      content,
+      promptMeta: promptMeta || undefined,
+      model: model || undefined,
+      error: null,
+    },
+  });
+  return storedReadingFromDb(saved);
+}
+
+export async function failReadingJob(readingId: string, error: string, refunded = false, promptMeta?: unknown) {
+  const status = refunded ? "REFUNDED" : "FAILED";
+  const demoUpdated = updateDemoReadingById(readingId, { status, error, promptMeta });
+  if (demoUpdated) return demoUpdated;
+  const db = getDb();
+  if (!db) return null;
+  const saved = await db.reading.update({
+    where: { id: readingId },
+    data: {
+      status,
+      error,
+      promptMeta: promptMeta || undefined,
+    },
+  });
+  return storedReadingFromDb(saved);
 }
 
 export async function getCompletedReadingsForScopes(user: SessionUser | null, chartId: string, keys: ReadingScopeKey[]) {
@@ -507,6 +691,7 @@ export async function getCompletedReadingsForScopes(user: SessionUser | null, ch
       .filter((reading) => {
         if (reading.chartId !== chartId) return false;
         if (user.role !== "ADMIN" && reading.userId !== user.id) return false;
+        if ((reading.status ?? "COMPLETED") !== "COMPLETED" || !reading.content) return false;
         return uniqueKeys.some((key) => key.type === reading.type && key.scopeKey === reading.scopeKey);
       })
       .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
@@ -551,7 +736,8 @@ export async function getCompletedReadingsForScopes(user: SessionUser | null, ch
 export async function getReadingById(userId: string, readingId: string) {
   const db = getDb();
   if (!db || usesInMemoryUser(userId)) {
-    return Array.from(readings().values()).find((reading) => reading.id === readingId && reading.userId === userId) || null;
+    const reading = Array.from(readings().values()).find((item) => item.id === readingId && item.userId === userId) || null;
+    return reading && (reading.status ?? "COMPLETED") === "COMPLETED" && reading.content ? reading : null;
   }
   const reading = await db.reading.findFirst({ where: { id: readingId, userId } });
   return reading?.status === "COMPLETED" && reading.content
@@ -580,7 +766,21 @@ export async function saveReading(
   const db = getDb();
   if (!db || usesInMemoryUser(user.id)) {
     const id = `demo-reading-${Date.now()}`;
-    const reading = { id, userId: user.id, chartId, type, scopeKey, priceCoins, content, createdAt: new Date() };
+    const reading = {
+      id,
+      userId: user.id,
+      chartId,
+      type,
+      scopeKey,
+      status: "COMPLETED" as const,
+      priceCoins,
+      content,
+      promptMeta,
+      model: process.env.AI_MODEL || "template-fallback",
+      error: null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
     readings().set(`${user.id}:${chartId}:${type}:${scopeKey}`, reading);
     return reading;
   }

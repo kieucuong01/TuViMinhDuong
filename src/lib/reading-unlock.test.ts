@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { generateTuViChart, type TuViChart } from "@/lib/chart";
-import { unlockReadingForUser, type ReadingUnlockDeps } from "@/lib/reading-unlock";
+import { startFullReadingJobForUser, unlockReadingForUser, type ReadingUnlockDeps } from "@/lib/reading-unlock";
 import type { ReadingKey } from "@/lib/pricing";
 import type { SessionUser } from "@/lib/auth";
 
@@ -32,6 +32,7 @@ function user(overrides: Partial<SessionUser> = {}): SessionUser {
 function createDeps(options: {
   balance?: number;
   cachedReadingId?: string;
+  pendingReadingId?: string;
   generateFails?: boolean;
   priceCoins?: number;
 } = {}) {
@@ -39,6 +40,7 @@ function createDeps(options: {
   let balance = options.balance ?? 0;
   const adjustments: number[] = [];
   const saved: Array<{ priceCoins: number; content: string; promptMeta?: unknown }> = [];
+  const pending: Array<{ priceCoins: number; promptMeta?: unknown }> = [];
   const priceCoins = options.priceCoins ?? 199;
   const chartId = "chart-1";
 
@@ -54,6 +56,21 @@ function createDeps(options: {
             scopeKey,
             priceCoins,
             content: "cached",
+            createdAt: new Date("2026-01-01T00:00:00Z"),
+          }
+        : null,
+    ),
+    getReadingJobByScope: vi.fn(async (userId: string, id: string, type: ReadingKey, scopeKey: string) =>
+      options.pendingReadingId
+        ? {
+            id: options.pendingReadingId,
+            userId,
+            chartId: id,
+            type,
+            scopeKey,
+            status: "PENDING",
+            priceCoins,
+            content: "",
             createdAt: new Date("2026-01-01T00:00:00Z"),
           }
         : null,
@@ -82,6 +99,20 @@ function createDeps(options: {
         createdAt: new Date("2026-01-01T00:00:00Z"),
       };
     }),
+    createPendingReading: vi.fn(async (readingUser, id, type, scopeKey, chargedCoins, promptMeta) => {
+      pending.push({ priceCoins: chargedCoins, promptMeta });
+      return {
+        id: "reading-pending",
+        userId: readingUser.id,
+        chartId: id,
+        type,
+        scopeKey,
+        status: "PENDING",
+        priceCoins: chargedCoins,
+        content: "",
+        createdAt: new Date("2026-01-01T00:00:00Z"),
+      };
+    }),
   };
 
   return {
@@ -90,6 +121,7 @@ function createDeps(options: {
     getBalance: () => balance,
     adjustments,
     saved,
+    pending,
   };
 }
 
@@ -192,5 +224,37 @@ describe("reading unlock paywall flow", () => {
     expect(harness.getBalance()).toBe(199);
     expect(harness.adjustments).toEqual([-199, 199]);
     expect(harness.deps.saveReading).not.toHaveBeenCalled();
+  });
+
+  it("queues a full reading job without running the LLM in the unlock action", async () => {
+    const harness = createDeps({ balance: 250, priceCoins: 199 });
+
+    const result = await startFullReadingJobForUser(harness.deps, {
+      user: user({ coinBalance: 250 }),
+      chartId: harness.chartId,
+      temporaryFullAccess: false,
+    });
+
+    expect(result).toEqual({ status: "queued", readingId: "reading-pending", chargedCoins: 199 });
+    expect(harness.adjustments).toEqual([-199]);
+    expect(harness.deps.generateReading).not.toHaveBeenCalled();
+    expect(harness.deps.saveReading).not.toHaveBeenCalled();
+    expect(harness.pending[0]).toMatchObject({ priceCoins: 199 });
+  });
+
+  it("reuses an existing pending full reading job without charging again", async () => {
+    const harness = createDeps({ balance: 250, pendingReadingId: "reading-pending-existing", priceCoins: 199 });
+
+    const result = await startFullReadingJobForUser(harness.deps, {
+      user: user({ coinBalance: 250 }),
+      chartId: harness.chartId,
+      temporaryFullAccess: false,
+    });
+
+    expect(result).toEqual({ status: "pending", readingId: "reading-pending-existing", chargedCoins: 0 });
+    expect(harness.getBalance()).toBe(250);
+    expect(harness.deps.adjustCoins).not.toHaveBeenCalled();
+    expect(harness.deps.generateReading).not.toHaveBeenCalled();
+    expect(harness.deps.createPendingReading).not.toHaveBeenCalled();
   });
 });

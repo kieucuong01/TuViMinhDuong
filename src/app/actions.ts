@@ -3,7 +3,7 @@
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { clearSession, createMagicSession, getCurrentUser, getOrCreateEmailUser, loginOrRegister, setSession, type SessionUser } from "@/lib/auth";
-import { getCachedReading, getChart, getFeaturePrice, getUserBalance, saveArticleCategoryFromForm, saveArticleFromForm, saveChart, saveReading, adjustCoins, deleteArticleBySlug, deleteUserChart } from "@/lib/data";
+import { getCachedReading, getChart, getFeaturePrice, getUserBalance, saveArticleCategoryFromForm, saveArticleFromForm, saveChart, saveReading, adjustCoins, deleteArticleBySlug, deleteUserChart, getReadingJobByScope, createPendingReading } from "@/lib/data";
 import { generateReading } from "@/lib/ai";
 import { getDb } from "@/lib/db";
 import { createPayOSCheckout, createPayOSCustomCheckout } from "@/lib/payos";
@@ -11,7 +11,7 @@ import type { CalendarType, Gender } from "@/lib/chart";
 import { COIN_PACKAGES, TEMPORARY_FULL_ACCESS } from "@/lib/pricing";
 import type { ReadingKey } from "@/lib/pricing";
 import { isPayOSEnabled } from "@/lib/env";
-import { unlockReadingForUser } from "@/lib/reading-unlock";
+import { startFullReadingJobForUser, unlockReadingForUser } from "@/lib/reading-unlock";
 
 export async function loginAction(formData: FormData) {
   const email = String(formData.get("email") || "");
@@ -222,14 +222,41 @@ export async function requestReadingAction(formData: FormData) {
   const nextPath = safeNextPath(formData.get("next"), `/la-so/${chartId}`);
   const user = await getReadingUser(chartId, nextPath);
 
+  if (type === "FULL" && scopeKey === "all") {
+    const result = await startFullReadingJobForUser(
+      {
+        getChart,
+        getCachedReading,
+        getReadingJobByScope,
+        getFeaturePrice,
+        getUserBalance,
+        adjustCoins,
+        generateReading,
+        createPendingReading,
+        saveReading,
+      },
+      { user, chartId, temporaryFullAccess: TEMPORARY_FULL_ACCESS },
+    );
+
+    if (result.status === "insufficient_coins") {
+      redirect(withQueryParams(nextPath, { paywall: "coins", need: result.needCoins }));
+    }
+
+    revalidatePath(`/la-so/${chartId}`);
+    const advancedPath = `/la-so/${chartId}/nang-cao`;
+    redirect(withQueryParams(advancedPath, { reading: result.readingId, ...(result.status === "cached" ? {} : { generating: "1" }) }));
+  }
+
   const result = await unlockReadingForUser(
     {
       getChart,
       getCachedReading,
+      getReadingJobByScope,
       getFeaturePrice,
       getUserBalance,
       adjustCoins,
       generateReading,
+      createPendingReading,
       saveReading,
     },
     { user, chartId, type, scopeKey, temporaryFullAccess: TEMPORARY_FULL_ACCESS },
