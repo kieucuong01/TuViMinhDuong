@@ -790,14 +790,24 @@ function paidTemporalGuidance(chart: TuViChart, type: ReadingKey, scopeKey: stri
 - Nếu có điểm sáng, chỉ rõ cách biến nó thành lợi thế thực tế trong công việc, tiền bạc, quan hệ hoặc nhịp sống.`;
 }
 
+function paidReadingUpperTargetWords(chapter?: PaidReadingChapter, fallback = 900) {
+  const matches = chapter?.targetWords.match(/\d[\d.]*/g);
+  if (!matches?.length) return fallback;
+  const values = matches.map((value) => Number(value.replace(/\./g, ""))).filter((value) => Number.isFinite(value) && value > 0);
+  return values.length ? Math.max(...values) : fallback;
+}
+
 export function paidReadingMaxTokens(type: ReadingKey, chapter?: PaidReadingChapter) {
-  if (type === "FULL") return PAID_READING_CHAPTER_MAX_TOKENS;
+  if (type === "FULL") {
+    const targetWords = paidReadingUpperTargetWords(chapter, 1400);
+    return Math.min(PAID_READING_CHAPTER_MAX_TOKENS, Math.max(3400, Math.ceil(targetWords * 3)));
+  }
   if (type === "DAI_VAN") return 4600;
   if (type === "PALACE" || type === "TIEU_VAN") return 4200;
   if (type === "NGUYET_VAN") return 3400;
   if (type === "NHAT_VAN") return 2600;
 
-  const target = Number(chapter?.targetWords.replace(/\./g, "").match(/\d+/)?.[0] || 900);
+  const target = paidReadingUpperTargetWords(chapter);
   return Math.min(PAID_READING_CHAPTER_MAX_TOKENS, Math.max(2600, Math.ceil(target * 3.8)));
 }
 

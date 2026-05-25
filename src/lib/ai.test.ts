@@ -336,13 +336,16 @@ describe("AI reading format", () => {
     expect(prompt).toContain("Thân");
   });
 
-  it("uses smaller token budgets for focused readings while preserving deeper full chapters", () => {
+  it("sizes token budgets to each full chapter instead of over-allocating every chapter", () => {
     const chart = sampleChart();
+    const fullChapters = paidReadingChapters(chart, "FULL");
+    const overviewChapter = fullChapters[0];
     const fullYearChapter = paidReadingChapters(chart, "FULL").at(-1)!;
     const palaceChapter = paidReadingChapters(chart, "PALACE")[0];
     const dailyChapter = paidReadingChapters(chart, "NHAT_VAN")[0];
 
-    expect(paidReadingMaxTokens("FULL", fullYearChapter)).toBe(PAID_READING_CHAPTER_MAX_TOKENS);
+    expect(paidReadingMaxTokens("FULL", overviewChapter)).toBeLessThan(PAID_READING_CHAPTER_MAX_TOKENS);
+    expect(paidReadingMaxTokens("FULL", fullYearChapter)).toBeGreaterThan(paidReadingMaxTokens("FULL", overviewChapter));
     expect(paidReadingMaxTokens("PALACE", palaceChapter)).toBeLessThan(PAID_READING_CHAPTER_MAX_TOKENS);
     expect(paidReadingMaxTokens("NHAT_VAN", dailyChapter)).toBeLessThan(paidReadingMaxTokens("PALACE", palaceChapter));
   });
