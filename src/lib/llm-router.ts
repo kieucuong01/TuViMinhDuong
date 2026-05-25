@@ -10,6 +10,8 @@ type GenerateOptions = {
   prompt: string;
   temperature?: number;
   maxTokens?: number;
+  geminiModel?: string;
+  providerOrder?: LlmProvider[];
 };
 
 class ProviderRateLimitError extends Error {}
@@ -22,13 +24,13 @@ function keysFromEnv(singleName: string, listName: string) {
     .filter(Boolean);
 }
 
-function providerOrder(): LlmProvider[] {
-  const configured = (process.env.LLM_PROVIDER_ORDER || "gemini,groq")
+function providerOrder(override?: LlmProvider[]): LlmProvider[] {
+  const configured = (override?.length ? override.join(",") : process.env.LLM_PROVIDER_ORDER || "groq,gemini")
     .split(/[\n,;]+/)
     .map((item) => item.trim().toLowerCase())
     .filter((item): item is LlmProvider => item === "gemini" || item === "groq");
 
-  return configured.length ? configured : ["gemini", "groq"];
+  return configured.length ? configured : ["groq", "gemini"];
 }
 
 function hashPrompt(value: string) {
@@ -61,7 +63,7 @@ function assertText(text: unknown, provider: LlmProvider) {
 }
 
 async function callGemini(options: GenerateOptions, key: string): Promise<LlmResult> {
-  const model = process.env.GEMINI_MODEL || "gemini-2.5-flash-lite";
+  const model = options.geminiModel || process.env.GEMINI_MODEL || "gemini-2.5-flash-lite";
   const response = await fetch(
     `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(key)}`,
     {
@@ -121,7 +123,7 @@ export async function generateWithLlmRouter(options: GenerateOptions): Promise<L
   const groqKeys = keysFromEnv("GROQ_API_KEY", "GROQ_API_KEYS");
   const errors: string[] = [];
 
-  for (const provider of providerOrder()) {
+  for (const provider of providerOrder(options.providerOrder)) {
     const keys = provider === "gemini" ? geminiKeys : groqKeys;
     const key = selectKey(keys, options.prompt);
     if (!key) continue;

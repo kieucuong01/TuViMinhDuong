@@ -9,6 +9,8 @@ export const PAID_READING_CHAPTER_MAX_TOKENS = 7000;
 export const FREE_OVERVIEW_VERSION = "free-overview-llm-v3";
 export const PAID_READING_VERSION = "paid-reading-chapters-v3";
 export const PAID_FULL_WORD_TARGET = "8.000-12.000 từ";
+const PAID_READING_DEFAULT_GEMINI_MODEL = "gemini-2.5-flash";
+const PAID_READING_DEFAULT_ESCALATION_GEMINI_MODEL = "gemini-3.5-flash";
 
 const IMPORTANT_PALACES = ["Mệnh", "Thân", "Quan Lộc", "Tài Bạch", "Phu Thê", "Tật Ách", "Thiên Di"];
 const GOOD_STAR_HINTS = ["Lộc", "Khoa", "Quyền", "Tả", "Hữu", "Xương", "Khúc", "Khôi", "Việt", "Thiên Mã", "Long Trì", "Phượng"];
@@ -200,6 +202,22 @@ function paidReadingConcurrencyLimit(type: ReadingKey) {
   return Math.max(1, Math.min(3, Number.isFinite(configured) ? Math.floor(configured) : 3));
 }
 
+function paidReadingPrimaryGeminiModel() {
+  return process.env.PAID_READING_PRIMARY_GEMINI_MODEL || PAID_READING_DEFAULT_GEMINI_MODEL;
+}
+
+function paidReadingEscalationGeminiModel() {
+  return process.env.PAID_READING_ESCALATION_GEMINI_MODEL || PAID_READING_DEFAULT_ESCALATION_GEMINI_MODEL;
+}
+
+function paidReadingYearlyGeminiModel() {
+  return process.env.PAID_READING_YEARLY_GEMINI_MODEL || paidReadingEscalationGeminiModel();
+}
+
+function paidReadingInitialGeminiModel(chapter: PaidReadingChapter) {
+  return chapter.key === "yearly-months" ? paidReadingYearlyGeminiModel() : paidReadingPrimaryGeminiModel();
+}
+
 function paidReadingPromptMeta(
   chart: TuViChart,
   type: ReadingKey,
@@ -214,6 +232,12 @@ function paidReadingPromptMeta(
     wordTarget: type === "FULL" ? PAID_FULL_WORD_TARGET : "theo phạm vi mở khóa",
     maxTokensPerChapter: PAID_READING_CHAPTER_MAX_TOKENS,
     concurrency: paidReadingConcurrencyLimit(type),
+    providerOrder: process.env.LLM_PROVIDER_ORDER || "groq,gemini",
+    modelPolicy: {
+      primaryGeminiModel: paidReadingPrimaryGeminiModel(),
+      escalationGeminiModel: paidReadingEscalationGeminiModel(),
+      yearlyGeminiModel: paidReadingYearlyGeminiModel(),
+    },
     chartEngineVersion: chart.engine?.version,
     chartEngineProfile: chart.engine?.starProfile,
     viewYear: chart.input.viewYear,
@@ -283,15 +307,32 @@ export async function generateReadingWithProgress(
   const outputs = await runReadingChapterTasks(chapters, paidReadingConcurrencyLimit(type), async (chapter, index) => {
     const prompt = paidReadingChapterPrompt(chart, type, scopeKey, focus, chapter, index, chapters.length);
     const maxTokens = paidReadingMaxTokens(type, chapter);
+    const initialGeminiModel = paidReadingInitialGeminiModel(chapter);
+    const escalationGeminiModel = paidReadingEscalationGeminiModel();
     let generated: Awaited<ReturnType<typeof generatePaidChapter>> = null;
     let chapterError: string | null = null;
     try {
-      generated = await generatePaidChapter(prompt, gatewayModel, maxTokens);
+      generated = await generatePaidChapter(prompt, gatewayModel, maxTokens, initialGeminiModel);
     } catch (error) {
       chapterError = error instanceof Error ? error.message : String(error);
     }
-    const generatedContent = generated?.content?.trim() || "";
-    const hasCompleteContent = generatedContent ? isCompletePaidChapter(generatedContent, chapter) : false;
+    let generatedContent = generated?.content?.trim() || "";
+    let hasCompleteContent = generatedContent ? isCompletePaidChapter(generatedContent, chapter) : false;
+
+    if (!hasCompleteContent && initialGeminiModel !== escalationGeminiModel) {
+      try {
+        const escalated = await generatePaidChapter(prompt, gatewayModel, maxTokens, escalationGeminiModel);
+        const escalatedContent = escalated?.content?.trim() || "";
+        if (escalatedContent) {
+          generated = escalated;
+          generatedContent = escalatedContent;
+          hasCompleteContent = isCompletePaidChapter(escalatedContent, chapter);
+        }
+      } catch (error) {
+        chapterError = error instanceof Error ? error.message : String(error);
+      }
+    }
+
     const content = hasCompleteContent ? generatedContent : fallbackChapterBody(chart, chapter, focus);
     const output = {
       key: chapter.key,
@@ -1039,11 +1080,12 @@ async function generateViaGateway(prompt: string, model: string, maxTokens: numb
   }
 }
 
-async function generatePaidChapter(prompt: string, gatewayModel: string, maxTokens: number) {
+async function generatePaidChapter(prompt: string, gatewayModel: string, maxTokens: number, geminiModel?: string) {
   const routed = await generateWithLlmRouter({
     prompt,
     maxTokens,
     temperature: 0.55,
+    geminiModel,
   });
   if (routed) return { content: routed.text, model: routed.model };
   return generateViaGateway(prompt, gatewayModel, maxTokens);

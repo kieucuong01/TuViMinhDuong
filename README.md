@@ -133,8 +133,11 @@ Target deploy là Vercel + Postgres. Các env quan trọng:
 - `GOOGLE_CLIENT_SECRET`
 - `GEMINI_API_KEY` hoặc `GEMINI_API_KEYS` cho Gemini
 - `GROQ_API_KEY` hoặc `GROQ_API_KEYS` cho Groq
-- `LLM_PROVIDER_ORDER` mặc định `gemini,groq`
+- `LLM_PROVIDER_ORDER` mặc định `groq,gemini`
 - `AI_GATEWAY_API_KEY` nếu muốn dùng Vercel AI Gateway fallback
+- `PAID_READING_PRIMARY_GEMINI_MODEL` tùy chọn, mặc định `gemini-2.5-flash` khi paid reading phải fallback từ Groq sang Gemini
+- `PAID_READING_ESCALATION_GEMINI_MODEL` tùy chọn, mặc định `gemini-3.5-flash` cho lần retry chương lỗi format/quá ngắn nếu router phải dùng Gemini
+- `PAID_READING_YEARLY_GEMINI_MODEL` tùy chọn, mặc định theo model escalation cho Chương 8 vận năm + 12 tháng nếu router phải dùng Gemini
 - `ERROR_WEBHOOK_URL` nếu muốn chuyển tiếp lỗi client ra hệ thống ngoài; để trống thì lỗi vẫn được ghi trong Vercel Runtime Logs.
 
 `GEMINI_API_KEYS` và `GROQ_API_KEYS` nhận danh sách key phân tách bằng dấu phẩy hoặc xuống dòng. Chỉ dùng các key/tài khoản hợp lệ bạn sở hữu để dự phòng và chia tải trong giới hạn nhà cung cấp, không dùng để né quota.
