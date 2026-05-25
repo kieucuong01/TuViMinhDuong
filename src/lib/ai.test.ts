@@ -229,6 +229,27 @@ describe("AI reading format", () => {
     expect(prompt).toContain("Không tự tính lại lá số");
   });
 
+  it("guides yearly full chapters away from prompt leakage, repeated greetings and robotic monthly loops", () => {
+    const chart = sampleChart("male");
+    const chapters = paidReadingChapters(chart, "FULL");
+    const yearlyChapter = chapters.at(-1)!;
+    const prompt = paidReadingChapterPrompt(
+      chart,
+      "FULL",
+      "all",
+      { title: "Luận giải toàn bộ", evidence: ["Mệnh: Sơn đầu Hỏa", "Lưu niên: L.Kình Dương (H)"] },
+      yearlyChapter,
+      7,
+      chapters.length,
+    );
+
+    expect(prompt).toContain("Không lặp lại lời chào ở đầu chương");
+    expect(prompt).toContain("không được in lại nhãn nội bộ");
+    expect(prompt).toContain("Bảng ngữ cảnh 12 tháng");
+    expect(prompt.match(/Tháng \d+:/g)).toHaveLength(12);
+    expect(prompt).toContain("mỗi tháng phải có trọng tâm riêng");
+  });
+
   it("guides paid readings away from generic Barnum copy and toward concrete value", () => {
     const chart = sampleChart("male");
     const chapters = paidReadingChapters(chart, "PALACE");
@@ -394,6 +415,12 @@ ${filler}
     expect(content).toContain("## Điều nên lưu ý");
     expect(content).toContain("## Gợi ý hành động");
     expect(content).toContain("Gợi ý 12 tháng");
+    expect(content).not.toContain("Chương này được dựng từ dữ liệu lá số");
+    expect(content).not.toContain("Dữ kiện trọng yếu");
+
+    const monthBodies = Array.from(content.matchAll(/^- Tháng \d+:\s*(.+)$/gm), (match) => match[1]);
+    expect(monthBodies).toHaveLength(12);
+    expect(new Set(monthBodies).size).toBe(12);
     expect(prompt).toContain("paid-reading-chapters-v3");
   });
 
