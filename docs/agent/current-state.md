@@ -1,6 +1,14 @@
 # Current State
 
-## Recent Update: Groq-First Reading Model Policy
+## Recent Update: Admin Operation Toggles
+
+- Admin now has operation toggles for PayOS payments, coin topups, and public paid readings.
+- The "Tắt trả phí public" preset disables payment, topup, and public paid-reading surfaces together.
+- When public paid readings are off, non-admin users only see the basic/free chart flow; Luận cung, Đại vận, Tiểu vận, Nguyệt vận, Nhật vận, prompt chips, quick purchase, and full-reading CTA are hidden or blocked.
+- Admin is exempt from the paid-reading shutdown and can still view/unlock advanced readings with zero coin charge.
+- Settings persist in `OperationSettings`; apply migration `20260526162000_add_operation_settings` before relying on this in production.
+
+## Previous Update: Groq-First Reading Model Policy
 
 - Free and paid readings now use provider order `groq,gemini` by default.
 - FULL paid readings still pass Gemini model hints so provider fallback uses `gemini-2.5-flash` for normal chapters.

@@ -64,12 +64,14 @@ export type ReadingUnlockDeps = {
 export type ReadingUnlockResult =
   | { status: "cached"; readingId: string; chargedCoins: 0 }
   | { status: "created"; readingId: string; chargedCoins: number }
+  | { status: "disabled" }
   | { status: "insufficient_coins"; needCoins: number; priceCoins: number; balance: number };
 
 export type FullReadingJobStartResult =
   | { status: "cached"; readingId: string; chargedCoins: 0 }
   | { status: "pending"; readingId: string; chargedCoins: 0 }
   | { status: "queued"; readingId: string; chargedCoins: number }
+  | { status: "disabled" }
   | { status: "insufficient_coins"; needCoins: number; priceCoins: number; balance: number };
 
 export async function startFullReadingJobForUser(
@@ -78,9 +80,12 @@ export async function startFullReadingJobForUser(
     user: SessionUser;
     chartId: string;
     temporaryFullAccess?: boolean;
+    paidReadingsEnabled?: boolean;
   },
 ): Promise<FullReadingJobStartResult> {
   const { user, chartId } = params;
+  if (params.paidReadingsEnabled === false && user.role !== "ADMIN") return { status: "disabled" };
+
   const chartRecord = await deps.getChart(chartId);
   if (!chartRecord) throw new Error("Không tìm thấy lá số.");
 
@@ -136,9 +141,12 @@ export async function unlockReadingForUser(
     type: ReadingKey;
     scopeKey: string;
     temporaryFullAccess?: boolean;
+    paidReadingsEnabled?: boolean;
   },
 ): Promise<ReadingUnlockResult> {
   const { user, chartId, type, scopeKey } = params;
+  if (params.paidReadingsEnabled === false && user.role !== "ADMIN") return { status: "disabled" };
+
   const chartRecord = await deps.getChart(chartId);
   if (!chartRecord) throw new Error("Không tìm thấy lá số.");
 

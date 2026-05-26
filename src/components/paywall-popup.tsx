@@ -22,7 +22,7 @@ export function PaywallPopup() {
 
   const cleanReturnTo = useMemo(() => {
     const params = new URLSearchParams(searchParams.toString());
-    ["paywall", "need", "status", "orderCode", "login", "next", "authError"].forEach((key) => params.delete(key));
+    ["paywall", "paid", "need", "status", "orderCode", "login", "next", "authError"].forEach((key) => params.delete(key));
     const query = params.toString();
     return `${pathname}${query ? `?${query}` : ""}`;
   }, [pathname, searchParams]);
@@ -34,6 +34,17 @@ export function PaywallPopup() {
 
   const notice = useMemo<PaywallNotice | null>(() => {
     const reason = searchParams.get("paywall");
+    const paidStatus = searchParams.get("paid");
+    if (paidStatus === "disabled") {
+      return {
+        icon: "lock",
+        title: "Luận giải chuyên sâu đang tắt",
+        body: "Admin đang tắt các phần trả phí với public. Bạn vẫn có thể xem lá số và bản luận giải cơ bản miễn phí.",
+        href: cleanReturnTo,
+        cta: "Quay lại lá số",
+      };
+    }
+
     if (reason === "login") {
       return {
         icon: "lock",

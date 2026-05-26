@@ -3,7 +3,7 @@
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { clearSession, createMagicSession, getCurrentUser, getOrCreateEmailUser, loginOrRegister, setSession, type SessionUser } from "@/lib/auth";
-import { getCachedReading, getChart, getFeaturePrice, getUserBalance, saveArticleCategoryFromForm, saveArticleFromForm, saveChart, saveReading, adjustCoins, deleteArticleBySlug, deleteUserChart, getReadingJobByScope, createPendingReading } from "@/lib/data";
+import { getCachedReading, getChart, getFeaturePrice, getOperationSettings, getUserBalance, saveArticleCategoryFromForm, saveArticleFromForm, saveChart, saveReading, adjustCoins, deleteArticleBySlug, deleteUserChart, getReadingJobByScope, createPendingReading, updateOperationSettings } from "@/lib/data";
 import { generateReading } from "@/lib/ai";
 import { getDb } from "@/lib/db";
 import { createPayOSCheckout, createPayOSCustomCheckout } from "@/lib/payos";
@@ -102,6 +102,9 @@ export async function createChartAction(formData: FormData) {
 }
 
 export async function quickReadingCheckoutAction(formData: FormData) {
+  const operationSettings = await getOperationSettings();
+  if (!operationSettings.paymentsEnabled || !operationSettings.paidReadingsEnabled) redirect("/?paid=disabled");
+
   const input = chartInputFromForm(formData);
   const email = String(formData.get("email") || "");
   const user = await getOrCreateEmailUser(email, input.fullName);
@@ -175,8 +178,8 @@ export async function deleteChartAction(formData: FormData) {
   redirect("/la-so");
 }
 
-async function getReadingUser(chartId: string, nextPath: string): Promise<SessionUser> {
-  const user = await getCurrentUser();
+async function getReadingUser(chartId: string, nextPath: string, currentUser?: SessionUser | null): Promise<SessionUser> {
+  const user = currentUser === undefined ? await getCurrentUser() : currentUser;
   if (user) return user;
   if (!TEMPORARY_FULL_ACCESS) {
     redirect(withQueryParams(nextPath, { paywall: "login", login: "1", next: nextPath }));
@@ -220,7 +223,13 @@ export async function requestReadingAction(formData: FormData) {
   const type = String(formData.get("type") || "FULL") as ReadingKey;
   const scopeKey = String(formData.get("scopeKey") || "all");
   const nextPath = safeNextPath(formData.get("next"), `/la-so/${chartId}`);
-  const user = await getReadingUser(chartId, nextPath);
+  const [currentUser, operationSettings] = await Promise.all([getCurrentUser(), getOperationSettings()]);
+
+  if (!operationSettings.paidReadingsEnabled && currentUser?.role !== "ADMIN") {
+    redirect(withQueryParams(nextPath, { paid: "disabled" }));
+  }
+
+  const user = await getReadingUser(chartId, nextPath, currentUser);
 
   if (type === "FULL" && scopeKey === "all") {
     const result = await startFullReadingJobForUser(
@@ -235,8 +244,12 @@ export async function requestReadingAction(formData: FormData) {
         createPendingReading,
         saveReading,
       },
-      { user, chartId, temporaryFullAccess: TEMPORARY_FULL_ACCESS },
+      { user, chartId, temporaryFullAccess: TEMPORARY_FULL_ACCESS, paidReadingsEnabled: operationSettings.paidReadingsEnabled },
     );
+
+    if (result.status === "disabled") {
+      redirect(withQueryParams(nextPath, { paid: "disabled" }));
+    }
 
     if (result.status === "insufficient_coins") {
       redirect(withQueryParams(nextPath, { paywall: "coins", need: result.needCoins }));
@@ -259,8 +272,12 @@ export async function requestReadingAction(formData: FormData) {
       createPendingReading,
       saveReading,
     },
-    { user, chartId, type, scopeKey, temporaryFullAccess: TEMPORARY_FULL_ACCESS },
+    { user, chartId, type, scopeKey, temporaryFullAccess: TEMPORARY_FULL_ACCESS, paidReadingsEnabled: operationSettings.paidReadingsEnabled },
   );
+
+  if (result.status === "disabled") {
+    redirect(withQueryParams(nextPath, { paid: "disabled" }));
+  }
 
   if (result.status === "insufficient_coins") {
     redirect(withQueryParams(nextPath, { paywall: "coins", need: result.needCoins }));
@@ -303,8 +320,34 @@ export async function saveArticleCategoryAction(formData: FormData) {
   redirect(`/admin?categorySaved=${category.slug}`);
 }
 
+export async function saveOperationSettingsAction(formData: FormData) {
+  const user = await getCurrentUser();
+  if (user?.role !== "ADMIN") redirect("/dang-nhap?next=/admin");
+
+  const mode = String(formData.get("mode") || "custom");
+  const settings =
+    mode === "basic-free"
+      ? { paymentsEnabled: false, coinTopupEnabled: false, paidReadingsEnabled: false }
+      : mode === "commercial"
+        ? { paymentsEnabled: true, coinTopupEnabled: true, paidReadingsEnabled: true }
+        : {
+            paymentsEnabled: formData.get("paymentsEnabled") === "1",
+            coinTopupEnabled: formData.get("coinTopupEnabled") === "1",
+            paidReadingsEnabled: formData.get("paidReadingsEnabled") === "1",
+          };
+
+  await updateOperationSettings(settings);
+  revalidatePath("/");
+  revalidatePath("/admin");
+  revalidatePath("/nap-xu");
+  revalidatePath("/pricing");
+  redirect("/admin?settingsSaved=1");
+}
+
 export async function createCheckoutAction(formData: FormData) {
   if (TEMPORARY_FULL_ACCESS) redirect("/nap-xu?status=disabled");
+  const operationSettings = await getOperationSettings();
+  if (!operationSettings.paymentsEnabled || !operationSettings.coinTopupEnabled) redirect("/nap-xu?status=disabled");
 
   const packageKey = String(formData.get("packageKey") || "full-reading");
   const returnTo = safeNextPath(formData.get("returnTo"), "/nap-xu");

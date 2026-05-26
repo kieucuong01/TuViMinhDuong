@@ -1,20 +1,23 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Suspense } from "react";
-import { TEMPORARY_FULL_ACCESS } from "@/lib/pricing";
 import { UserHeaderBadge } from "@/components/user-header-badge";
 import { CoinTopupLink } from "@/components/coin-topup-link";
 import { APP_NAME } from "@/lib/env";
 import { MobileSiteMenu } from "@/components/mobile-site-menu";
+import { getOperationSettings } from "@/lib/data";
 
-const nav = [
+const baseNav = [
   { href: "/", label: "Lập lá số tử vi" },
   { href: "/xem-ngay", label: "Xem ngày" },
   { href: "/kien-thuc-tu-vi", label: "Kiến thức" },
-  ...(TEMPORARY_FULL_ACCESS ? [] : [{ href: "/nap-xu", label: "Nạp xu", modal: true }]),
 ];
 
-export function SiteHeader() {
+export async function SiteHeader() {
+  const operationSettings = await getOperationSettings();
+  const showTopup = operationSettings.paymentsEnabled && operationSettings.coinTopupEnabled;
+  const nav = showTopup ? [...baseNav, { href: "/nap-xu", label: "Nạp xu", modal: true }] : baseNav;
+
   return (
     <header className="site-header sticky top-0 z-50 border-b border-orange-100/70 bg-white/75 shadow-sm shadow-orange-950/5 backdrop-blur-2xl supports-[backdrop-filter]:bg-white/70">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">

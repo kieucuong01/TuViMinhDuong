@@ -24,7 +24,7 @@ export function topupHref(pathname: string, searchParams?: URLSearchParams | str
   return `${pathname}${query ? `?${query}` : ""}`;
 }
 
-export function CoinTopupModal() {
+export function CoinTopupModal({ enabled = true }: { enabled?: boolean }) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -42,7 +42,7 @@ export function CoinTopupModal() {
     }));
   }, [need]);
 
-  if (!isOpen) return null;
+  if (!isOpen || !enabled) return null;
 
   function close() {
     startTransition(() => router.replace(returnTo, { scroll: false }));

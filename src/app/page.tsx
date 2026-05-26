@@ -5,7 +5,7 @@ import { ChartForm } from "@/components/chart-form";
 import { DayFortuneCard } from "@/components/day-fortune-card";
 import { DeferredSocialProof } from "@/components/deferred-social-proof";
 import { QuickReadingForm } from "@/components/quick-reading-form";
-import { listArticles } from "@/lib/data";
+import { getOperationSettings, listArticles } from "@/lib/data";
 import { APP_NAME } from "@/lib/env";
 import { routeMetadata } from "@/lib/metadata";
 import { organizationJsonLd, websiteJsonLd } from "@/lib/seo";
@@ -20,7 +20,9 @@ export const metadata = routeMetadata({
 });
 
 export default async function Home() {
-  const articles = (await listArticles()).slice(0, 3);
+  const [articleList, operationSettings] = await Promise.all([listArticles(), getOperationSettings()]);
+  const articles = articleList.slice(0, 3);
+  const showQuickReading = operationSettings.paymentsEnabled && operationSettings.paidReadingsEnabled;
   const trustSignals = [
     ["Miễn phí lập lá số", "Nhập ngày giờ sinh và xem ngay phần cơ bản."],
     ["Dễ đọc trên điện thoại", "Mỗi cung được chia rõ, không phải căng mắt đọc chữ nhỏ."],
@@ -157,11 +159,11 @@ export default async function Home() {
           </div>
         </div>
       </section>
-      <section className="section">
+      {showQuickReading ? <section className="section">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <QuickReadingForm />
         </div>
-      </section>
+      </section> : null}
 
       <section className="section">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">

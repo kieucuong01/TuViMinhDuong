@@ -8,7 +8,7 @@ import { MarkdownContent } from "@/components/markdown-content";
 import { ReadingPanel } from "@/components/reading-panel";
 import { getDeepReadingSummary, paidReadingChapters } from "@/lib/ai";
 import { getCurrentUser } from "@/lib/auth";
-import { getAnyCompletedReading, getCachedReading, getChart, getReadingJobById, getReadingJobByScope } from "@/lib/data";
+import { getAnyCompletedReading, getCachedReading, getChart, getOperationSettings, getReadingJobById, getReadingJobByScope } from "@/lib/data";
 
 export const metadata = {
   title: "Luận giải nâng cao",
@@ -33,8 +33,9 @@ export default async function AdvancedReadingPage({
 }) {
   const { id } = await params;
   const query = await searchParams;
-  const user = await getCurrentUser();
+  const [user, operationSettings] = await Promise.all([getCurrentUser(), getOperationSettings()]);
   if (!user) redirect(`/dang-nhap?next=/la-so/${id}/nang-cao`);
+  if (!operationSettings.paidReadingsEnabled && user.role !== "ADMIN") redirect(`/la-so/${id}`);
 
   const record = await getChart(id);
   if (!record) notFound();

@@ -150,6 +150,14 @@ model FeaturePrice {
   updatedAt  DateTime @updatedAt
 }
 
+model OperationSettings {
+  id                  String   @id @default("global")
+  paymentsEnabled     Boolean  @default(true)
+  coinTopupEnabled    Boolean  @default(true)
+  paidReadingsEnabled Boolean  @default(true)
+  updatedAt           DateTime @updatedAt
+}
+
 model PaymentOrder {
   id            String        @id @default(cuid())
   userId        String
