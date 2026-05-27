@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 96 96" role="img" aria-label="Lá số tinh hoa">
+  <defs>
+    <linearGradient id="lth-bg" x1="18" y1="14" x2="82" y2="82" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff7ed"/>
+      <stop offset=".54" stop-color="#ffedd5"/>
+      <stop offset="1" stop-color="#ecfdf5"/>
+    </linearGradient>
+    <linearGradient id="lth-ring" x1="14" y1="13" x2="82" y2="83" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fb923c"/>
+      <stop offset=".48" stop-color="#f97316"/>
+      <stop offset="1" stop-color="#10b981"/>
+    </linearGradient>
+    <filter id="lth-shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="10" stdDeviation="8" flood-color="#9a3412" flood-opacity=".18"/>
+    </filter>
+  </defs>
+  <rect width="96" height="96" rx="26" fill="url(#lth-bg)"/>
+  <circle cx="48" cy="48" r="34" fill="#fffaf0" stroke="#fed7aa" stroke-width="3"/>
+  <g filter="url(#lth-shadow)">
+    <path d="M48 16a32 32 0 1 1 0 64 32 32 0 0 1 0-64Zm0 8a24 24 0 1 0 0 48 24 24 0 0 0 0-48Z" fill="url(#lth-ring)"/>
+    <path d="M30 50c10-18 26-23 38-11-14-4-24 2-30 18l-7 18c-4-7-5-15-1-25Z" fill="#f97316"/>
+    <path d="M66 46c-10 18-26 23-38 11 14 4 24-2 30-18l7-18c4 7 5 15 1 25Z" fill="#10b981"/>
+    <circle cx="48" cy="48" r="5.5" fill="#fffaf0" stroke="#fdba74" stroke-width="2"/>
+  </g>
+  <path d="M22 48h52M48 22v52M31.5 31.5l33 33M64.5 31.5l-33 33" stroke="#7c2d12" stroke-width="1.35" stroke-linecap="round" opacity=".22"/>
+  <text x="48" y="53.5" text-anchor="middle" fill="#7c2d12" font-family="Arial, sans-serif" font-size="17" font-weight="900" letter-spacing=".5">TH</text>
+</svg>
