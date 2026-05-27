@@ -39,6 +39,13 @@ export type ReadingScopeKey = {
   scopeKey: string;
 };
 
+export type OperationSettings = {
+  paymentsEnabled: boolean;
+  coinTopupEnabled: boolean;
+  paidReadingsEnabled: boolean;
+  updatedAt?: Date | null;
+};
+
 type ChartWithFreeOverview = TuViChart & {
   freeOverview?: {
     content: string;
@@ -65,6 +72,14 @@ const globalStore = globalThis as unknown as {
   demoBalances?: Map<string, number>;
   demoArticles?: Map<string, ArticleView>;
   demoArticleCategories?: Map<string, ArticleCategoryView>;
+  demoOperationSettings?: OperationSettings;
+};
+
+export const DEFAULT_OPERATION_SETTINGS: OperationSettings = {
+  paymentsEnabled: true,
+  coinTopupEnabled: true,
+  paidReadingsEnabled: true,
+  updatedAt: null,
 };
 
 const seedArticleCategories: ArticleCategoryView[] = [
@@ -96,6 +111,20 @@ function demoArticles() {
 function demoArticleCategories() {
   globalStore.demoArticleCategories ||= new Map(seedArticleCategories.map((category) => [category.id, category]));
   return globalStore.demoArticleCategories;
+}
+
+function demoOperationSettings() {
+  globalStore.demoOperationSettings ||= { ...DEFAULT_OPERATION_SETTINGS };
+  return globalStore.demoOperationSettings;
+}
+
+function normalizeOperationSettings(row?: Partial<OperationSettings> | null): OperationSettings {
+  return {
+    paymentsEnabled: row?.paymentsEnabled ?? DEFAULT_OPERATION_SETTINGS.paymentsEnabled,
+    coinTopupEnabled: row?.coinTopupEnabled ?? DEFAULT_OPERATION_SETTINGS.coinTopupEnabled,
+    paidReadingsEnabled: row?.paidReadingsEnabled ?? DEFAULT_OPERATION_SETTINGS.paidReadingsEnabled,
+    updatedAt: row?.updatedAt ?? null,
+  };
 }
 
 function articleSortValue(article: ArticleView) {
@@ -420,6 +449,47 @@ export async function getFeaturePrice(type: ReadingKey) {
   if (!db) return fallback;
   const price = await db.featurePrice.findUnique({ where: { key: type } });
   return price?.isActive ? { label: price.label, priceCoins: price.priceCoins } : fallback;
+}
+
+export async function getOperationSettings(): Promise<OperationSettings> {
+  const db = getDb();
+  if (!db) return demoOperationSettings();
+
+  try {
+    const rows = await db.$queryRaw<
+      Array<{
+        paymentsEnabled: boolean;
+        coinTopupEnabled: boolean;
+        paidReadingsEnabled: boolean;
+        updatedAt: Date | null;
+      }>
+    >`SELECT "paymentsEnabled", "coinTopupEnabled", "paidReadingsEnabled", "updatedAt" FROM "OperationSettings" WHERE "id" = 'global' LIMIT 1`;
+
+    return normalizeOperationSettings(rows[0]);
+  } catch {
+    return DEFAULT_OPERATION_SETTINGS;
+  }
+}
+
+export async function updateOperationSettings(settings: Omit<OperationSettings, "updatedAt">) {
+  const next = normalizeOperationSettings(settings);
+  const db = getDb();
+  if (!db) {
+    globalStore.demoOperationSettings = { ...next, updatedAt: new Date() };
+    return globalStore.demoOperationSettings;
+  }
+
+  await db.$executeRaw`
+    INSERT INTO "OperationSettings" ("id", "paymentsEnabled", "coinTopupEnabled", "paidReadingsEnabled")
+    VALUES ('global', ${next.paymentsEnabled}, ${next.coinTopupEnabled}, ${next.paidReadingsEnabled})
+    ON CONFLICT ("id") DO UPDATE SET
+      "paymentsEnabled" = EXCLUDED."paymentsEnabled",
+      "coinTopupEnabled" = EXCLUDED."coinTopupEnabled",
+      "paidReadingsEnabled" = EXCLUDED."paidReadingsEnabled",
+      "updatedAt" = CURRENT_TIMESTAMP
+  `;
+
+  return getOperationSettings();
 }
 
 export async function getUserBalance(user: SessionUser) {
@@ -1089,6 +1159,7 @@ export async function saveArticleFromForm(formData: FormData) {
 
 export async function getAdminOverview() {
   const db = getDb();
+  const operationSettings = await getOperationSettings();
   if (!db) {
     return {
       users: 1,
@@ -1098,6 +1169,7 @@ export async function getAdminOverview() {
       payments: 0,
       coinPackages: COIN_PACKAGES,
       featurePrices: FEATURE_PRICES,
+      operationSettings,
     };
   }
   const [users, chartCount, readingCount, articleCount, paymentCount, packages, prices] = await Promise.all([
@@ -1117,5 +1189,6 @@ export async function getAdminOverview() {
     payments: paymentCount,
     coinPackages: packages.length ? packages : COIN_PACKAGES,
     featurePrices: prices.length ? Object.fromEntries(prices.map((item) => [item.key, { label: item.label, priceCoins: item.priceCoins }])) : FEATURE_PRICES,
+    operationSettings,
   };
 }

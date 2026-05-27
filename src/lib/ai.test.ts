@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   FREE_OVERVIEW_MAX_WORDS,
+  FREE_OVERVIEW_MAX_TOKENS,
   FREE_OVERVIEW_MIN_WORDS,
   PAID_FULL_WORD_TARGET,
   PAID_READING_CHAPTER_MAX_TOKENS,
@@ -34,6 +35,9 @@ const oldGeminiKey = process.env.GEMINI_API_KEY;
 const oldGeminiKeys = process.env.GEMINI_API_KEYS;
 const oldGroqKey = process.env.GROQ_API_KEY;
 const oldGroqKeys = process.env.GROQ_API_KEYS;
+const oldPaidPrimaryGeminiModel = process.env.PAID_READING_PRIMARY_GEMINI_MODEL;
+const oldPaidEscalationGeminiModel = process.env.PAID_READING_ESCALATION_GEMINI_MODEL;
+const oldPaidYearlyGeminiModel = process.env.PAID_READING_YEARLY_GEMINI_MODEL;
 
 function clearProviderEnv() {
   delete process.env.AI_GATEWAY_API_KEY;
@@ -102,6 +106,9 @@ afterEach(() => {
   restore("GEMINI_API_KEYS", oldGeminiKeys);
   restore("GROQ_API_KEY", oldGroqKey);
   restore("GROQ_API_KEYS", oldGroqKeys);
+  restore("PAID_READING_PRIMARY_GEMINI_MODEL", oldPaidPrimaryGeminiModel);
+  restore("PAID_READING_ESCALATION_GEMINI_MODEL", oldPaidEscalationGeminiModel);
+  restore("PAID_READING_YEARLY_GEMINI_MODEL", oldPaidYearlyGeminiModel);
 });
 
 describe("AI reading format", () => {
@@ -124,7 +131,7 @@ describe("AI reading format", () => {
     expect(result).toEqual(["chapter-0", "chapter-1", "chapter-2", "chapter-3", "chapter-4", "chapter-5", "chapter-6", "chapter-7"]);
   });
 
-  it("falls back only the failed full-reading chapter while keeping bounded parallel progress", async () => {
+  it("falls back only the failed full-reading chapter after the escalated retry also fails", async () => {
     clearProviderEnv();
     llmRouterMocks.hasExternalLlmProvider.mockReturnValue(true);
 
@@ -160,7 +167,7 @@ describe("AI reading format", () => {
     const successfulChapterMeta = promptMeta.chapters.find((chapter: { key: string }) => chapter.key === chapters[0].key);
 
     expect(maxActive).toBeLessThanOrEqual(3);
-    expect(llmRouterMocks.generateWithLlmRouter).toHaveBeenCalledTimes(8);
+    expect(llmRouterMocks.generateWithLlmRouter).toHaveBeenCalledTimes(9);
     expect(result.content).toContain(`generated-${chapters[0].key}`);
     expect(result.content).toContain(`# ${failedChapter.title}`);
     expect(result.content).not.toContain(`generated-${failedChapter.key}`);
@@ -169,6 +176,59 @@ describe("AI reading format", () => {
     expect(successfulChapterMeta).toMatchObject({ key: chapters[0].key, formatGuarded: false });
     expect(progressSnapshots).toHaveLength(8);
     expect(progressSnapshots.at(-1)?.completedChapters).toHaveLength(8);
+  });
+
+  it("routes paid chapters through Groq first while preserving Gemini model choices for fallback", async () => {
+    clearProviderEnv();
+    llmRouterMocks.hasExternalLlmProvider.mockReturnValue(true);
+
+    const chart = sampleChart();
+    const chapters = paidReadingChapters(chart, "FULL");
+    const weakChapter = chapters.find((chapter) => chapter.key === "money")!;
+    const yearlyChapter = chapters.find((chapter) => chapter.key === "yearly-months")!;
+    const attemptsByKey = new Map<string, number>();
+
+    llmRouterMocks.generateWithLlmRouter.mockImplementation(async (options: { prompt: string; geminiModel?: string }) => {
+      const chapter = chapters.find((item) => options.prompt.includes(item.title));
+      if (!chapter) throw new Error("Unknown chapter prompt");
+
+      const attempt = (attemptsByKey.get(chapter.key) || 0) + 1;
+      attemptsByKey.set(chapter.key, attempt);
+
+      if (chapter.key === weakChapter.key && attempt === 1) {
+        return {
+          text: `# ${chapter.title}\n\n## ${chapter.requiredSections[0]}\nToo short.`,
+          model: "groq/llama-3.1-8b-instant",
+          provider: "groq",
+        };
+      }
+
+      return {
+        text: completeGeneratedChapter(chapter, `generated-${chapter.key}-attempt-${attempt}`),
+        model: "groq/llama-3.1-8b-instant",
+        provider: "groq",
+      };
+    });
+
+    const result = await generateReadingWithProgress(chart, "FULL", "all");
+    const promptMeta = JSON.parse(result.prompt);
+    const weakChapterMeta = promptMeta.chapters.find((chapter: { key: string }) => chapter.key === weakChapter.key);
+    const weakChapterCalls = llmRouterMocks.generateWithLlmRouter.mock.calls.filter(([options]) =>
+      String((options as { prompt: string }).prompt).includes(weakChapter.title),
+    );
+    const yearlyCalls = llmRouterMocks.generateWithLlmRouter.mock.calls.filter(([options]) =>
+      String((options as { prompt: string }).prompt).includes(yearlyChapter.title),
+    );
+
+    expect(weakChapterCalls).toHaveLength(2);
+    expect((weakChapterCalls[0][0] as { providerOrder?: string[] }).providerOrder).toBeUndefined();
+    expect((weakChapterCalls[1][0] as { providerOrder?: string[] }).providerOrder).toBeUndefined();
+    expect((weakChapterCalls[0][0] as { geminiModel?: string }).geminiModel).toBe("gemini-2.5-flash");
+    expect((weakChapterCalls[1][0] as { geminiModel?: string }).geminiModel).toBe("gemini-3.5-flash");
+    expect(yearlyCalls).toHaveLength(1);
+    expect((yearlyCalls[0][0] as { geminiModel?: string }).geminiModel).toBe("gemini-3.5-flash");
+    expect(result.content).toContain(`generated-${weakChapter.key}-attempt-2`);
+    expect(weakChapterMeta).toMatchObject({ key: weakChapter.key, model: "groq/llama-3.1-8b-instant", formatGuarded: false });
   });
 
   it("asks the free overview LLM prompt for a long single-request reading", async () => {
@@ -183,6 +243,26 @@ describe("AI reading format", () => {
     expect(prompt).toContain("**Điểm nổi bật:**");
     expect(prompt).toContain("**Cần lưu ý:**");
     expect(prompt).toContain("QUY TẮC ĐỘ DÀI");
+  });
+
+  it("uses the default Groq-first router for free overview", async () => {
+    clearProviderEnv();
+    llmRouterMocks.hasExternalLlmProvider.mockReturnValue(true);
+    llmRouterMocks.generateWithLlmRouter.mockResolvedValue({
+      text: "Groq free overview",
+      model: "groq/llama-3.1-8b-instant",
+      provider: "groq",
+    });
+
+    const result = await generateFreeOverview(sampleChart());
+
+    expect(result.model).toBe("groq/llama-3.1-8b-instant");
+    expect(llmRouterMocks.generateWithLlmRouter).toHaveBeenCalledWith(
+      expect.objectContaining({
+        maxTokens: FREE_OVERVIEW_MAX_TOKENS,
+      }),
+    );
+    expect(llmRouterMocks.generateWithLlmRouter.mock.calls[0][0]).not.toHaveProperty("providerOrder");
   });
 
   it("defines the full paid reading as 8 fixed chapters", () => {
@@ -227,6 +307,27 @@ describe("AI reading format", () => {
     expect(prompt).toContain("sao lưu niên");
     expect(prompt).toContain("đủ 12 tháng");
     expect(prompt).toContain("Không tự tính lại lá số");
+  });
+
+  it("guides yearly full chapters away from prompt leakage, repeated greetings and robotic monthly loops", () => {
+    const chart = sampleChart("male");
+    const chapters = paidReadingChapters(chart, "FULL");
+    const yearlyChapter = chapters.at(-1)!;
+    const prompt = paidReadingChapterPrompt(
+      chart,
+      "FULL",
+      "all",
+      { title: "Luận giải toàn bộ", evidence: ["Mệnh: Sơn đầu Hỏa", "Lưu niên: L.Kình Dương (H)"] },
+      yearlyChapter,
+      7,
+      chapters.length,
+    );
+
+    expect(prompt).toContain("Không lặp lại lời chào ở đầu chương");
+    expect(prompt).toContain("không được in lại nhãn nội bộ");
+    expect(prompt).toContain("Bảng ngữ cảnh 12 tháng");
+    expect(prompt.match(/Tháng \d+:/g)).toHaveLength(12);
+    expect(prompt).toContain("mỗi tháng phải có trọng tâm riêng");
   });
 
   it("guides paid readings away from generic Barnum copy and toward concrete value", () => {
@@ -336,13 +437,16 @@ describe("AI reading format", () => {
     expect(prompt).toContain("Thân");
   });
 
-  it("uses smaller token budgets for focused readings while preserving deeper full chapters", () => {
+  it("sizes token budgets to each full chapter instead of over-allocating every chapter", () => {
     const chart = sampleChart();
+    const fullChapters = paidReadingChapters(chart, "FULL");
+    const overviewChapter = fullChapters[0];
     const fullYearChapter = paidReadingChapters(chart, "FULL").at(-1)!;
     const palaceChapter = paidReadingChapters(chart, "PALACE")[0];
     const dailyChapter = paidReadingChapters(chart, "NHAT_VAN")[0];
 
-    expect(paidReadingMaxTokens("FULL", fullYearChapter)).toBe(PAID_READING_CHAPTER_MAX_TOKENS);
+    expect(paidReadingMaxTokens("FULL", overviewChapter)).toBeLessThan(PAID_READING_CHAPTER_MAX_TOKENS);
+    expect(paidReadingMaxTokens("FULL", fullYearChapter)).toBeGreaterThan(paidReadingMaxTokens("FULL", overviewChapter));
     expect(paidReadingMaxTokens("PALACE", palaceChapter)).toBeLessThan(PAID_READING_CHAPTER_MAX_TOKENS);
     expect(paidReadingMaxTokens("NHAT_VAN", dailyChapter)).toBeLessThan(paidReadingMaxTokens("PALACE", palaceChapter));
   });
@@ -391,6 +495,12 @@ ${filler}
     expect(content).toContain("## Điều nên lưu ý");
     expect(content).toContain("## Gợi ý hành động");
     expect(content).toContain("Gợi ý 12 tháng");
+    expect(content).not.toContain("Chương này được dựng từ dữ liệu lá số");
+    expect(content).not.toContain("Dữ kiện trọng yếu");
+
+    const monthBodies = Array.from(content.matchAll(/^- Tháng \d+:\s*(.+)$/gm), (match) => match[1]);
+    expect(monthBodies).toHaveLength(12);
+    expect(new Set(monthBodies).size).toBe(12);
     expect(prompt).toContain("paid-reading-chapters-v3");
   });
 

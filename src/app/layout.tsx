@@ -9,6 +9,7 @@ import { LoginModal } from "@/components/login-modal";
 import { ClientErrorReporter } from "@/components/client-error-reporter";
 import { GoogleAnalytics } from "@/components/google-analytics";
 import { APP_NAME, APP_URL } from "@/lib/env";
+import { getOperationSettings } from "@/lib/data";
 import "./globals.css";
 
 const defaultOgImage = `/api/og?title=${encodeURIComponent("Lập lá số tử vi miễn phí")}&subtitle=${encodeURIComponent("Xem lá số, xem ngày và luận giải dễ hiểu")}`;
@@ -52,11 +53,14 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const operationSettings = await getOperationSettings();
+  const coinTopupEnabled = operationSettings.paymentsEnabled && operationSettings.coinTopupEnabled;
+
   return (
     <html
       lang="vi"
@@ -69,7 +73,7 @@ export default function RootLayout({
           <GlobalLoadingToast />
         </Suspense>
         <Suspense fallback={null}>
-          <CoinTopupModal />
+          <CoinTopupModal enabled={coinTopupEnabled} />
         </Suspense>
         <Suspense fallback={null}>
           <LoginModal />

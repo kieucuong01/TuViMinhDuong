@@ -17,11 +17,18 @@ type HeaderUser = {
   coinBalance: number;
 };
 
+type HeaderOperationSettings = {
+  paymentsEnabled: boolean;
+  coinTopupEnabled: boolean;
+  paidReadingsEnabled: boolean;
+};
+
 export function UserHeaderBadge() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [user, setUser] = useState<HeaderUser | null>(null);
   const [temporaryFullAccess, setTemporaryFullAccess] = useState(false);
+  const [operationSettings, setOperationSettings] = useState<HeaderOperationSettings | null>(null);
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
@@ -31,6 +38,7 @@ export function UserHeaderBadge() {
       .then((data) => {
         setUser(data.user || null);
         setTemporaryFullAccess(Boolean(data.temporaryFullAccess));
+        setOperationSettings(data.operationSettings || null);
         setLoaded(true);
       })
       .catch(() => {
@@ -48,6 +56,7 @@ export function UserHeaderBadge() {
         .then((data) => {
           setUser(data.user || null);
           setTemporaryFullAccess(Boolean(data.temporaryFullAccess));
+          setOperationSettings(data.operationSettings || null);
           setLoaded(true);
         })
         .catch(() => setLoaded(true));
@@ -91,10 +100,12 @@ export function UserHeaderBadge() {
     );
   }
 
+  const canTopUp = Boolean(operationSettings?.paymentsEnabled && operationSettings.coinTopupEnabled);
+
   return (
     <div className="user-header-badge">
-      {temporaryFullAccess ? (
-        <span className="user-coin-pill free"><Coins size={15} /> Miễn phí</span>
+      {temporaryFullAccess || !canTopUp ? (
+        <span className="user-coin-pill free"><Coins size={15} /> Cơ bản</span>
       ) : (
         <CoinTopupLink className="user-coin-pill" aria-label="Nạp xu nhanh">
           <Coins size={15} /> {user.coinBalance} xu

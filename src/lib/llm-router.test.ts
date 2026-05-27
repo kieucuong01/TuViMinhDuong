@@ -55,6 +55,70 @@ describe("LLM router", () => {
     expect(fetch).toHaveBeenCalledWith(expect.stringContaining("generativelanguage.googleapis.com"), expect.any(Object));
   });
 
+  it("defaults to Groq before Gemini when both providers are configured", async () => {
+    process.env.GEMINI_API_KEY = "gemini-test-key";
+    process.env.GROQ_API_KEY = "groq-test-key";
+    process.env.LLM_PROVIDER_ORDER = "";
+
+    vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          choices: [{ message: { content: "Groq default answer" } }],
+        }),
+        { status: 200, headers: { "content-type": "application/json" } },
+      ),
+    );
+
+    const result = await generateWithLlmRouter({ prompt: "Viết luận giải" });
+
+    expect(result?.provider).toBe("groq");
+    expect(result?.text).toBe("Groq default answer");
+    expect(fetch).toHaveBeenCalledWith("https://api.groq.com/openai/v1/chat/completions", expect.any(Object));
+  });
+
+
+  it("lets callers override the Gemini model for one generation", async () => {
+    process.env.GEMINI_API_KEY = "gemini-test-key";
+    process.env.GEMINI_MODEL = "gemini-2.5-flash-lite";
+    process.env.GROQ_API_KEY = "";
+    process.env.LLM_PROVIDER_ORDER = "gemini";
+
+    vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          candidates: [{ content: { parts: [{ text: "Gemini answer" }] } }],
+        }),
+        { status: 200, headers: { "content-type": "application/json" } },
+      ),
+    );
+
+    const result = await generateWithLlmRouter({ prompt: "Viết luận giải", geminiModel: "gemini-3.5-flash" });
+
+    expect(result?.model).toBe("gemini/gemini-3.5-flash");
+    expect(fetch).toHaveBeenCalledWith(expect.stringContaining("/models/gemini-3.5-flash:generateContent"), expect.any(Object));
+  });
+
+  it("honors a per-request provider order before the env default", async () => {
+    process.env.GEMINI_API_KEY = "gemini-test-key";
+    process.env.GROQ_API_KEY = "groq-test-key";
+    process.env.LLM_PROVIDER_ORDER = "gemini,groq";
+
+    vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          choices: [{ message: { content: "Groq answer" } }],
+        }),
+        { status: 200, headers: { "content-type": "application/json" } },
+      ),
+    );
+
+    const result = await generateWithLlmRouter({ prompt: "Viết luận giải", providerOrder: ["groq", "gemini"] });
+
+    expect(result?.provider).toBe("groq");
+    expect(result?.text).toBe("Groq answer");
+    expect(fetch).toHaveBeenCalledWith("https://api.groq.com/openai/v1/chat/completions", expect.any(Object));
+  });
+
   it("falls back from Gemini rate limit to Groq", async () => {
     process.env.GEMINI_API_KEY = "gemini-test-key";
     process.env.GROQ_API_KEY = "groq-test-key";

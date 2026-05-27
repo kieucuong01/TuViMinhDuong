@@ -209,6 +209,39 @@ describe("reading unlock paywall flow", () => {
     expect(harness.saved[0]?.priceCoins).toBe(0);
   });
 
+  it("blocks normal users when paid readings are disabled by admin", async () => {
+    const harness = createDeps({ balance: 250, priceCoins: 199 });
+
+    const result = await unlockReadingForUser(harness.deps, {
+      user: user({ coinBalance: 250 }),
+      chartId: harness.chartId,
+      type: "PALACE",
+      scopeKey: "Mệnh",
+      paidReadingsEnabled: false,
+    });
+
+    expect(result).toEqual({ status: "disabled" });
+    expect(harness.deps.getUserBalance).not.toHaveBeenCalled();
+    expect(harness.deps.adjustCoins).not.toHaveBeenCalled();
+    expect(harness.deps.generateReading).not.toHaveBeenCalled();
+    expect(harness.deps.saveReading).not.toHaveBeenCalled();
+  });
+
+  it("does not apply paid-reading shutdown to admins", async () => {
+    const harness = createDeps({ balance: 0, priceCoins: 199 });
+
+    const result = await startFullReadingJobForUser(harness.deps, {
+      user: user({ id: "admin-1", role: "ADMIN", coinBalance: 0 }),
+      chartId: harness.chartId,
+      paidReadingsEnabled: false,
+    });
+
+    expect(result).toEqual({ status: "queued", readingId: "reading-pending", chargedCoins: 0 });
+    expect(harness.deps.getUserBalance).not.toHaveBeenCalled();
+    expect(harness.deps.adjustCoins).not.toHaveBeenCalled();
+    expect(harness.pending[0]).toMatchObject({ priceCoins: 0 });
+  });
+
   it("refunds coins if generation fails after debit", async () => {
     const harness = createDeps({ balance: 199, priceCoins: 199, generateFails: true });
 

@@ -36,6 +36,7 @@ This folder keeps the high-signal context for future AI agents. It is inspired b
 - Date fortune: `src/lib/date-fortune.ts` calculates truc, hoang/hac dao, sao, xung hop, and activity advice.
 - CMS: admin article editing with SEO score and public article pages at `/kien-thuc-tu-vi/[slug]`.
 - Payment: PayOS checkout/webhook credits coins idempotently; `CoinLedger` is the source of truth.
+- Admin operation toggles can disable payments, coin topups, and public paid-reading surfaces; paid-reading shutdown does not apply to admins.
 
 ## Architecture Map
 
@@ -61,6 +62,7 @@ This folder keeps the high-signal context for future AI agents. It is inspired b
 - The chart engine must return structured JSON that AI readings can cite. Do not let AI recalculate the chart.
 - Coin balance is cached on `User.coinBalance`; transaction history lives in `CoinLedger`.
 - Paid readings should be cached by user/chart/type/scope so repeat views do not charge again.
+- When public paid readings are disabled, non-admin users should not see or invoke advanced reading surfaces; admins keep full paid-reading access without coin charge.
 - If payment or AI generation fails after charging, preserve an audit trail and refund via ledger transaction.
 
 ## Agent Workflow

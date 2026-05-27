@@ -1,7 +1,7 @@
 import Link from "next/link";
-import { Eye, FilePenLine, Plus, SearchCheck } from "lucide-react";
+import { Eye, FilePenLine, Plus, SearchCheck, SlidersHorizontal } from "lucide-react";
 import { redirect } from "next/navigation";
-import { saveArticleAction, saveArticleCategoryAction } from "@/app/actions";
+import { saveArticleAction, saveArticleCategoryAction, saveOperationSettingsAction } from "@/app/actions";
 import { getCurrentUser } from "@/lib/auth";
 import { getAdminArticleBySlug, getAdminOverview, listAdminArticles, listArticleCategories } from "@/lib/data";
 import type { ArticleView } from "@/lib/content";
@@ -69,7 +69,7 @@ function seoChecks(article: ArticleView) {
     .filter(Boolean) as Array<{ label: string; passed: boolean; hint: string }>;
 }
 
-export default async function AdminPage({ searchParams }: { searchParams: Promise<{ saved?: string; edit?: string; categorySaved?: string; deleted?: string }> }) {
+export default async function AdminPage({ searchParams }: { searchParams: Promise<{ saved?: string; edit?: string; categorySaved?: string; deleted?: string; settingsSaved?: string }> }) {
   const user = await getCurrentUser();
   if (user?.role !== "ADMIN") redirect("/dang-nhap?next=/admin");
 
@@ -81,6 +81,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
     params.edit ? getAdminArticleBySlug(params.edit) : Promise.resolve(null),
   ]);
   const article = editingArticle || emptyArticle();
+  const operationSettings = overview.operationSettings;
   const checks = seoChecks(article);
   const faqRows = [...(article.faqs || []), ...Array.from({ length: 5 }, () => ({ question: "", answer: "" }))].slice(0, 5);
 
@@ -101,6 +102,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
         {params.saved ? <p className="success mt-4">Đã lưu bài viết: {params.saved}</p> : null}
         {params.categorySaved ? <p className="success mt-4">Đã lưu danh mục: {params.categorySaved}</p> : null}
         {params.deleted ? <p className="success mt-4">Đã xóa bài viết: {params.deleted}</p> : null}
+        {params.settingsSaved ? <p className="success mt-4">Đã cập nhật cấu hình vận hành.</p> : null}
 
         <div className="mt-6 grid gap-4 md:grid-cols-5">
           {[
@@ -116,6 +118,52 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
             </div>
           ))}
         </div>
+
+        <section className="panel admin-operations-panel mt-6">
+          <div className="admin-panel-head">
+            <div>
+              <p className="eyebrow">Cấu hình vận hành</p>
+              <h2>Bật/tắt thanh toán, nạp xu và luận giải chuyên sâu</h2>
+            </div>
+            <span className="admin-operation-status">
+              <SlidersHorizontal size={17} /> {operationSettings.paidReadingsEnabled ? "Đang bán luận giải" : "Public chỉ xem bản cơ bản"}
+            </span>
+          </div>
+          <form action={saveOperationSettingsAction} className="admin-operation-form" data-loading-message="Đang lưu cấu hình..." data-loading-label="Đang lưu...">
+            <label className="admin-operation-toggle">
+              <input type="checkbox" name="paymentsEnabled" value="1" defaultChecked={operationSettings.paymentsEnabled} />
+              <span>
+                <strong>Thanh toán PayOS/VietQR</strong>
+                <small>Tắt thì hệ thống không tạo link thanh toán mới.</small>
+              </span>
+            </label>
+            <label className="admin-operation-toggle">
+              <input type="checkbox" name="coinTopupEnabled" value="1" defaultChecked={operationSettings.coinTopupEnabled} />
+              <span>
+                <strong>Nạp xu</strong>
+                <small>Tắt thì ẩn menu, modal và trang nạp xu với người dùng thường.</small>
+              </span>
+            </label>
+            <label className="admin-operation-toggle">
+              <input type="checkbox" name="paidReadingsEnabled" value="1" defaultChecked={operationSettings.paidReadingsEnabled} />
+              <span>
+                <strong>Luận giải chuyên sâu cho public</strong>
+                <small>Tắt thì ẩn Luận cung, Đại vận, Tiểu vận, Nguyệt vận, Nhật vận và Luận giải toàn bộ với non-admin. Admin vẫn toàn quyền.</small>
+              </span>
+            </label>
+            <div className="admin-operation-actions">
+              <LoadingSubmitButton className="btn btn-primary" name="mode" value="custom" loadingText="Đang lưu...">
+                Lưu cấu hình
+              </LoadingSubmitButton>
+              <LoadingSubmitButton className="btn btn-ghost" name="mode" value="basic-free" loadingText="Đang tắt...">
+                Tắt trả phí public
+              </LoadingSubmitButton>
+              <LoadingSubmitButton className="btn btn-ghost" name="mode" value="commercial" loadingText="Đang bật...">
+                Bật lại thương mại
+              </LoadingSubmitButton>
+            </div>
+          </form>
+        </section>
 
         <div className="admin-cms-grid">
           <section className="panel admin-editor-panel">

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Check, Coins, Sparkles, TrendingUp } from "lucide-react";
 import { COIN_PACKAGES, FEATURE_PRICES } from "@/lib/pricing";
+import { getOperationSettings } from "@/lib/data";
 import { formatCoins, formatVnd } from "@/lib/format";
 import { APP_NAME } from "@/lib/env";
 import { routeMetadata } from "@/lib/metadata";
@@ -27,7 +28,10 @@ const benefits = [
   "Nếu quá trình tạo luận giải lỗi sau khi trừ xu, hệ thống sẽ hoàn xu.",
 ];
 
-export default function PricingPage() {
+export default async function PricingPage() {
+  const operationSettings = await getOperationSettings();
+  const commercialEnabled = operationSettings.paymentsEnabled && operationSettings.coinTopupEnabled && operationSettings.paidReadingsEnabled;
+
   return (
     <main className="pricing-hero">
       <section className="section">
@@ -45,9 +49,9 @@ export default function PricingPage() {
                 <span><Check size={17} /> Lưu lịch sử xu trong tài khoản</span>
               </div>
               <div className="mt-6 flex flex-wrap gap-3">
-                <Link href="/pricing?topup=1" className="btn btn-primary btn-large" prefetch={false}>
+                {commercialEnabled ? <Link href="/pricing?topup=1" className="btn btn-primary btn-large" prefetch={false}>
                   <Coins size={20} /> Nạp xu
-                </Link>
+                </Link> : null}
                 <Link href="/#lap-la-so" className="btn btn-ghost btn-large">
                   <Sparkles size={20} /> Lập lá số
                 </Link>
@@ -66,9 +70,9 @@ export default function PricingPage() {
               </div>
               <p className="mt-3 text-lg leading-8 text-stone-600">Phù hợp khi bạn muốn xem đầy đủ trước, sau đó đọc sâu từng phần khi cần.</p>
               <p className="mt-5 text-4xl font-black text-orange-700">{formatCoins(FEATURE_PRICES.FULL.priceCoins)}</p>
-              <Link href="/pricing?topup=1" className="btn btn-primary btn-large mt-5 w-full" prefetch={false}>
+              {commercialEnabled ? <Link href="/pricing?topup=1" className="btn btn-primary btn-large mt-5 w-full" prefetch={false}>
                 Nạp xu để mở luận giải
-              </Link>
+              </Link> : <p className="alert mt-5">Luận giải chuyên sâu đang tắt với public. Bạn vẫn có thể lập lá số và đọc bản cơ bản miễn phí.</p>}
             </aside>
           </div>
         </div>
@@ -95,7 +99,7 @@ export default function PricingPage() {
             ))}
           </div>
 
-          <div className="grid gap-4">
+          {commercialEnabled ? <div className="grid gap-4">
             {COIN_PACKAGES.map((pack) => (
               <Link key={pack.key} href="/pricing?topup=1" className="pricing-card block" prefetch={false}>
                 <div className="flex items-start justify-between gap-4">
@@ -108,7 +112,7 @@ export default function PricingPage() {
                 {pack.bonusCoins ? <p className="mt-3 text-base font-bold text-emerald-700">Tặng thêm {pack.bonusCoins} xu</p> : null}
               </Link>
             ))}
-          </div>
+          </div> : null}
         </div>
       </section>
 

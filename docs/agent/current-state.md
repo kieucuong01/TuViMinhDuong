@@ -1,6 +1,22 @@
 # Current State
 
-## Recent Update: Reading Unlock Tests
+## Recent Update: Admin Operation Toggles
+
+- Admin now has operation toggles for PayOS payments, coin topups, and public paid readings.
+- The "Tắt trả phí public" preset disables payment, topup, and public paid-reading surfaces together.
+- When public paid readings are off, non-admin users only see the basic/free chart flow; Luận cung, Đại vận, Tiểu vận, Nguyệt vận, Nhật vận, prompt chips, quick purchase, and full-reading CTA are hidden or blocked.
+- Admin is exempt from the paid-reading shutdown and can still view/unlock advanced readings with zero coin charge.
+- Settings persist in `OperationSettings`; apply migration `20260526162000_add_operation_settings` before relying on this in production.
+
+## Previous Update: Groq-First Reading Model Policy
+
+- Free and paid readings now use provider order `groq,gemini` by default.
+- FULL paid readings still pass Gemini model hints so provider fallback uses `gemini-2.5-flash` for normal chapters.
+- If a generated paid chapter is too short, misses required headings, or otherwise fails the format guard, that chapter is retried once; if the router has to use Gemini on that retry, it uses `gemini-3.5-flash`.
+- Chapter 8 yearly/month guidance also uses `gemini-3.5-flash` if the router has to fall back from Groq to Gemini.
+- Env overrides: `PAID_READING_PRIMARY_GEMINI_MODEL`, `PAID_READING_ESCALATION_GEMINI_MODEL`, and `PAID_READING_YEARLY_GEMINI_MODEL`.
+
+## Previous Update: Reading Unlock Tests
 
 - Added `src/lib/reading-unlock.ts` as the testable core for paid reading unlocks.
 - `requestReadingAction` now delegates coin checks, cached reading reuse, admin bypass, debit, save, and refund-on-generation-failure to that service.
