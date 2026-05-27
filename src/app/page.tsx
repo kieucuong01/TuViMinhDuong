@@ -1,4 +1,4 @@
-import { BookOpenText, CheckCircle2, Coins, Eye, History, MessageCircle, ShieldCheck, Sparkles, Star } from "lucide-react";
+import { BookOpenText, Coins, Eye, History, MessageCircle, ShieldCheck, Sparkles, Star } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { ChartForm } from "@/components/chart-form";
@@ -6,7 +6,6 @@ import { DayFortuneCard } from "@/components/day-fortune-card";
 import { DeferredSocialProof } from "@/components/deferred-social-proof";
 import { QuickReadingForm } from "@/components/quick-reading-form";
 import { getOperationSettings, listArticles } from "@/lib/data";
-import { APP_NAME } from "@/lib/env";
 import { routeMetadata } from "@/lib/metadata";
 import { organizationJsonLd, websiteJsonLd } from "@/lib/seo";
 
@@ -23,11 +22,6 @@ export default async function Home() {
   const [articleList, operationSettings] = await Promise.all([listArticles(), getOperationSettings()]);
   const articles = articleList.slice(0, 3);
   const showQuickReading = operationSettings.paymentsEnabled && operationSettings.paidReadingsEnabled;
-  const trustSignals = [
-    ["Miễn phí lập lá số", "Nhập ngày giờ sinh và xem ngay phần cơ bản."],
-    ["Dễ đọc trên điện thoại", "Mỗi cung được chia rõ, không phải căng mắt đọc chữ nhỏ."],
-    ["Mua một lần, xem lại", "Luận giải đã mở sẽ được lưu trong tài khoản."],
-  ];
   const readerComments = [
     {
       initial: "H",
@@ -91,18 +85,6 @@ export default async function Home() {
             </div>
 
             <DayFortuneCard />
-          </div>
-
-          <div className="hero-trust-row" aria-label={`Điểm mạnh chính của ${APP_NAME}`}>
-            {trustSignals.map(([title, body]) => (
-              <article key={title}>
-                <CheckCircle2 size={20} />
-                <div>
-                  <strong>{title}</strong>
-                  <span>{body}</span>
-                </div>
-              </article>
-            ))}
           </div>
         </div>
       </section>
