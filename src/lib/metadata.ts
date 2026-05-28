@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { APP_NAME, APP_URL } from "@/lib/env";
+import { APP_NAME } from "@/lib/env";
+import { absoluteUrl } from "@/lib/seo";
 
 type RouteMetadataInput = {
   title: string;
@@ -18,13 +19,13 @@ export function routeMetadata({
   imageSubtitle = description,
   robots,
 }: RouteMetadataInput): Metadata {
-  const url = `${APP_URL}${path === "/" ? "" : path}`;
+  const url = absoluteUrl(path);
   const image = `/api/og?title=${encodeURIComponent(imageTitle)}&subtitle=${encodeURIComponent(imageSubtitle)}`;
 
   return {
     title,
     description,
-    alternates: { canonical: path },
+    alternates: { canonical: url },
     robots,
     openGraph: {
       title,

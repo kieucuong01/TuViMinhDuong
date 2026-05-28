@@ -7,7 +7,7 @@ import { DeferredSocialProof } from "@/components/deferred-social-proof";
 import { QuickReadingForm } from "@/components/quick-reading-form";
 import { getOperationSettings, listArticles } from "@/lib/data";
 import { routeMetadata } from "@/lib/metadata";
-import { organizationJsonLd, websiteJsonLd } from "@/lib/seo";
+import { organizationJsonLd, webPageJsonLd, websiteJsonLd } from "@/lib/seo";
 
 export const revalidate = 300;
 
@@ -22,6 +22,11 @@ export default async function Home() {
   const [articleList, operationSettings] = await Promise.all([listArticles(), getOperationSettings()]);
   const articles = articleList.slice(0, 3);
   const showQuickReading = operationSettings.paymentsEnabled && operationSettings.paidReadingsEnabled;
+  const homePageLd = webPageJsonLd({
+    name: "Lập lá số tử vi miễn phí",
+    description: "Lập lá số tử vi, xem ngày tốt xấu và đọc kiến thức tử vi dễ hiểu cho người Việt Nam.",
+    url: "/",
+  });
   const readerComments = [
     {
       initial: "H",
@@ -67,6 +72,7 @@ export default async function Home() {
     <main>
       <script id="website-jsonld" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd()) }} />
       <script id="organization-jsonld" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd()) }} />
+      <script id="homepage-jsonld" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(homePageLd) }} />
       <section className="hero-band">
         <div className="hero-shell mx-auto grid max-w-7xl gap-6 px-4 py-5 sm:px-6 lg:px-8 lg:py-8">
           <div className="grid gap-6 lg:grid-cols-[1.02fr_0.98fr] lg:items-stretch">

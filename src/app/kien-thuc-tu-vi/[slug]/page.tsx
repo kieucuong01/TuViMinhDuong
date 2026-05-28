@@ -4,7 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { APP_URL } from "@/lib/env";
 import { getArticleBySlug, listArticles } from "@/lib/data";
-import { articleJsonLd, breadcrumbJsonLd, faqJsonLd } from "@/lib/seo";
+import { absoluteUrl, articleJsonLd, breadcrumbJsonLd, faqJsonLd } from "@/lib/seo";
 import { MarkdownContent } from "@/components/markdown-content";
 
 export const revalidate = 300;
@@ -23,7 +23,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   return {
     title: article.metaTitle || article.title,
     description: article.metaDescription || article.excerpt,
-    alternates: { canonical: article.canonicalUrl || `/kien-thuc-tu-vi/${article.slug}` },
+    alternates: { canonical: absoluteUrl(article.canonicalUrl || `/kien-thuc-tu-vi/${article.slug}`) },
     robots: article.robots || "index,follow",
     openGraph: {
       title: article.ogTitle || article.metaTitle || article.title,
@@ -48,8 +48,8 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
   const articleLd = articleJsonLd(article);
   const breadcrumbLd = breadcrumbJsonLd([
     { name: "Trang chủ", url: APP_URL },
-    { name: "Kiến thức tử vi", url: `${APP_URL}/kien-thuc-tu-vi` },
-    { name: article.title, url: `${APP_URL}/kien-thuc-tu-vi/${article.slug}` },
+    { name: "Kiến thức tử vi", url: "/kien-thuc-tu-vi" },
+    { name: article.title, url: `/kien-thuc-tu-vi/${article.slug}` },
   ]);
   const faqLd = article.faqs?.length ? faqJsonLd(article.faqs) : null;
 

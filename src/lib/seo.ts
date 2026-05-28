@@ -20,6 +20,27 @@ export type SeoResult = {
   checks: { label: string; passed: boolean; points: number; hint: string }[];
 };
 
+export function absoluteUrl(value: string) {
+  if (/^https?:\/\//i.test(value)) return value;
+  const path = value.startsWith("/") ? value : `/${value}`;
+  return `${APP_URL}${path === "/" ? "" : path}`;
+}
+
+function normalizedUrl(value: string) {
+  return value.replace(/\/$/, "");
+}
+
+export function robotsAllowsIndex(robots?: string | null) {
+  const value = (robots || "index,follow").toLowerCase();
+  return !value.includes("noindex") && !value.includes("none");
+}
+
+export function isSelfCanonicalArticle(article: { slug: string; canonicalUrl?: string | null }) {
+  const expected = absoluteUrl(`/kien-thuc-tu-vi/${article.slug}`);
+  const canonical = article.canonicalUrl?.trim() ? absoluteUrl(article.canonicalUrl) : expected;
+  return normalizedUrl(canonical) === normalizedUrl(expected);
+}
+
 function includesKeyword(value: string | undefined, keyword: string) {
   return Boolean(value?.toLowerCase().includes(keyword.toLowerCase()));
 }
@@ -122,11 +143,11 @@ export function articleJsonLd(article: {
   updatedAt?: Date | string | null;
   coverImage?: string | null;
 }) {
-  const url = `${APP_URL}/kien-thuc-tu-vi/${article.slug}`;
+  const url = absoluteUrl(`/kien-thuc-tu-vi/${article.slug}`);
   const image = article.coverImage
     ? article.coverImage.startsWith("http")
       ? article.coverImage
-      : `${APP_URL}${article.coverImage}`
+      : absoluteUrl(article.coverImage)
     : undefined;
   return {
     "@context": "https://schema.org",
@@ -160,7 +181,38 @@ export function breadcrumbJsonLd(items: { name: string; url: string }[]) {
       "@type": "ListItem",
       position: index + 1,
       name: item.name,
-      item: item.url,
+      item: absoluteUrl(item.url),
+    })),
+  };
+}
+
+export function webPageJsonLd(page: { name: string; description: string; url: string; breadcrumb?: { name: string; url: string }[] }) {
+  const url = absoluteUrl(page.url);
+  return {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    name: page.name,
+    description: page.description,
+    url,
+    inLanguage: "vi-VN",
+    isPartOf: {
+      "@type": "WebSite",
+      name: APP_NAME,
+      url: APP_URL,
+    },
+    breadcrumb: page.breadcrumb?.length ? breadcrumbJsonLd(page.breadcrumb) : undefined,
+  };
+}
+
+export function itemListJsonLd(items: { name: string; url: string }[]) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    itemListElement: items.map((item, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      name: item.name,
+      url: absoluteUrl(item.url),
     })),
   };
 }

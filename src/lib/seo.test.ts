@@ -1,5 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { articleJsonLd, organizationJsonLd, scoreArticleSeo, websiteJsonLd } from "@/lib/seo";
+import {
+  absoluteUrl,
+  articleJsonLd,
+  isSelfCanonicalArticle,
+  organizationJsonLd,
+  robotsAllowsIndex,
+  scoreArticleSeo,
+  websiteJsonLd,
+} from "@/lib/seo";
 
 describe("SEO scoring", () => {
   it("rewards complete article metadata and structure", () => {
@@ -59,5 +67,19 @@ describe("Structured data", () => {
     });
 
     expect(jsonLd.publisher.logo.url).toContain("/favicon-96x96.png");
+  });
+});
+
+describe("SEO URL guards", () => {
+  it("normalizes relative URLs against the public app URL", () => {
+    expect(absoluteUrl("/kien-thuc-tu-vi")).toMatch(/^https?:\/\/.+\/kien-thuc-tu-vi$/);
+    expect(absoluteUrl("https://example.com/custom")).toBe("https://example.com/custom");
+  });
+
+  it("keeps noindex and non-self-canonical articles out of indexable sets", () => {
+    expect(robotsAllowsIndex("index,follow")).toBe(true);
+    expect(robotsAllowsIndex("noindex,nofollow")).toBe(false);
+    expect(isSelfCanonicalArticle({ slug: "cung-menh", canonicalUrl: "/kien-thuc-tu-vi/cung-menh" })).toBe(true);
+    expect(isSelfCanonicalArticle({ slug: "cung-menh", canonicalUrl: "/kien-thuc-tu-vi/bai-khac" })).toBe(false);
   });
 });

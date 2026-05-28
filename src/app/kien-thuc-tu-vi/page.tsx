@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { listArticleCategories, listArticles } from "@/lib/data";
 import { routeMetadata } from "@/lib/metadata";
+import { itemListJsonLd, webPageJsonLd } from "@/lib/seo";
 
 export const revalidate = 300;
 
@@ -15,6 +16,21 @@ export const metadata = routeMetadata({
 export default async function KnowledgePage({ searchParams }: { searchParams: Promise<{ category?: string }> }) {
   const [{ category }, articles, categories] = await Promise.all([searchParams, listArticles(), listArticleCategories()]);
   const visibleArticles = category ? articles.filter((article) => article.category?.slug === category) : articles;
+  const pageLd = webPageJsonLd({
+    name: "Kiến thức tử vi cho người mới",
+    description: "Bài viết kiến thức tử vi dễ đọc về cách lập lá số, cung mệnh, vận hạn, xem ngày và ứng dụng trong đời sống.",
+    url: "/kien-thuc-tu-vi",
+    breadcrumb: [
+      { name: "Trang chủ", url: "/" },
+      { name: "Kiến thức tử vi", url: "/kien-thuc-tu-vi" },
+    ],
+  });
+  const itemListLd = itemListJsonLd(
+    visibleArticles.slice(0, 12).map((article) => ({
+      name: article.title,
+      url: `/kien-thuc-tu-vi/${article.slug}`,
+    })),
+  );
   const bySlug = new Map(articles.map((article) => [article.slug, article]));
   const beginnerPath = [
     "la-so-tu-vi-la-gi",
@@ -38,6 +54,8 @@ export default async function KnowledgePage({ searchParams }: { searchParams: Pr
 
   return (
     <main className="section">
+      <script id="knowledge-page-jsonld" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(pageLd) }} />
+      <script id="knowledge-list-jsonld" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListLd) }} />
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="section-heading">
           <p className="eyebrow">Kiến thức tử vi</p>

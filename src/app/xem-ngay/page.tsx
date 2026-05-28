@@ -1,6 +1,6 @@
 import { DateView } from "@/components/date-view";
 import { routeMetadata } from "@/lib/metadata";
-import { faqJsonLd } from "@/lib/seo";
+import { faqJsonLd, webPageJsonLd } from "@/lib/seo";
 
 export const metadata = routeMetadata({
   title: "Xem ngày tốt xấu theo tuổi",
@@ -30,9 +30,19 @@ export default async function DateViewPage({
   searchParams: Promise<{ date?: string | string[] }>;
 }) {
   const query = await searchParams;
+  const pageLd = webPageJsonLd({
+    name: "Xem ngày tốt xấu theo tuổi",
+    description: "Xem ngày tốt xấu theo âm lịch, can chi, 12 trực, hoàng đạo, sao tốt xấu và việc nên làm trong ngày.",
+    url: "/xem-ngay",
+    breadcrumb: [
+      { name: "Trang chủ", url: "/" },
+      { name: "Xem ngày tốt xấu", url: "/xem-ngay" },
+    ],
+  });
 
   return (
     <main className="min-h-screen bg-[#fbfaf7]">
+      <script id="date-page-jsonld" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(pageLd) }} />
       <script id="date-faq-jsonld" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd(faqs)) }} />
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <DateView initialDate={query.date} />
