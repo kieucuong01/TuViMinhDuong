@@ -29,12 +29,12 @@ function id(prefix) {
 }
 
 const featurePrices = [
-  ["FULL", "Luận giải toàn bộ", 199],
-  ["PALACE", "Luận cung", 29],
-  ["DAI_VAN", "Luận đại vận", 49],
-  ["TIEU_VAN", "Luận tiểu vận", 39],
-  ["NGUYET_VAN", "Luận nguyệt vận", 19],
-  ["NHAT_VAN", "Luận nhật vận", 9],
+  ["FULL", "Luận giải toàn bộ", 139],
+  ["PALACE", "Luận cung", 20],
+  ["DAI_VAN", "Luận đại vận", 34],
+  ["TIEU_VAN", "Luận tiểu vận", 27],
+  ["NGUYET_VAN", "Luận nguyệt vận", 13],
+  ["NHAT_VAN", "Luận nhật vận", 6],
 ];
 
 const coinPackages = [

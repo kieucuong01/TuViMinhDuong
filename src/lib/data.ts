@@ -47,6 +47,56 @@ export type OperationSettings = {
   updatedAt?: Date | null;
 };
 
+export type AdminPaymentSource = "coin_topup" | "quick_reading" | "other";
+
+export type AdminRevenueMetrics = {
+  totalPaidVnd: number;
+  currentMonthPaidVnd: number;
+  last30DaysPaidVnd: number;
+  coinTopupPaidVnd: number;
+  quickReadingPaidVnd: number;
+  otherPaidVnd: number;
+  paidOrders: number;
+  pendingOrders: number;
+  failedOrders: number;
+  cancelledOrders: number;
+  expiredOrders: number;
+};
+
+export type AdminRecentUser = {
+  id: string;
+  email: string;
+  name: string | null;
+  role: "USER" | "ADMIN";
+  coinBalance: number;
+  createdAt: Date;
+  chartsCount: number;
+  readingsCount: number;
+  paidOrdersCount: number;
+  totalPaidVnd: number;
+  lastPaymentAt: Date | null;
+};
+
+export type AdminRecentPayment = {
+  id: string;
+  email: string;
+  name: string | null;
+  orderCode: string;
+  amountVnd: number;
+  coins: number;
+  status: string;
+  source: AdminPaymentSource;
+  sourceLabel: string;
+  createdAt: Date;
+  paidAt: Date | null;
+};
+
+export type AdminBusinessDashboard = {
+  revenue: AdminRevenueMetrics;
+  recentUsers: AdminRecentUser[];
+  recentPayments: AdminRecentPayment[];
+};
+
 type ChartWithFreeOverview = TuViChart & {
   freeOverview?: {
     content: string;
@@ -125,6 +175,105 @@ function normalizeOperationSettings(row?: Partial<OperationSettings> | null): Op
     coinTopupEnabled: row?.coinTopupEnabled ?? DEFAULT_OPERATION_SETTINGS.coinTopupEnabled,
     paidReadingsEnabled: row?.paidReadingsEnabled ?? DEFAULT_OPERATION_SETTINGS.paidReadingsEnabled,
     updatedAt: row?.updatedAt ?? null,
+  };
+}
+
+type AdminPaymentRecord = {
+  id: string;
+  orderCode: bigint | number | string;
+  amountVnd: number;
+  coins: number;
+  status: string;
+  packageId?: string | null;
+  rawPayload?: unknown;
+  createdAt: Date;
+  paidAt?: Date | null;
+  user?: {
+    email: string;
+    name: string | null;
+  } | null;
+};
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return Boolean(value && typeof value === "object");
+}
+
+function paymentDate(payment: Pick<AdminPaymentRecord, "paidAt" | "createdAt">) {
+  return payment.paidAt ? new Date(payment.paidAt) : new Date(payment.createdAt);
+}
+
+function paymentSource(payment: Pick<AdminPaymentRecord, "rawPayload" | "packageId" | "coins">): AdminPaymentSource {
+  if (isRecord(payment.rawPayload) && "quickReading" in payment.rawPayload) return "quick_reading";
+  if (payment.packageId || payment.coins > 0) return "coin_topup";
+  return "other";
+}
+
+function paymentSourceLabel(source: AdminPaymentSource) {
+  if (source === "quick_reading") return "Luận giải nhanh";
+  if (source === "coin_topup") return "Nạp xu";
+  return "Khác";
+}
+
+function emptyRevenueMetrics(): AdminRevenueMetrics {
+  return {
+    totalPaidVnd: 0,
+    currentMonthPaidVnd: 0,
+    last30DaysPaidVnd: 0,
+    coinTopupPaidVnd: 0,
+    quickReadingPaidVnd: 0,
+    otherPaidVnd: 0,
+    paidOrders: 0,
+    pendingOrders: 0,
+    failedOrders: 0,
+    cancelledOrders: 0,
+    expiredOrders: 0,
+  };
+}
+
+function summarizeRevenue(payments: AdminPaymentRecord[]): AdminRevenueMetrics {
+  const revenue = emptyRevenueMetrics();
+  const now = new Date();
+  const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+  const last30DaysStart = new Date(now);
+  last30DaysStart.setDate(now.getDate() - 30);
+
+  for (const payment of payments) {
+    if (payment.status === "PENDING") revenue.pendingOrders += 1;
+    if (payment.status === "FAILED") revenue.failedOrders += 1;
+    if (payment.status === "CANCELLED") revenue.cancelledOrders += 1;
+    if (payment.status === "EXPIRED") revenue.expiredOrders += 1;
+    if (payment.status !== "PAID") continue;
+
+    revenue.paidOrders += 1;
+    revenue.totalPaidVnd += payment.amountVnd;
+
+    const paidDate = paymentDate(payment);
+    if (paidDate >= currentMonthStart) revenue.currentMonthPaidVnd += payment.amountVnd;
+    if (paidDate >= last30DaysStart) revenue.last30DaysPaidVnd += payment.amountVnd;
+
+    const source = paymentSource(payment);
+    if (source === "quick_reading") revenue.quickReadingPaidVnd += payment.amountVnd;
+    else if (source === "coin_topup") revenue.coinTopupPaidVnd += payment.amountVnd;
+    else revenue.otherPaidVnd += payment.amountVnd;
+  }
+
+  return revenue;
+}
+
+function normalizeRecentPayment(payment: AdminPaymentRecord): AdminRecentPayment {
+  const source = paymentSource(payment);
+  return {
+    id: payment.id,
+    email: payment.user?.email || "Chưa có email",
+    name: payment.user?.name || null,
+    orderCode: String(payment.orderCode),
+    amountVnd: payment.amountVnd,
+    coins: payment.coins,
+    status: payment.status,
+    source,
+    sourceLabel: paymentSourceLabel(source),
+    createdAt: new Date(payment.createdAt),
+    paidAt: payment.paidAt ? new Date(payment.paidAt) : null,
   };
 }
 
@@ -1162,6 +1311,106 @@ export async function saveArticleFromForm(formData: FormData) {
         include: { category: true },
       });
   return articleWithNormalizedRelations(saved as unknown as ArticleRecord);
+}
+
+export async function getAdminBusinessDashboard(): Promise<AdminBusinessDashboard> {
+  const db = getDb();
+  if (!db) {
+    const demoUserIds = new Set<string>();
+    for (const chart of charts().values()) {
+      if (chart.userId) demoUserIds.add(chart.userId);
+    }
+    for (const reading of readings().values()) {
+      demoUserIds.add(reading.userId);
+    }
+
+    const recentUsers = Array.from(demoUserIds)
+      .map((userId) => {
+        const userCharts = Array.from(charts().values()).filter((chart) => chart.userId === userId);
+        const userReadings = Array.from(readings().values()).filter((reading) => reading.userId === userId);
+        const latestChart = userCharts.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())[0];
+        return {
+          id: userId,
+          email: userId.includes("@") ? userId : `${userId}@demo.local`,
+          name: userId.startsWith("guest-") ? "Khách xem thử" : "Demo user",
+          role: "USER" as const,
+          coinBalance: balances().get(userId) || 0,
+          createdAt: latestChart?.createdAt || new Date(0),
+          chartsCount: userCharts.length,
+          readingsCount: userReadings.length,
+          paidOrdersCount: 0,
+          totalPaidVnd: 0,
+          lastPaymentAt: null,
+        };
+      })
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+      .slice(0, 12);
+
+    return {
+      revenue: emptyRevenueMetrics(),
+      recentUsers,
+      recentPayments: [],
+    };
+  }
+
+  const [payments, users] = await Promise.all([
+    db.paymentOrder.findMany({
+      orderBy: { createdAt: "desc" },
+      include: {
+        user: {
+          select: {
+            email: true,
+            name: true,
+          },
+        },
+      },
+    }),
+    db.user.findMany({
+      orderBy: { createdAt: "desc" },
+      take: 12,
+      include: {
+        _count: {
+          select: {
+            charts: true,
+            readings: true,
+            payments: true,
+          },
+        },
+        payments: {
+          where: { status: "PAID" },
+          select: {
+            amountVnd: true,
+            status: true,
+            paidAt: true,
+            createdAt: true,
+          },
+          orderBy: { createdAt: "desc" },
+        },
+      },
+    }),
+  ]);
+
+  return {
+    revenue: summarizeRevenue(payments as AdminPaymentRecord[]),
+    recentPayments: (payments as AdminPaymentRecord[]).slice(0, 8).map(normalizeRecentPayment),
+    recentUsers: users.map((item) => {
+      const paidPayments = item.payments.filter((payment) => payment.status === "PAID");
+      const lastPayment = paidPayments[0];
+      return {
+        id: item.id,
+        email: item.email,
+        name: item.name,
+        role: item.role,
+        coinBalance: item.coinBalance,
+        createdAt: item.createdAt,
+        chartsCount: item._count.charts,
+        readingsCount: item._count.readings,
+        paidOrdersCount: paidPayments.length,
+        totalPaidVnd: paidPayments.reduce((sum, payment) => sum + payment.amountVnd, 0),
+        lastPaymentAt: lastPayment ? paymentDate(lastPayment) : null,
+      };
+    }),
+  };
 }
 
 export async function getAdminOverview() {

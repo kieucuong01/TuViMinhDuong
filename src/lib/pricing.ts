@@ -4,12 +4,12 @@ export type ReadingKey = "FULL" | "PALACE" | "DAI_VAN" | "TIEU_VAN" | "NGUYET_VA
 export const TEMPORARY_FULL_ACCESS = false;
 
 export const FEATURE_PRICES: Record<ReadingKey, { label: string; priceCoins: number }> = {
-  FULL: { label: "Luận giải toàn bộ", priceCoins: 199 },
-  PALACE: { label: "Luận cung", priceCoins: 29 },
-  DAI_VAN: { label: "Luận đại vận", priceCoins: 49 },
-  TIEU_VAN: { label: "Luận tiểu vận", priceCoins: 39 },
-  NGUYET_VAN: { label: "Luận nguyệt vận", priceCoins: 19 },
-  NHAT_VAN: { label: "Luận nhật vận", priceCoins: 9 },
+  FULL: { label: "Luận giải toàn bộ", priceCoins: 139 },
+  PALACE: { label: "Luận cung", priceCoins: 20 },
+  DAI_VAN: { label: "Luận đại vận", priceCoins: 34 },
+  TIEU_VAN: { label: "Luận tiểu vận", priceCoins: 27 },
+  NGUYET_VAN: { label: "Luận nguyệt vận", priceCoins: 13 },
+  NHAT_VAN: { label: "Luận nhật vận", priceCoins: 6 },
 };
 
 export const COIN_PACKAGES = [

@@ -3,10 +3,8 @@ import Image from "next/image";
 import { Suspense } from "react";
 import { BookOpenText, CalendarDays } from "lucide-react";
 import { UserHeaderBadge } from "@/components/user-header-badge";
-import { CoinTopupLink } from "@/components/coin-topup-link";
 import { APP_NAME } from "@/lib/env";
 import { MobileSiteMenu } from "@/components/mobile-site-menu";
-import { getOperationSettings } from "@/lib/data";
 
 const baseNav = [
   { href: "/", label: "Lập lá số tử vi", tone: "primary" },
@@ -15,9 +13,7 @@ const baseNav = [
 ];
 
 export async function SiteHeader() {
-  const operationSettings = await getOperationSettings();
-  const showTopup = operationSettings.paymentsEnabled && operationSettings.coinTopupEnabled;
-  const nav = showTopup ? [...baseNav, { href: "/nap-xu", label: "Nạp xu", modal: true, tone: "topup" }] : baseNav;
+  const nav = baseNav;
 
   return (
     <header className="site-header sticky top-0 z-50 border-b border-orange-100/70 bg-white/75 shadow-sm shadow-orange-950/5 backdrop-blur-2xl supports-[backdrop-filter]:bg-white/70">
@@ -37,12 +33,7 @@ export async function SiteHeader() {
             const Icon = item.tone === "date" ? CalendarDays : item.tone === "knowledge" ? BookOpenText : null;
             const linkClass = `site-nav-link rounded-full px-3.5 py-2 transition hover:bg-orange-50 hover:text-orange-700 ${index === 0 ? "site-nav-primary" : ""} ${item.tone === "date" ? "site-nav-date" : ""} ${item.tone === "knowledge" ? "site-nav-knowledge" : ""}`;
 
-            return "modal" in item && item.modal ? (
-              <CoinTopupLink key={item.href} className={linkClass}>
-                {Icon ? <Icon aria-hidden="true" size={16} strokeWidth={2.4} /> : null}
-                <span>{item.label}</span>
-              </CoinTopupLink>
-            ) : (
+            return (
               <Link key={item.href} href={item.href} className={linkClass} prefetch={false}>
                 {Icon ? <Icon aria-hidden="true" size={16} strokeWidth={2.4} /> : null}
                 <span>{item.label}</span>

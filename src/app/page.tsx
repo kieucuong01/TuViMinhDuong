@@ -1,4 +1,4 @@
-import { BookOpenText, Coins, Eye, History, MessageCircle, ShieldCheck, Sparkles, Star } from "lucide-react";
+import { BookOpenText, Eye, History, MessageCircle, ShieldCheck, Sparkles, Star } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { ChartForm } from "@/components/chart-form";
@@ -41,15 +41,15 @@ export default async function Home() {
       name: "Tuấn Minh",
       date: "22/5/2026",
       badge: "Xem trên điện thoại",
-      body: "Điểm mình thích là đọc trên điện thoại khá gọn, từng phần tách rõ. Bản miễn phí đủ để biết nên mở mục nào trước, không bị cảm giác mua mù.",
+      body: "Điểm mình thích là đọc trên điện thoại khá gọn, từng phần tách rõ. Bản miễn phí đủ để biết nên đọc mục nào trước, không bị cảm giác phải quyết định khi chưa hiểu.",
     },
     {
       initial: "L",
       name: "Linh",
       date: "21/5/2026",
-      badge: "Đã nạp xu",
+      badge: "Đã lưu lá số",
       body: "Mình lỡ nhập nhầm email lúc đầu, admin hỗ trợ tìm lại lá số khá nhanh. Luận giải không hù dọa, đọc kiểu định hướng nên dễ tiếp nhận.",
-      adminReply: "Cảm ơn Linh. Bên mình luôn ưu tiên giữ nội dung ở mức tham khảo thực tế, không gieo lo lắng. Nếu cần tìm lại lá số, bạn cứ dùng đúng email đã mua là được.",
+      adminReply: "Cảm ơn Linh. Bên mình luôn ưu tiên giữ nội dung ở mức tham khảo thực tế, không gieo lo lắng. Nếu cần tìm lại lá số, bạn cứ dùng đúng email đã lưu là được.",
     },
     {
       initial: "P",
@@ -62,8 +62,8 @@ export default async function Home() {
       initial: "K",
       name: "Khánh",
       date: "18/5/2026",
-      badge: "Mua lại để xem",
-      body: "Lúc đầu chỉ định xem thử, nhưng phần miễn phí viết có cấu trúc nên mình mở bản đầy đủ. Có mục nên lưu ý khá sát với chuyện gia đình của mình.",
+      badge: "Quay lại xem tiếp",
+      body: "Lúc đầu chỉ định xem thử, nhưng phần miễn phí viết có cấu trúc nên mình đọc thêm bản đầy đủ. Có mục nên lưu ý khá sát với chuyện gia đình của mình.",
       adminReply: "Cảm ơn Khánh đã tin dùng. Khi đọc các mục gia đình, bạn nên đối chiếu thêm Phúc Đức, Phụ Mẫu và bối cảnh thực tế để có góc nhìn cân bằng hơn.",
     },
   ];
@@ -84,7 +84,7 @@ export default async function Home() {
               </div>
               <ChartForm />
               <div className="form-assurance">
-                <span><ShieldCheck size={17} /> Không cần thanh toán để lập lá số</span>
+                <span><ShieldCheck size={17} /> Không cần trả phí để lập lá số</span>
                 <span><Eye size={17} /> Có bản đọc rõ trên điện thoại</span>
                 <span><History size={17} /> Đăng nhập để lưu và xem lại</span>
               </div>
@@ -139,7 +139,7 @@ export default async function Home() {
           <div className="reader-comments-cta">
             <div>
               <strong>Muốn xem lá số của mình rõ như vậy?</strong>
-              <span>Lập miễn phí trước, đọc tổng quan rồi chọn phần cần mở khóa sau.</span>
+              <span>Lập miễn phí trước, đọc tổng quan rồi đi tiếp vào phần bạn thật sự quan tâm.</span>
             </div>
             <Link href="#lap-la-so" className="btn btn-primary">
               Lập lá số ngay <Sparkles size={18} />
@@ -186,10 +186,10 @@ export default async function Home() {
         <div className="mx-auto grid max-w-7xl gap-6 px-4 sm:px-6 md:grid-cols-[1fr_auto] md:items-center lg:px-8">
           <div>
             <p className="eyebrow text-orange-300">Bắt đầu miễn phí</p>
-            <h2 className="text-balance text-3xl font-black">Tạo lá số đầu tiên, xem phần cơ bản rồi quyết định có mở bản đầy đủ hay không</h2>
+            <h2 className="text-balance text-3xl font-black">Tạo lá số đầu tiên, xem phần cơ bản rồi đọc tiếp khi bạn muốn hiểu sâu hơn</h2>
           </div>
           <Link href="/#lap-la-so" className="btn btn-primary btn-large">
-            <Coins size={20} /> Lập lá số ngay
+            <Sparkles size={20} /> Lập lá số ngay
           </Link>
         </div>
       </section>

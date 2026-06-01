@@ -2,10 +2,9 @@
 
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
-import { ChevronDown, Coins, FileText, LogOut, ShieldCheck, UserCircle } from "lucide-react";
+import { ChevronDown, FileText, LogOut, ShieldCheck, UserCircle } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { logoutAction } from "@/app/actions";
-import { CoinTopupLink } from "@/components/coin-topup-link";
 import { loginModalHref } from "@/components/login-modal-link";
 import { LoadingSubmitButton } from "@/components/loading-submit-button";
 
@@ -14,21 +13,12 @@ type HeaderUser = {
   email: string;
   name: string;
   role: "USER" | "ADMIN";
-  coinBalance: number;
-};
-
-type HeaderOperationSettings = {
-  paymentsEnabled: boolean;
-  coinTopupEnabled: boolean;
-  paidReadingsEnabled: boolean;
 };
 
 export function UserHeaderBadge() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [user, setUser] = useState<HeaderUser | null>(null);
-  const [temporaryFullAccess, setTemporaryFullAccess] = useState(false);
-  const [operationSettings, setOperationSettings] = useState<HeaderOperationSettings | null>(null);
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
@@ -37,8 +27,6 @@ export function UserHeaderBadge() {
       .then((response) => response.json())
       .then((data) => {
         setUser(data.user || null);
-        setTemporaryFullAccess(Boolean(data.temporaryFullAccess));
-        setOperationSettings(data.operationSettings || null);
         setLoaded(true);
       })
       .catch(() => {
@@ -55,8 +43,6 @@ export function UserHeaderBadge() {
         .then((response) => response.json())
         .then((data) => {
           setUser(data.user || null);
-          setTemporaryFullAccess(Boolean(data.temporaryFullAccess));
-          setOperationSettings(data.operationSettings || null);
           setLoaded(true);
         })
         .catch(() => setLoaded(true));
@@ -100,17 +86,8 @@ export function UserHeaderBadge() {
     );
   }
 
-  const canTopUp = Boolean(operationSettings?.paymentsEnabled && operationSettings.coinTopupEnabled);
-
   return (
     <div className="user-header-badge">
-      {temporaryFullAccess || !canTopUp ? (
-        <span className="user-coin-pill free"><Coins size={15} /> Cơ bản</span>
-      ) : (
-        <CoinTopupLink className="user-coin-pill" aria-label="Nạp xu nhanh">
-          <Coins size={15} /> {user.coinBalance} xu
-        </CoinTopupLink>
-      )}
       <Link href="/la-so" className="user-charts-pill" title="Lá số của tôi" aria-label="Lá số của tôi" prefetch={false}>
         <FileText size={15} />
         Lá số

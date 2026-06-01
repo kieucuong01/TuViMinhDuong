@@ -1,9 +1,9 @@
 import Link from "next/link";
-import { Eye, FilePenLine, Plus, SearchCheck, SlidersHorizontal } from "lucide-react";
+import { Banknote, Eye, FilePenLine, Plus, ReceiptText, SearchCheck, SlidersHorizontal, UsersRound } from "lucide-react";
 import { redirect } from "next/navigation";
 import { saveArticleAction, saveArticleCategoryAction, saveOperationSettingsAction } from "@/app/actions";
 import { getCurrentUser } from "@/lib/auth";
-import { getAdminArticleBySlug, getAdminOverview, listAdminArticles, listArticleCategories } from "@/lib/data";
+import { getAdminArticleBySlug, getAdminBusinessDashboard, getAdminOverview, listAdminArticles, listArticleCategories } from "@/lib/data";
 import type { ArticleView } from "@/lib/content";
 import { LoadingSubmitButton } from "@/components/loading-submit-button";
 import { AdminArticleDeleteForm } from "@/components/admin-article-delete-form";
@@ -42,6 +42,26 @@ function readableDate(date?: Date | null) {
   return date ? new Date(date).toLocaleDateString("vi-VN") : "Chưa xuất bản";
 }
 
+function readableDateTime(date?: Date | null) {
+  return date
+    ? new Date(date).toLocaleString("vi-VN", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      })
+    : "Chưa có";
+}
+
+function formatVnd(value = 0) {
+  return new Intl.NumberFormat("vi-VN", {
+    style: "currency",
+    currency: "VND",
+    maximumFractionDigits: 0,
+  }).format(value);
+}
+
 function seoTone(score = 0) {
   if (score >= 80) return "good";
   if (score >= 60) return "ok";
@@ -52,6 +72,19 @@ function statusLabel(status: string) {
   if (status === "published") return "Xuất bản";
   if (status === "archived") return "Lưu trữ";
   return "Nháp";
+}
+
+function paymentStatusLabel(status: string) {
+  if (status === "PAID") return "Đã thanh toán";
+  if (status === "PENDING") return "Đang chờ";
+  if (status === "CANCELLED") return "Đã hủy";
+  if (status === "EXPIRED") return "Hết hạn";
+  if (status === "FAILED") return "Lỗi";
+  return status;
+}
+
+function roleLabel(role: string) {
+  return role === "ADMIN" ? "Admin" : "User";
 }
 
 function seoChecks(article: ArticleView) {
@@ -74,8 +107,9 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
   if (user?.role !== "ADMIN") redirect("/dang-nhap?next=/admin");
 
   const params = await searchParams;
-  const [overview, articles, categories, editingArticle] = await Promise.all([
+  const [overview, business, articles, categories, editingArticle] = await Promise.all([
     getAdminOverview(),
+    getAdminBusinessDashboard(),
     listAdminArticles(),
     listArticleCategories(),
     params.edit ? getAdminArticleBySlug(params.edit) : Promise.resolve(null),
@@ -118,6 +152,134 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
             </div>
           ))}
         </div>
+
+        <section className="admin-business-grid mt-6">
+          <div className="panel admin-revenue-panel">
+            <div className="admin-panel-head">
+              <div>
+                <p className="eyebrow">Doanh thu</p>
+                <h2>Tổng quan đơn hàng và dòng tiền</h2>
+              </div>
+              <span className="admin-operation-status">
+                <Banknote size={17} /> {business.revenue.paidOrders} đơn đã thanh toán
+              </span>
+            </div>
+            <div className="admin-revenue-grid">
+              <article className="admin-revenue-card primary">
+                <span><Banknote size={18} /> Tổng doanh thu</span>
+                <strong>{formatVnd(business.revenue.totalPaidVnd)}</strong>
+              </article>
+              <article className="admin-revenue-card">
+                <span>Tháng này</span>
+                <strong>{formatVnd(business.revenue.currentMonthPaidVnd)}</strong>
+              </article>
+              <article className="admin-revenue-card">
+                <span>30 ngày gần nhất</span>
+                <strong>{formatVnd(business.revenue.last30DaysPaidVnd)}</strong>
+              </article>
+            </div>
+            <div className="admin-payment-summary">
+              <span className="paid">Đã thanh toán: {business.revenue.paidOrders}</span>
+              <span>Đang chờ: {business.revenue.pendingOrders}</span>
+              <span>Đã hủy: {business.revenue.cancelledOrders}</span>
+              <span>Lỗi/hết hạn: {business.revenue.failedOrders + business.revenue.expiredOrders}</span>
+            </div>
+            <div className="admin-source-grid" aria-label="Nguồn doanh thu">
+              <div>
+                <span>Nạp xu</span>
+                <strong>{formatVnd(business.revenue.coinTopupPaidVnd)}</strong>
+              </div>
+              <div>
+                <span>Luận giải nhanh</span>
+                <strong>{formatVnd(business.revenue.quickReadingPaidVnd)}</strong>
+              </div>
+              <div>
+                <span>Khác</span>
+                <strong>{formatVnd(business.revenue.otherPaidVnd)}</strong>
+              </div>
+            </div>
+          </div>
+
+          <aside className="panel admin-recent-payments-panel">
+            <div className="admin-panel-head">
+              <div>
+                <p className="eyebrow">Đơn gần đây</p>
+                <h2>Thanh toán mới nhất</h2>
+              </div>
+              <ReceiptText size={22} className="text-orange-700" />
+            </div>
+            <div className="admin-payment-list">
+              {business.recentPayments.length ? business.recentPayments.map((payment) => (
+                <article key={payment.id} className="admin-payment-row">
+                  <div>
+                    <strong>{formatVnd(payment.amountVnd)}</strong>
+                    <span>{payment.email}</span>
+                    <small>#{payment.orderCode} - {payment.sourceLabel}</small>
+                  </div>
+                  <div>
+                    <em className={`admin-payment-status ${payment.status.toLowerCase()}`}>{paymentStatusLabel(payment.status)}</em>
+                    <small>{readableDateTime(payment.paidAt || payment.createdAt)}</small>
+                  </div>
+                </article>
+              )) : (
+                <p className="admin-empty-note">Chưa có đơn thanh toán nào.</p>
+              )}
+            </div>
+          </aside>
+        </section>
+
+        <section className="panel admin-users-panel mt-6">
+          <div className="admin-panel-head">
+            <div>
+              <p className="eyebrow">User đã đăng ký</p>
+              <h2>Người dùng mới nhất</h2>
+            </div>
+            <span className="admin-operation-status">
+              <UsersRound size={17} /> {overview.users} tài khoản
+            </span>
+          </div>
+          <div className="admin-table-wrap">
+            <table className="admin-data-table">
+              <thead>
+                <tr>
+                  <th>User</th>
+                  <th>Vai trò</th>
+                  <th>Ngày tạo</th>
+                  <th>Lá số</th>
+                  <th>Luận giải</th>
+                  <th>Xu</th>
+                  <th>Đơn đã thanh toán</th>
+                  <th>Tổng chi</th>
+                  <th>Lần thanh toán gần nhất</th>
+                </tr>
+              </thead>
+              <tbody>
+                {business.recentUsers.length ? business.recentUsers.map((item) => (
+                  <tr key={item.id}>
+                    <td>
+                      <strong>{item.name || item.email}</strong>
+                      <span>{item.email}</span>
+                    </td>
+                    <td><em className={`admin-role-pill ${item.role.toLowerCase()}`}>{roleLabel(item.role)}</em></td>
+                    <td>{readableDate(item.createdAt)}</td>
+                    <td>{item.chartsCount}</td>
+                    <td>{item.readingsCount}</td>
+                    <td>{item.coinBalance}</td>
+                    <td>{item.paidOrdersCount}</td>
+                    <td>{formatVnd(item.totalPaidVnd)}</td>
+                    <td>{readableDateTime(item.lastPaymentAt)}</td>
+                  </tr>
+                )) : (
+                  <tr>
+                    <td colSpan={9}>
+                      <span>Chưa có user nào trong dữ liệu hiện tại.</span>
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </section>
 
         <section className="panel admin-operations-panel mt-6">
           <div className="admin-panel-head">

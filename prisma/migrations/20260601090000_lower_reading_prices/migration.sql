@@ -1,0 +1,12 @@
+UPDATE "FeaturePrice"
+SET "priceCoins" = CASE "key"
+  WHEN 'FULL' THEN 139
+  WHEN 'PALACE' THEN 20
+  WHEN 'DAI_VAN' THEN 34
+  WHEN 'TIEU_VAN' THEN 27
+  WHEN 'NGUYET_VAN' THEN 13
+  WHEN 'NHAT_VAN' THEN 6
+  ELSE "priceCoins"
+END,
+"updatedAt" = NOW()
+WHERE "key" IN ('FULL', 'PALACE', 'DAI_VAN', 'TIEU_VAN', 'NGUYET_VAN', 'NHAT_VAN');

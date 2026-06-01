@@ -1,33 +1,30 @@
 import { Mail, ShieldCheck, Sparkles } from "lucide-react";
 import { quickReadingCheckoutAction } from "@/app/actions";
-import { FEATURE_PRICES } from "@/lib/pricing";
-import { formatVnd } from "@/lib/format";
 import { LoadingSubmitButton } from "@/components/loading-submit-button";
 
 export function QuickReadingForm() {
   const now = new Date();
-  const price = FEATURE_PRICES.FULL.priceCoins * 1000;
 
   return (
-    <section id="mua-nhanh" className="quick-reading-panel">
+    <section id="luan-giai-nhanh" className="quick-reading-panel">
       <div className="quick-reading-copy">
-        <p className="eyebrow">Mua luận giải nhanh</p>
-        <h2>Nhập email, thanh toán và xem bản luận giải đầy đủ</h2>
+        <p className="eyebrow">Luận giải nhanh qua email</p>
+        <h2>Nhập email để nhận bản luận giải đầy đủ</h2>
         <p>
-          Phù hợp khi bạn muốn mua ngay mà chưa cần tạo tài khoản trước. Email dùng để lưu lá số và xem lại kết quả sau này.
+          Phù hợp khi bạn muốn đi thẳng tới phần đọc sâu mà chưa cần tạo tài khoản trước. Email dùng để lưu lá số và xem lại kết quả sau này.
         </p>
         <div className="quick-reading-points">
           <span><Mail size={17} /> Email dùng để lưu kết quả</span>
-          <span><ShieldCheck size={17} /> Mua một lần, xem lại trong tài khoản</span>
-          <span><Sparkles size={17} /> Bản đầy đủ {formatVnd(price)}</span>
+          <span><ShieldCheck size={17} /> Nội dung đã mở được lưu để xem lại</span>
+          <span><Sparkles size={17} /> Bản đọc sâu, trình bày theo từng mục</span>
         </div>
       </div>
 
       <form
         action={quickReadingCheckoutAction}
         className="quick-reading-form"
-        data-loading-message="Đang tạo đơn luận giải..."
-        data-loading-label="Đang tạo đơn..."
+        data-loading-message="Đang chuẩn bị bản luận giải..."
+        data-loading-label="Đang chuẩn bị..."
       >
         <div className="form-grid">
           <label className="md:col-span-2">
@@ -96,11 +93,11 @@ export function QuickReadingForm() {
             <input name="viewYear" type="number" inputMode="numeric" min="1900" max="2100" defaultValue={now.getFullYear()} required />
           </label>
         </div>
-        <LoadingSubmitButton className="btn btn-primary btn-large w-full" loadingText="Đang tạo đơn...">
-          Mua luận giải toàn bộ - {formatVnd(price)}
+        <LoadingSubmitButton className="btn btn-primary btn-large w-full" loadingText="Đang chuẩn bị...">
+          Nhận luận giải toàn bộ
         </LoadingSubmitButton>
         <p className="text-center text-sm leading-6 text-stone-500">
-          Sau khi mua, bạn có thể đăng nhập bằng email này để xem lại.
+          Sau khi hoàn tất, bạn có thể đăng nhập bằng email này để xem lại.
         </p>
       </form>
     </section>

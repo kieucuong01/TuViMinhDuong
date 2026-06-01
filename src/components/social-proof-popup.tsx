@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { X } from "lucide-react";
+import { Sparkles, X } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 
@@ -39,7 +39,7 @@ const contextActions = {
   ],
   home: [
     "vừa lập lá số tử vi",
-    "vừa mở luận giải chuyên sâu",
+    "vừa đọc luận giải chuyên sâu",
     "vừa tạo lá số mới",
   ],
 };
@@ -119,12 +119,12 @@ export function SocialProofPopup() {
   return (
     <aside className="social-proof-popup" aria-live="polite">
       <div className="social-proof-icon" aria-hidden="true">
-        <span>$</span>
+        <Sparkles size={18} />
       </div>
       <div className="min-w-0 flex-1">
         <p className="truncate text-sm font-black text-orange-950 sm:text-base">{event.email}</p>
         <p className="mt-1 text-sm font-medium text-stone-600 sm:text-base">
-          {event.action} <strong className="font-black text-stone-700">bằng xu</strong>
+          {event.action}
         </p>
         <Link className="social-proof-cta" href={getHref(context)} onClick={() => setVisible(false)}>
           Xem ngay
