@@ -5,6 +5,7 @@ import { loginAction } from "@/app/actions";
 import { getCurrentUser } from "@/lib/auth";
 import { LoadingSubmitButton } from "@/components/loading-submit-button";
 import { PaywallPopup } from "@/components/paywall-popup";
+import { GoogleLoginButton } from "@/components/google-login-button";
 
 export const metadata = {
   title: "Đăng nhập",
@@ -36,12 +37,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
             </label>
             <LoadingSubmitButton className="btn btn-primary w-full" loadingText="Đang đăng nhập...">Tiếp tục</LoadingSubmitButton>
           </form>
-          <a
-            className="btn btn-ghost mt-3 w-full"
-            href={`/api/oauth/google/start?next=${encodeURIComponent(params.next || "/")}`}
-          >
-            Tiếp tục với Google
-          </a>
+          <GoogleLoginButton href={`/api/oauth/google/start?next=${encodeURIComponent(params.next || "/")}`} className="mt-3" />
         </section>
         <aside className="auth-benefit-panel" aria-label="Lợi ích tài khoản">
           <p className="eyebrow">Giữ trải nghiệm liền mạch</p>

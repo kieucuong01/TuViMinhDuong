@@ -3,7 +3,7 @@
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { clearSession, createMagicSession, getCurrentUser, getOrCreateEmailUser, loginOrRegister, setSession, type SessionUser } from "@/lib/auth";
-import { getCachedReading, getChart, getFeaturePrice, getOperationSettings, getUserBalance, saveArticleCategoryFromForm, saveArticleFromForm, saveChart, saveReading, adjustCoins, deleteArticleBySlug, deleteUserChart, getReadingJobByScope, createPendingReading, updateOperationSettings } from "@/lib/data";
+import { getCachedReading, getChart, getFeaturePrice, getOperationSettings, getUserBalance, saveArticleCategoryFromForm, saveArticleFromForm, saveChart, saveReading, adjustCoins, deleteArticleBySlug, deleteUserChart, getReadingJobByScope, createPendingReading, updateOperationSettings, getCompletedReadingsForScopes, hasReadingBundleAccess } from "@/lib/data";
 import { generateReading } from "@/lib/ai";
 import { getDb } from "@/lib/db";
 import { createPayOSCheckout, createPayOSCustomCheckout } from "@/lib/payos";
@@ -11,7 +11,8 @@ import type { CalendarType, Gender } from "@/lib/chart";
 import { COIN_PACKAGES, TEMPORARY_FULL_ACCESS } from "@/lib/pricing";
 import type { ReadingKey } from "@/lib/pricing";
 import { isPayOSEnabled } from "@/lib/env";
-import { startFullReadingJobForUser, unlockReadingForUser } from "@/lib/reading-unlock";
+import { startFullReadingJobForUser, unlockReadingBundleForUser, unlockReadingForUser } from "@/lib/reading-unlock";
+import { isReadingBundleKey } from "@/lib/reading-bundles";
 
 export async function loginAction(formData: FormData) {
   const email = String(formData.get("email") || "");
@@ -240,6 +241,8 @@ export async function requestReadingAction(formData: FormData) {
         getFeaturePrice,
         getUserBalance,
         adjustCoins,
+        hasReadingBundleAccess,
+        getCompletedReadingsForScopes,
         generateReading,
         createPendingReading,
         saveReading,
@@ -268,6 +271,8 @@ export async function requestReadingAction(formData: FormData) {
       getFeaturePrice,
       getUserBalance,
       adjustCoins,
+      hasReadingBundleAccess,
+      getCompletedReadingsForScopes,
       generateReading,
       createPendingReading,
       saveReading,
@@ -285,6 +290,48 @@ export async function requestReadingAction(formData: FormData) {
 
   revalidatePath(`/la-so/${chartId}`);
   redirect(withReadingParam(nextPath, result.readingId));
+}
+
+export async function requestReadingBundleAction(formData: FormData) {
+  const chartId = String(formData.get("chartId") || "");
+  const rawType = String(formData.get("type") || "") as ReadingKey;
+  const nextPath = safeNextPath(formData.get("next"), `/la-so/${chartId}`);
+  if (!isReadingBundleKey(rawType)) redirect(nextPath);
+
+  const [currentUser, operationSettings] = await Promise.all([getCurrentUser(), getOperationSettings()]);
+
+  if (!operationSettings.paidReadingsEnabled && currentUser?.role !== "ADMIN") {
+    redirect(withQueryParams(nextPath, { paid: "disabled" }));
+  }
+
+  const user = await getReadingUser(chartId, nextPath, currentUser);
+  const result = await unlockReadingBundleForUser(
+    {
+      getChart,
+      getCachedReading,
+      getReadingJobByScope,
+      getFeaturePrice,
+      getUserBalance,
+      adjustCoins,
+      hasReadingBundleAccess,
+      getCompletedReadingsForScopes,
+      generateReading,
+      createPendingReading,
+      saveReading,
+    },
+    { user, chartId, type: rawType, temporaryFullAccess: TEMPORARY_FULL_ACCESS, paidReadingsEnabled: operationSettings.paidReadingsEnabled },
+  );
+
+  if (result.status === "disabled") {
+    redirect(withQueryParams(nextPath, { paid: "disabled" }));
+  }
+
+  if (result.status === "insufficient_coins") {
+    redirect(withQueryParams(nextPath, { paywall: "coins", need: result.needCoins }));
+  }
+
+  revalidatePath(`/la-so/${chartId}`);
+  redirect(withQueryParams(nextPath, { bundle: rawType }));
 }
 
 export async function saveArticleAction(formData: FormData) {

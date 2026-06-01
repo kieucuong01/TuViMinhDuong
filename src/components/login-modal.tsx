@@ -7,6 +7,7 @@ import { Coins, History, ShieldCheck, X } from "lucide-react";
 import { loginAction } from "@/app/actions";
 import { LoadingSubmitButton } from "@/components/loading-submit-button";
 import { cleanLoginModalPath } from "@/components/login-modal-link";
+import { GoogleLoginButton } from "@/components/google-login-button";
 
 function safeNext(path: string) {
   return path.startsWith("/") && !path.startsWith("//") ? path : "/";
@@ -68,12 +69,7 @@ export function LoginModal() {
           </LoadingSubmitButton>
         </form>
 
-        <a
-          className="btn btn-ghost mt-3 w-full"
-          href={`/api/oauth/google/start?next=${encodeURIComponent(next)}`}
-        >
-          Tiếp tục với Google
-        </a>
+        <GoogleLoginButton href={`/api/oauth/google/start?next=${encodeURIComponent(next)}`} className="mt-3" />
 
         <div className="login-modal-benefits" aria-label="Lợi ích đăng nhập">
           <span><History size={17} /> Lưu lá số để xem lại sau</span>

@@ -2,10 +2,12 @@ import { CheckCircle2, LockKeyhole, Sparkles } from "lucide-react";
 import { requestReadingAction } from "@/app/actions";
 import { LoadingSubmitButton } from "@/components/loading-submit-button";
 import { MarkdownContent } from "@/components/markdown-content";
-import { getCompletedReadingsForScopes } from "@/lib/data";
+import { ReadingBundleCta } from "@/components/reading-bundle-cta";
+import { getCachedReading, getCompletedReadingsForScopes } from "@/lib/data";
 import { formatCoins } from "@/lib/format";
 import { getPalaceReadingItems } from "@/lib/palace-analysis";
 import { FEATURE_PRICES } from "@/lib/pricing";
+import { readingBundleScopeKey } from "@/lib/reading-bundles";
 import type { SessionUser } from "@/lib/auth";
 import type { TuViChart } from "@/lib/chart";
 
@@ -31,7 +33,7 @@ function scoreTone(score: number) {
   return "border-rose-200 bg-rose-50 text-rose-700";
 }
 
-function UnlockPalaceButton({ chartId, palaceName }: { chartId: string; palaceName: string }) {
+function UnlockPalaceButton({ chartId, palaceName, hasBundleAccess = false }: { chartId: string; palaceName: string; hasBundleAccess?: boolean }) {
   const anchor = anchorForPalace(palaceName);
   return (
     <form
@@ -45,9 +47,9 @@ function UnlockPalaceButton({ chartId, palaceName }: { chartId: string; palaceNa
       <input type="hidden" name="scopeKey" value={palaceName} />
       <input type="hidden" name="next" value={`/la-so/${chartId}?view=luan-cung#${anchor}-reading`} />
       <LoadingSubmitButton className="btn btn-primary w-full sm:w-auto" loadingText="Đang mở..." data-testid={`unlock-palace-${palaceName}`}>
-        <LockKeyhole size={18} /> Đọc luận chi tiết - {formatCoins(FEATURE_PRICES.PALACE.priceCoins)}
+        <LockKeyhole size={18} /> {hasBundleAccess ? "Đọc luận chi tiết - đã mua gói" : `Đọc luận chi tiết - ${formatCoins(FEATURE_PRICES.PALACE.priceCoins)}`}
       </LoadingSubmitButton>
-      <p className="unlock-microcopy">Mở một lần, lưu lại để xem lại khi cần.</p>
+      <p className="unlock-microcopy">{hasBundleAccess ? "Không trừ xu thêm nhờ gói trọn nhóm." : "Mở một lần, lưu lại để xem lại khi cần."}</p>
     </form>
   );
 }
@@ -63,6 +65,9 @@ export async function PalaceFateView({ chartId, chart, user, activeReadingId }: 
     chartId,
     items.map((item) => ({ type: "PALACE", scopeKey: item.palace.name })),
   );
+  const hasBundleAccess =
+    user?.role === "ADMIN" ||
+    Boolean(user && (await getCachedReading(user.id, chartId, "PALACE", readingBundleScopeKey("PALACE"))));
   const unlockedCount = completedReadings.size;
 
   return (
@@ -83,6 +88,8 @@ export async function PalaceFateView({ chartId, chart, user, activeReadingId }: 
           <p>Mở từng phần, lưu lại để đọc lại khi cần.</p>
         </div>
       </header>
+
+      <ReadingBundleCta chartId={chartId} type="PALACE" nextPath={`/la-so/${chartId}?view=luan-cung`} totalCount={items.length} unlockedCount={unlockedCount} hasBundleAccess={hasBundleAccess} />
 
       <div className="mt-6 grid gap-4">
         {items.map((item) => {
@@ -145,7 +152,7 @@ export async function PalaceFateView({ chartId, chart, user, activeReadingId }: 
                       Xem lại nội dung đã mở
                     </a>
                   ) : (
-                    <UnlockPalaceButton chartId={chartId} palaceName={item.palace.name} />
+                    <UnlockPalaceButton chartId={chartId} palaceName={item.palace.name} hasBundleAccess={hasBundleAccess} />
                   )}
                 </div>
               </div>

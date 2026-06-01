@@ -3,11 +3,13 @@ import type { ReactNode } from "react";
 import { requestReadingAction } from "@/app/actions";
 import { LoadingSubmitButton } from "@/components/loading-submit-button";
 import { MarkdownContent } from "@/components/markdown-content";
-import { getCompletedReadingsForScopes } from "@/lib/data";
+import { ReadingBundleCta } from "@/components/reading-bundle-cta";
+import { getCachedReading, getCompletedReadingsForScopes } from "@/lib/data";
 import type { StoredReading } from "@/lib/data";
 import { formatCoins } from "@/lib/format";
 import { getDailyFateItem, getDailyMonthTrend, getMajorFateItems, getMinorFateItems, getMonthlyFateItems, type FateReadingItem } from "@/lib/fate-analysis";
 import { FEATURE_PRICES } from "@/lib/pricing";
+import { readingBundleScopeKey, type ReadingBundleKey } from "@/lib/reading-bundles";
 import type { SessionUser } from "@/lib/auth";
 import type { TuViChart } from "@/lib/chart";
 
@@ -27,7 +29,7 @@ function anchorId(value: string) {
     .replace(/^-|-$/g, "");
 }
 
-function OpenButton({ chartId, item, nextPath }: { chartId: string; item: FateReadingItem; nextPath: string }) {
+function OpenButton({ chartId, item, nextPath, hasBundleAccess = false }: { chartId: string; item: FateReadingItem; nextPath: string; hasBundleAccess?: boolean }) {
   const anchor = anchorId(item.scopeKey);
   return (
     <form className="fate-open-action" action={requestReadingAction} data-loading-message="Đang mở phần luận giải..." data-loading-label="Đang mở...">
@@ -36,9 +38,9 @@ function OpenButton({ chartId, item, nextPath }: { chartId: string; item: FateRe
       <input type="hidden" name="scopeKey" value={item.scopeKey} />
       <input type="hidden" name="next" value={`${nextPath}#${anchor}-reading`} />
       <LoadingSubmitButton className="fate-open-button" loadingText="Đang mở...">
-        <LockKeyhole size={16} /> Đọc chi tiết - {formatCoins(FEATURE_PRICES[item.type].priceCoins)}
+        <LockKeyhole size={16} /> {hasBundleAccess ? "Đọc chi tiết - đã mua gói" : `Đọc chi tiết - ${formatCoins(FEATURE_PRICES[item.type].priceCoins)}`}
       </LoadingSubmitButton>
-      <small>Mở một lần, xem lại trong tài khoản.</small>
+      <small>{hasBundleAccess ? "Không trừ xu thêm nhờ gói trọn nhóm." : "Mở một lần, xem lại trong tài khoản."}</small>
     </form>
   );
 }
@@ -137,6 +139,12 @@ async function readingMap(user: SessionUser | null, chartId: string, items: Fate
   );
 }
 
+async function hasBundleAccess(user: SessionUser | null, chartId: string, type: ReadingBundleKey) {
+  if (!user) return false;
+  if (user.role === "ADMIN") return true;
+  return Boolean(await getCachedReading(user.id, chartId, type, readingBundleScopeKey(type)));
+}
+
 function fateReadingMapKey(item: FateReadingItem) {
   return `${item.type}:${item.scopeKey}`;
 }
@@ -188,12 +196,14 @@ function FateRow({
   nextPath,
   reading,
   activeReadingId,
+  hasBundleAccess = false,
 }: {
   chartId: string;
   item: FateReadingItem;
   nextPath: string;
   reading: StoredReading | null;
   activeReadingId?: string;
+  hasBundleAccess?: boolean;
 }) {
   const anchor = anchorId(item.scopeKey);
   const isActiveReading = Boolean(reading && reading.id === activeReadingId);
@@ -229,7 +239,7 @@ function FateRow({
             <small>Không trừ xu lần nữa.</small>
           </div>
         ) : (
-          <OpenButton chartId={chartId} item={item} nextPath={nextPath} />
+          <OpenButton chartId={chartId} item={item} nextPath={nextPath} hasBundleAccess={hasBundleAccess} />
         )}
       </div>
       {reading && isActiveReading ? (
@@ -244,7 +254,7 @@ function FateRow({
 
 export async function MajorFateView({ chartId, chart, user, activeReadingId }: FateViewProps) {
   const items = getMajorFateItems(chart);
-  const readings = await readingMap(user, chartId, items);
+  const [readings, bundleAccess] = await Promise.all([readingMap(user, chartId, items), hasBundleAccess(user, chartId, "DAI_VAN")]);
   const currentIndex = items.findIndex((item) => item.isCurrent);
 
   return (
@@ -256,10 +266,11 @@ export async function MajorFateView({ chartId, chart, user, activeReadingId }: F
       >
         <TrendBars items={items.map((item) => ({ label: item.label, good: item.good, challenge: item.challenge }))} currentIndex={currentIndex === -1 ? undefined : currentIndex} />
       </FateHero>
+      <ReadingBundleCta chartId={chartId} type="DAI_VAN" nextPath={`/la-so/${chartId}?view=dai-van`} totalCount={items.length} unlockedCount={readings.size} hasBundleAccess={bundleAccess} />
       <ExplainBox />
       <div className="fate-list">
         {items.map((item) => (
-          <FateRow key={item.scopeKey} chartId={chartId} item={item} nextPath={`/la-so/${chartId}?view=dai-van`} reading={readings.get(fateReadingMapKey(item)) || null} activeReadingId={activeReadingId} />
+          <FateRow key={item.scopeKey} chartId={chartId} item={item} nextPath={`/la-so/${chartId}?view=dai-van`} reading={readings.get(fateReadingMapKey(item)) || null} activeReadingId={activeReadingId} hasBundleAccess={bundleAccess} />
         ))}
       </div>
     </section>
@@ -268,7 +279,7 @@ export async function MajorFateView({ chartId, chart, user, activeReadingId }: F
 
 export async function MinorFateView({ chartId, chart, user, activeReadingId }: FateViewProps) {
   const items = getMinorFateItems(chart);
-  const readings = await readingMap(user, chartId, items);
+  const [readings, bundleAccess] = await Promise.all([readingMap(user, chartId, items), hasBundleAccess(user, chartId, "TIEU_VAN")]);
   const currentIndex = items.findIndex((item) => item.isCurrent);
 
   return (
@@ -280,10 +291,11 @@ export async function MinorFateView({ chartId, chart, user, activeReadingId }: F
       >
         <TrendArea items={items.map((item) => ({ label: item.label, good: item.good, challenge: item.challenge }))} currentIndex={currentIndex === -1 ? undefined : currentIndex} markerLabel="Năm xem" />
       </FateHero>
+      <ReadingBundleCta chartId={chartId} type="TIEU_VAN" nextPath={`/la-so/${chartId}?view=tieu-van`} totalCount={items.length} unlockedCount={readings.size} hasBundleAccess={bundleAccess} />
       <ExplainBox />
       <div className="fate-list">
         {items.map((item) => (
-          <FateRow key={item.scopeKey} chartId={chartId} item={item} nextPath={`/la-so/${chartId}?view=tieu-van`} reading={readings.get(fateReadingMapKey(item)) || null} activeReadingId={activeReadingId} />
+          <FateRow key={item.scopeKey} chartId={chartId} item={item} nextPath={`/la-so/${chartId}?view=tieu-van`} reading={readings.get(fateReadingMapKey(item)) || null} activeReadingId={activeReadingId} hasBundleAccess={bundleAccess} />
         ))}
       </div>
     </section>
@@ -292,7 +304,7 @@ export async function MinorFateView({ chartId, chart, user, activeReadingId }: F
 
 export async function MonthlyFateView({ chartId, chart, user, activeReadingId }: FateViewProps) {
   const items = getMonthlyFateItems(chart);
-  const readings = await readingMap(user, chartId, items);
+  const [readings, bundleAccess] = await Promise.all([readingMap(user, chartId, items), hasBundleAccess(user, chartId, "NGUYET_VAN")]);
 
   return (
     <section className="fate-page narrow" data-testid="monthly-fate-view">
@@ -301,9 +313,10 @@ export async function MonthlyFateView({ chartId, chart, user, activeReadingId }:
         description="Mỗi tháng có preview miễn phí để bạn nhìn trọng tâm trước, sau đó mở riêng tháng cần đọc kỹ."
         price={formatCoins(FEATURE_PRICES.NGUYET_VAN.priceCoins)}
       />
+      <ReadingBundleCta chartId={chartId} type="NGUYET_VAN" nextPath={`/la-so/${chartId}?view=nguyet-van`} totalCount={items.length} unlockedCount={readings.size} hasBundleAccess={bundleAccess} />
       <div className="fate-list">
         {items.map((item) => (
-          <FateRow key={item.scopeKey} chartId={chartId} item={item} nextPath={`/la-so/${chartId}?view=nguyet-van`} reading={readings.get(fateReadingMapKey(item)) || null} activeReadingId={activeReadingId} />
+          <FateRow key={item.scopeKey} chartId={chartId} item={item} nextPath={`/la-so/${chartId}?view=nguyet-van`} reading={readings.get(fateReadingMapKey(item)) || null} activeReadingId={activeReadingId} hasBundleAccess={bundleAccess} />
         ))}
       </div>
     </section>

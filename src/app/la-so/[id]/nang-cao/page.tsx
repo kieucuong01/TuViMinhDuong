@@ -120,7 +120,7 @@ export default async function AdvancedReadingPage({
           </div>
         </div>
 
-        <section className="panel mt-8" data-testid="advanced-reading-panel">
+        <section className="panel reading-content-panel mt-8" data-testid="advanced-reading-panel">
           <div className="flex flex-col gap-5 lg:grid lg:grid-cols-[260px_1fr] lg:items-start">
             <aside className="rounded-2xl border border-orange-100 bg-orange-50/70 p-4 lg:sticky lg:top-24" data-testid="advanced-reading-toc">
               <p className="inline-flex items-center gap-2 text-sm font-black uppercase tracking-[0.18em] text-orange-800">

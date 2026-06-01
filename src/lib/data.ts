@@ -4,6 +4,7 @@ import { CHART_ENGINE_VERSION, generateTuViChart, type ChartInput, type TuViChar
 import { articleWithScore, seedArticles, type ArticleCategoryView, type ArticleView } from "@/lib/content";
 import { getDb } from "@/lib/db";
 import { FEATURE_PRICES, COIN_PACKAGES, type ReadingKey } from "@/lib/pricing";
+import { isReadingBundleKey, readingBundleScopeKey } from "@/lib/reading-bundles";
 import { FREE_OVERVIEW_MIN_WORDS, FREE_OVERVIEW_VERSION, countWords } from "@/lib/ai";
 import { scoreArticleSeo } from "@/lib/seo";
 import { slugify } from "@/lib/format";
@@ -553,6 +554,12 @@ export async function getCachedReading(userId: string, chartId: string, type: Re
         createdAt: reading.createdAt,
       }
     : null;
+}
+
+export async function hasReadingBundleAccess(user: SessionUser, chartId: string, type: ReadingKey) {
+  if (user.role === "ADMIN") return true;
+  if (!isReadingBundleKey(type)) return false;
+  return Boolean(await getCachedReading(user.id, chartId, type, readingBundleScopeKey(type)));
 }
 
 export async function getAnyCompletedReading(chartId: string, type: ReadingKey, scopeKey: string) {

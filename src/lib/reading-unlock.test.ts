@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { generateTuViChart, type TuViChart } from "@/lib/chart";
-import { startFullReadingJobForUser, unlockReadingForUser, type ReadingUnlockDeps } from "@/lib/reading-unlock";
+import { startFullReadingJobForUser, unlockReadingBundleForUser, unlockReadingForUser, type ReadingUnlockDeps } from "@/lib/reading-unlock";
 import type { ReadingKey } from "@/lib/pricing";
 import type { SessionUser } from "@/lib/auth";
 
@@ -32,6 +32,8 @@ function user(overrides: Partial<SessionUser> = {}): SessionUser {
 function createDeps(options: {
   balance?: number;
   cachedReadingId?: string;
+  bundleAccess?: boolean;
+  completedScopes?: string[];
   pendingReadingId?: string;
   generateFails?: boolean;
   priceCoins?: number;
@@ -75,6 +77,24 @@ function createDeps(options: {
           }
         : null,
     ),
+    hasReadingBundleAccess: vi.fn(async () => Boolean(options.bundleAccess)),
+    getCompletedReadingsForScopes: vi.fn(async (_user, id, keys) => {
+      const completed = new Map();
+      for (const key of keys) {
+        if (!options.completedScopes?.includes(key.scopeKey)) continue;
+        completed.set(`${key.type}:${key.scopeKey}`, {
+          id: `completed-${key.scopeKey}`,
+          userId: "user-1",
+          chartId: id,
+          type: key.type,
+          scopeKey: key.scopeKey,
+          priceCoins,
+          content: "completed",
+          createdAt: new Date("2026-01-01T00:00:00Z"),
+        });
+      }
+      return completed;
+    }),
     getFeaturePrice: vi.fn(async () => ({ label: "Luận giải toàn bộ", priceCoins })),
     getUserBalance: vi.fn(async () => balance),
     adjustCoins: vi.fn(async (_user, amount) => {
@@ -156,6 +176,40 @@ describe("reading unlock paywall flow", () => {
     expect(harness.getBalance()).toBe(250);
     expect(harness.deps.adjustCoins).not.toHaveBeenCalled();
     expect(harness.deps.generateReading).not.toHaveBeenCalled();
+  });
+
+  it("does not charge a focused reading when the user already bought that reading group", async () => {
+    const harness = createDeps({ balance: 250, priceCoins: 29, bundleAccess: true });
+
+    const result = await unlockReadingForUser(harness.deps, {
+      user: user({ coinBalance: 250 }),
+      chartId: harness.chartId,
+      type: "PALACE",
+      scopeKey: "Mệnh",
+    });
+
+    expect(result).toEqual({ status: "created", readingId: "reading-1", chargedCoins: 0 });
+    expect(harness.getBalance()).toBe(250);
+    expect(harness.deps.adjustCoins).not.toHaveBeenCalled();
+    expect(harness.saved[0]).toMatchObject({ priceCoins: 0 });
+  });
+
+  it("charges a one-time reading group bundle at 50 percent of remaining item prices", async () => {
+    const harness = createDeps({ balance: 500, priceCoins: 29, completedScopes: ["Mệnh", "Tài Bạch"] });
+
+    const result = await unlockReadingBundleForUser(harness.deps, {
+      user: user({ coinBalance: 500 }),
+      chartId: harness.chartId,
+      type: "PALACE",
+    });
+
+    expect(result).toEqual({ status: "created", readingId: "reading-1", chargedCoins: 145, unlockedCount: 10, totalCount: 12 });
+    expect(harness.getBalance()).toBe(355);
+    expect(harness.adjustments).toEqual([-145]);
+    expect(harness.saved[0]).toMatchObject({
+      priceCoins: 145,
+      content: expect.stringContaining("trọn nhóm Luận cung"),
+    });
   });
 
   it("charges normal users once when creating a new paid reading", async () => {

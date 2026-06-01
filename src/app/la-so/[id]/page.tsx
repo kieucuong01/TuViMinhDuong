@@ -106,7 +106,7 @@ export default async function ChartPage({
           </aside>
         </div>
 
-        <section className="panel mt-8" id="luan-giai" data-testid="free-reading-panel">
+        <section className="panel reading-content-panel mt-8" id="luan-giai" data-testid="free-reading-panel">
           <p className="eyebrow">{activeLabel}</p>
           {activeReading ? (
             <>

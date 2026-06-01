@@ -27,4 +27,10 @@ describe("reading typography", () => {
     expect(cssRule(".free-reading-summary .prose-content li strong,\n.free-reading-summary .prose-content p strong")).toContain("font-weight: 650");
     expect(cssRule(".free-reading-summary h2,\n.free-reading-summary h3")).toContain("font-weight: 800");
   });
+
+  it("lets reading panels expand instead of clipping long generated text", () => {
+    expect(cssRule(".reading-content-panel")).toContain("overflow: visible");
+    expect(cssRule(".reading-content-panel .prose-content")).toContain("max-width: none");
+    expect(cssRule(".reading-content-panel .prose-content")).toContain("overflow-wrap: anywhere");
+  });
 });
