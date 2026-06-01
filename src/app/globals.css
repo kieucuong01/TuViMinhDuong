@@ -80,6 +80,52 @@ body {
   }
 }
 
+@keyframes celestial-drift {
+  from {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+  to {
+    transform: translate3d(-0.35rem, 0.25rem, 0) rotate(360deg);
+  }
+}
+
+@keyframes home-sheen-sweep {
+  from {
+    transform: translateX(-145%) skewX(-16deg);
+  }
+  to {
+    transform: translateX(245%) skewX(-16deg);
+  }
+}
+
+@property --form-border-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
+@keyframes form-border-orbit {
+  to {
+    --form-border-angle: 360deg;
+  }
+}
+
+@keyframes fortune-gauge-orbit {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes fortune-gauge-glow {
+  0%,
+  100% {
+    opacity: 0.48;
+  }
+  50% {
+    opacity: 0.78;
+  }
+}
+
 @keyframes popup-slide-in {
   from {
     opacity: 0;
@@ -727,18 +773,40 @@ button.is-loading:not(.icon-button)::before {
 }
 
 .hero-band {
+  isolation: isolate;
   position: relative;
   overflow: hidden;
   background:
     radial-gradient(circle at 16% 0%, rgb(251 191 36 / 0.3), transparent 24rem),
+    radial-gradient(circle at 82% 16%, rgb(20 184 166 / 0.12), transparent 22rem),
     linear-gradient(180deg, #ffe4bd 0%, #fffaf0 90%);
   @apply bg-gradient-to-br from-orange-100 via-white to-emerald-50;
+}
+
+.hero-band::before {
+  content: "";
+  position: absolute;
+  top: -8.5rem;
+  right: clamp(-9rem, -8vw, -4rem);
+  z-index: 0;
+  width: min(42rem, 92vw);
+  aspect-ratio: 1;
+  border-radius: 999px;
+  background:
+    repeating-conic-gradient(from 8deg, rgb(169 22 36 / 0.13) 0deg 1deg, transparent 1deg 30deg),
+    radial-gradient(circle, transparent 0 34%, rgb(232 201 143 / 0.2) 35% 36%, transparent 37% 52%, rgb(169 22 36 / 0.08) 53% 54%, transparent 55% 70%, rgb(15 118 110 / 0.1) 71% 72%, transparent 73%);
+  -webkit-mask-image: radial-gradient(circle, #000 0 72%, transparent 76%);
+  mask-image: radial-gradient(circle, #000 0 72%, transparent 76%);
+  opacity: 0.58;
+  pointer-events: none;
+  animation: celestial-drift 32s linear infinite;
 }
 
 .hero-band::after {
   content: "";
   position: absolute;
   inset: auto -8rem -9rem auto;
+  z-index: 0;
   width: 28rem;
   height: 28rem;
   border: 1.5rem solid rgb(249 115 22 / 0.08);
@@ -793,11 +861,51 @@ button.is-loading:not(.icon-button)::before {
   animation-delay: 520ms;
   align-self: start;
   border-radius: var(--home-card-radius);
+  box-shadow: 0 22px 58px rgb(15 118 110 / 0.12), 0 10px 26px rgb(120 53 15 / 0.08);
 }
 
 .day-fortune-card .fortune-gauge {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
   width: 8.9rem;
   height: 8.9rem;
+  box-shadow: 0 18px 32px rgb(15 118 110 / 0.14), 0 0 0 1px rgb(232 201 143 / 0.55);
+  filter: drop-shadow(0 16px 24px rgb(15 118 110 / 0.12));
+}
+
+.day-fortune-card .fortune-gauge::before {
+  content: "";
+  position: absolute;
+  inset: -36%;
+  z-index: 0;
+  border-radius: inherit;
+  background: conic-gradient(from 0deg, transparent 0deg 52deg, rgb(255 255 255 / 0.78) 78deg, rgb(232 201 143 / 0.62) 98deg, transparent 128deg 360deg);
+  mix-blend-mode: screen;
+  pointer-events: none;
+  animation: fortune-gauge-orbit 4.8s linear infinite;
+}
+
+.day-fortune-card .fortune-gauge::after {
+  content: "";
+  position: absolute;
+  inset: 0.45rem;
+  z-index: 0;
+  border-radius: inherit;
+  background: radial-gradient(circle, rgb(255 255 255 / 0.38), transparent 62%);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.58), 0 0 26px rgb(16 185 129 / 0.18);
+  pointer-events: none;
+  animation: fortune-gauge-glow 3.6s ease-in-out infinite;
+}
+
+.day-fortune-card .fortune-gauge > div {
+  position: relative;
+  z-index: 1;
+  box-shadow: inset 0 2px 12px rgb(120 53 15 / 0.08), 0 10px 24px rgb(255 255 255 / 0.22);
+}
+
+.day-fortune-card .fortune-gauge strong {
+  text-shadow: 0 8px 22px rgb(16 185 129 / 0.22);
 }
 
 .day-fortune-top {
@@ -863,11 +971,63 @@ button.is-loading:not(.icon-button)::before {
 
 .hero-form-card {
   position: relative;
-  border-color: #e8c98f;
+  isolation: isolate;
+  overflow: hidden;
+  align-self: start;
+  --form-border-angle: 0deg;
+  border-color: #d9bd83;
   border-radius: var(--home-card-radius);
-  background: #fffefb;
+  background:
+    linear-gradient(180deg, rgb(255 254 251 / 0.99), rgb(255 251 244 / 0.97)),
+    linear-gradient(135deg, rgb(232 201 143 / 0.16), transparent 42%);
   padding: clamp(1.25rem, 3vw, 2rem);
-  box-shadow: 0 10px 24px rgb(120 53 15 / 0.08);
+  box-shadow: 0 24px 62px rgb(120 53 15 / 0.13), 0 0 0 1px rgb(232 201 143 / 0.7), inset 0 1px 0 rgb(255 255 255 / 0.8);
+  transition: border-color 220ms ease, box-shadow 220ms ease;
+  animation: fade-up 680ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.hero-form-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: inherit;
+  padding: 1.5px;
+  background: conic-gradient(from var(--form-border-angle), rgb(232 201 143 / 0.95) 0deg 28deg, transparent 58deg 152deg, rgb(169 22 36 / 0.76) 184deg 218deg, transparent 250deg 330deg, rgb(232 201 143 / 0.95) 360deg);
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  opacity: 0.92;
+  pointer-events: none;
+  animation: form-border-orbit 6.2s linear infinite;
+}
+
+.hero-form-card::after {
+  content: "";
+  position: absolute;
+  inset: 0.65rem;
+  z-index: 0;
+  border-radius: calc(var(--home-card-radius) - 0.45rem);
+  box-shadow: inset 0 0 0 1px rgb(232 201 143 / 0.34);
+  background: linear-gradient(135deg, rgb(255 255 255 / 0.28), transparent 34%);
+  opacity: 0.68;
+  pointer-events: none;
+}
+
+.hero-form-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+.hero-form-card:focus-within {
+  border-color: #a91624;
+  animation: none;
+  box-shadow: 0 30px 78px rgb(120 53 15 / 0.18), 0 0 0 1px rgb(169 22 36 / 0.24), inset 0 1px 0 rgb(255 255 255 / 0.86);
 }
 
 .day-fortune-tips {
@@ -949,12 +1109,21 @@ button.is-loading:not(.icon-button)::before {
   color: #292524;
   font-size: 1.12rem;
   box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.7);
+  transition: border-color 180ms ease, box-shadow 180ms ease, background 180ms ease, transform 180ms ease;
 }
 
 .hero-form-card .chart-form input:focus,
 .hero-form-card .chart-form select:focus {
   border-color: #a91624;
-  box-shadow: 0 0 0 4px rgb(169 22 36 / 0.1);
+  background: #fff;
+  box-shadow: 0 0 0 4px rgb(169 22 36 / 0.11), 0 12px 22px rgb(169 22 36 / 0.08);
+}
+
+.hero-form-card .chart-form input:hover,
+.hero-form-card .chart-form select:hover {
+  transform: translateY(-1px);
+  border-color: #d6b573;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.82), 0 10px 22px rgb(120 53 15 / 0.06);
 }
 
 .hero-form-card .birth-date-grid {
@@ -979,17 +1148,34 @@ button.is-loading:not(.icon-button)::before {
 }
 
 .hero-form-card .chart-form .btn-primary {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
   min-height: 4rem;
   border-radius: var(--home-control-radius);
-  background: #a91624;
+  background: linear-gradient(135deg, #a91624, #8f111d 55%, #c2410c);
   box-shadow: 0 14px 30px rgb(169 22 36 / 0.18);
   font-family: "Times New Roman", Cambria, serif;
   font-size: 1.15rem;
   font-weight: 700;
+  transition: transform 180ms ease, box-shadow 180ms ease, background 180ms ease;
+}
+
+.hero-form-card .chart-form .btn-primary::after {
+  content: "";
+  position: absolute;
+  inset: -35% auto -35% -30%;
+  z-index: 0;
+  width: 42%;
+  background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.34), transparent);
+  pointer-events: none;
+  animation: home-sheen-sweep 4.8s ease-in-out infinite;
 }
 
 .hero-form-card .chart-form .btn-primary:hover {
-  background: #8f111d;
+  transform: translateY(-1px);
+  background: linear-gradient(135deg, #8f111d, #7c0f19 56%, #b53510);
+  box-shadow: 0 18px 36px rgb(169 22 36 / 0.24);
 }
 
 .hero-form-card .chart-form > p {
@@ -1571,6 +1757,14 @@ button.is-loading:not(.icon-button)::before {
   background: rgb(255 255 255 / 0.92);
   padding: 1rem;
   box-shadow: 0 12px 32px rgb(28 25 23 / 0.05);
+  transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease, background 180ms ease;
+}
+
+.reader-comment-card:hover {
+  transform: translateY(-2px);
+  border-color: rgb(232 201 143 / 0.9);
+  background: rgb(255 255 255 / 0.98);
+  box-shadow: 0 18px 42px rgb(120 53 15 / 0.09);
 }
 
 .reader-comment-avatar {
@@ -1847,6 +2041,11 @@ button.is-loading:not(.icon-button)::before {
 .panel {
   padding: 1.25rem;
   @apply transition duration-200 hover:-translate-y-1 hover:shadow-2xl;
+}
+
+.article-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 22px 52px rgb(120 53 15 / 0.13);
 }
 
 .feature-card,

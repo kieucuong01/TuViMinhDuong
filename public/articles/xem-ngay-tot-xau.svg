@@ -13,5 +13,5 @@
   <path d="M820 170a158 158 0 0 1 0 316c-60 0-108-48-108-108s48-108 108-108c31 0 56-25 56-56s-25-44-56-44Z" fill="#FB923C"/>
   <circle cx="820" cy="238" r="28" fill="#FFF7ED"/>
   <circle cx="820" cy="418" r="28" fill="#16A34A"/>
-  <text x="700" y="595" fill="#1C1917" font-family="Arial, sans-serif" font-size="42" font-weight="900">Theo tuổi & loại việc</text>
+  <text x="700" y="595" fill="#1C1917" font-family="Arial, sans-serif" font-size="42" font-weight="900">Theo tuổi &amp; loại việc</text>
 </svg>
