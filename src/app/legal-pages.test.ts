@@ -21,14 +21,24 @@ describe("legal and trust pages for ads readiness", () => {
   });
 
   it("links trust pages from the global footer", () => {
-    for (const href of ["/chinh-sach-bao-mat", "/dieu-khoan-su-dung", "/chinh-sach-thanh-toan-hoan-xu", "/lien-he"]) {
+    for (const href of ["/chinh-sach-bao-mat", "/dieu-khoan-su-dung", "/lien-he"]) {
       expect(footerSource).toContain(href);
     }
+    expect(footerSource).not.toContain("/chinh-sach-thanh-toan-hoan-xu");
+    expect(footerSource).not.toContain("/nap-xu");
   });
 
   it("includes public trust pages in the sitemap", () => {
-    for (const path of ["/chinh-sach-bao-mat", "/dieu-khoan-su-dung", "/chinh-sach-thanh-toan-hoan-xu", "/lien-he"]) {
+    for (const path of ["/chinh-sach-bao-mat", "/dieu-khoan-su-dung", "/lien-he"]) {
       expect(sitemapSource).toContain(path);
     }
+    expect(sitemapSource).not.toContain("/chinh-sach-thanh-toan-hoan-xu");
+  });
+
+  it("keeps money-related policy surfaces behind an authenticated account context", () => {
+    expect(pageSource("chinh-sach-thanh-toan-hoan-xu")).toContain("getCurrentUser");
+    expect(pageSource("chinh-sach-thanh-toan-hoan-xu")).toContain('redirect("/dang-nhap?next=/chinh-sach-thanh-toan-hoan-xu")');
+    expect(pageSource("lien-he")).toContain("authOnly");
+    expect(pageSource("lien-he")).toContain("visibleSupportItems");
   });
 });

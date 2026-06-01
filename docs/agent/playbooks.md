@@ -89,7 +89,9 @@ Read first:
 - `src/lib/pricing.ts`
 - `src/lib/payos.ts`
 - `src/lib/data.ts`
+- `src/components/user-header-badge.tsx`
 - `src/app/api/payments/payos/checkout/route.ts`
+- `src/app/api/payments/status/route.ts`
 - `src/app/api/webhooks/payos/route.ts`
 - `prisma/schema.prisma`
 
@@ -99,6 +101,9 @@ Rules:
 - `CoinLedger` is the truth; `User.coinBalance` is a cache updated in the same transaction.
 - PayOS webhook must be idempotent and signature checked when real env is present.
 - Do not credit coins from a return URL alone.
+- Do not fire purchase conversion from a return URL alone. It must wait for verified paid order state.
+- Guests should not see money-only support/policy links in public footer/contact/sitemap.
+- Logged-in users should see coin balance, saved charts, logout, topup, and payment/refund policy from the account menu.
 - Prefer modal or inline payment entry so users do not lose chart/report context.
 
 Done:
@@ -106,6 +111,8 @@ Done:
 - Not enough coins blocks paid content with a clear next action.
 - Repeated webhooks do not double-credit.
 - Existing unlocked readings can be viewed without charging again.
+- Guest public pages do not expose refund/topup policy links unless explicitly intended.
+- Logout remains visible on mobile and desktop account menus.
 
 ## SEO / CMS
 
@@ -127,6 +134,7 @@ Rules:
 - Public article URLs are `/kien-thuc-tu-vi/[slug]`.
 - Include natural visible copy first; metadata and schema support it, not the reverse.
 - Keep personal chart pages `noindex` unless explicitly changed.
+- Keep authenticated/money-only policy routes out of public sitemap unless the user asks otherwise.
 - Seed evergreen articles should create an internal link cluster back to `/#lap-la-so`, `/xem-ngay`, and related knowledge articles.
 - Use FAQ schema only when the page has visible FAQ content.
 - When brand/domain changes, update visible UI, metadata base, canonical, sitemap, robots, JSON-LD, favicon/logo assets, and seeded content references.
@@ -136,6 +144,37 @@ Done:
 
 - Metadata, canonical, OG/Twitter, sitemap, robots, and JSON-LD stay consistent.
 - Article pages remain fast and readable on mobile.
+
+## Google Ads / Conversion Tracking
+
+Trigger: Google Ads env, Tag Assistant, gtag, conversion labels, `/lap-la-so`, purchase tracking, ad landing QA.
+
+Read first:
+
+- `docs/google-ads.md`
+- `src/components/google-analytics.tsx`
+- `src/components/google-ads-event-reporter.tsx`
+- `src/lib/google-ads.ts`
+- `src/lib/env.ts`
+- `src/app/api/payments/status/route.ts`
+- `src/app/lap-la-so/page.tsx`
+
+Rules:
+
+- Never invent `AW-...` IDs or conversion labels. They must come from the user's Google Ads account or Vercel env.
+- Do not commit `.env*`; `.env.example` may document variable names only.
+- `create_chart` fires after chart creation redirect with `created=1`.
+- `begin_checkout` marks checkout intent only.
+- `purchase` fires only after `/api/payments/status` verifies the order belongs to the current user and is `PAID`.
+- Demo payment status can be used only for safe smoke/demo behavior.
+- Landing copy must avoid guaranteed-future or exaggerated claims.
+
+Done:
+
+- Tracking source has dedupe keys for repeat visits.
+- Google Ads env names are documented.
+- `npm run smoke:google-ads` can catch missing tag/config after deploy when real env values are supplied.
+- Manual Tag Assistant smoke confirms the expected AW tag and conversions.
 
 ## Deployment / Production
 

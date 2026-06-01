@@ -6,6 +6,17 @@ This folder keeps the high-signal context for future AI agents. It is inspired b
 - Skill-style playbooks: load the right small guide only when the task needs it.
 - Goal-driven execution: define the expected behavior and verification before editing.
 
+## Fast Path For New Agents
+
+If token budget matters, read in this order:
+
+1. `AGENTS.md`
+2. `docs/agent/quickstart.md`
+3. One matching section in `docs/agent/playbooks.md`
+4. `docs/agent/verification.md` before claiming completion
+
+Use this README only when the quickstart is not enough. For current project drift, prefer `docs/agent/current-state.md` over chat history.
+
 ## Product Snapshot
 
 - Brand: **Lá số tinh hoa**
@@ -36,6 +47,8 @@ This folder keeps the high-signal context for future AI agents. It is inspired b
 - Date fortune: `src/lib/date-fortune.ts` calculates truc, hoang/hac dao, sao, xung hop, and activity advice.
 - CMS: admin article editing with SEO score and public article pages at `/kien-thuc-tu-vi/[slug]`.
 - Payment: PayOS checkout/webhook credits coins idempotently; `CoinLedger` is the source of truth.
+- Google Ads: `/lap-la-so` is the ad landing page; purchase conversion waits for verified paid order status.
+- Public trust: privacy, terms, contact are public; payment/refund policy is for logged-in users and stays out of public footer/sitemap.
 - Admin operation toggles can disable payments, coin topups, and public paid-reading surfaces; paid-reading shutdown does not apply to admins.
 
 ## Architecture Map
@@ -48,6 +61,8 @@ This folder keeps the high-signal context for future AI agents. It is inspired b
 - `src/components/chart-form.tsx`: public chart input form.
 - `src/components/global-loading-toast.tsx`: global loading feedback for navigations/forms.
 - `src/components/loading-submit-button.tsx`: submit button state for server-action forms.
+- `src/components/google-ads-event-reporter.tsx`: client conversion reporter with dedupe and verified purchase check.
+- `src/app/api/payments/status/route.ts`: current-user payment status endpoint used by Google Ads purchase conversion.
 - `src/lib/chart.ts`: tử vi chart engine.
 - `src/lib/chart.fixtures.ts`: golden chart fixtures.
 - `src/lib/date-fortune.ts`: date fortune engine.
@@ -61,6 +76,7 @@ This folder keeps the high-signal context for future AI agents. It is inspired b
 - Chart pages are personal/private by default; avoid indexing personal chart URLs unless the user asks.
 - The chart engine must return structured JSON that AI readings can cite. Do not let AI recalculate the chart.
 - Coin balance is cached on `User.coinBalance`; transaction history lives in `CoinLedger`.
+- Money-only policy/support surfaces should not be linked for guests in public footer/contact/sitemap.
 - Paid readings should be cached by user/chart/type/scope so repeat views do not charge again.
 - When public paid readings are disabled, non-admin users should not see or invoke advanced reading surfaces; admins keep full paid-reading access without coin charge.
 - If payment or AI generation fails after charging, preserve an audit trail and refund via ledger transaction.
@@ -76,6 +92,7 @@ This folder keeps the high-signal context for future AI agents. It is inspired b
 
 ## Planning And Test Docs
 
+- `docs/agent/quickstart.md`: lowest-token onboarding map for a fresh agent session.
 - `docs/agent/current-state.md`: latest project snapshot, known stable areas, risky areas, and next recommended work.
 - `docs/roadmap.md`: module roadmap, priorities, and what "done" means before selling harder.
 - `docs/backlog.md`: prioritized P0/P1/P2 task queue for "làm tiếp đi" style requests.

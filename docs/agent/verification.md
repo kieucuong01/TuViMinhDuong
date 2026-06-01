@@ -16,6 +16,15 @@ Preferred local app port for this project:
 npx next dev --webpack -p 4000
 ```
 
+If `npm` resolves to Node 18, run checks with the bundled Node executable instead of trusting the failure:
+
+```powershell
+& "C:\Users\ASUS\.cache\codex-runtimes\codex-primary-runtime\dependencies\node\bin\node.exe" .\node_modules\vitest\vitest.mjs run
+& "C:\Users\ASUS\.cache\codex-runtimes\codex-primary-runtime\dependencies\node\bin\node.exe" .\node_modules\eslint\bin\eslint.js
+$env:PATH="C:\Users\ASUS\.cache\codex-runtimes\codex-primary-runtime\dependencies\node\bin;$env:PATH"
+& "C:\Users\ASUS\.cache\codex-runtimes\codex-primary-runtime\dependencies\node\bin\node.exe" .\node_modules\next\dist\bin\next build
+```
+
 Production-like local server after build:
 
 ```powershell
@@ -79,6 +88,20 @@ Payments:
 - Use a safe PayOS/mock flow unless the user asks for a real transaction test.
 - Confirm insufficient coins blocks paid content.
 - Confirm unlocked readings can be revisited without charging again.
+- Confirm `purchase` tracking depends on verified paid order status, not only return URL query params.
+- Confirm guest public footer/contact/sitemap do not expose topup/refund-only policy links.
+
+Google Ads:
+
+- Do not smoke with invented `AW-...` values.
+- With real env values, run `npm run smoke:google-ads`.
+- In Tag Assistant, verify AW tag on `/lap-la-so`, `create_chart` after `created=1`, and `purchase` only after `/api/payments/status` returns `verified: true`.
+
+Public trust policy:
+
+- As guest, `/chinh-sach-thanh-toan-hoan-xu` should redirect to `/dang-nhap?next=/chinh-sach-thanh-toan-hoan-xu`.
+- As guest, `/lien-he` should not show refund/topup-only CTA.
+- `sitemap.xml` should not include authenticated/money-only policy routes.
 
 ## Git Hygiene
 

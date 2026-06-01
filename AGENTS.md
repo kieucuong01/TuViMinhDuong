@@ -13,10 +13,11 @@ Use this file as the map, not the encyclopedia. Load only the docs and files nee
 ## Read Order
 
 1. Read this file.
-2. Read [docs/agent/README.md](docs/agent/README.md) for product and architecture context.
-3. Read the relevant section in [docs/agent/playbooks.md](docs/agent/playbooks.md).
+2. Read [docs/agent/quickstart.md](docs/agent/quickstart.md) for the low-token project snapshot and task routing.
+3. Read only the relevant section in [docs/agent/playbooks.md](docs/agent/playbooks.md).
 4. Read [docs/agent/verification.md](docs/agent/verification.md) before claiming completion.
-5. For handoff to another agent, use [docs/agent/handoff.md](docs/agent/handoff.md).
+5. Read [docs/agent/README.md](docs/agent/README.md) only when the quickstart/playbook is not enough.
+6. For handoff to another agent, use [docs/agent/handoff.md](docs/agent/handoff.md).
 
 ## Operating Rules
 

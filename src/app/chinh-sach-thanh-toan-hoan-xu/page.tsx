@@ -1,11 +1,15 @@
+import { redirect } from "next/navigation";
+
 import { LegalPage } from "@/components/legal-page";
 import { APP_NAME } from "@/lib/env";
+import { getCurrentUser } from "@/lib/auth";
 import { routeMetadata } from "@/lib/metadata";
 
 export const metadata = routeMetadata({
   title: "Chính sách thanh toán và hoàn xu",
   description: `Chính sách thanh toán, cộng xu, hoàn xu và hỗ trợ giao dịch PayOS/VietQR trên ${APP_NAME}.`,
   path: "/chinh-sach-thanh-toan-hoan-xu",
+  robots: { index: false, follow: false },
 });
 
 const sections = [
@@ -48,7 +52,10 @@ const sections = [
   },
 ];
 
-export default function PaymentRefundPolicyPage() {
+export default async function PaymentRefundPolicyPage() {
+  const user = await getCurrentUser();
+  if (!user) redirect("/dang-nhap?next=/chinh-sach-thanh-toan-hoan-xu");
+
   return (
     <LegalPage
       eyebrow="Thanh toán"

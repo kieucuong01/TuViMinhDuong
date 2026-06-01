@@ -20,7 +20,6 @@ const knowledgeLinks = [
 ];
 
 const trustLinks = [
-  { href: "/nap-xu", label: "Luận giải chuyên sâu" },
   { href: "/la-so", label: "Lá số đã lưu" },
   { href: "/kien-thuc-tu-vi", label: "Kiến thức tử vi" },
 ];
@@ -28,7 +27,6 @@ const trustLinks = [
 const legalLinks = [
   { href: "/chinh-sach-bao-mat", label: "Chính sách bảo mật" },
   { href: "/dieu-khoan-su-dung", label: "Điều khoản sử dụng" },
-  { href: "/chinh-sach-thanh-toan-hoan-xu", label: "Thanh toán và hoàn xu" },
   { href: "/lien-he", label: "Liên hệ hỗ trợ" },
 ];
 

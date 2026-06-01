@@ -6,10 +6,18 @@ Use this when starting a new AI-agent session. Paste the short bootstrap plus th
 
 ```text
 You are working in C:\Users\ASUS\Documents\Claude\Projects\Tu vi.
-Start by reading AGENTS.md, then docs/agent/README.md, then only the relevant playbook in docs/agent/playbooks.md.
+Start by reading AGENTS.md, then docs/agent/quickstart.md, then only the relevant playbook in docs/agent/playbooks.md.
 This is the Lá số tinh hoa Next.js 16 app. The primary production URL is lasotinhhoa.vn; tu-vi-minh-duong.vercel.app remains the Vercel fallback URL.
 Follow existing patterns, preserve unrelated dirty changes, and verify with the smallest sufficient ladder from docs/agent/verification.md.
 ```
+
+## Token-Saving Rules
+
+- Do not paste old chat history unless it contains facts not captured in repo docs.
+- Prefer route/component/file names over screenshots when describing code tasks.
+- Point to one playbook section, not the whole docs folder.
+- Include exact repro steps and acceptance criteria so the next agent can skip rediscovery.
+- Mention whether dirty files are yours, user changes, or unknown before asking the next agent to commit.
 
 ## Task Prompt Shape
 
@@ -41,6 +49,9 @@ Verified:
 
 Open:
 - <risks, blockers, or follow-up>
+
+Dirty state:
+- <remaining uncommitted files and whether they belong to this task>
 ```
 
 ## When To Update Docs

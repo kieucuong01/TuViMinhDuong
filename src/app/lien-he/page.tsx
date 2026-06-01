@@ -1,7 +1,8 @@
 import Link from "next/link";
-import { Mail, ReceiptText, ShieldQuestion, Sparkles } from "lucide-react";
+import { Mail, ReceiptText, ShieldQuestion, Sparkles, type LucideIcon } from "lucide-react";
 
 import { APP_NAME, ADMIN_EMAIL } from "@/lib/env";
+import { getCurrentUser } from "@/lib/auth";
 import { routeMetadata } from "@/lib/metadata";
 
 export const metadata = routeMetadata({
@@ -10,11 +11,19 @@ export const metadata = routeMetadata({
   path: "/lien-he",
 });
 
-const supportItems = [
+type SupportItem = {
+  title: string;
+  description: string;
+  icon: LucideIcon;
+  authOnly?: boolean;
+};
+
+const supportItems: SupportItem[] = [
   {
     title: "Thanh toán và xu",
     description: "Kiểm tra đơn PayOS/VietQR, số dư xu, giao dịch đã trả tiền nhưng chưa được cộng xu.",
     icon: ReceiptText,
+    authOnly: true,
   },
   {
     title: "Tài khoản và lá số",
@@ -28,7 +37,10 @@ const supportItems = [
   },
 ];
 
-export default function ContactPage() {
+export default async function ContactPage() {
+  const user = await getCurrentUser();
+  const visibleSupportItems = supportItems.filter((item) => !item.authOnly || user);
+
   return (
     <main>
       <section className="section">
@@ -42,7 +54,7 @@ export default function ContactPage() {
           </div>
 
           <div className="grid gap-5 md:grid-cols-3">
-            {supportItems.map((item) => {
+            {visibleSupportItems.map((item) => {
               const Icon = item.icon;
 
               return (
@@ -76,9 +88,11 @@ export default function ContactPage() {
           </section>
 
           <div className="mt-6 flex flex-wrap justify-center gap-3">
-            <Link href="/chinh-sach-thanh-toan-hoan-xu" className="btn btn-secondary" prefetch={false}>
-              Chính sách hoàn xu
-            </Link>
+            {user ? (
+              <Link href="/chinh-sach-thanh-toan-hoan-xu" className="btn btn-secondary" prefetch={false}>
+                Chính sách hoàn xu
+              </Link>
+            ) : null}
             <Link href="/chinh-sach-bao-mat" className="btn btn-ghost" prefetch={false}>
               Chính sách bảo mật
             </Link>

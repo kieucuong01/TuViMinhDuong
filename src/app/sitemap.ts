@@ -9,7 +9,6 @@ const TRUST_ROUTES = [
   { path: "/pricing", changeFrequency: "weekly" as const, priority: 0.6 },
   { path: "/chinh-sach-bao-mat", changeFrequency: "yearly" as const, priority: 0.4 },
   { path: "/dieu-khoan-su-dung", changeFrequency: "yearly" as const, priority: 0.4 },
-  { path: "/chinh-sach-thanh-toan-hoan-xu", changeFrequency: "yearly" as const, priority: 0.4 },
   { path: "/lien-he", changeFrequency: "monthly" as const, priority: 0.5 },
 ];
 

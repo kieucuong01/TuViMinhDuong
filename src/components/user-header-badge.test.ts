@@ -24,6 +24,12 @@ describe("user header coin balance", () => {
     expect(userHeaderSource).toContain("useCloseDetailsOnOutsideClick(detailsRef)");
   });
 
+  it("keeps logout and money policy links inside the logged-in account menu on mobile", () => {
+    expect(userHeaderSource).toContain("user-account-logout-form");
+    expect(userHeaderSource).toContain('href="/chinh-sach-thanh-toan-hoan-xu"');
+    expect(globalsCss).not.toMatch(/\.user-header-badge\s+\.user-account-value,\s*\n\s*\.user-header-badge\s+form\s*{[\s\S]*display:\s*none/);
+  });
+
   it("keeps the saved-chart shortcut compact enough for narrow mobile headers", () => {
     expect(userHeaderSource).toContain("user-charts-label");
     expect(globalsCss).toMatch(/\.user-header-badge\s+\.user-charts-label\s*{[\s\S]*display:\s*none/);

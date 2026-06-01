@@ -8238,8 +8238,7 @@ button.is-loading:not(.icon-button)::before {
     font-size: 0.82rem;
   }
 
-  .user-header-badge .user-account-value,
-  .user-header-badge form {
+  .user-header-badge .user-account-value {
     display: none;
   }
 
