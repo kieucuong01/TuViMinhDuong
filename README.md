@@ -129,6 +129,8 @@ Target deploy là Vercel + Postgres. Các env quan trọng:
 - `PAYOS_CLIENT_ID`
 - `PAYOS_API_KEY`
 - `PAYOS_CHECKSUM_KEY`
+- `NEXT_PUBLIC_GA_ID` cho GA4 page view/event
+- `NEXT_PUBLIC_GOOGLE_ADS_ID` và các label conversion `NEXT_PUBLIC_GOOGLE_ADS_*_LABEL` nếu chạy Google Ads
 - `GOOGLE_CLIENT_ID`
 - `GOOGLE_CLIENT_SECRET`
 - `GEMINI_API_KEY` hoặc `GEMINI_API_KEYS` cho Gemini
@@ -145,6 +147,7 @@ Target deploy là Vercel + Postgres. Các env quan trọng:
 ### Theo dõi sau deploy
 
 - Vercel Web Analytics và Speed Insights đã được gắn ở root layout.
+- Google Ads/GA4 funnel tracking được ghi trong `docs/google-ads.md`; landing Search Ads chính là `/lap-la-so`.
 - Lỗi client được gửi về `/api/telemetry/error`, rút gọn payload và ghi vào runtime logs.
 - Sau deploy, chạy `npm run perf:smoke` với `PERF_BASE_URL` là domain production.
 - Khi cần rà lỗi nhanh trên Vercel, dùng `npx vercel logs <deployment-url> --level error --since 1h`.

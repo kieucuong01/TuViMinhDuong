@@ -4,12 +4,18 @@ import { Sparkles } from "lucide-react";
 
 const days = Array.from({ length: 31 }, (_, index) => index + 1);
 const months = Array.from({ length: 12 }, (_, index) => index + 1);
+const DEFAULT_VIEW_YEAR = 2026;
 
 function descendingYears(start: number, end: number) {
   return Array.from({ length: end - start + 1 }, (_, index) => end - index);
 }
 
-export function ChartForm({ compact = false }: { compact?: boolean }) {
+type ChartFormProps = {
+  compact?: boolean;
+  adSource?: string;
+};
+
+export function ChartForm({ compact = false, adSource = "chart_form" }: ChartFormProps) {
   const now = new Date();
   const currentYear = now.getFullYear();
   const birthYears = descendingYears(1900, currentYear);
@@ -20,15 +26,17 @@ export function ChartForm({ compact = false }: { compact?: boolean }) {
       action={createChartAction}
       className={compact ? "chart-form compact" : "chart-form"}
       data-testid="chart-form"
+      data-ad-event="create_chart_submit"
+      data-ad-placement={adSource}
       data-loading-message="Đang lập lá số..."
       data-loading-label="Đang lập lá số..."
     >
+      <input type="hidden" name="adSource" value={adSource} />
       <div className="form-grid">
         <label className="chart-name-field md:col-span-2">
           <span className="chart-field-label">Họ và tên</span>
           <span className="chart-name-control">
-            <input name="fullName" placeholder="Ví dụ: Nguyễn Minh Anh" required data-testid="chart-full-name" />
-            <em>Thông tin bắt buộc</em>
+            <input name="fullName" placeholder="Họ và tên" required data-testid="chart-full-name" />
           </span>
         </label>
 
@@ -37,7 +45,8 @@ export function ChartForm({ compact = false }: { compact?: boolean }) {
           <div className="birth-date-grid">
             <label>
               <span>Ngày</span>
-              <select name="day" defaultValue="1" required data-testid="chart-day">
+              <select name="day" defaultValue="" required data-testid="chart-day">
+                <option value="" disabled hidden>Ngày</option>
                 {days.map((day) => (
                   <option key={day} value={day}>{day}</option>
                 ))}
@@ -45,7 +54,8 @@ export function ChartForm({ compact = false }: { compact?: boolean }) {
             </label>
             <label>
               <span>Tháng</span>
-              <select name="month" defaultValue="1" required data-testid="chart-month">
+              <select name="month" defaultValue="" required data-testid="chart-month">
+                <option value="" disabled hidden>Tháng</option>
                 {months.map((month) => (
                   <option key={month} value={month}>{month}</option>
                 ))}
@@ -53,7 +63,8 @@ export function ChartForm({ compact = false }: { compact?: boolean }) {
             </label>
             <label>
               <span>Năm</span>
-              <select name="year" defaultValue="1990" required data-testid="chart-year">
+              <select name="year" defaultValue="" required data-testid="chart-year">
+                <option value="" disabled hidden>Năm sinh</option>
                 {birthYears.map((year) => (
                   <option key={year} value={year}>{year}</option>
                 ))}
@@ -71,7 +82,8 @@ export function ChartForm({ compact = false }: { compact?: boolean }) {
 
         <label className="chart-hour-field md:col-span-2">
           <span>Giờ sinh</span>
-          <select name="birthHour" defaultValue="0" data-testid="chart-birth-hour">
+          <select name="birthHour" defaultValue="" required data-testid="chart-birth-hour">
+            <option value="" disabled hidden>Giờ sinh</option>
             <option value="0">Tý: 23h - 1h</option>
             <option value="2">Sửu: 1h - 3h</option>
             <option value="4">Dần: 3h - 5h</option>
@@ -90,14 +102,14 @@ export function ChartForm({ compact = false }: { compact?: boolean }) {
         <label>
           <span>Giới tính</span>
           <select name="gender" defaultValue="male" data-testid="chart-gender">
-            <option value="male">Nam giới</option>
-            <option value="female">Nữ giới</option>
+            <option value="male">Nam</option>
+            <option value="female">Nữ</option>
           </select>
         </label>
 
         <label>
           <span>Năm xem</span>
-          <select name="viewYear" defaultValue={currentYear} required data-testid="chart-view-year">
+          <select name="viewYear" defaultValue={DEFAULT_VIEW_YEAR} required data-testid="chart-view-year">
             {viewYears.map((year) => (
               <option key={year} value={year}>Năm xem {year}</option>
             ))}

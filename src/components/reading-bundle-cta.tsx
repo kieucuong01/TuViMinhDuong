@@ -36,7 +36,14 @@ export function ReadingBundleCta({ chartId, type, nextPath, totalCount, unlocked
         {hasBundleAccess || remainingCount === 0 ? (
           <small>Những mục trong nhóm này sẽ không trừ xu khi mở chi tiết.</small>
         ) : (
-          <form action={requestReadingBundleAction} data-loading-message={`Đang mở trọn nhóm ${label}...`} data-loading-label="Đang mở gói...">
+          <form
+            action={requestReadingBundleAction}
+            data-ad-event="paid_reading_request"
+            data-ad-placement="reading_bundle_cta"
+            data-ad-value={bundlePrice * 1000}
+            data-loading-message={`Đang mở trọn nhóm ${label}...`}
+            data-loading-label="Đang mở gói..."
+          >
             <input type="hidden" name="chartId" value={chartId} />
             <input type="hidden" name="type" value={type} />
             <input type="hidden" name="next" value={nextPath} />

@@ -44,7 +44,17 @@ export default async function CoinsPage({ searchParams }: { searchParams: Promis
         </div>
         {topupEnabled ? <div className="grid gap-4 md:grid-cols-3">
           {COIN_PACKAGES.map((pack) => (
-            <form key={pack.key} action={createCheckoutAction} className="pricing-card" data-loading-message="Đang tạo link thanh toán..." data-loading-label="Đang tạo link...">
+            <form
+              key={pack.key}
+              action={createCheckoutAction}
+              className="pricing-card"
+              data-ad-event="begin_checkout"
+              data-ad-placement="topup_page"
+              data-ad-package={pack.key}
+              data-ad-value={pack.priceVnd}
+              data-loading-message="Đang tạo link thanh toán..."
+              data-loading-label="Đang tạo link..."
+            >
               <input type="hidden" name="packageKey" value={pack.key} />
               <Coins className="text-orange-600" size={30} />
               <h2>{pack.label}</h2>

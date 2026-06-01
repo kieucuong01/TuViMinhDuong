@@ -83,6 +83,10 @@ export function CoinTopupModal({ enabled = true }: { enabled?: boolean }) {
               key={pack.key}
               action={createCheckoutAction}
               className={pack.recommended ? "paywall-package-card recommended" : "paywall-package-card"}
+              data-ad-event="begin_checkout"
+              data-ad-placement="coin_topup_modal"
+              data-ad-package={pack.key}
+              data-ad-value={pack.priceVnd}
               data-loading-message="Đang tạo link thanh toán..."
               data-loading-label="Đang tạo link..."
             >

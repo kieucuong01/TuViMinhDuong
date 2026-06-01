@@ -101,7 +101,14 @@ function PremiumReadingConfirmModal({
         Hệ thống sẽ kiểm tra số xu trong tài khoản. Nếu đủ xu, phần luận giải sẽ được mở và lưu lại; nếu chưa đủ, bạn sẽ được nhắc nạp thêm xu.
       </p>
 
-      <form action={requestReadingAction} className="premium-confirm-actions" data-loading-message="Đang mở luận giải...">
+      <form
+        action={requestReadingAction}
+        className="premium-confirm-actions"
+        data-ad-event="paid_reading_request"
+        data-ad-placement="premium_confirm_modal"
+        data-ad-value={fullPriceCoins * 1000}
+        data-loading-message="Đang mở luận giải..."
+      >
         <input type="hidden" name="chartId" value={chartId} />
         <input type="hidden" name="type" value="FULL" />
         <input type="hidden" name="scopeKey" value="all" />

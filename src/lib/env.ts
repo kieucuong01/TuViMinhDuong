@@ -1,3 +1,5 @@
+import { normalizeGoogleAdsId, type GoogleAdsEventName } from "@/lib/google-ads";
+
 const DEFAULT_APP_URL =
   process.env.NODE_ENV === "production" ? "https://lasotinhhoa.vn" : "http://localhost:4000";
 
@@ -7,6 +9,17 @@ export const APP_URL = configuredAppUrl || DEFAULT_APP_URL;
 
 export const GOOGLE_ANALYTICS_ID =
   process.env.NEXT_PUBLIC_GA_ID || process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || "G-5JSNC2T5G0";
+
+export const GOOGLE_ADS_ID = normalizeGoogleAdsId(
+  process.env.NEXT_PUBLIC_GOOGLE_ADS_ID || process.env.NEXT_PUBLIC_GOOGLE_ADS_CONVERSION_ID,
+);
+
+export const GOOGLE_ADS_LABELS: Partial<Record<GoogleAdsEventName, string | undefined>> = {
+  create_chart: process.env.NEXT_PUBLIC_GOOGLE_ADS_CREATE_CHART_LABEL,
+  begin_checkout: process.env.NEXT_PUBLIC_GOOGLE_ADS_BEGIN_CHECKOUT_LABEL,
+  purchase: process.env.NEXT_PUBLIC_GOOGLE_ADS_PURCHASE_LABEL,
+  paid_reading_request: process.env.NEXT_PUBLIC_GOOGLE_ADS_PAID_READING_LABEL,
+};
 
 export const APP_NAME = "Lá số tinh hoa";
 

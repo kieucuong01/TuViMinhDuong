@@ -121,14 +121,14 @@ export function SocialProofPopup() {
       <div className="social-proof-icon" aria-hidden="true">
         <Sparkles size={18} />
       </div>
-      <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-black text-orange-950 sm:text-base">{event.email}</p>
-        <p className="mt-1 text-sm font-medium text-stone-600 sm:text-base">
-          {event.action}
-        </p>
-        <Link className="social-proof-cta" href={getHref(context)} onClick={() => setVisible(false)}>
-          Xem ngay
-        </Link>
+      <div className="social-proof-body">
+        <p className="social-proof-email">{event.email}</p>
+        <div className="social-proof-action-row">
+          <p>{event.action}</p>
+          <Link className="social-proof-cta" href={getHref(context)} onClick={() => setVisible(false)}>
+            Xem ngay
+          </Link>
+        </div>
       </div>
       <button
         className="social-proof-close"

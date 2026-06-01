@@ -82,6 +82,11 @@ function withQueryParams(path: string, params: Record<string, string | number | 
   return `${basePath}${qs ? `?${qs}` : ""}${hash ? `#${hash}` : ""}`;
 }
 
+function safeAdSource(value: FormDataEntryValue | null) {
+  const source = String(value || "chart_form").trim();
+  return /^[a-z0-9_-]{1,64}$/i.test(source) ? source : "chart_form";
+}
+
 function chartInputFromForm(formData: FormData) {
   return {
     fullName: String(formData.get("fullName") || ""),
@@ -100,7 +105,7 @@ function chartInputFromForm(formData: FormData) {
 export async function createChartAction(formData: FormData) {
   const user = await getCurrentUser();
   const chart = await saveChart(chartInputFromForm(formData), user);
-  redirect(`/la-so/${chart.id}`);
+  redirect(withQueryParams(`/la-so/${chart.id}`, { created: "1", adSource: safeAdSource(formData.get("adSource")) }));
 }
 
 export async function quickReadingCheckoutAction(formData: FormData) {
@@ -479,8 +484,9 @@ export async function createCheckoutAction(formData: FormData) {
   if (!user) {
     redirect(`/dang-nhap?next=${encodeURIComponent(withQueryParams(returnTo, { topup: "1" }))}&paywall=login`);
   }
-  const checkout = await createPayOSCheckout(packageKey, user, returnTo);
   const pack = COIN_PACKAGES.find((item) => item.key === packageKey) || COIN_PACKAGES[1];
+  const adsReturnTo = withQueryParams(returnTo, { adPackage: pack.key, adValue: pack.priceVnd });
+  const checkout = await createPayOSCheckout(packageKey, user, adsReturnTo);
   const db = getDb();
 
   if (db) {
@@ -516,7 +522,7 @@ export async function createCheckoutAction(formData: FormData) {
     });
   } else if (checkout.raw && typeof checkout.raw === "object" && "mode" in checkout.raw) {
     await adjustCoins(user, checkout.coins, "Demo nạp xu", String(checkout.orderCode));
-    redirect(withQueryParams(returnTo, { status: "demo-paid", orderCode: checkout.orderCode }));
+    redirect(withQueryParams(adsReturnTo, { status: "demo-paid", orderCode: checkout.orderCode }));
   }
 
   redirect(checkout.checkoutUrl);

@@ -23,6 +23,9 @@ export function QuickReadingForm() {
       <form
         action={quickReadingCheckoutAction}
         className="quick-reading-form"
+        data-ad-event="begin_checkout"
+        data-ad-placement="quick_reading_form"
+        data-ad-package="quick-full-reading"
         data-loading-message="Đang chuẩn bị bản luận giải..."
         data-loading-label="Đang chuẩn bị..."
       >
