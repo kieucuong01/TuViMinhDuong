@@ -4,7 +4,6 @@ import { Suspense } from "react";
 import { BookOpenText, CalendarDays } from "lucide-react";
 import { UserHeaderBadge } from "@/components/user-header-badge";
 import { APP_NAME } from "@/lib/env";
-import { MobileSiteMenu } from "@/components/mobile-site-menu";
 
 const baseNav = [
   { href: "/", label: "Lập lá số tử vi", tone: "primary" },
@@ -46,8 +45,6 @@ export async function SiteHeader() {
           <Suspense fallback={<div className="user-header-skeleton" aria-hidden="true"><span /></div>}>
             <UserHeaderBadge />
           </Suspense>
-
-          <MobileSiteMenu items={nav} />
         </div>
       </div>
     </header>

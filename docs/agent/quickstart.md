@@ -25,7 +25,7 @@ Purpose: this is the first low-token context file for any new AI agent. Read thi
 
 - Routes: `src/app/**`
 - Server actions: `src/app/actions.ts`
-- Header/footer/account UI: `src/components/site-header.tsx`, `src/components/user-header-badge.tsx`, `src/components/site-footer.tsx`
+- Header/footer/account UI: `src/components/site-header.tsx`, `src/components/mobile-bottom-nav.tsx`, `src/components/user-header-badge.tsx`, `src/components/site-footer.tsx`
 - Chart engine: `src/lib/chart.ts`, `src/lib/lunar.ts`, `src/lib/chart.fixtures.ts`
 - Date engine: `src/lib/date-fortune.ts`
 - Auth/session: `src/lib/auth.ts`, `src/app/api/me/route.ts`

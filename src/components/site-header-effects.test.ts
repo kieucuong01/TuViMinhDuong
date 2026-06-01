@@ -3,7 +3,7 @@ import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 
 const headerSource = readFileSync(fileURLToPath(new URL("./site-header.tsx", import.meta.url)), "utf8");
-const mobileMenuSource = readFileSync(fileURLToPath(new URL("./mobile-site-menu.tsx", import.meta.url)), "utf8");
+const mobileBottomNavSource = readFileSync(fileURLToPath(new URL("./mobile-bottom-nav.tsx", import.meta.url)), "utf8");
 const globalsCss = readFileSync(fileURLToPath(new URL("../app/globals.css", import.meta.url)), "utf8");
 
 describe("site header featured nav effects", () => {
@@ -16,22 +16,25 @@ describe("site header featured nav effects", () => {
     expect(headerSource).toContain("site-nav-knowledge");
   });
 
-  it("keeps the same featured treatment available in the mobile menu", () => {
-    expect(mobileMenuSource).toContain("CalendarDays");
-    expect(mobileMenuSource).toContain("BookOpenText");
-    expect(mobileMenuSource).toContain("mobile-menu-date");
-    expect(mobileMenuSource).toContain("mobile-menu-knowledge");
+  it("keeps featured destinations available in the mobile bottom nav", () => {
+    expect(mobileBottomNavSource).toContain("CalendarDays");
+    expect(mobileBottomNavSource).toContain("BookOpenText");
+    expect(mobileBottomNavSource).toContain('href="/xem-ngay"');
+    expect(mobileBottomNavSource).toContain('href="/kien-thuc-tu-vi"');
   });
 
-  it("closes the mobile menu when the visitor presses outside it", () => {
-    expect(mobileMenuSource).toContain("useCloseDetailsOnOutsideClick");
-    expect(mobileMenuSource).toContain("useCloseDetailsOnOutsideClick(detailsRef)");
+  it("keeps mobile header focused by moving the navigation into the bottom nav", () => {
+    expect(headerSource).not.toContain("MobileSiteMenu");
+    expect(mobileBottomNavSource).toContain("mobile-account-backdrop");
+    expect(mobileBottomNavSource).toContain("routeKey");
+    expect(mobileBottomNavSource).toContain("setAccountSheet");
   });
 
   it("lets the mobile brand shrink before overlapping the account controls", () => {
     expect(headerSource).toContain("site-header-actions");
     expect(globalsCss).toMatch(/\.site-brand\s*{[\s\S]*flex:\s*1 1 auto/);
     expect(globalsCss).toMatch(/\.site-header-actions\s*{[\s\S]*flex-shrink:\s*0/);
+    expect(globalsCss).toMatch(/\.site-header-actions \.login-link\s*{[\s\S]*display:\s*none/);
   });
 
   it("adds restrained chip glint and hover polish through CSS", () => {
@@ -39,7 +42,7 @@ describe("site header featured nav effects", () => {
     expect(globalsCss).toMatch(/\.site-nav-date,\s*\n\.site-nav-knowledge\s*{[\s\S]*box-shadow:/);
     expect(globalsCss).toMatch(/\.site-nav-date::before,\s*\n\.site-nav-knowledge::before\s*{[\s\S]*animation:\s*nav-chip-glint\s+5\.4s/);
     expect(globalsCss).toMatch(/\.site-nav-date:hover,\s*\n\.site-nav-knowledge:hover[\s\S]*translateY\(-1px\)/);
-    expect(globalsCss).toMatch(/\.mobile-menu-date\s*{[\s\S]*linear-gradient/);
-    expect(globalsCss).toMatch(/\.mobile-menu-knowledge\s*{[\s\S]*linear-gradient/);
+    expect(globalsCss).toMatch(/\.mobile-bottom-nav\s*{[\s\S]*backdrop-filter:\s*blur\(20px\)/);
+    expect(globalsCss).toMatch(/\.mobile-bottom-nav \.is-active\s*{[\s\S]*background:\s*#fff7ed/);
   });
 });
