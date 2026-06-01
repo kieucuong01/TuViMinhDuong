@@ -16,7 +16,7 @@ Tao cac conversion trong Google Ads, roi dien label vao Vercel env:
 | --- | --- | --- |
 | `create_chart` | `NEXT_PUBLIC_GOOGLE_ADS_CREATE_CHART_LABEL` | User tao la so thanh cong |
 | `begin_checkout` | `NEXT_PUBLIC_GOOGLE_ADS_BEGIN_CHECKOUT_LABEL` | User bat dau checkout nap xu/luan giai |
-| `purchase` | `NEXT_PUBLIC_GOOGLE_ADS_PURCHASE_LABEL` | User quay ve tu PayOS voi status thanh cong |
+| `purchase` | `NEXT_PUBLIC_GOOGLE_ADS_PURCHASE_LABEL` | Don nap xu da duoc webhook/order status xac minh PAID |
 | `paid_reading_request` | `NEXT_PUBLIC_GOOGLE_ADS_PAID_READING_LABEL` | User yeu cau mo luan giai tra phi bang xu |
 
 Bat buoc set:
@@ -31,12 +31,23 @@ NEXT_PUBLIC_GOOGLE_ADS_PAID_READING_LABEL="..."
 
 `NEXT_PUBLIC_GA_ID` van duoc dung cho GA4 page view va event funnel.
 
+Khong commit cac gia tri nay vao repo. Set tren Vercel Production/Preview bang dashboard hoac CLI:
+
+```powershell
+vercel env add NEXT_PUBLIC_GOOGLE_ADS_ID production
+vercel env add NEXT_PUBLIC_GOOGLE_ADS_CREATE_CHART_LABEL production
+vercel env add NEXT_PUBLIC_GOOGLE_ADS_BEGIN_CHECKOUT_LABEL production
+vercel env add NEXT_PUBLIC_GOOGLE_ADS_PURCHASE_LABEL production
+vercel env add NEXT_PUBLIC_GOOGLE_ADS_PAID_READING_LABEL production
+```
+
 ## Current Tracking
 
 - Form lap la so gui `create_chart_submit` luc submit.
 - Sau khi tao la so, server redirect ve `/la-so/<id>?created=1&adSource=...`; client ban conversion `create_chart` mot lan theo chart id.
 - Form nap xu va luan giai nhanh gui `begin_checkout`.
-- PayOS return URL tu nap xu co them `adPackage` va `adValue`; neu ve voi `status=success` hoac demo `status=demo-paid`, client ban conversion `purchase` mot lan theo `orderCode`.
+- PayOS return URL tu nap xu co `status=success` va `orderCode`, nhung client chi ban conversion `purchase` sau khi `/api/payments/status?orderCode=...` tra ve order dung user va da `PAID`.
+- Che do demo `status=demo-paid` van duoc phep ban conversion trong moi truong demo de smoke flow khong can webhook that.
 - Khi user mo full reading va job bat dau, URL co `generating=1&reading=...`; client ban `paid_reading_request`.
 
 ## Campaign Setup
@@ -48,8 +59,22 @@ NEXT_PUBLIC_GOOGLE_ADS_PAID_READING_LABEL="..."
 
 ## Smoke Test After Deploy
 
-1. Mo `https://lasotinhhoa.vn/lap-la-so?utm_source=google&utm_medium=cpc&utm_campaign=smoke`.
-2. Tao mot la so test va xac nhan URL co `created=1`.
-3. Trong DevTools hoac Google Tag Assistant, xac nhan event `create_chart` va conversion tuong ung duoc gui.
-4. Test checkout PayOS sandbox/production an toan; sau khi quay ve, xac nhan URL co `status=success`, `orderCode`, `adPackage`, `adValue`.
+Chay smoke script de bat loi cau hinh co ban:
+
+```powershell
+$env:ADS_SMOKE_URL="https://lasotinhhoa.vn/lap-la-so?utm_source=google&utm_medium=cpc&utm_campaign=smoke"
+$env:ADS_EXPECTED_GOOGLE_ADS_ID="AW-XXXXXXXXXX"
+$env:NEXT_PUBLIC_GOOGLE_ADS_CREATE_CHART_LABEL="..."
+$env:NEXT_PUBLIC_GOOGLE_ADS_BEGIN_CHECKOUT_LABEL="..."
+$env:NEXT_PUBLIC_GOOGLE_ADS_PURCHASE_LABEL="..."
+$env:NEXT_PUBLIC_GOOGLE_ADS_PAID_READING_LABEL="..."
+npm run smoke:google-ads
+```
+
+Sau do smoke bang Google Tag Assistant:
+
+1. Mo Tag Assistant va connect toi `https://lasotinhhoa.vn/lap-la-so?utm_source=google&utm_medium=cpc&utm_campaign=smoke`.
+2. Xac nhan AW tag duoc nhan tren landing page.
+3. Tao mot la so test va xac nhan URL co `created=1`; event `create_chart` chi ban mot lan theo chart id.
+4. Test checkout PayOS sandbox/production an toan; sau khi quay ve voi `status=success`, xac nhan `purchase` chi ban sau khi request `/api/payments/status` tra ve `verified: true`.
 5. Kiem tra Google Ads conversion status sau vai gio den 24 gio dau.

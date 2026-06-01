@@ -17,12 +17,26 @@ declare global {
 }
 
 type AdEventPayload = Record<string, string | number | boolean | undefined>;
+type PaymentStatusResponse = {
+  verified?: boolean;
+  status?: string;
+  transactionId?: string;
+  value?: number;
+  currency?: string;
+  packageKey?: string;
+  coins?: number;
+};
 
 const DEDUPE_PREFIX = "lsth-ad-event";
 const CREATED_CHART_FLAG = "created=1";
 
 function numberFrom(value?: string | null) {
   const parsed = Number(value || 0);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : undefined;
+}
+
+function numberFromUnknown(value: unknown) {
+  const parsed = typeof value === "number" ? value : Number(value || 0);
   return Number.isFinite(parsed) && parsed > 0 ? parsed : undefined;
 }
 
@@ -78,6 +92,8 @@ export function GoogleAdsEventReporter() {
   useEffect(() => {
     const params = new URLSearchParams(searchParams.toString());
     const chartId = pathname.startsWith("/la-so/") ? pathname.split("/")[2] : "";
+    const controller = new AbortController();
+    let cancelled = false;
 
     if (params.get("created") === "1" && chartId) {
       sendOnce(`${CREATED_CHART_FLAG}:${chartId}`, "create_chart", {
@@ -88,13 +104,38 @@ export function GoogleAdsEventReporter() {
 
     const status = params.get("status");
     const orderCode = params.get("orderCode");
-    if ((status === "success" || status === "demo-paid") && orderCode) {
-      sendOnce(`orderCode:${orderCode}`, "purchase", {
+    if (status === "demo-paid" && orderCode) {
+      sendOnce(`demo-orderCode:${orderCode}`, "purchase", {
         transaction_id: orderCode,
         payment_status: status,
         package_key: params.get("adPackage") || undefined,
         value: numberFrom(params.get("adValue")),
       });
+    }
+
+    if (status === "success" && orderCode) {
+      fetch(`/api/payments/status?orderCode=${encodeURIComponent(orderCode)}`, {
+        cache: "no-store",
+        credentials: "same-origin",
+        signal: controller.signal,
+      })
+        .then((response) => (response.ok ? response.json() : null))
+        .then((paymentStatus: PaymentStatusResponse | null) => {
+          if (cancelled || !paymentStatus?.verified) return;
+
+          const transactionId = paymentStatus.transactionId || orderCode;
+          sendOnce(`verified-orderCode:${transactionId}`, "purchase", {
+            transaction_id: transactionId,
+            payment_status: paymentStatus.status || status,
+            package_key: paymentStatus.packageKey || params.get("adPackage") || undefined,
+            value: numberFromUnknown(paymentStatus.value),
+            currency: paymentStatus.currency || "VND",
+            coins: paymentStatus.coins,
+          });
+        })
+        .catch(() => {
+          // Purchase conversions must come from verified paid orders only.
+        });
     }
 
     const readingId = params.get("reading");
@@ -104,6 +145,11 @@ export function GoogleAdsEventReporter() {
         reading_id: readingId,
       });
     }
+
+    return () => {
+      cancelled = true;
+      controller.abort();
+    };
   }, [pathname, searchParams]);
 
   useEffect(() => {

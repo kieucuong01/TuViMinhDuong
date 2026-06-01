@@ -25,6 +25,13 @@ const trustLinks = [
   { href: "/kien-thuc-tu-vi", label: "Kiến thức tử vi" },
 ];
 
+const legalLinks = [
+  { href: "/chinh-sach-bao-mat", label: "Chính sách bảo mật" },
+  { href: "/dieu-khoan-su-dung", label: "Điều khoản sử dụng" },
+  { href: "/chinh-sach-thanh-toan-hoan-xu", label: "Thanh toán và hoàn xu" },
+  { href: "/lien-he", label: "Liên hệ hỗ trợ" },
+];
+
 export function SiteFooter() {
   const year = new Date().getFullYear();
 
@@ -81,6 +88,17 @@ export function SiteFooter() {
             <h2>Tài khoản và luận giải</h2>
             <ul>
               {trustLinks.map((item) => (
+                <li key={item.href}>
+                  <Link href={item.href} prefetch={false}>{item.label}</Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+
+          <nav aria-label="Chính sách và hỗ trợ">
+            <h2>Chính sách và hỗ trợ</h2>
+            <ul>
+              {legalLinks.map((item) => (
                 <li key={item.href}>
                   <Link href={item.href} prefetch={false}>{item.label}</Link>
                 </li>

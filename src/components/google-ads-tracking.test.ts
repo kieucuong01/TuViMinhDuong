@@ -20,6 +20,8 @@ describe("Google Ads tracking markers", () => {
     expect(reporterSource).toContain("localStorage");
     expect(reporterSource).toContain("created=1");
     expect(reporterSource).toContain("orderCode");
+    expect(reporterSource).toContain("/api/payments/status");
+    expect(reporterSource).toContain("verified");
     expect(reporterSource).toContain("paid_reading_request");
   });
 

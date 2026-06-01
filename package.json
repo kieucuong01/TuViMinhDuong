@@ -23,6 +23,7 @@
     "db:setup": "npm run db:deploy && npm run db:seed",
     "analyze": "ANALYZE=true next build",
     "perf:smoke": "node scripts/smoke-performance.mjs",
+    "smoke:google-ads": "node scripts/smoke-google-ads.mjs",
     "smoke:payos": "node scripts/smoke-payos-checkout.mjs"
   },
   "dependencies": {
