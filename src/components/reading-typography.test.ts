@@ -33,4 +33,11 @@ describe("reading typography", () => {
     expect(cssRule(".reading-content-panel .prose-content")).toContain("max-width: none");
     expect(cssRule(".reading-content-panel .prose-content")).toContain("overflow-wrap: anywhere");
   });
+
+  it("lets unlocked paid readings use the full card width with justified body text", () => {
+    expect(cssRule(".unlocked-reading .prose-content")).toContain("max-width: none");
+    expect(cssRule(".unlocked-reading .prose-content")).toContain("width: 100%");
+    expect(cssRule(".unlocked-reading .prose-content p,\n.unlocked-reading .prose-content li")).toContain("text-align: justify");
+    expect(cssRule(".unlocked-reading .prose-content p,\n.unlocked-reading .prose-content li")).toContain("text-justify: inter-word");
+  });
 });

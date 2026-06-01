@@ -32,6 +32,10 @@ describe("homepage balanced visual effects", () => {
     expect(globalsCss).toMatch(/\.hero-form-card:focus-within\s*{[\s\S]*box-shadow:/);
   });
 
+  it("keeps anchored returns to the chart form below the sticky header", () => {
+    expect(globalsCss).toMatch(/#lap-la-so\s*{[\s\S]*scroll-margin-top:\s*6\.25rem/);
+  });
+
   it("adds a dedicated sweep to the homepage Cat-Hung gauge", () => {
     expect(globalsCss).toContain("@keyframes fortune-gauge-orbit");
     expect(globalsCss).toContain("@keyframes fortune-gauge-glow");

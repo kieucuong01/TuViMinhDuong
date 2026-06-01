@@ -1211,6 +1211,10 @@ button.is-loading:not(.icon-button)::before {
   z-index: 1;
 }
 
+#lap-la-so {
+  scroll-margin-top: 6.25rem;
+}
+
 .hero-band .eyebrow,
 .hero-band h1,
 .hero-band p,
@@ -5502,9 +5506,12 @@ button.is-loading:not(.icon-button)::before {
 
 .unlocked-reading .prose-content {
   margin-top: 1rem;
+  width: 100%;
+  max-width: none;
   color: #4f4842;
   font-size: 1rem;
   line-height: 1.86;
+  overflow-wrap: anywhere;
 }
 
 .unlocked-reading .prose-content h1 {
@@ -5527,6 +5534,14 @@ button.is-loading:not(.icon-button)::before {
 .unlocked-reading .prose-content p,
 .unlocked-reading .prose-content ul {
   margin-top: 0.72rem;
+}
+
+.unlocked-reading .prose-content p,
+.unlocked-reading .prose-content li {
+  width: 100%;
+  max-width: none;
+  text-align: justify;
+  text-justify: inter-word;
 }
 
 .article-shell {
