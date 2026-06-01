@@ -3839,12 +3839,96 @@ button.is-loading:not(.icon-button)::before {
   line-height: 1.7;
 }
 
+.admin-tabs {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 0.65rem;
+  margin-top: 1.25rem;
+  border: 1px solid #ffedd5;
+  border-radius: 1.1rem;
+  background: rgb(255 255 255 / 0.76);
+  padding: 0.55rem;
+  box-shadow: 0 16px 44px rgb(124 45 18 / 0.07);
+}
+
+.admin-tab-link {
+  display: grid;
+  gap: 0.1rem;
+  min-height: 3.35rem;
+  align-content: center;
+  border: 1px solid transparent;
+  border-radius: 0.85rem;
+  padding: 0.55rem 0.7rem;
+  color: #57534e;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+.admin-tab-link:hover {
+  border-color: #fed7aa;
+  background: #fff7ed;
+  color: #9a3412;
+  transform: translateY(-1px);
+}
+
+.admin-tab-link.active {
+  border-color: #fb923c;
+  background: linear-gradient(135deg, #fff7ed 0%, #ffffff 100%);
+  color: #7c2d12;
+  box-shadow: inset 0 0 0 1px rgb(251 146 60 / 0.16);
+}
+
+.admin-tab-link strong,
+.admin-tab-link span {
+  display: block;
+}
+
+.admin-tab-link strong {
+  font-size: 0.94rem;
+  font-weight: 950;
+}
+
+.admin-tab-link span {
+  font-size: 0.76rem;
+  font-weight: 750;
+  line-height: 1.35;
+}
+
+.admin-tab-section {
+  margin-top: 1.25rem;
+}
+
+.admin-overview-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.admin-overview-value {
+  margin-top: 0.4rem;
+  color: #1c1917;
+  font-size: clamp(1.7rem, 3vw, 2.25rem);
+  font-weight: 950;
+  letter-spacing: 0;
+}
+
+.admin-overview-note {
+  margin-top: 0.4rem;
+  color: #78716c;
+  font-size: 0.95rem;
+  line-height: 1.65;
+}
+
 .admin-cms-grid {
   display: grid;
   grid-template-columns: minmax(0, 1.08fr) minmax(20rem, 0.92fr);
   gap: 1.5rem;
   align-items: start;
   margin-top: 2rem;
+}
+
+.admin-cms-grid.admin-tab-section {
+  margin-top: 1.25rem;
 }
 
 .admin-editor-panel {
@@ -4184,6 +4268,37 @@ button.is-loading:not(.icon-button)::before {
   margin-top: 0.12rem;
   color: #78716c;
   font-size: 0.8rem;
+}
+
+.admin-pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.85rem;
+  margin-top: 1rem;
+}
+
+.admin-pricing-row {
+  display: flex;
+  min-height: 4rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+  border: 1px solid #ffedd5;
+  border-radius: 1rem;
+  background: #fffaf4;
+  padding: 0.95rem 1rem;
+}
+
+.admin-pricing-row span {
+  color: #57534e;
+  font-weight: 850;
+}
+
+.admin-pricing-row strong {
+  color: #9a3412;
+  font-size: 1.05rem;
+  font-weight: 950;
+  white-space: nowrap;
 }
 
 .admin-article-form {
@@ -4943,6 +5058,19 @@ button.is-loading:not(.icon-button)::before {
   color: #78716c;
   font-size: 0.88rem;
   line-height: 1.55;
+}
+
+.unlock-palace-button {
+  white-space: normal;
+  align-items: center;
+  gap: 0.45rem;
+  text-align: center;
+}
+
+.unlock-palace-button span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  line-height: 1.35;
 }
 
 .reading-bundle-cta {
@@ -7425,6 +7553,15 @@ button.is-loading:not(.icon-button)::before {
   }
 
   .admin-form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-tabs {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .admin-overview-grid,
+  .admin-pricing-grid {
     grid-template-columns: 1fr;
   }
 

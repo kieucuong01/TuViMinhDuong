@@ -41,8 +41,14 @@ export function isSelfCanonicalArticle(article: { slug: string; canonicalUrl?: s
   return normalizedUrl(canonical) === normalizedUrl(expected);
 }
 
+function normalizedKeywordText(value: string) {
+  return slugify(value).replace(/-/g, " ");
+}
+
 function includesKeyword(value: string | undefined, keyword: string) {
-  return Boolean(value?.toLowerCase().includes(keyword.toLowerCase()));
+  const normalizedKeyword = normalizedKeywordText(keyword);
+  if (!value || !normalizedKeyword) return false;
+  return normalizedKeywordText(value).includes(normalizedKeyword);
 }
 
 function wordCount(content: string) {

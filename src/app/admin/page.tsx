@@ -13,6 +13,23 @@ export const metadata = {
   robots: { index: false, follow: false },
 };
 
+type AdminTab = "overview" | "users" | "revenue" | "content" | "settings" | "pricing";
+
+const adminTabs: Array<{ id: AdminTab; label: string; helper: string }> = [
+  { id: "overview", label: "Tổng quan", helper: "Chỉ số chính" },
+  { id: "users", label: "User", helper: "Tài khoản đăng ký" },
+  { id: "revenue", label: "Doanh thu", helper: "Đơn hàng và dòng tiền" },
+  { id: "content", label: "Bài viết", helper: "CMS và SEO" },
+  { id: "settings", label: "Cấu hình", helper: "Bật/tắt vận hành" },
+  { id: "pricing", label: "Giá", helper: "Xu từng tính năng" },
+];
+
+function normalizeAdminTab(params: { tab?: string; edit?: string; saved?: string; categorySaved?: string; deleted?: string; settingsSaved?: string }): AdminTab {
+  if (params.edit || params.saved || params.categorySaved || params.deleted) return "content";
+  if (params.settingsSaved) return "settings";
+  return adminTabs.some((tab) => tab.id === params.tab) ? (params.tab as AdminTab) : "overview";
+}
+
 function emptyArticle(): ArticleView {
   return {
     id: "new",
@@ -102,7 +119,7 @@ function seoChecks(article: ArticleView) {
     .filter(Boolean) as Array<{ label: string; passed: boolean; hint: string }>;
 }
 
-export default async function AdminPage({ searchParams }: { searchParams: Promise<{ saved?: string; edit?: string; categorySaved?: string; deleted?: string; settingsSaved?: string }> }) {
+export default async function AdminPage({ searchParams }: { searchParams: Promise<{ tab?: string; saved?: string; edit?: string; categorySaved?: string; deleted?: string; settingsSaved?: string }> }) {
   const user = await getCurrentUser();
   if (user?.role !== "ADMIN") redirect("/dang-nhap?next=/admin");
 
@@ -118,17 +135,18 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
   const operationSettings = overview.operationSettings;
   const checks = seoChecks(article);
   const faqRows = [...(article.faqs || []), ...Array.from({ length: 5 }, () => ({ question: "", answer: "" }))].slice(0, 5);
+  const activeTab = normalizeAdminTab(params);
 
   return (
     <main className="section" data-testid="admin-page">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="admin-hero">
           <div>
-            <p className="eyebrow">Admin CMS</p>
-            <h1 className="section-title">Quản trị bài viết, SEO và xuất bản</h1>
-            <p>Viết bài mới, lưu nháp, xuất bản, xem SEO score và mở lại bài để chỉnh sửa từ cùng một màn hình.</p>
+            <p className="eyebrow">Admin</p>
+            <h1 className="section-title">Quản trị hệ thống Lá số tinh hoa</h1>
+            <p>Chọn từng mục bên dưới để quản lý user, doanh thu, bài viết, giá và cấu hình vận hành gọn hơn.</p>
           </div>
-          <Link href="/admin" className="btn btn-primary">
+          <Link href="/admin?tab=content" className="btn btn-primary">
             <Plus size={18} /> Tạo bài mới
           </Link>
         </div>
@@ -138,7 +156,23 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
         {params.deleted ? <p className="success mt-4">Đã xóa bài viết: {params.deleted}</p> : null}
         {params.settingsSaved ? <p className="success mt-4">Đã cập nhật cấu hình vận hành.</p> : null}
 
-        <div className="mt-6 grid gap-4 md:grid-cols-5">
+        <nav className="admin-tabs" aria-label="Mục quản trị">
+          {adminTabs.map((tab) => (
+            <Link key={tab.id} href={`/admin?tab=${tab.id}`} className={tab.id === activeTab ? "admin-tab-link active" : "admin-tab-link"} aria-current={tab.id === activeTab ? "page" : undefined} prefetch={false}>
+              <strong>{tab.label}</strong>
+              <span>{tab.helper}</span>
+            </Link>
+          ))}
+        </nav>
+
+        {activeTab === "overview" ? <section className="admin-tab-section">
+          <div className="admin-panel-head">
+            <div>
+              <p className="eyebrow">Tổng quan</p>
+              <h2>Chỉ số nhanh</h2>
+            </div>
+          </div>
+          <div className="mt-4 grid gap-4 md:grid-cols-5">
           {[
             ["Users", overview.users],
             ["Lá số", overview.charts],
@@ -151,9 +185,30 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
               <span>{String(label)}</span>
             </div>
           ))}
-        </div>
+          </div>
+          <div className="admin-overview-grid">
+            <article className="panel">
+              <p className="eyebrow">Doanh thu</p>
+              <h2 className="admin-overview-value">{formatVnd(business.revenue.totalPaidVnd)}</h2>
+              <p className="admin-overview-note">{business.revenue.paidOrders} đơn đã thanh toán, {formatVnd(business.revenue.last30DaysPaidVnd)} trong 30 ngày gần nhất.</p>
+              <Link href="/admin?tab=revenue" className="btn btn-ghost btn-small mt-4" prefetch={false}>Xem doanh thu</Link>
+            </article>
+            <article className="panel">
+              <p className="eyebrow">User mới</p>
+              <h2 className="admin-overview-value">{business.recentUsers.length}</h2>
+              <p className="admin-overview-note">Danh sách gần nhất đang lấy tối đa 12 tài khoản để admin theo dõi nhanh.</p>
+              <Link href="/admin?tab=users" className="btn btn-ghost btn-small mt-4" prefetch={false}>Xem user</Link>
+            </article>
+            <article className="panel">
+              <p className="eyebrow">Bài viết</p>
+              <h2 className="admin-overview-value">{articles.length}</h2>
+              <p className="admin-overview-note">Quản lý nháp, xuất bản, preview và checklist SEO trong mục Bài viết.</p>
+              <Link href="/admin?tab=content" className="btn btn-ghost btn-small mt-4" prefetch={false}>Mở CMS</Link>
+            </article>
+          </div>
+        </section> : null}
 
-        <section className="admin-business-grid mt-6">
+        {activeTab === "revenue" ? <section className="admin-business-grid admin-tab-section">
           <div className="panel admin-revenue-panel">
             <div className="admin-panel-head">
               <div>
@@ -226,9 +281,9 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
               )}
             </div>
           </aside>
-        </section>
+        </section> : null}
 
-        <section className="panel admin-users-panel mt-6">
+        {activeTab === "users" ? <section className="panel admin-users-panel admin-tab-section">
           <div className="admin-panel-head">
             <div>
               <p className="eyebrow">User đã đăng ký</p>
@@ -279,9 +334,9 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
               </tbody>
             </table>
           </div>
-        </section>
+        </section> : null}
 
-        <section className="panel admin-operations-panel mt-6">
+        {activeTab === "settings" ? <section className="panel admin-operations-panel admin-tab-section">
           <div className="admin-panel-head">
             <div>
               <p className="eyebrow">Cấu hình vận hành</p>
@@ -325,9 +380,9 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
               </LoadingSubmitButton>
             </div>
           </form>
-        </section>
+        </section> : null}
 
-        <div className="admin-cms-grid">
+        {activeTab === "content" ? <div className="admin-cms-grid admin-tab-section">
           <section className="panel admin-editor-panel">
             <div className="admin-panel-head">
               <div>
@@ -479,24 +534,12 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
             </section>
 
             <section className="panel">
-              <p className="eyebrow">Giá tính năng</p>
-              <div className="grid gap-2 text-sm">
-                {Object.entries(overview.featurePrices).map(([key, value]) => (
-                  <div key={key} className="flex justify-between rounded-lg bg-orange-50 px-3 py-2">
-                    <span>{value.label}</span>
-                    <strong>{value.priceCoins} xu</strong>
-                  </div>
-                ))}
-              </div>
-            </section>
-
-            <section className="panel">
               <div className="admin-panel-head">
                 <div>
                   <p className="eyebrow">Bài trong CMS</p>
                   <h2>{articles.length} bài</h2>
                 </div>
-                <Link href="/admin" className="btn btn-ghost btn-small">
+                <Link href="/admin?tab=content" className="btn btn-ghost btn-small">
                   <Plus size={17} /> Mới
                 </Link>
               </div>
@@ -514,7 +557,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
                       </div>
                     </div>
                     <div className="admin-row-actions">
-                      <Link href={`/admin?edit=${item.slug}`} className="btn btn-ghost btn-small" prefetch={false}>Sửa</Link>
+                      <Link href={`/admin?tab=content&edit=${item.slug}`} className="btn btn-ghost btn-small" prefetch={false}>Sửa</Link>
                       <Link href={`/admin/preview/${item.slug}`} className="btn btn-ghost btn-small" prefetch={false}>Preview</Link>
                       {item.status === "published" ? (
                         <Link href={`/kien-thuc-tu-vi/${item.slug}`} className="btn btn-ghost btn-small" prefetch={false}>Xem</Link>
@@ -526,7 +569,24 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
               </div>
             </section>
           </aside>
-        </div>
+        </div> : null}
+
+        {activeTab === "pricing" ? <section className="panel admin-pricing-panel admin-tab-section">
+          <div className="admin-panel-head">
+            <div>
+              <p className="eyebrow">Giá tính năng</p>
+              <h2>Xu cần dùng cho từng loại luận giải</h2>
+            </div>
+          </div>
+          <div className="admin-pricing-grid">
+            {Object.entries(overview.featurePrices).map(([key, value]) => (
+              <div key={key} className="admin-pricing-row">
+                <span>{value.label}</span>
+                <strong>{value.priceCoins} xu</strong>
+              </div>
+            ))}
+          </div>
+        </section> : null}
       </div>
     </main>
   );

@@ -46,8 +46,9 @@ function UnlockPalaceButton({ chartId, palaceName, hasBundleAccess = false }: { 
       <input type="hidden" name="type" value="PALACE" />
       <input type="hidden" name="scopeKey" value={palaceName} />
       <input type="hidden" name="next" value={`/la-so/${chartId}?view=luan-cung#${anchor}-reading`} />
-      <LoadingSubmitButton className="btn btn-primary w-full sm:w-auto" loadingText="Đang mở..." data-testid={`unlock-palace-${palaceName}`}>
-        <LockKeyhole size={18} /> {hasBundleAccess ? "Đọc luận chi tiết - đã mua gói" : `Đọc luận chi tiết - ${formatCoins(FEATURE_PRICES.PALACE.priceCoins)}`}
+      <LoadingSubmitButton className="btn btn-primary unlock-palace-button w-full sm:w-auto" loadingText="Đang mở..." data-testid={`unlock-palace-${palaceName}`}>
+        <LockKeyhole size={18} />
+        <span>{hasBundleAccess ? "Đọc luận chi tiết - đã mua gói" : `Đọc luận chi tiết - ${formatCoins(FEATURE_PRICES.PALACE.priceCoins)}`}</span>
       </LoadingSubmitButton>
       <p className="unlock-microcopy">{hasBundleAccess ? "Không trừ xu thêm nhờ gói trọn nhóm." : "Mở một lần, lưu lại để xem lại khi cần."}</p>
     </form>

@@ -60,6 +60,187 @@ const cta = `## Thực hành trên lá số cá nhân
 
 export const seedArticles: ArticleView[] = [
   article({
+    title: "Xem ngày tốt tháng 6/2026: Ngày đẹp nên chọn, ngày cần tránh",
+    slug: "xem-ngay-tot-thang-6-2026",
+    excerpt: "Danh sách ngày tốt tháng 6/2026 theo lịch âm, trực, hoàng đạo và sao tốt xấu, kèm cách chọn ngày hợp tuổi cho khai trương, ký kết, cưới hỏi.",
+    focusKeyword: "xem ngày tốt tháng 6 2026",
+    coverImage: "/articles/xem-ngay-tot-xau.svg",
+    coverAlt: "Lịch xem ngày tốt tháng 6 năm 2026 theo âm lịch và hoàng đạo",
+    metaTitle: "Xem ngày tốt tháng 6/2026: Ngày đẹp cần biết",
+    metaDescription: "Xem ngày tốt tháng 6/2026 theo lịch âm, trực, hoàng đạo và sao tốt xấu; gợi ý ngày nên chọn, ngày cần tránh và cách xét theo tuổi.",
+    canonicalUrl: "/kien-thuc-tu-vi/xem-ngay-tot-thang-6-2026",
+    date: "2026-05-31",
+    faqs: [
+      {
+        question: "Ngày tốt tháng 6/2026 có dùng chung cho mọi tuổi không?",
+        answer: "Không nên dùng hoàn toàn chung. Danh sách ngày tốt chỉ là lớp tổng quát; khi làm việc lớn cần xét thêm năm sinh, tuổi xung hợp, giờ hoàng đạo và điều kiện thực tế.",
+      },
+      {
+        question: "Tháng 6/2026 có ngày nào nên tránh khai trương hoặc ký kết không?",
+        answer: "Theo engine xem ngày của Lá số tinh hoa, các ngày 6/6, 7/6, 19/6, 21/6 và 24/6 có nhiều tín hiệu cần thận trọng hơn, nên hạn chế mở việc lớn nếu có lựa chọn khác.",
+      },
+      {
+        question: "Nên chọn ngày tốt theo dương lịch hay âm lịch?",
+        answer: "Người dùng thường chọn theo ngày dương để lên lịch, nhưng khi luận tốt xấu cần đối chiếu ngày âm, can chi, trực, hoàng đạo, nhị thập bát tú và tuổi của người đứng việc.",
+      },
+    ],
+    content: `Xem ngày tốt tháng 6 2026 là việc nhiều người tìm trước khi bước vào tháng mới, nhất là khi cần khai trương, ký hợp đồng, cưới hỏi, xuất hành, chuyển nhà hoặc bắt đầu một kế hoạch quan trọng. Nhưng một ngày được gọi là "đẹp" không nên hiểu là tốt tuyệt đối cho mọi người.
+
+Bài viết này tổng hợp các ngày nổi bật trong tháng 6/2026 theo engine [xem ngày tốt xấu](/xem-ngay) của Lá số tinh hoa. Cách tính đối chiếu âm lịch, can chi, 12 trực, hoàng đạo - hắc đạo, nhị thập bát tú, sao tốt xấu và điểm phù hợp theo từng việc. Khi cần dùng thật, bạn vẫn nên nhập thêm năm sinh trên công cụ để xét xung hợp theo tuổi.
+
+## Tổng quan tháng 6/2026
+
+Tháng 6 dương lịch năm 2026 có 30 ngày. Theo lịch âm trong hệ thống, ngày 1/6/2026 rơi vào 16/4 âm lịch, và từ ngày 15/6/2026 bắt đầu tháng 5 âm lịch. Vì vậy, khi xem ngày trong tháng này cần chú ý cả hai lớp: lịch dương để sắp công việc, lịch âm để luận can chi và vận khí.
+
+Nếu bạn đang tìm góc nhìn rộng hơn cho cả tháng, có thể đọc thêm bài [tử vi tháng 6/2026](/kien-thuc-tu-vi/tu-vi-thang-6-2026). Bài đó giúp đặt ngày tốt vào bối cảnh lá số cá nhân, đại vận, lưu niên và nguyệt vận, tránh việc chỉ chọn ngày mà bỏ qua mục tiêu thật sự.
+
+## Những ngày tốt tháng 6/2026 nên ưu tiên
+
+Dưới đây là nhóm ngày có điểm tổng quát nổi bật trong engine xem ngày. Danh sách này phù hợp để tham khảo trước, sau đó bạn nên chọn tiếp theo việc cần làm và tuổi của người đứng việc.
+
+- 02/06/2026: 17/4 âm, ngày Đinh Mùi, trực Mãn, hoàng đạo, sao Vĩ. Nên ưu tiên việc tổng quát, cưới hỏi, khai trương.
+- 15/06/2026: 1/5 âm, ngày Canh Thân, trực Mãn, hoàng đạo, sao Tất. Hợp cưới hỏi, khai trương và việc mở đầu tháng âm.
+- 25/06/2026: 11/5 âm, ngày Canh Ngọ, trực Kiến, hoàng đạo, sao Giác. Hợp khai trương, ký hợp đồng, học tập, cầu danh.
+- 22/06/2026: 8/5 âm, ngày Đinh Mão, trực Thu, hoàng đạo, sao Trương. Hợp ký kết, chốt việc, gom kết quả.
+- 13/06/2026: 28/4 âm, ngày Mậu Ngọ, trực Trừ, hoàng đạo, sao Vị. Hợp khai trương, ký hợp đồng, xử lý việc tồn.
+
+Những ngày trên không có nghĩa là cứ làm là thành. Ngày tốt giống điều kiện thuận gió: nếu kế hoạch chưa rõ, giấy tờ còn thiếu, tài chính chưa chắc hoặc người tham gia chưa thống nhất, bạn vẫn nên chuẩn bị thêm thay vì vội chọn ngày.
+
+## Ngày nào hợp khai trương, ký kết, cưới hỏi?
+
+Với khai trương, nhóm ngày đáng chú ý là 02/06, 15/06, 25/06 và 13/06. Đây là các ngày có nhiều tín hiệu hỗ trợ cho việc mở cửa, khởi động, giới thiệu dịch vụ hoặc công bố kế hoạch. Riêng 25/06 hợp hơn với khai mở có tính học tập, danh tiếng, ký kết, vì ngày này có sao Giác và hoàng đạo.
+
+Với ký hợp đồng, nên nhìn kỹ 25/06, 22/06, 13/06 và 04/06. Ngày 22/06 có trực Thu, hợp việc chốt lại, thu gom kết quả, hoàn tất điều khoản. Dù vậy, ký kết vẫn cần ưu tiên kiểm tra nội dung hợp đồng, trách nhiệm, dòng tiền, điều khoản phạt và người có thẩm quyền.
+
+Với cưới hỏi, nhóm ngày 02/06 và 15/06 nổi bật hơn trong tháng. Một số ngày trung bình vẫn có thể dùng nếu hợp tuổi, hợp giờ và gia đình thuận tiện, nhưng không nên chỉ dựa vào điểm tổng quát. Cưới hỏi cần xem thêm tuổi hai bên, ngày xung, giờ đón dâu và điều kiện thực tế của gia đình.
+
+## Những ngày cần cân nhắc trong tháng 6/2026
+
+Một số ngày có nhiều tín hiệu bất lợi hơn thuận lợi, nên giảm việc lớn hoặc chuyển sang việc rà soát, dọn dẹp, sửa sai:
+
+- 06/06/2026: ngày Tân Hợi, trực Phá, sao Nữ; nên tránh ký kết lớn, khai trương hoặc việc cần sự mở rộng nhanh.
+- 07/06/2026: ngày Nhâm Tý, trực Nguy, hắc đạo, sao Hư; hợp cảnh giác, kiểm tra rủi ro hơn là khởi sự.
+- 19/06/2026: ngày Giáp Tý, trực Phá, sao Quỷ; không nên chọn cho khai trương, ký hợp đồng hoặc việc cần hình ảnh tốt.
+- 21/06/2026: ngày Bính Dần, hắc đạo, sao Tinh; dễ sinh cảm giác vội, nên tránh cưới hỏi, khai trương, động thổ.
+- 24/06/2026: ngày Kỷ Tỵ, trực Bế, hắc đạo; hợp đóng việc cũ, nghỉ ngơi, rà soát hơn là mở việc mới.
+
+Nếu bắt buộc phải làm trong các ngày này, hãy giảm quy mô, chọn giờ tốt, chuẩn bị hồ sơ kỹ và tránh quyết định cảm tính. Với các việc có tiền lớn, pháp lý hoặc sức khỏe, lời khuyên chuyên môn vẫn quan trọng hơn mọi lịch chọn ngày.
+
+## Cách tự chọn ngày hợp tuổi trong tháng 6/2026
+
+Để chọn ngày sát hơn, bạn nên đi theo bốn bước.
+
+Trước hết, xác định việc cần làm. Khai trương, ký hợp đồng, cưới hỏi, xuất hành và động thổ không dùng cùng một tiêu chí. Có ngày hợp khai trương nhưng chưa chắc hợp cưới hỏi; có ngày hợp ký kết nhưng không nên xuất hành xa.
+
+Tiếp theo, chọn vài ngày tổng quát tốt hoặc trung bình khá. Đừng chỉ lấy một ngày duy nhất rồi ép mọi việc theo ngày đó. Hãy có hai đến ba phương án để còn xét tuổi, giờ và điều kiện thực tế.
+
+Sau đó, nhập năm sinh trên công cụ [xem ngày tốt xấu](/xem-ngay). Hệ thống sẽ xét thêm thiên can, địa chi, tam hợp, lục hợp, lục xung, tương hại và tương phá. Đây là bước giúp cá nhân hóa danh sách ngày tốt tháng 6/2026.
+
+Cuối cùng, chọn giờ hoàng đạo và chuẩn bị việc thật. Ngày đẹp không thay thế hợp đồng tốt, kế hoạch rõ, sức khỏe ổn và người tham gia đồng thuận. Nếu các điều kiện này chưa đủ, chọn một ngày trung bình nhưng chuẩn bị kỹ vẫn có thể tốt hơn ngày đẹp mà làm vội.
+
+## Nên đọc ngày tốt cùng lá số hay chỉ xem lịch?
+
+Nếu việc nhỏ, xem lịch ngày tốt xấu là đủ để tham khảo. Nhưng với việc lớn như cưới hỏi, chuyển hướng công việc, đầu tư, mua bán lớn hoặc khai trương quan trọng, nên đọc thêm lá số cá nhân. Lá số cho biết giai đoạn hiện tại đang thiên về mở rộng, tích lũy, học lại hay giữ ổn định.
+
+Bạn có thể bắt đầu bằng cách [lập lá số tử vi miễn phí](/#lap-la-so), rồi đọc thêm [Nguyệt vận và Nhật vận](/kien-thuc-tu-vi/nguyet-van-nhat-van). Khi hiểu vận tháng, bạn sẽ biết nên dùng ngày tốt để mở việc mới, hoàn thiện việc cũ hay đơn giản là giảm rủi ro.
+
+Tóm lại, ngày tốt tháng 6/2026 đáng chú ý gồm 02/06, 15/06, 25/06, 22/06 và 13/06. Các ngày 06/06, 07/06, 19/06, 21/06 và 24/06 nên cân nhắc hơn với việc lớn. Hãy dùng danh sách này như bản lọc đầu tiên, rồi xét tiếp theo tuổi, việc cần làm, giờ tốt và điều kiện thực tế.
+
+${cta}`,
+  }),
+  article({
+    title: "Tử vi tháng 6/2026: Cách xem vận tháng theo lá số cá nhân",
+    slug: "tu-vi-thang-6-2026",
+    excerpt: "Tử vi tháng 6/2026 nên được đọc từ lá số gốc, đại vận, lưu niên và ngày tốt xấu, giúp bạn lên kế hoạch công việc, tiền bạc, sức khỏe bình tĩnh hơn.",
+    focusKeyword: "tử vi tháng 6 2026",
+    coverImage: "/articles/nguyet-nhat-van.svg",
+    coverAlt: "Lịch tháng 6 năm 2026 và lá số tử vi cá nhân",
+    metaTitle: "Tử vi tháng 6/2026: Cách xem vận tháng cá nhân",
+    metaDescription: "Tử vi tháng 6/2026 nên được đọc từ lá số gốc, đại vận, lưu niên và ngày tốt xấu để lên kế hoạch công việc, tiền bạc, sức khỏe.",
+    canonicalUrl: "/kien-thuc-tu-vi/tu-vi-thang-6-2026",
+    date: "2026-05-28",
+    faqs: [
+      {
+        question: "Tử vi tháng 6/2026 có đúng cho tất cả mọi người không?",
+        answer: "Không. Bài viết chỉ giúp bạn hiểu cách đọc vận tháng. Muốn sát hơn cần có ngày, giờ sinh, giới tính, lá số gốc, đại vận và lưu niên của từng người.",
+      },
+      {
+        question: "Nên xem tử vi tháng 6/2026 theo dương lịch hay âm lịch?",
+        answer: "Khi lập lá số cần nhập đúng dữ liệu sinh theo hệ thống đang dùng. Với kế hoạch đời sống hằng ngày, bạn có thể bắt đầu từ tháng 6 dương lịch rồi đối chiếu thêm ngày âm, trực, sao tốt xấu trên công cụ xem ngày.",
+      },
+      {
+        question: "Có nên quyết định tiền bạc hoặc công việc chỉ dựa vào tử vi tháng không?",
+        answer: "Không nên. Tử vi tháng chỉ là lớp tham khảo để nhắc bạn chuẩn bị kỹ hơn. Quyết định quan trọng vẫn cần dữ liệu thực tế, năng lực tài chính và lời khuyên chuyên môn khi cần.",
+      },
+    ],
+    content: `Tử vi tháng 6 2026 là chủ đề được nhiều người tìm trước khi bước sang tháng mới. Nhưng nếu chỉ đọc một bảng dự đoán chung cho 12 con giáp, bạn rất dễ nhận lời khuyên quá rộng: ai cũng thấy có phần đúng, nhưng khó biết mình nên làm gì ngay tuần này.
+
+Cách đọc bình tĩnh hơn là xem tháng 6/2026 như một lớp thời gian ngắn, đặt lên trên lá số gốc, đại vận, lưu niên và lịch ngày tốt xấu. Khi đó, tử vi không còn là một câu phán cố định, mà trở thành bản nhắc việc: tháng này nên ưu tiên điều gì, việc nào cần kiểm tra kỹ, lúc nào nên giảm tốc.
+
+## Tử vi tháng 6/2026 nên xem theo hướng nào?
+
+Tháng 6 dương lịch là giai đoạn nhiều người bắt đầu rà lại kế hoạch giữa năm: công việc đã đi đúng hướng chưa, tài chính có cần siết lại không, sức khỏe có dấu hiệu quá tải không, quan hệ gia đình có điều gì cần nói rõ hơn không. Vì vậy, ý định tìm kiếm "tử vi tháng 6/2026" thường không chỉ là tò mò, mà là nhu cầu chuẩn bị.
+
+Với Lá số tinh hoa, cách xem phù hợp là đi từ cá nhân đến kế hoạch. Trước hết, bạn cần biết lá số gốc nói gì về Cung Mệnh, Cung Thân, Cung Tài Bạch, Cung Quan Lộc và Cung Tật Ách. Sau đó mới ghép thêm vận năm, vận tháng và từng ngày cụ thể.
+
+Nếu chưa có lá số, bạn có thể [lập lá số tử vi miễn phí](/#lap-la-so) trước. Nếu đã có nền tảng, hãy đọc thêm bài [lá số tử vi là gì](/kien-thuc-tu-vi/la-so-tu-vi-la-gi) để hiểu vì sao cùng một tháng nhưng mỗi người lại có trọng tâm khác nhau.
+
+## Bước 1: Nhìn lại lá số gốc trước khi xem vận tháng
+
+Lá số gốc là nền. Nó cho biết khí chất, xu hướng hành động, cách kiếm tiền, cách chịu áp lực và kiểu môi trường dễ phát huy. Khi xem vận tháng mà bỏ qua lá số gốc, bạn chỉ còn một bản dự đoán chung.
+
+Ví dụ, một người có Cung Quan Lộc mạnh thường nên dùng tháng mới để sắp xếp mục tiêu nghề nghiệp, học thêm kỹ năng hoặc nhận trách nhiệm rõ hơn. Người có Cung Tài Bạch cần quản trị rủi ro thì tháng 6/2026 nên rà lại dòng tiền, tránh quyết định theo cảm xúc. Người đang chịu áp lực ở Cung Tật Ách nên ưu tiên ngủ nghỉ, khám định kỳ và giảm quá tải.
+
+Điểm quan trọng là không lấy một sao hay một cung để kết luận toàn bộ tháng. Hãy đọc theo cụm: Mệnh - Thân cho biết nền người, Quan Lộc cho biết việc, Tài Bạch cho biết tiền, Phu Thê và Phúc Đức cho biết quan hệ nâng đỡ, Tật Ách cho biết nhịp sức khỏe.
+
+## Bước 2: Ghép đại vận và lưu niên năm Bính Ngọ
+
+Năm 2026 là năm Bính Ngọ. Khi bước vào tháng 6/2026, bạn không chỉ đang sống trong một tháng riêng lẻ, mà còn đang đi trong nhịp năm. Vì vậy, nên xem tháng này là một đoạn nhỏ của vận năm và đại vận hiện tại.
+
+[Đại vận](/kien-thuc-tu-vi/dai-van-la-gi) cho biết giai đoạn 10 năm đang nghiêng về mở rộng, tích lũy, học lại hay chuyển hướng. Lưu niên cho biết năm hiện tại kích hoạt chủ đề nào. Nguyệt vận giúp đưa các chủ đề đó xuống mức hành động gần hơn: tháng này nên bắt đầu, hoàn thiện, đàm phán, nghỉ ngơi hay chuẩn bị.
+
+Nếu đại vận đang thuận cho học tập và nghề nghiệp, tháng 6 có thể là thời điểm đặt lại lịch làm việc, hoàn thiện hồ sơ, học một kỹ năng rõ ràng. Nếu đại vận đang nhắc về tài chính, bạn nên ưu tiên ngân sách, khoản nợ, khoản đầu tư và mức dự phòng. Nếu vận năm đang tạo nhiều biến động quan hệ, hãy chọn cách nói chuyện chậm hơn, rõ hơn, tránh quyết định lúc nóng.
+
+## Bước 3: Dùng nguyệt vận để chọn trọng tâm tháng
+
+Nguyệt vận không nên được hiểu là "tháng này chắc chắn tốt" hoặc "tháng này chắc chắn xấu". Nó giống một tấm lịch chiến lược: việc nào nên đưa lên trước, việc nào nên lùi lại, việc nào cần thêm người hỗ trợ.
+
+Bạn có thể tự hỏi bốn câu:
+
+- Công việc: tháng này nên mở rộng, hoàn thiện hay dọn việc tồn?
+- Tài chính: nên tăng thu, giảm chi, thu hồi nợ hay tránh đầu tư vội?
+- Quan hệ: nên chủ động kết nối hay giữ khoảng lặng để tránh hiểu lầm?
+- Sức khỏe: nên tăng tốc hay giảm tải để giữ nhịp bền?
+
+Nếu muốn hiểu rõ hơn hai lớp thời gian ngắn, hãy đọc bài [Nguyệt vận và Nhật vận](/kien-thuc-tu-vi/nguyet-van-nhat-van). Sau khi xác định trọng tâm tháng, bạn có thể dùng công cụ [xem ngày tốt xấu](/xem-ngay) để chọn ngày phù hợp cho từng việc cụ thể.
+
+## Gợi ý ứng dụng cho công việc, tiền bạc và sức khỏe
+
+Với công việc, tử vi tháng 6/2026 nên được dùng để chọn nhịp. Nếu bạn đang muốn đổi việc, ký hợp đồng, mở dự án hoặc xin tăng trách nhiệm, hãy kiểm tra lại ba điểm: năng lực đã đủ chưa, thông tin đã rõ chưa, người hỗ trợ đã sẵn chưa. Một ngày tốt không bù được kế hoạch sơ sài.
+
+Với tiền bạc, tháng mới là thời điểm hợp lý để nhìn lại dòng tiền nửa đầu năm. Hãy ghi rõ khoản cần giữ, khoản có thể đầu tư, khoản cần dừng và khoản phải dự phòng. Nếu lá số hoặc vận tháng nhắc đến rủi ro tài chính, lời khuyên thực tế là chậm lại một nhịp, đọc kỹ hợp đồng và tránh vay mượn vì sĩ diện.
+
+Với sức khỏe, đừng đợi đến khi quá mệt mới điều chỉnh. Cung Tật Ách và vận tháng có thể được xem như tín hiệu nhắc bạn ngủ đều hơn, uống đủ nước, kiểm tra định kỳ và giảm những lịch hẹn không cần thiết. Tử vi tốt nhất là tử vi giúp mình sống có kỷ luật hơn, không phải sống lo lắng hơn.
+
+## Những sai lầm thường gặp khi đọc tử vi tháng
+
+Sai lầm đầu tiên là đọc một bảng chung rồi áp vào mọi quyết định cá nhân. Người cùng tuổi vẫn khác giờ sinh, khác giới tính, khác đại vận, khác hoàn cảnh gia đình và công việc. Vì vậy, cùng một lời khuyên có thể hợp với người này nhưng chưa chắc hợp với người khác.
+
+Sai lầm thứ hai là chỉ tìm ngày đẹp mà bỏ qua sự chuẩn bị. Nếu cần ký giấy tờ, yếu tố quan trọng vẫn là nội dung hợp đồng, năng lực thực hiện và người chịu trách nhiệm. Nếu cần đi xa, hãy kiểm tra lịch trình, sức khỏe và giấy tờ trước khi xét ngày.
+
+Sai lầm thứ ba là đọc tử vi theo hướng tự hù dọa. Một tín hiệu khó không có nghĩa là tháng đó hỏng. Nó thường là lời nhắc để quản trị rủi ro: nói rõ hơn, kiểm tra kỹ hơn, nghỉ đúng lúc hơn và không hành động vì bốc đồng.
+
+## Khi nào nên lập lá số cá nhân?
+
+Bạn nên lập lá số cá nhân nếu đang có một quyết định cụ thể trong tháng 6/2026: đổi việc, mở kinh doanh nhỏ, cưới hỏi, mua bán lớn, chuyển nhà, đi xa hoặc xử lý chuyện gia đình. Lá số giúp bạn nhìn rõ hơn trọng tâm của mình thay vì chạy theo quá nhiều dự đoán ngoài kia.
+
+Người mới có thể bắt đầu bằng bài [cách đọc lá số tử vi cho người mới](/kien-thuc-tu-vi/cach-doc-la-so-tu-vi-cho-nguoi-moi), sau đó đọc tiếp [12 cung trong lá số tử vi](/kien-thuc-tu-vi/12-cung-trong-la-so-tu-vi). Khi có nền tảng, việc xem tử vi tháng sẽ bớt mơ hồ và bớt phụ thuộc vào may rủi.
+
+Tóm lại, tử vi tháng 6/2026 nên được dùng như một công cụ lập kế hoạch mềm: biết việc cần ưu tiên, nhận diện điểm cần thận trọng và chọn ngày phù hợp cho những việc quan trọng. Càng đọc theo lá số cá nhân, bạn càng tránh được cảm giác mông lung khi đứng trước quá nhiều lời dự đoán chung.
+
+${cta}`,
+  }),
+  article({
     title: "Tử vi hằng ngày: Cách đọc vận khí không mê tín",
     slug: "tu-vi-hang-ngay-cach-doc-van-khi",
     excerpt: "Cách đọc tử vi hằng ngày theo hướng ứng dụng: kết hợp lá số gốc, nhịp tháng, nhịp ngày và quyết định thực tế.",

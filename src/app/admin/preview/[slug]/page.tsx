@@ -27,7 +27,7 @@ export default async function AdminArticlePreviewPage({ params }: { params: Prom
           <strong>{article.status === "published" ? "Bài đã xuất bản" : article.status === "archived" ? "Bài đang lưu trữ" : "Bản nháp chưa public"}</strong>
         </div>
         <div>
-          <Link href={`/admin?edit=${article.slug}`} className="btn btn-ghost btn-small" prefetch={false}>Sửa bài</Link>
+          <Link href={`/admin?tab=content&edit=${article.slug}`} className="btn btn-ghost btn-small" prefetch={false}>Sửa bài</Link>
           {article.status === "published" ? <Link href={`/kien-thuc-tu-vi/${article.slug}`} className="btn btn-primary btn-small" prefetch={false}>Xem public</Link> : null}
         </div>
       </div>
@@ -36,7 +36,7 @@ export default async function AdminArticlePreviewPage({ params }: { params: Prom
         <nav className="article-breadcrumb" aria-label="Breadcrumb">
           <Link href="/admin">Admin</Link>
           <span>/</span>
-          <Link href={`/admin?edit=${article.slug}`}>CMS</Link>
+          <Link href={`/admin?tab=content&edit=${article.slug}`}>CMS</Link>
         </nav>
         <p className="eyebrow">Kiến thức tử vi</p>
         <h1 className="text-balance text-4xl font-black leading-tight text-stone-950 sm:text-5xl">{article.title}</h1>

@@ -342,7 +342,7 @@ export async function saveArticleAction(formData: FormData) {
   revalidatePath("/kien-thuc-tu-vi");
   if (originalSlug && originalSlug !== article.slug) revalidatePath(`/kien-thuc-tu-vi/${originalSlug}`);
   revalidatePath(`/kien-thuc-tu-vi/${article.slug}`);
-  redirect(`/admin?edit=${article.slug}&saved=${article.slug}`);
+  redirect(`/admin?tab=content&edit=${article.slug}&saved=${article.slug}`);
 }
 
 export async function deleteArticleAction(formData: FormData) {
@@ -355,7 +355,7 @@ export async function deleteArticleAction(formData: FormData) {
     revalidatePath("/kien-thuc-tu-vi");
     revalidatePath(`/kien-thuc-tu-vi/${slug}`);
   }
-  redirect(`/admin${slug ? `?deleted=${encodeURIComponent(slug)}` : ""}`);
+  redirect(`/admin?tab=content${slug ? `&deleted=${encodeURIComponent(slug)}` : ""}`);
 }
 
 export async function saveArticleCategoryAction(formData: FormData) {
@@ -364,7 +364,7 @@ export async function saveArticleCategoryAction(formData: FormData) {
   const category = await saveArticleCategoryFromForm(formData);
   revalidatePath("/admin");
   revalidatePath("/kien-thuc-tu-vi");
-  redirect(`/admin?categorySaved=${category.slug}`);
+  redirect(`/admin?tab=content&categorySaved=${category.slug}`);
 }
 
 export async function saveOperationSettingsAction(formData: FormData) {
@@ -388,7 +388,7 @@ export async function saveOperationSettingsAction(formData: FormData) {
   revalidatePath("/admin");
   revalidatePath("/nap-xu");
   revalidatePath("/pricing");
-  redirect("/admin?settingsSaved=1");
+  redirect("/admin?tab=settings&settingsSaved=1");
 }
 
 export async function createCheckoutAction(formData: FormData) {

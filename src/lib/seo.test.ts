@@ -40,6 +40,32 @@ Xem thêm [Cung Thân](/kien-thuc-tu-vi/cung-menh-cung-than).`,
     expect(strong.score).toBeGreaterThan(weak.score);
     expect(strong.score).toBeGreaterThanOrEqual(70);
   });
+
+  it("matches Vietnamese keywords against clean URL slugs", () => {
+    const result = scoreArticleSeo({
+      title: "Tử vi tháng 6/2026: Cách xem vận tháng cá nhân",
+      slug: "tu-vi-thang-6-2026",
+      excerpt: "Tử vi tháng 6/2026 nên được đọc từ lá số gốc, đại vận, lưu niên và ngày tốt xấu để lên kế hoạch bình tĩnh hơn.",
+      focusKeyword: "tử vi tháng 6 2026",
+      metaTitle: "Tử vi tháng 6/2026: Cách xem vận tháng cá nhân",
+      metaDescription: "Tử vi tháng 6/2026 nên được đọc từ lá số gốc, đại vận, lưu niên và ngày tốt xấu để lên kế hoạch công việc, tiền bạc, sức khỏe.",
+      canonicalUrl: "/kien-thuc-tu-vi/tu-vi-thang-6-2026",
+      coverAlt: "Lịch tháng 6 năm 2026 và lá số tử vi cá nhân",
+      schemaType: "Article",
+      content: `Tử vi tháng 6 2026 là chủ đề nhiều người tìm trước khi bước sang tháng mới.
+
+## Cách đọc vận tháng
+
+${"Nên đối chiếu lá số gốc, đại vận, lưu niên và bối cảnh thực tế. ".repeat(90)}
+
+## Đọc cùng ngày tốt xấu
+
+Xem thêm [xem ngày tốt xấu](/xem-ngay).`,
+    });
+
+    expect(result.checks.find((check) => check.label === "Từ khóa trong slug")?.passed).toBe(true);
+    expect(result.score).toBe(100);
+  });
 });
 
 describe("Structured data", () => {
