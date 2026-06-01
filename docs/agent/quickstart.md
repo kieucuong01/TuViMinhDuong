@@ -42,7 +42,7 @@ Purpose: this is the first low-token context file for any new AI agent. Read thi
 - AI readings must use chart JSON from the engine; do not recalculate chart logic in prompts/UI.
 - Chart/date engine changes need focused fixtures/tests.
 - Guest users must not see money-only policy/support links such as refund/topup policy in public footer/contact/sitemap.
-- Logged-in users need visible account actions, including logout, saved charts, coin balance/topup, and payment/refund policy.
+- Logged-in users need visible account actions, including logout, saved charts, and coin balance/topup. Payment/refund policy belongs in the footer for logged-in users, not the account menu.
 
 ## Current Operational Notes
 

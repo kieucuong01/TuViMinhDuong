@@ -6,8 +6,8 @@
 - `src/app/api/payments/status/route.ts` exposes a current-user order status check for conversion verification.
 - Google Ads setup and smoke instructions live in `docs/google-ads.md`; real `AW-...` IDs and labels must stay in env/Vercel, not the repo.
 - Public trust pages now include privacy, terms, contact, and an authenticated payment/refund policy page.
-- `/chinh-sach-thanh-toan-hoan-xu` is a logged-in route and is intentionally kept out of the public footer and sitemap.
-- Guest contact/footer surfaces should not expose topup/refund/money-only links. Logged-in account menu should expose payment/refund policy, coin balance/topup, saved charts, and logout.
+- `/chinh-sach-thanh-toan-hoan-xu` is a logged-in route and is intentionally kept out of the guest footer and sitemap.
+- Guest contact/footer surfaces should not expose topup/refund/money-only links. Logged-in footer should expose payment/refund policy. Logged-in account menu should expose coin balance/topup, saved charts, and logout.
 - Header account UX is sensitive on mobile: do not hide the logout form when compacting account text.
 
 ## Recent Update: Admin Operation Toggles

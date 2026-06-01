@@ -48,7 +48,7 @@ Use this README only when the quickstart is not enough. For current project drif
 - CMS: admin article editing with SEO score and public article pages at `/kien-thuc-tu-vi/[slug]`.
 - Payment: PayOS checkout/webhook credits coins idempotently; `CoinLedger` is the source of truth.
 - Google Ads: `/lap-la-so` is the ad landing page; purchase conversion waits for verified paid order status.
-- Public trust: privacy, terms, contact are public; payment/refund policy is for logged-in users and stays out of public footer/sitemap.
+- Public trust: privacy, terms, contact are public; payment/refund policy appears in the footer only for logged-in users and stays out of guest footer/sitemap.
 - Admin operation toggles can disable payments, coin topups, and public paid-reading surfaces; paid-reading shutdown does not apply to admins.
 
 ## Architecture Map

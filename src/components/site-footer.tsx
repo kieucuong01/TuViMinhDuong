@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { BookOpenText, CalendarDays, LogIn, Sparkles } from "lucide-react";
+import { FooterAccountPolicyLink } from "@/components/footer-account-policy-link";
 import { APP_NAME } from "@/lib/env";
 
 const primaryLinks = [
@@ -101,6 +102,7 @@ export function SiteFooter() {
                   <Link href={item.href} prefetch={false}>{item.label}</Link>
                 </li>
               ))}
+              <FooterAccountPolicyLink />
             </ul>
           </nav>
 

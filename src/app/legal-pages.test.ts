@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 
 const appRoot = fileURLToPath(new URL("./", import.meta.url));
 const footerSource = readFileSync(fileURLToPath(new URL("../components/site-footer.tsx", import.meta.url)), "utf8");
+const footerAccountPolicySource = readFileSync(fileURLToPath(new URL("../components/footer-account-policy-link.tsx", import.meta.url)), "utf8");
 const sitemapSource = readFileSync(fileURLToPath(new URL("./sitemap.ts", import.meta.url)), "utf8");
 
 function pageSource(path: string) {
@@ -26,6 +27,7 @@ describe("legal and trust pages for ads readiness", () => {
     }
     expect(footerSource).not.toContain("/chinh-sach-thanh-toan-hoan-xu");
     expect(footerSource).not.toContain("/nap-xu");
+    expect(footerSource).toContain("FooterAccountPolicyLink");
   });
 
   it("includes public trust pages in the sitemap", () => {
@@ -40,5 +42,8 @@ describe("legal and trust pages for ads readiness", () => {
     expect(pageSource("chinh-sach-thanh-toan-hoan-xu")).toContain('redirect("/dang-nhap?next=/chinh-sach-thanh-toan-hoan-xu")');
     expect(pageSource("lien-he")).toContain("authOnly");
     expect(pageSource("lien-he")).toContain("visibleSupportItems");
+    expect(footerAccountPolicySource).toContain('fetch("/api/me"');
+    expect(footerAccountPolicySource).toContain("Boolean(data.user)");
+    expect(footerAccountPolicySource).toContain('href="/chinh-sach-thanh-toan-hoan-xu"');
   });
 });

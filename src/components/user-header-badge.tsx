@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
-import { ChevronDown, Coins, FileText, LogOut, ReceiptText, ShieldCheck, UserCircle } from "lucide-react";
+import { ChevronDown, Coins, FileText, LogOut, ShieldCheck, UserCircle } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { logoutAction } from "@/app/actions";
 import { loginModalHref } from "@/components/login-modal-link";
@@ -121,9 +121,6 @@ export function UserHeaderBadge() {
           </Link>
           <Link href="/nap-xu" prefetch={false}>
             <Coins size={15} /> Nạp xu <span className="user-account-popover-value">{coinLabel}</span>
-          </Link>
-          <Link href="/chinh-sach-thanh-toan-hoan-xu" prefetch={false}>
-            <ReceiptText size={15} /> Thanh toán và hoàn xu
           </Link>
           {user.role === "ADMIN" ? (
             <Link href="/admin" prefetch={false}>

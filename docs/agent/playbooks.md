@@ -103,7 +103,7 @@ Rules:
 - Do not credit coins from a return URL alone.
 - Do not fire purchase conversion from a return URL alone. It must wait for verified paid order state.
 - Guests should not see money-only support/policy links in public footer/contact/sitemap.
-- Logged-in users should see coin balance, saved charts, logout, topup, and payment/refund policy from the account menu.
+- Logged-in users should see coin balance, saved charts, logout, and topup from the account menu. Payment/refund policy belongs in the footer for logged-in users.
 - Prefer modal or inline payment entry so users do not lose chart/report context.
 
 Done:

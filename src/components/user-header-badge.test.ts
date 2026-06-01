@@ -24,9 +24,9 @@ describe("user header coin balance", () => {
     expect(userHeaderSource).toContain("useCloseDetailsOnOutsideClick(detailsRef)");
   });
 
-  it("keeps logout and money policy links inside the logged-in account menu on mobile", () => {
+  it("keeps logout inside the logged-in account menu on mobile", () => {
     expect(userHeaderSource).toContain("user-account-logout-form");
-    expect(userHeaderSource).toContain('href="/chinh-sach-thanh-toan-hoan-xu"');
+    expect(userHeaderSource).not.toContain('href="/chinh-sach-thanh-toan-hoan-xu"');
     expect(globalsCss).not.toMatch(/\.user-header-badge\s+\.user-account-value,\s*\n\s*\.user-header-badge\s+form\s*{[\s\S]*display:\s*none/);
   });
 
