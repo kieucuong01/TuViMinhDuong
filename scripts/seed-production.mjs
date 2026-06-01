@@ -29,7 +29,7 @@ function id(prefix) {
 }
 
 const featurePrices = [
-  ["FULL", "Luận giải toàn bộ", 139],
+  ["FULL", "Luận giải toàn bộ", 199],
   ["PALACE", "Luận cung", 20],
   ["DAI_VAN", "Luận đại vận", 34],
   ["TIEU_VAN", "Luận tiểu vận", 27],

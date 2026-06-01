@@ -3,9 +3,9 @@ import { FEATURE_PRICES } from "@/lib/pricing";
 import { readingBundleItemPrice } from "@/lib/reading-bundles";
 
 describe("reading feature pricing", () => {
-  it("keeps paid reading prices about 30 percent lower than the original launch prices", () => {
+  it("keeps the full reading at 199 coins while focused readings stay discounted", () => {
     expect(FEATURE_PRICES).toMatchObject({
-      FULL: { priceCoins: 139 },
+      FULL: { priceCoins: 199 },
       PALACE: { priceCoins: 20 },
       DAI_VAN: { priceCoins: 34 },
       TIEU_VAN: { priceCoins: 27 },
