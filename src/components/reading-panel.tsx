@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { FEATURE_PRICES, type ReadingKey } from "@/lib/pricing";
+import type { FeaturePriceMap, ReadingKey } from "@/lib/pricing";
 import { formatCoins } from "@/lib/format";
 import type { TuViChart } from "@/lib/chart";
 
@@ -12,7 +12,7 @@ const options: { type: ReadingKey; href: (chartId: string) => string; label: str
   { type: "NHAT_VAN", href: (chartId) => `/la-so/${chartId}?view=nhat-van`, label: "Luận nhật vận", description: "Xem ngày đang quan tâm với gợi ý việc nên làm và giờ tốt.", cta: "Xem ngày" },
 ];
 
-export function ReadingPanel({ chartId, chart }: { chartId: string; chart: TuViChart }) {
+export function ReadingPanel({ chartId, chart, featurePrices }: { chartId: string; chart: TuViChart; featurePrices: FeaturePriceMap }) {
   return (
     <section className="panel">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
@@ -26,7 +26,7 @@ export function ReadingPanel({ chartId, chart }: { chartId: string; chart: TuViC
       </div>
       <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
         {options.map((option) => {
-          const price = FEATURE_PRICES[option.type].priceCoins;
+          const price = featurePrices[option.type].priceCoins;
           return (
             <Link
               key={option.type}

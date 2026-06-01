@@ -1,7 +1,7 @@
 import Link from "next/link";
-import { Banknote, Eye, FilePenLine, Plus, ReceiptText, SearchCheck, SlidersHorizontal, UsersRound } from "lucide-react";
+import { Banknote, Coins, Eye, FilePenLine, Plus, ReceiptText, SearchCheck, SlidersHorizontal, Trash2, UsersRound, X } from "lucide-react";
 import { redirect } from "next/navigation";
-import { saveArticleAction, saveArticleCategoryAction, saveOperationSettingsAction } from "@/app/actions";
+import { adjustUserCoinsAction, deleteUserAction, saveArticleAction, saveArticleCategoryAction, saveFeaturePricesAction, saveOperationSettingsAction } from "@/app/actions";
 import { getCurrentUser } from "@/lib/auth";
 import { getAdminArticleBySlug, getAdminBusinessDashboard, getAdminOverview, listAdminArticles, listArticleCategories } from "@/lib/data";
 import type { ArticleView } from "@/lib/content";
@@ -14,6 +14,7 @@ export const metadata = {
 };
 
 type AdminTab = "overview" | "users" | "revenue" | "content" | "settings" | "pricing";
+const ARTICLES_PER_ADMIN_PAGE = 8;
 
 const adminTabs: Array<{ id: AdminTab; label: string; helper: string }> = [
   { id: "overview", label: "Tổng quan", helper: "Chỉ số chính" },
@@ -24,10 +25,27 @@ const adminTabs: Array<{ id: AdminTab; label: string; helper: string }> = [
   { id: "pricing", label: "Giá", helper: "Xu từng tính năng" },
 ];
 
-function normalizeAdminTab(params: { tab?: string; edit?: string; saved?: string; categorySaved?: string; deleted?: string; settingsSaved?: string }): AdminTab {
+function normalizeAdminTab(params: { tab?: string; edit?: string; saved?: string; categorySaved?: string; deleted?: string; settingsSaved?: string; userAdjusted?: string; userDeleted?: string; userError?: string; pricingSaved?: string; pricingError?: string; articleModal?: string; articlePage?: string }): AdminTab {
   if (params.edit || params.saved || params.categorySaved || params.deleted) return "content";
   if (params.settingsSaved) return "settings";
+  if (params.userAdjusted || params.userDeleted || params.userError) return "users";
+  if (params.pricingSaved || params.pricingError) return "pricing";
   return adminTabs.some((tab) => tab.id === params.tab) ? (params.tab as AdminTab) : "overview";
+}
+
+function clampPage(value: string | undefined, pageCount: number) {
+  const parsed = Number.parseInt(value || "1", 10);
+  if (!Number.isFinite(parsed)) return 1;
+  return Math.min(Math.max(parsed, 1), pageCount);
+}
+
+function adminContentHref(params: Record<string, string | number | null | undefined>) {
+  const query = new URLSearchParams({ tab: "content" });
+  Object.entries(params).forEach(([key, value]) => {
+    if (value === null || value === undefined || value === "") return;
+    query.set(key, String(value));
+  });
+  return `/admin?${query.toString()}`;
 }
 
 function emptyArticle(): ArticleView {
@@ -119,7 +137,7 @@ function seoChecks(article: ArticleView) {
     .filter(Boolean) as Array<{ label: string; passed: boolean; hint: string }>;
 }
 
-export default async function AdminPage({ searchParams }: { searchParams: Promise<{ tab?: string; saved?: string; edit?: string; categorySaved?: string; deleted?: string; settingsSaved?: string }> }) {
+export default async function AdminPage({ searchParams }: { searchParams: Promise<{ tab?: string; saved?: string; edit?: string; categorySaved?: string; deleted?: string; settingsSaved?: string; userAdjusted?: string; userDeleted?: string; userError?: string; pricingSaved?: string; pricingError?: string; articleModal?: string; articlePage?: string }> }) {
   const user = await getCurrentUser();
   if (user?.role !== "ADMIN") redirect("/dang-nhap?next=/admin");
 
@@ -136,6 +154,11 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
   const checks = seoChecks(article);
   const faqRows = [...(article.faqs || []), ...Array.from({ length: 5 }, () => ({ question: "", answer: "" }))].slice(0, 5);
   const activeTab = normalizeAdminTab(params);
+  const articlePageCount = Math.max(1, Math.ceil(articles.length / ARTICLES_PER_ADMIN_PAGE));
+  const articlePage = clampPage(params.articlePage, articlePageCount);
+  const paginatedArticles = articles.slice((articlePage - 1) * ARTICLES_PER_ADMIN_PAGE, articlePage * ARTICLES_PER_ADMIN_PAGE);
+  const isArticleModalOpen = activeTab === "content" && (params.articleModal === "new" || Boolean(params.edit));
+  const closeArticleModalHref = adminContentHref({ articlePage });
 
   return (
     <main className="section" data-testid="admin-page">
@@ -146,7 +169,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
             <h1 className="section-title">Quản trị hệ thống Lá số tinh hoa</h1>
             <p>Chọn từng mục bên dưới để quản lý user, doanh thu, bài viết, giá và cấu hình vận hành gọn hơn.</p>
           </div>
-          <Link href="/admin?tab=content" className="btn btn-primary">
+          <Link href="/admin?tab=content&articleModal=new" className="btn btn-primary">
             <Plus size={18} /> Tạo bài mới
           </Link>
         </div>
@@ -155,6 +178,11 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
         {params.categorySaved ? <p className="success mt-4">Đã lưu danh mục: {params.categorySaved}</p> : null}
         {params.deleted ? <p className="success mt-4">Đã xóa bài viết: {params.deleted}</p> : null}
         {params.settingsSaved ? <p className="success mt-4">Đã cập nhật cấu hình vận hành.</p> : null}
+        {params.userAdjusted ? <p className="success mt-4">Đã cập nhật xu cho user: {params.userAdjusted}</p> : null}
+        {params.userDeleted ? <p className="success mt-4">Đã xóa user: {params.userDeleted}</p> : null}
+        {params.userError ? <p className="alert mt-4">{params.userError}</p> : null}
+        {params.pricingSaved ? <p className="success mt-4">Đã cập nhật bảng giá luận giải.</p> : null}
+        {params.pricingError ? <p className="alert mt-4">{params.pricingError}</p> : null}
 
         <nav className="admin-tabs" aria-label="Mục quản trị">
           {adminTabs.map((tab) => (
@@ -306,6 +334,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
                   <th>Đơn đã thanh toán</th>
                   <th>Tổng chi</th>
                   <th>Lần thanh toán gần nhất</th>
+                  <th>Thao tác admin</th>
                 </tr>
               </thead>
               <tbody>
@@ -323,10 +352,40 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
                     <td>{item.paidOrdersCount}</td>
                     <td>{formatVnd(item.totalPaidVnd)}</td>
                     <td>{readableDateTime(item.lastPaymentAt)}</td>
+                    <td className="admin-user-action-cell">
+                      <div className="admin-user-actions">
+                        <form action={adjustUserCoinsAction} className="admin-user-credit-form" data-testid={`admin-user-coins-${item.id}`} data-loading-message="Đang cập nhật xu..." data-loading-label="Đang cập nhật...">
+                          <input type="hidden" name="userId" value={item.id} />
+                          <label>
+                            <span>Số xu</span>
+                            <input name="amount" type="number" inputMode="numeric" min="1" step="1" placeholder="Xu" required aria-label={`Số xu cho ${item.email}`} />
+                          </label>
+                          <label>
+                            <span>Lý do</span>
+                            <input name="reason" placeholder="Lý do" aria-label={`Lý do chỉnh xu cho ${item.email}`} />
+                          </label>
+                          <div className="admin-user-credit-buttons">
+                            <LoadingSubmitButton className="btn btn-primary btn-small" name="direction" value="credit" loadingText="Đang cộng...">
+                              <Coins size={15} /> Cộng
+                            </LoadingSubmitButton>
+                            <LoadingSubmitButton className="btn btn-ghost btn-small" name="direction" value="debit" loadingText="Đang thu...">
+                              Thu hồi
+                            </LoadingSubmitButton>
+                          </div>
+                        </form>
+                        <form action={deleteUserAction} className="admin-user-delete-form" data-loading-message="Đang xóa user..." data-loading-label="Đang xóa...">
+                          <input type="hidden" name="userId" value={item.id} />
+                          <LoadingSubmitButton className="btn btn-danger btn-small" loadingText="Đang xóa..." disabled={item.role === "ADMIN" || item.id === user.id} data-testid={`admin-user-delete-${item.id}`}>
+                            <Trash2 size={15} /> Xóa user
+                          </LoadingSubmitButton>
+                          {item.role === "ADMIN" || item.id === user.id ? <small>Không xóa tài khoản admin.</small> : <small>Xóa vĩnh viễn user và dữ liệu phụ thuộc.</small>}
+                        </form>
+                      </div>
+                    </td>
                   </tr>
                 )) : (
                   <tr>
-                    <td colSpan={9}>
+                    <td colSpan={10}>
                       <span>Chưa có user nào trong dữ liệu hiện tại.</span>
                     </td>
                   </tr>
@@ -383,93 +442,63 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
         </section> : null}
 
         {activeTab === "content" ? <div className="admin-cms-grid admin-tab-section">
-          <section className="panel admin-editor-panel">
+          <section className="panel admin-article-board">
             <div className="admin-panel-head">
               <div>
-                <p className="eyebrow">CMS bài viết</p>
-                <h2>{editingArticle ? "Sửa bài SEO" : "Tạo bài SEO mới"}</h2>
+                <p className="eyebrow">Bài viết hiện tại</p>
+                <h2>Quản lý toàn bộ bài trong CMS</h2>
               </div>
-              {editingArticle?.status === "published" ? (
-                <Link href={`/kien-thuc-tu-vi/${editingArticle.slug}`} className="btn btn-ghost btn-small" prefetch={false}>
-                  <Eye size={17} /> Xem public
-                </Link>
-              ) : null}
-              {editingArticle ? (
-                <Link href={`/admin/preview/${editingArticle.slug}`} className="btn btn-ghost btn-small" prefetch={false}>
-                  <Eye size={17} /> Preview
-                </Link>
-              ) : null}
+              <Link href="/admin?tab=content&articleModal=new" className="btn btn-primary btn-small" prefetch={false}>
+                <Plus size={17} /> Tạo bài mới
+              </Link>
             </div>
-
-            <form action={saveArticleAction} className="admin-article-form" data-testid="admin-article-form" data-loading-message="Đang lưu bài viết..." data-loading-label="Đang lưu...">
-              <input type="hidden" name="originalSlug" value={article.slug} />
-
-              <div className="admin-form-row">
-                <label><span>Tiêu đề</span><input name="title" defaultValue={article.title} required data-testid="admin-article-title" /></label>
-                <label>
-                  <span>Trạng thái</span>
-                  <select name="status" defaultValue={article.status === "published" || article.status === "archived" ? article.status : "draft"} data-testid="admin-article-status">
-                    <option value="draft">Nháp</option>
-                    <option value="published">Xuất bản</option>
-                    <option value="archived">Lưu trữ</option>
-                  </select>
-                </label>
-              </div>
-
-              <label>
-                <span>Danh mục</span>
-                <select name="categoryId" defaultValue={article.categoryId || ""} data-testid="admin-article-category">
-                  <option value="">Chưa chọn danh mục</option>
-                  {categories.map((category) => (
-                    <option key={category.id} value={category.id}>
-                      {category.name}
-                    </option>
-                  ))}
-                </select>
-              </label>
-
-              <div className="admin-form-row">
-                <label><span>Slug</span><input name="slug" defaultValue={article.slug} placeholder="tu-khoa-bai-viet" data-testid="admin-article-slug" /></label>
-                <label><span>Focus keyword</span><input name="focusKeyword" defaultValue={article.focusKeyword || ""} data-testid="admin-article-focus-keyword" /></label>
-              </div>
-
-              <label><span>Excerpt</span><textarea name="excerpt" rows={3} defaultValue={article.excerpt} data-testid="admin-article-excerpt" /></label>
-
-              <div className="admin-form-row">
-                <label><span>Meta title</span><input name="metaTitle" defaultValue={article.metaTitle || ""} data-testid="admin-article-meta-title" /></label>
-                <label><span>Canonical URL</span><input name="canonicalUrl" defaultValue={article.canonicalUrl || (article.slug ? `/kien-thuc-tu-vi/${article.slug}` : "")} data-testid="admin-article-canonical" /></label>
-              </div>
-
-              <label><span>Meta description</span><textarea name="metaDescription" rows={2} defaultValue={article.metaDescription || ""} data-testid="admin-article-meta-description" /></label>
-
-              <div className="admin-form-row">
-                <label><span>Ảnh đại diện</span><input name="coverImage" defaultValue={article.coverImage || ""} data-testid="admin-article-cover-image" /></label>
-                <label><span>Alt ảnh đại diện</span><input name="coverAlt" defaultValue={article.coverAlt || ""} data-testid="admin-article-cover-alt" /></label>
-              </div>
-
-              <label><span>Nội dung Markdown</span><textarea name="content" rows={16} defaultValue={article.content} data-testid="admin-article-content" /></label>
-
-              <fieldset className="admin-faq-editor">
-                <legend>FAQ trong bài viết</legend>
-                <p>Chỉ những cặp câu hỏi và câu trả lời đầy đủ mới hiện ngoài public và sinh FAQ schema.</p>
-                {faqRows.map((faq, index) => (
-                  <div key={index} className="admin-faq-row">
-                    <label><span>Câu hỏi {index + 1}</span><input name="faqQuestion[]" defaultValue={faq.question} data-testid={`admin-faq-question-${index}`} /></label>
-                    <label><span>Câu trả lời {index + 1}</span><textarea name="faqAnswer[]" rows={2} defaultValue={faq.answer} data-testid={`admin-faq-answer-${index}`} /></label>
+            <p className="admin-board-note">
+              Hiển thị {paginatedArticles.length} / {articles.length} bài. Trang {articlePage} / {articlePageCount}.
+            </p>
+            <div className="admin-article-list">
+              {paginatedArticles.length ? paginatedArticles.map((item) => (
+                <article key={item.slug} className={item.slug === article.slug ? "admin-article-row active" : "admin-article-row"}>
+                  <div>
+                    <h3>{item.title}</h3>
+                    <p>/{item.slug}</p>
+                    <div className="admin-row-meta">
+                      <span className={`admin-status ${item.status === "published" ? "published" : item.status === "archived" ? "archived" : "draft"}`}>{statusLabel(item.status)}</span>
+                      {item.category ? <span>{item.category.name}</span> : null}
+                      <span className={`admin-seo-mini ${seoTone(item.seoScore)}`}>SEO {item.seoScore || 0}</span>
+                      <span>{readableDate(item.publishedAt || item.updatedAt)}</span>
+                    </div>
                   </div>
+                  <div className="admin-row-actions">
+                    <Link href={adminContentHref({ articleModal: "edit", edit: item.slug, articlePage })} className="btn btn-ghost btn-small" prefetch={false}>Sửa</Link>
+                    <Link href={`/admin/preview/${item.slug}`} className="btn btn-ghost btn-small" prefetch={false}>Preview</Link>
+                    {item.status === "published" ? (
+                      <Link href={`/kien-thuc-tu-vi/${item.slug}`} className="btn btn-ghost btn-small" prefetch={false}>Xem</Link>
+                    ) : null}
+                    <AdminArticleDeleteForm slug={item.slug} title={item.title} />
+                  </div>
+                </article>
+              )) : (
+                <p className="admin-empty-note">Chưa có bài viết nào trong CMS.</p>
+              )}
+            </div>
+            {articlePageCount > 1 ? (
+              <nav className="admin-article-pagination" aria-label="Phân trang bài viết">
+                <Link href={adminContentHref({ articlePage: Math.max(1, articlePage - 1) })} className={articlePage <= 1 ? "disabled" : ""} aria-disabled={articlePage <= 1} prefetch={false}>
+                  Trước
+                </Link>
+                {Array.from({ length: articlePageCount }, (_, index) => index + 1).map((page) => (
+                  <Link key={page} href={adminContentHref({ articlePage: page })} className={page === articlePage ? "active" : ""} aria-current={page === articlePage ? "page" : undefined} prefetch={false}>
+                    {page}
+                  </Link>
                 ))}
-              </fieldset>
-
-              <div className="admin-submit-row">
-                <LoadingSubmitButton className="btn btn-primary" loadingText="Đang lưu..." data-testid="admin-article-submit">
-                  <FilePenLine size={18} /> Lưu bài và chấm SEO
-                </LoadingSubmitButton>
-                <span>Chỉ trạng thái “Xuất bản” hiện ngoài public. Nháp và Lưu trữ chỉ xem được trong admin preview.</span>
-              </div>
-            </form>
+                <Link href={adminContentHref({ articlePage: Math.min(articlePageCount, articlePage + 1) })} className={articlePage >= articlePageCount ? "disabled" : ""} aria-disabled={articlePage >= articlePageCount} prefetch={false}>
+                  Sau
+                </Link>
+              </nav>
+            ) : null}
           </section>
 
-          <aside className="grid gap-6">
+          <section className="admin-content-support-grid">
             <section className="panel">
               <div className="admin-panel-head">
                 <div>
@@ -494,81 +523,145 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
                 ))}
               </div>
             </section>
+          </section>
 
-            <section className="panel">
-              <div className="admin-panel-head">
-                <div>
-                  <p className="eyebrow">SEO checklist</p>
-                  <h2>Điểm hiện tại</h2>
+          {isArticleModalOpen ? (
+            <div className="admin-article-modal" role="dialog" aria-modal="true" aria-labelledby="admin-article-modal-title">
+              <Link href={closeArticleModalHref} className="admin-article-modal-backdrop" aria-label="Đóng trình soạn bài viết" prefetch={false} />
+              <section className="panel admin-editor-panel admin-article-modal-card">
+                <div className="admin-panel-head admin-modal-head">
+                  <div>
+                    <p className="eyebrow">CMS bài viết</p>
+                    <h2 id="admin-article-modal-title">{editingArticle ? "Sửa bài SEO" : "Tạo bài SEO mới"}</h2>
+                  </div>
+                  <div className="admin-modal-actions">
+                    {editingArticle?.status === "published" ? (
+                      <Link href={`/kien-thuc-tu-vi/${editingArticle.slug}`} className="btn btn-ghost btn-small" prefetch={false}>
+                        <Eye size={17} /> Xem public
+                      </Link>
+                    ) : null}
+                    {editingArticle ? (
+                      <Link href={`/admin/preview/${editingArticle.slug}`} className="btn btn-ghost btn-small" prefetch={false}>
+                        <Eye size={17} /> Preview
+                      </Link>
+                    ) : null}
+                    <Link href={closeArticleModalHref} className="btn btn-ghost btn-small" prefetch={false} aria-label="Đóng">
+                      <X size={17} /> Đóng
+                    </Link>
+                  </div>
                 </div>
-                <span className={`admin-seo-score ${seoTone(article.seoScore)}`}>{article.seoScore || 0}/100</span>
-              </div>
-              {checks.length ? (
-                <div className="admin-seo-checks">
-                  {checks.map((check) => (
-                    <div key={check.label} data-pass={check.passed ? "true" : "false"}>
-                      <SearchCheck size={17} />
-                      <span>
-                        <strong>{check.label}</strong>
-                        {check.hint ? <small>{check.hint}</small> : null}
-                      </span>
+
+                <div className="admin-modal-body-grid">
+                  <form action={saveArticleAction} className="admin-article-form" data-testid="admin-article-form" data-loading-message="Đang lưu bài viết..." data-loading-label="Đang lưu...">
+                    <input type="hidden" name="originalSlug" value={article.slug} />
+
+                    <div className="admin-form-row">
+                      <label><span>Tiêu đề</span><input name="title" defaultValue={article.title} required data-testid="admin-article-title" /></label>
+                      <label>
+                        <span>Trạng thái</span>
+                        <select name="status" defaultValue={article.status === "published" || article.status === "archived" ? article.status : "draft"} data-testid="admin-article-status">
+                          <option value="draft">Nháp</option>
+                          <option value="published">Xuất bản</option>
+                          <option value="archived">Lưu trữ</option>
+                        </select>
+                      </label>
                     </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="mt-3 text-sm leading-6 text-stone-600">Lưu bài một lần để hệ thống chấm SEO và hiện checklist.</p>
-              )}
-            </section>
 
-            <section className="panel">
-              <p className="eyebrow">SEO preview</p>
-              <div className="admin-serp-preview">
-                <span>{article.canonicalUrl || (article.slug ? `/kien-thuc-tu-vi/${article.slug}` : "/kien-thuc-tu-vi/slug-bai-viet")}</span>
-                <strong>{article.metaTitle || article.title || "Tiêu đề SEO sẽ hiển thị ở đây"}</strong>
-                <p>{article.metaDescription || article.excerpt || "Meta description giúp người đọc hiểu nhanh nội dung bài viết trước khi bấm vào kết quả tìm kiếm."}</p>
-              </div>
-              <div className="admin-preview-hints">
-                <span>Title: {(article.metaTitle || article.title || "").length}/60</span>
-                <span>Description: {(article.metaDescription || article.excerpt || "").length}/160</span>
-              </div>
-            </section>
+                    <label>
+                      <span>Danh mục</span>
+                      <select name="categoryId" defaultValue={article.categoryId || ""} data-testid="admin-article-category">
+                        <option value="">Chưa chọn danh mục</option>
+                        {categories.map((category) => (
+                          <option key={category.id} value={category.id}>
+                            {category.name}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
 
-            <section className="panel">
-              <div className="admin-panel-head">
-                <div>
-                  <p className="eyebrow">Bài trong CMS</p>
-                  <h2>{articles.length} bài</h2>
-                </div>
-                <Link href="/admin?tab=content" className="btn btn-ghost btn-small">
-                  <Plus size={17} /> Mới
-                </Link>
-              </div>
-              <div className="admin-article-list">
-                {articles.map((item) => (
-                  <article key={item.slug} className={item.slug === article.slug ? "admin-article-row active" : "admin-article-row"}>
-                    <div>
-                      <h3>{item.title}</h3>
-                      <p>/{item.slug}</p>
-                      <div className="admin-row-meta">
-                        <span className={`admin-status ${item.status === "published" ? "published" : item.status === "archived" ? "archived" : "draft"}`}>{statusLabel(item.status)}</span>
-                        {item.category ? <span>{item.category.name}</span> : null}
-                        <span className={`admin-seo-mini ${seoTone(item.seoScore)}`}>SEO {item.seoScore || 0}</span>
-                        <span>{readableDate(item.publishedAt || item.updatedAt)}</span>
+                    <div className="admin-form-row">
+                      <label><span>Slug</span><input name="slug" defaultValue={article.slug} placeholder="tu-khoa-bai-viet" data-testid="admin-article-slug" /></label>
+                      <label><span>Focus keyword</span><input name="focusKeyword" defaultValue={article.focusKeyword || ""} data-testid="admin-article-focus-keyword" /></label>
+                    </div>
+
+                    <label><span>Excerpt</span><textarea name="excerpt" rows={3} defaultValue={article.excerpt} data-testid="admin-article-excerpt" /></label>
+
+                    <div className="admin-form-row">
+                      <label><span>Meta title</span><input name="metaTitle" defaultValue={article.metaTitle || ""} data-testid="admin-article-meta-title" /></label>
+                      <label><span>Canonical URL</span><input name="canonicalUrl" defaultValue={article.canonicalUrl || (article.slug ? `/kien-thuc-tu-vi/${article.slug}` : "")} data-testid="admin-article-canonical" /></label>
+                    </div>
+
+                    <label><span>Meta description</span><textarea name="metaDescription" rows={2} defaultValue={article.metaDescription || ""} data-testid="admin-article-meta-description" /></label>
+
+                    <div className="admin-form-row">
+                      <label><span>Ảnh đại diện</span><input name="coverImage" defaultValue={article.coverImage || ""} data-testid="admin-article-cover-image" /></label>
+                      <label><span>Alt ảnh đại diện</span><input name="coverAlt" defaultValue={article.coverAlt || ""} data-testid="admin-article-cover-alt" /></label>
+                    </div>
+
+                    <label><span>Nội dung Markdown</span><textarea name="content" rows={16} defaultValue={article.content} data-testid="admin-article-content" /></label>
+
+                    <fieldset className="admin-faq-editor">
+                      <legend>FAQ trong bài viết</legend>
+                      <p>Chỉ những cặp câu hỏi và câu trả lời đầy đủ mới hiện ngoài public và sinh FAQ schema.</p>
+                      {faqRows.map((faq, index) => (
+                        <div key={index} className="admin-faq-row">
+                          <label><span>Câu hỏi {index + 1}</span><input name="faqQuestion[]" defaultValue={faq.question} data-testid={`admin-faq-question-${index}`} /></label>
+                          <label><span>Câu trả lời {index + 1}</span><textarea name="faqAnswer[]" rows={2} defaultValue={faq.answer} data-testid={`admin-faq-answer-${index}`} /></label>
+                        </div>
+                      ))}
+                    </fieldset>
+
+                    <div className="admin-submit-row">
+                      <LoadingSubmitButton className="btn btn-primary" loadingText="Đang lưu..." data-testid="admin-article-submit">
+                        <FilePenLine size={18} /> Lưu bài và chấm SEO
+                      </LoadingSubmitButton>
+                      <span>Chỉ trạng thái “Xuất bản” hiện ngoài public. Nháp và Lưu trữ chỉ xem được trong admin preview.</span>
+                    </div>
+                  </form>
+
+                  <aside className="admin-modal-side">
+                    <section>
+                      <div className="admin-panel-head">
+                        <div>
+                          <p className="eyebrow">SEO checklist</p>
+                          <h2>Điểm hiện tại</h2>
+                        </div>
+                        <span className={`admin-seo-score ${seoTone(article.seoScore)}`}>{article.seoScore || 0}/100</span>
                       </div>
-                    </div>
-                    <div className="admin-row-actions">
-                      <Link href={`/admin?tab=content&edit=${item.slug}`} className="btn btn-ghost btn-small" prefetch={false}>Sửa</Link>
-                      <Link href={`/admin/preview/${item.slug}`} className="btn btn-ghost btn-small" prefetch={false}>Preview</Link>
-                      {item.status === "published" ? (
-                        <Link href={`/kien-thuc-tu-vi/${item.slug}`} className="btn btn-ghost btn-small" prefetch={false}>Xem</Link>
-                      ) : null}
-                      <AdminArticleDeleteForm slug={item.slug} title={item.title} />
-                    </div>
-                  </article>
-                ))}
-              </div>
-            </section>
-          </aside>
+                      {checks.length ? (
+                        <div className="admin-seo-checks">
+                          {checks.map((check) => (
+                            <div key={check.label} data-pass={check.passed ? "true" : "false"}>
+                              <SearchCheck size={17} />
+                              <span>
+                                <strong>{check.label}</strong>
+                                {check.hint ? <small>{check.hint}</small> : null}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="mt-3 text-sm leading-6 text-stone-600">Lưu bài một lần để hệ thống chấm SEO và hiện checklist.</p>
+                      )}
+                    </section>
+
+                    <section>
+                      <p className="eyebrow">SEO preview</p>
+                      <div className="admin-serp-preview">
+                        <span>{article.canonicalUrl || (article.slug ? `/kien-thuc-tu-vi/${article.slug}` : "/kien-thuc-tu-vi/slug-bai-viet")}</span>
+                        <strong>{article.metaTitle || article.title || "Tiêu đề SEO sẽ hiển thị ở đây"}</strong>
+                        <p>{article.metaDescription || article.excerpt || "Meta description giúp người đọc hiểu nhanh nội dung bài viết trước khi bấm vào kết quả tìm kiếm."}</p>
+                      </div>
+                      <div className="admin-preview-hints">
+                        <span>Title: {(article.metaTitle || article.title || "").length}/60</span>
+                        <span>Description: {(article.metaDescription || article.excerpt || "").length}/160</span>
+                      </div>
+                    </section>
+                  </aside>
+                </div>
+              </section>
+            </div>
+          ) : null}
         </div> : null}
 
         {activeTab === "pricing" ? <section className="panel admin-pricing-panel admin-tab-section">
@@ -578,14 +671,33 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
               <h2>Xu cần dùng cho từng loại luận giải</h2>
             </div>
           </div>
-          <div className="admin-pricing-grid">
+          <form action={saveFeaturePricesAction} className="admin-pricing-form" data-testid="admin-pricing-form" data-loading-message="Đang lưu bảng giá..." data-loading-label="Đang lưu...">
+            <div className="admin-pricing-grid">
             {Object.entries(overview.featurePrices).map(([key, value]) => (
-              <div key={key} className="admin-pricing-row">
+              <label key={key} className="admin-pricing-row">
                 <span>{value.label}</span>
-                <strong>{value.priceCoins} xu</strong>
-              </div>
+                <input
+                  className="admin-pricing-input"
+                  name={`priceCoins:${key}`}
+                  type="number"
+                  inputMode="numeric"
+                  min="0"
+                  max="999999"
+                  step="1"
+                  defaultValue={value.priceCoins}
+                  aria-label={`Giá xu cho ${value.label}`}
+                  required
+                />
+              </label>
             ))}
-          </div>
+            </div>
+            <div className="admin-pricing-actions">
+              <p>Giá này dùng chung cho nút mở luận giải, paywall và số xu bị trừ khi người dùng xác nhận.</p>
+              <LoadingSubmitButton className="btn btn-primary" loadingText="Đang lưu...">
+                Lưu bảng giá
+              </LoadingSubmitButton>
+            </div>
+          </form>
         </section> : null}
       </div>
     </main>

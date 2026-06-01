@@ -8,7 +8,7 @@ import { getCachedReading, getCompletedReadingsForScopes } from "@/lib/data";
 import type { StoredReading } from "@/lib/data";
 import { formatCoins } from "@/lib/format";
 import { getDailyFateItem, getDailyMonthTrend, getMajorFateItems, getMinorFateItems, getMonthlyFateItems, type FateReadingItem } from "@/lib/fate-analysis";
-import { FEATURE_PRICES } from "@/lib/pricing";
+import type { FeaturePriceMap } from "@/lib/pricing";
 import { readingBundleScopeKey, type ReadingBundleKey } from "@/lib/reading-bundles";
 import type { SessionUser } from "@/lib/auth";
 import type { TuViChart } from "@/lib/chart";
@@ -18,6 +18,7 @@ type FateViewProps = {
   chart: TuViChart;
   user: SessionUser | null;
   activeReadingId?: string;
+  featurePrices: FeaturePriceMap;
 };
 
 function anchorId(value: string) {
@@ -29,8 +30,9 @@ function anchorId(value: string) {
     .replace(/^-|-$/g, "");
 }
 
-function OpenButton({ chartId, item, nextPath, hasBundleAccess = false }: { chartId: string; item: FateReadingItem; nextPath: string; hasBundleAccess?: boolean }) {
+function OpenButton({ chartId, item, nextPath, featurePrices, hasBundleAccess = false }: { chartId: string; item: FateReadingItem; nextPath: string; featurePrices: FeaturePriceMap; hasBundleAccess?: boolean }) {
   const anchor = anchorId(item.scopeKey);
+  const priceCoins = featurePrices[item.type].priceCoins;
   return (
     <form className="fate-open-action" action={requestReadingAction} data-loading-message="Đang mở phần luận giải..." data-loading-label="Đang mở...">
       <input type="hidden" name="chartId" value={chartId} />
@@ -38,7 +40,7 @@ function OpenButton({ chartId, item, nextPath, hasBundleAccess = false }: { char
       <input type="hidden" name="scopeKey" value={item.scopeKey} />
       <input type="hidden" name="next" value={`${nextPath}#${anchor}-reading`} />
       <LoadingSubmitButton className="fate-open-button" loadingText="Đang mở...">
-        <LockKeyhole size={16} /> {hasBundleAccess ? "Đọc chi tiết - đã mua gói" : `Đọc chi tiết - ${formatCoins(FEATURE_PRICES[item.type].priceCoins)}`}
+        <LockKeyhole size={16} /> {hasBundleAccess ? "Đọc chi tiết - đã mua gói" : `Đọc chi tiết - ${formatCoins(priceCoins)}`}
       </LoadingSubmitButton>
       <small>{hasBundleAccess ? "Không trừ xu thêm nhờ gói trọn nhóm." : "Mở một lần, xem lại trong tài khoản."}</small>
     </form>
@@ -196,6 +198,7 @@ function FateRow({
   nextPath,
   reading,
   activeReadingId,
+  featurePrices,
   hasBundleAccess = false,
 }: {
   chartId: string;
@@ -203,6 +206,7 @@ function FateRow({
   nextPath: string;
   reading: StoredReading | null;
   activeReadingId?: string;
+  featurePrices: FeaturePriceMap;
   hasBundleAccess?: boolean;
 }) {
   const anchor = anchorId(item.scopeKey);
@@ -239,7 +243,7 @@ function FateRow({
             <small>Không trừ xu lần nữa.</small>
           </div>
         ) : (
-          <OpenButton chartId={chartId} item={item} nextPath={nextPath} hasBundleAccess={hasBundleAccess} />
+          <OpenButton chartId={chartId} item={item} nextPath={nextPath} featurePrices={featurePrices} hasBundleAccess={hasBundleAccess} />
         )}
       </div>
       {reading && isActiveReading ? (
@@ -252,7 +256,7 @@ function FateRow({
   );
 }
 
-export async function MajorFateView({ chartId, chart, user, activeReadingId }: FateViewProps) {
+export async function MajorFateView({ chartId, chart, user, activeReadingId, featurePrices }: FateViewProps) {
   const items = getMajorFateItems(chart);
   const [readings, bundleAccess] = await Promise.all([readingMap(user, chartId, items), hasBundleAccess(user, chartId, "DAI_VAN")]);
   const currentIndex = items.findIndex((item) => item.isCurrent);
@@ -262,22 +266,22 @@ export async function MajorFateView({ chartId, chart, user, activeReadingId }: F
       <FateHero
         title={`Đại vận của ${chart.input.fullName}`}
         description="Nhìn toàn cảnh từng giai đoạn 10 năm trước, rồi chỉ mở đúng đại vận bạn muốn đọc sâu."
-        price={formatCoins(FEATURE_PRICES.DAI_VAN.priceCoins)}
+        price={formatCoins(featurePrices.DAI_VAN.priceCoins)}
       >
         <TrendBars items={items.map((item) => ({ label: item.label, good: item.good, challenge: item.challenge }))} currentIndex={currentIndex === -1 ? undefined : currentIndex} />
       </FateHero>
-      <ReadingBundleCta chartId={chartId} type="DAI_VAN" nextPath={`/la-so/${chartId}?view=dai-van`} totalCount={items.length} unlockedCount={readings.size} hasBundleAccess={bundleAccess} />
+      <ReadingBundleCta chartId={chartId} type="DAI_VAN" nextPath={`/la-so/${chartId}?view=dai-van`} totalCount={items.length} unlockedCount={readings.size} hasBundleAccess={bundleAccess} unitPriceCoins={featurePrices.DAI_VAN.priceCoins} />
       <ExplainBox />
       <div className="fate-list">
         {items.map((item) => (
-          <FateRow key={item.scopeKey} chartId={chartId} item={item} nextPath={`/la-so/${chartId}?view=dai-van`} reading={readings.get(fateReadingMapKey(item)) || null} activeReadingId={activeReadingId} hasBundleAccess={bundleAccess} />
+          <FateRow key={item.scopeKey} chartId={chartId} item={item} nextPath={`/la-so/${chartId}?view=dai-van`} reading={readings.get(fateReadingMapKey(item)) || null} activeReadingId={activeReadingId} featurePrices={featurePrices} hasBundleAccess={bundleAccess} />
         ))}
       </div>
     </section>
   );
 }
 
-export async function MinorFateView({ chartId, chart, user, activeReadingId }: FateViewProps) {
+export async function MinorFateView({ chartId, chart, user, activeReadingId, featurePrices }: FateViewProps) {
   const items = getMinorFateItems(chart);
   const [readings, bundleAccess] = await Promise.all([readingMap(user, chartId, items), hasBundleAccess(user, chartId, "TIEU_VAN")]);
   const currentIndex = items.findIndex((item) => item.isCurrent);
@@ -287,22 +291,22 @@ export async function MinorFateView({ chartId, chart, user, activeReadingId }: F
       <FateHero
         title={`Tiểu vận của ${chart.input.fullName}`}
         description="So sánh các năm gần nhau để biết năm nào nên tiến, năm nào nên giữ nhịp, rồi mở riêng năm cần quyết định."
-        price={formatCoins(FEATURE_PRICES.TIEU_VAN.priceCoins)}
+        price={formatCoins(featurePrices.TIEU_VAN.priceCoins)}
       >
         <TrendArea items={items.map((item) => ({ label: item.label, good: item.good, challenge: item.challenge }))} currentIndex={currentIndex === -1 ? undefined : currentIndex} markerLabel="Năm xem" />
       </FateHero>
-      <ReadingBundleCta chartId={chartId} type="TIEU_VAN" nextPath={`/la-so/${chartId}?view=tieu-van`} totalCount={items.length} unlockedCount={readings.size} hasBundleAccess={bundleAccess} />
+      <ReadingBundleCta chartId={chartId} type="TIEU_VAN" nextPath={`/la-so/${chartId}?view=tieu-van`} totalCount={items.length} unlockedCount={readings.size} hasBundleAccess={bundleAccess} unitPriceCoins={featurePrices.TIEU_VAN.priceCoins} />
       <ExplainBox />
       <div className="fate-list">
         {items.map((item) => (
-          <FateRow key={item.scopeKey} chartId={chartId} item={item} nextPath={`/la-so/${chartId}?view=tieu-van`} reading={readings.get(fateReadingMapKey(item)) || null} activeReadingId={activeReadingId} hasBundleAccess={bundleAccess} />
+          <FateRow key={item.scopeKey} chartId={chartId} item={item} nextPath={`/la-so/${chartId}?view=tieu-van`} reading={readings.get(fateReadingMapKey(item)) || null} activeReadingId={activeReadingId} featurePrices={featurePrices} hasBundleAccess={bundleAccess} />
         ))}
       </div>
     </section>
   );
 }
 
-export async function MonthlyFateView({ chartId, chart, user, activeReadingId }: FateViewProps) {
+export async function MonthlyFateView({ chartId, chart, user, activeReadingId, featurePrices }: FateViewProps) {
   const items = getMonthlyFateItems(chart);
   const [readings, bundleAccess] = await Promise.all([readingMap(user, chartId, items), hasBundleAccess(user, chartId, "NGUYET_VAN")]);
 
@@ -311,23 +315,23 @@ export async function MonthlyFateView({ chartId, chart, user, activeReadingId }:
       <FateHero
         title={`Nguyệt vận của ${chart.input.fullName} năm ${chart.input.viewYear}`}
         description="Mỗi tháng có preview miễn phí để bạn nhìn trọng tâm trước, sau đó mở riêng tháng cần đọc kỹ."
-        price={formatCoins(FEATURE_PRICES.NGUYET_VAN.priceCoins)}
+        price={formatCoins(featurePrices.NGUYET_VAN.priceCoins)}
       />
-      <ReadingBundleCta chartId={chartId} type="NGUYET_VAN" nextPath={`/la-so/${chartId}?view=nguyet-van`} totalCount={items.length} unlockedCount={readings.size} hasBundleAccess={bundleAccess} />
+      <ReadingBundleCta chartId={chartId} type="NGUYET_VAN" nextPath={`/la-so/${chartId}?view=nguyet-van`} totalCount={items.length} unlockedCount={readings.size} hasBundleAccess={bundleAccess} unitPriceCoins={featurePrices.NGUYET_VAN.priceCoins} />
       <div className="fate-list">
         {items.map((item) => (
-          <FateRow key={item.scopeKey} chartId={chartId} item={item} nextPath={`/la-so/${chartId}?view=nguyet-van`} reading={readings.get(fateReadingMapKey(item)) || null} activeReadingId={activeReadingId} hasBundleAccess={bundleAccess} />
+          <FateRow key={item.scopeKey} chartId={chartId} item={item} nextPath={`/la-so/${chartId}?view=nguyet-van`} reading={readings.get(fateReadingMapKey(item)) || null} activeReadingId={activeReadingId} featurePrices={featurePrices} hasBundleAccess={bundleAccess} />
         ))}
       </div>
     </section>
   );
 }
 
-function DailyPlans() {
+function DailyPlans({ featurePrices }: { featurePrices: FeaturePriceMap }) {
   const plans = [
-    { title: "Xem nhanh", price: formatCoins(FEATURE_PRICES.NHAT_VAN.priceCoins), note: "Mở riêng một ngày đang xem" },
-    { title: "Theo tháng", price: formatCoins(FEATURE_PRICES.NGUYET_VAN.priceCoins), note: "Mở từng tháng khi cần đọc kỹ", popular: true },
-    { title: "Luận toàn bộ", price: formatCoins(FEATURE_PRICES.FULL.priceCoins), note: "Đọc sâu toàn lá số và vận năm" },
+    { title: "Xem nhanh", price: formatCoins(featurePrices.NHAT_VAN.priceCoins), note: "Mở riêng một ngày đang xem" },
+    { title: "Theo tháng", price: formatCoins(featurePrices.NGUYET_VAN.priceCoins), note: "Mở từng tháng khi cần đọc kỹ", popular: true },
+    { title: "Luận toàn bộ", price: formatCoins(featurePrices.FULL.priceCoins), note: "Đọc sâu toàn lá số và vận năm" },
   ];
 
   return (
@@ -348,7 +352,7 @@ function DailyPlans() {
   );
 }
 
-export async function DailyFateView({ chartId, chart, user, activeReadingId }: FateViewProps) {
+export async function DailyFateView({ chartId, chart, user, activeReadingId, featurePrices }: FateViewProps) {
   const item = getDailyFateItem(chart);
   const trends = getDailyMonthTrend(chart);
   const readings = await readingMap(user, chartId, [item]);
@@ -399,11 +403,11 @@ export async function DailyFateView({ chartId, chart, user, activeReadingId }: F
             <small>Không trừ xu lần nữa.</small>
           </div>
         ) : (
-          <OpenButton chartId={chartId} item={item} nextPath={`/la-so/${chartId}?view=nhat-van`} />
+          <OpenButton chartId={chartId} item={item} nextPath={`/la-so/${chartId}?view=nhat-van`} featurePrices={featurePrices} />
         )}
       </section>
 
-      <DailyPlans />
+      <DailyPlans featurePrices={featurePrices} />
     </section>
   );
 }

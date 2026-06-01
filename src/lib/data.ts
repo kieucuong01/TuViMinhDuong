@@ -3,7 +3,7 @@ import "server-only";
 import { CHART_ENGINE_VERSION, generateTuViChart, type ChartInput, type TuViChart } from "@/lib/chart";
 import { articleWithScore, seedArticles, type ArticleCategoryView, type ArticleView } from "@/lib/content";
 import { getDb } from "@/lib/db";
-import { FEATURE_PRICES, COIN_PACKAGES, type ReadingKey } from "@/lib/pricing";
+import { FEATURE_PRICE_KEYS, FEATURE_PRICES, COIN_PACKAGES, type FeaturePriceMap, type ReadingKey } from "@/lib/pricing";
 import { isReadingBundleKey, readingBundleScopeKey } from "@/lib/reading-bundles";
 import { FREE_OVERVIEW_MIN_WORDS, FREE_OVERVIEW_VERSION, countWords } from "@/lib/ai";
 import { scoreArticleSeo } from "@/lib/seo";
@@ -124,6 +124,7 @@ const globalStore = globalThis as unknown as {
   demoArticles?: Map<string, ArticleView>;
   demoArticleCategories?: Map<string, ArticleCategoryView>;
   demoOperationSettings?: OperationSettings;
+  demoFeaturePrices?: FeaturePriceMap;
 };
 
 export const DEFAULT_OPERATION_SETTINGS: OperationSettings = {
@@ -167,6 +168,39 @@ function demoArticleCategories() {
 function demoOperationSettings() {
   globalStore.demoOperationSettings ||= { ...DEFAULT_OPERATION_SETTINGS };
   return globalStore.demoOperationSettings;
+}
+
+function cloneDefaultFeaturePrices(): FeaturePriceMap {
+  return Object.fromEntries(
+    FEATURE_PRICE_KEYS.map((key) => [key, { ...FEATURE_PRICES[key] }]),
+  ) as FeaturePriceMap;
+}
+
+function demoFeaturePrices() {
+  globalStore.demoFeaturePrices ||= cloneDefaultFeaturePrices();
+  return globalStore.demoFeaturePrices;
+}
+
+function normalizeFeaturePriceMap(rows: Array<{ key: string; label: string; priceCoins: number; isActive?: boolean | null }> = []): FeaturePriceMap {
+  const rowMap = new Map(rows.map((row) => [row.key, row]));
+  return Object.fromEntries(
+    FEATURE_PRICE_KEYS.map((key) => {
+      const fallback = FEATURE_PRICES[key];
+      const row = rowMap.get(key);
+      if (!row?.isActive) return [key, { ...fallback }];
+      return [key, { label: row.label || fallback.label, priceCoins: row.priceCoins }];
+    }),
+  ) as FeaturePriceMap;
+}
+
+function normalizeFeaturePriceUpdates(updates: Array<{ key: string; priceCoins: number }>) {
+  return updates.map((item) => {
+    if (!FEATURE_PRICE_KEYS.includes(item.key as ReadingKey)) throw new Error("INVALID_PRICE_KEY");
+    const key = item.key as ReadingKey;
+    const priceCoins = Number(item.priceCoins);
+    if (!Number.isInteger(priceCoins) || priceCoins < 0 || priceCoins > 999999) throw new Error("INVALID_PRICE");
+    return { key, label: FEATURE_PRICES[key].label, priceCoins };
+  });
 }
 
 function normalizeOperationSettings(row?: Partial<OperationSettings> | null): OperationSettings {
@@ -594,11 +628,41 @@ export async function deleteUserChart(user: SessionUser, chartId: string) {
 }
 
 export async function getFeaturePrice(type: ReadingKey) {
-  const fallback = FEATURE_PRICES[type];
+  const prices = await getFeaturePrices();
+  return prices[type];
+}
+
+export async function getFeaturePrices(): Promise<FeaturePriceMap> {
   const db = getDb();
-  if (!db) return fallback;
-  const price = await db.featurePrice.findUnique({ where: { key: type } });
-  return price?.isActive ? { label: price.label, priceCoins: price.priceCoins } : fallback;
+  if (!db) return demoFeaturePrices();
+  const prices = await db.featurePrice.findMany();
+  return normalizeFeaturePriceMap(prices);
+}
+
+export async function updateFeaturePrices(updates: Array<{ key: string; priceCoins: number }>) {
+  const normalized = normalizeFeaturePriceUpdates(updates);
+  const db = getDb();
+
+  if (!db) {
+    const next = { ...demoFeaturePrices() };
+    for (const item of normalized) {
+      next[item.key] = { label: item.label, priceCoins: item.priceCoins };
+    }
+    globalStore.demoFeaturePrices = next;
+    return next;
+  }
+
+  await db.$transaction(
+    normalized.map((item) =>
+      db.featurePrice.upsert({
+        where: { key: item.key },
+        update: { label: item.label, priceCoins: item.priceCoins, isActive: true },
+        create: { key: item.key, label: item.label, priceCoins: item.priceCoins, isActive: true },
+      }),
+    ),
+  );
+
+  return getFeaturePrices();
 }
 
 export async function getOperationSettings(): Promise<OperationSettings> {
@@ -1415,7 +1479,7 @@ export async function getAdminBusinessDashboard(): Promise<AdminBusinessDashboar
 
 export async function getAdminOverview() {
   const db = getDb();
-  const operationSettings = await getOperationSettings();
+  const [operationSettings, featurePrices] = await Promise.all([getOperationSettings(), getFeaturePrices()]);
   if (!db) {
     return {
       users: 1,
@@ -1424,18 +1488,17 @@ export async function getAdminOverview() {
       articles: demoArticles().size,
       payments: 0,
       coinPackages: COIN_PACKAGES,
-      featurePrices: FEATURE_PRICES,
+      featurePrices,
       operationSettings,
     };
   }
-  const [users, chartCount, readingCount, articleCount, paymentCount, packages, prices] = await Promise.all([
+  const [users, chartCount, readingCount, articleCount, paymentCount, packages] = await Promise.all([
     db.user.count(),
     db.chart.count(),
     db.reading.count(),
     db.article.count({ where: { status: { not: DELETED_ARTICLE_STATUS } } }),
     db.paymentOrder.count(),
     db.coinPackage.findMany({ orderBy: { priceVnd: "asc" } }),
-    db.featurePrice.findMany(),
   ]);
   return {
     users,
@@ -1444,7 +1507,7 @@ export async function getAdminOverview() {
     articles: articleCount,
     payments: paymentCount,
     coinPackages: packages.length ? packages : COIN_PACKAGES,
-    featurePrices: prices.length ? Object.fromEntries(prices.map((item) => [item.key, { label: item.label, priceCoins: item.priceCoins }])) : FEATURE_PRICES,
+    featurePrices,
     operationSettings,
   };
 }

@@ -3,16 +3,17 @@
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { clearSession, createMagicSession, getCurrentUser, getOrCreateEmailUser, loginOrRegister, setSession, type SessionUser } from "@/lib/auth";
-import { getCachedReading, getChart, getFeaturePrice, getOperationSettings, getUserBalance, saveArticleCategoryFromForm, saveArticleFromForm, saveChart, saveReading, adjustCoins, deleteArticleBySlug, deleteUserChart, getReadingJobByScope, createPendingReading, updateOperationSettings, getCompletedReadingsForScopes, hasReadingBundleAccess } from "@/lib/data";
+import { getCachedReading, getChart, getFeaturePrice, getOperationSettings, getUserBalance, saveArticleCategoryFromForm, saveArticleFromForm, saveChart, saveReading, adjustCoins, deleteArticleBySlug, deleteUserChart, getReadingJobByScope, createPendingReading, updateOperationSettings, updateFeaturePrices, getCompletedReadingsForScopes, hasReadingBundleAccess } from "@/lib/data";
 import { generateReading } from "@/lib/ai";
 import { getDb } from "@/lib/db";
 import { createPayOSCheckout, createPayOSCustomCheckout } from "@/lib/payos";
 import type { CalendarType, Gender } from "@/lib/chart";
-import { COIN_PACKAGES, TEMPORARY_FULL_ACCESS } from "@/lib/pricing";
+import { COIN_PACKAGES, FEATURE_PRICE_KEYS, TEMPORARY_FULL_ACCESS } from "@/lib/pricing";
 import type { ReadingKey } from "@/lib/pricing";
 import { isPayOSEnabled } from "@/lib/env";
 import { startFullReadingJobForUser, unlockReadingBundleForUser, unlockReadingForUser } from "@/lib/reading-unlock";
 import { isReadingBundleKey } from "@/lib/reading-bundles";
+import { adminAdjustUserCoins, adminDeleteUser } from "@/lib/admin-user-management";
 
 export async function loginAction(formData: FormData) {
   const email = String(formData.get("email") || "");
@@ -358,6 +359,54 @@ export async function deleteArticleAction(formData: FormData) {
   redirect(`/admin?tab=content${slug ? `&deleted=${encodeURIComponent(slug)}` : ""}`);
 }
 
+function adminUserErrorMessage(error: unknown) {
+  const message = error instanceof Error ? error.message : "";
+  if (message === "INVALID_AMOUNT") return "Số xu cần là số nguyên khác 0.";
+  if (message === "INSUFFICIENT_COINS") return "Không thể thu hồi nhiều hơn số xu hiện có.";
+  if (message === "USER_NOT_FOUND") return "Không tìm thấy user này.";
+  if (message === "CANNOT_DELETE_SELF") return "Admin không thể tự xóa tài khoản đang đăng nhập.";
+  if (message === "CANNOT_DELETE_ADMIN") return "Không thể xóa tài khoản admin.";
+  if (message === "DATABASE_REQUIRED") return "Chức năng này cần kết nối database thật.";
+  return "Chưa xử lý được thao tác user. Vui lòng thử lại.";
+}
+
+export async function adjustUserCoinsAction(formData: FormData) {
+  const user = await getCurrentUser();
+  if (user?.role !== "ADMIN") redirect("/dang-nhap?next=/admin");
+
+  const userId = String(formData.get("userId") || "");
+  const direction = String(formData.get("direction") || "credit");
+  const amountValue = Number(formData.get("amount"));
+  const amount = direction === "debit" ? -Math.abs(amountValue) : Math.abs(amountValue);
+  const reason = String(formData.get("reason") || "");
+
+  let result: Awaited<ReturnType<typeof adminAdjustUserCoins>>;
+  try {
+    result = await adminAdjustUserCoins(user, { userId, amount, reason });
+  } catch (error) {
+    redirect(`/admin?tab=users&userError=${encodeURIComponent(adminUserErrorMessage(error))}`);
+  }
+
+  revalidatePath("/admin");
+  redirect(`/admin?tab=users&userAdjusted=${encodeURIComponent(result.email)}`);
+}
+
+export async function deleteUserAction(formData: FormData) {
+  const user = await getCurrentUser();
+  if (user?.role !== "ADMIN") redirect("/dang-nhap?next=/admin");
+
+  const userId = String(formData.get("userId") || "");
+  let result: Awaited<ReturnType<typeof adminDeleteUser>>;
+  try {
+    result = await adminDeleteUser(user, { userId });
+  } catch (error) {
+    redirect(`/admin?tab=users&userError=${encodeURIComponent(adminUserErrorMessage(error))}`);
+  }
+
+  revalidatePath("/admin");
+  redirect(`/admin?tab=users&userDeleted=${encodeURIComponent(result.email)}`);
+}
+
 export async function saveArticleCategoryAction(formData: FormData) {
   const user = await getCurrentUser();
   if (user?.role !== "ADMIN") redirect("/dang-nhap?next=/admin");
@@ -389,6 +438,34 @@ export async function saveOperationSettingsAction(formData: FormData) {
   revalidatePath("/nap-xu");
   revalidatePath("/pricing");
   redirect("/admin?tab=settings&settingsSaved=1");
+}
+
+function adminPricingErrorMessage(error: unknown) {
+  const message = error instanceof Error ? error.message : "";
+  if (message === "INVALID_PRICE_KEY") return "Không nhận diện được loại luận giải cần cập nhật.";
+  if (message === "INVALID_PRICE") return "Giá phải là số xu nguyên, không âm.";
+  return "Chưa lưu được bảng giá. Vui lòng thử lại.";
+}
+
+export async function saveFeaturePricesAction(formData: FormData) {
+  const user = await getCurrentUser();
+  if (user?.role !== "ADMIN") redirect("/dang-nhap?next=/admin");
+
+  const updates = FEATURE_PRICE_KEYS.map((key) => ({
+    key,
+    priceCoins: Number(formData.get(`priceCoins:${key}`)),
+  }));
+
+  try {
+    await updateFeaturePrices(updates);
+  } catch (error) {
+    redirect(`/admin?tab=pricing&pricingError=${encodeURIComponent(adminPricingErrorMessage(error))}`);
+  }
+
+  revalidatePath("/");
+  revalidatePath("/admin");
+  revalidatePath("/pricing");
+  redirect("/admin?tab=pricing&pricingSaved=1");
 }
 
 export async function createCheckoutAction(formData: FormData) {

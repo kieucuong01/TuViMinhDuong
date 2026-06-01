@@ -2,8 +2,18 @@ import { createChartAction } from "@/app/actions";
 import { LoadingSubmitButton } from "@/components/loading-submit-button";
 import { Sparkles } from "lucide-react";
 
+const days = Array.from({ length: 31 }, (_, index) => index + 1);
+const months = Array.from({ length: 12 }, (_, index) => index + 1);
+
+function descendingYears(start: number, end: number) {
+  return Array.from({ length: end - start + 1 }, (_, index) => end - index);
+}
+
 export function ChartForm({ compact = false }: { compact?: boolean }) {
   const now = new Date();
+  const currentYear = now.getFullYear();
+  const birthYears = descendingYears(1900, currentYear);
+  const viewYears = descendingYears(1900, 2100);
 
   return (
     <form
@@ -15,8 +25,66 @@ export function ChartForm({ compact = false }: { compact?: boolean }) {
     >
       <div className="form-grid">
         <label className="chart-name-field md:col-span-2">
-          <span>Họ và tên</span>
-          <input name="fullName" placeholder="Ví dụ: Nguyễn Minh Anh" required data-testid="chart-full-name" />
+          <span className="chart-field-label">Họ và tên</span>
+          <span className="chart-name-control">
+            <input name="fullName" placeholder="Ví dụ: Nguyễn Minh Anh" required data-testid="chart-full-name" />
+            <em>Thông tin bắt buộc</em>
+          </span>
+        </label>
+
+        <fieldset className="birth-date-group chart-birth-field md:col-span-2">
+          <legend>Ngày sinh</legend>
+          <div className="birth-date-grid">
+            <label>
+              <span>Ngày</span>
+              <select name="day" defaultValue="1" required data-testid="chart-day">
+                {days.map((day) => (
+                  <option key={day} value={day}>{day}</option>
+                ))}
+              </select>
+            </label>
+            <label>
+              <span>Tháng</span>
+              <select name="month" defaultValue="1" required data-testid="chart-month">
+                {months.map((month) => (
+                  <option key={month} value={month}>{month}</option>
+                ))}
+              </select>
+            </label>
+            <label>
+              <span>Năm</span>
+              <select name="year" defaultValue="1990" required data-testid="chart-year">
+                {birthYears.map((year) => (
+                  <option key={year} value={year}>{year}</option>
+                ))}
+              </select>
+            </label>
+            <label>
+              <span>Lịch</span>
+              <select name="calendarType" defaultValue="solar" data-testid="chart-calendar-type">
+                <option value="solar">Dương lịch</option>
+                <option value="lunar">Âm lịch</option>
+              </select>
+            </label>
+          </div>
+        </fieldset>
+
+        <label className="chart-hour-field md:col-span-2">
+          <span>Giờ sinh</span>
+          <select name="birthHour" defaultValue="0" data-testid="chart-birth-hour">
+            <option value="0">Tý: 23h - 1h</option>
+            <option value="2">Sửu: 1h - 3h</option>
+            <option value="4">Dần: 3h - 5h</option>
+            <option value="6">Mão: 5h - 7h</option>
+            <option value="8">Thìn: 7h - 9h</option>
+            <option value="10">Tỵ: 9h - 11h</option>
+            <option value="12">Ngọ: 11h - 13h</option>
+            <option value="14">Mùi: 13h - 15h</option>
+            <option value="16">Thân: 15h - 17h</option>
+            <option value="18">Dậu: 17h - 19h</option>
+            <option value="20">Tuất: 19h - 21h</option>
+            <option value="22">Hợi: 21h - 23h</option>
+          </select>
         </label>
 
         <label>
@@ -28,52 +96,12 @@ export function ChartForm({ compact = false }: { compact?: boolean }) {
         </label>
 
         <label>
-          <span>Lịch sinh</span>
-          <select name="calendarType" defaultValue="solar" data-testid="chart-calendar-type">
-            <option value="solar">Dương lịch</option>
-            <option value="lunar">Âm lịch</option>
+          <span>Năm xem</span>
+          <select name="viewYear" defaultValue={currentYear} required data-testid="chart-view-year">
+            {viewYears.map((year) => (
+              <option key={year} value={year}>Năm xem {year}</option>
+            ))}
           </select>
-        </label>
-
-        <fieldset className="birth-date-group chart-birth-field md:col-span-2">
-          <legend>Ngày sinh</legend>
-          <div className="birth-date-grid">
-            <label>
-              <span>Ngày</span>
-              <input name="day" type="number" inputMode="numeric" min="1" max="31" defaultValue="1" required data-testid="chart-day" />
-            </label>
-            <label>
-              <span>Tháng</span>
-              <input name="month" type="number" inputMode="numeric" min="1" max="12" defaultValue="1" required data-testid="chart-month" />
-            </label>
-            <label>
-              <span>Năm</span>
-              <input name="year" type="number" inputMode="numeric" min="1900" max={now.getFullYear()} defaultValue="1990" required data-testid="chart-year" />
-            </label>
-          </div>
-        </fieldset>
-
-        <label>
-          <span>Giờ sinh</span>
-          <select name="birthHour" defaultValue="0" data-testid="chart-birth-hour">
-            <option value="0">Tý: 23h - 00h59</option>
-            <option value="2">Sửu: 01h - 02h59</option>
-            <option value="4">Dần: 03h - 04h59</option>
-            <option value="6">Mão: 05h - 06h59</option>
-            <option value="8">Thìn: 07h - 08h59</option>
-            <option value="10">Tỵ: 09h - 10h59</option>
-            <option value="12">Ngọ: 11h - 12h59</option>
-            <option value="14">Mùi: 13h - 14h59</option>
-            <option value="16">Thân: 15h - 16h59</option>
-            <option value="18">Dậu: 17h - 18h59</option>
-            <option value="20">Tuất: 19h - 20h59</option>
-            <option value="22">Hợi: 21h - 22h59</option>
-          </select>
-        </label>
-
-        <label>
-          <span>Năm muốn xem</span>
-          <input name="viewYear" type="number" inputMode="numeric" min="1900" max="2100" defaultValue={now.getFullYear()} required data-testid="chart-view-year" />
         </label>
       </div>
 

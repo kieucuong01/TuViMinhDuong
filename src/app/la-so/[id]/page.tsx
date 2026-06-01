@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { ChartBoard, MobileChartReader } from "@/components/chart-board";
-import { getAnyCompletedReading, getCachedReading, getChart, getOperationSettings, getReadingById } from "@/lib/data";
+import { getAnyCompletedReading, getCachedReading, getChart, getFeaturePrices, getOperationSettings, getReadingById } from "@/lib/data";
 import { getCurrentUser } from "@/lib/auth";
 import { FeedbackActions } from "@/components/feedback-actions";
 import { PromptChips } from "@/components/prompt-chips";
@@ -43,7 +43,7 @@ export default async function ChartPage({
   const query = await searchParams;
   const record = await getChart(id);
   if (!record) notFound();
-  const [user, operationSettings] = await Promise.all([getCurrentUser(), getOperationSettings()]);
+  const [user, operationSettings, featurePrices] = await Promise.all([getCurrentUser(), getOperationSettings(), getFeaturePrices()]);
   const paidFeaturesVisible = operationSettings.paidReadingsEnabled || user?.role === "ADMIN";
   const fateViews: FateView[] = paidFeaturesVisible ? ["la-so", "luan-cung", "dai-van", "tieu-van", "nguyet-van", "nhat-van", "chuyen-de"] : ["la-so"];
   const activeView: FateView = fateViews.includes(query.view as FateView) ? (query.view as FateView) : "la-so";
@@ -63,11 +63,11 @@ export default async function ChartPage({
       {paidFeaturesVisible ? <FateTabs chartId={id} active={activeView} /> : null}
 
       <div className="mx-auto max-w-6xl px-3 pb-10 sm:px-6 lg:px-8">
-        {activeView === "dai-van" ? <MajorFateView chartId={id} chart={record.chart} user={user} activeReadingId={query.reading} /> : null}
-        {activeView === "luan-cung" ? <PalaceFateView chartId={id} chart={record.chart} user={user} activeReadingId={query.reading} /> : null}
-        {activeView === "tieu-van" ? <MinorFateView chartId={id} chart={record.chart} user={user} activeReadingId={query.reading} /> : null}
-        {activeView === "nguyet-van" ? <MonthlyFateView chartId={id} chart={record.chart} user={user} activeReadingId={query.reading} /> : null}
-        {activeView === "nhat-van" ? <DailyFateView chartId={id} chart={record.chart} user={user} activeReadingId={query.reading} /> : null}
+        {activeView === "dai-van" ? <MajorFateView chartId={id} chart={record.chart} user={user} activeReadingId={query.reading} featurePrices={featurePrices} /> : null}
+        {activeView === "luan-cung" ? <PalaceFateView chartId={id} chart={record.chart} user={user} activeReadingId={query.reading} featurePrices={featurePrices} /> : null}
+        {activeView === "tieu-van" ? <MinorFateView chartId={id} chart={record.chart} user={user} activeReadingId={query.reading} featurePrices={featurePrices} /> : null}
+        {activeView === "nguyet-van" ? <MonthlyFateView chartId={id} chart={record.chart} user={user} activeReadingId={query.reading} featurePrices={featurePrices} /> : null}
+        {activeView === "nhat-van" ? <DailyFateView chartId={id} chart={record.chart} user={user} activeReadingId={query.reading} featurePrices={featurePrices} /> : null}
         {isScopedReadingView ? null : (
         <>
         <div className="chart-titlebar">
@@ -122,8 +122,8 @@ export default async function ChartPage({
 
         {paidFeaturesVisible ? (
           <>
-            <ReadingTabs chartId={id} chart={record.chart} />
-            <PremiumReadingCta chartId={id} fullName={record.chart.input.fullName} hasAdvancedReading={hasAdvancedReading} />
+            <ReadingTabs chartId={id} chart={record.chart} featurePrices={featurePrices} />
+            <PremiumReadingCta chartId={id} fullName={record.chart.input.fullName} hasAdvancedReading={hasAdvancedReading} fullPriceCoins={featurePrices.FULL.priceCoins} />
           </>
         ) : null}
         </>

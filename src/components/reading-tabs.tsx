@@ -1,6 +1,6 @@
 import { Sparkles } from "lucide-react";
 import Link from "next/link";
-import { FEATURE_PRICES, type ReadingKey } from "@/lib/pricing";
+import type { FeaturePriceMap, ReadingKey } from "@/lib/pricing";
 import type { TuViChart } from "@/lib/chart";
 import { formatCoins } from "@/lib/format";
 
@@ -42,7 +42,7 @@ const tabCards: { type: ReadingKey; view: string; title: string; body: string; v
   },
 ];
 
-export function ReadingTabs({ chartId, chart }: { chartId: string; chart: TuViChart }) {
+export function ReadingTabs({ chartId, chart, featurePrices }: { chartId: string; chart: TuViChart; featurePrices: FeaturePriceMap }) {
   return (
     <section className="mt-8">
       <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
@@ -69,7 +69,7 @@ export function ReadingTabs({ chartId, chart }: { chartId: string; chart: TuViCh
             <p className="unlock-card-value">{card.value}</p>
             <div className="mt-5 flex items-center justify-between gap-3">
               <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-3 py-1 text-sm font-bold text-emerald-700">
-                Từ {formatCoins(FEATURE_PRICES[card.type].priceCoins)}
+                Từ {formatCoins(featurePrices[card.type].priceCoins)}
               </span>
               <span className="btn btn-primary btn-small">Chọn phần</span>
             </div>

@@ -8,7 +8,7 @@ import { MarkdownContent } from "@/components/markdown-content";
 import { ReadingPanel } from "@/components/reading-panel";
 import { getDeepReadingSummary, paidReadingChapters } from "@/lib/ai";
 import { getCurrentUser } from "@/lib/auth";
-import { getAnyCompletedReading, getCachedReading, getChart, getOperationSettings, getReadingJobById, getReadingJobByScope } from "@/lib/data";
+import { getAnyCompletedReading, getCachedReading, getChart, getFeaturePrices, getOperationSettings, getReadingJobById, getReadingJobByScope } from "@/lib/data";
 
 export const metadata = {
   title: "Luận giải nâng cao",
@@ -33,7 +33,7 @@ export default async function AdvancedReadingPage({
 }) {
   const { id } = await params;
   const query = await searchParams;
-  const [user, operationSettings] = await Promise.all([getCurrentUser(), getOperationSettings()]);
+  const [user, operationSettings, featurePrices] = await Promise.all([getCurrentUser(), getOperationSettings(), getFeaturePrices()]);
   if (!user) redirect(`/dang-nhap?next=/la-so/${id}/nang-cao`);
   if (!operationSettings.paidReadingsEnabled && user.role !== "ADMIN") redirect(`/la-so/${id}`);
 
@@ -144,7 +144,7 @@ export default async function AdvancedReadingPage({
         </section>
 
         <div className="mt-8">
-          <ReadingPanel chartId={id} chart={record.chart} />
+          <ReadingPanel chartId={id} chart={record.chart} featurePrices={featurePrices} />
         </div>
         </>
         )}

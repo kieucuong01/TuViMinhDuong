@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Check, Coins, Sparkles, TrendingUp } from "lucide-react";
-import { COIN_PACKAGES, FEATURE_PRICES } from "@/lib/pricing";
-import { getOperationSettings } from "@/lib/data";
+import { COIN_PACKAGES } from "@/lib/pricing";
+import { getFeaturePrices, getOperationSettings } from "@/lib/data";
 import { formatCoins, formatVnd } from "@/lib/format";
 import { APP_NAME } from "@/lib/env";
 import { routeMetadata } from "@/lib/metadata";
@@ -13,15 +13,6 @@ export const metadata = routeMetadata({
   imageSubtitle: "Giá rõ ràng trước khi mở luận giải, mua một lần xem lại",
 });
 
-const featureRows = [
-  { label: "Luận giải toàn bộ", detail: "Tổng quan, 12 cung, vận hạn và gợi ý hành động", price: FEATURE_PRICES.FULL.priceCoins },
-  { label: "Luận cung", detail: "Xem sâu một cung như Mệnh, Quan Lộc, Tài Bạch", price: FEATURE_PRICES.PALACE.priceCoins },
-  { label: "Đại vận", detail: "Giai đoạn 10 năm, cơ hội và điều cần thận trọng", price: FEATURE_PRICES.DAI_VAN.priceCoins },
-  { label: "Tiểu vận", detail: "Từng năm trong nền đại vận, việc nên chuẩn bị", price: FEATURE_PRICES.TIEU_VAN.priceCoins },
-  { label: "Nguyệt vận", detail: "Trọng tâm tháng hiện tại theo lá số", price: FEATURE_PRICES.NGUYET_VAN.priceCoins },
-  { label: "Nhật vận", detail: "Gợi ý nhanh cho một ngày cụ thể", price: FEATURE_PRICES.NHAT_VAN.priceCoins },
-];
-
 const benefits = [
   "Giá hiển thị trước khi mở khóa.",
   "Mua một lần, đọc lại không trừ thêm xu.",
@@ -29,8 +20,16 @@ const benefits = [
 ];
 
 export default async function PricingPage() {
-  const operationSettings = await getOperationSettings();
+  const [operationSettings, featurePrices] = await Promise.all([getOperationSettings(), getFeaturePrices()]);
   const commercialEnabled = operationSettings.paymentsEnabled && operationSettings.coinTopupEnabled && operationSettings.paidReadingsEnabled;
+  const featureRows = [
+    { label: "Luận giải toàn bộ", detail: "Tổng quan, 12 cung, vận hạn và gợi ý hành động", price: featurePrices.FULL.priceCoins },
+    { label: "Luận cung", detail: "Xem sâu một cung như Mệnh, Quan Lộc, Tài Bạch", price: featurePrices.PALACE.priceCoins },
+    { label: "Đại vận", detail: "Giai đoạn 10 năm, cơ hội và điều cần thận trọng", price: featurePrices.DAI_VAN.priceCoins },
+    { label: "Tiểu vận", detail: "Từng năm trong nền đại vận, việc nên chuẩn bị", price: featurePrices.TIEU_VAN.priceCoins },
+    { label: "Nguyệt vận", detail: "Trọng tâm tháng hiện tại theo lá số", price: featurePrices.NGUYET_VAN.priceCoins },
+    { label: "Nhật vận", detail: "Gợi ý nhanh cho một ngày cụ thể", price: featurePrices.NHAT_VAN.priceCoins },
+  ];
 
   return (
     <main className="pricing-hero">
@@ -69,7 +68,7 @@ export default async function PricingPage() {
                 </span>
               </div>
               <p className="mt-3 text-lg leading-8 text-stone-600">Phù hợp khi bạn muốn xem đầy đủ trước, sau đó đọc sâu từng phần khi cần.</p>
-              <p className="mt-5 text-4xl font-black text-orange-700">{formatCoins(FEATURE_PRICES.FULL.priceCoins)}</p>
+              <p className="mt-5 text-4xl font-black text-orange-700">{formatCoins(featurePrices.FULL.priceCoins)}</p>
               {commercialEnabled ? <Link href="/pricing?topup=1" className="btn btn-primary btn-large mt-5 w-full" prefetch={false}>
                 Nạp xu để mở luận giải
               </Link> : <p className="alert mt-5">Luận giải chuyên sâu đang tắt với public. Bạn vẫn có thể lập lá số và đọc bản cơ bản miễn phí.</p>}

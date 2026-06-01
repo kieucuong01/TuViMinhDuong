@@ -6,7 +6,7 @@ import { ReadingBundleCta } from "@/components/reading-bundle-cta";
 import { getCachedReading, getCompletedReadingsForScopes } from "@/lib/data";
 import { formatCoins } from "@/lib/format";
 import { getPalaceReadingItems } from "@/lib/palace-analysis";
-import { FEATURE_PRICES } from "@/lib/pricing";
+import type { FeaturePriceMap } from "@/lib/pricing";
 import { readingBundleScopeKey } from "@/lib/reading-bundles";
 import type { SessionUser } from "@/lib/auth";
 import type { TuViChart } from "@/lib/chart";
@@ -16,6 +16,7 @@ type PalaceFateViewProps = {
   chart: TuViChart;
   user: SessionUser | null;
   activeReadingId?: string;
+  featurePrices: FeaturePriceMap;
 };
 
 function anchorForPalace(name: string) {
@@ -33,7 +34,7 @@ function scoreTone(score: number) {
   return "border-rose-200 bg-rose-50 text-rose-700";
 }
 
-function UnlockPalaceButton({ chartId, palaceName, hasBundleAccess = false }: { chartId: string; palaceName: string; hasBundleAccess?: boolean }) {
+function UnlockPalaceButton({ chartId, palaceName, priceCoins, hasBundleAccess = false }: { chartId: string; palaceName: string; priceCoins: number; hasBundleAccess?: boolean }) {
   const anchor = anchorForPalace(palaceName);
   return (
     <form
@@ -48,7 +49,7 @@ function UnlockPalaceButton({ chartId, palaceName, hasBundleAccess = false }: { 
       <input type="hidden" name="next" value={`/la-so/${chartId}?view=luan-cung#${anchor}-reading`} />
       <LoadingSubmitButton className="btn btn-primary unlock-palace-button w-full sm:w-auto" loadingText="Đang mở..." data-testid={`unlock-palace-${palaceName}`}>
         <LockKeyhole size={18} />
-        <span>{hasBundleAccess ? "Đọc luận chi tiết - đã mua gói" : `Đọc luận chi tiết - ${formatCoins(FEATURE_PRICES.PALACE.priceCoins)}`}</span>
+        <span>{hasBundleAccess ? "Đọc luận chi tiết - đã mua gói" : `Đọc luận chi tiết - ${formatCoins(priceCoins)}`}</span>
       </LoadingSubmitButton>
       <p className="unlock-microcopy">{hasBundleAccess ? "Không trừ xu thêm nhờ gói trọn nhóm." : "Mở một lần, lưu lại để xem lại khi cần."}</p>
     </form>
@@ -59,7 +60,7 @@ function palaceReadingHref(chartId: string, readingId: string, anchor: string) {
   return `/la-so/${chartId}?view=luan-cung&reading=${encodeURIComponent(readingId)}#${anchor}-reading`;
 }
 
-export async function PalaceFateView({ chartId, chart, user, activeReadingId }: PalaceFateViewProps) {
+export async function PalaceFateView({ chartId, chart, user, activeReadingId, featurePrices }: PalaceFateViewProps) {
   const items = getPalaceReadingItems(chart);
   const completedReadings = await getCompletedReadingsForScopes(
     user,
@@ -79,7 +80,7 @@ export async function PalaceFateView({ chartId, chart, user, activeReadingId }: 
           <p>Mỗi cung có preview miễn phí để hiểu nhanh điểm mạnh, điểm cần lưu ý và bằng chứng tử vi. Khi cần đọc sâu, bạn mở riêng đúng cung mình quan tâm.</p>
           <div className="fate-hero-points" aria-label="Trạng thái luận cung">
             <span><CheckCircle2 size={15} /> Đã mở {unlockedCount}/12 cung</span>
-            <span><LockKeyhole size={15} /> Giá từng cung {formatCoins(FEATURE_PRICES.PALACE.priceCoins)}</span>
+            <span><LockKeyhole size={15} /> Giá từng cung {formatCoins(featurePrices.PALACE.priceCoins)}</span>
             <span><Sparkles size={15} /> Nên đọc Mệnh, Quan Lộc, Tài Bạch trước</span>
           </div>
         </div>
@@ -90,7 +91,7 @@ export async function PalaceFateView({ chartId, chart, user, activeReadingId }: 
         </div>
       </header>
 
-      <ReadingBundleCta chartId={chartId} type="PALACE" nextPath={`/la-so/${chartId}?view=luan-cung`} totalCount={items.length} unlockedCount={unlockedCount} hasBundleAccess={hasBundleAccess} />
+      <ReadingBundleCta chartId={chartId} type="PALACE" nextPath={`/la-so/${chartId}?view=luan-cung`} totalCount={items.length} unlockedCount={unlockedCount} hasBundleAccess={hasBundleAccess} unitPriceCoins={featurePrices.PALACE.priceCoins} />
 
       <div className="mt-6 grid gap-4">
         {items.map((item) => {
@@ -153,7 +154,7 @@ export async function PalaceFateView({ chartId, chart, user, activeReadingId }: 
                       Xem lại nội dung đã mở
                     </a>
                   ) : (
-                    <UnlockPalaceButton chartId={chartId} palaceName={item.palace.name} hasBundleAccess={hasBundleAccess} />
+                    <UnlockPalaceButton chartId={chartId} palaceName={item.palace.name} priceCoins={featurePrices.PALACE.priceCoins} hasBundleAccess={hasBundleAccess} />
                   )}
                 </div>
               </div>

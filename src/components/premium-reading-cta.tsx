@@ -5,15 +5,15 @@ import { LockKeyhole, Sparkles, X } from "lucide-react";
 import { requestReadingAction } from "@/app/actions";
 import { LoadingSubmitButton } from "@/components/loading-submit-button";
 import { formatCoins } from "@/lib/format";
-import { FEATURE_PRICES } from "@/lib/pricing";
 
 type PremiumReadingCtaProps = {
   chartId: string;
   fullName: string;
   hasAdvancedReading: boolean;
+  fullPriceCoins: number;
 };
 
-function PremiumCtaContent({ hasAdvancedReading }: { hasAdvancedReading: boolean }) {
+function PremiumCtaContent({ hasAdvancedReading, fullPriceCoins }: { hasAdvancedReading: boolean; fullPriceCoins: number }) {
   return (
     <>
       <span className="premium-reading-cta-orb" aria-hidden="true">
@@ -21,7 +21,7 @@ function PremiumCtaContent({ hasAdvancedReading }: { hasAdvancedReading: boolean
       </span>
       <span className="premium-reading-cta-copy">
         <strong>{hasAdvancedReading ? "Xem lại luận giải nâng cao" : "Mở luận giải toàn bộ"}</strong>
-        <small>{hasAdvancedReading ? "Đã mở khóa" : formatCoins(FEATURE_PRICES.FULL.priceCoins)}</small>
+        <small>{hasAdvancedReading ? "Đã mở khóa" : formatCoins(fullPriceCoins)}</small>
       </span>
     </>
   );
@@ -31,6 +31,7 @@ function PremiumCtaAction({
   chartId,
   fullName,
   hasAdvancedReading,
+  fullPriceCoins,
   placement,
   modalId,
 }: PremiumReadingCtaProps & { placement: "floating" | "bottom"; modalId: string }) {
@@ -39,7 +40,7 @@ function PremiumCtaAction({
   if (hasAdvancedReading) {
     return (
       <Link href={`/la-so/${chartId}/nang-cao`} className={className} aria-label={`Xem lại luận giải nâng cao của ${fullName}`}>
-        <PremiumCtaContent hasAdvancedReading />
+        <PremiumCtaContent hasAdvancedReading fullPriceCoins={fullPriceCoins} />
       </Link>
     );
   }
@@ -52,7 +53,7 @@ function PremiumCtaAction({
       data-testid={`premium-reading-cta-${placement}`}
       popoverTarget={modalId}
     >
-      <PremiumCtaContent hasAdvancedReading={false} />
+      <PremiumCtaContent hasAdvancedReading={false} fullPriceCoins={fullPriceCoins} />
     </button>
   );
 }
@@ -60,10 +61,12 @@ function PremiumCtaAction({
 function PremiumReadingConfirmModal({
   chartId,
   fullName,
+  fullPriceCoins,
   modalId,
 }: {
   chartId: string;
   fullName: string;
+  fullPriceCoins: number;
   modalId: string;
 }) {
   return (
@@ -91,7 +94,7 @@ function PremiumReadingConfirmModal({
 
       <div className="premium-confirm-price">
         <span>Chi phí</span>
-        <strong>{formatCoins(FEATURE_PRICES.FULL.priceCoins)}</strong>
+        <strong>{formatCoins(fullPriceCoins)}</strong>
       </div>
 
       <p className="premium-confirm-note">
@@ -121,7 +124,7 @@ export function PremiumReadingCta(props: PremiumReadingCtaProps) {
     <>
       <PremiumCtaAction {...props} placement="floating" modalId={modalId} />
       <PremiumCtaAction {...props} placement="bottom" modalId={modalId} />
-      <PremiumReadingConfirmModal chartId={props.chartId} fullName={props.fullName} modalId={modalId} />
+      <PremiumReadingConfirmModal chartId={props.chartId} fullName={props.fullName} fullPriceCoins={props.fullPriceCoins} modalId={modalId} />
     </>
   );
 }

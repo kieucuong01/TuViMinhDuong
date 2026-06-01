@@ -2,7 +2,6 @@ import { PackageCheck } from "lucide-react";
 import { requestReadingBundleAction } from "@/app/actions";
 import { LoadingSubmitButton } from "@/components/loading-submit-button";
 import { formatCoins } from "@/lib/format";
-import { FEATURE_PRICES } from "@/lib/pricing";
 import { readingBundleItemPrice, readingBundleLabel, type ReadingBundleKey } from "@/lib/reading-bundles";
 
 type ReadingBundleCtaProps = {
@@ -12,12 +11,13 @@ type ReadingBundleCtaProps = {
   totalCount: number;
   unlockedCount: number;
   hasBundleAccess: boolean;
+  unitPriceCoins: number;
 };
 
-export function ReadingBundleCta({ chartId, type, nextPath, totalCount, unlockedCount, hasBundleAccess }: ReadingBundleCtaProps) {
+export function ReadingBundleCta({ chartId, type, nextPath, totalCount, unlockedCount, hasBundleAccess, unitPriceCoins }: ReadingBundleCtaProps) {
   const remainingCount = Math.max(0, totalCount - unlockedCount);
   const label = readingBundleLabel(type);
-  const bundlePrice = readingBundleItemPrice(FEATURE_PRICES[type].priceCoins, remainingCount);
+  const bundlePrice = readingBundleItemPrice(unitPriceCoins, remainingCount);
 
   return (
     <section className="reading-bundle-cta" aria-label={`Gói trọn nhóm ${label}`}>
