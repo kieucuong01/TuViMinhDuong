@@ -13,10 +13,17 @@ describe("user header coin balance", () => {
     expect(userHeaderSource).toContain('className="user-coin-pill"');
   });
 
-  it("keeps coin balance readable on mobile without adding another header chip", () => {
+  it("keeps the mobile account trigger compact on the right side of the header", () => {
     expect(userHeaderSource).toContain("user-account-mobile-coins");
     expect(globalsCss).toMatch(/\.user-header-badge\s+\.user-coin-pill[\s\S]*display:\s*none/);
-    expect(globalsCss).toMatch(/\.user-account-mobile-coins\s*{[\s\S]*display:\s*inline-flex/);
+    expect(globalsCss).toMatch(/\.user-header-badge\s+\.user-name-pill\s*{[\s\S]*width:\s*2\.8rem/);
+    expect(globalsCss).toMatch(/\.user-header-badge\s+\.user-account-mobile-coins,\s*\n\s*\.user-header-badge\s+\.user-account-chevron\s*{[\s\S]*display:\s*none/);
+  });
+
+  it("renders guest account access as an icon-friendly header action", () => {
+    expect(userHeaderSource).toContain('aria-label="Tài khoản"');
+    expect(userHeaderSource).toContain("<UserCircle size={16} />");
+    expect(globalsCss).toMatch(/\.site-header-actions \.login-link span\s*{[\s\S]*display:\s*none/);
   });
 
   it("closes the account dropdown when the visitor presses outside it", () => {

@@ -40,4 +40,13 @@ describe("reading typography", () => {
     expect(cssRule(".unlocked-reading .prose-content p,\n.unlocked-reading .prose-content li")).toContain("text-align: justify");
     expect(cssRule(".unlocked-reading .prose-content p,\n.unlocked-reading .prose-content li")).toContain("text-justify: inter-word");
   });
+
+  it("justifies long-form paragraph surfaces without relying on per-page inline classes", () => {
+    const longFormRule = cssRule(
+      ".prose-content p,\n.prose-content li,\n.article-shell > p:not(.eyebrow),\n.article-faq p,\n.site-footer-brand p,\n.site-footer-columns p,\n.reader-comments-head p:not(.eyebrow),\n.reader-comment-body p,\n.reader-comment-reply p,\n.day-fortune-note,\n.date-guide-card p,\n.date-faq-item p,\n.date-info-card p.leading-7,\n.date-task-card p,\n.date-rule-card p,\n.date-star-chip span,\n.fate-hero-copy p,\n.fate-explain p,\n.fate-summary,\n.palace-stat-card p,\n.palace-preview-card p,\n.palace-reading-card p,\n.palace-card-summary,\n.fate-preview-panel p,\n.fate-preview-panel li,\n.fate-premium-box p,\n.fate-premium-box li,\n.fate-plans > p",
+    );
+
+    expect(longFormRule).toContain("text-align: justify");
+    expect(longFormRule).toContain("text-justify: inter-word");
+  });
 });

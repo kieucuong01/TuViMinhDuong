@@ -19,7 +19,7 @@ Rules:
 - Optimize for 30-60 year old readers: larger text, clear labels, obvious buttons, fewer decorative badges.
 - Keep homepage form-first. New users should be able to create a chart without reading a long hero.
 - Use orange/gold CTAs for money actions, but do not cover report content.
-- On mobile, keep the app shell centered on the bottom nav tabs `Lá số`, `Xem ngày`, `Kiến thức`, `Tài khoản`; sticky CTAs, modals, paywalls, and assistant widgets must respect the shared safe-area bottom offset.
+- On mobile, keep navigation in the header: menu button on the left for `Lá số`, `Xem ngày`, `Kiến thức`; logo centered; account trigger on the right. Do not reintroduce a bottom nav unless the user explicitly asks.
 - For server-action forms, use `LoadingSubmitButton` or `data-loading-message` so the global toast can show progress.
 
 Done:

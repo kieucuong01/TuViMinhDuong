@@ -4,7 +4,6 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Suspense } from "react";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
-import { MobileBottomNav } from "@/components/mobile-bottom-nav";
 import { GlobalLoadingToast } from "@/components/global-loading-toast";
 import { CoinTopupModal } from "@/components/coin-topup-modal";
 import { LoginModal } from "@/components/login-modal";
@@ -72,9 +71,6 @@ export default async function RootLayout({
         <SiteHeader />
         {children}
         <SiteFooter />
-        <Suspense fallback={null}>
-          <MobileBottomNav />
-        </Suspense>
         <Suspense fallback={null}>
           <GlobalLoadingToast />
         </Suspense>

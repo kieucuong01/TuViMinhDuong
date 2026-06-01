@@ -1,12 +1,12 @@
 # Current State
 
-## Recent Update: Mobile App Shell
+## Recent Update: Mobile Header Navigation
 
-- Mobile navigation is now the fixed bottom app shell with four tabs: `Lá số`, `Xem ngày`, `Kiến thức`, and `Tài khoản`.
-- `src/components/mobile-bottom-nav.tsx` owns the mobile account sheet. Guest account taps open login; logged-in users get saved charts, topup, coin balance, and logout.
+- Mobile bottom navigation has been removed. Do not reintroduce it unless the user explicitly asks.
+- Mobile header uses three zones: left menu for `Lá số`, `Xem ngày`, `Kiến thức`; centered logo/brand; right account trigger.
+- `src/components/mobile-site-menu.tsx` owns the left mobile navigation menu. `src/components/user-header-badge.tsx` owns account/login on the right and must keep logout available for logged-in users.
 - Do not add payment/refund policy links to account menus. The authenticated payment/refund policy remains a logged-in footer link only.
-- Mobile floating surfaces should use the shared CSS variables `--mobile-bottom-nav-height`, `--mobile-floating-bottom`, and `--mobile-safe-bottom` so CTAs, paywall popups, and modals stay above the tabbar.
-- Keep the mobile header compact: brand plus lightweight account/coin affordance. Avoid reintroducing a second mobile nav menu unless the bottom nav is intentionally redesigned.
+- Mobile floating surfaces should use `--mobile-floating-bottom` and `--mobile-safe-bottom`; there is no bottom tabbar height to reserve.
 
 ## Recent Update: Google Ads, Trust Pages, And Account Menu
 

@@ -3,10 +3,11 @@ import Image from "next/image";
 import { Suspense } from "react";
 import { BookOpenText, CalendarDays } from "lucide-react";
 import { UserHeaderBadge } from "@/components/user-header-badge";
+import { MobileSiteMenu } from "@/components/mobile-site-menu";
 import { APP_NAME } from "@/lib/env";
 
 const baseNav = [
-  { href: "/", label: "Lập lá số tử vi", tone: "primary" },
+  { href: "/", label: "Lập lá số", tone: "primary" },
   { href: "/xem-ngay", label: "Xem ngày", tone: "date" },
   { href: "/kien-thuc-tu-vi", label: "Kiến thức", tone: "knowledge" },
 ];
@@ -16,7 +17,11 @@ export async function SiteHeader() {
 
   return (
     <header className="site-header sticky top-0 z-50 border-b border-orange-100/70 bg-white/75 shadow-sm shadow-orange-950/5 backdrop-blur-2xl supports-[backdrop-filter]:bg-white/70">
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+      <div className="site-header-shell mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+        <div className="site-header-menu-slot">
+          <MobileSiteMenu items={nav} />
+        </div>
+
         <Link href="/" className="site-brand group flex min-w-0 items-center gap-2 font-semibold text-stone-950" prefetch={false}>
           <span className="site-brand-mark grid h-10 w-10 place-items-center overflow-hidden rounded-2xl bg-orange-50 shadow-inner shadow-white ring-1 ring-orange-200/70 transition-transform group-hover:-rotate-6 group-hover:scale-105">
             <Image src="/brand/laso-tinhhoa-mark.svg" alt="" width={40} height={40} priority />

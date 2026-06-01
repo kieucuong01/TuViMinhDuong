@@ -3,7 +3,8 @@ import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 
 const headerSource = readFileSync(fileURLToPath(new URL("./site-header.tsx", import.meta.url)), "utf8");
-const mobileBottomNavSource = readFileSync(fileURLToPath(new URL("./mobile-bottom-nav.tsx", import.meta.url)), "utf8");
+const mobileMenuSource = readFileSync(fileURLToPath(new URL("./mobile-site-menu.tsx", import.meta.url)), "utf8");
+const layoutSource = readFileSync(fileURLToPath(new URL("../app/layout.tsx", import.meta.url)), "utf8");
 const globalsCss = readFileSync(fileURLToPath(new URL("../app/globals.css", import.meta.url)), "utf8");
 
 describe("site header featured nav effects", () => {
@@ -16,25 +17,29 @@ describe("site header featured nav effects", () => {
     expect(headerSource).toContain("site-nav-knowledge");
   });
 
-  it("keeps featured destinations available in the mobile bottom nav", () => {
-    expect(mobileBottomNavSource).toContain("CalendarDays");
-    expect(mobileBottomNavSource).toContain("BookOpenText");
-    expect(mobileBottomNavSource).toContain('href="/xem-ngay"');
-    expect(mobileBottomNavSource).toContain('href="/kien-thuc-tu-vi"');
+  it("keeps featured destinations available in the left mobile header menu", () => {
+    expect(headerSource).toContain("MobileSiteMenu");
+    expect(mobileMenuSource).toContain("Sparkles");
+    expect(mobileMenuSource).toContain("CalendarDays");
+    expect(mobileMenuSource).toContain("BookOpenText");
+    expect(headerSource).toContain('href: "/xem-ngay"');
+    expect(headerSource).toContain('href: "/kien-thuc-tu-vi"');
   });
 
-  it("keeps mobile header focused by moving the navigation into the bottom nav", () => {
-    expect(headerSource).not.toContain("MobileSiteMenu");
-    expect(mobileBottomNavSource).toContain("mobile-account-backdrop");
-    expect(mobileBottomNavSource).toContain("routeKey");
-    expect(mobileBottomNavSource).toContain("setAccountSheet");
+  it("removes the mobile bottom nav in favor of a three-zone mobile header", () => {
+    expect(layoutSource).not.toContain("MobileBottomNav");
+    expect(headerSource).toContain("site-header-menu-slot");
+    expect(globalsCss).toMatch(/\.site-header-shell\s*{[\s\S]*grid-template-columns:\s*minmax\(3rem,\s*1fr\)\s+auto\s+minmax\(3rem,\s*1fr\)/);
+    expect(globalsCss).toMatch(/\.site-header-menu-slot\s*{[\s\S]*justify-self:\s*start/);
+    expect(globalsCss).toMatch(/\.site-brand\s*{[\s\S]*justify-self:\s*center/);
+    expect(globalsCss).toMatch(/\.site-header-actions\s*{[\s\S]*justify-self:\s*end/);
   });
 
   it("lets the mobile brand shrink before overlapping the account controls", () => {
     expect(headerSource).toContain("site-header-actions");
-    expect(globalsCss).toMatch(/\.site-brand\s*{[\s\S]*flex:\s*1 1 auto/);
-    expect(globalsCss).toMatch(/\.site-header-actions\s*{[\s\S]*flex-shrink:\s*0/);
-    expect(globalsCss).toMatch(/\.site-header-actions \.login-link\s*{[\s\S]*display:\s*none/);
+    expect(globalsCss).toMatch(/\.site-brand-copy > span:first-child\s*{[\s\S]*max-width:\s*min\(8\.2rem,\s*42vw\)/);
+    expect(globalsCss).toMatch(/\.site-header-actions \.login-link\s*{[\s\S]*width:\s*2\.8rem/);
+    expect(globalsCss).toMatch(/\.site-header-actions \.login-link span\s*{[\s\S]*display:\s*none/);
   });
 
   it("adds restrained chip glint and hover polish through CSS", () => {
@@ -42,7 +47,7 @@ describe("site header featured nav effects", () => {
     expect(globalsCss).toMatch(/\.site-nav-date,\s*\n\.site-nav-knowledge\s*{[\s\S]*box-shadow:/);
     expect(globalsCss).toMatch(/\.site-nav-date::before,\s*\n\.site-nav-knowledge::before\s*{[\s\S]*animation:\s*nav-chip-glint\s+5\.4s/);
     expect(globalsCss).toMatch(/\.site-nav-date:hover,\s*\n\.site-nav-knowledge:hover[\s\S]*translateY\(-1px\)/);
-    expect(globalsCss).toMatch(/\.mobile-bottom-nav\s*{[\s\S]*backdrop-filter:\s*blur\(20px\)/);
-    expect(globalsCss).toMatch(/\.mobile-bottom-nav \.is-active\s*{[\s\S]*background:\s*#fff7ed/);
+    expect(globalsCss).toMatch(/\.mobile-menu-date\s*{[\s\S]*linear-gradient/);
+    expect(globalsCss).toMatch(/\.mobile-menu-knowledge\s*{[\s\S]*linear-gradient/);
   });
 });

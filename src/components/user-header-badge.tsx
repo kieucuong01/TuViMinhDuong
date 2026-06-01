@@ -89,8 +89,9 @@ export function UserHeaderBadge() {
 
   if (!user) {
     return (
-      <Link href={loginHref} className="login-link btn btn-small btn-ghost" prefetch={false}>
-        Đăng nhập
+      <Link href={loginHref} className="login-link btn btn-small btn-ghost" aria-label="Tài khoản" title="Tài khoản" prefetch={false}>
+        <UserCircle size={16} />
+        <span>Đăng nhập</span>
       </Link>
     );
   }
@@ -113,7 +114,7 @@ export function UserHeaderBadge() {
           <span className="user-account-value">{user.name || user.email}</span>
           <span className="user-account-mobile-coins">{coinLabel}</span>
           {user.role === "ADMIN" ? <ShieldCheck className="user-admin-mini" size={14} aria-label="Admin" /> : null}
-          <ChevronDown size={14} />
+          <ChevronDown className="user-account-chevron" size={14} />
         </summary>
         <div className="user-account-popover">
           <Link href="/la-so" prefetch={false}>
