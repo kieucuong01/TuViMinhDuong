@@ -126,6 +126,57 @@ body {
   }
 }
 
+@keyframes nav-chip-glint {
+  from {
+    transform: translateX(-145%) skewX(-18deg);
+  }
+  to {
+    transform: translateX(235%) skewX(-18deg);
+  }
+}
+
+@keyframes date-page-orbit {
+  from {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+  to {
+    transform: translate3d(0.25rem, -0.2rem, 0) rotate(360deg);
+  }
+}
+
+@keyframes date-active-pulse {
+  0%,
+  100% {
+    opacity: 0.5;
+    transform: scale(0.86);
+  }
+  50% {
+    opacity: 0.9;
+    transform: scale(1.08);
+  }
+}
+
+@keyframes page-card-glow {
+  0%,
+  100% {
+    opacity: 0.42;
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    opacity: 0.72;
+    transform: translate3d(0.35rem, -0.25rem, 0);
+  }
+}
+
+@keyframes knowledge-thumb-sheen {
+  from {
+    transform: translateX(-130%) skewX(-16deg);
+  }
+  to {
+    transform: translateX(235%) skewX(-16deg);
+  }
+}
+
 @keyframes popup-slide-in {
   from {
     opacity: 0;
@@ -712,11 +763,79 @@ button.is-loading:not(.icon-button)::before {
 }
 
 .site-nav-link {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
   min-height: 2.55rem;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 0.38rem;
   white-space: nowrap;
+  transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease, background 180ms ease, color 180ms ease;
+}
+
+.site-nav-link > svg,
+.site-nav-link > span {
+  position: relative;
+  z-index: 1;
+}
+
+.site-nav-link > svg {
+  flex: none;
+}
+
+.site-nav-date,
+.site-nav-knowledge {
+  border: 1px solid rgb(232 201 143 / 0.48);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.86), 0 8px 18px rgb(120 53 15 / 0.05);
+}
+
+.site-nav-date {
+  background: linear-gradient(135deg, rgb(236 253 245 / 0.95), rgb(255 247 237 / 0.92));
+  color: #047857;
+}
+
+.site-nav-knowledge {
+  background: linear-gradient(135deg, rgb(255 247 237 / 0.98), rgb(255 251 235 / 0.92));
+  color: #9a3412;
+}
+
+.site-nav-date::before,
+.site-nav-knowledge::before {
+  content: "";
+  position: absolute;
+  inset: -45% auto -45% -38%;
+  z-index: 0;
+  width: 36%;
+  background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.62), transparent);
+  pointer-events: none;
+  animation: nav-chip-glint 5.4s ease-in-out infinite;
+}
+
+.site-nav-knowledge::before {
+  animation-delay: 1.2s;
+}
+
+.site-nav-date:hover,
+.site-nav-knowledge:hover,
+.site-nav-date:focus-visible,
+.site-nav-knowledge:focus-visible {
+  transform: translateY(-1px);
+  border-color: rgb(232 201 143 / 0.9);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.92), 0 12px 26px rgb(120 53 15 / 0.1);
+}
+
+.site-nav-date:hover,
+.site-nav-date:focus-visible {
+  background: linear-gradient(135deg, #ecfdf5, #fff7ed);
+  color: #047857;
+}
+
+.site-nav-knowledge:hover,
+.site-nav-knowledge:focus-visible {
+  background: linear-gradient(135deg, #fff7ed, #fef3c7);
+  color: #9a3412;
 }
 
 .site-nav-primary {
@@ -724,6 +843,27 @@ button.is-loading:not(.icon-button)::before {
   background: linear-gradient(135deg, #fff7ed, #ffedd5);
   color: #9a3412;
   box-shadow: 0 8px 20px rgb(234 88 12 / 0.08);
+}
+
+.mobile-menu-link {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.mobile-menu-link > svg {
+  flex: none;
+}
+
+.mobile-menu-date {
+  background: linear-gradient(135deg, rgb(236 253 245 / 0.92), rgb(255 247 237 / 0.72));
+  color: #047857;
+}
+
+.mobile-menu-knowledge {
+  background: linear-gradient(135deg, rgb(255 247 237 / 0.96), rgb(254 243 199 / 0.76));
+  color: #9a3412;
 }
 
 @media (max-width: 520px) {
@@ -2125,14 +2265,36 @@ button.is-loading:not(.icon-button)::before {
 }
 
 .article-thumb.image {
+  position: relative;
   overflow: hidden;
   background: #fff7ed;
+}
+
+.article-thumb.image::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(110deg, transparent 0%, rgb(255 255 255 / 0.56) 45%, transparent 72%);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(-130%) skewX(-16deg);
 }
 
 .article-thumb.image img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transition: transform 280ms ease, filter 280ms ease;
+}
+
+.article-card:hover .article-thumb.image::after {
+  animation: knowledge-thumb-sheen 860ms ease both;
+  opacity: 1;
+}
+
+.article-card:hover .article-thumb.image img {
+  filter: saturate(1.06) contrast(1.02);
+  transform: scale(1.035);
 }
 
 .seo-pill,
@@ -4576,7 +4738,134 @@ button.is-loading:not(.icon-button)::before {
   border-bottom: 0;
 }
 
+.knowledge-page-surface,
+.date-page-surface {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+.knowledge-page-surface {
+  background:
+    radial-gradient(circle at 12% 8%, rgb(249 115 22 / 0.11), transparent 22rem),
+    radial-gradient(circle at 86% 18%, rgb(16 185 129 / 0.08), transparent 24rem),
+    linear-gradient(180deg, #fffaf4 0%, #fbfaf7 46%, #fff 100%);
+}
+
+.knowledge-page-surface > div:not(.knowledge-page-orbit),
+.date-page-surface > div:not(.date-page-aura) {
+  position: relative;
+  z-index: 1;
+}
+
+.knowledge-page-orbit,
+.date-page-aura {
+  position: absolute;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.knowledge-page-orbit {
+  top: 2rem;
+  right: max(-8rem, -8vw);
+  width: min(30rem, 78vw);
+  aspect-ratio: 1;
+  border-radius: 999px;
+  background:
+    repeating-conic-gradient(from 18deg, rgb(251 146 60 / 0.12) 0deg 6deg, transparent 6deg 18deg),
+    radial-gradient(circle, transparent 48%, rgb(251 146 60 / 0.18) 49%, transparent 51%);
+  opacity: 0.62;
+  filter: blur(0.1px);
+  animation: date-page-orbit 48s linear infinite;
+}
+
+.knowledge-page-orbit::before {
+  content: "";
+  position: absolute;
+  inset: 18%;
+  border: 1px solid rgb(251 146 60 / 0.22);
+  border-radius: inherit;
+  box-shadow: 0 0 70px rgb(251 146 60 / 0.12);
+}
+
+.knowledge-path-panel,
+.knowledge-palace-panel {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  box-shadow: 0 18px 48px rgb(120 53 15 / 0.08);
+}
+
+.knowledge-path-panel::before,
+.knowledge-palace-panel::before,
+.knowledge-cta-band::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.knowledge-path-panel::before {
+  inset: -28% -16% auto auto;
+  width: 18rem;
+  height: 18rem;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgb(251 146 60 / 0.18), transparent 66%);
+  animation: page-card-glow 7.5s ease-in-out infinite;
+}
+
+.knowledge-palace-panel::before {
+  inset: auto auto -42% -18%;
+  width: 16rem;
+  height: 16rem;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgb(16 185 129 / 0.13), transparent 65%);
+  animation: page-card-glow 8.2s ease-in-out infinite reverse;
+}
+
+.knowledge-path-panel > *,
+.knowledge-palace-panel > *,
+.knowledge-cta-band > * {
+  position: relative;
+  z-index: 1;
+}
+
+.knowledge-path-card,
+.knowledge-palace-link {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.72);
+}
+
+.knowledge-path-card::before,
+.knowledge-palace-link::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  z-index: 0;
+  width: 0.22rem;
+  border-radius: inherit;
+  background: linear-gradient(180deg, #fb923c, #facc15);
+  opacity: 0.82;
+  transition: width 180ms ease, opacity 180ms ease;
+}
+
+.knowledge-path-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+.knowledge-path-card:hover::before,
+.knowledge-palace-link:hover::before {
+  width: 100%;
+  opacity: 0.12;
+}
+
 .knowledge-cta-band {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   gap: 1rem;
@@ -4589,6 +4878,14 @@ button.is-loading:not(.icon-button)::before {
     linear-gradient(135deg, #fff7ed, #fff);
   padding: clamp(1rem, 3vw, 1.35rem);
   box-shadow: 0 16px 42px rgb(120 53 15 / 0.07);
+}
+
+.knowledge-cta-band::before {
+  inset: -70% auto -70% -22%;
+  width: 28%;
+  background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.56), transparent);
+  transform: translateX(-125%) skewX(-16deg);
+  animation: home-sheen-sweep 7.2s ease-in-out infinite;
 }
 
 .knowledge-cta-band h2 {
@@ -4615,6 +4912,8 @@ button.is-loading:not(.icon-button)::before {
 
 .knowledge-category-nav a,
 .article-category-label {
+  position: relative;
+  overflow: hidden;
   display: inline-flex;
   min-height: 2.15rem;
   align-items: center;
@@ -4625,13 +4924,28 @@ button.is-loading:not(.icon-button)::before {
   color: #7c2d12;
   font-size: 0.82rem;
   font-weight: 900;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.75);
+  transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease, background 180ms ease;
 }
 
 .knowledge-category-nav a.active,
 .knowledge-category-nav a:hover {
+  transform: translateY(-1px);
   border-color: #fb923c;
   background: #fff7ed;
   color: #c2410c;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.9), 0 10px 22px rgb(249 115 22 / 0.12);
+}
+
+.knowledge-category-nav a.active::after {
+  content: "";
+  position: absolute;
+  right: 0.7rem;
+  bottom: 0.35rem;
+  left: 0.7rem;
+  height: 2px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, transparent, #fb923c, transparent);
 }
 
 .article-category-label {
@@ -4705,6 +5019,35 @@ button.is-loading:not(.icon-button)::before {
   box-shadow: 0 20px 48px rgb(120 53 15 / 0.1);
 }
 
+.date-page-surface {
+  background:
+    radial-gradient(circle at 14% 7%, rgb(249 115 22 / 0.1), transparent 22rem),
+    radial-gradient(circle at 88% 14%, rgb(16 185 129 / 0.08), transparent 24rem),
+    linear-gradient(180deg, #fffaf4 0%, #fbfaf7 52%, #fff 100%);
+}
+
+.date-page-aura {
+  top: 1.5rem;
+  left: max(-11rem, -12vw);
+  width: min(32rem, 82vw);
+  aspect-ratio: 1;
+  border-radius: 999px;
+  background:
+    repeating-conic-gradient(from 0deg, rgb(251 146 60 / 0.1) 0deg 5deg, transparent 5deg 16deg),
+    radial-gradient(circle, transparent 45%, rgb(251 146 60 / 0.16) 46%, transparent 48%, transparent 58%, rgb(16 185 129 / 0.1) 59%, transparent 61%);
+  opacity: 0.68;
+  animation: date-page-orbit 54s linear infinite reverse;
+}
+
+.date-page-aura::before {
+  content: "";
+  position: absolute;
+  inset: 22%;
+  border: 1px solid rgb(251 146 60 / 0.22);
+  border-radius: inherit;
+  box-shadow: 0 0 80px rgb(251 146 60 / 0.11);
+}
+
 .date-view-shell {
   display: grid;
   gap: 1.5rem;
@@ -4717,6 +5060,28 @@ button.is-loading:not(.icon-button)::before {
   background: rgb(255 255 255 / 0.9);
   box-shadow: 0 18px 46px rgb(120 53 15 / 0.08);
   backdrop-filter: blur(16px);
+}
+
+.date-month-calendar-card,
+.date-picker-card,
+.date-score-panel,
+.date-info-card,
+.date-guide-panel,
+.date-task-card,
+.date-rule-card,
+.date-star-chip,
+.date-hour-card,
+.date-list-item {
+  position: relative;
+  isolation: isolate;
+}
+
+.date-month-calendar-card,
+.date-picker-card,
+.date-score-panel,
+.date-guide-panel,
+.date-task-card {
+  overflow: hidden;
 }
 
 .date-month-overview {
@@ -4739,6 +5104,32 @@ button.is-loading:not(.icon-button)::before {
     radial-gradient(circle at 8% 0%, rgb(249 115 22 / 0.12), transparent 16rem),
     rgb(255 255 255 / 0.94);
   box-shadow: 0 18px 42px rgb(120 53 15 / 0.08);
+}
+
+.date-month-calendar-card::before,
+.date-score-panel::before,
+.date-guide-panel::before {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+}
+
+.date-month-calendar-card::before {
+  inset: -36% auto auto -18%;
+  z-index: 0;
+  width: 22rem;
+  height: 22rem;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgb(251 146 60 / 0.16), transparent 66%);
+  animation: page-card-glow 7.8s ease-in-out infinite;
+}
+
+.date-month-calendar-card > *,
+.date-score-panel > *,
+.date-guide-panel > *,
+.date-task-card > * {
+  position: relative;
+  z-index: 1;
 }
 
 .date-month-calendar-head {
@@ -4826,6 +5217,55 @@ button.is-loading:not(.icon-button)::before {
   align-items: center;
   border-radius: 1.45rem;
   padding: clamp(1.2rem, 3vw, 2rem);
+  background:
+    radial-gradient(circle at 80% 12%, rgb(16 185 129 / 0.12), transparent 18rem),
+    rgb(255 255 255 / 0.9);
+}
+
+.date-score-panel::before {
+  inset: auto -12% -48% auto;
+  z-index: 0;
+  width: 20rem;
+  height: 20rem;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgb(251 146 60 / 0.14), transparent 64%);
+  animation: page-card-glow 8.6s ease-in-out infinite reverse;
+}
+
+.date-score-panel .fortune-gauge {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  box-shadow: 0 18px 42px rgb(16 185 129 / 0.15);
+}
+
+.date-score-panel .fortune-gauge::before {
+  content: "";
+  position: absolute;
+  inset: -36%;
+  z-index: 0;
+  border-radius: inherit;
+  background: conic-gradient(transparent 0deg, rgb(255 255 255 / 0.72) 55deg, transparent 112deg, transparent 360deg);
+  mix-blend-mode: screen;
+  pointer-events: none;
+  animation: fortune-gauge-orbit 5.2s linear infinite;
+}
+
+.date-score-panel .fortune-gauge::after {
+  content: "";
+  position: absolute;
+  inset: 0.44rem;
+  z-index: 0;
+  border-radius: inherit;
+  border: 1px solid rgb(255 255 255 / 0.7);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.42), 0 0 30px rgb(16 185 129 / 0.18);
+  pointer-events: none;
+  animation: fortune-gauge-glow 3.8s ease-in-out infinite;
+}
+
+.date-score-panel .fortune-gauge > div {
+  position: relative;
+  z-index: 1;
 }
 
 .date-info-card {
@@ -4853,6 +5293,9 @@ button.is-loading:not(.icon-button)::before {
 }
 
 .date-calendar-day {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
   display: grid;
   min-height: 3.35rem;
   place-items: center;
@@ -4861,6 +5304,22 @@ button.is-loading:not(.icon-button)::before {
   background: #fff;
   color: #44403c;
   transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.date-calendar-day::before {
+  content: "";
+  position: absolute;
+  inset: 0.36rem;
+  z-index: 0;
+  border-radius: 0.58rem;
+  border: 1px solid rgb(251 146 60 / 0.48);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.date-calendar-day > * {
+  position: relative;
+  z-index: 1;
 }
 
 .date-calendar-day strong {
@@ -4894,6 +5353,11 @@ button.is-loading:not(.icon-button)::before {
 .date-calendar-day.active {
   background: #fff7ed;
   color: #9a3412;
+}
+
+.date-calendar-day.active::before {
+  opacity: 0.72;
+  animation: date-active-pulse 3.6s ease-in-out infinite;
 }
 
 .date-hour-card {
@@ -4949,10 +5413,27 @@ button.is-loading:not(.icon-button)::before {
   transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
 }
 
+.date-task-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  z-index: 0;
+  width: 0.28rem;
+  border-radius: inherit;
+  background: linear-gradient(180deg, #fb923c, #facc15);
+  opacity: 0.7;
+  transition: width 180ms ease, opacity 180ms ease;
+}
+
 .date-task-card:hover {
   transform: translateY(-2px);
   border-color: #fdba74;
   box-shadow: 0 18px 42px rgb(120 53 15 / 0.09);
+}
+
+.date-task-card:hover::before {
+  width: 100%;
+  opacity: 0.08;
 }
 
 .date-task-card[data-tone="good"] {
@@ -5053,6 +5534,42 @@ button.is-loading:not(.icon-button)::before {
 .date-star-chip[data-tone="bad"] {
   border-color: #fecdd3;
   background: #fff1f2;
+}
+
+.date-guide-panel {
+  border-color: rgb(254 215 170 / 0.92);
+  background:
+    radial-gradient(circle at 0% 0%, rgb(251 146 60 / 0.12), transparent 16rem),
+    rgb(255 255 255 / 0.93);
+}
+
+.date-guide-panel::before {
+  inset: -38% -12% auto auto;
+  z-index: 0;
+  width: 20rem;
+  height: 20rem;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgb(16 185 129 / 0.12), transparent 64%);
+  animation: page-card-glow 8s ease-in-out infinite;
+}
+
+.date-guide-card,
+.date-faq-item {
+  transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease, background 180ms ease;
+}
+
+.date-guide-card {
+  border-radius: 1rem;
+  border: 1px solid rgb(254 215 170 / 0.72);
+  background: rgb(255 247 237 / 0.42);
+  padding: 1rem;
+}
+
+.date-guide-card:hover,
+.date-faq-item:hover {
+  transform: translateY(-2px);
+  border-color: #fdba74;
+  box-shadow: 0 16px 34px rgb(120 53 15 / 0.08);
 }
 
 @media (min-width: 720px) {

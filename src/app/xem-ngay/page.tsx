@@ -41,31 +41,32 @@ export default async function DateViewPage({
   });
 
   return (
-    <main className="min-h-screen bg-[#fbfaf7]">
+    <main className="date-page-surface min-h-screen bg-[#fbfaf7]">
+      <div className="date-page-aura" aria-hidden="true" />
       <script id="date-page-jsonld" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(pageLd) }} />
       <script id="date-faq-jsonld" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd(faqs)) }} />
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <DateView initialDate={query.date} />
-        <section className="panel mt-8">
+        <section className="date-guide-panel panel mt-8">
           <p className="eyebrow">Hướng dẫn đọc kết quả</p>
           <h2 className="text-2xl font-black text-stone-950">Xem ngày tốt xấu nên dùng như bản tham khảo có điều kiện</h2>
           <div className="mt-4 grid gap-4 text-base leading-8 text-stone-700 md:grid-cols-3">
-            <article>
+            <article className="date-guide-card">
               <h3 className="font-black text-stone-950">Xem theo việc cần làm</h3>
               <p>Một ngày có thể tốt cho xuất hành nhưng chưa chắc phù hợp để ký hợp đồng hoặc cưới hỏi. Vì vậy điểm được tách theo từng nhóm việc.</p>
             </article>
-            <article>
+            <article className="date-guide-card">
               <h3 className="font-black text-stone-950">Nhập tuổi để xét xung hợp</h3>
               <p>Năm sinh giúp hệ thống xét thêm tam hợp, lục hợp, lục xung, hình, hại, phá và thiên can để kết quả sát với người xem hơn.</p>
             </article>
-            <article>
+            <article className="date-guide-card">
               <h3 className="font-black text-stone-950">Chọn giờ tốt nếu ngày trung bình</h3>
               <p>Nếu ngày không quá đẹp nhưng vẫn cần làm việc, hãy ưu tiên giờ hoàng đạo và giảm quy mô các quyết định quan trọng.</p>
             </article>
           </div>
           <div className="mt-6 grid gap-3">
             {faqs.map((item) => (
-              <details key={item.question} className="rounded-2xl border border-orange-100 bg-orange-50/50 p-4">
+              <details key={item.question} className="date-faq-item rounded-2xl border border-orange-100 bg-orange-50/50 p-4">
                 <summary className="cursor-pointer text-base font-black text-stone-950">{item.question}</summary>
                 <p className="mt-3 text-base leading-7 text-stone-700">{item.answer}</p>
               </details>

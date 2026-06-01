@@ -53,7 +53,8 @@ export default async function KnowledgePage({ searchParams }: { searchParams: Pr
     .filter(Boolean);
 
   return (
-    <main className="section">
+    <main className="knowledge-page-surface section">
+      <div className="knowledge-page-orbit" aria-hidden="true" />
       <script id="knowledge-page-jsonld" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(pageLd) }} />
       <script id="knowledge-list-jsonld" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListLd) }} />
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -62,12 +63,12 @@ export default async function KnowledgePage({ searchParams }: { searchParams: Pr
           <h1>Bài viết dễ đọc cho người mới bắt đầu</h1>
         </div>
         <section className="mb-8 grid gap-4 lg:grid-cols-[1.25fr_0.75fr]" aria-label="Cụm bài nên đọc">
-          <div className="rounded-[1.5rem] border border-orange-100 bg-white/90 p-5 shadow-sm sm:p-6">
+          <div className="knowledge-path-panel rounded-[1.5rem] border border-orange-100 bg-white/90 p-5 shadow-sm sm:p-6">
             <p className="eyebrow">Nên đọc theo thứ tự</p>
             <h2 className="mt-2 text-2xl font-black text-stone-950">Bắt đầu từ lá số, rồi đi vào cung và vận hạn</h2>
             <div className="mt-5 grid gap-3 sm:grid-cols-2">
               {beginnerPath.map((article, index) => (
-                <Link key={article!.slug} href={`/kien-thuc-tu-vi/${article!.slug}`} className="group rounded-2xl border border-stone-100 bg-orange-50/40 p-4 transition hover:-translate-y-0.5 hover:border-orange-200 hover:bg-orange-50">
+                <Link key={article!.slug} href={`/kien-thuc-tu-vi/${article!.slug}`} className="knowledge-path-card group rounded-2xl border border-stone-100 bg-orange-50/40 p-4 transition hover:-translate-y-0.5 hover:border-orange-200 hover:bg-orange-50">
                   <span className="text-sm font-black text-orange-600">Bước {index + 1}</span>
                   <h3 className="mt-2 text-lg font-black text-stone-950 group-hover:text-orange-700">{article!.title}</h3>
                   <p className="mt-2 line-clamp-2 text-sm leading-6 text-stone-600">{article!.excerpt}</p>
@@ -75,12 +76,12 @@ export default async function KnowledgePage({ searchParams }: { searchParams: Pr
               ))}
             </div>
           </div>
-          <aside className="rounded-[1.5rem] border border-orange-100 bg-orange-50/70 p-5 sm:p-6">
+          <aside className="knowledge-palace-panel rounded-[1.5rem] border border-orange-100 bg-orange-50/70 p-5 sm:p-6">
             <p className="eyebrow">Cụm 12 cung</p>
             <h2 className="mt-2 text-xl font-black text-stone-950">Các cung được tìm nhiều</h2>
             <div className="mt-4 grid gap-2">
               {palaceCluster.map((article) => (
-                <Link key={article!.slug} href={`/kien-thuc-tu-vi/${article!.slug}`} className="rounded-2xl bg-white/80 px-4 py-3 text-base font-bold text-stone-800 transition hover:bg-white hover:text-orange-700">
+                <Link key={article!.slug} href={`/kien-thuc-tu-vi/${article!.slug}`} className="knowledge-palace-link rounded-2xl bg-white/80 px-4 py-3 text-base font-bold text-stone-800 transition hover:bg-white hover:text-orange-700">
                   {article!.title}
                 </Link>
               ))}

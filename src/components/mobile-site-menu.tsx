@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu } from "lucide-react";
+import { BookOpenText, CalendarDays, Menu } from "lucide-react";
 import { useEffect, useRef } from "react";
 import { CoinTopupLink } from "@/components/coin-topup-link";
 
@@ -10,6 +10,7 @@ type MobileSiteMenuItem = {
   href: string;
   label: string;
   modal?: boolean;
+  tone?: string;
 };
 
 type MobileSiteMenuProps = {
@@ -34,17 +35,22 @@ export function MobileSiteMenu({ items }: MobileSiteMenuProps) {
         <Menu size={20} />
       </summary>
       <div className="absolute right-0 mt-3 grid w-60 gap-1 rounded-2xl border border-orange-100 bg-white/95 p-2 shadow-2xl shadow-orange-950/10 backdrop-blur-xl">
-        {items.map((item) =>
-          item.modal ? (
-            <CoinTopupLink key={item.href} className="rounded-xl px-3 py-2.5 text-sm font-semibold text-stone-700 transition hover:bg-orange-50 hover:text-orange-700" onClick={closeMenu}>
-              {item.label}
+        {items.map((item) => {
+          const Icon = item.tone === "date" ? CalendarDays : item.tone === "knowledge" ? BookOpenText : null;
+          const itemClass = `mobile-menu-link rounded-xl px-3 py-2.5 text-sm font-semibold text-stone-700 transition hover:bg-orange-50 hover:text-orange-700 ${item.tone === "date" ? "mobile-menu-date" : ""} ${item.tone === "knowledge" ? "mobile-menu-knowledge" : ""}`;
+
+          return item.modal ? (
+            <CoinTopupLink key={item.href} className={itemClass} onClick={closeMenu}>
+              {Icon ? <Icon aria-hidden="true" size={16} strokeWidth={2.4} /> : null}
+              <span>{item.label}</span>
             </CoinTopupLink>
           ) : (
-            <Link key={item.href} href={item.href} className="rounded-xl px-3 py-2.5 text-sm font-semibold text-stone-700 transition hover:bg-orange-50 hover:text-orange-700" prefetch={false} onClick={closeMenu}>
-              {item.label}
+            <Link key={item.href} href={item.href} className={itemClass} prefetch={false} onClick={closeMenu}>
+              {Icon ? <Icon aria-hidden="true" size={16} strokeWidth={2.4} /> : null}
+              <span>{item.label}</span>
             </Link>
-          )
-        )}
+          );
+        })}
       </div>
     </details>
   );
