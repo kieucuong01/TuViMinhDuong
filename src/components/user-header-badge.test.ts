@@ -18,4 +18,14 @@ describe("user header coin balance", () => {
     expect(globalsCss).toMatch(/\.user-header-badge\s+\.user-coin-pill[\s\S]*display:\s*none/);
     expect(globalsCss).toMatch(/\.user-account-mobile-coins\s*{[\s\S]*display:\s*inline-flex/);
   });
+
+  it("closes the account dropdown when the visitor presses outside it", () => {
+    expect(userHeaderSource).toContain("useCloseDetailsOnOutsideClick");
+    expect(userHeaderSource).toContain("useCloseDetailsOnOutsideClick(detailsRef)");
+  });
+
+  it("keeps the saved-chart shortcut compact enough for narrow mobile headers", () => {
+    expect(userHeaderSource).toContain("user-charts-label");
+    expect(globalsCss).toMatch(/\.user-header-badge\s+\.user-charts-label\s*{[\s\S]*display:\s*none/);
+  });
 });

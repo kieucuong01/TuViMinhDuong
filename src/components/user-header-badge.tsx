@@ -3,10 +3,11 @@
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { ChevronDown, Coins, FileText, LogOut, ShieldCheck, UserCircle } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { logoutAction } from "@/app/actions";
 import { loginModalHref } from "@/components/login-modal-link";
 import { LoadingSubmitButton } from "@/components/loading-submit-button";
+import { useCloseDetailsOnOutsideClick } from "@/components/use-close-details-on-outside-click";
 import { formatCoins } from "@/lib/format";
 
 type HeaderUser = {
@@ -22,6 +23,8 @@ export function UserHeaderBadge() {
   const searchParams = useSearchParams();
   const [user, setUser] = useState<HeaderUser | null>(null);
   const [loaded, setLoaded] = useState(false);
+  const detailsRef = useRef<HTMLDetailsElement>(null);
+  useCloseDetailsOnOutsideClick(detailsRef);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -37,6 +40,10 @@ export function UserHeaderBadge() {
     return () => {
       controller.abort();
     };
+  }, [pathname, searchParams]);
+
+  useEffect(() => {
+    if (detailsRef.current?.open) detailsRef.current.open = false;
   }, [pathname, searchParams]);
 
   useEffect(() => {
@@ -94,13 +101,13 @@ export function UserHeaderBadge() {
     <div className="user-header-badge">
       <Link href="/la-so" className="user-charts-pill" title="Lá số của tôi" aria-label="Lá số của tôi" prefetch={false}>
         <FileText size={15} />
-        Lá số
+        <span className="user-charts-label">Lá số</span>
       </Link>
       <Link href="/nap-xu" className="user-coin-pill" title={`Số dư ${coinLabel}. Bấm để nạp xu`} aria-label={`Số dư ${coinLabel}. Nạp xu`} prefetch={false}>
         <Coins size={15} aria-hidden="true" />
         <span>{coinLabel}</span>
       </Link>
-      <details className="user-account-menu">
+      <details ref={detailsRef} className="user-account-menu">
         <summary className="user-name-pill" title={user.name || user.email} aria-label={`Tài khoản ${user.name || user.email}`}>
           <UserCircle size={16} />
           <span className="user-account-value">{user.name || user.email}</span>

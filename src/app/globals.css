@@ -1149,18 +1149,32 @@ button.is-loading:not(.icon-button)::before {
   }
 
   .site-brand {
+    flex: 1 1 auto;
+    min-width: 0;
     gap: 0.45rem;
   }
 
   .site-brand-mark {
+    flex-shrink: 0;
     width: 2.65rem;
     height: 2.65rem;
     border-radius: 1rem;
   }
 
+  .site-brand-copy {
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
   .site-brand-copy > span:first-child {
-    max-width: 9.4rem;
+    max-width: min(9.4rem, 100%);
     font-size: 1.08rem;
+  }
+
+  .site-header-actions {
+    flex-shrink: 0;
+    gap: 0.35rem;
   }
 
   .login-link.btn-small {
@@ -1174,6 +1188,16 @@ button.is-loading:not(.icon-button)::before {
     width: 2.8rem;
     height: 2.8rem;
     border-radius: 0.95rem;
+  }
+
+  .user-header-badge .user-charts-pill {
+    width: 2.8rem;
+    justify-content: center;
+    padding: 0;
+  }
+
+  .user-header-badge .user-charts-label {
+    display: none;
   }
 }
 

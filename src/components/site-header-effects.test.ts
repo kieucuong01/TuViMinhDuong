@@ -23,6 +23,17 @@ describe("site header featured nav effects", () => {
     expect(mobileMenuSource).toContain("mobile-menu-knowledge");
   });
 
+  it("closes the mobile menu when the visitor presses outside it", () => {
+    expect(mobileMenuSource).toContain("useCloseDetailsOnOutsideClick");
+    expect(mobileMenuSource).toContain("useCloseDetailsOnOutsideClick(detailsRef)");
+  });
+
+  it("lets the mobile brand shrink before overlapping the account controls", () => {
+    expect(headerSource).toContain("site-header-actions");
+    expect(globalsCss).toMatch(/\.site-brand\s*{[\s\S]*flex:\s*1 1 auto/);
+    expect(globalsCss).toMatch(/\.site-header-actions\s*{[\s\S]*flex-shrink:\s*0/);
+  });
+
   it("adds restrained chip glint and hover polish through CSS", () => {
     expect(globalsCss).toContain("@keyframes nav-chip-glint");
     expect(globalsCss).toMatch(/\.site-nav-date,\s*\n\.site-nav-knowledge\s*{[\s\S]*box-shadow:/);

@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { BookOpenText, CalendarDays, Menu } from "lucide-react";
 import { useEffect, useRef } from "react";
 import { CoinTopupLink } from "@/components/coin-topup-link";
+import { useCloseDetailsOnOutsideClick } from "@/components/use-close-details-on-outside-click";
 
 type MobileSiteMenuItem = {
   href: string;
@@ -20,6 +21,7 @@ type MobileSiteMenuProps = {
 export function MobileSiteMenu({ items }: MobileSiteMenuProps) {
   const pathname = usePathname();
   const detailsRef = useRef<HTMLDetailsElement>(null);
+  useCloseDetailsOnOutsideClick(detailsRef);
 
   const closeMenu = () => {
     if (detailsRef.current?.open) detailsRef.current.open = false;

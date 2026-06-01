@@ -42,7 +42,7 @@ export async function SiteHeader() {
           })}
         </nav>
 
-        <div className="flex items-center gap-2">
+        <div className="site-header-actions flex items-center gap-2">
           <Suspense fallback={<div className="user-header-skeleton" aria-hidden="true"><span /></div>}>
             <UserHeaderBadge />
           </Suspense>
