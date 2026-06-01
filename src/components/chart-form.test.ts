@@ -53,4 +53,11 @@ describe("chart form compact picker UI", () => {
     expect(globalsCss).toMatch(/\.hero-form-card \.chart-field-label,[\s\S]*clip:\s*rect\(0, 0, 0, 0\)/);
     expect(globalsCss).toMatch(/\.hero-form-card \.birth-date-grid input,[\s\S]*\.hero-form-card \.birth-date-grid select/);
   });
+
+  it("keeps the hero chart form typography aligned with the site sans font", () => {
+    expect(globalsCss).toMatch(/\.hero-form-card h1\s*{[\s\S]*font-family:\s*inherit/);
+    expect(globalsCss).toMatch(/\.hero-form-card \.chart-form input,[\s\S]*\.hero-form-card \.chart-form select\s*{[\s\S]*font-family:\s*inherit/);
+    expect(globalsCss).toMatch(/\.hero-form-card \.birth-date-grid input,[\s\S]*\.hero-form-card \.birth-date-grid select\s*{[\s\S]*font-family:\s*inherit/);
+    expect(globalsCss).toMatch(/\.hero-form-card \.chart-form \.btn-primary\s*{[\s\S]*font-family:\s*inherit/);
+  });
 });

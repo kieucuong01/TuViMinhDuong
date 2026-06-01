@@ -182,17 +182,6 @@ export default async function Home() {
         </div>
       </section>
 
-      <section className="section bg-stone-950 text-white">
-        <div className="mx-auto grid max-w-7xl gap-6 px-4 sm:px-6 md:grid-cols-[1fr_auto] md:items-center lg:px-8">
-          <div>
-            <p className="eyebrow text-orange-300">Bắt đầu miễn phí</p>
-            <h2 className="text-balance text-3xl font-black">Tạo lá số đầu tiên, xem phần cơ bản rồi đọc tiếp khi bạn muốn hiểu sâu hơn</h2>
-          </div>
-          <Link href="/#lap-la-so" className="btn btn-primary btn-large">
-            <Sparkles size={20} /> Lập lá số ngay
-          </Link>
-        </div>
-      </section>
       <DeferredSocialProof />
     </main>
   );

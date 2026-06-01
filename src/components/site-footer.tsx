@@ -20,9 +20,9 @@ const knowledgeLinks = [
 ];
 
 const trustLinks = [
-  { href: "/nap-xu", label: "Nạp xu luận giải" },
+  { href: "/nap-xu", label: "Luận giải chuyên sâu" },
   { href: "/la-so", label: "Lá số đã lưu" },
-  { href: "/kien-thuc-tu-vi/seo-cho-website-tu-vi", label: "Cách xây cụm nội dung tử vi" },
+  { href: "/kien-thuc-tu-vi", label: "Kiến thức tử vi" },
 ];
 
 export function SiteFooter() {
