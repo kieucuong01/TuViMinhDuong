@@ -2,17 +2,19 @@
 
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
-import { ChevronDown, FileText, LogOut, ShieldCheck, UserCircle } from "lucide-react";
+import { ChevronDown, Coins, FileText, LogOut, ShieldCheck, UserCircle } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { logoutAction } from "@/app/actions";
 import { loginModalHref } from "@/components/login-modal-link";
 import { LoadingSubmitButton } from "@/components/loading-submit-button";
+import { formatCoins } from "@/lib/format";
 
 type HeaderUser = {
   id: string;
   email: string;
   name: string;
   role: "USER" | "ADMIN";
+  coinBalance: number;
 };
 
 export function UserHeaderBadge() {
@@ -86,22 +88,32 @@ export function UserHeaderBadge() {
     );
   }
 
+  const coinLabel = formatCoins(user.coinBalance ?? 0);
+
   return (
     <div className="user-header-badge">
       <Link href="/la-so" className="user-charts-pill" title="Lá số của tôi" aria-label="Lá số của tôi" prefetch={false}>
         <FileText size={15} />
         Lá số
       </Link>
+      <Link href="/nap-xu" className="user-coin-pill" title={`Số dư ${coinLabel}. Bấm để nạp xu`} aria-label={`Số dư ${coinLabel}. Nạp xu`} prefetch={false}>
+        <Coins size={15} aria-hidden="true" />
+        <span>{coinLabel}</span>
+      </Link>
       <details className="user-account-menu">
         <summary className="user-name-pill" title={user.name || user.email} aria-label={`Tài khoản ${user.name || user.email}`}>
           <UserCircle size={16} />
           <span className="user-account-value">{user.name || user.email}</span>
+          <span className="user-account-mobile-coins">{coinLabel}</span>
           {user.role === "ADMIN" ? <ShieldCheck className="user-admin-mini" size={14} aria-label="Admin" /> : null}
           <ChevronDown size={14} />
         </summary>
         <div className="user-account-popover">
           <Link href="/la-so" prefetch={false}>
             <FileText size={15} /> Lá số của tôi
+          </Link>
+          <Link href="/nap-xu" prefetch={false}>
+            <Coins size={15} /> Nạp xu <span className="user-account-popover-value">{coinLabel}</span>
           </Link>
           {user.role === "ADMIN" ? (
             <Link href="/admin" prefetch={false}>

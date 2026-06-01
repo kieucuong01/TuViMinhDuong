@@ -665,6 +665,11 @@ button.is-loading:not(.icon-button)::before {
   font-variant-numeric: tabular-nums;
 }
 
+.user-coin-pill:hover {
+  background: #fef3c7;
+  color: #78350f;
+}
+
 .user-coin-pill.free {
   border-color: #a7f3d0;
   background: #ecfdf5;
@@ -702,6 +707,16 @@ button.is-loading:not(.icon-button)::before {
   color: #c2410c;
 }
 
+.user-account-mobile-coins {
+  display: none;
+  align-items: center;
+  max-width: 6.3rem;
+  overflow: hidden;
+  color: #92400e;
+  font-variant-numeric: tabular-nums;
+  text-overflow: ellipsis;
+}
+
 .user-account-popover {
   position: absolute;
   right: 0;
@@ -737,6 +752,14 @@ button.is-loading:not(.icon-button)::before {
 .user-account-popover button:hover {
   background: #fff7ed;
   color: #9a3412;
+}
+
+.user-account-popover-value {
+  margin-left: auto;
+  color: #92400e;
+  font-size: 0.78rem;
+  font-variant-numeric: tabular-nums;
+  font-weight: 900;
 }
 
 .user-charts-pill {
@@ -8178,6 +8201,10 @@ button.is-loading:not(.icon-button)::before {
     display: inline-flex;
     max-width: 7rem;
     padding: 0 0.65rem;
+  }
+
+  .user-header-badge .user-account-mobile-coins {
+    display: inline-flex;
   }
 
   .user-header-badge .user-charts-pill {
