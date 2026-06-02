@@ -1301,8 +1301,7 @@ button.is-loading:not(.icon-button)::before {
 .hero-band p,
 .hero-band .btn,
 .metric-card,
-.day-fortune-card,
-.hero-form-card {
+.day-fortune-card {
   animation: fade-up 680ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
@@ -1460,7 +1459,6 @@ button.is-loading:not(.icon-button)::before {
   padding: clamp(1.25rem, 3vw, 2rem);
   box-shadow: 0 24px 62px rgb(120 53 15 / 0.13), 0 0 0 1px rgb(232 201 143 / 0.7), inset 0 1px 0 rgb(255 255 255 / 0.8);
   transition: border-color 220ms ease, box-shadow 220ms ease;
-  animation: fade-up 680ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .hero-form-card::before {
@@ -1503,7 +1501,6 @@ button.is-loading:not(.icon-button)::before {
 
 .hero-form-card:focus-within {
   border-color: #a91624;
-  animation: none;
   box-shadow: 0 30px 78px rgb(120 53 15 / 0.18), 0 0 0 1px rgb(169 22 36 / 0.24), inset 0 1px 0 rgb(255 255 255 / 0.86);
 }
 
@@ -1807,7 +1804,6 @@ button.is-loading:not(.icon-button)::before {
 .section + .section,
 .home-preview-section,
 .reading-tabs,
-.quick-insights,
 .pricing-hero section,
 .article-card,
 .feature-card {
@@ -2002,6 +1998,16 @@ button.is-loading:not(.icon-button)::before {
 
 .chart-form label:nth-child(even) {
   animation: fade-up 520ms cubic-bezier(0.22, 1, 0.36, 1) 60ms both;
+}
+
+.hero-form-card .chart-form label,
+.hero-form-card .birth-date-group {
+  animation: none;
+}
+
+.hero-form-card .chart-form label:focus-within,
+.hero-form-card .birth-date-group:focus-within {
+  transform: none;
 }
 
 .form-grid {
@@ -3495,89 +3501,6 @@ button.is-loading:not(.icon-button)::before {
   .knowledge-cta-actions {
     justify-content: flex-start;
   }
-}
-
-.quick-insights {
-  margin-bottom: 1.25rem;
-  border: 1px solid #fed7aa;
-  border-radius: 1.1rem;
-  background: linear-gradient(135deg, #fff7ed, #fff, #ecfdf5);
-  padding: 1rem;
-  box-shadow: 0 18px 48px rgb(120 53 15 / 0.08);
-}
-
-.quick-insights-head {
-  display: grid;
-  gap: 0.35rem;
-}
-
-.quick-insights-head h2 {
-  color: #111827;
-  font-size: clamp(1.25rem, 2.4vw, 1.75rem);
-  font-weight: 950;
-}
-
-.quick-insights-head p:not(.eyebrow) {
-  color: #57534e;
-  line-height: 1.6;
-}
-
-.quick-insight-grid {
-  margin-top: 0.95rem;
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 0.7rem;
-}
-
-.quick-insight-grid article {
-  border-radius: 0.9rem;
-  background: rgb(255 255 255 / 0.82);
-  padding: 0.9rem;
-  box-shadow: inset 0 0 0 1px rgb(254 215 170 / 0.62);
-}
-
-.quick-insight-grid span {
-  display: grid;
-  width: 2rem;
-  height: 2rem;
-  place-items: center;
-  border-radius: 0.75rem;
-  background: #ffedd5;
-  color: #c2410c;
-}
-
-.quick-insight-grid h3 {
-  margin-top: 0.7rem;
-  color: #1f2937;
-  font-size: 1rem;
-  font-weight: 950;
-}
-
-.quick-insight-grid p {
-  margin-top: 0.35rem;
-  color: #57534e;
-  font-size: 0.92rem;
-  line-height: 1.62;
-}
-
-.quick-insight-actions {
-  margin-top: 0.85rem;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-}
-
-.quick-insight-actions a {
-  display: inline-flex;
-  min-height: 2.35rem;
-  align-items: center;
-  gap: 0.35rem;
-  border-radius: 999px;
-  background: #fb8c00;
-  padding: 0 0.9rem;
-  color: #fff;
-  font-size: 0.86rem;
-  font-weight: 900;
 }
 
 .chart-frame {
@@ -8232,15 +8155,6 @@ button.is-loading:not(.icon-button)::before {
   .day-fortune-tips strong {
     font-size: 0.78rem;
     line-height: 1.22;
-  }
-
-  .quick-insight-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .quick-insights {
-    border-radius: 0.95rem;
-    padding: 0.85rem;
   }
 
   .chart-board {

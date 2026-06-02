@@ -8,7 +8,6 @@ import { FeedbackActions } from "@/components/feedback-actions";
 import { PromptChips } from "@/components/prompt-chips";
 import { ReadingTabs } from "@/components/reading-tabs";
 import { DeferredAssistantWidget } from "@/components/deferred-assistant-widget";
-import { ChartQuickInsights } from "@/components/chart-quick-insights";
 import { FateTabs, type FateView } from "@/components/fate-tabs";
 import { DailyFateView, MajorFateView, MinorFateView, MonthlyFateView } from "@/components/fate-views";
 import { PalaceFateView } from "@/components/palace-fate-view";
@@ -45,7 +44,7 @@ export default async function ChartPage({
   if (!record) notFound();
   const [user, operationSettings, featurePrices] = await Promise.all([getCurrentUser(), getOperationSettings(), getFeaturePrices()]);
   const paidFeaturesVisible = operationSettings.paidReadingsEnabled || user?.role === "ADMIN";
-  const fateViews: FateView[] = paidFeaturesVisible ? ["la-so", "luan-cung", "dai-van", "tieu-van", "nguyet-van", "nhat-van", "chuyen-de"] : ["la-so"];
+  const fateViews: FateView[] = paidFeaturesVisible ? ["la-so", "luan-cung", "dai-van", "tieu-van", "nguyet-van", "nhat-van"] : ["la-so"];
   const activeView: FateView = fateViews.includes(query.view as FateView) ? (query.view as FateView) : "la-so";
   const isScopedReadingView = ["luan-cung", "dai-van", "tieu-van", "nguyet-van", "nhat-van"].includes(activeView);
 
@@ -73,8 +72,6 @@ export default async function ChartPage({
         <div className="chart-titlebar">
           <h1>Tổng quan lá số của {record.chart.input.fullName}</h1>
         </div>
-
-        <ChartQuickInsights chart={record.chart} chartId={id} />
 
         <MobileChartReader chart={record.chart} />
 

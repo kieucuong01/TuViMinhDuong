@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect } from "react";
 
-export type FateView = "la-so" | "luan-cung" | "dai-van" | "tieu-van" | "nguyet-van" | "nhat-van" | "chuyen-de";
+export type FateView = "la-so" | "luan-cung" | "dai-van" | "tieu-van" | "nguyet-van" | "nhat-van";
 
 const tabs: { key: FateView; label: string }[] = [
   { key: "la-so", label: "Lá số" },
@@ -12,7 +12,6 @@ const tabs: { key: FateView; label: string }[] = [
   { key: "tieu-van", label: "Tiểu vận" },
   { key: "nguyet-van", label: "Nguyệt vận" },
   { key: "nhat-van", label: "Nhật vận" },
-  { key: "chuyen-de", label: "Chuyên đề" },
 ];
 
 export function FateTabs({ chartId, active }: { chartId: string; active: FateView }) {

@@ -60,4 +60,14 @@ describe("chart form compact picker UI", () => {
     expect(globalsCss).toMatch(/\.hero-form-card \.birth-date-grid input,[\s\S]*\.hero-form-card \.birth-date-grid select\s*{[\s\S]*font-family:\s*inherit/);
     expect(globalsCss).toMatch(/\.hero-form-card \.chart-form \.btn-primary\s*{[\s\S]*font-family:\s*inherit/);
   });
+
+  it("does not move or restart hero form animations when fields blur", () => {
+    const focusWithinBlock = globalsCss.match(/\.hero-form-card:focus-within\s*{[\s\S]*?}/)?.[0] || "";
+    const heroCardBlock = globalsCss.match(/\.hero-form-card\s*{[\s\S]*?}/)?.[0] || "";
+
+    expect(focusWithinBlock).not.toContain("animation:");
+    expect(heroCardBlock).not.toContain("animation:");
+    expect(globalsCss).toMatch(/\.hero-form-card \.chart-form label,[\s\S]*\.hero-form-card \.birth-date-group\s*{[\s\S]*animation:\s*none/);
+    expect(globalsCss).toMatch(/\.hero-form-card \.chart-form label:focus-within,[\s\S]*\.hero-form-card \.birth-date-group:focus-within\s*{[\s\S]*transform:\s*none/);
+  });
 });
