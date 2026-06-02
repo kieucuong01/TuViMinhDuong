@@ -5398,6 +5398,18 @@ button.is-loading:not(.icon-button)::before {
   line-height: 1.92;
 }
 
+.free-overview-inline-status {
+  margin-bottom: 1rem;
+  border-radius: 1rem;
+  border: 1px solid #fed7aa;
+  background: #fff7ed;
+  color: #9a3412;
+  font-size: 0.95rem;
+  font-weight: 700;
+  line-height: 1.55;
+  padding: 0.85rem 1rem;
+}
+
 .free-overview-loading,
 .free-overview-error {
   display: grid;

@@ -6,13 +6,62 @@ import { MarkdownContent } from "@/components/markdown-content";
 type FreeOverviewState =
   | { status: "loading"; content?: undefined; error?: undefined }
   | { status: "ready"; content: string; error?: undefined }
-  | { status: "error"; content?: undefined; error: string };
+  | { status: "fallback"; content: string; jobStatus: "idle" | "processing" | "stale" | "failed"; error?: string }
+  | { status: "error"; content?: string; error: string };
+
+type FreeOverviewPayload =
+  | {
+      status: "ready";
+      content: string;
+    }
+  | {
+      status: "fallback";
+      content: string;
+      jobStatus?: "idle" | "processing" | "stale" | "failed";
+      error?: string;
+    };
+
+const POLL_DELAY_MS = 2500;
+const MAX_POLL_ATTEMPTS = 24;
 
 export function FreeOverviewLoader({ chartId }: { chartId: string }) {
   const [state, setState] = useState<FreeOverviewState>({ status: "loading" });
 
   useEffect(() => {
     const controller = new AbortController();
+    let processStarted = false;
+    let pollAttempts = 0;
+    let pollTimer: ReturnType<typeof setTimeout> | undefined;
+
+    function clearPollTimer() {
+      if (!pollTimer) return;
+      clearTimeout(pollTimer);
+      pollTimer = undefined;
+    }
+
+    function schedulePoll() {
+      if (controller.signal.aborted || pollAttempts >= MAX_POLL_ATTEMPTS) return;
+      pollAttempts += 1;
+      clearPollTimer();
+      pollTimer = setTimeout(loadOverview, POLL_DELAY_MS);
+    }
+
+    async function startProcess() {
+      if (processStarted || controller.signal.aborted) return;
+      processStarted = true;
+
+      try {
+        const response = await fetch(`/api/charts/${encodeURIComponent(chartId)}/free-overview/process`, {
+          method: "POST",
+          signal: controller.signal,
+          headers: { accept: "application/json" },
+        });
+        if (response.status === 404) return;
+        schedulePoll();
+      } catch {
+        if (!controller.signal.aborted) schedulePoll();
+      }
+    }
 
     async function loadOverview() {
       try {
@@ -21,9 +70,22 @@ export function FreeOverviewLoader({ chartId }: { chartId: string }) {
           signal: controller.signal,
           headers: { accept: "application/json" },
         });
-        const payload = await response.json();
+        const payload = (await response.json()) as FreeOverviewPayload & { error?: string };
         if (!response.ok) throw new Error(payload?.error || "Không tải được luận giải.");
-        setState({ status: "ready", content: String(payload.content || "") });
+
+        if (payload.status === "ready") {
+          clearPollTimer();
+          setState({ status: "ready", content: String(payload.content || "") });
+          return;
+        }
+
+        setState({
+          status: "fallback",
+          content: String(payload.content || ""),
+          jobStatus: payload.jobStatus || "idle",
+          error: payload.error,
+        });
+        startProcess();
       } catch (error) {
         if (controller.signal.aborted) return;
         setState({
@@ -34,12 +96,22 @@ export function FreeOverviewLoader({ chartId }: { chartId: string }) {
     }
 
     loadOverview();
-    return () => controller.abort();
+    return () => {
+      controller.abort();
+      clearPollTimer();
+    };
   }, [chartId]);
 
-  if (state.status === "ready") {
+  if (state.status === "ready" || state.status === "fallback") {
     return (
       <article className="free-reading-summary">
+        {state.status === "fallback" ? (
+          <div className="free-overview-inline-status" role="status" aria-live="polite">
+            {state.jobStatus === "failed"
+              ? "Đang hiển thị bản tóm tắt nhanh. Bản chi tiết sẽ được thử lại khi bạn mở lại trang."
+              : "Đang viết bản chi tiết hơn ở nền. Bạn có thể đọc bản tóm tắt này trước."}
+          </div>
+        ) : null}
         <MarkdownContent content={state.content} />
       </article>
     );

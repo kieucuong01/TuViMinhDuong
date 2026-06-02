@@ -1,9 +1,9 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { clearSession, createMagicSession, getCurrentUser, getOrCreateEmailUser, loginOrRegister, setSession, type SessionUser } from "@/lib/auth";
-import { getCachedReading, getChart, getFeaturePrice, getOperationSettings, getUserBalance, saveArticleCategoryFromForm, saveArticleFromForm, saveChart, saveReading, adjustCoins, deleteArticleBySlug, deleteUserChart, getReadingJobByScope, createPendingReading, updateOperationSettings, updateFeaturePrices, getCompletedReadingsForScopes, hasReadingBundleAccess } from "@/lib/data";
+import { FEATURE_PRICES_CACHE_TAG, OPERATION_SETTINGS_CACHE_TAG, getCachedReading, getChart, getFeaturePrice, getOperationSettings, getUserBalance, saveArticleCategoryFromForm, saveArticleFromForm, saveChart, saveReading, adjustCoins, deleteArticleBySlug, deleteUserChart, getReadingJobByScope, createPendingReading, updateOperationSettings, updateFeaturePrices, getCompletedReadingsForScopes, hasReadingBundleAccess } from "@/lib/data";
 import { generateReading } from "@/lib/ai";
 import { getDb } from "@/lib/db";
 import { createPayOSCheckout, createPayOSCustomCheckout } from "@/lib/payos";
@@ -14,6 +14,7 @@ import { isPayOSEnabled } from "@/lib/env";
 import { startFullReadingJobForUser, unlockReadingBundleForUser, unlockReadingForUser } from "@/lib/reading-unlock";
 import { isReadingBundleKey } from "@/lib/reading-bundles";
 import { adminAdjustUserCoins, adminDeleteUser } from "@/lib/admin-user-management";
+import { createPerfTimer, logPerfEvent } from "@/lib/perf";
 
 export async function loginAction(formData: FormData) {
   const email = String(formData.get("email") || "");
@@ -103,8 +104,15 @@ function chartInputFromForm(formData: FormData) {
 }
 
 export async function createChartAction(formData: FormData) {
-  const user = await getCurrentUser();
-  const chart = await saveChart(chartInputFromForm(formData), user);
+  const timer = createPerfTimer();
+  const input = chartInputFromForm(formData);
+  const user = await timer.time("getCurrentUser", () => getCurrentUser());
+  const chart = await timer.time("saveChart", () => saveChart(input, user));
+  logPerfEvent("create_chart_action_timing", timer.total(), {
+    hasUser: Boolean(user),
+    chartId: chart.id,
+    timings: timer.timings(),
+  });
   redirect(withQueryParams(`/la-so/${chart.id}`, { created: "1", adSource: safeAdSource(formData.get("adSource")) }));
 }
 
@@ -438,6 +446,7 @@ export async function saveOperationSettingsAction(formData: FormData) {
           };
 
   await updateOperationSettings(settings);
+  revalidateTag(OPERATION_SETTINGS_CACHE_TAG, "max");
   revalidatePath("/");
   revalidatePath("/admin");
   revalidatePath("/nap-xu");
@@ -467,6 +476,7 @@ export async function saveFeaturePricesAction(formData: FormData) {
     redirect(`/admin?tab=pricing&pricingError=${encodeURIComponent(adminPricingErrorMessage(error))}`);
   }
 
+  revalidateTag(FEATURE_PRICES_CACHE_TAG, "max");
   revalidatePath("/");
   revalidatePath("/admin");
   revalidatePath("/pricing");

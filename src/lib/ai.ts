@@ -719,7 +719,7 @@ QUY TẮC ĐỘ DÀI BẮT BUỘC GHI ĐÈ MỌI DÒNG KHÁC:
 - Nếu các dòng trước có nhắc mốc ngắn hơn, bỏ qua mốc đó và tuân theo quy tắc này.`;
 }
 
-function fallbackFreeOverview(chart: TuViChart) {
+export function buildInstantFreeOverview(chart: TuViChart) {
   const menhPalace = chart.palaces.find((item) => item.name === "Mệnh");
   const thanPalace = palaceByName(chart, "Thân");
   const menhStars = menhPalace ? starsWithStates(chart, menhPalace.mainStars, menhPalace.name, "vô chính diệu") : "đang cập nhật";
@@ -758,10 +758,10 @@ Tóm tắt nhanh:
 
 export async function generateFreeOverview(chart: TuViChart) {
   const prompt = freeOverviewPrompt(chart);
-  if (isLlmDisabledForSmoke()) return { content: fallbackFreeOverview(chart), model: "template-fallback", prompt };
+  if (isLlmDisabledForSmoke()) return { content: buildInstantFreeOverview(chart), model: "template-fallback", prompt };
   const routed = await generateWithLlmRouter({ prompt, maxTokens: FREE_OVERVIEW_MAX_TOKENS, temperature: 0.55 });
   if (routed) return { content: routed.text, model: routed.model, prompt };
-  return { content: fallbackFreeOverview(chart), model: "template-fallback", prompt };
+  return { content: buildInstantFreeOverview(chart), model: "template-fallback", prompt };
 }
 
 export function paidReadingChapters(chart: TuViChart, type: ReadingKey): PaidReadingChapter[] {

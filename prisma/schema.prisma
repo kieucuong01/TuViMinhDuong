@@ -95,6 +95,8 @@ model Chart {
   updatedAt DateTime  @updatedAt
   user      User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
   readings  Reading[]
+
+  @@index([userId, createdAt])
 }
 
 model Reading {
@@ -115,6 +117,8 @@ model Reading {
   chart       Chart         @relation(fields: [chartId], references: [id], onDelete: Cascade)
 
   @@unique([userId, chartId, type, scopeKey])
+  @@index([userId, type, scopeKey, status, createdAt])
+  @@index([chartId, type, scopeKey, status])
 }
 
 model CoinLedger {

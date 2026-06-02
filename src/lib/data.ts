@@ -1,14 +1,16 @@
 import "server-only";
 
+import { unstable_cache } from "next/cache";
 import { CHART_ENGINE_VERSION, generateTuViChart, type ChartInput, type TuViChart } from "@/lib/chart";
 import { articleWithScore, seedArticles, type ArticleCategoryView, type ArticleView } from "@/lib/content";
 import { getDb } from "@/lib/db";
 import { FEATURE_PRICE_KEYS, FEATURE_PRICES, COIN_PACKAGES, type FeaturePriceMap, type ReadingKey } from "@/lib/pricing";
 import { isReadingBundleKey, readingBundleScopeKey } from "@/lib/reading-bundles";
-import { FREE_OVERVIEW_MIN_WORDS, FREE_OVERVIEW_VERSION, countWords } from "@/lib/ai";
+import { FREE_OVERVIEW_VERSION, buildInstantFreeOverview, countWords, isCompleteFreeOverview } from "@/lib/ai";
 import { scoreArticleSeo } from "@/lib/seo";
 import { slugify } from "@/lib/format";
 import type { SessionUser } from "@/lib/auth";
+import { createPerfTimer, logPerfEvent } from "@/lib/perf";
 
 type StoredChart = {
   id: string;
@@ -104,13 +106,47 @@ type ChartWithFreeOverview = TuViChart & {
     generatedAt: string;
     version?: string;
   };
+  freeOverviewJob?: {
+    status: "PENDING" | "COMPLETED" | "FAILED";
+    startedAt: string;
+    updatedAt: string;
+    version?: string;
+    error?: string;
+  };
 };
+
+export type FreeOverviewStatus =
+  | {
+      status: "ready";
+      content: string;
+      source: "ai-cache";
+      model: string;
+      generatedAt: string;
+      wordCount: number;
+      jobStatus: "completed";
+    }
+  | {
+      status: "fallback";
+      content: string;
+      source: "instant-template";
+      wordCount: number;
+      jobStatus: "idle" | "processing" | "stale" | "failed";
+      error?: string;
+    };
+
+export type FreeOverviewGenerationClaim =
+  | { status: "ready"; overview: Extract<FreeOverviewStatus, { status: "ready" }> }
+  | { status: "processing"; overview: Extract<FreeOverviewStatus, { status: "fallback" }> }
+  | { status: "claimed" };
 
 type ArticleRecord = Omit<ArticleView, "faqs"> & {
   faqs?: unknown;
 };
 
 const DELETED_ARTICLE_STATUS = "deleted";
+export const OPERATION_SETTINGS_CACHE_TAG = "operation-settings";
+export const FEATURE_PRICES_CACHE_TAG = "feature-prices";
+const FREE_OVERVIEW_JOB_STALE_MS = 90_000;
 
 export type ChartHistoryItem = StoredChart & {
   hasAdvancedReading: boolean;
@@ -383,33 +419,47 @@ async function findPurchasedDuplicateChart(user: SessionUser | null, input: Char
   const db = getDb();
 
   if (!db || usesInMemoryUser(user.id)) {
-    for (const chart of charts().values()) {
-      if (chart.userId !== user.id || chartInputKey(chart.input) !== inputKey) continue;
-      const hasPurchasedReading = Array.from(readings().values()).some(
-        (reading) =>
-          reading.userId === user.id &&
-          reading.chartId === chart.id &&
-          reading.type === "FULL" &&
-          reading.scopeKey === "all" &&
-          (reading.status ?? "COMPLETED") === "COMPLETED",
-      );
-      if (hasPurchasedReading) return upgradeStoredChart(chart);
+    const purchasedChartIds = new Set(
+      Array.from(readings().values())
+        .filter(
+          (reading) =>
+            reading.userId === user.id &&
+            reading.type === "FULL" &&
+            reading.scopeKey === "all" &&
+            (reading.status ?? "COMPLETED") === "COMPLETED",
+        )
+        .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+        .map((reading) => reading.chartId),
+    );
+
+    for (const chartId of purchasedChartIds) {
+      const chart = charts().get(chartId);
+      if (!chart || chart.userId !== user.id || chartInputKey(chart.input) !== inputKey) continue;
+      return upgradeStoredChart(chart);
     }
     return null;
   }
 
-  const candidates = await db.chart.findMany({
-    where: { userId: user.id },
-    include: {
-      readings: {
-        where: { userId: user.id, type: "FULL", scopeKey: "all", status: "COMPLETED" },
-        take: 1,
+  const purchasedReadings = await db.reading.findMany({
+    where: { userId: user.id, type: "FULL", scopeKey: "all", status: "COMPLETED" },
+    select: {
+      chart: {
+        select: {
+          id: true,
+          title: true,
+          input: true,
+          chart: true,
+          userId: true,
+          createdAt: true,
+        },
       },
     },
     orderBy: { createdAt: "desc" },
   });
 
-  const duplicate = candidates.find((candidate) => candidate.readings.length > 0 && chartInputKey(candidate.input as ChartInput) === inputKey);
+  const duplicate = purchasedReadings
+    .map((reading) => reading.chart)
+    .find((candidate) => candidate && chartInputKey(candidate.input as ChartInput) === inputKey);
   if (!duplicate) return null;
 
   return upgradeStoredChart({
@@ -450,29 +500,44 @@ function upgradeStoredChart(record: StoredChart) {
 }
 
 export async function saveChart(input: ChartInput, user: SessionUser | null) {
-  const chart = generateTuViChart(input);
+  const timer = createPerfTimer();
+  const chart = await timer.time("engine", () => generateTuViChart(input));
   const title = chartTitle(chart);
   const db = getDb();
-  const duplicate = await findPurchasedDuplicateChart(user, chart.input);
-  if (duplicate) return duplicate;
+  const duplicate = await timer.time("duplicateLookup", () => findPurchasedDuplicateChart(user, chart.input));
+  if (duplicate) {
+    logPerfEvent("save_chart_timing", timer.total(), {
+      hasUser: Boolean(user),
+      result: "duplicate",
+      timings: timer.timings(),
+    });
+    return duplicate;
+  }
 
   if (!db) {
     const id = `demo-chart-${Date.now()}`;
     const stored = { id, title, input: chart.input, chart, userId: user?.id, createdAt: new Date() };
     charts().set(id, stored);
+    logPerfEvent("save_chart_timing", timer.total(), {
+      hasUser: Boolean(user),
+      result: "demo-created",
+      timings: timer.timings(),
+    });
     return stored;
   }
 
-  const created = await db.chart.create({
-    data: {
-      title,
-      input: chart.input,
-      chart,
-      userId: user?.id,
-      isPrivate: true,
-    },
-  });
-  return {
+  const created = await timer.time("dbCreate", () =>
+    db.chart.create({
+      data: {
+        title,
+        input: chart.input,
+        chart,
+        userId: user?.id,
+        isPrivate: true,
+      },
+    }),
+  );
+  const stored = {
     id: created.id,
     title: created.title,
     input: created.input as ChartInput,
@@ -480,6 +545,12 @@ export async function saveChart(input: ChartInput, user: SessionUser | null) {
     userId: created.userId || undefined,
     createdAt: created.createdAt,
   };
+  logPerfEvent("save_chart_timing", timer.total(), {
+    hasUser: Boolean(user),
+    result: "created",
+    timings: timer.timings(),
+  });
+  return stored;
 }
 
 export async function getChart(id: string) {
@@ -515,40 +586,148 @@ export async function getChart(id: string) {
   return upgraded;
 }
 
-export async function getOrCreateFreeOverview(chartId: string, chart: TuViChart) {
-  const chartWithOverview = chart as ChartWithFreeOverview;
-  if (
-    chartWithOverview.freeOverview?.content &&
-    chartWithOverview.freeOverview.version === FREE_OVERVIEW_VERSION &&
-    countWords(chartWithOverview.freeOverview.content) >= FREE_OVERVIEW_MIN_WORDS
-  ) {
-    return chartWithOverview.freeOverview.content;
-  }
-
-  const { generateFreeOverview } = await import("@/lib/ai");
-  const result = await generateFreeOverview(chart);
-  const updatedChart: ChartWithFreeOverview = {
-    ...chart,
-    freeOverview: {
-      content: result.content,
-      model: result.model,
-      generatedAt: new Date().toISOString(),
-      version: FREE_OVERVIEW_VERSION,
-    },
-  };
-
+async function updateStoredChartPayload(chartId: string, chart: TuViChart) {
   const db = getDb();
   if (!db) {
     const record = charts().get(chartId);
-    if (record) charts().set(chartId, { ...record, chart: updatedChart });
-    return result.content;
+    if (record) charts().set(chartId, { ...record, chart });
+    return;
   }
 
   await db.chart.update({
     where: { id: chartId },
-    data: { chart: updatedChart },
+    data: { chart },
   });
-  return result.content;
+}
+
+function isFreshFreeOverviewJob(job: ChartWithFreeOverview["freeOverviewJob"]) {
+  if (!job?.startedAt) return false;
+  const startedAt = Date.parse(job.startedAt);
+  return Number.isFinite(startedAt) && Date.now() - startedAt < FREE_OVERVIEW_JOB_STALE_MS;
+}
+
+export function getFreeOverviewStatus(chart: TuViChart): FreeOverviewStatus {
+  const chartWithOverview = chart as ChartWithFreeOverview;
+  if (
+    chartWithOverview.freeOverview?.content &&
+    chartWithOverview.freeOverview.version === FREE_OVERVIEW_VERSION &&
+    isCompleteFreeOverview(chartWithOverview.freeOverview.content)
+  ) {
+    return {
+      status: "ready",
+      content: chartWithOverview.freeOverview.content,
+      source: "ai-cache",
+      model: chartWithOverview.freeOverview.model,
+      generatedAt: chartWithOverview.freeOverview.generatedAt,
+      wordCount: countWords(chartWithOverview.freeOverview.content),
+      jobStatus: "completed",
+    };
+  }
+
+  const job = chartWithOverview.freeOverviewJob;
+  const fallback = buildInstantFreeOverview(chart);
+  const hasCurrentJobVersion = job?.version === FREE_OVERVIEW_VERSION;
+  const jobStatus =
+    hasCurrentJobVersion && job?.status === "PENDING" && isFreshFreeOverviewJob(job)
+      ? "processing"
+      : hasCurrentJobVersion && job?.status === "PENDING"
+        ? "stale"
+        : hasCurrentJobVersion && job?.status === "FAILED"
+          ? "failed"
+          : "idle";
+
+  return {
+    status: "fallback",
+    content: fallback,
+    source: "instant-template",
+    wordCount: countWords(fallback),
+    jobStatus,
+    ...(jobStatus === "failed" && job?.error ? { error: job.error } : {}),
+  };
+}
+
+export async function claimFreeOverviewGeneration(chartId: string, chart: TuViChart): Promise<FreeOverviewGenerationClaim> {
+  const current = getFreeOverviewStatus(chart);
+  if (current.status === "ready") return { status: "ready", overview: current };
+  if (current.jobStatus === "processing") return { status: "processing", overview: current };
+
+  const now = new Date().toISOString();
+  const nextChart: ChartWithFreeOverview = {
+    ...chart,
+    freeOverviewJob: {
+      status: "PENDING",
+      startedAt: now,
+      updatedAt: now,
+      version: FREE_OVERVIEW_VERSION,
+    },
+  };
+
+  await updateStoredChartPayload(chartId, nextChart);
+  return { status: "claimed" };
+}
+
+export async function failFreeOverviewGeneration(chartId: string, error: string) {
+  const record = await getChart(chartId);
+  if (!record) return null;
+  const chartWithOverview = record.chart as ChartWithFreeOverview;
+  const now = new Date().toISOString();
+  const nextChart: ChartWithFreeOverview = {
+    ...record.chart,
+    freeOverviewJob: {
+      status: "FAILED",
+      startedAt: chartWithOverview.freeOverviewJob?.startedAt || now,
+      updatedAt: now,
+      version: FREE_OVERVIEW_VERSION,
+      error,
+    },
+  };
+  await updateStoredChartPayload(chartId, nextChart);
+  return getFreeOverviewStatus(nextChart);
+}
+
+export async function generateAndStoreFreeOverview(chartId: string) {
+  const record = await getChart(chartId);
+  if (!record) throw new Error("Khong tim thay la so.");
+
+  const current = getFreeOverviewStatus(record.chart);
+  if (current.status === "ready") return current;
+
+  const { generateFreeOverview } = await import("@/lib/ai");
+  const result = await generateFreeOverview(record.chart);
+  if (!isCompleteFreeOverview(result.content)) {
+    const message = "Ban AI tong quan chua du do dai hoac thieu muc can thiet.";
+    await failFreeOverviewGeneration(chartId, message);
+    throw new Error(message);
+  }
+
+  const now = new Date().toISOString();
+  const updatedChart: ChartWithFreeOverview = {
+    ...record.chart,
+    freeOverview: {
+      content: result.content,
+      model: result.model,
+      generatedAt: now,
+      version: FREE_OVERVIEW_VERSION,
+    },
+    freeOverviewJob: {
+      status: "COMPLETED",
+      startedAt: (record.chart as ChartWithFreeOverview).freeOverviewJob?.startedAt || now,
+      updatedAt: now,
+      version: FREE_OVERVIEW_VERSION,
+    },
+  };
+
+  await updateStoredChartPayload(chartId, updatedChart);
+  const ready = getFreeOverviewStatus(updatedChart);
+  if (ready.status !== "ready") throw new Error("Chua luu duoc ban tong quan AI.");
+  return ready;
+}
+
+export async function getOrCreateFreeOverview(chartId: string, chart: TuViChart) {
+  const current = getFreeOverviewStatus(chart);
+  if (current.status === "ready") return current.content;
+  const generated = await generateAndStoreFreeOverview(chartId);
+  return generated.content;
 }
 
 export async function listUserCharts(userId: string, includeAll = false): Promise<ChartHistoryItem[]> {
@@ -632,11 +811,30 @@ export async function getFeaturePrice(type: ReadingKey) {
   return prices[type];
 }
 
-export async function getFeaturePrices(): Promise<FeaturePriceMap> {
+function cacheServerData<T extends (...args: never[]) => Promise<unknown>>(
+  reader: T,
+  keyParts: string[],
+  options: { tags: string[]; revalidate: number },
+) {
+  if (process.env.NODE_ENV === "test") return reader;
+  return unstable_cache(reader as unknown as Parameters<typeof unstable_cache>[0], keyParts, options) as unknown as T;
+}
+
+async function readFeaturePricesFromDb(): Promise<FeaturePriceMap> {
   const db = getDb();
   if (!db) return demoFeaturePrices();
   const prices = await db.featurePrice.findMany();
   return normalizeFeaturePriceMap(prices);
+}
+
+const getCachedFeaturePricesFromDb = cacheServerData(readFeaturePricesFromDb, [FEATURE_PRICES_CACHE_TAG], {
+  tags: [FEATURE_PRICES_CACHE_TAG],
+  revalidate: 300,
+});
+
+export async function getFeaturePrices(): Promise<FeaturePriceMap> {
+  if (!getDb()) return demoFeaturePrices();
+  return getCachedFeaturePricesFromDb();
 }
 
 export async function updateFeaturePrices(updates: Array<{ key: string; priceCoins: number }>) {
@@ -662,10 +860,10 @@ export async function updateFeaturePrices(updates: Array<{ key: string; priceCoi
     ),
   );
 
-  return getFeaturePrices();
+  return readFeaturePricesFromDb();
 }
 
-export async function getOperationSettings(): Promise<OperationSettings> {
+async function readOperationSettingsFromDb(): Promise<OperationSettings> {
   const db = getDb();
   if (!db) return demoOperationSettings();
 
@@ -683,6 +881,16 @@ export async function getOperationSettings(): Promise<OperationSettings> {
   } catch {
     return DEFAULT_OPERATION_SETTINGS;
   }
+}
+
+const getCachedOperationSettingsFromDb = cacheServerData(readOperationSettingsFromDb, [OPERATION_SETTINGS_CACHE_TAG], {
+  tags: [OPERATION_SETTINGS_CACHE_TAG],
+  revalidate: 300,
+});
+
+export async function getOperationSettings(): Promise<OperationSettings> {
+  if (!getDb()) return demoOperationSettings();
+  return getCachedOperationSettingsFromDb();
 }
 
 export async function updateOperationSettings(settings: Omit<OperationSettings, "updatedAt">) {
@@ -703,7 +911,7 @@ export async function updateOperationSettings(settings: Omit<OperationSettings, 
       "updatedAt" = CURRENT_TIMESTAMP
   `;
 
-  return getOperationSettings();
+  return readOperationSettingsFromDb();
 }
 
 export async function getUserBalance(user: SessionUser) {

@@ -42,8 +42,9 @@ export default async function ChartPage({
   const query = await searchParams;
   const record = await getChart(id);
   if (!record) notFound();
-  const [user, operationSettings, featurePrices] = await Promise.all([getCurrentUser(), getOperationSettings(), getFeaturePrices()]);
+  const [user, operationSettings] = await Promise.all([getCurrentUser(), getOperationSettings()]);
   const paidFeaturesVisible = operationSettings.paidReadingsEnabled || user?.role === "ADMIN";
+  const featurePrices = paidFeaturesVisible ? await getFeaturePrices() : null;
   const fateViews: FateView[] = paidFeaturesVisible ? ["la-so", "luan-cung", "dai-van", "tieu-van", "nguyet-van", "nhat-van"] : ["la-so"];
   const activeView: FateView = fateViews.includes(query.view as FateView) ? (query.view as FateView) : "la-so";
   const isScopedReadingView = ["luan-cung", "dai-van", "tieu-van", "nguyet-van", "nhat-van"].includes(activeView);
@@ -62,11 +63,11 @@ export default async function ChartPage({
       {paidFeaturesVisible ? <FateTabs chartId={id} active={activeView} /> : null}
 
       <div className="mx-auto max-w-6xl px-3 pb-10 sm:px-6 lg:px-8">
-        {activeView === "dai-van" ? <MajorFateView chartId={id} chart={record.chart} user={user} activeReadingId={query.reading} featurePrices={featurePrices} /> : null}
-        {activeView === "luan-cung" ? <PalaceFateView chartId={id} chart={record.chart} user={user} activeReadingId={query.reading} featurePrices={featurePrices} /> : null}
-        {activeView === "tieu-van" ? <MinorFateView chartId={id} chart={record.chart} user={user} activeReadingId={query.reading} featurePrices={featurePrices} /> : null}
-        {activeView === "nguyet-van" ? <MonthlyFateView chartId={id} chart={record.chart} user={user} activeReadingId={query.reading} featurePrices={featurePrices} /> : null}
-        {activeView === "nhat-van" ? <DailyFateView chartId={id} chart={record.chart} user={user} activeReadingId={query.reading} featurePrices={featurePrices} /> : null}
+        {activeView === "dai-van" && featurePrices ? <MajorFateView chartId={id} chart={record.chart} user={user} activeReadingId={query.reading} featurePrices={featurePrices} /> : null}
+        {activeView === "luan-cung" && featurePrices ? <PalaceFateView chartId={id} chart={record.chart} user={user} activeReadingId={query.reading} featurePrices={featurePrices} /> : null}
+        {activeView === "tieu-van" && featurePrices ? <MinorFateView chartId={id} chart={record.chart} user={user} activeReadingId={query.reading} featurePrices={featurePrices} /> : null}
+        {activeView === "nguyet-van" && featurePrices ? <MonthlyFateView chartId={id} chart={record.chart} user={user} activeReadingId={query.reading} featurePrices={featurePrices} /> : null}
+        {activeView === "nhat-van" && featurePrices ? <DailyFateView chartId={id} chart={record.chart} user={user} activeReadingId={query.reading} featurePrices={featurePrices} /> : null}
         {isScopedReadingView ? null : (
         <>
         <div className="chart-titlebar">
@@ -119,8 +120,8 @@ export default async function ChartPage({
 
         {paidFeaturesVisible ? (
           <>
-            <ReadingTabs chartId={id} chart={record.chart} featurePrices={featurePrices} />
-            <PremiumReadingCta chartId={id} fullName={record.chart.input.fullName} hasAdvancedReading={hasAdvancedReading} fullPriceCoins={featurePrices.FULL.priceCoins} />
+            {featurePrices ? <ReadingTabs chartId={id} chart={record.chart} featurePrices={featurePrices} /> : null}
+            {featurePrices ? <PremiumReadingCta chartId={id} fullName={record.chart.input.fullName} hasAdvancedReading={hasAdvancedReading} fullPriceCoins={featurePrices.FULL.priceCoins} /> : null}
           </>
         ) : null}
         </>
