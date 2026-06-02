@@ -27,7 +27,7 @@ const faqs = [
 export default async function DateViewPage({
   searchParams,
 }: {
-  searchParams: Promise<{ date?: string | string[] }>;
+  searchParams: Promise<{ date?: string | string[]; birthYear?: string | string[] }>;
 }) {
   const query = await searchParams;
   const pageLd = webPageJsonLd({
@@ -46,7 +46,7 @@ export default async function DateViewPage({
       <script id="date-page-jsonld" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(pageLd) }} />
       <script id="date-faq-jsonld" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd(faqs)) }} />
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        <DateView initialDate={query.date} />
+        <DateView initialDate={query.date} initialBirthYear={query.birthYear} />
         <section className="date-guide-panel panel mt-8">
           <p className="eyebrow">Hướng dẫn đọc kết quả</p>
           <h2 className="text-2xl font-black text-stone-950">Xem ngày tốt xấu nên dùng như bản tham khảo có điều kiện</h2>

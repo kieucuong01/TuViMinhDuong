@@ -29,9 +29,15 @@ export const ADMIN_EMAIL =
 export const ADMIN_PASSWORD =
   process.env.ADMIN_PASSWORD || "";
 
-export function hasDatabaseUrl() {
+export function databaseEnvState() {
   const value = process.env.DATABASE_URL;
-  return Boolean(value && !value.includes("johndoe:randompassword"));
+  if (!value) return "missing";
+  if (value.includes("johndoe:randompassword")) return "placeholder";
+  return "configured";
+}
+
+export function hasDatabaseUrl() {
+  return databaseEnvState() === "configured";
 }
 
 export function isGoogleOAuthEnabled() {

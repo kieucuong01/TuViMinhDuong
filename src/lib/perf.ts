@@ -1,4 +1,6 @@
-type PerfFields = Record<string, unknown>;
+type PerfFields = Record<string, unknown> & {
+  force?: boolean;
+};
 
 function nowMs() {
   return typeof performance !== "undefined" ? performance.now() : Date.now();
@@ -40,12 +42,13 @@ export function createPerfTimer() {
 
 export function logPerfEvent(event: string, durationMs: number, fields: PerfFields = {}) {
   const thresholdMs = Number(process.env.PERF_LOG_THRESHOLD_MS || 500);
-  if (process.env.PERF_LOG !== "1" && durationMs < thresholdMs) return;
+  const { force, ...payloadFields } = fields;
+  if (!force && process.env.PERF_LOG !== "1" && durationMs < thresholdMs) return;
 
   console.info(JSON.stringify({
     level: "info",
     event,
     durationMs: roundedMs(durationMs),
-    ...fields,
+    ...payloadFields,
   }));
 }

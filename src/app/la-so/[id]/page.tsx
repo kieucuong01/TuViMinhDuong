@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { ChartBoard, MobileChartReader } from "@/components/chart-board";
-import { getAnyCompletedReading, getCachedReading, getChart, getFeaturePrices, getOperationSettings, getReadingById } from "@/lib/data";
+import { getAnyCompletedReading, getCachedReading, getChart, getFeaturePrices, getFreeOverviewStatus, getOperationSettings, getReadingById } from "@/lib/data";
 import { getCurrentUser } from "@/lib/auth";
 import { FeedbackActions } from "@/components/feedback-actions";
 import { PromptChips } from "@/components/prompt-chips";
@@ -13,6 +13,8 @@ import { DailyFateView, MajorFateView, MinorFateView, MonthlyFateView } from "@/
 import { PalaceFateView } from "@/components/palace-fate-view";
 import { PremiumReadingCta } from "@/components/premium-reading-cta";
 import { ChartActionPanel } from "@/components/chart-action-panel";
+import { ChartReadingRoadmap } from "@/components/chart-reading-roadmap";
+import { ChartRetentionPanel } from "@/components/chart-retention-panel";
 import { PaywallPopup } from "@/components/paywall-popup";
 import { FreeOverviewLoader } from "@/components/free-overview-loader";
 import { MarkdownContent } from "@/components/markdown-content";
@@ -57,6 +59,7 @@ export default async function ChartPage({
   const activeReading = selectedReading || fullReading;
   const hasAdvancedReading = Boolean(fullReading);
   const activeLabel = activeReading ? readingLabels[activeReading.type] : "Luận giải tổng quan";
+  const freeOverviewStatus = activeReading || isScopedReadingView ? null : getFreeOverviewStatus(record.chart);
 
   return (
     <main className="chart-page" data-testid="chart-page">
@@ -73,6 +76,10 @@ export default async function ChartPage({
         <div className="chart-titlebar">
           <h1>Tổng quan lá số của {record.chart.input.fullName}</h1>
         </div>
+
+        <ChartReadingRoadmap chartId={id} chart={record.chart} />
+
+        <ChartRetentionPanel chartId={id} chart={record.chart} isSignedIn={Boolean(user)} />
 
         <MobileChartReader chart={record.chart} />
 
@@ -113,7 +120,7 @@ export default async function ChartPage({
             </>
           ) : (
             <>
-              <FreeOverviewLoader chartId={id} />
+              <FreeOverviewLoader chartId={id} initialOverview={freeOverviewStatus} />
             </>
           )}
         </section>

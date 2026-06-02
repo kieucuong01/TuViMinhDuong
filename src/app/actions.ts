@@ -10,11 +10,19 @@ import { createPayOSCheckout, createPayOSCustomCheckout } from "@/lib/payos";
 import type { CalendarType, Gender } from "@/lib/chart";
 import { COIN_PACKAGES, FEATURE_PRICE_KEYS, TEMPORARY_FULL_ACCESS } from "@/lib/pricing";
 import type { ReadingKey } from "@/lib/pricing";
-import { isPayOSEnabled } from "@/lib/env";
+import { databaseEnvState, isPayOSEnabled } from "@/lib/env";
 import { startFullReadingJobForUser, unlockReadingBundleForUser, unlockReadingForUser } from "@/lib/reading-unlock";
 import { isReadingBundleKey } from "@/lib/reading-bundles";
 import { adminAdjustUserCoins, adminDeleteUser } from "@/lib/admin-user-management";
 import { createPerfTimer, logPerfEvent } from "@/lib/perf";
+import { ActionTimeoutError, withActionTimeout } from "@/lib/action-timeout";
+
+function createChartTimeoutMs(value = process.env.CREATE_CHART_ACTION_TIMEOUT_MS) {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) && parsed >= 1000 ? parsed : 12000;
+}
+
+const CREATE_CHART_ACTION_TIMEOUT_MS = createChartTimeoutMs();
 
 export async function loginAction(formData: FormData) {
   const email = String(formData.get("email") || "");
@@ -106,14 +114,36 @@ function chartInputFromForm(formData: FormData) {
 export async function createChartAction(formData: FormData) {
   const timer = createPerfTimer();
   const input = chartInputFromForm(formData);
-  const user = await timer.time("getCurrentUser", () => getCurrentUser());
-  const chart = await timer.time("saveChart", () => saveChart(input, user));
+  const adSource = safeAdSource(formData.get("adSource"));
+  let result: { user: SessionUser | null; chart: Awaited<ReturnType<typeof saveChart>> };
+
+  try {
+    result = await withActionTimeout("createChartAction", CREATE_CHART_ACTION_TIMEOUT_MS, async () => {
+      const user = await timer.time("getCurrentUser", () => getCurrentUser());
+      const chart = await timer.time("saveChart", () => saveChart(input, user));
+      return { user, chart };
+    });
+  } catch (error) {
+    const isTimeout = error instanceof ActionTimeoutError;
+    logPerfEvent("create_chart_action_failed", timer.total(), {
+      force: true,
+      reason: isTimeout ? "timeout" : "error",
+      timeoutMs: CREATE_CHART_ACTION_TIMEOUT_MS,
+      dbEnvState: databaseEnvState(),
+      error: error instanceof Error ? error.message : String(error),
+      timings: timer.timings(),
+    });
+    redirect(withQueryParams("/#lap-la-so", { chartError: isTimeout ? "timeout" : "failed", adSource }));
+  }
+
   logPerfEvent("create_chart_action_timing", timer.total(), {
-    hasUser: Boolean(user),
-    chartId: chart.id,
+    hasUser: Boolean(result.user),
+    chartId: result.chart.id,
+    dbEnvState: databaseEnvState(),
+    timeoutMs: CREATE_CHART_ACTION_TIMEOUT_MS,
     timings: timer.timings(),
   });
-  redirect(withQueryParams(`/la-so/${chart.id}`, { created: "1", adSource: safeAdSource(formData.get("adSource")) }));
+  redirect(withQueryParams(`/la-so/${result.chart.id}`, { created: "1", adSource }));
 }
 
 export async function quickReadingCheckoutAction(formData: FormData) {

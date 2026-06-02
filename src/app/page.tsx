@@ -18,10 +18,26 @@ export const metadata = routeMetadata({
   imageSubtitle: "Nhập ngày giờ sinh để xem lá số cơ bản ngay",
 });
 
-export default async function Home() {
-  const [articleList, operationSettings] = await Promise.all([listArticles(), getOperationSettings()]);
+type HomeSearchParams = {
+  chartError?: string;
+};
+
+function chartFormErrorMessage(chartError?: string) {
+  if (chartError === "timeout") {
+    return "Lập lá số đang chậm bất thường. Bạn thử lại sau ít phút; nếu vẫn lỗi, hệ thống đã ghi nhận để kiểm tra kết nối dữ liệu.";
+  }
+  if (chartError === "failed") {
+    return "Chưa lập được lá số trong lượt này. Bạn kiểm tra lại thông tin sinh rồi thử lại giúp mình nhé.";
+  }
+  return "";
+}
+
+export default async function Home({ searchParams }: { searchParams?: Promise<HomeSearchParams> }) {
+  const paramsPromise: Promise<HomeSearchParams> = searchParams ?? Promise.resolve({});
+  const [params, articleList, operationSettings] = await Promise.all([paramsPromise, listArticles(), getOperationSettings()]);
   const articles = articleList.slice(0, 3);
   const showQuickReading = operationSettings.paymentsEnabled && operationSettings.paidReadingsEnabled;
+  const chartErrorMessage = chartFormErrorMessage(params.chartError);
   const homePageLd = webPageJsonLd({
     name: "Lập lá số tử vi miễn phí",
     description: "Lập lá số tử vi, xem ngày tốt xấu và đọc kiến thức tử vi dễ hiểu cho người Việt Nam.",
@@ -82,6 +98,11 @@ export default async function Home() {
                 <h1 className="text-balance text-3xl font-black tracking-tight text-stone-950 sm:text-4xl">Lập lá số tử vi miễn phí</h1>
                 <p className="mt-2 text-base font-medium text-stone-600">Nhập thông tin sinh bên dưới để xem lá số cơ bản ngay.</p>
               </div>
+              {chartErrorMessage ? (
+                <p className="chart-form-error" role="status">
+                  {chartErrorMessage}
+                </p>
+              ) : null}
               <ChartForm />
               <div className="form-assurance">
                 <span><ShieldCheck size={17} /> Không cần trả phí để lập lá số</span>

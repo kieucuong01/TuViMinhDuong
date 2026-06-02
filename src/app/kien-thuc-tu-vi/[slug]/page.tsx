@@ -6,6 +6,7 @@ import { APP_URL } from "@/lib/env";
 import { getArticleBySlug, listArticles } from "@/lib/data";
 import { absoluteUrl, articleJsonLd, breadcrumbJsonLd, faqJsonLd } from "@/lib/seo";
 import { MarkdownContent } from "@/components/markdown-content";
+import { ArticlePersonalizedCta } from "@/components/article-personalized-cta";
 
 export const revalidate = 300;
 export const dynamicParams = true;
@@ -73,6 +74,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
             <span className="tag tag-soft">Cập nhật {new Date(article.publishedAt).toLocaleDateString("vi-VN")}</span>
           </div>
         ) : null}
+        <ArticlePersonalizedCta articleTitle={article.title} categoryName={article.category?.name} />
         {article.coverImage ? (
           <figure className="article-cover">
             <Image

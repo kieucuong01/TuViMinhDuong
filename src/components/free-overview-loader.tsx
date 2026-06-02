@@ -24,8 +24,19 @@ type FreeOverviewPayload =
 const POLL_DELAY_MS = 2500;
 const MAX_POLL_ATTEMPTS = 24;
 
-export function FreeOverviewLoader({ chartId }: { chartId: string }) {
-  const [state, setState] = useState<FreeOverviewState>({ status: "loading" });
+function initialOverviewState(initialOverview?: FreeOverviewPayload | null): FreeOverviewState {
+  if (!initialOverview?.content) return { status: "loading" };
+  if (initialOverview.status === "ready") return { status: "ready", content: initialOverview.content };
+  return {
+    status: "fallback",
+    content: initialOverview.content,
+    jobStatus: initialOverview.jobStatus || "idle",
+    error: initialOverview.error,
+  };
+}
+
+export function FreeOverviewLoader({ chartId, initialOverview }: { chartId: string; initialOverview?: FreeOverviewPayload | null }) {
+  const [state, setState] = useState<FreeOverviewState>(() => initialOverviewState(initialOverview));
 
   useEffect(() => {
     const controller = new AbortController();

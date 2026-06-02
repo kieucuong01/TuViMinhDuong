@@ -47,6 +47,11 @@ function parseBirthYear(value: string) {
   return Number.isInteger(parsed) && parsed >= 1900 && parsed <= 2100 ? parsed : undefined;
 }
 
+function safeBirthYear(value: string | string[] | null | undefined) {
+  if (Array.isArray(value)) return safeBirthYear(value[0]);
+  return parseBirthYear(value || "") ? value || "" : "";
+}
+
 function safeInputDate(value: string | string[] | null | undefined) {
   if (Array.isArray(value)) return safeInputDate(value[0]);
   if (!value || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return toInputDate(new Date());
@@ -63,9 +68,9 @@ function TaskIcon({ type }: { type: DateTaskKey }) {
   return <Icon size={19} className="date-task-icon" />;
 }
 
-export function DateView({ initialDate }: { initialDate?: string | string[] }) {
+export function DateView({ initialDate, initialBirthYear }: { initialDate?: string | string[]; initialBirthYear?: string | string[] }) {
   const [selectedDate, setSelectedDate] = useState(() => safeInputDate(initialDate));
-  const [birthYear, setBirthYear] = useState("");
+  const [birthYear, setBirthYear] = useState(() => safeBirthYear(initialBirthYear));
   const parsedBirthYear = parseBirthYear(birthYear);
   const date = useMemo(() => parseInputDate(selectedDate), [selectedDate]);
   const fortune = useMemo(() => analyzeDate(date, parsedBirthYear), [date, parsedBirthYear]);
