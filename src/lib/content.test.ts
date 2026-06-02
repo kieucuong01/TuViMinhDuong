@@ -8,6 +8,7 @@ describe("SEO content cluster", () => {
     expect(slugs).toContain("la-so-tu-vi-la-gi");
     expect(slugs).toContain("cach-doc-la-so-tu-vi-cho-nguoi-moi");
     expect(slugs).toContain("cung-phu-the-trong-tu-vi");
+    expect(slugs).toContain("cung-phuc-duc-trong-tu-vi");
     expect(slugs).toContain("cung-tat-ach-trong-tu-vi");
     expect(slugs).toContain("cung-thien-di-trong-tu-vi");
   });
@@ -24,9 +25,26 @@ describe("SEO content cluster", () => {
     expect(guide?.content).toContain("/kien-thuc-tu-vi/cung-thien-di-trong-tu-vi");
   });
 
+  it("does not expose SEO implementation notes in public article copy", () => {
+    for (const article of seedArticles) {
+      expect(article.content).not.toContain("Nguồn tham khảo và kỹ thuật SEO");
+      expect(article.content).not.toContain("Website dùng canonical URL");
+      expect(article.content).not.toContain("qualify outbound links");
+    }
+  });
+
   it("keeps new evergreen articles above the minimum SEO score", () => {
     const newCluster = seedArticles
-      .filter((article) => ["la-so-tu-vi-la-gi", "cach-doc-la-so-tu-vi-cho-nguoi-moi", "cung-phu-the-trong-tu-vi", "cung-tat-ach-trong-tu-vi", "cung-thien-di-trong-tu-vi"].includes(article.slug))
+      .filter((article) =>
+        [
+          "la-so-tu-vi-la-gi",
+          "cach-doc-la-so-tu-vi-cho-nguoi-moi",
+          "cung-phu-the-trong-tu-vi",
+          "cung-phuc-duc-trong-tu-vi",
+          "cung-tat-ach-trong-tu-vi",
+          "cung-thien-di-trong-tu-vi",
+        ].includes(article.slug),
+      )
       .map(articleWithScore);
 
     for (const article of newCluster) {

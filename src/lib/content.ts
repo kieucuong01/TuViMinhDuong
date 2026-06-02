@@ -49,14 +49,7 @@ function article(input: Omit<ArticleView, "id" | "status" | "robots" | "schemaTy
 
 const cta = `## Thực hành trên lá số cá nhân
 
-Ý nghĩa cung và vận hạn sẽ rõ hơn khi đối chiếu với lá số riêng. Bạn có thể [lập lá số tử vi miễn phí](/#lap-la-so), sau đó đọc tiếp các phần [luận cung](/kien-thuc-tu-vi/12-cung-trong-la-so-tu-vi), [đại vận](/kien-thuc-tu-vi/dai-van-la-gi) và [xem ngày](/xem-ngay) để hiểu nhịp vận theo từng lớp thời gian.
-
-## Nguồn tham khảo và kỹ thuật SEO
-
-- Website dùng canonical URL, sitemap, dữ liệu có cấu trúc Article và liên kết nội bộ để crawler hiểu quan hệ giữa các bài.
-- Phần schema tham khảo từ [Schema.org Article](https://schema.org/Article).
-- Cách viết title, description và liên kết ngoài tham khảo [Google Search Central SEO Starter Guide](https://developers.google.com/search/docs/fundamentals/seo-starter-guide).
-- Khi dẫn nguồn ngoài, hãy ưu tiên trang chính thống; khi đặt link quảng cáo hoặc trả phí cần đánh dấu đúng quan hệ theo hướng dẫn [qualify outbound links](https://developers.google.com/search/docs/crawling-indexing/qualify-outbound-links).`;
+Ý nghĩa cung và vận hạn sẽ rõ hơn khi đối chiếu với lá số riêng. Bạn có thể [lập lá số tử vi miễn phí](/#lap-la-so), sau đó đọc tiếp các phần [luận cung](/kien-thuc-tu-vi/12-cung-trong-la-so-tu-vi), [đại vận](/kien-thuc-tu-vi/dai-van-la-gi) và [xem ngày](/xem-ngay) để hiểu nhịp vận theo từng lớp thời gian.`;
 
 export const seedArticles: ArticleView[] = [
   article({
@@ -145,6 +138,90 @@ Nếu việc nhỏ, xem lịch ngày tốt xấu là đủ để tham khảo. Nh
 Bạn có thể bắt đầu bằng cách [lập lá số tử vi miễn phí](/#lap-la-so), rồi đọc thêm [Nguyệt vận và Nhật vận](/kien-thuc-tu-vi/nguyet-van-nhat-van). Khi hiểu vận tháng, bạn sẽ biết nên dùng ngày tốt để mở việc mới, hoàn thiện việc cũ hay đơn giản là giảm rủi ro.
 
 Tóm lại, ngày tốt tháng 6/2026 đáng chú ý gồm 02/06, 15/06, 25/06, 22/06 và 13/06. Các ngày 06/06, 07/06, 19/06, 21/06 và 24/06 nên cân nhắc hơn với việc lớn. Hãy dùng danh sách này như bản lọc đầu tiên, rồi xét tiếp theo tuổi, việc cần làm, giờ tốt và điều kiện thực tế.
+
+${cta}`,
+  }),
+  article({
+    title: "Cung Phúc Đức trong tử vi: Cách đọc nền phúc, gia đạo và tinh thần",
+    slug: "cung-phuc-duc-trong-tu-vi",
+    excerpt: "Cung Phúc Đức trong tử vi cho thấy nền phúc, gia đạo, đời sống tinh thần và cách một người được nâng đỡ khi đi qua vận hạn.",
+    focusKeyword: "cung phúc đức",
+    coverImage: "/articles/la-so-12-cung.svg",
+    coverAlt: "Lá số tử vi 12 cung với trọng tâm Cung Phúc Đức",
+    metaTitle: "Cung Phúc Đức trong tử vi: Nền phúc và gia đạo",
+    metaDescription: "Tìm hiểu Cung Phúc Đức trong tử vi, cách đọc nền phúc, gia đạo, tinh thần và vì sao nên xem cùng Mệnh, Thân, Phu Thê, Đại vận.",
+    canonicalUrl: "/kien-thuc-tu-vi/cung-phuc-duc-trong-tu-vi",
+    date: "2026-06-03",
+    faqs: [
+      {
+        question: "Cung Phúc Đức có quyết định toàn bộ số mệnh không?",
+        answer: "Không. Cung Phúc Đức là một lớp rất quan trọng về nền phúc và tinh thần, nhưng vẫn cần đọc cùng Mệnh, Thân, đại vận, lưu niên và hoàn cảnh sống thật.",
+      },
+      {
+        question: "Cung Phúc Đức yếu có phải là xấu cả đời không?",
+        answer: "Không nên hiểu cực đoan như vậy. Cung có tín hiệu khó thường là lời nhắc để sống có kỷ luật, giữ quan hệ gia đình lành mạnh, làm việc thiện và quản trị rủi ro tốt hơn.",
+      },
+      {
+        question: "Nên đọc Cung Phúc Đức cùng cung nào?",
+        answer: "Nên đọc cùng Cung Mệnh, Cung Thân, Cung Phu Thê, Cung Thiên Di và Đại vận để hiểu nền người, quan hệ, môi trường bên ngoài và giai đoạn vận hạn hiện tại.",
+      },
+    ],
+    content: `Cung Phúc Đức trong tử vi là một trong những cung khiến nhiều người vừa tò mò vừa dễ lo. Nghe đến chữ "phúc", người ta thường nghĩ ngay đến phúc phần dòng họ, âm đức, gia đạo, sự nâng đỡ vô hình và đời sống tinh thần. Nhưng nếu đọc quá cực đoan, Cung Phúc Đức rất dễ bị biến thành lời phán nặng nề.
+
+Cách hiểu thực tế hơn là xem Cung Phúc Đức như nền khí hậu phía sau một lá số. Nó không thay bạn quyết định, cũng không xóa hết khó khăn, nhưng cho biết một người thường được nâng đỡ ra sao, tinh thần có dễ ổn định không, quan hệ họ hàng - gia đình ảnh hưởng thế nào và khi gặp vận hạn thì nên dựa vào điều gì để đi qua.
+
+## Cung Phúc Đức là gì?
+
+Trong lá số tử vi, Cung Phúc Đức thường được dùng để đọc nền phúc, gia đạo, họ hàng, đời sống tinh thần và phần nâng đỡ dài hạn. Nếu Cung Mệnh cho biết khí chất cá nhân, Cung Thân cho biết cách một người nhập cuộc, thì Cung Phúc Đức giúp nhìn vào phần nền: môi trường tinh thần, phúc trạch và những điều âm thầm ảnh hưởng đến cuộc sống.
+
+Điều quan trọng là Phúc Đức không nên được hiểu như một điểm số may mắn cố định. Một cung đẹp vẫn cần người đó sống có trách nhiệm, biết giữ quan hệ và biết tạo giá trị. Một cung có tín hiệu khó cũng không có nghĩa là cả đời thiếu may mắn; nó có thể là lời nhắc cần chăm nền gia đình, tinh thần, đạo đức và cách ứng xử với người thân.
+
+Với người mới, nên đọc bài [lá số tử vi là gì](/kien-thuc-tu-vi/la-so-tu-vi-la-gi) và [12 cung trong lá số tử vi](/kien-thuc-tu-vi/12-cung-trong-la-so-tu-vi) trước để hiểu vị trí của Cung Phúc Đức trong toàn bộ bàn lá số.
+
+## Vì sao Phúc Đức cần đọc cùng Mệnh và Thân?
+
+Không nên tách Cung Phúc Đức ra khỏi [Cung Mệnh và Cung Thân](/kien-thuc-tu-vi/cung-menh-cung-than). Mệnh và Thân cho biết bản thân một người nghĩ gì, phản ứng ra sao, hành động thế nào. Phúc Đức cho biết phần nền phía sau có nâng đỡ hay tạo áp lực cho những hành động đó.
+
+Ví dụ, một người có Mệnh mạnh, nhiều năng lực, nhưng nền Phúc Đức cho thấy tinh thần dễ căng hoặc gia đình nhiều việc phải lo, thì lời khuyên không chỉ là "cố lên". Người đó cần học cách nghỉ ngơi, giữ nhịp, đặt ranh giới với trách nhiệm gia đình và tránh ôm quá nhiều việc.
+
+Ngược lại, có người Mệnh không quá nổi bật nhưng Phúc Đức ổn, gia đạo có sự nâng đỡ, tinh thần bền và biết sống tử tế. Khi đi qua vận khó, họ thường có thêm người giúp, thêm cơ hội sửa sai hoặc thêm sức chịu đựng. Đây là lý do nhiều người xưa coi Phúc Đức là phần nền rất đáng xem.
+
+## Đọc Cung Phúc Đức cùng Phu Thê và Thiên Di
+
+Cung Phúc Đức thường nên đọc cùng [Cung Phu Thê](/kien-thuc-tu-vi/cung-phu-the-trong-tu-vi) và [Cung Thiên Di](/kien-thuc-tu-vi/cung-thien-di-trong-tu-vi). Ba lớp này giúp người xem hiểu rõ hơn quan hệ thân mật, cách bước ra bên ngoài và phần nền tinh thần - gia đạo.
+
+Khi Phúc Đức ổn, người xem thường dễ có nền tinh thần vững hơn để xử lý quan hệ. Điều đó không bảo đảm hôn nhân luôn thuận, nhưng giúp người đó biết lắng nghe, biết sửa, biết nhìn dài hạn. Khi Phúc Đức có nhiều tín hiệu thử thách, quan hệ vợ chồng hoặc giao tiếp xã hội có thể cần thêm sự chậm rãi, rõ ràng và tôn trọng ranh giới.
+
+Thiên Di lại cho biết cách một người ra ngoài gặp đời. Nếu Phúc Đức tốt nhưng Thiên Di nhiều va chạm, người đó có thể vẫn được nâng đỡ từ nền gia đình hoặc tinh thần, nhưng cần cẩn trọng khi giao tiếp, chọn môi trường và hợp tác. Nếu cả Phúc Đức và Thiên Di đều nhiều áp lực, lời khuyên thực tế là tránh vội tin người, chuẩn bị kỹ giấy tờ, giữ uy tín và không quyết định khi tâm đang bất an.
+
+## Những dấu hiệu nên nhìn bình tĩnh
+
+Khi đọc Cung Phúc Đức, nhiều người dễ bị ám ảnh bởi các cụm như "phúc mỏng", "họ hàng ly tán", "tinh thần bất ổn" hoặc "khó nhờ cậy". Những cách nói này nếu dùng không khéo sẽ làm người xem lo hơn là hiểu.
+
+Một tín hiệu khó trong Cung Phúc Đức nên được chuyển thành câu hỏi hành động:
+
+- Gia đình có việc gì cần nói rõ hơn để bớt hiểu lầm?
+- Mình có đang sống quá căng, thiếu nghỉ ngơi hoặc thiếu điểm tựa tinh thần không?
+- Có trách nhiệm nào của dòng họ, cha mẹ, con cái khiến mình cần sắp xếp lại không?
+- Mình có đang lặp lại một thói quen cũ của gia đình mà nên điều chỉnh không?
+
+Cách đọc này giúp tử vi trở thành công cụ soi lại đời sống, thay vì một lời kết luận khiến người ta sợ hãi. Với người trưởng thành, đặc biệt ở độ tuổi 30-60, điều quan trọng không phải nghe một câu phán hay, mà là biết nên sống chậm hơn ở đâu và sửa điều gì cho bền.
+
+## Cách ứng dụng Cung Phúc Đức trong đời sống
+
+Ứng dụng đầu tiên là chăm lại nền tinh thần. Nếu Cung Phúc Đức nhắc về áp lực, hãy xem giấc ngủ, lịch làm việc, thời gian ở bên gia đình và cách bạn xử lý căng thẳng. Không cần làm điều gì to tát; đôi khi chỉ cần giảm tranh cãi, giữ lời hứa, dọn một khoản nợ tinh thần hoặc chủ động hỏi thăm người thân.
+
+Ứng dụng thứ hai là nhìn lại quan hệ họ hàng và gia đình. Phúc Đức không có nghĩa là phải gánh mọi thứ. Nó cũng nhắc bạn phân biệt đâu là trách nhiệm nên giữ, đâu là việc cần đặt ranh giới. Gia đạo tốt không chỉ là không có chuyện buồn, mà là có khả năng nói chuyện, giúp nhau và sửa sai khi cần.
+
+Ứng dụng thứ ba là đọc vận hạn mềm hơn. Khi đang bước vào một [Đại vận](/kien-thuc-tu-vi/dai-van-la-gi) nhiều thay đổi, Cung Phúc Đức giúp xem bạn nên dựa vào đâu: gia đình, tín ngưỡng, bạn bè tốt, kỷ luật sống hay việc thiện. Những điểm tựa này không thay thế hành động, nhưng giúp hành động bớt chông chênh.
+
+## Khi nào nên xem kỹ Cung Phúc Đức?
+
+Bạn nên xem kỹ Cung Phúc Đức khi đang có biến động gia đình, áp lực tinh thần, chuyện hôn nhân, chuyện đi xa, chuyển nhà, đổi việc hoặc một giai đoạn vận hạn khiến mình thấy mệt hơn bình thường. Đây là lúc việc đọc Cung Phúc Đức có thể giúp bạn nhìn lại nền phía sau thay vì chỉ nhìn sự việc trước mắt.
+
+Nếu chưa có lá số, hãy [lập lá số tử vi miễn phí](/#lap-la-so) rồi đọc theo thứ tự: Mệnh - Thân để hiểu bản thân, Phúc Đức để hiểu nền phúc và tinh thần, Phu Thê - Thiên Di để hiểu quan hệ và môi trường, sau đó mới đi vào vận hạn. Người mới có thể đọc thêm [cách đọc lá số tử vi cho người mới](/kien-thuc-tu-vi/cach-doc-la-so-tu-vi-cho-nguoi-moi) để tránh bị rối.
+
+Tóm lại, Cung Phúc Đức trong tử vi không phải nơi để tự dọa mình bằng những kết luận nặng nề. Đây là cung giúp bạn nhìn phần nền: gia đạo, tinh thần, phúc trạch và cách mình được nâng đỡ khi đi qua đời sống. Đọc đúng, Cung Phúc Đức sẽ nhắc ta sống tử tế hơn, giữ nền vững hơn và ra quyết định bình tĩnh hơn.
 
 ${cta}`,
   }),
