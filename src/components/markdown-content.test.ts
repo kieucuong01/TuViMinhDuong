@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { MarkdownContent, parseInlineMarkdown } from "@/components/markdown-content";
+import { extractMarkdownHeadings, MarkdownContent, parseInlineMarkdown } from "@/components/markdown-content";
 
 describe("parseInlineMarkdown", () => {
   it("keeps emphasized labels and markdown links as separate inline tokens", () => {
@@ -34,5 +34,49 @@ Lá số này nên đọc từ phần tổng quan.
     expect(html).toContain("<p>Lá số này nên đọc từ phần tổng quan.</p>");
     expect(html).toContain("<strong>Điểm nổi bật:</strong>");
     expect(html).toContain('<h2 id="menh-va-than-noi-gi">Mệnh và Thân nói gì</h2>');
+  });
+
+  it("can insert a retention block after the first H2 section", () => {
+    const html = renderToStaticMarkup(
+      createElement(MarkdownContent, {
+        content: `## Phần đầu
+Đoạn mở đầu.
+
+## Phần tiếp theo
+Đoạn tiếp theo.`,
+        afterFirstSection: createElement("aside", { className: "mid-cta" }, "Lập lá số miễn phí"),
+      }),
+    );
+
+    expect(html.indexOf("Đoạn mở đầu.")).toBeLessThan(html.indexOf("mid-cta"));
+    expect(html.indexOf("mid-cta")).toBeLessThan(html.indexOf("Phần tiếp theo"));
+  });
+});
+
+describe("extractMarkdownHeadings", () => {
+  it("builds a table of contents from H2 sections only", () => {
+    expect(
+      extractMarkdownHeadings(`## Tổng quan tháng 6/2026
+Nên đọc phần này trước.
+
+### Ghi chú nhỏ
+Không đưa vào mục lục chính.
+
+## **Cách đọc** [vận tháng](/xem-ngay)
+Nội dung tiếp theo.`),
+    ).toEqual([
+      { id: "tong-quan-thang-6-2026", title: "Tổng quan tháng 6/2026" },
+      { id: "cach-doc-van-thang", title: "Cách đọc vận tháng" },
+    ]);
+  });
+
+  it("deduplicates repeated heading ids", () => {
+    expect(
+      extractMarkdownHeadings(`## Cung Mệnh
+## Cung Mệnh`),
+    ).toEqual([
+      { id: "cung-menh", title: "Cung Mệnh" },
+      { id: "cung-menh-2", title: "Cung Mệnh" },
+    ]);
   });
 });

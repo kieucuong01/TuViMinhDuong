@@ -4,17 +4,23 @@ import { CalendarDays, Sparkles } from "lucide-react";
 type ArticlePersonalizedCtaProps = {
   articleTitle: string;
   categoryName?: string;
+  variant?: "inline" | "final";
 };
 
-export function ArticlePersonalizedCta({ articleTitle, categoryName }: ArticlePersonalizedCtaProps) {
+export function ArticlePersonalizedCta({ articleTitle, categoryName, variant = "inline" }: ArticlePersonalizedCtaProps) {
   const topic = categoryName || articleTitle;
+  const isFinal = variant === "final";
 
   return (
-    <aside className="article-personalized-cta" aria-label="Cá nhân hóa bài viết này">
+    <aside className={`article-personalized-cta article-personalized-cta-${variant}`} aria-label="Cá nhân hóa bài viết này">
       <div>
-        <p className="eyebrow">Cá nhân hóa bài viết</p>
-        <strong>Muốn đọc chủ đề này theo lá số của bạn?</strong>
-        <span>Chủ đề “{topic}” sẽ hữu ích hơn khi đặt cạnh ngày giờ sinh, Mệnh, Thân và vận đang đi qua.</span>
+        <p className="eyebrow">{isFinal ? "Bước tiếp theo" : "Cá nhân hóa bài viết"}</p>
+        <strong>{isFinal ? "Đọc xong, hãy đối chiếu với lá số của bạn" : "Muốn đọc chủ đề này theo lá số của bạn?"}</strong>
+        <span>
+          {isFinal
+            ? `Chủ đề “${topic}” sẽ rõ hơn khi bạn xem trực tiếp Mệnh, Thân, cung liên quan và vận đang đi qua.`
+            : `Chủ đề “${topic}” sẽ hữu ích hơn khi đặt cạnh ngày giờ sinh, Mệnh, Thân và vận đang đi qua.`}
+        </span>
       </div>
       <div className="article-personalized-actions">
         <Link href="/#lap-la-so" className="btn btn-primary">

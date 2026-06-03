@@ -15,9 +15,19 @@ describe("ArticlePersonalizedCta", () => {
     expect(ctaSource).toContain("/xem-ngay");
   });
 
-  it("renders before long-form article content", () => {
+  it("renders the personalized CTA inside the long-form reading flow", () => {
     expect(articlePageSource).toContain("ArticlePersonalizedCta");
-    expect(articlePageSource.indexOf("<ArticlePersonalizedCta")).toBeLessThan(articlePageSource.indexOf("<MarkdownContent"));
+    expect(articlePageSource).toContain("const midArticleCta");
+    expect(articlePageSource).toContain("afterFirstSection={midArticleCta}");
+  });
+
+  it("keeps article readers moving with table of contents, middle CTA, final CTA, and related articles", () => {
+    expect(articlePageSource).toContain("extractMarkdownHeadings");
+    expect(articlePageSource).toContain("article-table-of-contents");
+    expect(articlePageSource).toContain("afterFirstSection");
+    expect(articlePageSource).toContain("article-final-cta");
+    expect(articlePageSource).toContain("article-related-grid");
+    expect(articlePageSource).toContain("article.category?.id");
   });
 
   it("has scoped styling so the CTA is visible without hijacking the article", () => {

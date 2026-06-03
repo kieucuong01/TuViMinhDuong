@@ -5,7 +5,7 @@ import { notFound } from "next/navigation";
 import { APP_URL } from "@/lib/env";
 import { getArticleBySlug, listArticles } from "@/lib/data";
 import { absoluteUrl, articleJsonLd, breadcrumbJsonLd, faqJsonLd } from "@/lib/seo";
-import { MarkdownContent } from "@/components/markdown-content";
+import { extractMarkdownHeadings, MarkdownContent } from "@/components/markdown-content";
 import { ArticlePersonalizedCta } from "@/components/article-personalized-cta";
 
 export const revalidate = 300;
@@ -44,8 +44,17 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function ArticlePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const article = await getArticleBySlug(slug);
+  const [article, articles] = await Promise.all([getArticleBySlug(slug), listArticles()]);
   if (!article) notFound();
+  const tableOfContents = extractMarkdownHeadings(article.content).slice(0, 8);
+  const relatedByCategory = article.category?.id
+    ? articles.filter((item) => item.slug !== article.slug && item.category?.id === article.category?.id)
+    : [];
+  const fallbackArticles = articles.filter(
+    (item) => item.slug !== article.slug && !relatedByCategory.some((related) => related.slug === item.slug),
+  );
+  const relatedArticles = [...relatedByCategory, ...fallbackArticles].slice(0, 3);
+  const midArticleCta = <ArticlePersonalizedCta articleTitle={article.title} categoryName={article.category?.name} />;
   const articleLd = articleJsonLd(article);
   const breadcrumbLd = breadcrumbJsonLd([
     { name: "Trang chủ", url: APP_URL },
@@ -74,7 +83,18 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
             <span className="tag tag-soft">Cập nhật {new Date(article.publishedAt).toLocaleDateString("vi-VN")}</span>
           </div>
         ) : null}
-        <ArticlePersonalizedCta articleTitle={article.title} categoryName={article.category?.name} />
+        {tableOfContents.length ? (
+          <nav className="article-table-of-contents" aria-label="Trong bài này">
+            <p>Trong bài này</p>
+            <ol>
+              {tableOfContents.map((heading) => (
+                <li key={heading.id}>
+                  <a href={`#${heading.id}`}>{heading.title}</a>
+                </li>
+              ))}
+            </ol>
+          </nav>
+        ) : null}
         {article.coverImage ? (
           <figure className="article-cover">
             <Image
@@ -88,7 +108,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
             {article.coverAlt ? <figcaption>{article.coverAlt}</figcaption> : null}
           </figure>
         ) : null}
-        <MarkdownContent content={article.content} />
+        <MarkdownContent content={article.content} afterFirstSection={midArticleCta} />
         {article.faqs?.length ? (
           <section className="article-faq" aria-labelledby="article-faq-heading">
             <h2 id="article-faq-heading">Câu hỏi thường gặp</h2>
@@ -98,6 +118,31 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
                   <summary>{item.question}</summary>
                   <p>{item.answer}</p>
                 </details>
+              ))}
+            </div>
+          </section>
+        ) : null}
+        <div className="article-final-cta">
+          <ArticlePersonalizedCta articleTitle={article.title} categoryName={article.category?.name} variant="final" />
+        </div>
+        {relatedArticles.length ? (
+          <section className="article-related-section" aria-labelledby="article-related-heading">
+            <p className="eyebrow">Đọc tiếp</p>
+            <h2 id="article-related-heading">Bài liên quan cùng chủ đề</h2>
+            <div className="article-related-grid">
+              {relatedArticles.map((related) => (
+                <Link key={related.slug} href={`/kien-thuc-tu-vi/${related.slug}`} className={`article-related-card${related.coverImage ? "" : " no-thumb"}`}>
+                  {related.coverImage ? (
+                    <span className="article-related-thumb">
+                      <Image src={related.coverImage} alt={related.coverAlt || related.title} width={320} height={180} sizes="(min-width: 768px) 220px, 30vw" />
+                    </span>
+                  ) : null}
+                  <span>
+                    {related.category ? <em>{related.category.name}</em> : null}
+                    <strong>{related.title}</strong>
+                    <small>{related.excerpt}</small>
+                  </span>
+                </Link>
               ))}
             </div>
           </section>
