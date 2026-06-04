@@ -68,7 +68,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
       <script id="article-jsonld" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleLd) }} />
       <script id="breadcrumb-jsonld" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
       {faqLd ? <script id="faq-jsonld" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }} /> : null}
-      <article className="article-shell mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
+      <article className="article-shell article-shell-public mx-auto px-4 sm:px-6 lg:px-8">
         <nav className="article-breadcrumb" aria-label="Breadcrumb">
           <Link href="/">Trang chủ</Link>
           <span>/</span>

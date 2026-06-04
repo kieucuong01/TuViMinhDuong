@@ -226,6 +226,99 @@ Tóm lại, Cung Phúc Đức trong tử vi không phải nơi để tự dọa 
 ${cta}`,
   }),
   article({
+    title: "Cung Điền Trạch trong tử vi: Cách đọc nhà cửa, đất đai và nơi ở",
+    slug: "cung-dien-trach-trong-tu-vi",
+    excerpt: "Cung Điền Trạch trong tử vi phản ánh nhà cửa, đất đai, môi trường sống, tài sản tích lũy và cách một người tạo sự ổn định vật chất.",
+    focusKeyword: "cung điền trạch",
+    coverImage: "/articles/la-so-12-cung.svg",
+    coverAlt: "Lá số tử vi 12 cung với trọng tâm Cung Điền Trạch",
+    metaTitle: "Cung Điền Trạch trong tử vi: Nhà cửa và đất đai",
+    metaDescription: "Tìm hiểu Cung Điền Trạch trong tử vi, cách đọc nhà cửa, đất đai, môi trường sống, tài sản tích lũy và thời điểm nên mua bán.",
+    canonicalUrl: "/kien-thuc-tu-vi/cung-dien-trach-trong-tu-vi",
+    date: "2026-06-04",
+    faqs: [
+      {
+        question: "Cung Điền Trạch có cho biết chắc chắn mua được nhà không?",
+        answer: "Không. Cung Điền Trạch cho biết xu hướng về nhà cửa, đất đai và môi trường sống, nhưng việc mua nhà còn phụ thuộc thu nhập, pháp lý, thị trường và kế hoạch tài chính.",
+      },
+      {
+        question: "Nên đọc Cung Điền Trạch cùng cung nào?",
+        answer: "Nên đọc cùng Cung Tài Bạch, Cung Quan Lộc, Cung Phúc Đức và Đại vận để hiểu tiền bạc, nghề nghiệp, nền gia đạo và giai đoạn tích lũy hiện tại.",
+      },
+      {
+        question: "Có nên quyết định mua bán đất chỉ dựa vào tử vi không?",
+        answer: "Không nên. Tử vi chỉ là lớp tham khảo. Mua bán nhà đất cần kiểm pháp lý, dòng tiền, vị trí, nhu cầu sử dụng và tư vấn chuyên môn khi cần.",
+      },
+    ],
+    content: `Cung Điền Trạch trong tử vi là cung được nhiều người quan tâm khi bắt đầu nghĩ đến nhà cửa, đất đai, nơi ở, tài sản tích lũy hoặc sự ổn định lâu dài. Với người trưởng thành, đặc biệt sau tuổi 30, câu hỏi "mình có dễ mua nhà không", "có nên đầu tư đất không", "nơi ở có ổn định không" thường rất thực tế chứ không chỉ là tò mò.
+
+Điền Trạch không nên được hiểu như lời hứa chắc chắn rằng ai đó sẽ giàu bất động sản hay không có nhà. Cung này giống một lớp thông tin về nền vật chất: cách một người tạo chỗ ở, tích lũy tài sản, chịu ảnh hưởng từ gia đình, môi trường sống và các giai đoạn vận hạn liên quan tới nhà đất.
+
+## Cung Điền Trạch là gì?
+
+Trong lá số tử vi, Cung Điền Trạch thường được dùng để đọc nhà cửa, đất đai, tài sản cố định, nơi cư trú và môi trường sống. Nếu Cung Tài Bạch nói về cách tạo tiền, Cung Quan Lộc nói về công việc tạo giá trị, thì Cung Điền Trạch cho thấy phần tài sản có xu hướng kết tinh thành nơi ở hoặc cơ sở vật chất ra sao.
+
+Một Cung Điền Trạch sáng không có nghĩa là cứ mua gì cũng lời. Nó thường cho thấy khả năng xây nền ổn định, có duyên với nhà đất, dễ có nơi ở phù hợp hoặc biết tích lũy thành tài sản bền. Ngược lại, Cung Điền Trạch có tín hiệu thử thách không có nghĩa là cả đời không có nhà; nó có thể nhắc người xem phải kỹ hơn về pháp lý, dòng tiền, thời điểm và cách quản trị rủi ro.
+
+Nếu mới bắt đầu học tử vi, bạn nên đọc thêm [12 cung trong lá số tử vi](/kien-thuc-tu-vi/12-cung-trong-la-so-tu-vi) để hiểu Điền Trạch nằm trong bức tranh chung, không tách rời các cung còn lại.
+
+## Đọc Điền Trạch cùng Tài Bạch và Quan Lộc
+
+Muốn hiểu chuyện nhà cửa, không thể chỉ nhìn Cung Điền Trạch. Bạn cần đọc cùng [Cung Tài Bạch](/kien-thuc-tu-vi/cung-tai-bach-trong-tu-vi) và [Cung Quan Lộc](/kien-thuc-tu-vi/cung-quan-loc-trong-tu-vi). Tài Bạch cho biết cách tạo tiền và giữ tiền; Quan Lộc cho biết công việc, nghề nghiệp, trách nhiệm và con đường tạo giá trị.
+
+Ví dụ, một người có Điền Trạch tốt nhưng Tài Bạch yếu thì vẫn cần học quản lý dòng tiền trước khi mua nhà. Người có Quan Lộc tốt, công việc ổn định, nhưng Điền Trạch nhiều biến động có thể phù hợp với lộ trình tích lũy chậm, chọn tài sản pháp lý rõ, tránh vay quá sức. Người có Tài Bạch mạnh nhưng Quan Lộc bấp bênh cần cẩn trọng với đầu tư dài hạn, vì dòng tiền đều quan trọng hơn cảm xúc mua nhanh.
+
+Ba cung này nên trả lời ba câu hỏi rất đời thường:
+
+- Mình kiếm tiền bằng năng lực nào?
+- Dòng tiền có đủ đều để giữ tài sản không?
+- Nhà cửa, đất đai nên phục vụ nhu cầu ở thật hay đầu tư?
+
+Khi ba câu trả lời còn mơ hồ, tử vi nên được xem như lời nhắc chuẩn bị, không phải lý do để xuống tiền vội.
+
+## Điền Trạch và nền gia đạo
+
+Cung Điền Trạch cũng nên đọc cùng [Cung Phúc Đức](/kien-thuc-tu-vi/cung-phuc-duc-trong-tu-vi). Phúc Đức cho biết nền gia đạo, tinh thần, phúc trạch và sự nâng đỡ phía sau. Điền Trạch cho biết nền đó biểu hiện ra thành nơi ở, tài sản, nhà cửa hoặc sự ổn định vật chất như thế nào.
+
+Có người được gia đình hỗ trợ chỗ ở, đất đai hoặc vốn ban đầu. Có người phải tự lập hoàn toàn, nhưng lại có khả năng xây nền bền từ công việc. Có người có tài sản nhưng môi trường sống nhiều áp lực, khiến nhà không chỉ là tài sản mà còn là nơi cần được chữa lành. Vì vậy, đọc Điền Trạch tốt nên bao gồm cả câu hỏi: nơi ở này có giúp mình sống yên hơn không?
+
+Một lá số có Điền Trạch thuận không nhất thiết phải thể hiện bằng nhiều nhà đất. Đôi khi nó là khả năng chọn đúng nơi ở, giữ được sự ổn định gia đình, có không gian làm việc tốt hoặc biết biến tài sản nhỏ thành nền an cư lâu dài.
+
+## Khi nào Cung Điền Trạch cần thận trọng?
+
+Cung Điền Trạch có tín hiệu thử thách nên được hiểu theo hướng quản trị rủi ro. Với nhà đất, rủi ro thường không nằm ở cảm giác "ngày xấu", mà nằm ở pháp lý chưa rõ, vay quá sức, mua theo tin đồn, không kiểm quy hoạch hoặc không tính chi phí duy trì.
+
+Khi luận giải nhắc Điền Trạch biến động, bạn nên tự hỏi:
+
+- Giấy tờ nhà đất đã kiểm đủ chưa?
+- Khoản vay có vượt khả năng trả trong 12-24 tháng không?
+- Mua để ở hay mua để đầu tư, hai mục tiêu này có bị lẫn không?
+- Môi trường sống có hợp sức khỏe, công việc và gia đình không?
+- Nếu thị trường chậm lại, mình có chịu được không?
+
+Những câu hỏi này thực tế hơn nhiều so với việc chỉ nghe "cung tốt" hay "cung xấu". Tử vi hay nhất là tử vi giúp bạn chậm lại đúng lúc và kiểm tra thứ cần kiểm tra.
+
+## Đại vận nào dễ kích hoạt chuyện nhà cửa?
+
+[Đại vận](/kien-thuc-tu-vi/dai-van-la-gi) là lớp thời gian dài, thường dùng để xem giai đoạn 10 năm. Khi đại vận hoặc lưu niên kích hoạt Điền Trạch, người xem có thể quan tâm nhiều hơn tới mua nhà, sửa nhà, chuyển nơi ở, tách hộ, mở văn phòng, đầu tư đất hoặc xử lý tài sản gia đình.
+
+Nếu vận đang thuận, đây có thể là giai đoạn tích lũy, tìm tài sản phù hợp hoặc ổn định nơi ở. Nếu vận đang nhiều áp lực, lời khuyên không phải là tuyệt đối không làm gì, mà là chia nhỏ bước đi: kiểm hồ sơ, giảm nợ, chờ dòng tiền chắc hơn, hoặc chọn tài sản phù hợp nhu cầu thật thay vì chạy theo kỳ vọng.
+
+Khi cần chọn thời điểm ký giấy tờ, chuyển nhà hoặc khởi công sửa chữa, bạn có thể dùng thêm công cụ [xem ngày tốt xấu](/xem-ngay). Tuy vậy, ngày tốt chỉ nên là lớp hỗ trợ sau khi pháp lý, tài chính và kế hoạch sử dụng đã rõ.
+
+## Có nên xem Điền Trạch trước khi mua nhà đất?
+
+Bạn có thể xem Cung Điền Trạch trước khi mua nhà đất, nhưng nên xem với tâm thế tham khảo. Lá số giúp bạn hiểu mình hợp kiểu tài sản nào: nơi ở ổn định, tài sản tích lũy dài hạn, nhà phục vụ công việc, hay môi trường sống cần nhiều sự yên tĩnh. Nó cũng giúp nhận ra giai đoạn nên tích lũy hay nên thận trọng.
+
+Nhưng quyết định mua bán vẫn phải dựa trên dữ liệu thật. Hãy kiểm giấy tờ, quy hoạch, hạ tầng, khả năng vay, dòng tiền dự phòng, nhu cầu gia đình và tư vấn chuyên môn. Nếu một lời luận khiến bạn muốn quyết định ngay mà bỏ qua kiểm tra cơ bản, đó không phải là cách dùng tử vi lành mạnh.
+
+Người mới có thể bắt đầu bằng cách [lập lá số tử vi miễn phí](/#lap-la-so), sau đó đọc thêm [Cung Mệnh và Cung Thân](/kien-thuc-tu-vi/cung-menh-cung-than) để hiểu nền người, rồi mới đi vào Điền Trạch, Tài Bạch, Quan Lộc và Đại vận.
+
+Tóm lại, Cung Điền Trạch trong tử vi giúp bạn nhìn chuyện nhà cửa, đất đai và nơi ở một cách có hệ thống hơn. Đọc đúng, cung này không khiến người ta mơ hồ về giàu nghèo, mà nhắc mình xây nền vững: tiền rõ, pháp lý rõ, nhu cầu rõ và thời điểm đủ chín.
+
+${cta}`,
+  }),
+  article({
     title: "Tử vi tháng 6/2026: Cách xem vận tháng theo lá số cá nhân",
     slug: "tu-vi-thang-6-2026",
     excerpt: "Tử vi tháng 6/2026 nên được đọc từ lá số gốc, đại vận, lưu niên và ngày tốt xấu, giúp bạn lên kế hoạch công việc, tiền bạc, sức khỏe bình tĩnh hơn.",

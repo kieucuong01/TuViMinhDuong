@@ -5855,6 +5855,10 @@ button.is-loading:not(.icon-button)::before {
   width: 100%;
 }
 
+.article-shell-public > h1 {
+  max-width: none;
+}
+
 .article-shell-public > p:not(.eyebrow) {
   max-width: none;
 }

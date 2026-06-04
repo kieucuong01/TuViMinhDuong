@@ -34,4 +34,15 @@ describe("ArticlePersonalizedCta", () => {
     expect(globalsSource).toContain(".article-personalized-cta");
     expect(globalsSource).toContain(".article-personalized-actions");
   });
+
+  it("keeps public article pages wide and justified on desktop", () => {
+    expect(articlePageSource).toContain("article-shell article-shell-public");
+    expect(articlePageSource).not.toContain("article-shell mx-auto max-w-3xl");
+    expect(globalsSource).toContain("width: min(100%, 80rem)");
+    expect(globalsSource).toContain(".article-shell-public > h1");
+    expect(globalsSource).toContain(".article-shell-public .prose-content");
+    expect(globalsSource).toContain("width: 100%");
+    expect(globalsSource).toContain(".article-shell-public .prose-content p");
+    expect(globalsSource).toContain("text-align: justify");
+  });
 });

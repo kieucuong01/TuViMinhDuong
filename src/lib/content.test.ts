@@ -9,6 +9,7 @@ describe("SEO content cluster", () => {
     expect(slugs).toContain("cach-doc-la-so-tu-vi-cho-nguoi-moi");
     expect(slugs).toContain("cung-phu-the-trong-tu-vi");
     expect(slugs).toContain("cung-phuc-duc-trong-tu-vi");
+    expect(slugs).toContain("cung-dien-trach-trong-tu-vi");
     expect(slugs).toContain("cung-tat-ach-trong-tu-vi");
     expect(slugs).toContain("cung-thien-di-trong-tu-vi");
   });
@@ -41,6 +42,7 @@ describe("SEO content cluster", () => {
           "cach-doc-la-so-tu-vi-cho-nguoi-moi",
           "cung-phu-the-trong-tu-vi",
           "cung-phuc-duc-trong-tu-vi",
+          "cung-dien-trach-trong-tu-vi",
           "cung-tat-ach-trong-tu-vi",
           "cung-thien-di-trong-tu-vi",
         ].includes(article.slug),
