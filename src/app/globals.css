@@ -5817,21 +5817,54 @@ button.is-loading:not(.icon-button)::before {
 }
 
 .article-shell {
+  width: min(100%, 80rem);
   border-radius: 1.35rem;
 }
 
+.article-shell-public {
+  padding-top: clamp(1.25rem, 4vw, 3.25rem);
+  padding-bottom: clamp(1.25rem, 4vw, 3.25rem);
+}
+
 .article-shell > h1 {
-  max-width: 16ch;
-  font-size: clamp(2.1rem, 4.5vw, 3.2rem);
+  max-width: 18ch;
+  font-size: clamp(2.1rem, 4vw, 3.45rem);
   font-weight: 720;
   line-height: 1.12;
 }
 
 .article-shell > p:not(.eyebrow) {
-  max-width: 68ch;
+  max-width: 82ch;
   color: #5f5852;
   font-size: clamp(1.04rem, 2vw, 1.16rem);
   line-height: 1.82;
+}
+
+.article-shell-public .prose-content,
+.article-shell-public .article-table-of-contents,
+.article-shell-public .article-cover,
+.article-shell-public .article-faq,
+.article-shell-public .article-final-cta,
+.article-shell-public .article-related-section {
+  width: 100%;
+  max-width: none;
+}
+
+.article-shell-public > h1,
+.article-shell-public > p:not(.eyebrow) {
+  width: 100%;
+}
+
+.article-shell-public > p:not(.eyebrow) {
+  max-width: none;
+}
+
+.article-shell-public .prose-content p,
+.article-shell-public .prose-content li,
+.article-shell-public > p:not(.eyebrow),
+.article-shell-public .article-faq p {
+  text-align: justify;
+  text-justify: inter-word;
 }
 
 .article-breadcrumb {
@@ -5942,6 +5975,16 @@ button.is-loading:not(.icon-button)::before {
     max-width: none;
     font-size: clamp(1.9rem, 9vw, 2.45rem);
     line-height: 1.1;
+  }
+
+  .article-shell-public {
+    width: 100%;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+
+  .article-shell > p:not(.eyebrow) {
+    max-width: none;
   }
 
   .article-table-of-contents {
