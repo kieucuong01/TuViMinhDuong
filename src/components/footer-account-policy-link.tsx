@@ -2,20 +2,24 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { fetchClientSession } from "@/components/client-user-session";
 
 export function FooterAccountPolicyLink() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
-    const controller = new AbortController();
-    fetch("/api/me", { credentials: "same-origin", cache: "no-store", signal: controller.signal })
-      .then((response) => response.json())
-      .then((data) => setIsLoggedIn(Boolean(data.user)))
+    let cancelled = false;
+    fetchClientSession()
+      .then((data) => {
+        if (!cancelled) setIsLoggedIn(Boolean(data.user));
+      })
       .catch(() => {
-        if (!controller.signal.aborted) setIsLoggedIn(false);
+        if (!cancelled) setIsLoggedIn(false);
       });
 
-    return () => controller.abort();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   if (!isLoggedIn) return null;

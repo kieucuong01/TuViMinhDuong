@@ -32,6 +32,7 @@ export function FateTabs({ chartId, active }: { chartId: string; active: FateVie
           key={tab.key}
           href={tab.key === "la-so" ? `/la-so/${chartId}` : `/la-so/${chartId}?view=${tab.key}`}
           className={active === tab.key ? "chart-tab active" : "chart-tab"}
+          prefetch={false}
         >
           {tab.label}
         </Link>

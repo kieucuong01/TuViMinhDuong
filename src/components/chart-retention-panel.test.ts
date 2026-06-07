@@ -22,7 +22,7 @@ describe("ChartRetentionPanel", () => {
   it("appears before deeper chart actions so users see the loop early", () => {
     expect(chartPageSource).toContain("ChartRetentionPanel");
     expect(chartPageSource.indexOf("<ChartRetentionPanel")).toBeGreaterThan(chartPageSource.indexOf("<ChartReadingRoadmap"));
-    expect(chartPageSource.indexOf("<ChartRetentionPanel")).toBeLessThan(chartPageSource.indexOf("<ChartActionPanel"));
+    expect(chartPageSource.indexOf("<ChartRetentionPanel")).toBeLessThan(chartPageSource.indexOf("<DeferredChartActionPanel"));
   });
 
   it("passes the chart birth year into date fortune from the URL", () => {

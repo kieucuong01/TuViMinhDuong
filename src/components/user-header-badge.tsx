@@ -8,37 +8,33 @@ import { logoutAction } from "@/app/actions";
 import { loginModalHref } from "@/components/login-modal-link";
 import { LoadingSubmitButton } from "@/components/loading-submit-button";
 import { useCloseDetailsOnOutsideClick } from "@/components/use-close-details-on-outside-click";
+import { fetchClientSession, type ClientSessionUser } from "@/components/client-user-session";
 import { formatCoins } from "@/lib/format";
-
-type HeaderUser = {
-  id: string;
-  email: string;
-  name: string;
-  role: "USER" | "ADMIN";
-  coinBalance: number;
-};
 
 export function UserHeaderBadge() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const [user, setUser] = useState<HeaderUser | null>(null);
+  const [user, setUser] = useState<ClientSessionUser | null>(null);
   const [loaded, setLoaded] = useState(false);
+  const hasFetchedRef = useRef(false);
   const detailsRef = useRef<HTMLDetailsElement>(null);
   useCloseDetailsOnOutsideClick(detailsRef);
 
   useEffect(() => {
-    const controller = new AbortController();
-    fetch("/api/me", { credentials: "same-origin", cache: "no-store", signal: controller.signal })
-      .then((response) => response.json())
+    let cancelled = false;
+    const force = hasFetchedRef.current;
+    hasFetchedRef.current = true;
+    fetchClientSession({ force })
       .then((data) => {
+        if (cancelled) return;
         setUser(data.user || null);
         setLoaded(true);
       })
       .catch(() => {
-        if (!controller.signal.aborted) setLoaded(true);
+        if (!cancelled) setLoaded(true);
       });
     return () => {
-      controller.abort();
+      cancelled = true;
     };
   }, [pathname, searchParams]);
 
@@ -48,8 +44,7 @@ export function UserHeaderBadge() {
 
   useEffect(() => {
     function refreshUser() {
-      fetch("/api/me", { credentials: "same-origin", cache: "no-store" })
-        .then((response) => response.json())
+      fetchClientSession({ force: true })
         .then((data) => {
           setUser(data.user || null);
           setLoaded(true);

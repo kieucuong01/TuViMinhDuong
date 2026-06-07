@@ -3,7 +3,7 @@
 import { redirect } from "next/navigation";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { clearSession, createMagicSession, getCurrentUser, getOrCreateEmailUser, loginOrRegister, setSession, type SessionUser } from "@/lib/auth";
-import { FEATURE_PRICES_CACHE_TAG, OPERATION_SETTINGS_CACHE_TAG, getCachedReading, getChart, getFeaturePrice, getOperationSettings, getUserBalance, saveArticleCategoryFromForm, saveArticleFromForm, saveChart, saveReading, adjustCoins, deleteArticleBySlug, deleteUserChart, getReadingJobByScope, createPendingReading, updateOperationSettings, updateFeaturePrices, getCompletedReadingsForScopes, hasReadingBundleAccess } from "@/lib/data";
+import { ARTICLES_CACHE_TAG, FEATURE_PRICES_CACHE_TAG, OPERATION_SETTINGS_CACHE_TAG, getCachedReading, getChart, getFeaturePrice, getOperationSettings, getUserBalance, saveArticleCategoryFromForm, saveArticleFromForm, saveChart, saveReading, adjustCoins, deleteArticleBySlug, deleteUserChart, getReadingJobByScope, createPendingReading, updateOperationSettings, updateFeaturePrices, getCompletedReadingsForScopes, hasReadingBundleAccess } from "@/lib/data";
 import { generateReading } from "@/lib/ai";
 import { getDb } from "@/lib/db";
 import { createPayOSCheckout, createPayOSCustomCheckout } from "@/lib/payos";
@@ -383,6 +383,7 @@ export async function saveArticleAction(formData: FormData) {
   if (user?.role !== "ADMIN") redirect("/dang-nhap?next=/admin");
   const originalSlug = String(formData.get("originalSlug") || "");
   const article = await saveArticleFromForm(formData);
+  revalidateTag(ARTICLES_CACHE_TAG, "max");
   revalidatePath("/kien-thuc-tu-vi");
   if (originalSlug && originalSlug !== article.slug) revalidatePath(`/kien-thuc-tu-vi/${originalSlug}`);
   revalidatePath(`/kien-thuc-tu-vi/${article.slug}`);
@@ -395,6 +396,7 @@ export async function deleteArticleAction(formData: FormData) {
   const slug = String(formData.get("slug") || "");
   if (slug) {
     await deleteArticleBySlug(slug);
+    revalidateTag(ARTICLES_CACHE_TAG, "max");
     revalidatePath("/admin");
     revalidatePath("/kien-thuc-tu-vi");
     revalidatePath(`/kien-thuc-tu-vi/${slug}`);
@@ -454,6 +456,7 @@ export async function saveArticleCategoryAction(formData: FormData) {
   const user = await getCurrentUser();
   if (user?.role !== "ADMIN") redirect("/dang-nhap?next=/admin");
   const category = await saveArticleCategoryFromForm(formData);
+  revalidateTag(ARTICLES_CACHE_TAG, "max");
   revalidatePath("/admin");
   revalidatePath("/kien-thuc-tu-vi");
   redirect(`/admin?tab=content&categorySaved=${category.slug}`);

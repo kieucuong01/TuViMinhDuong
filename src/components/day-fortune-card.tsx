@@ -141,7 +141,7 @@ export function DayFortuneCard() {
           <span>Chọn ngày</span>
           <input type="date" value={selectedDate} onChange={(event) => setSelectedDate(event.target.value)} />
         </label>
-        <Link href={`/xem-ngay?date=${selectedDate}`} className="btn btn-ghost self-end">
+        <Link href={`/xem-ngay?date=${selectedDate}`} className="btn btn-ghost self-end" prefetch={false}>
           Xem chi tiết <ChevronRight size={17} />
         </Link>
       </div>

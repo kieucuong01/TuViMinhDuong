@@ -12,7 +12,7 @@ import { FateTabs, type FateView } from "@/components/fate-tabs";
 import { DailyFateView, MajorFateView, MinorFateView, MonthlyFateView } from "@/components/fate-views";
 import { PalaceFateView } from "@/components/palace-fate-view";
 import { PremiumReadingCta } from "@/components/premium-reading-cta";
-import { ChartActionPanel } from "@/components/chart-action-panel";
+import { DeferredChartActionPanel } from "@/components/deferred-chart-action-panel";
 import { ChartReadingRoadmap } from "@/components/chart-reading-roadmap";
 import { ChartRetentionPanel } from "@/components/chart-retention-panel";
 import { PaywallPopup } from "@/components/paywall-popup";
@@ -89,7 +89,7 @@ export default async function ChartPage({
           </div>
         </div>
 
-        <ChartActionPanel chartId={id} chart={record.chart} />
+        <DeferredChartActionPanel chartId={id} chart={record.chart} />
 
         <div className="chart-quick-panels">
           {paidFeaturesVisible ? (
@@ -120,7 +120,7 @@ export default async function ChartPage({
             </>
           ) : (
             <>
-              <FreeOverviewLoader chartId={id} initialOverview={freeOverviewStatus} />
+              <FreeOverviewLoader chartId={id} initialOverview={freeOverviewStatus} deferUntilVisible />
             </>
           )}
         </section>

@@ -5,8 +5,7 @@ import { Suspense } from "react";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { GlobalLoadingToast } from "@/components/global-loading-toast";
-import { CoinTopupModal } from "@/components/coin-topup-modal";
-import { LoginModal } from "@/components/login-modal";
+import { DeferredGlobalModals } from "@/components/deferred-global-modals";
 import { ClientErrorReporter } from "@/components/client-error-reporter";
 import { GoogleAnalytics } from "@/components/google-analytics";
 import { APP_NAME, APP_URL } from "@/lib/env";
@@ -75,10 +74,7 @@ export default async function RootLayout({
           <GlobalLoadingToast />
         </Suspense>
         <Suspense fallback={null}>
-          <CoinTopupModal enabled={coinTopupEnabled} />
-        </Suspense>
-        <Suspense fallback={null}>
-          <LoginModal />
+          <DeferredGlobalModals coinTopupEnabled={coinTopupEnabled} />
         </Suspense>
         <ClientErrorReporter />
         <GoogleAnalytics />

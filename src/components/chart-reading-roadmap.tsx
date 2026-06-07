@@ -25,22 +25,22 @@ export function ChartReadingRoadmap({ chartId, chart }: ChartReadingRoadmapProps
           <strong>1. Mệnh</strong>
           <span>Nắm khí chất chính và hướng đọc tổng quan.</span>
         </a>
-        <Link href={`/la-so/${chartId}?view=luan-cung`}>
+        <Link href={`/la-so/${chartId}?view=luan-cung`} prefetch={false}>
           <Wallet size={18} />
           <strong>2. Tài Bạch</strong>
           <span>Đối chiếu tiền bạc, nguồn lực và cách giữ nhịp.</span>
         </Link>
-        <Link href={`/la-so/${chartId}?view=luan-cung`}>
+        <Link href={`/la-so/${chartId}?view=luan-cung`} prefetch={false}>
           <Route size={18} />
           <strong>3. Quan Lộc</strong>
           <span>Đọc trọng tâm công việc, vai trò và hướng đi.</span>
         </Link>
-        <Link href={`/la-so/${chartId}?view=luan-cung`}>
+        <Link href={`/la-so/${chartId}?view=luan-cung`} prefetch={false}>
           <HeartHandshake size={18} />
           <strong>4. Phu Thê</strong>
           <span>Xem cách đọc quan hệ, hôn nhân và người đồng hành.</span>
         </Link>
-        <Link href={`/la-so/${chartId}?view=nguyet-van`}>
+        <Link href={`/la-so/${chartId}?view=nguyet-van`} prefetch={false}>
           <CalendarDays size={18} />
           <strong>5. Vận tháng/ngày</strong>
           <span>Quay lại theo tháng {viewYear} và từng ngày cần chọn.</span>

@@ -42,7 +42,7 @@ describe("legal and trust pages for ads readiness", () => {
     expect(pageSource("chinh-sach-thanh-toan-hoan-xu")).toContain('redirect("/dang-nhap?next=/chinh-sach-thanh-toan-hoan-xu")');
     expect(pageSource("lien-he")).toContain("authOnly");
     expect(pageSource("lien-he")).toContain("visibleSupportItems");
-    expect(footerAccountPolicySource).toContain('fetch("/api/me"');
+    expect(footerAccountPolicySource).toContain("fetchClientSession");
     expect(footerAccountPolicySource).toContain("Boolean(data.user)");
     expect(footerAccountPolicySource).toContain('href="/chinh-sach-thanh-toan-hoan-xu"');
   });

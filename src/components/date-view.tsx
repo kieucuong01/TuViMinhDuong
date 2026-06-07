@@ -71,21 +71,124 @@ function TaskIcon({ type }: { type: DateTaskKey }) {
 export function DateView({ initialDate, initialBirthYear }: { initialDate?: string | string[]; initialBirthYear?: string | string[] }) {
   const [selectedDate, setSelectedDate] = useState(() => safeInputDate(initialDate));
   const [birthYear, setBirthYear] = useState(() => safeBirthYear(initialBirthYear));
+  const [selectedTask, setSelectedTask] = useState<DateTaskKey>("general");
   const parsedBirthYear = parseBirthYear(birthYear);
   const date = useMemo(() => parseInputDate(selectedDate), [selectedDate]);
   const fortune = useMemo(() => analyzeDate(date, parsedBirthYear), [date, parsedBirthYear]);
   const days = useMemo(() => monthDays(fortune.solar.year, fortune.solar.month), [fortune.solar.month, fortune.solar.year]);
   const firstWeekday = useMemo(() => new Date(`${fortune.solar.year}-${String(fortune.solar.month).padStart(2, "0")}-01T12:00:00+07:00`).getDay(), [fortune.solar.month, fortune.solar.year]);
   const starHits = [...fortune.goodStars, ...fortune.badStars];
+  const selectedTaskScore = useMemo(() => fortune.taskScores.find((task) => task.key === selectedTask) ?? fortune.taskScores[0], [fortune.taskScores, selectedTask]);
 
   return (
     <div className="date-view-shell" data-testid="date-view">
+      <section className="date-quick-start">
+        <div className="date-quick-copy">
+          <p className="eyebrow">Xem ngày tốt xấu</p>
+          <h1>Xem ngày tốt xấu theo tuổi</h1>
+          <p>Chọn ngày, nhập năm sinh và chọn việc đang chuẩn bị. Kết quả hiện ngay để bạn biết nên làm, nên tránh và nên đọc phần nào tiếp theo.</p>
+          <div className="date-quick-status">
+            <strong>{fortune.weekday}, {fortune.solar.day}/{fortune.solar.month}/{fortune.solar.year}</strong>
+            <span className={`rounded-full px-3 py-1 text-sm font-black ring-1 ${toneClass[fortune.status.tone]}`}>{fortune.status.label}</span>
+          </div>
+          <div className="date-quick-advice" aria-label="Tóm tắt việc nên làm và nên tránh">
+            <article>
+              <CheckCircle2 size={18} />
+              <span>Nên ưu tiên</span>
+              <strong>{fortune.goodThings[0] || "Việc quen thuộc"}</strong>
+            </article>
+            <article>
+              <XCircle size={18} />
+              <span>Nên cân nhắc</span>
+              <strong>{fortune.avoidThings[0] || "Quyết định nóng"}</strong>
+            </article>
+            <article>
+              <Clock3 size={18} />
+              <span>Giờ tốt gần nhất</span>
+              <strong>{fortune.goodHours[0]?.branch} {fortune.goodHours[0]?.range}</strong>
+            </article>
+          </div>
+        </div>
+
+        <div className="date-quick-score" aria-label={`Cát hung ${fortune.score} phần trăm`}>
+          <div
+            className="fortune-gauge"
+            style={{ background: `conic-gradient(#34d399 ${fortune.score * 3.6}deg, #fde68a ${fortune.score * 3.6}deg)` }}
+          >
+            <div>
+              <strong>{fortune.score}<span>%</span></strong>
+              <small>Cát - Hung</small>
+            </div>
+          </div>
+          <p>{formatLunarDate(fortune.lunar)}<span>{fortune.canChi.day}</span></p>
+        </div>
+
+        <aside className="date-quick-controls">
+          <div className="date-control-grid">
+            <label>
+              <span>Chọn ngày</span>
+              <input type="date" value={selectedDate} onChange={(event) => setSelectedDate(event.target.value)} data-testid="date-input" />
+            </label>
+            <label>
+              <span>Năm sinh để xét tuổi</span>
+              <input
+                type="number"
+                inputMode="numeric"
+                min="1900"
+                max="2100"
+                placeholder="Ví dụ 1994"
+                value={birthYear}
+                onChange={(event) => setBirthYear(event.target.value)}
+                data-testid="birth-year-input"
+              />
+            </label>
+          </div>
+          <div className="date-jump-row">
+            <button type="button" className="btn btn-ghost btn-small" onClick={() => setSelectedDate(shiftDate(selectedDate, -1))} data-testid="date-prev-button">
+              <ChevronLeft size={16} /> Trước
+            </button>
+            <button type="button" className="btn btn-ghost btn-small" onClick={() => setSelectedDate(toInputDate(new Date()))} data-testid="date-today-button">
+              Hôm nay
+            </button>
+            <button type="button" className="btn btn-ghost btn-small" onClick={() => setSelectedDate(shiftDate(selectedDate, 1))} data-testid="date-next-button">
+              Sau <ChevronRight size={16} />
+            </button>
+          </div>
+
+          <div className="date-task-picker" aria-label="Chọn việc cần xem">
+            <span>Việc đang xem</span>
+            <div>
+              {fortune.taskScores.map((task) => (
+                <button
+                  key={task.key}
+                  type="button"
+                  className="date-task-choice"
+                  data-active={task.key === selectedTask}
+                  data-task-key={task.key}
+                  data-tone={task.tone}
+                  onClick={() => setSelectedTask(task.key)}
+                >
+                  <TaskIcon type={task.key} />
+                  {task.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="date-selected-task" data-tone={selectedTaskScore.tone}>
+            <span>{selectedTaskScore.label}</span>
+            <strong>{selectedTaskScore.score}%</strong>
+            <p>{selectedTaskScore.verdict}</p>
+          </div>
+        </aside>
+      </section>
+
       <section className="date-month-overview">
         <div className="date-month-calendar-card">
           <div className="date-month-calendar-head">
             <div>
               <p className="eyebrow">Tổng quan tháng</p>
-              <h1>Tháng {fortune.solar.month}/{fortune.solar.year}</h1>
+              <h2>Tháng {fortune.solar.month}/{fortune.solar.year}</h2>
               <p>Nhìn nhanh ngày tốt, ngày cần cân nhắc rồi chọn ngày để xem chi tiết.</p>
             </div>
             <CalendarDays className="text-orange-600" size={28} />
@@ -124,7 +227,7 @@ export function DateView({ initialDate, initialBirthYear }: { initialDate?: stri
           <span className={`mt-3 inline-flex rounded-full px-3 py-1 text-sm font-black ring-1 ${toneClass[fortune.status.tone]}`}>{fortune.status.label}</span>
           <label className="mt-5 block">
             <span>Chọn ngày</span>
-            <input type="date" value={selectedDate} onChange={(event) => setSelectedDate(event.target.value)} data-testid="date-input" />
+            <input type="date" value={selectedDate} onChange={(event) => setSelectedDate(event.target.value)} />
           </label>
           <label className="mt-3 block">
             <span>Năm sinh để xét tuổi</span>
@@ -136,17 +239,16 @@ export function DateView({ initialDate, initialBirthYear }: { initialDate?: stri
               placeholder="Ví dụ 1994"
               value={birthYear}
               onChange={(event) => setBirthYear(event.target.value)}
-              data-testid="birth-year-input"
             />
           </label>
           <div className="mt-3 grid grid-cols-3 gap-2">
-            <button type="button" className="btn btn-ghost btn-small" onClick={() => setSelectedDate(shiftDate(selectedDate, -1))} data-testid="date-prev-button">
+            <button type="button" className="btn btn-ghost btn-small" onClick={() => setSelectedDate(shiftDate(selectedDate, -1))}>
               <ChevronLeft size={16} /> Trước
             </button>
-            <button type="button" className="btn btn-ghost btn-small" onClick={() => setSelectedDate(toInputDate(new Date()))} data-testid="date-today-button">
+            <button type="button" className="btn btn-ghost btn-small" onClick={() => setSelectedDate(toInputDate(new Date()))}>
               Hôm nay
             </button>
-            <button type="button" className="btn btn-ghost btn-small" onClick={() => setSelectedDate(shiftDate(selectedDate, 1))} data-testid="date-next-button">
+            <button type="button" className="btn btn-ghost btn-small" onClick={() => setSelectedDate(shiftDate(selectedDate, 1))}>
               Sau <ChevronRight size={16} />
             </button>
           </div>

@@ -10,6 +10,8 @@ describe("FreeOverviewLoader fast-first flow", () => {
   it("renders fallback content while starting the background overview process", () => {
     expect(loaderSource).toContain('status: "fallback"');
     expect(loaderSource).toContain("/free-overview/process");
+    expect(loaderSource).toContain("deferUntilVisible");
+    expect(loaderSource).toContain("IntersectionObserver");
     expect(loaderSource).toContain("schedulePoll()");
     expect(loaderSource).toContain("free-overview-inline-status");
   });
@@ -19,6 +21,7 @@ describe("FreeOverviewLoader fast-first flow", () => {
     expect(loaderSource).toContain("useState<FreeOverviewState>(() =>");
     expect(chartPageSource).toContain("getFreeOverviewStatus(record.chart)");
     expect(chartPageSource).toContain("initialOverview={freeOverviewStatus}");
+    expect(chartPageSource).toContain("deferUntilVisible");
   });
 
   it("has inline status styling for the fast overview state", () => {

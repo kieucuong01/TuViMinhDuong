@@ -28,19 +28,19 @@ export function ChartRetentionPanel({ chartId, chart, isSignedIn }: ChartRetenti
       </div>
 
       <div className="chart-retention-grid">
-        <Link href={saveHref} className="chart-retention-card">
+        <Link href={saveHref} className="chart-retention-card" prefetch={false}>
           {isSignedIn ? <History size={19} /> : <LogIn size={19} />}
           <strong>{isSignedIn ? "Xem lá số đã lưu" : "Đăng nhập để lưu lá số"}</strong>
           <span>{isSignedIn ? "Mở danh sách lá số và nội dung đã từng xem." : "Lưu đường dẫn này vào tài khoản để quay lại đúng lá số."}</span>
         </Link>
 
-        <Link href={`${chartPath}?view=nguyet-van`} className="chart-retention-card">
+        <Link href={`${chartPath}?view=nguyet-van`} className="chart-retention-card" prefetch={false}>
           <CalendarDays size={19} />
           <strong>Quay lại xem Nguyệt vận</strong>
           <span>Đầu tháng mới, mở mục này để đọc trọng tâm tháng theo lá số.</span>
         </Link>
 
-        <Link href={`/xem-ngay?${dateParams.toString()}`} className="chart-retention-card">
+        <Link href={`/xem-ngay?${dateParams.toString()}`} className="chart-retention-card" prefetch={false}>
           <CalendarDays size={19} />
           <strong>Xem ngày theo tuổi</strong>
           <span>Tự điền năm sinh {birthYear} để chọn ngày hợp việc và hợp tuổi hơn.</span>

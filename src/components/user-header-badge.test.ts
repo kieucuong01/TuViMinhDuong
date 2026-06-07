@@ -3,11 +3,13 @@ import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 
 const userHeaderSource = readFileSync(fileURLToPath(new URL("./user-header-badge.tsx", import.meta.url)), "utf8");
+const clientSessionSource = readFileSync(fileURLToPath(new URL("./client-user-session.ts", import.meta.url)), "utf8");
 const globalsCss = readFileSync(fileURLToPath(new URL("../app/globals.css", import.meta.url)), "utf8");
 
 describe("user header coin balance", () => {
   it("renders a logged-in user's coin balance with a top-up destination", () => {
-    expect(userHeaderSource).toContain("coinBalance: number");
+    expect(clientSessionSource).toContain("coinBalance: number");
+    expect(userHeaderSource).toContain("ClientSessionUser");
     expect(userHeaderSource).toContain("formatCoins(user.coinBalance ?? 0)");
     expect(userHeaderSource).toContain('href="/nap-xu"');
     expect(userHeaderSource).toContain('className="user-coin-pill"');

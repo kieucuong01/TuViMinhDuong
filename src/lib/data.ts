@@ -146,6 +146,7 @@ type ArticleRecord = Omit<ArticleView, "faqs"> & {
 const DELETED_ARTICLE_STATUS = "deleted";
 export const OPERATION_SETTINGS_CACHE_TAG = "operation-settings";
 export const FEATURE_PRICES_CACHE_TAG = "feature-prices";
+export const ARTICLES_CACHE_TAG = "articles";
 const FREE_OVERVIEW_JOB_STALE_MS = 90_000;
 
 export type ChartHistoryItem = StoredChart & {
@@ -1316,7 +1317,7 @@ export async function saveReading(
   };
 }
 
-export async function listArticles() {
+async function readArticlesFromDb() {
   const db = getDb();
   if (!db) return sortArticlesNewestFirst(Array.from(demoArticles().values()).filter((article) => article.status === "published").map(articleWithNormalizedRelations));
   let articles: ArticleRecord[] = [];
@@ -1338,6 +1339,16 @@ export async function listArticles() {
     bySlug.set(article.slug, articleWithNormalizedRelations(article));
   }
   return sortArticlesNewestFirst(Array.from(bySlug.values()));
+}
+
+const getCachedArticlesFromDb = cacheServerData(readArticlesFromDb, [ARTICLES_CACHE_TAG, "list"], {
+  tags: [ARTICLES_CACHE_TAG],
+  revalidate: 300,
+});
+
+export async function listArticles() {
+  if (!getDb()) return readArticlesFromDb();
+  return getCachedArticlesFromDb();
 }
 
 export async function listAdminArticles() {
@@ -1362,7 +1373,7 @@ export async function listAdminArticles() {
   }
 }
 
-export async function getArticleBySlug(slug: string) {
+async function readArticleBySlugFromDb(slug: string) {
   const db = getDb();
   if (!db) {
     const article = demoArticles().get(slug);
@@ -1378,6 +1389,16 @@ export async function getArticleBySlug(slug: string) {
   } catch {
     return seedArticles.map(articleWithNormalizedRelations).find((item) => item.slug === slug) || null;
   }
+}
+
+const getCachedArticleBySlugFromDb = cacheServerData(readArticleBySlugFromDb, [ARTICLES_CACHE_TAG, "slug"], {
+  tags: [ARTICLES_CACHE_TAG],
+  revalidate: 300,
+});
+
+export async function getArticleBySlug(slug: string) {
+  if (!getDb()) return readArticleBySlugFromDb(slug);
+  return getCachedArticleBySlugFromDb(slug);
 }
 
 export async function getAdminArticleBySlug(slug: string) {
@@ -1447,7 +1468,7 @@ export async function deleteArticleBySlug(slug: string) {
   return true;
 }
 
-export async function listArticleCategories() {
+async function readArticleCategoriesFromDb() {
   const db = getDb();
   if (!db) return Array.from(demoArticleCategories().values()).sort((a, b) => a.name.localeCompare(b.name, "vi"));
   try {
@@ -1455,6 +1476,16 @@ export async function listArticleCategories() {
   } catch {
     return Array.from(demoArticleCategories().values()).sort((a, b) => a.name.localeCompare(b.name, "vi"));
   }
+}
+
+const getCachedArticleCategoriesFromDb = cacheServerData(readArticleCategoriesFromDb, [ARTICLES_CACHE_TAG, "categories"], {
+  tags: [ARTICLES_CACHE_TAG],
+  revalidate: 300,
+});
+
+export async function listArticleCategories() {
+  if (!getDb()) return readArticleCategoriesFromDb();
+  return getCachedArticleCategoriesFromDb();
 }
 
 export async function saveArticleCategoryFromForm(formData: FormData) {
