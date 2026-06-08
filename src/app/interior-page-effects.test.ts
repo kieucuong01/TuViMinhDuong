@@ -38,4 +38,11 @@ describe("interior page visual effects", () => {
     expect(globalsCss).toMatch(/\.knowledge-path-card::before,\s*\n\.knowledge-palace-link::before\s*{[\s\S]*linear-gradient/);
     expect(globalsCss).toMatch(/\.article-card:hover \.article-thumb\.image::after\s*{[\s\S]*knowledge-thumb-sheen/);
   });
+
+  it("keeps the date hero score card separated from the desktop controls", () => {
+    expect(globalsCss).toMatch(/@media \(min-width: 780px\)\s*{[\s\S]*\.date-quick-start\s*{[\s\S]*minmax\(13\.75rem, 0\.36fr\)/);
+    expect(globalsCss).toMatch(/@media \(min-width: 1120px\)\s*{[\s\S]*\.date-quick-start\s*{[\s\S]*column-gap:\s*clamp\(1\.25rem, 2\.5vw, 2\.5rem\);[\s\S]*minmax\(13\.75rem, 14\.5rem\)[\s\S]*minmax\(20rem, 25rem\)/);
+    expect(globalsCss).toMatch(/\.date-quick-score\s*{[\s\S]*justify-self:\s*start;[\s\S]*width:\s*min\(100%, 13\.75rem\);[\s\S]*transform:\s*translateX\(clamp\(-3rem, -3vw, -1\.25rem\)\)/);
+    expect(globalsCss).toMatch(/\.date-quick-controls\s*{[\s\S]*justify-self:\s*end;[\s\S]*width:\s*min\(100%, 25rem\)/);
+  });
 });

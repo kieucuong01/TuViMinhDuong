@@ -7383,7 +7383,7 @@ button.is-loading:not(.icon-button)::before {
 
 @media (min-width: 780px) {
   .date-quick-start {
-    grid-template-columns: minmax(0, 1.08fr) minmax(10rem, 0.36fr);
+    grid-template-columns: minmax(0, 1.08fr) minmax(13.75rem, 0.36fr);
   }
 
   .date-quick-controls {
@@ -7401,16 +7401,22 @@ button.is-loading:not(.icon-button)::before {
 
 @media (min-width: 1120px) {
   .date-quick-start {
-    grid-template-columns: minmax(0, 1.08fr) minmax(10rem, 0.28fr) minmax(20rem, 0.48fr);
+    column-gap: clamp(1.25rem, 2.5vw, 2.5rem);
+    grid-template-columns: minmax(0, 1fr) minmax(13.75rem, 14.5rem) minmax(20rem, 25rem);
   }
 
   .date-quick-score {
     order: 2;
+    justify-self: start;
+    width: min(100%, 13.75rem);
+    transform: translateX(clamp(-3rem, -3vw, -1.25rem));
   }
 
   .date-quick-controls {
     grid-column: auto;
     order: 3;
+    justify-self: end;
+    width: min(100%, 25rem);
   }
 
   .date-control-grid {
