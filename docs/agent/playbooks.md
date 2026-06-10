@@ -120,6 +120,7 @@ Trigger: article pages, admin CMS, metadata, sitemap, robots, brand/domain, OG i
 
 Read first:
 
+- `docs/agent/seo-autopilot.md` for autonomous SEO growth runs
 - `src/lib/seo.ts`
 - `src/lib/metadata.ts`
 - `src/app/layout.tsx`
@@ -132,6 +133,7 @@ Read first:
 Rules:
 
 - Public article URLs are `/kien-thuc-tu-vi/[slug]`.
+- For SEO Autopilot runs, start with `npm run seo:autopilot` and use the snapshot to pick the safest highest-impact task.
 - Include natural visible copy first; metadata and schema support it, not the reverse.
 - Keep personal chart pages `noindex` unless explicitly changed.
 - Keep authenticated/money-only policy routes out of public sitemap unless the user asks otherwise.

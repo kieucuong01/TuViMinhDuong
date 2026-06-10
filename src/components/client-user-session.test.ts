@@ -41,6 +41,9 @@ describe("client user session cache", () => {
   it("routes header and footer account checks through the shared helper", () => {
     expect(headerSource).toContain("fetchClientSession");
     expect(footerPolicySource).toContain("fetchClientSession");
+    expect(headerSource).toContain("notifyClientSessionChanged");
+    expect(headerSource).toContain("onClientSessionChanged");
+    expect(footerPolicySource).toContain("onClientSessionChanged");
     expect(footerPolicySource).not.toContain('fetch("/api/me"');
   });
 });

@@ -23,7 +23,7 @@ describe("user header coin balance", () => {
   });
 
   it("renders guest account access as an icon-friendly header action", () => {
-    expect(userHeaderSource).toContain('aria-label="Tài khoản"');
+    expect(userHeaderSource).toContain('className="login-link btn btn-small btn-ghost"');
     expect(userHeaderSource).toContain("<UserCircle size={16} />");
     expect(globalsCss).toMatch(/\.site-header-actions \.login-link span\s*{[\s\S]*display:\s*none/);
   });
@@ -34,7 +34,10 @@ describe("user header coin balance", () => {
   });
 
   it("keeps logout inside the logged-in account menu on mobile", () => {
-    expect(userHeaderSource).toContain("user-account-logout-form");
+    expect(userHeaderSource).toContain('fetch("/api/auth/logout"');
+    expect(userHeaderSource).toContain("handleLogout");
+    expect(userHeaderSource).toContain("notifyClientSessionChanged");
+    expect(userHeaderSource).toContain("onClientSessionChanged");
     expect(userHeaderSource).not.toContain('href="/chinh-sach-thanh-toan-hoan-xu"');
     expect(globalsCss).not.toMatch(/\.user-header-badge\s+\.user-account-value,\s*\n\s*\.user-header-badge\s+form\s*{[\s\S]*display:\s*none/);
   });

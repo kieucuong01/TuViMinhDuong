@@ -1,0 +1,26 @@
+{
+  "chartUrl": "http://localhost:4000/la-so/demo-chart-1780379349052?created=1&adSource=chart_form",
+  "articleCheck": {
+    "ctaVisible": true,
+    "ctaBeforeMarkdown": true,
+    "ctaText": "Cá nhân hóa bài viếtMuốn đọc chủ đề này theo lá số của bạn?Chủ đề “Tử vi tháng 6/2026: Cách xem vận tháng theo lá số cá nhân” sẽ hữu ích hơn khi đặt cạnh ngày giờ sinh, Mệnh, Thân "
+  },
+  "chartCheck": {
+    "roadmapVisible": true,
+    "retentionVisible": true,
+    "retentionAfterRoadmap": true,
+    "mobileReaderAfterRetention": false,
+    "dateHref": "/xem-ngay?date=2026-06-02&birthYear=1994"
+  },
+  "mobileCheck": {
+    "retentionCardsStacked": true,
+    "roadmapCardsStacked": true
+  },
+  "birthYearValue": "1994",
+  "screenshots": [
+    "C:\\Users\\ASUS\\Documents\\Claude\\Projects\\Tu vi\\.codex-audit-screenshots\\after-article-personalized-cta-desktop.png",
+    "C:\\Users\\ASUS\\Documents\\Claude\\Projects\\Tu vi\\.codex-audit-screenshots\\after-chart-roadmap-retention-desktop.png",
+    "C:\\Users\\ASUS\\Documents\\Claude\\Projects\\Tu vi\\.codex-audit-screenshots\\after-chart-roadmap-retention-mobile.png",
+    "C:\\Users\\ASUS\\Documents\\Claude\\Projects\\Tu vi\\.codex-audit-screenshots\\after-date-birthyear-prefill-mobile.png"
+  ]
+}

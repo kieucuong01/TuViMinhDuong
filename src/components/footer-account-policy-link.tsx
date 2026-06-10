@@ -2,14 +2,15 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { fetchClientSession } from "@/components/client-user-session";
+import { fetchClientSession, onClientSessionChanged } from "@/components/client-user-session";
 
 export function FooterAccountPolicyLink() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
-    fetchClientSession()
+    const refresh = () =>
+      fetchClientSession({ force: true })
       .then((data) => {
         if (!cancelled) setIsLoggedIn(Boolean(data.user));
       })
@@ -17,8 +18,12 @@ export function FooterAccountPolicyLink() {
         if (!cancelled) setIsLoggedIn(false);
       });
 
+    refresh();
+    const unsubscribeSession = onClientSessionChanged(refresh);
+
     return () => {
       cancelled = true;
+      unsubscribeSession();
     };
   }, []);
 

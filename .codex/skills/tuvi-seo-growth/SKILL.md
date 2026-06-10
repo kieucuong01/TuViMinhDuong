@@ -1,0 +1,68 @@
+---
+name: tuvi-seo-growth
+description: Use for autonomous SEO/content growth work on lasotinhhoa.vn and the Tu vi app, including audits, article planning, content updates, metadata, sitemap/canonical checks, and Codex Automation reports.
+---
+
+# Tu vi SEO Growth
+
+## Read first
+
+1. `AGENTS.md`
+2. `docs/agent/quickstart.md`
+3. `docs/agent/playbooks.md#seo--cms`
+4. `docs/agent/seo-autopilot.md`
+
+## Autonomy
+
+The user allows SEO Autopilot to choose and implement safe SEO/content improvements, then report after completion.
+
+Default throughput: publish or prepare **3 high-quality articles per week**. Do not exceed this by creating thin content. If quality or evidence is insufficient, publish fewer and report why.
+
+Safe without asking:
+
+- article drafts and refreshes under `/kien-thuc-tu-vi/[slug]`
+- metadata, canonical, JSON-LD, FAQ, internal links, article CTA improvements
+- sitemap/robots consistency fixes
+- safe performance improvements for public SEO pages
+- tests, build, live smoke, commit, push, deploy for SEO/content-only changes
+
+Ask before:
+
+- deleting many URLs or changing URL structure
+- changing domain, brand positioning, payment/auth/database/chart engine/date engine
+- spending money or using paid APIs
+- publishing guaranteed health, finance, marriage, career, or fate claims
+- deploying when verification fails
+
+## Standard run
+
+```powershell
+$env:PATH="C:\Users\ASUS\.cache\codex-runtimes\codex-primary-runtime\dependencies\node\bin;$env:PATH"
+npm run seo:autopilot
+```
+
+For scheduled automation runs that should leave durable artifacts:
+
+```powershell
+npm run seo:autopilot:execute
+```
+
+Then choose the highest-impact safe SEO task, implement it, verify, and report:
+
+- use `plan.nextAction` and `plan.brief` from the command output as the default decision
+- if `nextAction.type` is `weekly_content_batch`, create or update up to 3 seeded articles, then verify
+- each article must follow `brief.targetCharacterRange`, `brief.internalLinkPolicy`, `brief.googleQualityPolicy`, and the funnel stage in `plan.weeklyContentPlan`
+- if live evidence contradicts the generated plan, choose the safer higher-impact SEO task and explain why
+
+- what changed
+- why it was chosen
+- tests/build/live checks
+- expected SEO impact
+- next priority
+
+Content quality rules:
+
+- Write people-first content for a real reader question, not content made only for rankings.
+- Use at least 5 contextual internal links and at least one useful conversion path to `/#lap-la-so` when relevant.
+- Do not stuff exact-match anchors, copy competitor content, create doorway pages, or mass-produce low-value articles.
+- Treat character ranges as anti-thin-content safeguards, not as Google ranking requirements.

@@ -16,6 +16,7 @@ Purpose: this is the first low-token context file for any new AI agent. Read thi
 - Chart/date engine: `docs/agent/playbooks.md#chart-engine` or `#date-fortune-engine`
 - Auth/coins/payment: `docs/agent/playbooks.md#auth-coins-payments`
 - SEO/CMS/articles/sitemap: `docs/agent/playbooks.md#seo--cms`
+- SEO Autopilot/Codex Automation: `docs/agent/seo-autopilot.md`
 - Google Ads/tracking: `docs/agent/playbooks.md#google-ads--conversion-tracking` and `docs/google-ads.md`
 - Deploy/prod/env: `docs/agent/playbooks.md#deployment--production`
 - Verification commands: `docs/agent/verification.md`
@@ -31,6 +32,7 @@ Purpose: this is the first low-token context file for any new AI agent. Read thi
 - Auth/session: `src/lib/auth.ts`, `src/app/api/me/route.ts`
 - Payments/coins: `src/lib/pricing.ts`, `src/lib/payos.ts`, `src/app/api/payments/**`, `src/app/api/webhooks/payos/route.ts`
 - SEO/CMS: `src/lib/seo.ts`, `src/lib/metadata.ts`, `src/app/sitemap.ts`, `src/app/robots.ts`, `src/app/kien-thuc-tu-vi/**`
+- SEO Autopilot: `scripts/seo/seo-autopilot-snapshot.mjs`, `scripts/seo/seo-autopilot-core.mjs`, `docs/agent/seo-autopilot.md`
 - DB schema: `prisma/schema.prisma`, `prisma/migrations/**`
 
 ## Non-Negotiable Invariants

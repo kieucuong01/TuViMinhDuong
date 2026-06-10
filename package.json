@@ -23,6 +23,9 @@
     "db:setup": "npm run db:deploy && npm run db:seed",
     "analyze": "ANALYZE=true next build",
     "perf:smoke": "node scripts/smoke-performance.mjs",
+    "seo:autopilot": "node scripts/seo/seo-autopilot-plan.mjs --json",
+    "seo:autopilot:execute": "node scripts/seo/seo-autopilot-execute.mjs",
+    "seo:autopilot:snapshot": "node scripts/seo/seo-autopilot-snapshot.mjs --json",
     "smoke:google-ads": "node scripts/smoke-google-ads.mjs",
     "smoke:payos": "node scripts/smoke-payos-checkout.mjs"
   },
