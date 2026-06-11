@@ -11,12 +11,12 @@ export function FooterAccountPolicyLink() {
     let cancelled = false;
     const refresh = () =>
       fetchClientSession({ force: true })
-      .then((data) => {
-        if (!cancelled) setIsLoggedIn(Boolean(data.user));
-      })
-      .catch(() => {
-        if (!cancelled) setIsLoggedIn(false);
-      });
+        .then((data) => {
+          if (!cancelled) setIsLoggedIn(Boolean(data.user));
+        })
+        .catch(() => {
+          if (!cancelled) setIsLoggedIn(false);
+        });
 
     refresh();
     const unsubscribeSession = onClientSessionChanged(refresh);

@@ -106,9 +106,9 @@ export function UserHeaderBadge() {
 
   if (!user) {
     return (
-      <Link href={loginHref} className="login-link btn btn-small btn-ghost" aria-label="TÃ i khoáº£n" title="TÃ i khoáº£n" prefetch={false}>
+      <Link href={loginHref} className="login-link btn btn-small btn-ghost" aria-label="Tài khoản" title="Tài khoản" prefetch={false}>
         <UserCircle size={16} />
-        <span>ÄÄƒng nháº­p</span>
+        <span>Đăng nhập</span>
       </Link>
     );
   }
@@ -117,16 +117,16 @@ export function UserHeaderBadge() {
 
   return (
     <div className="user-header-badge">
-      <Link href="/la-so" className="user-charts-pill" title="LÃ¡ sá»‘ cá»§a tÃ´i" aria-label="LÃ¡ sá»‘ cá»§a tÃ´i" prefetch={false}>
+      <Link href="/la-so" className="user-charts-pill" title="Lá số của tôi" aria-label="Lá số của tôi" prefetch={false}>
         <FileText size={15} />
-        <span className="user-charts-label">LÃ¡ sá»‘</span>
+        <span className="user-charts-label">Lá số</span>
       </Link>
-      <Link href="/nap-xu" className="user-coin-pill" title={`Sá»‘ dÆ° ${coinLabel}. Báº¥m Ä‘á»ƒ náº¡p xu`} aria-label={`Sá»‘ dÆ° ${coinLabel}. Náº¡p xu`} prefetch={false}>
+      <Link href="/nap-xu" className="user-coin-pill" title={`Số dư ${coinLabel}. Bấm để nạp xu`} aria-label={`Số dư ${coinLabel}. Nạp xu`} prefetch={false}>
         <Coins size={15} aria-hidden="true" />
         <span>{coinLabel}</span>
       </Link>
       <details ref={detailsRef} className="user-account-menu">
-        <summary className="user-name-pill" title={user.name || user.email} aria-label={`TÃ i khoáº£n ${user.name || user.email}`}>
+        <summary className="user-name-pill" title={user.name || user.email} aria-label={`Tài khoản ${user.name || user.email}`}>
           <UserCircle size={16} />
           <span className="user-account-value">{user.name || user.email}</span>
           <span className="user-account-mobile-coins">{coinLabel}</span>
@@ -135,10 +135,10 @@ export function UserHeaderBadge() {
         </summary>
         <div className="user-account-popover">
           <Link href="/la-so" prefetch={false}>
-            <FileText size={15} /> LÃ¡ sá»‘ cá»§a tÃ´i
+            <FileText size={15} /> Lá số của tôi
           </Link>
           <Link href="/nap-xu" prefetch={false}>
-            <Coins size={15} /> Náº¡p xu <span className="user-account-popover-value">{coinLabel}</span>
+            <Coins size={15} /> Nạp xu <span className="user-account-popover-value">{coinLabel}</span>
           </Link>
           {user.role === "ADMIN" ? (
             <Link href="/admin" prefetch={false}>
@@ -148,16 +148,16 @@ export function UserHeaderBadge() {
           <button
             type="button"
             className={`user-account-menu-button ${loggingOut ? "is-loading" : ""}`.trim()}
-            data-loading-message="Äang Ä‘Äƒng xuáº¥t..."
+            data-loading-message="Đang đăng xuất..."
             onClick={() => {
               void handleLogout();
             }}
             disabled={loggingOut}
             aria-busy={loggingOut}
           >
-            {loggingOut ? "Äang thoÃ¡t..." : (
+            {loggingOut ? "Đang thoát..." : (
               <>
-                <LogOut size={15} /> ÄÄƒng xuáº¥t
+                <LogOut size={15} /> Đăng xuất
               </>
             )}
           </button>

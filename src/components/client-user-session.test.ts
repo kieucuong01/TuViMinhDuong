@@ -46,4 +46,9 @@ describe("client user session cache", () => {
     expect(footerPolicySource).toContain("onClientSessionChanged");
     expect(footerPolicySource).not.toContain('fetch("/api/me"');
   });
+
+  it("keeps session-gated footer copy readable", () => {
+    expect(footerPolicySource).toContain("Thanh toán và hoàn xu");
+    expect(footerPolicySource).not.toMatch(/Ã|Â|Æ|â€|Ä/);
+  });
 });

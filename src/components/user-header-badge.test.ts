@@ -42,6 +42,13 @@ describe("user header coin balance", () => {
     expect(globalsCss).not.toMatch(/\.user-header-badge\s+\.user-account-value,\s*\n\s*\.user-header-badge\s+form\s*{[\s\S]*display:\s*none/);
   });
 
+  it("keeps account menu labels in readable Vietnamese", () => {
+    for (const label of ["Tài khoản", "Đăng nhập", "Lá số của tôi", "Nạp xu", "Đăng xuất", "Đang thoát..."]) {
+      expect(userHeaderSource).toContain(label);
+    }
+    expect(userHeaderSource).not.toMatch(/Ã|Â|Æ|â€|Ä/);
+  });
+
   it("keeps the saved-chart shortcut compact enough for narrow mobile headers", () => {
     expect(userHeaderSource).toContain("user-charts-label");
     expect(globalsCss).toMatch(/\.user-header-badge\s+\.user-charts-label\s*{[\s\S]*display:\s*none/);
