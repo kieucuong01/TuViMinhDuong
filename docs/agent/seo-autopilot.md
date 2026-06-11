@@ -75,6 +75,13 @@ $env:PATH="C:\Users\ASUS\.cache\codex-runtimes\codex-primary-runtime\dependencie
 npm run seo:autopilot:execute
 ```
 
+For a publisher run that should consider and write only the next production article/refresh, use the token-conscious single-task command:
+
+```powershell
+$env:PATH="C:\Users\ASUS\.cache\codex-runtimes\codex-primary-runtime\dependencies\node\bin;$env:PATH"
+npm run seo:autopilot:publisher
+```
+
 This writes:
 
 - `docs/seo-autopilot/drafts/<slug>.md`
@@ -101,15 +108,18 @@ Goal: improve qualified organic traffic and route readers toward free chart crea
 Start by reading AGENTS.md, docs/agent/quickstart.md, docs/agent/playbooks.md#seo--cms, and docs/agent/seo-autopilot.md.
 
 Then:
-1. Run npm run seo:autopilot:execute.
+1. Run `npm run seo:autopilot:publisher` for Mon/Wed/Fri publisher runs, or `npm run seo:autopilot:execute` for the Sunday strategy batch.
 2. Inspect the generated draft/report and repo SEO/content files only as needed.
-3. Use plan.weeklyContentPlan as the default 3-article weekly content batch unless live evidence points to a higher-impact safe task.
-4. Implement up to 3 SEO/content articles per week without asking first.
+3. For publisher runs, implement at most one selected article/refresh. For Sunday strategy, use plan.weeklyContentPlan as the 3-slot weekly queue unless live evidence points to a higher-impact safe task.
+4. Implement up to 3 SEO/content articles per week without asking first, but never more than one production article/refresh per automation run.
 5. Each article must follow the brief:
    - target character range from brief.targetCharacterRange
    - at least 5 contextual internal links
    - at least 1 conversion link to /#lap-la-so where relevant
    - at least 2 related knowledge links
+   - at least 2 unique-value data blocks from brief.uniqueValueRequirements, such as a score table, modifier-star/context notes, or algorithmic source notes
+   - an expert-frame analysis that explains causal logic, not generic AI advice
+   - a compact interactive CTA that sends the reader to /#lap-la-so to check the personal chart context
    - FAQ content only when visible FAQ is included
    - no exact-match anchor stuffing
    - no copied, thin, doorway, or mass-produced search-first content
@@ -120,6 +130,29 @@ Then:
 
 Keep content useful for Vietnamese adults 30-60. Avoid generic AI filler, exaggerated claims, and hidden SEO notes in public copy. Follow Google Search Central's people-first guidance and spam policies: do not create scaled low-value content to manipulate ranking.
 ```
+
+## Programmatic SEO Quality Gate
+
+Programmatic SEO is allowed only when the generated page has real unique value beyond prose. Do not create separate near-duplicate pages by swapping variables such as star names, palace names, birth years, or synonym keywords into the same template.
+
+Every automatically drafted article must include:
+
+- Data enrichment: at least two structured blocks, such as score/risk tables, companion-star modifiers, palace context, chart-input logic, or source notes from the app's calculation/data layer.
+- Expert prompt frame: analysis must follow causal logic from star/palace nature -> condition/modifier -> likely expression -> limit of interpretation -> practical next step.
+- Interactive element: include a concise CTA asking readers to enter birth date/time at `/#lap-la-so` to check whether the discussed pattern appears in their own chart and whether modifiers change the reading.
+
+Stop or downgrade to draft/report-only when the topic would produce thin advice, doorway variants, or a page that cannot add data/tool value.
+
+## Token And Work Budget
+
+Automation should avoid repeated heavy work. Use the smallest useful loop:
+
+- Publisher runs use `npm run seo:autopilot:publisher`, which limits planning to one selected task and prints summary JSON instead of the full plan.
+- Sunday strategy may use the full batch planner because it is the handoff for the week.
+- Do not run `npm test`, `npm run build`, deploy, or live smoke when no repo/content files changed.
+- Prefer targeted tests and targeted ESLint for touched files; run full build only before release.
+- If GSC, SEMrush, sitemap, and content inventory are unchanged from the latest `docs/seo-autopilot/state.json`, do a short report/skip instead of repeating the same draft.
+- Keep useful repetition: weekly measurement, GSC opportunity checks, and one publish/refresh slot per scheduled publisher run are worth keeping because they catch trend changes and prevent stale content.
 
 ## Suggested Schedule
 

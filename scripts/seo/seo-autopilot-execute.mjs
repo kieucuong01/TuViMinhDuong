@@ -14,6 +14,7 @@ import {
 const args = parseArgs(process.argv.slice(2));
 const baseUrl = normalizeBaseUrl(args.baseUrl || "https://lasotinhhoa.vn");
 const sampleSize = Number.parseInt(args.sampleSize || "8", 10);
+const articlesPerWeek = clampArticleCount(args.articles || args.articlesPerWeek || "3");
 const dryRun = Boolean(args.dryRun);
 
 try {
@@ -29,6 +30,7 @@ try {
     existingSlugs,
     keywordRows: keywordSource.rows,
     searchConsole,
+    articlesPerWeek,
   });
   const draftPaths = plan.weeklyContentPlan.articles.map((article) =>
     resolve(process.cwd(), "docs/seo-autopilot/drafts", `${article.slug}.md`),
@@ -90,7 +92,8 @@ try {
     );
   }
 
-  console.log(JSON.stringify({ ...result, dryRun }, null, 2));
+  const output = { ...result, dryRun };
+  console.log(JSON.stringify(args.summaryJson ? summarizeExecutionOutput(output) : output, null, 2));
 } catch (error) {
   console.error(`SEO Autopilot execute failed: ${error.message}`);
   process.exitCode = 1;
@@ -127,6 +130,9 @@ function parseArgs(values) {
     } else if (value === "--sample-size") {
       parsed.sampleSize = values[index + 1];
       index += 1;
+    } else if (value === "--articles" || value === "--articles-per-week") {
+      parsed.articles = values[index + 1];
+      index += 1;
     } else if (value === "--keyword-csv") {
       parsed.keywordCsv = values[index + 1];
       index += 1;
@@ -135,9 +141,47 @@ function parseArgs(values) {
       index += 1;
     } else if (value === "--skip-search-console") {
       parsed.skipSearchConsole = true;
+    } else if (value === "--summary-json") {
+      parsed.summaryJson = true;
     }
   }
   return parsed;
+}
+
+function clampArticleCount(value) {
+  const parsed = Number.parseInt(value, 10);
+  if (!Number.isFinite(parsed)) return 3;
+  return Math.min(Math.max(parsed, 1), 3);
+}
+
+function summarizeExecutionOutput(result) {
+  const plan = result.plan;
+  return {
+    generatedAt: result.generatedAt,
+    dryRun: result.dryRun,
+    baseUrl: result.baseUrl,
+    status: plan.status,
+    warnings: result.snapshot?.warnings || [],
+    seedArticleCount: result.contentInventory?.seedArticleCount,
+    keywordSource: result.keywordSource,
+    searchConsoleStatus: result.searchConsole?.status || (result.searchConsole ? "unknown" : "skipped"),
+    nextAction: plan.nextAction,
+    selectedArticles: plan.weeklyContentPlan?.articles?.map((article) => ({
+      day: article.day,
+      slug: article.slug,
+      funnelStage: article.funnelStage,
+      focusKeyword: article.focusKeyword,
+      targetCharacterRange: article.brief.targetCharacterRange,
+    })) || [],
+    qualityGate: {
+      minDataEnrichmentBlocks: plan.brief?.uniqueValueRequirements?.minDataEnrichmentBlocks,
+      requiredDataBlocks: plan.brief?.uniqueValueRequirements?.requiredDataBlocks,
+      interactiveTarget: plan.brief?.uniqueValueRequirements?.interactiveElement?.targetLink,
+      programmaticGuardrailCount: plan.brief?.programmaticSeoGuardrails?.length || 0,
+    },
+    artifacts: result.artifacts,
+    verificationCommands: plan.verificationCommands,
+  };
 }
 
 function summarizeSearchConsoleForState(searchConsole) {

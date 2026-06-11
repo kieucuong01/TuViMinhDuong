@@ -213,6 +213,18 @@ export const seedArticles = [
       maxExactMatchAnchors: 2,
       requiredLinks: ["/#lap-la-so", "/kien-thuc-tu-vi"],
     });
+    expect(brief.uniqueValueRequirements).toMatchObject({
+      minDataEnrichmentBlocks: 2,
+      interactiveElement: {
+        required: true,
+        targetLink: "/#lap-la-so",
+      },
+    });
+    expect(brief.uniqueValueRequirements.requiredDataBlocks).toEqual(
+      expect.arrayContaining(["structured-score-table", "modifier-stars-or-context"]),
+    );
+    expect(brief.uniqueValueRequirements.expertPromptFrame.join(" ")).toContain("logic nhan qua");
+    expect(brief.programmaticSeoGuardrails.join(" ")).toContain("Doorway");
     expect(brief.googleQualityPolicy).toEqual(
       expect.arrayContaining([
         "People-first: giải quyết câu hỏi thật của người đọc trước khi tối ưu keyword.",
@@ -277,6 +289,22 @@ export const seedArticles = [
     );
   });
 
+  it("can plan a single publisher task to avoid repeated batch work", () => {
+    const plan = planSeoAutopilotRun({
+      snapshot: {
+        status: "ok",
+        sitemapUrlCount: 30,
+        warnings: [],
+      },
+      existingSlugs: ["la-so-tu-vi-la-gi", "sao-chinh-tinh-tu-vi"],
+      articlesPerWeek: 1,
+    });
+
+    expect(plan.nextAction.slugs).toHaveLength(1);
+    expect(plan.weeklyContentPlan.articles).toHaveLength(1);
+    expect(plan.nextAction.reason).toContain("Publish 1 people-first");
+  });
+
   it("renders a content draft artifact that automation can publish later", () => {
     const draft = renderContentDraft(
       buildContentBrief({
@@ -293,6 +321,10 @@ export const seedArticles = [
     expect(draft).toContain("# Sao Tử Vi trong lá số: ý nghĩa và cách đọc dễ hiểu");
     expect(draft).toContain("## Outline");
     expect(draft).toContain("## FAQ");
+    expect(draft).toContain("## Unique Value Requirements");
+    expect(draft).toContain("structured-score-table");
+    expect(draft).toContain("expert prompt frame");
+    expect(draft).toContain("interactive CTA");
     expect(draft).toContain("/#lap-la-so");
     expect(draft).toContain("Không hứa chắc kết quả hôn nhân, tài chính, sức khỏe hoặc vận mệnh.");
   });
@@ -325,6 +357,8 @@ export const seedArticles = [
     expect(report).toContain("Status: warning");
     expect(report).toContain("Next action: draft_article `sao-tu-vi`");
     expect(report).toContain("Draft: `docs/seo-autopilot/drafts/sao-tu-vi.md`");
+    expect(report).toContain("## Programmatic SEO Guardrails");
+    expect(report).toContain("Doorway");
     expect(report).toContain("npm run build");
   });
 });

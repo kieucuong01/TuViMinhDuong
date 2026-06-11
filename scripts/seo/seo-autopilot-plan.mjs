@@ -12,6 +12,7 @@ import {
 const args = parseArgs(process.argv.slice(2));
 const baseUrl = normalizeBaseUrl(args.baseUrl || "https://lasotinhhoa.vn");
 const sampleSize = Number.parseInt(args.sampleSize || "8", 10);
+const articlesPerWeek = clampArticleCount(args.articles || args.articlesPerWeek || "3");
 
 try {
   const snapshot = await buildSnapshot({ baseUrl, sampleSize });
@@ -25,6 +26,7 @@ try {
     existingSlugs,
     keywordRows: keywordSource.rows,
     searchConsole,
+    articlesPerWeek,
   });
   const result = {
     generatedAt: new Date().toISOString(),
@@ -129,6 +131,9 @@ function parseArgs(values) {
     } else if (value === "--sample-size") {
       parsed.sampleSize = values[index + 1];
       index += 1;
+    } else if (value === "--articles" || value === "--articles-per-week") {
+      parsed.articles = values[index + 1];
+      index += 1;
     } else if (value === "--keyword-csv") {
       parsed.keywordCsv = values[index + 1];
       index += 1;
@@ -140,6 +145,12 @@ function parseArgs(values) {
     }
   }
   return parsed;
+}
+
+function clampArticleCount(value) {
+  const parsed = Number.parseInt(value, 10);
+  if (!Number.isFinite(parsed)) return 3;
+  return Math.min(Math.max(parsed, 1), 3);
 }
 
 function keywordSourceLine(result) {

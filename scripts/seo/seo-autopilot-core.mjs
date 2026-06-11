@@ -209,6 +209,13 @@ const KEYWORD_EXCLUSION_RULES = [
   },
 ];
 
+const PROGRAMMATIC_SEO_GUARDRAILS = [
+  "Doorway Pages: do not create near-duplicate pages by swapping star, palace, birth-year, or keyword variables into the same frame.",
+  "Helpful Content: reject thin generic AI advice; every publishable article must add structured data, expert causal logic, and a next useful action.",
+  "One search intent, one useful URL: merge close variants instead of making separate pages for lap, lay, tao, tra, ve, or ke when the user need is the same.",
+  "Programmatic content needs unique value from the product: score tables, modifier-star context, chart-form interaction, and clear limits of interpretation.",
+];
+
 export function readSemrushKeywordRows({ csvPath, candidatePaths = DEFAULT_KEYWORD_CSV_PATHS } = {}) {
   const paths = [csvPath, process.env.SEO_KEYWORD_CSV_PATH, ...candidatePaths].filter(Boolean);
   const selectedPath = paths.find((path) => existsSync(path));
@@ -407,6 +414,8 @@ export function buildContentBrief(opportunity) {
     overrides.metaDescription ||
     `Tìm hiểu ${focusKeyword} trong tử vi, ý nghĩa khi nằm ở các cung quan trọng, cách tự kiểm tra trên lá số và những điểm cần đọc cùng vận hạn.`;
 
+  const uniqueValueRequirements = buildUniqueValueRequirements({ focusKeyword, titleTopic, topic });
+
   return {
     slug: topic.slug,
     cluster: topic.cluster,
@@ -436,6 +445,8 @@ export function buildContentBrief(opportunity) {
       "Không lặp keyword máy móc, không cloaking, không doorway page, không nội dung sao chép.",
       "Bài phải có trải nghiệm/giải thích riêng cho Lá số tinh hoa và đường dẫn hữu ích cho người đọc.",
     ],
+    programmaticSeoGuardrails: PROGRAMMATIC_SEO_GUARDRAILS,
+    uniqueValueRequirements,
     outline: overrides.outline || [
       `${titleTopic} là gì?`,
       `Ý nghĩa ${focusKeyword} tại Mệnh, Quan Lộc, Tài Bạch và Phu Thê`,
@@ -479,7 +490,7 @@ export function buildContentBrief(opportunity) {
   };
 }
 
-export function planSeoAutopilotRun({ snapshot, existingSlugs, keywordRows, searchConsole }) {
+export function planSeoAutopilotRun({ snapshot, existingSlugs, keywordRows, searchConsole, articlesPerWeek = 3 }) {
   const currentSlugs = new Set(existingSlugs || []);
   const snapshotOpportunities = Array.isArray(snapshot?.opportunities) ? snapshot.opportunities : [];
   const inputKeywordRows = Array.isArray(keywordRows) ? keywordRows : [];
@@ -492,7 +503,7 @@ export function planSeoAutopilotRun({ snapshot, existingSlugs, keywordRows, sear
     : snapshotOpportunities.length
       ? snapshotOpportunities.filter((item) => !currentSlugs.has(item.slug))
       : rankTopicOpportunities([...currentSlugs]);
-  const weeklyContentPlan = buildWeeklyContentPlan({ opportunities, articlesPerWeek: 3 });
+  const weeklyContentPlan = buildWeeklyContentPlan({ opportunities, articlesPerWeek });
   const selected = weeklyContentPlan.articles[0]?.brief || buildContentBrief(rankTopicOpportunities([...currentSlugs])[0]);
   const brief = buildContentBrief(selected);
   const slugs = weeklyContentPlan.articles.map((item) => item.slug);
@@ -616,6 +627,25 @@ export function renderContentDraft(brief, { generatedAt } = {}) {
     "## Google Quality Policy",
     ...brief.googleQualityPolicy.map((item) => `- ${item}`),
     "",
+    "## Programmatic SEO Guardrails",
+    ...(brief.programmaticSeoGuardrails || PROGRAMMATIC_SEO_GUARDRAILS).map((item) => `- ${item}`),
+    "",
+    "## Unique Value Requirements",
+    "",
+    `Minimum data enrichment blocks: ${brief.uniqueValueRequirements?.minDataEnrichmentBlocks || 2}`,
+    "",
+    "Required data blocks:",
+    ...(brief.uniqueValueRequirements?.requiredDataBlocks || []).map((item) => `- ${item}`),
+    "",
+    "Data enrichment examples:",
+    ...(brief.uniqueValueRequirements?.dataEnrichmentExamples || []).map((item) => `- ${item}`),
+    "",
+    "expert prompt frame:",
+    ...(brief.uniqueValueRequirements?.expertPromptFrame || []).map((item) => `- ${item}`),
+    "",
+    `interactive CTA: ${brief.uniqueValueRequirements?.interactiveElement?.prompt || brief.conversionCta}`,
+    `interactive target: ${brief.uniqueValueRequirements?.interactiveElement?.targetLink || "/#lap-la-so"}`,
+    "",
     "## CTA",
     "",
     brief.conversionCta,
@@ -685,6 +715,9 @@ export function renderRunReport(result) {
     "## Warnings",
     ...(snapshot.warnings?.length ? snapshot.warnings.map((item) => `- ${item}`) : ["- None"]),
     "",
+    "## Programmatic SEO Guardrails",
+    ...(plan.brief?.programmaticSeoGuardrails || PROGRAMMATIC_SEO_GUARDRAILS).map((item) => `- ${item}`),
+    "",
     "## Artifacts",
     ...(artifacts?.draftPaths?.length
       ? artifacts.draftPaths.map((path) => `- Batch draft: \`${path}\``)
@@ -752,6 +785,39 @@ function formatMetricRows(rows, key) {
     (row) =>
       `- ${row[key] || "unknown"}: ${row.clicks} clicks, ${row.impressions} impressions, ${(row.ctr * 100).toFixed(2)}% CTR, position ${row.position}`,
   );
+}
+
+function buildUniqueValueRequirements({ focusKeyword, titleTopic, topic }) {
+  return {
+    minDataEnrichmentBlocks: 2,
+    requiredDataBlocks: [
+      "structured-score-table",
+      "modifier-stars-or-context",
+      "algorithmic-source-notes",
+    ],
+    dataEnrichmentExamples: [
+      `Create a compact score table for ${focusKeyword}: risk, stability, accumulation/relationship/career fit, and reading confidence.`,
+      "List modifier stars, palace context, or chart conditions that can change the interpretation; do not present one-star claims as absolute.",
+      "Name the internal calculation/data source when relevant, such as chart input, palace position, star state, companion stars, or date-fortune output.",
+    ],
+    expertPromptFrame: [
+      `Expert prompt frame for ${titleTopic}: analyze by logic nhan qua from star/palace nature, activation condition, likely expression, limitation, then practical advice.`,
+      "Force three concrete sections: what pattern can be read, what can reverse or weaken it, and what the reader should check in their own chart.",
+      "Use objective, bounded language; no vague AI filler like 'be careful with money' unless the causal reason is explained.",
+    ],
+    interactiveElement: {
+      required: true,
+      type: "chart-form-cta",
+      targetLink: "/#lap-la-so",
+      prompt:
+        `Invite the reader to enter birth date/time to check whether ${focusKeyword} appears in their chart and what palace/modifier context changes the reading.`,
+    },
+    noGoPatterns: [
+      `Do not make a separate thin page for every minor variant of ${topic?.slug || focusKeyword}.`,
+      "Do not rewrite the same article by replacing only star, palace, or year variables.",
+      "Do not publish until the page has at least one data block and one interactive next step that help the reader beyond plain prose.",
+    ],
+  };
 }
 
 function pluralizeMessage(message) {
