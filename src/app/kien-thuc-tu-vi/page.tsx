@@ -46,6 +46,10 @@ export default async function KnowledgePage({ searchParams }: { searchParams: Pr
     "cung-tai-bach-trong-tu-vi",
     "cung-quan-loc-trong-tu-vi",
     "cung-phu-the-trong-tu-vi",
+    "cung-phuc-duc-trong-tu-vi",
+    "cung-dien-trach-trong-tu-vi",
+    "cung-tu-tuc-trong-tu-vi",
+    "cung-no-boc-trong-tu-vi",
     "cung-tat-ach-trong-tu-vi",
     "cung-thien-di-trong-tu-vi",
   ]
