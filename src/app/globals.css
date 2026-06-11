@@ -5111,6 +5111,11 @@ button.is-loading:not(.icon-button)::before {
   color: #57534e;
 }
 
+.admin-role-pill.guest {
+  background: #fff7ed;
+  color: #9a3412;
+}
+
 .admin-empty-note {
   color: #78716c;
   font-size: 0.95rem;

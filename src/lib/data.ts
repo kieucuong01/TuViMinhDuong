@@ -99,6 +99,26 @@ export type AdminBusinessDashboard = {
   recentPayments: AdminRecentPayment[];
 };
 
+export type AdminChartSubmission = {
+  id: string;
+  title: string;
+  createdAt: Date;
+  submitterType: "guest" | "user";
+  userId: string | null;
+  userEmail: string | null;
+  userName: string | null;
+  fullName: string;
+  gender: ChartInput["gender"];
+  calendarType: ChartInput["calendarType"];
+  day: number;
+  month: number;
+  year: number;
+  birthHour: number;
+  birthMinute: number;
+  viewYear: number;
+  timezone: string;
+};
+
 type ChartWithFreeOverview = TuViChart & {
   freeOverview?: {
     content: string;
@@ -267,6 +287,67 @@ type AdminPaymentRecord = {
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return Boolean(value && typeof value === "object");
+}
+
+function numberFromRecord(record: Record<string, unknown>, key: string, fallback: number) {
+  const value = record[key];
+  const numberValue = typeof value === "number" ? value : typeof value === "string" ? Number.parseInt(value, 10) : Number.NaN;
+  return Number.isFinite(numberValue) ? numberValue : fallback;
+}
+
+function normalizeAdminChartInput(input: unknown): ChartInput {
+  const record = isRecord(input) ? input : {};
+  const gender = record.gender === "female" ? "female" : "male";
+  const calendarType = record.calendarType === "lunar" ? "lunar" : "solar";
+  return {
+    fullName: String(record.fullName || "Chưa nhập tên"),
+    gender,
+    calendarType,
+    day: numberFromRecord(record, "day", 1),
+    month: numberFromRecord(record, "month", 1),
+    year: numberFromRecord(record, "year", 1990),
+    birthHour: numberFromRecord(record, "birthHour", 0),
+    birthMinute: numberFromRecord(record, "birthMinute", 0),
+    viewYear: numberFromRecord(record, "viewYear", new Date().getFullYear()),
+    timezone: String(record.timezone || "Asia/Bangkok"),
+  };
+}
+
+type AdminChartSubmissionRecord = {
+  id: string;
+  title: string;
+  input: unknown;
+  userId?: string | null;
+  createdAt: Date;
+  user?: {
+    id?: string;
+    email: string;
+    name: string | null;
+  } | null;
+};
+
+function normalizeAdminChartSubmission(record: AdminChartSubmissionRecord): AdminChartSubmission {
+  const input = normalizeAdminChartInput(record.input);
+  const userId = record.userId || record.user?.id || null;
+  return {
+    id: record.id,
+    title: record.title,
+    createdAt: new Date(record.createdAt),
+    submitterType: userId ? "user" : "guest",
+    userId,
+    userEmail: record.user?.email || null,
+    userName: record.user?.name || null,
+    fullName: input.fullName,
+    gender: input.gender,
+    calendarType: input.calendarType,
+    day: input.day,
+    month: input.month,
+    year: input.year,
+    birthHour: input.birthHour,
+    birthMinute: input.birthMinute || 0,
+    viewYear: input.viewYear,
+    timezone: input.timezone || "Asia/Bangkok",
+  };
 }
 
 function paymentDate(payment: Pick<AdminPaymentRecord, "paidAt" | "createdAt">) {
@@ -1714,6 +1795,46 @@ export async function getAdminBusinessDashboard(): Promise<AdminBusinessDashboar
       };
     }),
   };
+}
+
+export async function listAdminChartSubmissions(limit = 80): Promise<AdminChartSubmission[]> {
+  const db = getDb();
+  if (!db) {
+    return Array.from(charts().values())
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+      .slice(0, limit)
+      .map((chart) => {
+        const userEmail = chart.userId?.includes("@") ? chart.userId : null;
+        return normalizeAdminChartSubmission({
+          id: chart.id,
+          title: chart.title,
+          input: chart.input,
+          userId: chart.userId || null,
+          createdAt: chart.createdAt,
+          user: userEmail ? { email: userEmail, name: null } : null,
+        });
+      });
+  }
+
+  const rows = await db.chart.findMany({
+    orderBy: { createdAt: "desc" },
+    take: limit,
+    select: {
+      id: true,
+      title: true,
+      input: true,
+      userId: true,
+      createdAt: true,
+      user: {
+        select: {
+          id: true,
+          email: true,
+          name: true,
+        },
+      },
+    },
+  });
+  return rows.map((row) => normalizeAdminChartSubmission(row));
 }
 
 export async function getAdminOverview() {

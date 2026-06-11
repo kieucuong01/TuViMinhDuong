@@ -1,9 +1,9 @@
 import Link from "next/link";
-import { Banknote, Coins, Eye, FilePenLine, Plus, ReceiptText, SearchCheck, SlidersHorizontal, Trash2, UsersRound, X } from "lucide-react";
+import { Banknote, ClipboardList, Coins, Eye, FilePenLine, Plus, ReceiptText, SearchCheck, SlidersHorizontal, Trash2, UsersRound, X } from "lucide-react";
 import { redirect } from "next/navigation";
 import { adjustUserCoinsAction, deleteUserAction, saveArticleAction, saveArticleCategoryAction, saveFeaturePricesAction, saveOperationSettingsAction } from "@/app/actions";
 import { getCurrentUser } from "@/lib/auth";
-import { getAdminArticleBySlug, getAdminBusinessDashboard, getAdminOverview, listAdminArticles, listArticleCategories } from "@/lib/data";
+import { getAdminArticleBySlug, getAdminBusinessDashboard, getAdminOverview, listAdminArticles, listAdminChartSubmissions, listArticleCategories } from "@/lib/data";
 import type { ArticleView } from "@/lib/content";
 import { LoadingSubmitButton } from "@/components/loading-submit-button";
 import { AdminArticleDeleteForm } from "@/components/admin-article-delete-form";
@@ -13,12 +13,13 @@ export const metadata = {
   robots: { index: false, follow: false },
 };
 
-type AdminTab = "overview" | "users" | "revenue" | "content" | "settings" | "pricing";
+type AdminTab = "overview" | "users" | "charts" | "revenue" | "content" | "settings" | "pricing";
 const ARTICLES_PER_ADMIN_PAGE = 8;
 
 const adminTabs: Array<{ id: AdminTab; label: string; helper: string }> = [
   { id: "overview", label: "Tổng quan", helper: "Chỉ số chính" },
   { id: "users", label: "User", helper: "Tài khoản đăng ký" },
+  { id: "charts", label: "Lá số", helper: "Form đã submit" },
   { id: "revenue", label: "Doanh thu", helper: "Đơn hàng và dòng tiền" },
   { id: "content", label: "Bài viết", helper: "CMS và SEO" },
   { id: "settings", label: "Cấu hình", helper: "Bật/tắt vận hành" },
@@ -122,6 +123,32 @@ function roleLabel(role: string) {
   return role === "ADMIN" ? "Admin" : "User";
 }
 
+function genderLabel(gender: string) {
+  return gender === "female" ? "Nữ" : "Nam";
+}
+
+function calendarTypeLabel(calendarType: string) {
+  return calendarType === "lunar" ? "Âm lịch" : "Dương lịch";
+}
+
+function padTime(value: number) {
+  return String(value).padStart(2, "0");
+}
+
+function chartBirthLabel(item: { day: number; month: number; year: number; birthHour: number; birthMinute: number; calendarType: string }) {
+  return `${padTime(item.day)}/${padTime(item.month)}/${item.year} - ${padTime(item.birthHour)}:${padTime(item.birthMinute)}`;
+}
+
+function submitterLabel(item: { submitterType: "guest" | "user"; userName: string | null; userEmail: string | null }) {
+  if (item.submitterType === "guest") return "Khách vãng lai";
+  return item.userName || item.userEmail || "User đã đăng nhập";
+}
+
+function submitterDetail(item: { submitterType: "guest" | "user"; userId: string | null; userEmail: string | null }) {
+  if (item.submitterType === "guest") return "Không gắn tài khoản";
+  return item.userEmail || item.userId || "User đã đăng nhập";
+}
+
 function seoChecks(article: ArticleView) {
   if (!Array.isArray(article.seoChecklist)) return [];
   return article.seoChecklist
@@ -142,9 +169,11 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
   if (user?.role !== "ADMIN") redirect("/dang-nhap?next=/admin");
 
   const params = await searchParams;
-  const [overview, business, articles, categories, editingArticle] = await Promise.all([
+  const activeTab = normalizeAdminTab(params);
+  const [overview, business, chartSubmissions, articles, categories, editingArticle] = await Promise.all([
     getAdminOverview(),
     getAdminBusinessDashboard(),
+    activeTab === "charts" ? listAdminChartSubmissions() : Promise.resolve([]),
     listAdminArticles(),
     listArticleCategories(),
     params.edit ? getAdminArticleBySlug(params.edit) : Promise.resolve(null),
@@ -153,7 +182,6 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
   const operationSettings = overview.operationSettings;
   const checks = seoChecks(article);
   const faqRows = [...(article.faqs || []), ...Array.from({ length: 5 }, () => ({ question: "", answer: "" }))].slice(0, 5);
-  const activeTab = normalizeAdminTab(params);
   const articlePageCount = Math.max(1, Math.ceil(articles.length / ARTICLES_PER_ADMIN_PAGE));
   const articlePage = clampPage(params.articlePage, articlePageCount);
   const paginatedArticles = articles.slice((articlePage - 1) * ARTICLES_PER_ADMIN_PAGE, articlePage * ARTICLES_PER_ADMIN_PAGE);
@@ -226,6 +254,12 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
               <h2 className="admin-overview-value">{business.recentUsers.length}</h2>
               <p className="admin-overview-note">Danh sách gần nhất đang lấy tối đa 12 tài khoản để admin theo dõi nhanh.</p>
               <Link href="/admin?tab=users" className="btn btn-ghost btn-small mt-4" prefetch={false}>Xem user</Link>
+            </article>
+            <article className="panel">
+              <p className="eyebrow">Form lập lá số</p>
+              <h2 className="admin-overview-value">{overview.charts}</h2>
+              <p className="admin-overview-note">Theo dõi khách vãng lai và user đã đăng nhập đã submit form lập lá số.</p>
+              <Link href="/admin?tab=charts" className="btn btn-ghost btn-small mt-4" prefetch={false}>Xem lá số</Link>
             </article>
             <article className="panel">
               <p className="eyebrow">Bài viết</p>
@@ -387,6 +421,72 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
                   <tr>
                     <td colSpan={10}>
                       <span>Chưa có user nào trong dữ liệu hiện tại.</span>
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </section> : null}
+
+        {activeTab === "charts" ? <section className="panel admin-chart-submissions-panel admin-tab-section" data-testid="admin-chart-submissions">
+          <div className="admin-panel-head">
+            <div>
+              <p className="eyebrow">Form lập lá số</p>
+              <h2>Lá số đã được submit gần đây</h2>
+            </div>
+            <span className="admin-operation-status">
+              <ClipboardList size={17} /> {overview.charts} lá số
+            </span>
+          </div>
+          <p className="admin-board-note">
+            Hiển thị tối đa {chartSubmissions.length} bản ghi mới nhất, bao gồm cả Khách vãng lai và User đã đăng nhập.
+          </p>
+          <div className="admin-table-wrap">
+            <table className="admin-data-table">
+              <thead>
+                <tr>
+                  <th>Thời gian submit</th>
+                  <th>Người submit</th>
+                  <th>Họ tên nhập form</th>
+                  <th>Ngày giờ sinh</th>
+                  <th>Lịch</th>
+                  <th>Giới tính</th>
+                  <th>Năm xem</th>
+                  <th>Múi giờ</th>
+                  <th>Lá số</th>
+                </tr>
+              </thead>
+              <tbody>
+                {chartSubmissions.length ? chartSubmissions.map((item) => (
+                  <tr key={item.id}>
+                    <td>{readableDateTime(item.createdAt)}</td>
+                    <td>
+                      <strong>{submitterLabel(item)}</strong>
+                      <span>{submitterDetail(item)}</span>
+                      <em className={`admin-role-pill ${item.submitterType === "guest" ? "guest" : "user"}`}>
+                        {item.submitterType === "guest" ? "Khách vãng lai" : "User đã đăng nhập"}
+                      </em>
+                    </td>
+                    <td>
+                      <strong>{item.fullName}</strong>
+                      <span>{item.title}</span>
+                    </td>
+                    <td>{chartBirthLabel(item)}</td>
+                    <td>{calendarTypeLabel(item.calendarType)}</td>
+                    <td>{genderLabel(item.gender)}</td>
+                    <td>{item.viewYear}</td>
+                    <td>{item.timezone}</td>
+                    <td>
+                      <Link href={`/la-so/${item.id}`} className="btn btn-ghost btn-small" prefetch={false}>
+                        Mở lá số
+                      </Link>
+                    </td>
+                  </tr>
+                )) : (
+                  <tr>
+                    <td colSpan={9}>
+                      <span>Chưa có form lập lá số nào trong dữ liệu hiện tại.</span>
                     </td>
                   </tr>
                 )}
