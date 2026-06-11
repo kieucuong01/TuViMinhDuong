@@ -53,10 +53,26 @@ For Mon/Wed/Fri publisher runs, prefer the single-task, summary-output command t
 npm run seo:autopilot:publisher
 ```
 
+For an external technical SEO regression audit, use Lighthouse CI only when useful:
+
+```powershell
+npm run seo:lighthouse
+```
+
+For the daily traffic coordinator that repurposes SEO work into organic distribution, internal links, and measurement without duplicating publisher runs:
+
+```powershell
+npm run traffic:autopilot
+```
+
+Traffic work should read `.agents/product-marketing.md` and apply the imported `coreyhaines31/marketingskills` subset only as lightweight frameworks: content-strategy, social, community-marketing, free-tools, CRO, analytics, and AI SEO. Keep the daily limit to one primary task.
+
 Then choose the highest-impact safe SEO task, implement it, verify, and report:
 
 - use `plan.nextAction` and `plan.brief` from the command output as the default decision
 - publisher runs should act on one selected article/refresh only; Sunday strategy can inspect the full 3-slot weekly plan
+- daily traffic runs should execute at most one primary follow-up task and must not rerun the Mon/Wed/Fri publisher unless that automation failed or is disabled
+- Lighthouse CI is weekly/manual; do not run it for every publisher task unless public SEO layout, metadata, structured data, or page experience changed
 - if `nextAction.type` is `weekly_content_batch`, create or update up to 3 seeded articles, then verify
 - each article must follow `brief.targetCharacterRange`, `brief.internalLinkPolicy`, `brief.googleQualityPolicy`, and the funnel stage in `plan.weeklyContentPlan`
 - if live evidence contradicts the generated plan, choose the safer higher-impact SEO task and explain why

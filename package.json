@@ -26,7 +26,9 @@
     "seo:autopilot": "node scripts/seo/seo-autopilot-plan.mjs --json",
     "seo:autopilot:execute": "node scripts/seo/seo-autopilot-execute.mjs",
     "seo:autopilot:publisher": "node scripts/seo/seo-autopilot-execute.mjs --articles 1 --summary-json",
+    "seo:lighthouse": "npx @lhci/cli@0.15.x autorun --config=./lighthouserc.cjs",
     "seo:autopilot:snapshot": "node scripts/seo/seo-autopilot-snapshot.mjs --json",
+    "traffic:autopilot": "node scripts/traffic/traffic-autopilot.mjs",
     "smoke:google-ads": "node scripts/smoke-google-ads.mjs",
     "smoke:payos": "node scripts/smoke-payos-checkout.mjs"
   },

@@ -7,6 +7,7 @@ Purpose: this is the first low-token context file for any new AI agent. Read thi
 - App: `La so tinh hoa`, Vietnamese tu vi web app for adults 30-60.
 - Primary URL: `https://lasotinhhoa.vn`; Vercel fallback: `https://tu-vi-minh-duong.vercel.app`.
 - Main funnel: free chart creation -> saved chart -> paid/coin readings.
+- Product marketing context: `.agents/product-marketing.md`.
 - Trust model: clear Vietnamese copy, no exaggerated fortune promises, money/policy surfaces hidden from guests unless needed for public compliance.
 - Stack: Next.js 16 App Router, React 19, TypeScript, Tailwind v4, Prisma 7/Postgres, PayOS/VietQR, Vitest, ESLint, Vercel.
 
@@ -17,6 +18,7 @@ Purpose: this is the first low-token context file for any new AI agent. Read thi
 - Auth/coins/payment: `docs/agent/playbooks.md#auth-coins-payments`
 - SEO/CMS/articles/sitemap: `docs/agent/playbooks.md#seo--cms`
 - SEO Autopilot/Codex Automation: `docs/agent/seo-autopilot.md`
+- Daily traffic workflow: `docs/agent/traffic-autopilot.md`
 - Google Ads/tracking: `docs/agent/playbooks.md#google-ads--conversion-tracking` and `docs/google-ads.md`
 - Deploy/prod/env: `docs/agent/playbooks.md#deployment--production`
 - Verification commands: `docs/agent/verification.md`
@@ -33,6 +35,7 @@ Purpose: this is the first low-token context file for any new AI agent. Read thi
 - Payments/coins: `src/lib/pricing.ts`, `src/lib/payos.ts`, `src/app/api/payments/**`, `src/app/api/webhooks/payos/route.ts`
 - SEO/CMS: `src/lib/seo.ts`, `src/lib/metadata.ts`, `src/app/sitemap.ts`, `src/app/robots.ts`, `src/app/kien-thuc-tu-vi/**`
 - SEO Autopilot: `scripts/seo/seo-autopilot-snapshot.mjs`, `scripts/seo/seo-autopilot-core.mjs`, `docs/agent/seo-autopilot.md`
+- Traffic Autopilot: `scripts/traffic/traffic-autopilot.mjs`, `docs/agent/traffic-autopilot.md`
 - DB schema: `prisma/schema.prisma`, `prisma/migrations/**`
 
 ## Non-Negotiable Invariants

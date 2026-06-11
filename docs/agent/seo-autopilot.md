@@ -68,6 +68,12 @@ Search Console defaults:
 - Site property: `SEO_GSC_SITE_URL`, otherwise `https://lasotinhhoa.vn/`
 - Skip GSC when needed: `node scripts/seo/seo-autopilot-plan.mjs --skip-search-console`
 
+Trusted external tooling:
+
+- Google Search Central is the policy source for people-first content, spam/doorway risks, structured data, and page experience decisions.
+- Lighthouse CI from `GoogleChrome/lighthouse-ci` is the technical regression tool. Use `npm run seo:lighthouse` manually or through the weekly GitHub workflow when checking live SEO/accessibility/best-practice regressions.
+- Do not install generic SEO keyword-spinning plugins. New third-party tools must be reputable, scoped, and useful beyond what Search Console, SEMrush export, sitemap checks, and Lighthouse already provide.
+
 Run this when the automation should create durable artifacts for the next work cycle:
 
 ```powershell
@@ -87,6 +93,15 @@ This writes:
 - `docs/seo-autopilot/drafts/<slug>.md`
 - `docs/seo-autopilot/reports/<date>-<slug>.md`
 - `docs/seo-autopilot/state.json`
+
+For daily traffic growth beyond publishing, use the lightweight Traffic Autopilot coordinator:
+
+```powershell
+$env:PATH="C:\Users\ASUS\.cache\codex-runtimes\codex-primary-runtime\dependencies\node\bin;$env:PATH"
+npm run traffic:autopilot
+```
+
+Traffic Autopilot does not create extra articles, auto-post, or spend money. It chooses one daily follow-up action such as social-ready copy, internal-link flow, CTA cleanup, publisher follow-up, or weekly measurement. See `docs/agent/traffic-autopilot.md`.
 
 For a local Windows heartbeat outside Codex Automation, run:
 
@@ -149,6 +164,7 @@ Automation should avoid repeated heavy work. Use the smallest useful loop:
 
 - Publisher runs use `npm run seo:autopilot:publisher`, which limits planning to one selected task and prints summary JSON instead of the full plan.
 - Sunday strategy may use the full batch planner because it is the handoff for the week.
+- Lighthouse CI is weekly/manual only. Do not run it inside every publisher automation unless the task changed public SEO layout, metadata, structured data, or page experience.
 - Do not run `npm test`, `npm run build`, deploy, or live smoke when no repo/content files changed.
 - Prefer targeted tests and targeted ESLint for touched files; run full build only before release.
 - If GSC, SEMrush, sitemap, and content inventory are unchanged from the latest `docs/seo-autopilot/state.json`, do a short report/skip instead of repeating the same draft.
