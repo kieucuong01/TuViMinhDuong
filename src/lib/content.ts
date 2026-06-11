@@ -1132,6 +1132,107 @@ Thiên Di nên đọc cùng [Cung Mệnh và Cung Thân](/kien-thuc-tu-vi/cung-m
 
 ${cta}`,
   }),
+  article({
+    title: "Tạo lá số tử vi: Cần chuẩn bị gì để xem đúng hơn?",
+    slug: "tao-la-so-tu-vi",
+    categoryId: "cat-nhap-mon",
+    excerpt: "Hướng dẫn tạo lá số tử vi cho người mới: cần ngày sinh, giờ sinh, giới tính, lịch sinh nào và nên đọc kết quả theo thứ tự nào để tránh hiểu sai.",
+    focusKeyword: "tạo lá số tử vi",
+    coverImage: "/articles/la-so-12-cung.svg",
+    coverAlt: "Minh họa bàn lá số tử vi và các thông tin cần chuẩn bị trước khi lập lá số",
+    metaTitle: "Tạo lá số tử vi: Cách chuẩn bị ngày giờ sinh cho đúng",
+    metaDescription: "Tìm hiểu cách tạo lá số tử vi đúng hơn: cần ngày sinh, giờ sinh, giới tính, lịch âm hay dương, vì sao sai giờ sinh làm lệch cung sao và nên đọc kết quả theo thứ tự nào.",
+    canonicalUrl: "/kien-thuc-tu-vi/tao-la-so-tu-vi",
+    date: "2026-06-11",
+    faqs: [
+      {
+        question: "Tạo lá số tử vi có bắt buộc phải biết chính xác giờ sinh không?",
+        answer: "Nên có giờ sinh càng sát thực tế càng tốt vì giờ sinh ảnh hưởng đến Cung Mệnh, Cung Thân và cách an sao. Nếu chưa chắc, bạn vẫn có thể lập lá số để tham khảo nhưng nên đối chiếu thêm các mốc đời thật.",
+      },
+      {
+        question: "Nên nhập ngày sinh âm lịch hay dương lịch khi tạo lá số?",
+        answer: "Phần lớn người dùng nên nhập theo ngày sinh dương lịch ghi trên giấy tờ, sau đó hệ thống sẽ quy đổi âm lịch ở lớp tính toán. Điều quan trọng là nhập đúng loại lịch theo biểu mẫu và không tự đổi hai lần.",
+      },
+      {
+        question: "Sau khi tạo lá số tử vi, nên đọc phần nào trước?",
+        answer: "Người mới nên đi theo thứ tự: Cung Mệnh và Cung Thân, 12 cung chính, chính tinh, trạng thái sao rồi mới sang đại vận và vận ngắn hạn. Cách đọc này giúp tránh kết luận vội từ một sao hoặc một câu luận riêng lẻ.",
+      },
+    ],
+    content: `Tạo lá số tử vi thường là bước đầu tiên của người mới khi muốn hiểu bản thân, công việc, tình cảm hoặc nhịp vận của một giai đoạn. Nhưng nhiều người nhập dữ liệu rất nhanh rồi đọc kết quả theo cảm tính, nên dễ gặp tình trạng: cùng một lá số mà thấy câu nào cũng đúng một ít, còn phần quan trọng thì lại không biết bắt đầu từ đâu.
+
+Muốn việc tạo lá số tử vi có ích, bạn không cần học hết tử vi ngay từ đầu. Điều cần hơn là chuẩn bị đúng dữ liệu đầu vào, hiểu vì sao mỗi trường thông tin lại quan trọng, rồi đọc kết quả theo thứ tự hợp lý. Nếu bạn chưa nắm nền tảng, hãy xem thêm bài [lá số tử vi là gì](/kien-thuc-tu-vi/la-so-tu-vi-la-gi) và [cách đọc lá số tử vi cho người mới](/kien-thuc-tu-vi/cach-doc-la-so-tu-vi-cho-nguoi-moi) để có khung nhìn rõ hơn.
+
+## Tạo lá số tử vi thực chất là đang làm gì?
+
+Tạo lá số tử vi không chỉ là điền vài ô thông tin để nhận một bài luận sẵn. Về bản chất, hệ thống đang dùng ngày tháng năm sinh, giờ sinh, giới tính và lịch sinh để xác định vị trí các cung, an chính tinh, phụ tinh và sắp xếp các lớp vận theo thời gian. Vì vậy, đầu vào càng sát thực tế thì phần giải nghĩa phía sau càng đáng tin hơn.
+
+Điểm người mới hay nhầm là tưởng chỉ cần đúng ngày sinh là đủ. Thực tế, [giờ sinh trong tử vi](/kien-thuc-tu-vi/gio-sinh-trong-tu-vi) và cách quy đổi lịch có thể làm thay đổi trục đọc chính của lá số. Nếu lệch ở phần này, bạn sẽ thấy phần luận về [Cung Mệnh và Cung Thân](/kien-thuc-tu-vi/cung-menh-cung-than), [12 cung trong lá số tử vi](/kien-thuc-tu-vi/12-cung-trong-la-so-tu-vi) hoặc [chính tinh trong tử vi](/kien-thuc-tu-vi/sao-chinh-tinh-tu-vi) không còn khớp với trải nghiệm đời thật.
+
+## Bảng chuẩn bị trước khi nhập lá số
+
+| Thông tin cần nhập | Vì sao quan trọng | Nếu chưa chắc thì làm gì |
+| --- | --- | --- |
+| Ngày tháng năm sinh | Là nền để an cung, an sao và xác định các lớp vận | Kiểm tra lại giấy tờ gốc hoặc hỏi người thân lớn tuổi |
+| Giờ sinh | Có thể làm đổi Cung Mệnh, Cung Thân và một số sao chủ chốt | Ghi lại 1-2 khung giờ gần nhất để đối chiếu bằng sự kiện đời thật |
+| Giới tính | Ảnh hưởng tới một số cách an vòng và hướng đọc trong hệ thống | Chọn đúng như hồ sơ cá nhân đang dùng |
+| Loại lịch sinh | Tránh lỗi tự đổi âm-dương hai lần | Nếu sinh theo giấy khai sinh, thường nên nhập dương lịch rồi để hệ thống quy đổi |
+
+Khối dữ liệu này nghe đơn giản nhưng lại quyết định phần lớn độ tin cậy của lá số. Người mới thường vội đọc lời luận mà quên kiểm tra đầu vào. Cách làm an toàn hơn là nhập chậm, kiểm lại một lần, rồi mới xem kết quả.
+
+## Vì sao sai giờ sinh có thể làm lệch cách đọc?
+
+Trong tử vi, giờ sinh không chỉ thêm chi tiết phụ. Nó có thể làm đổi vị trí cung trọng tâm và kéo theo cách an sao, khiến logic diễn giải thay đổi từ gốc. Đây là điểm cần hiểu theo quan hệ nhân quả, không nên chỉ xem như "sai một chút chắc không sao".
+
+Ví dụ, nếu giờ sinh làm đổi trục Mệnh - Thân, thì câu chuyện về khí chất gốc, phản xạ tự nhiên, cách bước ra ngoài xã hội và trọng tâm đời sống cũng đổi theo. Khi đó, bạn có thể đọc thấy một đoạn luận về sự chủ động, ổn định hoặc hướng nghề nghiệp mà cảm giác "không phải mình". Nhiều trường hợp không phải lá số sai hoàn toàn, mà là đầu vào chưa đủ sát.
+
+### Bảng mức tin cậy của dữ liệu đầu vào
+
+| Tình huống nhập liệu | Mức tin cậy khi đọc | Cách dùng kết quả |
+| --- | --- | --- |
+| Đúng ngày sinh, đúng giờ sinh | Cao | Có thể đọc cả cấu trúc lá số và các lớp vận sâu hơn |
+| Đúng ngày sinh, giờ sinh gần đúng | Trung bình | Nên ưu tiên phần tổng quan, sau đó đối chiếu mốc đời thật |
+| Đúng ngày sinh, không chắc loại lịch | Thấp đến trung bình | Kiểm tra lại lịch trước khi tin vào các kết luận chi tiết |
+| Chỉ nhớ khoảng năm sinh hoặc giờ quá mơ hồ | Thấp | Chỉ nên xem như bản nháp để học cách đọc, chưa nên kết luận |
+
+Nếu bạn đang ở nhóm giữa, tốt nhất hãy tạo lá số rồi đối chiếu với những mốc đã biết: giai đoạn học hành, công việc, gia đình, thay đổi chỗ ở, hoặc các bước ngoặt rõ ràng. Khi trục luận khớp với đời thật, bạn mới nên đi tiếp sang phần vận hạn.
+
+## Sau khi tạo lá số, nên đọc theo thứ tự nào?
+
+Người mới rất dễ nhảy thẳng tới câu hỏi "năm nay có gì?" hoặc "có hợp nghề này không?". Làm vậy thường khiến phần đọc lá số bị rời rạc. Thứ tự an toàn hơn là:
+
+1. Đọc [Cung Mệnh và Cung Thân](/kien-thuc-tu-vi/cung-menh-cung-than) để hiểu nền tính cách, cách phản ứng và trọng tâm sống.
+2. Đọc [12 cung trong lá số tử vi](/kien-thuc-tu-vi/12-cung-trong-la-so-tu-vi) để biết mỗi cung đang đại diện cho mặt nào của đời sống.
+3. Đọc [chính tinh trong tử vi](/kien-thuc-tu-vi/sao-chinh-tinh-tu-vi) để hiểu trục năng lượng chính của từng cung.
+4. Đọc [cách đọc lá số tử vi cho người mới](/kien-thuc-tu-vi/cach-doc-la-so-tu-vi-cho-nguoi-moi) để biết cách ghép cung, sao và trạng thái sao.
+5. Sau đó mới nhìn [Đại vận](/kien-thuc-tu-vi/dai-van-la-gi) và [Nguyệt vận - Nhật vận](/kien-thuc-tu-vi/nguyet-van-nhat-van) để xem chủ đề nào đang được kích hoạt theo thời gian.
+
+Thứ tự này quan trọng vì tử vi không nên bị đọc như một câu phán duy nhất. Một sao tốt chưa chắc đã thành kết quả tốt nếu nằm sai cung, ở trạng thái yếu hoặc đi cùng nhiều yếu tố cản trở. Ngược lại, một dấu hiệu khó cũng không đồng nghĩa với kết luận xấu nếu lá số có nhiều lớp nâng đỡ khác.
+
+## Khi nào chỉ cần đọc miễn phí, khi nào nên đi sâu hơn?
+
+Nếu mục tiêu của bạn là hiểu bố cục lá số, tự nhận diện các cung chính và biết mình nên đọc theo đường nào, phần tạo lá số miễn phí đã đủ để bắt đầu. Đây là bước phù hợp cho người mới, người đang kiểm tra lại giờ sinh hoặc người muốn có một khung đọc trước khi tìm hiểu sâu hơn.
+
+Khi bạn đã có đầu vào tương đối chắc và bắt đầu muốn giải một câu hỏi cụ thể, ví dụ đổi việc, thay đổi môi trường sống, nhịp quan hệ hay giai đoạn áp lực kéo dài, lúc đó mới cần đọc sâu theo từng cung và từng lớp vận. Đọc sâu không phải để tìm câu trả lời tuyệt đối, mà để hiểu điều kiện nào đang làm một xu hướng mạnh lên, yếu đi hoặc đảo chiều.
+
+## Ghi chú nguồn thuật toán của Lá số tinh hoa
+
+- Hệ thống dùng dữ liệu ngày tháng năm sinh, giờ sinh, giới tính và loại lịch để dựng lá số gốc.
+- Các cung và sao được đọc theo cấu trúc của engine lá số nội bộ, sau đó mới đưa ra lớp diễn giải.
+- Phần vận hạn chỉ có ý nghĩa khi đọc cùng lá số gốc; không nên tách riêng một năm hay một tháng để kết luận toàn bộ cuộc đời.
+- Công cụ [xem ngày](/xem-ngay) là lớp bổ sung cho quyết định theo thời điểm, không thay thế việc đọc cấu trúc lá số cá nhân.
+
+## Nên bắt đầu từ đâu ngay bây giờ?
+
+Nếu bạn đã có ngày sinh và khung giờ sinh tương đối rõ, hãy [lập lá số tử vi miễn phí](/#lap-la-so) trước. Sau khi tạo xong, đừng đọc lan man. Hãy mở lại các bài [lá số tử vi là gì](/kien-thuc-tu-vi/la-so-tu-vi-la-gi), [giờ sinh trong tử vi](/kien-thuc-tu-vi/gio-sinh-trong-tu-vi) và [cách đọc lá số tử vi cho người mới](/kien-thuc-tu-vi/cach-doc-la-so-tu-vi-cho-nguoi-moi) để đối chiếu từng bước.
+
+Mục tiêu tốt nhất của bài này không phải là khiến bạn thấy "đúng hết", mà là giúp bạn tạo lá số tử vi theo cách cẩn thận hơn, biết phần nào đáng tin, phần nào cần kiểm tra lại và phần nào chỉ nên dùng như gợi ý để quan sát bản thân.
+
+## Thử nhanh trên lá số của bạn
+
+Nhập ngày sinh, giờ sinh và giới tính tại [phần lập lá số](/#lap-la-so). Sau khi hệ thống tạo xong, hãy kiểm tra trước trục Mệnh - Thân, sau đó mới đọc sang cung nghề nghiệp, tài bạch hay vận hạn để xem phần nào thực sự khớp với đời sống hiện tại.
+
+${cta}`,
+  }),
 ];
 
 export function articleWithScore(article: ArticleView): ArticleView {
