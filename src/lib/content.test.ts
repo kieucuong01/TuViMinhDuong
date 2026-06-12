@@ -90,4 +90,25 @@ describe("SEO content cluster", () => {
       expect(article.seoScore).toBeGreaterThanOrEqual(70);
     }
   });
+
+  it("refreshes the core pillars with depth, trust framing, and contextual anchors", () => {
+    const corePillars = [
+      "la-so-tu-vi-la-gi",
+      "12-cung-trong-la-so-tu-vi",
+      "cung-menh-cung-than",
+    ].map((slug) => seedArticles.find((article) => article.slug === slug));
+
+    for (const article of corePillars) {
+      expect(article, "pillar article should exist").toBeTruthy();
+      expect(article!.content.length, `${article!.slug} should not be a thin pillar`).toBeGreaterThanOrEqual(5000);
+      expect(article!.content, `${article!.slug} should explain editorial trust`).toContain("Cách Lá số tinh hoa biên tập");
+      expect(article!.content, `${article!.slug} should keep reader-first caveats`).toContain("không thay thế");
+      expect(article!.content, `${article!.slug} should include the conversion path`).toContain("[lập lá số tử vi miễn phí](/#lap-la-so)");
+      expect(article!.faqs?.length ?? 0, `${article!.slug} should have visible FAQ support`).toBeGreaterThanOrEqual(3);
+    }
+
+    expect(corePillars[0]!.content).toContain("[Cung Mệnh và Cung Thân là hai trục đọc đầu tiên](/kien-thuc-tu-vi/cung-menh-cung-than)");
+    expect(corePillars[1]!.content).toContain("[Cung Quan Lộc khi đang hỏi về công việc](/kien-thuc-tu-vi/cung-quan-loc-trong-tu-vi)");
+    expect(corePillars[2]!.content).toContain("[12 cung trong lá số tử vi để đặt Mệnh - Thân vào bức tranh đầy đủ](/kien-thuc-tu-vi/12-cung-trong-la-so-tu-vi)");
+  });
 });

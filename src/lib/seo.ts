@@ -223,6 +223,30 @@ export function itemListJsonLd(items: { name: string; url: string }[]) {
   };
 }
 
+export function offerCatalogJsonLd(catalog: {
+  name: string;
+  description: string;
+  url: string;
+  offers: { name: string; description: string; priceCoins: number }[];
+}) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "OfferCatalog",
+    name: catalog.name,
+    description: catalog.description,
+    url: absoluteUrl(catalog.url),
+    itemListElement: catalog.offers.map((offer) => ({
+      "@type": "Offer",
+      name: offer.name,
+      description: offer.description,
+      price: offer.priceCoins * 1000,
+      priceCurrency: "VND",
+      availability: "https://schema.org/InStock",
+      url: absoluteUrl(catalog.url),
+    })),
+  };
+}
+
 export function websiteJsonLd() {
   return {
     "@context": "https://schema.org",

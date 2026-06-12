@@ -1,6 +1,7 @@
 import { LegalPage } from "@/components/legal-page";
 import { APP_NAME } from "@/lib/env";
 import { routeMetadata } from "@/lib/metadata";
+import { webPageJsonLd } from "@/lib/seo";
 
 export const metadata = routeMetadata({
   title: "Chính sách bảo mật",
@@ -48,13 +49,26 @@ const sections = [
 ];
 
 export default function PrivacyPolicyPage() {
+  const pageLd = webPageJsonLd({
+    name: "Chính sách bảo mật",
+    description: `${APP_NAME} minh bạch cách thu thập, dùng và bảo vệ thông tin khi bạn lập lá số tử vi, đăng nhập, nạp xu và mở luận giải.`,
+    url: "/chinh-sach-bao-mat",
+    breadcrumb: [
+      { name: "Trang chủ", url: "/" },
+      { name: "Chính sách bảo mật", url: "/chinh-sach-bao-mat" },
+    ],
+  });
+
   return (
-    <LegalPage
-      eyebrow="Bảo mật dữ liệu"
-      title="Chính sách bảo mật"
-      description="Chúng tôi giữ chính sách này rõ ràng để bạn biết dữ liệu nào được dùng, dùng vào việc gì và cách yêu cầu hỗ trợ khi cần."
-      updatedAt="01/06/2026"
-      sections={sections}
-    />
+    <>
+      <script id="privacy-page-jsonld" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(pageLd) }} />
+      <LegalPage
+        eyebrow="Bảo mật dữ liệu"
+        title="Chính sách bảo mật"
+        description="Chúng tôi giữ chính sách này rõ ràng để bạn biết dữ liệu nào được dùng, dùng vào việc gì và cách yêu cầu hỗ trợ khi cần."
+        updatedAt="01/06/2026"
+        sections={sections}
+      />
+    </>
   );
 }

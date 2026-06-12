@@ -5,6 +5,7 @@ import { getFeaturePrices, getOperationSettings } from "@/lib/data";
 import { formatCoins, formatVnd } from "@/lib/format";
 import { APP_NAME } from "@/lib/env";
 import { routeMetadata } from "@/lib/metadata";
+import { offerCatalogJsonLd, webPageJsonLd } from "@/lib/seo";
 
 export const metadata = routeMetadata({
   title: "Bảng giá luận giải tử vi",
@@ -30,9 +31,30 @@ export default async function PricingPage() {
     { label: "Nguyệt vận", detail: "Trọng tâm tháng hiện tại theo lá số", price: featurePrices.NGUYET_VAN.priceCoins },
     { label: "Nhật vận", detail: "Gợi ý nhanh cho một ngày cụ thể", price: featurePrices.NHAT_VAN.priceCoins },
   ];
+  const pageLd = webPageJsonLd({
+    name: "Bảng giá luận giải tử vi",
+    description: `Bảng giá xu cho luận giải toàn bộ, luận cung, đại vận, nguyệt vận và nhật vận trên ${APP_NAME}.`,
+    url: "/pricing",
+    breadcrumb: [
+      { name: "Trang chủ", url: "/" },
+      { name: "Bảng giá", url: "/pricing" },
+    ],
+  });
+  const offerCatalogLd = offerCatalogJsonLd({
+    name: "Bảng giá luận giải tử vi",
+    description: "Các phần luận giải có thể mở bằng xu trên Lá số tinh hoa.",
+    url: "/pricing",
+    offers: featureRows.map((row) => ({
+      name: row.label,
+      description: row.detail,
+      priceCoins: row.price,
+    })),
+  });
 
   return (
     <main className="pricing-hero">
+      <script id="pricing-page-jsonld" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(pageLd) }} />
+      <script id="pricing-offer-jsonld" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(offerCatalogLd) }} />
       <section className="section">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid gap-8 lg:grid-cols-[1fr_420px] lg:items-center">

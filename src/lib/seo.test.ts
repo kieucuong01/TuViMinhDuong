@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   absoluteUrl,
   articleJsonLd,
+  offerCatalogJsonLd,
   isSelfCanonicalArticle,
   organizationJsonLd,
   robotsAllowsIndex,
@@ -93,6 +94,31 @@ describe("Structured data", () => {
     });
 
     expect(jsonLd.publisher.logo.url).toContain("/favicon-96x96.png");
+  });
+
+  it("describes visible pricing offers with an OfferCatalog", () => {
+    const catalog = offerCatalogJsonLd({
+      name: "Bảng giá luận giải tử vi",
+      description: "Các phần luận giải có thể mở bằng xu trên Lá số tinh hoa.",
+      url: "/pricing",
+      offers: [
+        { name: "Luận giải toàn bộ", description: "Tổng quan, 12 cung và vận hạn.", priceCoins: 199 },
+      ],
+    });
+
+    expect(catalog).toMatchObject({
+      "@type": "OfferCatalog",
+      name: "Bảng giá luận giải tử vi",
+      url: expect.stringMatching(/\/pricing$/),
+      itemListElement: [
+        {
+          "@type": "Offer",
+          name: "Luận giải toàn bộ",
+          price: 199000,
+          priceCurrency: "VND",
+        },
+      ],
+    });
   });
 });
 

@@ -1,6 +1,7 @@
 import { LegalPage } from "@/components/legal-page";
 import { APP_NAME } from "@/lib/env";
 import { routeMetadata } from "@/lib/metadata";
+import { webPageJsonLd } from "@/lib/seo";
 
 export const metadata = routeMetadata({
   title: "Điều khoản sử dụng",
@@ -48,13 +49,26 @@ const sections = [
 ];
 
 export default function TermsPage() {
+  const pageLd = webPageJsonLd({
+    name: "Điều khoản sử dụng",
+    description: `Điều khoản sử dụng ${APP_NAME}: phạm vi nội dung tử vi tham khảo, tài khoản, xu, thanh toán và trách nhiệm khi dùng dịch vụ.`,
+    url: "/dieu-khoan-su-dung",
+    breadcrumb: [
+      { name: "Trang chủ", url: "/" },
+      { name: "Điều khoản sử dụng", url: "/dieu-khoan-su-dung" },
+    ],
+  });
+
   return (
-    <LegalPage
-      eyebrow="Điều khoản"
-      title="Điều khoản sử dụng"
-      description="Các điều khoản này giúp trải nghiệm luận giải minh bạch hơn, đặc biệt với tài khoản, xu và nội dung trả phí."
-      updatedAt="01/06/2026"
-      sections={sections}
-    />
+    <>
+      <script id="terms-page-jsonld" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(pageLd) }} />
+      <LegalPage
+        eyebrow="Điều khoản"
+        title="Điều khoản sử dụng"
+        description="Các điều khoản này giúp trải nghiệm luận giải minh bạch hơn, đặc biệt với tài khoản, xu và nội dung trả phí."
+        updatedAt="01/06/2026"
+        sections={sections}
+      />
+    </>
   );
 }

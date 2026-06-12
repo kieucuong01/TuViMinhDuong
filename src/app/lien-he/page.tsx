@@ -2,8 +2,8 @@ import Link from "next/link";
 import { Mail, ReceiptText, ShieldQuestion, Sparkles, type LucideIcon } from "lucide-react";
 
 import { APP_NAME, ADMIN_EMAIL } from "@/lib/env";
-import { getCurrentUser } from "@/lib/auth";
 import { routeMetadata } from "@/lib/metadata";
+import { webPageJsonLd } from "@/lib/seo";
 
 export const metadata = routeMetadata({
   title: "Liên hệ hỗ trợ",
@@ -15,7 +15,6 @@ type SupportItem = {
   title: string;
   description: string;
   icon: LucideIcon;
-  authOnly?: boolean;
 };
 
 const supportItems: SupportItem[] = [
@@ -23,7 +22,6 @@ const supportItems: SupportItem[] = [
     title: "Thanh toán và xu",
     description: "Kiểm tra đơn PayOS/VietQR, số dư xu, giao dịch đã trả tiền nhưng chưa được cộng xu.",
     icon: ReceiptText,
-    authOnly: true,
   },
   {
     title: "Tài khoản và lá số",
@@ -37,12 +35,20 @@ const supportItems: SupportItem[] = [
   },
 ];
 
-export default async function ContactPage() {
-  const user = await getCurrentUser();
-  const visibleSupportItems = supportItems.filter((item) => !item.authOnly || user);
+export default function ContactPage() {
+  const pageLd = webPageJsonLd({
+    name: "Liên hệ hỗ trợ",
+    description: `Liên hệ ${APP_NAME} để được hỗ trợ tài khoản, lá số, nạp xu, giao dịch PayOS/VietQR và hoàn xu khi có lỗi kỹ thuật.`,
+    url: "/lien-he",
+    breadcrumb: [
+      { name: "Trang chủ", url: "/" },
+      { name: "Liên hệ", url: "/lien-he" },
+    ],
+  });
 
   return (
     <main>
+      <script id="contact-page-jsonld" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(pageLd) }} />
       <section className="section">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           <div className="section-heading">
@@ -54,7 +60,7 @@ export default async function ContactPage() {
           </div>
 
           <div className="grid gap-5 md:grid-cols-3">
-            {visibleSupportItems.map((item) => {
+            {supportItems.map((item) => {
               const Icon = item.icon;
 
               return (
@@ -88,11 +94,9 @@ export default async function ContactPage() {
           </section>
 
           <div className="mt-6 flex flex-wrap justify-center gap-3">
-            {user ? (
-              <Link href="/chinh-sach-thanh-toan-hoan-xu" className="btn btn-secondary" prefetch={false}>
+            <Link href="/chinh-sach-thanh-toan-hoan-xu" className="btn btn-secondary" prefetch={false}>
                 Chính sách hoàn xu
-              </Link>
-            ) : null}
+            </Link>
             <Link href="/chinh-sach-bao-mat" className="btn btn-ghost" prefetch={false}>
               Chính sách bảo mật
             </Link>

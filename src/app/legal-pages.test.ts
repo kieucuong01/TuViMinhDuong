@@ -37,11 +37,22 @@ describe("legal and trust pages for ads readiness", () => {
     expect(sitemapSource).not.toContain("/chinh-sach-thanh-toan-hoan-xu");
   });
 
-  it("keeps money-related policy surfaces behind an authenticated account context", () => {
+  it("adds structured data to public trust and pricing pages", () => {
+    for (const path of ["chinh-sach-bao-mat", "dieu-khoan-su-dung", "lien-he", "pricing"]) {
+      const source = pageSource(path);
+
+      expect(source).toContain('type="application/ld+json"');
+      expect(source).toContain("webPageJsonLd");
+    }
+
+    expect(pageSource("pricing")).toContain("offerCatalogJsonLd");
+  });
+
+  it("keeps account-only policy entry points authenticated without making contact dynamic", () => {
     expect(pageSource("chinh-sach-thanh-toan-hoan-xu")).toContain("getCurrentUser");
     expect(pageSource("chinh-sach-thanh-toan-hoan-xu")).toContain('redirect("/dang-nhap?next=/chinh-sach-thanh-toan-hoan-xu")');
-    expect(pageSource("lien-he")).toContain("authOnly");
-    expect(pageSource("lien-he")).toContain("visibleSupportItems");
+    expect(pageSource("lien-he")).not.toContain("getCurrentUser");
+    expect(pageSource("lien-he")).not.toContain("visibleSupportItems");
     expect(footerAccountPolicySource).toContain("fetchClientSession");
     expect(footerAccountPolicySource).toContain("Boolean(data.user)");
     expect(footerAccountPolicySource).toContain('href="/chinh-sach-thanh-toan-hoan-xu"');
