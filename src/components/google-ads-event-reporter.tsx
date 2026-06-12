@@ -30,6 +30,16 @@ type PaymentStatusResponse = {
 const DEDUPE_PREFIX = "lsth-ad-event";
 const CREATED_CHART_FLAG = "created=1";
 
+function ensureGtagQueue() {
+  window.dataLayer = window.dataLayer || [];
+  window.gtag =
+    window.gtag ||
+    function gtag(...args: unknown[]) {
+      window.dataLayer?.push(args);
+    };
+  return window.gtag;
+}
+
 function numberFrom(value?: string | null) {
   const parsed = Number(value || 0);
   return Number.isFinite(parsed) && parsed > 0 ? parsed : undefined;
@@ -52,6 +62,7 @@ function markTrackedOnce(key: string) {
 }
 
 function sendGtagEvent(eventName: string, payload: AdEventPayload = {}) {
+  const gtag = ensureGtagQueue();
   const value =
     typeof payload.value === "number"
       ? payload.value
@@ -67,12 +78,12 @@ function sendGtagEvent(eventName: string, payload: AdEventPayload = {}) {
     send_to: GOOGLE_ANALYTICS_ID,
   };
 
-  window.gtag?.("event", eventName, eventPayload);
+  gtag("event", eventName, eventPayload);
 
   const conversionSendTo = googleAdsSendTo(GOOGLE_ADS_ID, GOOGLE_ADS_LABELS, eventName);
   if (!conversionSendTo) return;
 
-  window.gtag?.("event", "conversion", {
+  gtag("event", "conversion", {
     send_to: conversionSendTo,
     ...(value ? { value } : {}),
     currency,

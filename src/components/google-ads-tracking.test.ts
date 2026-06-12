@@ -4,6 +4,10 @@ import { describe, expect, it } from "vitest";
 
 const reporterSource = readFileSync(fileURLToPath(new URL("./google-ads-event-reporter.tsx", import.meta.url)), "utf8");
 const analyticsSource = readFileSync(fileURLToPath(new URL("./google-analytics.tsx", import.meta.url)), "utf8");
+const deferredLoaderSource = readFileSync(
+  fileURLToPath(new URL("./google-analytics-deferred-loader.tsx", import.meta.url)),
+  "utf8",
+);
 const chartFormSource = readFileSync(fileURLToPath(new URL("./chart-form.tsx", import.meta.url)), "utf8");
 const coinTopupSource = readFileSync(fileURLToPath(new URL("./coin-topup-modal.tsx", import.meta.url)), "utf8");
 const topupPageSource = readFileSync(fileURLToPath(new URL("../app/nap-xu/page.tsx", import.meta.url)), "utf8");
@@ -12,8 +16,11 @@ const quickReadingSource = readFileSync(fileURLToPath(new URL("./quick-reading-f
 describe("Google Ads tracking markers", () => {
   it("mounts the event reporter alongside the Google tag", () => {
     expect(analyticsSource).toContain("GoogleAdsEventReporter");
+    expect(analyticsSource).toContain("GoogleAnalyticsDeferredLoader");
     expect(analyticsSource).toContain("GOOGLE_ADS_ID");
-    expect(analyticsSource).toContain("gtag('config', '${GOOGLE_ADS_ID}')");
+    expect(deferredLoaderSource).toContain("googletagmanager.com/gtag/js");
+    expect(deferredLoaderSource).toContain("setTimeout(loadGoogleTag, 12000)");
+    expect(deferredLoaderSource).toContain('gtag("config", adsId)');
   });
 
   it("dedupes page-load conversions by conversion intent and order/chart id", () => {

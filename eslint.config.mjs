@@ -15,6 +15,7 @@ const eslintConfig = defineConfig([
     "build/**",
     "coverage/**",
     "dist/**",
+    ".codex/tools*/**",
     "scripts/**",
     "next-env.d.ts",
     "tsconfig.tsbuildinfo",

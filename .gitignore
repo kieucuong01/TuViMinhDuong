@@ -37,6 +37,10 @@ yarn-error.log*
 # local tooling cache
 .npm-cache/
 .lighthouseci/
+.codex/tools*/
+deploy-tmp/
+vps_*_tmp.py
+.next-home-*.html
 
 # env files (can opt-in for committing if needed)
 .env*

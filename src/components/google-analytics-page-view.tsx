@@ -14,6 +14,16 @@ type GoogleAnalyticsPageViewProps = {
   measurementId: string;
 };
 
+function ensureGtagQueue() {
+  window.dataLayer = window.dataLayer || [];
+  window.gtag =
+    window.gtag ||
+    function gtag(...args: unknown[]) {
+      window.dataLayer?.push(args);
+    };
+  return window.gtag;
+}
+
 export function GoogleAnalyticsPageView({ measurementId }: GoogleAnalyticsPageViewProps) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -25,7 +35,8 @@ export function GoogleAnalyticsPageView({ measurementId }: GoogleAnalyticsPageVi
     if (previousPath.current === pagePath) return;
     previousPath.current = pagePath;
 
-    window.gtag?.("event", "page_view", {
+    const gtag = ensureGtagQueue();
+    gtag("event", "page_view", {
       page_title: document.title,
       page_location: window.location.href,
       page_path: pagePath,

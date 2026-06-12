@@ -1,6 +1,4 @@
 import type { Metadata } from "next";
-import { Analytics } from "@vercel/analytics/next";
-import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Suspense } from "react";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
@@ -78,8 +76,6 @@ export default async function RootLayout({
         </Suspense>
         <ClientErrorReporter />
         <GoogleAnalytics />
-        <Analytics />
-        <SpeedInsights />
       </body>
     </html>
   );
