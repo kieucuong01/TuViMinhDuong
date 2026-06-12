@@ -57,9 +57,9 @@ export const seedArticles: ArticleView[] = [
     slug: "xem-ngay-tot-thang-6-2026",
     excerpt: "Danh sách ngày tốt tháng 6/2026 theo lịch âm, trực, hoàng đạo và sao tốt xấu, kèm cách chọn ngày hợp tuổi cho khai trương, ký kết, cưới hỏi.",
     focusKeyword: "xem ngày tốt tháng 6 2026",
-    coverImage: "/articles/xem-ngay-tot-thang-6-2026.svg",
+    coverImage: "/articles/xem-ngay-tot-thang-6-2026.webp",
     coverAlt: "Minh họa lịch xem ngày tốt tháng 6 năm 2026 với ngày đẹp và ngày cần tránh",
-    ogImage: "/articles/xem-ngay-tot-thang-6-2026.svg",
+    ogImage: "/articles/xem-ngay-tot-thang-6-2026.webp",
     metaTitle: "Xem ngày tốt tháng 6/2026: Ngày đẹp cần biết",
     metaDescription: "Xem ngày tốt tháng 6/2026 theo lịch âm, trực, hoàng đạo và sao tốt xấu; gợi ý ngày nên chọn, ngày cần tránh và cách xét theo tuổi.",
     canonicalUrl: "/kien-thuc-tu-vi/xem-ngay-tot-thang-6-2026",
@@ -80,7 +80,7 @@ export const seedArticles: ArticleView[] = [
     ],
     content: `Xem ngày tốt tháng 6 2026 là việc nhiều người tìm trước khi bước vào tháng mới, nhất là khi cần khai trương, ký hợp đồng, cưới hỏi, xuất hành, chuyển nhà hoặc bắt đầu một kế hoạch quan trọng. Nhưng một ngày được gọi là "đẹp" không nên hiểu là tốt tuyệt đối cho mọi người.
 
-![Minh họa lịch xem ngày tốt tháng 6 năm 2026 với ngày đẹp và ngày cần tránh](/articles/xem-ngay-tot-thang-6-2026.svg)
+![Minh họa lịch xem ngày tốt tháng 6 năm 2026 với ngày đẹp và ngày cần tránh](/articles/xem-ngay-tot-thang-6-2026.webp)
 
 Bài viết này tổng hợp các ngày nổi bật trong tháng 6/2026 theo engine [xem ngày tốt xấu](/xem-ngay) của Lá số tinh hoa. Cách tính đối chiếu âm lịch, can chi, 12 trực, hoàng đạo - hắc đạo, nhị thập bát tú, sao tốt xấu và điểm phù hợp theo từng việc. Khi cần dùng thật, bạn vẫn nên nhập thêm năm sinh trên công cụ để xét xung hợp theo tuổi.
 
@@ -149,9 +149,9 @@ ${cta}`,
     slug: "cung-phuc-duc-trong-tu-vi",
     excerpt: "Cung Phúc Đức trong tử vi cho thấy nền phúc, gia đạo, đời sống tinh thần và cách một người được nâng đỡ khi đi qua vận hạn.",
     focusKeyword: "cung phúc đức",
-    coverImage: "/articles/cung-phuc-duc-trong-tu-vi.svg",
+    coverImage: "/articles/cung-phuc-duc-trong-tu-vi.webp",
     coverAlt: "Minh họa cung Phúc Đức trong lá số tử vi với nền phúc, gia đạo và tinh thần",
-    ogImage: "/articles/cung-phuc-duc-trong-tu-vi.svg",
+    ogImage: "/articles/cung-phuc-duc-trong-tu-vi.webp",
     metaTitle: "Cung Phúc Đức trong tử vi: Nền phúc và gia đạo",
     metaDescription: "Tìm hiểu Cung Phúc Đức trong tử vi, cách đọc nền phúc, gia đạo, tinh thần và vì sao nên xem cùng Mệnh, Thân, Phu Thê, Đại vận.",
     canonicalUrl: "/kien-thuc-tu-vi/cung-phuc-duc-trong-tu-vi",
@@ -172,7 +172,7 @@ ${cta}`,
     ],
     content: `Cung Phúc Đức trong tử vi là một trong những cung khiến nhiều người vừa tò mò vừa dễ lo. Nghe đến chữ "phúc", người ta thường nghĩ ngay đến phúc phần dòng họ, âm đức, gia đạo, sự nâng đỡ vô hình và đời sống tinh thần. Nhưng nếu đọc quá cực đoan, Cung Phúc Đức rất dễ bị biến thành lời phán nặng nề.
 
-![Minh họa cung Phúc Đức trong lá số tử vi với nền phúc, gia đạo và tinh thần](/articles/cung-phuc-duc-trong-tu-vi.svg)
+![Minh họa cung Phúc Đức trong lá số tử vi với nền phúc, gia đạo và tinh thần](/articles/cung-phuc-duc-trong-tu-vi.webp)
 
 Cách hiểu thực tế hơn là xem Cung Phúc Đức như nền khí hậu phía sau một lá số. Nó không thay bạn quyết định, cũng không xóa hết khó khăn, nhưng cho biết một người thường được nâng đỡ ra sao, tinh thần có dễ ổn định không, quan hệ họ hàng - gia đình ảnh hưởng thế nào và khi gặp vận hạn thì nên dựa vào điều gì để đi qua.
 
@@ -236,9 +236,9 @@ ${cta}`,
     slug: "cung-dien-trach-trong-tu-vi",
     excerpt: "Cung Điền Trạch trong tử vi phản ánh nhà cửa, đất đai, môi trường sống, tài sản tích lũy và cách một người tạo sự ổn định vật chất.",
     focusKeyword: "cung điền trạch",
-    coverImage: "/articles/cung-dien-trach-trong-tu-vi.svg",
+    coverImage: "/articles/cung-dien-trach-trong-tu-vi.webp",
     coverAlt: "Minh họa cung Điền Trạch trong tử vi về nhà cửa đất đai và nơi ở",
-    ogImage: "/articles/cung-dien-trach-trong-tu-vi.svg",
+    ogImage: "/articles/cung-dien-trach-trong-tu-vi.webp",
     metaTitle: "Cung Điền Trạch trong tử vi: Nhà cửa và đất đai",
     metaDescription: "Tìm hiểu Cung Điền Trạch trong tử vi, cách đọc nhà cửa, đất đai, môi trường sống, tài sản tích lũy và thời điểm nên mua bán.",
     canonicalUrl: "/kien-thuc-tu-vi/cung-dien-trach-trong-tu-vi",
@@ -259,7 +259,7 @@ ${cta}`,
     ],
     content: `Cung Điền Trạch trong tử vi là cung được nhiều người quan tâm khi bắt đầu nghĩ đến nhà cửa, đất đai, nơi ở, tài sản tích lũy hoặc sự ổn định lâu dài. Với người trưởng thành, đặc biệt sau tuổi 30, câu hỏi "mình có dễ mua nhà không", "có nên đầu tư đất không", "nơi ở có ổn định không" thường rất thực tế chứ không chỉ là tò mò.
 
-![Minh họa cung Điền Trạch trong tử vi về nhà cửa đất đai và nơi ở](/articles/cung-dien-trach-trong-tu-vi.svg)
+![Minh họa cung Điền Trạch trong tử vi về nhà cửa đất đai và nơi ở](/articles/cung-dien-trach-trong-tu-vi.webp)
 
 Điền Trạch không nên được hiểu như lời hứa chắc chắn rằng ai đó sẽ giàu bất động sản hay không có nhà. Cung này giống một lớp thông tin về nền vật chất: cách một người tạo chỗ ở, tích lũy tài sản, chịu ảnh hưởng từ gia đình, môi trường sống và các giai đoạn vận hạn liên quan tới nhà đất.
 
@@ -332,9 +332,9 @@ ${cta}`,
     slug: "cung-tu-tuc-trong-tu-vi",
     excerpt: "Cung Tử Tức trong tử vi phản ánh duyên con cái, cách nuôi dạy, mối quan hệ cha mẹ - con, hậu vận gia đình và những bài học về trách nhiệm kế thừa.",
     focusKeyword: "cung tử tức",
-    coverImage: "/articles/cung-tu-tuc-trong-tu-vi.svg",
+    coverImage: "/articles/cung-tu-tuc-trong-tu-vi.webp",
     coverAlt: "Minh họa cung Tử Tức trong tử vi về con cái nuôi dạy và hậu vận",
-    ogImage: "/articles/cung-tu-tuc-trong-tu-vi.svg",
+    ogImage: "/articles/cung-tu-tuc-trong-tu-vi.webp",
     metaTitle: "Cung Tử Tức trong tử vi: Con cái, nuôi dạy và hậu vận",
     metaDescription: "Tìm hiểu Cung Tử Tức trong tử vi, cách đọc duyên con cái, mối quan hệ cha mẹ - con, hậu vận, nuôi dạy và các cung nên xem cùng.",
     canonicalUrl: "/kien-thuc-tu-vi/cung-tu-tuc-trong-tu-vi",
@@ -355,7 +355,7 @@ ${cta}`,
     ],
     content: `Cung Tử Tức trong tử vi là một trong những cung được hỏi nhiều khi người xem bắt đầu quan tâm đến gia đình, con cái, việc nuôi dạy, mối quan hệ cha mẹ - con và hậu vận. Với nhiều người, đây không chỉ là câu hỏi "có mấy con" hay "con cái có thành đạt không", mà còn là câu hỏi sâu hơn: mình có duyên chăm sóc thế hệ sau ra sao, gia đình có gắn kết không, và về già mình dựa vào điều gì để thấy đời sống có ý nghĩa.
 
-![Minh họa cung Tử Tức trong tử vi về con cái nuôi dạy và hậu vận](/articles/cung-tu-tuc-trong-tu-vi.svg)
+![Minh họa cung Tử Tức trong tử vi về con cái nuôi dạy và hậu vận](/articles/cung-tu-tuc-trong-tu-vi.webp)
 
 Đọc Cung Tử Tức cần rất thận trọng. Đây là chủ đề liên quan đến sinh nở, lựa chọn cá nhân, sức khỏe, hôn nhân và hoàn cảnh sống. Vì vậy, một lá số không nên được dùng để phán chắc chắn hay tạo áp lực cho ai đó phải có con, sinh con sớm, sinh con muộn hoặc đánh giá con cái tốt xấu. Cách đọc lành mạnh hơn là xem Cung Tử Tức như một lớp thông tin về trách nhiệm kế thừa, khả năng nuôi dưỡng, cách kết nối với con trẻ và bài học gia đình.
 
@@ -427,9 +427,9 @@ ${cta}`,
     slug: "cung-no-boc-trong-tu-vi",
     excerpt: "Cung Nô Bộc trong tử vi cho biết cách một người kết giao bạn bè, làm việc với đồng nghiệp, gặp quý nhân, quản lý cấp dưới và chọn môi trường hỗ trợ mình.",
     focusKeyword: "cung nô bộc",
-    coverImage: "/articles/cung-no-boc-trong-tu-vi.svg",
+    coverImage: "/articles/cung-no-boc-trong-tu-vi.webp",
     coverAlt: "Minh họa cung Nô Bộc trong tử vi về bạn bè đồng nghiệp và quý nhân",
-    ogImage: "/articles/cung-no-boc-trong-tu-vi.svg",
+    ogImage: "/articles/cung-no-boc-trong-tu-vi.webp",
     metaTitle: "Cung Nô Bộc trong tử vi: Bạn bè và quý nhân",
     metaDescription: "Tìm hiểu Cung Nô Bộc trong tử vi, cách đọc bạn bè, đồng nghiệp, quý nhân, cấp dưới, quan hệ xã hội và các cung nên xem cùng.",
     canonicalUrl: "/kien-thuc-tu-vi/cung-no-boc-trong-tu-vi",
@@ -450,7 +450,7 @@ ${cta}`,
     ],
     content: `Cung Nô Bộc trong tử vi là cung giúp nhìn cách một người kết giao bạn bè, làm việc với đồng nghiệp, gặp quý nhân, quản lý cấp dưới và xây dựng đội nhóm quanh mình. Trong đời sống hiện đại, đây là cung rất thực tế vì phần lớn cơ hội công việc, tiền bạc và danh tiếng đều đi qua con người.
 
-![Minh họa cung Nô Bộc trong tử vi về bạn bè đồng nghiệp và quý nhân](/articles/cung-no-boc-trong-tu-vi.svg)
+![Minh họa cung Nô Bộc trong tử vi về bạn bè đồng nghiệp và quý nhân](/articles/cung-no-boc-trong-tu-vi.webp)
 
 Nhiều người nghe chữ "nô bộc" rồi nghĩ cung này chỉ nói về người giúp việc hoặc cấp dưới. Cách hiểu đó quá hẹp. Khi đọc lá số ngày nay, Cung Nô Bộc nên được xem như cung của mạng lưới quan hệ: ai dễ nâng đỡ mình, ai dễ kéo mình vào rắc rối, mình hợp làm việc với kiểu người nào và cần đặt ranh giới ra sao.
 
@@ -527,9 +527,9 @@ ${cta}`,
     slug: "tu-vi-thang-6-2026",
     excerpt: "Tử vi tháng 6/2026 nên được đọc từ lá số gốc, đại vận, lưu niên và ngày tốt xấu, giúp bạn lên kế hoạch công việc, tiền bạc, sức khỏe bình tĩnh hơn.",
     focusKeyword: "tử vi tháng 6 2026",
-    coverImage: "/articles/tu-vi-thang-6-2026.svg",
+    coverImage: "/articles/tu-vi-thang-6-2026.webp",
     coverAlt: "Minh họa tử vi tháng 6 năm 2026 theo lá số cá nhân và vận tháng",
-    ogImage: "/articles/tu-vi-thang-6-2026.svg",
+    ogImage: "/articles/tu-vi-thang-6-2026.webp",
     metaTitle: "Tử vi tháng 6/2026: Cách xem vận tháng cá nhân",
     metaDescription: "Tử vi tháng 6/2026 nên được đọc từ lá số gốc, đại vận, lưu niên và ngày tốt xấu để lên kế hoạch công việc, tiền bạc, sức khỏe.",
     canonicalUrl: "/kien-thuc-tu-vi/tu-vi-thang-6-2026",
@@ -550,7 +550,7 @@ ${cta}`,
     ],
     content: `Tử vi tháng 6 2026 là chủ đề được nhiều người tìm trước khi bước sang tháng mới. Nhưng nếu chỉ đọc một bảng dự đoán chung cho 12 con giáp, bạn rất dễ nhận lời khuyên quá rộng: ai cũng thấy có phần đúng, nhưng khó biết mình nên làm gì ngay tuần này.
 
-![Minh họa tử vi tháng 6 năm 2026 theo lá số cá nhân và vận tháng](/articles/tu-vi-thang-6-2026.svg)
+![Minh họa tử vi tháng 6 năm 2026 theo lá số cá nhân và vận tháng](/articles/tu-vi-thang-6-2026.webp)
 
 Cách đọc bình tĩnh hơn là xem tháng 6/2026 như một lớp thời gian ngắn, đặt lên trên lá số gốc, đại vận, lưu niên và lịch ngày tốt xấu. Khi đó, tử vi không còn là một câu phán cố định, mà trở thành bản nhắc việc: tháng này nên ưu tiên điều gì, việc nào cần kiểm tra kỹ, lúc nào nên giảm tốc.
 
@@ -622,16 +622,16 @@ ${cta}`,
     slug: "tu-vi-hang-ngay-cach-doc-van-khi",
     excerpt: "Cách đọc tử vi hằng ngày theo hướng ứng dụng: kết hợp lá số gốc, nhịp tháng, nhịp ngày và quyết định thực tế.",
     focusKeyword: "tử vi hằng ngày",
-    coverImage: "/articles/tu-vi-hang-ngay-cach-doc-van-khi.svg",
+    coverImage: "/articles/tu-vi-hang-ngay-cach-doc-van-khi.webp",
     coverAlt: "Minh họa tử vi hằng ngày và cách đọc vận khí không mê tín",
-    ogImage: "/articles/tu-vi-hang-ngay-cach-doc-van-khi.svg",
+    ogImage: "/articles/tu-vi-hang-ngay-cach-doc-van-khi.webp",
     metaTitle: "Tử vi hằng ngày: Cách đọc vận khí ứng dụng",
     metaDescription: "Tìm hiểu cách đọc tử vi hằng ngày có trách nhiệm, kết hợp lá số gốc, vận tháng, vận ngày và lựa chọn thực tế.",
     canonicalUrl: "/kien-thuc-tu-vi/tu-vi-hang-ngay-cach-doc-van-khi",
     date: "2026-06-06",
     content: `Tử vi hằng ngày là cách quan sát nhịp vận khí theo ngày để chủ động hơn trong công việc, tài chính và các mối quan hệ. Điều quan trọng không phải là tin tuyệt đối vào một kết luận cố định, mà là hiểu xu hướng để chọn hành động tỉnh táo.
 
-![Minh họa tử vi hằng ngày và cách đọc vận khí không mê tín](/articles/tu-vi-hang-ngay-cach-doc-van-khi.svg)
+![Minh họa tử vi hằng ngày và cách đọc vận khí không mê tín](/articles/tu-vi-hang-ngay-cach-doc-van-khi.webp)
 
 ## Vì sao cần xem cả lá số gốc
 
@@ -648,9 +648,9 @@ ${cta}`,
     slug: "cung-menh-cung-than",
     excerpt: "Cung Mệnh cho thấy nền tính cách, Cung Thân phản ánh cách con người nhập cuộc và hành động trong đời sống.",
     focusKeyword: "cung mệnh cung thân",
-    coverImage: "/articles/cung-menh-cung-than.svg",
+    coverImage: "/articles/cung-menh-cung-than.webp",
     coverAlt: "Minh họa cung Mệnh và cung Thân là hai trục chính khi luận lá số tử vi",
-    ogImage: "/articles/cung-menh-cung-than.svg",
+    ogImage: "/articles/cung-menh-cung-than.webp",
     metaTitle: "Cung Mệnh và Cung Thân trong lá số tử vi",
     metaDescription: "Tìm hiểu ý nghĩa Cung Mệnh, Cung Thân và cách hai trục này giúp đọc tính cách, hành động và vận trình trong lá số.",
     canonicalUrl: "/kien-thuc-tu-vi/cung-menh-cung-than",
@@ -671,7 +671,7 @@ ${cta}`,
     ],
     content: `Cung Mệnh là điểm khởi đầu để đọc khí chất, thiên hướng và cách một người phản ứng với hoàn cảnh. Cung Thân thường được xem như cách năng lượng đó biểu hiện rõ hơn khi trưởng thành.
 
-![Minh họa cung Mệnh và cung Thân là hai trục chính khi luận lá số tử vi](/articles/cung-menh-cung-than.svg)
+![Minh họa cung Mệnh và cung Thân là hai trục chính khi luận lá số tử vi](/articles/cung-menh-cung-than.webp)
 
 ## Mệnh và Thân khác nhau thế nào
 
@@ -737,9 +737,9 @@ ${cta}`,
     slug: "12-cung-trong-la-so-tu-vi",
     excerpt: "Tổng quan 12 cung tử vi và thứ tự đọc dễ hiểu cho người mới: Mệnh, Tài Bạch, Quan Lộc, Phu Thê, Tật Ách.",
     focusKeyword: "12 cung tử vi",
-    coverImage: "/articles/12-cung-trong-la-so-tu-vi.svg",
+    coverImage: "/articles/12-cung-trong-la-so-tu-vi.webp",
     coverAlt: "Minh họa 12 cung trong lá số tử vi và thứ tự đọc cho người mới",
-    ogImage: "/articles/12-cung-trong-la-so-tu-vi.svg",
+    ogImage: "/articles/12-cung-trong-la-so-tu-vi.webp",
     metaTitle: "12 cung trong lá số tử vi và thứ tự đọc cho người mới",
     metaDescription: "Hiểu nhanh 12 cung trong lá số tử vi, cung nào nên đọc trước và cách liên kết Mệnh, Tài Bạch, Quan Lộc với đời sống.",
     canonicalUrl: "/kien-thuc-tu-vi/12-cung-trong-la-so-tu-vi",
@@ -760,7 +760,7 @@ ${cta}`,
     ],
     content: `12 cung trong lá số tử vi là 12 vùng đời sống. Mỗi cung không đứng riêng lẻ, mà cần đọc trong quan hệ với Mệnh, Thân, chính tinh, phụ tinh và vận hạn.
 
-![Minh họa 12 cung trong lá số tử vi và thứ tự đọc cho người mới](/articles/12-cung-trong-la-so-tu-vi.svg)
+![Minh họa 12 cung trong lá số tử vi và thứ tự đọc cho người mới](/articles/12-cung-trong-la-so-tu-vi.webp)
 
 ## Thứ tự đọc gợi ý
 
@@ -841,16 +841,16 @@ ${cta}`,
     slug: "cung-tai-bach-trong-tu-vi",
     excerpt: "Cung Tài Bạch phản ánh thái độ với tiền, năng lực tạo tài chính và cách quản lý nguồn lực cá nhân.",
     focusKeyword: "cung tài bạch",
-    coverImage: "/articles/cung-tai-bach-trong-tu-vi.svg",
+    coverImage: "/articles/cung-tai-bach-trong-tu-vi.webp",
     coverAlt: "Minh họa cung Tài Bạch trong tử vi về năng lực kiếm tiền và quản trị tài chính",
-    ogImage: "/articles/cung-tai-bach-trong-tu-vi.svg",
+    ogImage: "/articles/cung-tai-bach-trong-tu-vi.webp",
     metaTitle: "Cung Tài Bạch trong tử vi: Năng lực kiếm tiền và quản lý tài chính",
     metaDescription: "Tìm hiểu Cung Tài Bạch trong lá số tử vi, cách đọc năng lực kiếm tiền, quản lý tài chính và các điểm cần thận trọng.",
     canonicalUrl: "/kien-thuc-tu-vi/cung-tai-bach-trong-tu-vi",
     date: "2026-05-12",
     content: `Cung Tài Bạch không chỉ nói về tiền nhiều hay ít. Nó phản ánh cách một người tạo nguồn lực, quản trị tài chính, chấp nhận rủi ro và định nghĩa sự đủ đầy.
 
-![Minh họa cung Tài Bạch trong tử vi về năng lực kiếm tiền và quản trị tài chính](/articles/cung-tai-bach-trong-tu-vi.svg)
+![Minh họa cung Tài Bạch trong tử vi về năng lực kiếm tiền và quản trị tài chính](/articles/cung-tai-bach-trong-tu-vi.webp)
 
 ## Khi nào Tài Bạch dễ phát huy
 
@@ -867,16 +867,16 @@ ${cta}`,
     slug: "cung-quan-loc-trong-tu-vi",
     excerpt: "Cung Quan Lộc giúp nhìn nhịp học tập, công việc, trách nhiệm và môi trường sự nghiệp phù hợp.",
     focusKeyword: "cung quan lộc",
-    coverImage: "/articles/cung-quan-loc-trong-tu-vi.svg",
+    coverImage: "/articles/cung-quan-loc-trong-tu-vi.webp",
     coverAlt: "Minh họa cung Quan Lộc trong tử vi về sự nghiệp công danh và môi trường làm việc",
-    ogImage: "/articles/cung-quan-loc-trong-tu-vi.svg",
+    ogImage: "/articles/cung-quan-loc-trong-tu-vi.webp",
     metaTitle: "Cung Quan Lộc trong tử vi: Sự nghiệp, học tập và công danh",
     metaDescription: "Hiểu ý nghĩa Cung Quan Lộc trong tử vi và cách ứng dụng để định hướng công việc, học tập và nhịp phát triển sự nghiệp.",
     canonicalUrl: "/kien-thuc-tu-vi/cung-quan-loc-trong-tu-vi",
     date: "2026-05-14",
     content: `Cung Quan Lộc là nơi đọc thái độ với trách nhiệm, cách làm việc, môi trường nghề nghiệp và nhịp thăng tiến. Đây là cung nên xem sớm nếu bạn đang cần định hướng công việc.
 
-![Minh họa cung Quan Lộc trong tử vi về sự nghiệp công danh và môi trường làm việc](/articles/cung-quan-loc-trong-tu-vi.svg)
+![Minh họa cung Quan Lộc trong tử vi về sự nghiệp công danh và môi trường làm việc](/articles/cung-quan-loc-trong-tu-vi.webp)
 
 ## Đọc Quan Lộc cùng Tài Bạch
 
@@ -893,16 +893,16 @@ ${cta}`,
     slug: "dai-van-la-gi",
     excerpt: "Đại vận cho biết nhịp 10 năm, giai đoạn mở rộng, tích lũy hay cần thận trọng trong đời sống.",
     focusKeyword: "đại vận",
-    coverImage: "/articles/dai-van-la-gi.svg",
+    coverImage: "/articles/dai-van-la-gi.webp",
     coverAlt: "Minh họa đại vận 10 năm trong tử vi và các chu kỳ phát triển",
-    ogImage: "/articles/dai-van-la-gi.svg",
+    ogImage: "/articles/dai-van-la-gi.webp",
     metaTitle: "Đại vận là gì? Cách đọc chu kỳ 10 năm trong tử vi",
     metaDescription: "Tìm hiểu Đại vận trong tử vi, cách đọc chu kỳ 10 năm và cách ứng dụng để lên kế hoạch công việc, tài chính, quan hệ.",
     canonicalUrl: "/kien-thuc-tu-vi/dai-van-la-gi",
     date: "2026-05-16",
     content: `Đại vận là lớp thời gian dài, thường dùng để đọc xu hướng 10 năm. Nó không thay thế quyết định cá nhân, nhưng giúp bạn hiểu giai đoạn nào nên mở rộng, giai đoạn nào nên tích lũy.
 
-![Minh họa đại vận 10 năm trong tử vi và các chu kỳ phát triển](/articles/dai-van-la-gi.svg)
+![Minh họa đại vận 10 năm trong tử vi và các chu kỳ phát triển](/articles/dai-van-la-gi.webp)
 
 ## Vì sao Đại vận quan trọng
 
@@ -919,16 +919,16 @@ ${cta}`,
     slug: "nguyet-van-nhat-van",
     excerpt: "Nguyệt vận giúp xem nhịp tháng, Nhật vận giúp chọn việc nên làm và nên tránh trong từng ngày.",
     focusKeyword: "nguyệt vận nhật vận",
-    coverImage: "/articles/nguyet-van-nhat-van.svg",
+    coverImage: "/articles/nguyet-van-nhat-van.webp",
     coverAlt: "Minh họa nguyệt vận và nhật vận trong tử vi cho kế hoạch tháng ngày",
-    ogImage: "/articles/nguyet-van-nhat-van.svg",
+    ogImage: "/articles/nguyet-van-nhat-van.webp",
     metaTitle: "Nguyệt vận và Nhật vận trong tử vi: Kế hoạch tháng, ngày",
     metaDescription: "Phân biệt Nguyệt vận và Nhật vận, cách ứng dụng để lập kế hoạch tháng, chọn ngày và quản trị rủi ro cá nhân.",
     canonicalUrl: "/kien-thuc-tu-vi/nguyet-van-nhat-van",
     date: "2026-05-18",
     content: `Nguyệt vận và Nhật vận là hai lớp thời gian ngắn. Nếu Đại vận giống bản đồ đường dài, Nguyệt vận và Nhật vận giống lịch điều chỉnh nhịp hành động.
 
-![Minh họa nguyệt vận và nhật vận trong tử vi cho kế hoạch tháng ngày](/articles/nguyet-van-nhat-van.svg)
+![Minh họa nguyệt vận và nhật vận trong tử vi cho kế hoạch tháng ngày](/articles/nguyet-van-nhat-van.webp)
 
 ## Dùng Nguyệt vận để lập kế hoạch
 
@@ -945,9 +945,9 @@ ${cta}`,
     slug: "gio-sinh-trong-tu-vi",
     excerpt: "Giờ sinh ảnh hưởng trực tiếp đến Cung Mệnh, Cung Thân và cách an sao. Tìm hiểu cách chọn giờ sinh tử vi dễ hiểu cho người mới.",
     focusKeyword: "giờ sinh tử vi",
-    coverImage: "/articles/gio-sinh-trong-tu-vi.svg",
+    coverImage: "/articles/gio-sinh-trong-tu-vi.webp",
     coverAlt: "Minh họa giờ sinh trong tử vi và ảnh hưởng tới cung Mệnh cung Thân",
-    ogImage: "/articles/gio-sinh-trong-tu-vi.svg",
+    ogImage: "/articles/gio-sinh-trong-tu-vi.webp",
     metaTitle: "Giờ sinh tử vi: Cách chọn đúng giờ khi lập lá số",
     metaDescription: "Tìm hiểu vì sao giờ sinh tử vi quan trọng, cách chọn giờ Tý Sửu Dần Mão và lưu ý khi không nhớ chính xác giờ sinh.",
     canonicalUrl: "/kien-thuc-tu-vi/gio-sinh-trong-tu-vi",
@@ -964,7 +964,7 @@ ${cta}`,
     ],
     content: `Giờ sinh tử vi là dữ liệu rất quan trọng khi lập lá số. Cùng một ngày, tháng, năm sinh nhưng khác giờ sinh thì vị trí Cung Mệnh, Cung Thân và nhiều sao có thể thay đổi. Vì vậy, nếu muốn đọc lá số rõ hơn, bạn nên chọn đúng khung giờ sinh trước khi xem luận giải.
 
-![Minh họa giờ sinh trong tử vi và ảnh hưởng tới cung Mệnh cung Thân](/articles/gio-sinh-trong-tu-vi.svg)
+![Minh họa giờ sinh trong tử vi và ảnh hưởng tới cung Mệnh cung Thân](/articles/gio-sinh-trong-tu-vi.webp)
 
 ## Giờ sinh ảnh hưởng đến phần nào?
 
@@ -991,9 +991,9 @@ ${cta}`,
     slug: "sao-chinh-tinh-tu-vi",
     excerpt: "Tổng quan 14 chính tinh trong tử vi và cách đọc sao chính theo cung, trạng thái Miếu Vượng Đắc Bình Hãm.",
     focusKeyword: "chính tinh tử vi",
-    coverImage: "/articles/sao-chinh-tinh-tu-vi.svg",
+    coverImage: "/articles/sao-chinh-tinh-tu-vi.webp",
     coverAlt: "Minh họa 14 chính tinh trong tử vi trên bàn lá số",
-    ogImage: "/articles/sao-chinh-tinh-tu-vi.svg",
+    ogImage: "/articles/sao-chinh-tinh-tu-vi.webp",
     metaTitle: "Chính tinh tử vi: 14 sao chính và cách đọc dễ hiểu",
     metaDescription: "Tìm hiểu 14 chính tinh tử vi, ý nghĩa sao chính trong cung và vì sao trạng thái Miếu Vượng Đắc Hãm rất quan trọng.",
     canonicalUrl: "/kien-thuc-tu-vi/sao-chinh-tinh-tu-vi",
@@ -1010,7 +1010,7 @@ ${cta}`,
     ],
     content: `Chính tinh tử vi là nhóm sao chính tạo nên sắc thái lớn của từng cung. Khi nhìn một lá số, người đọc thường bắt đầu từ Cung Mệnh, Cung Thân và các chính tinh đi cùng. Tuy vậy, không nên chỉ nhìn tên sao rồi kết luận ngay, vì một sao còn phải xét cung, trạng thái và các sao đi kèm.
 
-![Minh họa 14 chính tinh trong tử vi trên bàn lá số](/articles/sao-chinh-tinh-tu-vi.svg)
+![Minh họa 14 chính tinh trong tử vi trên bàn lá số](/articles/sao-chinh-tinh-tu-vi.webp)
 
 ## 14 chính tinh thường gặp
 
@@ -1037,9 +1037,9 @@ ${cta}`,
     slug: "tuan-triet-trong-la-so-tu-vi",
     excerpt: "Tuần và Triệt thường khiến người mới lo lắng. Bài viết giải thích cách hiểu Tuần Triệt theo hướng cân bằng, dễ ứng dụng.",
     focusKeyword: "tuần triệt tử vi",
-    coverImage: "/articles/tuan-triet-trong-la-so-tu-vi.svg",
+    coverImage: "/articles/tuan-triet-trong-la-so-tu-vi.webp",
     coverAlt: "Minh họa Tuần Triệt trong lá số tử vi và cách hiểu đúng để không lo quá",
-    ogImage: "/articles/tuan-triet-trong-la-so-tu-vi.svg",
+    ogImage: "/articles/tuan-triet-trong-la-so-tu-vi.webp",
     metaTitle: "Tuần Triệt tử vi: Ý nghĩa và cách đọc cân bằng",
     metaDescription: "Giải thích Tuần Triệt trong lá số tử vi, cách đọc ảnh hưởng đến cung sao và vì sao không nên lo lắng cực đoan.",
     canonicalUrl: "/kien-thuc-tu-vi/tuan-triet-trong-la-so-tu-vi",
@@ -1056,7 +1056,7 @@ ${cta}`,
     ],
     content: `Tuần Triệt tử vi là một trong những phần dễ khiến người mới lo lắng. Nhiều người thấy Cung Mệnh, Quan Lộc hoặc Tài Bạch gặp Tuần Triệt thì vội nghĩ là xấu. Cách hiểu như vậy quá đơn giản và dễ gây áp lực không cần thiết.
 
-![Minh họa Tuần Triệt trong lá số tử vi và cách hiểu đúng để không lo quá](/articles/tuan-triet-trong-la-so-tu-vi.svg)
+![Minh họa Tuần Triệt trong lá số tử vi và cách hiểu đúng để không lo quá](/articles/tuan-triet-trong-la-so-tu-vi.webp)
 
 ## Tuần Triệt nên hiểu thế nào?
 
@@ -1081,9 +1081,9 @@ ${cta}`,
     slug: "xem-ngay-tot-xau-theo-tuoi",
     excerpt: "Xem ngày tốt xấu theo tuổi nên kết hợp trực, hoàng đạo hắc đạo, nhị thập bát tú, can chi xung hợp và mục đích công việc.",
     focusKeyword: "xem ngày tốt xấu theo tuổi",
-    coverImage: "/articles/xem-ngay-tot-xau-theo-tuoi.svg",
+    coverImage: "/articles/xem-ngay-tot-xau-theo-tuoi.webp",
     coverAlt: "Minh họa xem ngày tốt xấu theo tuổi như một công cụ hỗ trợ lựa chọn",
-    ogImage: "/articles/xem-ngay-tot-xau-theo-tuoi.svg",
+    ogImage: "/articles/xem-ngay-tot-xau-theo-tuoi.webp",
     metaTitle: "Xem ngày tốt xấu theo tuổi: Cách hiểu dễ ứng dụng",
     metaDescription: "Hướng dẫn xem ngày tốt xấu theo tuổi bằng trực, hoàng đạo hắc đạo, nhị thập bát tú, can chi xung hợp và loại việc.",
     canonicalUrl: "/kien-thuc-tu-vi/xem-ngay-tot-xau-theo-tuoi",
@@ -1100,7 +1100,7 @@ ${cta}`,
     ],
     content: `Xem ngày tốt xấu theo tuổi là nhu cầu phổ biến khi chuẩn bị cưới hỏi, khai trương, ký hợp đồng, xuất hành hoặc bắt đầu việc quan trọng. Tuy nhiên, ngày tốt nên được hiểu như công cụ hỗ trợ ra quyết định, không phải yếu tố quyết định tất cả.
 
-![Minh họa xem ngày tốt xấu theo tuổi như một công cụ hỗ trợ lựa chọn](/articles/xem-ngay-tot-xau-theo-tuoi.svg)
+![Minh họa xem ngày tốt xấu theo tuổi như một công cụ hỗ trợ lựa chọn](/articles/xem-ngay-tot-xau-theo-tuoi.webp)
 
 ## Một ngày tốt cần xét những gì?
 
@@ -1125,16 +1125,16 @@ ${cta}`,
     slug: "seo-cho-website-tu-vi",
     excerpt: "Cách xây nền SEO cho website tử vi: chọn cụm chủ đề, viết bài evergreen, đặt internal link, outbound reference và schema Article.",
     focusKeyword: "seo website tử vi",
-    coverImage: "/articles/seo-cho-website-tu-vi.svg",
+    coverImage: "/articles/seo-cho-website-tu-vi.webp",
     coverAlt: "Minh họa SEO website tử vi với topic cluster schema và internal link",
-    ogImage: "/articles/seo-cho-website-tu-vi.svg",
+    ogImage: "/articles/seo-cho-website-tu-vi.webp",
     metaTitle: "SEO website tử vi: Topic cluster, backlink và schema",
     metaDescription: "Hướng dẫn SEO website tử vi bằng topic cluster, bài evergreen, internal link, outbound reference, schema Article và tối ưu trải nghiệm đọc.",
     canonicalUrl: "/kien-thuc-tu-vi/seo-cho-website-tu-vi",
     date: "2026-05-20",
     content: `SEO website tử vi cần cân bằng giữa nội dung dễ hiểu, cấu trúc kỹ thuật và độ tin cậy. Một bài viết tốt không chỉ nhồi từ khóa "tử vi", mà phải trả lời đúng ý định tìm kiếm của người đọc: muốn lập lá số, hiểu cung Mệnh, xem ngày, hay tra vận hạn.
 
-![Minh họa SEO website tử vi với topic cluster schema và internal link](/articles/seo-cho-website-tu-vi.svg)
+![Minh họa SEO website tử vi với topic cluster schema và internal link](/articles/seo-cho-website-tu-vi.webp)
 
 ## Xây topic cluster trước khi viết bài
 
@@ -1159,9 +1159,9 @@ ${cta}`,
     slug: "la-so-tu-vi-la-gi",
     excerpt: "Lá số tử vi là bản đồ 12 cung được lập từ ngày, tháng, năm, giờ sinh. Bài viết giúp người mới hiểu lá số dùng để làm gì và nên đọc theo thứ tự nào.",
     focusKeyword: "lá số tử vi là gì",
-    coverImage: "/articles/la-so-tu-vi-la-gi.svg",
+    coverImage: "/articles/la-so-tu-vi-la-gi.webp",
     coverAlt: "Minh họa lá số tử vi cơ bản với 12 cung và các lớp thông tin nền",
-    ogImage: "/articles/la-so-tu-vi-la-gi.svg",
+    ogImage: "/articles/la-so-tu-vi-la-gi.webp",
     metaTitle: "Lá số tử vi là gì? Hướng dẫn dễ hiểu cho người mới",
     metaDescription: "Tìm hiểu lá số tử vi là gì, gồm những phần nào, vì sao cần giờ sinh và cách đọc lá số tử vi theo thứ tự dễ hiểu cho người mới bắt đầu.",
     canonicalUrl: "/kien-thuc-tu-vi/la-so-tu-vi-la-gi",
@@ -1182,7 +1182,7 @@ ${cta}`,
     ],
     content: `Lá số tử vi là bản đồ gồm 12 cung, được lập từ ngày, tháng, năm và giờ sinh của một người. Mỗi cung phản ánh một mảng đời sống như bản thân, công việc, tiền bạc, hôn nhân, gia đình, sức khỏe, quan hệ và vận hạn. Khi đọc đúng cách, lá số không nhằm làm người xem lo sợ, mà giúp họ hiểu mình hơn và chuẩn bị tốt hơn.
 
-![Minh họa lá số tử vi cơ bản với 12 cung và các lớp thông tin nền](/articles/la-so-tu-vi-la-gi.svg)
+![Minh họa lá số tử vi cơ bản với 12 cung và các lớp thông tin nền](/articles/la-so-tu-vi-la-gi.webp)
 
 ## Lá số tử vi gồm những phần chính nào?
 
@@ -1249,9 +1249,9 @@ ${cta}`,
     slug: "cach-doc-la-so-tu-vi-cho-nguoi-moi",
     excerpt: "Hướng dẫn 7 bước đọc lá số tử vi cho người mới: xem Mệnh Thân, 12 cung, chính tinh, trạng thái sao, đại vận và vận năm.",
     focusKeyword: "cách đọc lá số tử vi",
-    coverImage: "/articles/cach-doc-la-so-tu-vi-cho-nguoi-moi.svg",
+    coverImage: "/articles/cach-doc-la-so-tu-vi-cho-nguoi-moi.webp",
     coverAlt: "Minh họa 7 bước đọc lá số tử vi cho người mới",
-    ogImage: "/articles/cach-doc-la-so-tu-vi-cho-nguoi-moi.svg",
+    ogImage: "/articles/cach-doc-la-so-tu-vi-cho-nguoi-moi.webp",
     metaTitle: "Cách đọc lá số tử vi cho người mới: 7 bước dễ hiểu",
     metaDescription: "Hướng dẫn cách đọc lá số tử vi cho người mới theo 7 bước: Mệnh Thân, 12 cung, chính tinh, phụ tinh, trạng thái sao, đại vận và vận năm.",
     canonicalUrl: "/kien-thuc-tu-vi/cach-doc-la-so-tu-vi-cho-nguoi-moi",
@@ -1268,7 +1268,7 @@ ${cta}`,
     ],
     content: `Cách đọc lá số tử vi cho người mới nên đi từ tổng quan đến chi tiết. Nếu đọc ngay từng sao nhỏ, bạn rất dễ rối và khó biết phần nào quan trọng. Một quy trình rõ ràng sẽ giúp lời luận dễ hiểu hơn, đặc biệt với người mới lập lá số lần đầu.
 
-![Minh họa 7 bước đọc lá số tử vi cho người mới](/articles/cach-doc-la-so-tu-vi-cho-nguoi-moi.svg)
+![Minh họa 7 bước đọc lá số tử vi cho người mới](/articles/cach-doc-la-so-tu-vi-cho-nguoi-moi.webp)
 
 ## Bước 1: Kiểm tra thông tin sinh
 
@@ -1297,16 +1297,16 @@ ${cta}`,
     slug: "cung-phu-the-trong-tu-vi",
     excerpt: "Cung Phu Thê phản ánh xu hướng hôn nhân, cách chọn người đồng hành, bài học trong quan hệ và điều cần lưu ý khi đọc lá số.",
     focusKeyword: "cung phu thê",
-    coverImage: "/articles/cung-phu-the-trong-tu-vi.svg",
+    coverImage: "/articles/cung-phu-the-trong-tu-vi.webp",
     coverAlt: "Minh họa cung Phu Thê trong tử vi về hôn nhân và người đồng hành",
-    ogImage: "/articles/cung-phu-the-trong-tu-vi.svg",
+    ogImage: "/articles/cung-phu-the-trong-tu-vi.webp",
     metaTitle: "Cung Phu Thê trong tử vi: Hôn nhân và người đồng hành",
     metaDescription: "Tìm hiểu Cung Phu Thê trong tử vi, cách đọc xu hướng hôn nhân, người đồng hành, bài học trong quan hệ và cách ứng dụng cân bằng.",
     canonicalUrl: "/kien-thuc-tu-vi/cung-phu-the-trong-tu-vi",
     date: "2026-06-03",
     content: `Cung Phu Thê trong tử vi thường được quan tâm vì liên quan đến hôn nhân, người đồng hành và cách một người xây dựng quan hệ lâu dài. Tuy vậy, cung này không nên dùng để kết luận cứng về việc "tốt" hay "xấu" trong tình cảm.
 
-![Minh họa cung Phu Thê trong tử vi về hôn nhân và người đồng hành](/articles/cung-phu-the-trong-tu-vi.svg)
+![Minh họa cung Phu Thê trong tử vi về hôn nhân và người đồng hành](/articles/cung-phu-the-trong-tu-vi.webp)
 
 ## Cung Phu Thê cho biết điều gì?
 
@@ -1327,9 +1327,9 @@ ${cta}`,
     slug: "cung-tat-ach-trong-tu-vi",
     excerpt: "Cung Tật Ách giúp nhận diện xu hướng sức khỏe, áp lực tinh thần, thói quen cần điều chỉnh và cách đọc sao theo hướng chủ động.",
     focusKeyword: "cung tật ách",
-    coverImage: "/articles/cung-tat-ach-trong-tu-vi.svg",
+    coverImage: "/articles/cung-tat-ach-trong-tu-vi.webp",
     coverAlt: "Minh họa cung Tật Ách trong tử vi về sức khỏe tinh thần và nhịp sống",
-    ogImage: "/articles/cung-tat-ach-trong-tu-vi.svg",
+    ogImage: "/articles/cung-tat-ach-trong-tu-vi.webp",
     metaTitle: "Cung Tật Ách trong tử vi: Sức khỏe và điều cần lưu ý",
     metaDescription: "Tìm hiểu Cung Tật Ách trong tử vi, cách đọc xu hướng sức khỏe, áp lực tinh thần và các lưu ý thực tế khi xem lá số cá nhân.",
     canonicalUrl: "/kien-thuc-tu-vi/cung-tat-ach-trong-tu-vi",
@@ -1342,7 +1342,7 @@ ${cta}`,
     ],
     content: `Cung Tật Ách trong tử vi liên quan đến sức khỏe, áp lực tinh thần, thói quen sinh hoạt và những điểm cần thận trọng. Đây là cung nên đọc với thái độ bình tĩnh, tránh tự hù dọa bản thân bằng các kết luận cực đoan.
 
-![Minh họa cung Tật Ách trong tử vi về sức khỏe tinh thần và nhịp sống](/articles/cung-tat-ach-trong-tu-vi.svg)
+![Minh họa cung Tật Ách trong tử vi về sức khỏe tinh thần và nhịp sống](/articles/cung-tat-ach-trong-tu-vi.webp)
 
 ## Cung Tật Ách nên được hiểu thế nào?
 
@@ -1363,16 +1363,16 @@ ${cta}`,
     slug: "cung-thien-di-trong-tu-vi",
     excerpt: "Cung Thiên Di cho biết cách một người bước ra bên ngoài, giao tiếp xã hội, đi xa, gặp cơ hội và xử lý môi trường lạ.",
     focusKeyword: "cung thiên di",
-    coverImage: "/articles/cung-thien-di-trong-tu-vi.svg",
+    coverImage: "/articles/cung-thien-di-trong-tu-vi.webp",
     coverAlt: "Minh họa cung Thiên Di trong tử vi về ra ngoài giao tiếp và cơ hội bên ngoài",
-    ogImage: "/articles/cung-thien-di-trong-tu-vi.svg",
+    ogImage: "/articles/cung-thien-di-trong-tu-vi.webp",
     metaTitle: "Cung Thiên Di trong tử vi: Giao tiếp, đi xa và cơ hội",
     metaDescription: "Tìm hiểu Cung Thiên Di trong tử vi, cách đọc khả năng giao tiếp, đi xa, cơ hội bên ngoài và những điều cần lưu ý khi nhập cuộc xã hội.",
     canonicalUrl: "/kien-thuc-tu-vi/cung-thien-di-trong-tu-vi",
     date: "2026-06-05",
     content: `Cung Thiên Di trong tử vi phản ánh cách một người bước ra bên ngoài: giao tiếp, gặp người lạ, di chuyển, đi xa, làm việc với môi trường mới và nắm bắt cơ hội ngoài phạm vi quen thuộc.
 
-![Minh họa cung Thiên Di trong tử vi về ra ngoài giao tiếp và cơ hội bên ngoài](/articles/cung-thien-di-trong-tu-vi.svg)
+![Minh họa cung Thiên Di trong tử vi về ra ngoài giao tiếp và cơ hội bên ngoài](/articles/cung-thien-di-trong-tu-vi.webp)
 
 ## Cung Thiên Di cho biết điều gì?
 
@@ -1394,9 +1394,9 @@ ${cta}`,
     categoryId: "cat-nhap-mon",
     excerpt: "Hướng dẫn tạo lá số tử vi cho người mới: cần ngày sinh, giờ sinh, giới tính, lịch sinh nào và nên đọc kết quả theo thứ tự nào để tránh hiểu sai.",
     focusKeyword: "tạo lá số tử vi",
-    coverImage: "/articles/tao-la-so-tu-vi.svg",
+    coverImage: "/articles/tao-la-so-tu-vi.webp",
     coverAlt: "Minh họa tạo lá số tử vi với biểu mẫu ngày giờ sinh và bàn lá số 12 cung",
-    ogImage: "/articles/tao-la-so-tu-vi.svg",
+    ogImage: "/articles/tao-la-so-tu-vi.webp",
     metaTitle: "Tạo lá số tử vi: Cách chuẩn bị ngày giờ sinh cho đúng",
     metaDescription: "Tìm hiểu cách tạo lá số tử vi đúng hơn: cần ngày sinh, giờ sinh, giới tính, lịch âm hay dương, vì sao sai giờ sinh làm lệch cung sao và nên đọc kết quả theo thứ tự nào.",
     canonicalUrl: "/kien-thuc-tu-vi/tao-la-so-tu-vi",
@@ -1417,7 +1417,7 @@ ${cta}`,
     ],
     content: `Tạo lá số tử vi thường là bước đầu tiên của người mới khi muốn hiểu bản thân, công việc, tình cảm hoặc nhịp vận của một giai đoạn. Nhưng nhiều người nhập dữ liệu rất nhanh rồi đọc kết quả theo cảm tính, nên dễ gặp tình trạng: cùng một lá số mà thấy câu nào cũng đúng một ít, còn phần quan trọng thì lại không biết bắt đầu từ đâu.
 
-![Minh họa tạo lá số tử vi với biểu mẫu ngày giờ sinh và bàn lá số 12 cung](/articles/tao-la-so-tu-vi.svg)
+![Minh họa tạo lá số tử vi với biểu mẫu ngày giờ sinh và bàn lá số 12 cung](/articles/tao-la-so-tu-vi.webp)
 
 Muốn việc tạo lá số tử vi có ích, bạn không cần học hết tử vi ngay từ đầu. Điều cần hơn là chuẩn bị đúng dữ liệu đầu vào, hiểu vì sao mỗi trường thông tin lại quan trọng, rồi đọc kết quả theo thứ tự hợp lý. Nếu bạn chưa nắm nền tảng, hãy xem thêm bài [lá số tử vi là gì](/kien-thuc-tu-vi/la-so-tu-vi-la-gi) và [cách đọc lá số tử vi cho người mới](/kien-thuc-tu-vi/cach-doc-la-so-tu-vi-cho-nguoi-moi) để có khung nhìn rõ hơn.
 
@@ -1498,11 +1498,11 @@ ${cta}`,
     categoryId: "cat-nhap-mon",
     excerpt: "Hướng dẫn lập lá số tử vi chuẩn cho người mới: cần chuẩn bị ngày sinh, giờ sinh, giới tính, loại lịch nào và cách kiểm tra độ sát của kết quả trước khi đọc sâu.",
     focusKeyword: "lập lá số tử vi chuẩn",
-    coverImage: "/articles/lap-la-so-tu-vi-chuan.png",
+    coverImage: "/articles/lap-la-so-tu-vi-chuan.webp",
     coverAlt: "Minh họa lập lá số tử vi chuẩn với biểu mẫu ngày giờ sinh và bàn lá số 12 cung",
     metaTitle: "Lập lá số tử vi chuẩn: Chuẩn bị ngày giờ sinh thế nào?",
     metaDescription: "Hướng dẫn lập lá số tử vi chuẩn: cần ngày sinh, giờ sinh, giới tính, loại lịch nào, vì sao sai giờ sinh làm lệch Mệnh - Thân và cách kiểm tra kết quả.",
-    ogImage: "/articles/lap-la-so-tu-vi-chuan.png",
+    ogImage: "/articles/lap-la-so-tu-vi-chuan.webp",
     ogTitle: "Lập lá số tử vi chuẩn: kiểm tra ngày giờ sinh trước khi đọc sâu",
     ogDescription: "Bảng kiểm dễ hiểu giúp bạn chuẩn bị dữ liệu sinh, tránh nhập sai lịch hoặc giờ sinh trước khi tạo lá số tử vi.",
     canonicalUrl: "/kien-thuc-tu-vi/lap-la-so-tu-vi-chuan",
@@ -1523,7 +1523,7 @@ ${cta}`,
     ],
     content: `Lập lá số tử vi chuẩn là nhu cầu rất thực tế của người mới: ai cũng muốn xem lá số của mình sát hơn, nhưng lại không chắc phải chuẩn bị ngày giờ sinh, giới tính, lịch sinh và cách đọc kết quả ra sao. Chỉ một chi tiết nhập sai cũng có thể làm phần Mệnh - Thân, vị trí cung hoặc cách an sao kém khớp với đời thật.
 
-![Minh họa lập lá số tử vi chuẩn với biểu mẫu ngày giờ sinh và bàn lá số 12 cung](/articles/lap-la-so-tu-vi-chuan.png)
+![Minh họa lập lá số tử vi chuẩn với biểu mẫu ngày giờ sinh và bàn lá số 12 cung](/articles/lap-la-so-tu-vi-chuan.webp)
 
 Vì vậy, bài này không hứa rằng lá số sẽ "nói đúng mọi thứ". Mục tiêu là giúp bạn giảm sai số đầu vào, biết cách kiểm tra độ tin cậy của lá số vừa tạo, và chọn đúng bước đọc tiếp theo. Nếu làm kỹ từ đầu, phần tổng quan miễn phí và các bài luận sâu phía sau sẽ có nền vững hơn.
 

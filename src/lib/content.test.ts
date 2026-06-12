@@ -37,7 +37,7 @@ describe("SEO content cluster", () => {
     const coverImages = new Set<string>();
 
     for (const article of seedArticles) {
-      expect(article.coverImage, `${article.slug} should have a local thumbnail`).toMatch(/^\/articles\/.+\.(svg|png)$/);
+      expect(article.coverImage, `${article.slug} should have a local thumbnail`).toMatch(/^\/articles\/.+\.(svg|png|webp)$/);
       expect(article.ogImage, `${article.slug} should use the same image for social sharing`).toBe(article.coverImage);
       expect(article.coverAlt, `${article.slug} should have descriptive alt text`).toMatch(/^Minh họa .{24,}$/);
       expect(article.coverAlt, `${article.slug} alt should not contain mojibake`).not.toMatch(/Ã|Â|á»|Ä|Æ|�|\?/);
@@ -53,8 +53,8 @@ describe("SEO content cluster", () => {
   it("uses a dedicated raster SEO cover for the precise chart setup article", () => {
     const preciseSetup = seedArticles.find((article) => article.slug === "lap-la-so-tu-vi-chuan");
 
-    expect(preciseSetup?.coverImage).toBe("/articles/lap-la-so-tu-vi-chuan.png");
-    expect(preciseSetup?.ogImage).toBe("/articles/lap-la-so-tu-vi-chuan.png");
+    expect(preciseSetup?.coverImage).toBe("/articles/lap-la-so-tu-vi-chuan.webp");
+    expect(preciseSetup?.ogImage).toBe("/articles/lap-la-so-tu-vi-chuan.webp");
     expect(preciseSetup?.coverAlt).toContain("lập lá số tử vi chuẩn");
     expect(preciseSetup?.coverAlt).toContain("ngày giờ sinh");
     expect(preciseSetup?.coverAlt).toContain("bàn lá số 12 cung");
