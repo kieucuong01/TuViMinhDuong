@@ -2,9 +2,9 @@ import { type TuViChart } from "@/lib/chart";
 import { generateWithLlmRouter, hasExternalLlmProvider } from "@/lib/llm-router";
 import { FEATURE_PRICES, type ReadingKey } from "@/lib/pricing";
 
-export const FREE_OVERVIEW_MIN_WORDS = 1200;
-export const FREE_OVERVIEW_MAX_WORDS = 2000;
-export const FREE_OVERVIEW_MAX_TOKENS = 7000;
+export const FREE_OVERVIEW_MIN_WORDS = 900;
+export const FREE_OVERVIEW_MAX_WORDS = 1200;
+export const FREE_OVERVIEW_MAX_TOKENS = 4500;
 export const PAID_READING_CHAPTER_MAX_TOKENS = 7000;
 export const FREE_OVERVIEW_VERSION = "free-overview-llm-v3";
 export const PAID_READING_VERSION = "paid-reading-chapters-v3";
@@ -697,7 +697,7 @@ Yêu cầu:
 - Đây là 1 prompt duy nhất cho bản miễn phí; hãy tự tổng hợp đủ thông tin từ dữ liệu đã cấp.
 - Không hứa chắc kết quả, không dọa nạt.
 - BẮT BUỘC viết từ ${FREE_OVERVIEW_MIN_WORDS} đến ${FREE_OVERVIEW_MAX_WORDS} từ tiếng Việt, không được trả lời ngắn và không vượt quá ${FREE_OVERVIEW_MAX_WORDS} từ.
-- Mỗi mục chính tối thiểu 220 từ, có nội dung thực tế dựa trên lá số.
+- Mỗi mục chính tối thiểu 150 từ, có nội dung thực tế dựa trên lá số.
 - Đây là bản miễn phí: chỉ nêu tổng quan và gợi ý đọc lá số, không luận chi tiết đủ 12 cung.
 - Ngay sau heading "## Tổng quan miễn phí", viết một cụm "Tóm tắt nhanh" gồm đúng 3 bullet sau, dùng đúng nhãn Markdown:
   - **Điểm nổi bật:** nêu 1 điểm sáng chính của lá số, có dẫn chứng từ Mệnh/Thân/cục hoặc đại vận.
@@ -722,38 +722,46 @@ QUY TẮC ĐỘ DÀI BẮT BUỘC GHI ĐÈ MỌI DÒNG KHÁC:
 export function buildInstantFreeOverview(chart: TuViChart) {
   const menhPalace = chart.palaces.find((item) => item.name === "Mệnh");
   const thanPalace = palaceByName(chart, "Thân");
+  const quanPalace = palaceByName(chart, "Quan Lộc");
+  const taiPalace = palaceByName(chart, "Tài Bạch");
+  const decade = compactDecadeContext(chart);
   const menhStars = menhPalace ? starsWithStates(chart, menhPalace.mainStars, menhPalace.name, "vô chính diệu") : "đang cập nhật";
   const thanStars = thanPalace ? starsWithStates(chart, thanPalace.mainStars, thanPalace.name, "vô chính diệu") : "đang cập nhật";
+  const quanStars = quanPalace ? starsWithStates(chart, [...quanPalace.mainStars, ...quanPalace.supportStars].slice(0, 5), quanPalace.name, "đang cập nhật") : "đang cập nhật";
+  const taiStars = taiPalace ? starsWithStates(chart, [...taiPalace.mainStars, ...taiPalace.supportStars].slice(0, 5), taiPalace.name, "đang cập nhật") : "đang cập nhật";
+  const summary = chart.summary.join(" ");
+  const firstSignal = chart.summary[0] || `Mệnh ${chart.menh}, Thân ${chart.than} và ${chart.cuc} là trục chính cần đọc trước.`;
+  const viewerAddress = chart.input.gender === "female" ? "chị/bạn" : "anh/bạn";
 
   return `## Tổng quan miễn phí
-Lá số của ${chart.input.fullName} được lập theo năm xem ${chart.input.viewYear}. Phần miễn phí này giúp bạn nắm hướng đọc chính trước khi đi sâu vào từng cung và từng vận.
+Lá số của ${chart.input.fullName} được lập theo năm xem ${chart.input.viewYear}. Phần miễn phí này là bản định hướng ban đầu: đọc để biết trục nào nên ưu tiên, vùng nào cần đi chậm, và khi mở bản luận sâu thì nên bắt đầu từ đâu. Bản này không thay cho luận giải toàn bộ, nhưng vẫn đủ để ${viewerAddress} có một cái nhìn rõ trước khi đọc tiếp.
 
-${chart.summary.join(" ")}
+${summary}
 
 Tóm tắt nhanh:
-- **Điểm nổi bật:** ${chart.summary[0] || `Mệnh ${chart.menh}, Thân ${chart.than} và ${chart.cuc} là trục chính cần đọc trước.`}
-- **Nên ưu tiên:** đọc Mệnh, Thân và đại vận hiện tại để hiểu nhịp hành động trong năm ${chart.input.viewYear}.
-- **Cần lưu ý:** dùng phần này như bản định hướng để quản trị rủi ro, không xem như kết luận tuyệt đối.
+- **Điểm nổi bật:** ${firstSignal}
+- **Nên ưu tiên:** đọc Mệnh, Thân và đại vận hiện tại trước, rồi mới đi vào từng cung như Quan Lộc, Tài Bạch, Phu Thê hoặc Tật Ách.
+- **Cần lưu ý:** mọi tín hiệu trong tử vi nên dùng như bản đồ tham khảo để quản trị lựa chọn, không xem như kết luận tuyệt đối về tương lai.
 
 ## Mệnh và Thân nói gì
-- **Khí chất chính:** Mệnh thuộc ${chart.menh}, cục là ${chart.cuc}, âm dương là ${chart.amDuong}.
-- **Cung Mệnh:** có ${menhStars}. Đây là nhóm tín hiệu dùng để đọc khí chất, cách phản ứng và xu hướng phát triển ban đầu.
-- **Cung Thân:** ${chart.than} có ${thanStars}. Thân thường cho thấy môi trường hành động rõ hơn khi trưởng thành.
+**Khí chất chính** của lá số nằm ở Mệnh ${chart.menh}, Cục ${chart.cuc}, bản mệnh ${chart.banMenh} và thế âm dương ${chart.amDuong}. Cung Mệnh có ${menhStars}; đây là lớp tín hiệu đầu tiên để đọc cách phản ứng, khí chất tự nhiên và kiểu năng lượng người này dễ mang vào các quyết định quan trọng. Nếu Mệnh có tín hiệu căng, nên hiểu đó là lời nhắc về cách dùng sức, chọn môi trường và giữ nhịp ổn định.
+
+Cung Thân ở ${chart.than} có ${thanStars}. Thân thường thể hiện rõ hơn sau khi người đọc đã bước vào tuổi trưởng thành, khi trách nhiệm, nghề nghiệp và các mối quan hệ thực tế bắt đầu định hình. Vì vậy, khi đọc lá số này không nên chỉ hỏi "mình là người thế nào", mà nên hỏi thêm "mình phát huy tốt trong bối cảnh nào, với nhịp nào, cùng kiểu người nào". Đại vận hiện tại là ${decade.current}; đây là nền quan trọng để nối Mệnh và Thân với câu chuyện năm ${chart.input.viewYear}.
 
 ## Điểm mạnh dễ phát huy
-- **Điểm nên phát huy:** những việc có kế hoạch rõ, làm từng bước và có kiểm chứng.
-- **Nhịp làm việc:** khi đã chọn được hướng chính, bạn dễ ổn định hơn nếu giữ nhịp đều.
-- **Vùng có thể mở rộng:** các cung sáng trong lá số nên được xem như nơi có thể chủ động đầu tư thêm thời gian và nguồn lực.
+**Điểm nên phát huy** của lá số này là khả năng đi đường dài khi mục tiêu được chia nhỏ và có mốc kiểm chứng. Với trục Mệnh - Thân - Cục như trên, người đọc nên ưu tiên việc có cấu trúc, có lịch rõ, có người phản hồi đáng tin và có tiêu chuẩn đo tiến triển. Khi chưa chắc hướng, đừng vội mở quá nhiều nhánh; hãy chọn một việc quan trọng, thử trong phạm vi nhỏ, rồi mới tăng cam kết.
+
+Về công việc, cung Quan Lộc có tín hiệu ${quanStars}. Đây không phải kết luận nghề nghiệp cố định, nhưng là gợi ý rằng khi đọc sâu nên chú ý đến môi trường làm việc, vai trò phù hợp và cách ra quyết định dưới áp lực. Về tiền bạc, cung Tài Bạch có ${taiStars}; phần này nên đọc theo hướng quản trị dòng tiền, cách tích lũy và cách kiểm tra rủi ro trước khi đầu tư hoặc vay mượn.
 
 ## Điều nên lưu ý
-- **Điều cần quản trị:** tử vi nên được dùng như bản tham khảo để quản trị rủi ro, không phải kết luận tuyệt đối.
-- **Khi gặp sao hãm hoặc vận khó:** nên hiểu đó là lời nhắc để làm chậm lại, kiểm tra kỹ tiền bạc, giấy tờ và quan hệ.
-- **Trước quyết định lớn:** tránh hành động khi cảm xúc đang mạnh hoặc thông tin chưa đủ rõ.
+**Điều cần quản trị** là xu hướng nhìn lá số như một câu trả lời cuối cùng. Cách đọc tốt hơn là xem mỗi tín hiệu như một câu hỏi thực tế: việc gì đang thuận để làm kỹ hơn, việc gì cần thêm dữ liệu, việc gì nên chậm lại để tránh sai vì cảm xúc. Nếu gặp sao hãm, vận căng hoặc cung có nhiều dấu hiệu xung đột, không nên hiểu là "xấu chắc chắn"; hãy xem đó là lời nhắc đặt quy trình, kiểm tra giấy tờ, quản trị tiền bạc và giữ khoảng nghỉ trước quyết định lớn.
+
+Trong quan hệ và gia đình, lá số cũng nên được đọc bằng giọng bình tĩnh. Không dùng một cung hay một sao để phán xét người khác. Nếu muốn đọc sâu về tình cảm, nên xem Phu Thê, Phúc Đức, Mệnh, Thân và vận hiện tại cùng nhau. Với sức khỏe, Tật Ách chỉ là lời nhắc về nhịp sống và áp lực, không thay thế tư vấn y tế.
 
 ## Gợi ý cho năm ${chart.input.viewYear}
-- **Ưu tiên:** việc có nền tảng, có người hỗ trợ và có kế hoạch dự phòng.
-- **Cách thử việc mới:** nên thử nhỏ trước, sau đó mới mở rộng.
-- **Gợi ý đọc tiếp:** nếu muốn đọc sâu hơn, nên xem tiếp phần luận giải toàn bộ để nối Mệnh, Thân, 12 cung và vận hạn thành một bức tranh đầy đủ hơn.`;
+Năm ${chart.input.viewYear} nên được đọc trên nền tuổi xem ${decade.currentAge} và đại vận ${decade.current}. **Ưu tiên** là những việc có nền tảng, có người hỗ trợ, có kế hoạch dự phòng và có thời điểm rà soát lại. Nếu đang định đổi việc, đầu tư hoặc mở rộng kinh doanh, nên chia thành từng bước: thu thập thông tin, thử nhỏ, kiểm chứng, rồi mới cam kết lớn.
+
+**Gợi ý đọc tiếp:** nếu chỉ cần định hướng nhanh, hãy quay lại phần bản đồ 12 cung phía trên và xem kỹ Mệnh, Thân, Quan Lộc, Tài Bạch. Nếu muốn hiểu đầy đủ hơn, bản luận giải toàn bộ sẽ nối Mệnh, Thân, 12 cung, đại vận và vận năm thành một mạch đọc liền, giúp phân biệt đâu là lợi thế nên phát huy, đâu là rủi ro cần quản trị và đâu là việc nên ưu tiên trong năm ${chart.input.viewYear}.`;
 }
 
 export async function generateFreeOverview(chart: TuViChart) {

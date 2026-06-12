@@ -1,13 +1,14 @@
 #!/usr/bin/env node
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import { extractSeedArticleSlugs } from "../seo/seo-autopilot-core.mjs";
 
 const REPO_ROOT = fileURLToPath(new URL("../..", import.meta.url));
 const CONTENT_PATH = resolve(REPO_ROOT, "src/lib/content.ts");
 const SEO_STATE_PATH = resolve(REPO_ROOT, "docs/seo-autopilot/state.json");
 const PRODUCT_MARKETING_PATH = resolve(REPO_ROOT, ".agents/product-marketing.md");
+const TRAFFIC_REPORTS_DIR = resolve(REPO_ROOT, "docs/traffic-autopilot/reports");
 const SITE_URL = "https://lasotinhhoa.vn";
 const MARKETINGSKILLS_SOURCE = "coreyhaines31/marketingskills";
 
@@ -53,40 +54,106 @@ export function pickTrafficArticle({ existingSlugs = [], preferredSlug, seoState
 
 export function buildSocialDistribution({ article } = {}) {
   const selected = article || pickTrafficArticle();
-  const utmLink = `${selected.absoluteUrl}?utm_source=organic_social&utm_medium=community&utm_campaign=traffic_autopilot`;
+  const shortVideoPack = buildShortVideoPack({ article: selected });
 
   return [
     {
-      channel: "facebook-zalo-community",
+      channel: "tiktok-short",
       link: selected.url,
-      copy:
-        `Mot loi nhac nho nho khi xem tu vi: dung doc tung sao rieng le, hay dat no trong boi canh cung, gio sinh va van han. ` +
-        `Minh vua tong hop mot bai ngan ve "${selected.title}" de nguoi moi doc de hon: ${utmLink}. ` +
-        `Neu muon doi chieu voi la so ca nhan, co the lap mien phi tai /#lap-la-so.`,
+      platform: "TikTok",
+      copy: shortVideoPack.platformCaptions.tiktok,
+      script: shortVideoPack.script,
       checklist: [
-        "Dang vao nhom phu hop va co noi dung trao doi that, khong spam nhieu nhom trong cung mot ngay.",
-        "Tra loi binh luan bang giai thich chung, khong hua chac ket qua doi tuong ca nhan.",
+        "Dang dang video doc/ghi man hinh doc tu nhien, khong can san xuat cau ky.",
+        "Pin comment voi link bio hoac URL ngan ve trang lap la so.",
+        "Khong dung ngon tu cam ket van menh, tien bac, hon nhan, suc khoe.",
       ],
     },
     {
-      channel: "short-video",
+      channel: "youtube-shorts",
       link: selected.url,
-      script: [
-        `Hook 3s: Neu ban moi lap la so, dung voi ket luan chi tu mot sao hoac mot cung.`,
-        `Than bai 20s: Neu muon doc "${selected.title}", hay kiem tra 3 lop: thong tin sinh co dung khong, cung nao dang xet, va co sao/phu tinh nao lam doi nghia khong.`,
-        `CTA 5s: Doc bai tai ${selected.url}, sau do thu lap la so rieng tai /#lap-la-so de doi chieu boi canh.`,
+      platform: "YouTube Shorts",
+      copy: shortVideoPack.platformCaptions.youtubeShorts,
+      script: shortVideoPack.script,
+      checklist: [
+        "Dat title ngan duoi 100 ky tu, co y dinh tim kiem ro.",
+        "Them related link ve bai kien thuc hoac landing lap la so khi kenh du dieu kien.",
+        "Theo doi engaged views thay vi chi nhin raw views.",
       ],
-      checklist: ["Dung caption ngan, them link bai viet, khong dung ngon tu khang dinh so menh."],
     },
     {
-      channel: "internal-link-flow",
+      channel: "facebook-reels",
+      link: selected.url,
+      platform: "Facebook Reels",
+      copy: shortVideoPack.platformCaptions.facebookReels,
+      script: shortVideoPack.script,
+      checklist: [
+        "Dang lai ban clean, khong watermark TikTok.",
+        "Caption them cau hoi de keo comment that.",
+        "Dat link trong comment dau tien hoac bio/page CTA.",
+      ],
+    },
+    {
+      channel: "website-cta-flow",
       link: selected.url,
       copy:
-        `Khi co bai moi hoac bai dang co impression, them 1-2 link noi bo tu hub kien thuc hoac bai lien quan den ${selected.url}. ` +
-        `Anchor nen tu nhien, uu tien cau hoi nguoi doc dang co, va ket bai dat CTA gon den /#lap-la-so.`,
-      checklist: ["Chi sua link neu bai lien quan that su.", "Khong nhoi anchor trung khop qua 2 lan."],
+        `Moi video short nen co mot duong ve website: link bio/page, comment ghim, hoac caption ngan den ${selected.url}. ` +
+        `Trang dich chinh van la /#lap-la-so de nguoi xem lap la so mien phi ngay sau khi xem.`,
+      checklist: ["Gan UTM rieng cho tung nen tang.", "Khong tao landing moi neu trang lap la so hien tai da du dung."],
     },
   ];
+}
+
+export function buildShortVideoPack({ article } = {}) {
+  const selected = article || pickTrafficArticle();
+  const landingUrl = `${SITE_URL}/#lap-la-so`;
+  const articleUrl = selected.absoluteUrl;
+
+  return {
+    phase: "organic-short-video",
+    goal: "Keo nguoi xem tu video ngan ve website de lap la so mien phi.",
+    format: {
+      aspectRatio: "9:16",
+      targetLengthSeconds: "20-35",
+      structure: ["Hook 0-3s", "One idea 3-18s", "Example 18-27s", "CTA 27-35s"],
+      productionRule: "Dung mot script goc, xuat 3 caption/CTA rieng cho TikTok, YouTube Shorts, Facebook Reels.",
+    },
+    sourceArticle: selected,
+    landingUrl,
+    articleUrl,
+    script: [
+      "Hook 3s: Neu ban moi xem la so, dung voi ket luan chi tu mot sao hoac mot cung.",
+      `Than bai 15s: Voi chu de "${selected.title}", hay kiem tra 3 lop: thong tin sinh co dung khong, cung nao dang xet, va co sao/phu tinh nao lam doi nghia khong.`,
+      "Vi du 7s: Cung co mot dau hieu, nhung khac gio sinh hoac khac boi canh thi cach doc se khac.",
+      "CTA 5s: Vao website lap la so mien phi, roi doi chieu voi bai huong dan thay vi doan bang mot cau.",
+    ],
+    shotList: [
+      "Canh 1: mat nguoi noi truc dien hoac text lon tren nen la so mo.",
+      "Canh 2: quay man hinh landing lap la so, che thong tin ca nhan.",
+      "Canh 3: zoom vao mot cum noi dung trong bai viet, them text 'doc theo boi canh'.",
+      "Canh 4: man hinh CTA 'Lap la so mien phi - link bio'.",
+    ],
+    platformCaptions: {
+      tiktok:
+        `Dung doc la so bang mot dau hieu rieng le. Xem boi canh truoc, roi vao link bio lap la so mien phi de doi chieu. ` +
+        `${buildTrackedUrl({ target: landingUrl, source: "tiktok", content: selected.slug })}`,
+      youtubeShorts:
+        `Moi xem la so? Bat dau bang gio sinh, cung dang xet va boi canh sao di kem. Lap la so mien phi: ` +
+        `${buildTrackedUrl({ target: landingUrl, source: "youtube_shorts", content: selected.slug })}`,
+      facebookReels:
+        `Mot la so khong nen doc bang mot sao duy nhat. Neu muon tu doi chieu, vao website lap la so mien phi roi doc tiep bai huong dan: ` +
+        `${buildTrackedUrl({ target: landingUrl, source: "facebook_reels", content: selected.slug })}`,
+    },
+    metrics: [
+      "3-second hold",
+      "average watch time",
+      "completion rate",
+      "profile/bio clicks",
+      "utm sessions",
+      "chart creation starts",
+      "chart creation completes",
+    ],
+  };
 }
 
 export function buildTrafficAutopilotPlan({ now = new Date(), existingSlugs = [], seoState = null } = {}) {
@@ -108,22 +175,24 @@ export function buildTrafficAutopilotPlan({ now = new Date(), existingSlugs = []
       reason: "80/20: one useful traffic action per day, no repeated heavy planning when existing automations already run.",
     },
     trafficChannels: [
-      "SEO content compounding via existing Mon/Wed/Fri publisher",
-      "Organic Facebook/Zalo/community distribution from existing useful articles",
+      "SEO content compounding via the daily 21:00 publisher",
+      "Organic short-video distribution on TikTok, YouTube Shorts, and Facebook Reels",
       "Internal links and compact CTAs toward chart creation",
       "Weekly Search Console and Lighthouse-style regression review",
     ],
     marketingFrameworks: buildMarketingFrameworks({ hasProductMarketingContext }),
+    shortVideoPack: buildShortVideoPack({ article }),
     socialDistribution,
     qualityGate: [
       "People-first content: answer one real reader question and add a next useful action.",
       "No doorway variants, no thin AI rewrites, no one-page-per-keyword spam.",
       "Every social/community task must add context, not only drop a link.",
+      "Short videos must point to a helpful next step on the website, not make guaranteed personal claims.",
       "Use Search Console or repo evidence before refreshing/publishing; report blockers honestly.",
     ],
     hardStops: [
       "Khong tu dong dang bai len Facebook/Zalo/forum khi chua co kenh va chinh sach duoc duyet.",
-      "Khong chay quang cao tra phi hoac dung paid API khi chua co ngan sach va phe duyet ro rang.",
+      "Khong chay quang cao tra phi trong phase video short organic hien tai; ads de phase sau.",
       "Khong tao noi dung hang loat bang cach thay ten sao/cung/tu khoa vao cung mot khung.",
       "Khong sua payment, auth, coin gate, chart engine, date engine trong workflow traffic.",
     ],
@@ -141,9 +210,9 @@ export function buildTrafficAutopilotPlan({ now = new Date(), existingSlugs = []
     return {
       ...basePlan,
       primaryTask:
-        `Theo doi publisher 21:00, chon 1 URL vua publish/refresh hoac ${article.url} de phan phoi lai va them link noi bo neu huu ich.`,
+        `Theo doi publisher 21:00, chon 1 URL vua publish/refresh hoac ${article.url} de bien thanh 1 goi TikTok/YouTube Shorts/Facebook Reels.`,
       why:
-        "Mon/Wed/Fri already have the dedicated SEO publisher; this daily traffic run should not duplicate article generation.",
+        "The dedicated SEO publisher now runs daily; this traffic run should turn useful SEO work into short videos instead of duplicating article generation.",
       commands: ["npm run traffic:autopilot"],
       optionalCommands: ["npm run seo:autopilot:publisher # only if the dedicated publisher automation failed or is disabled"],
     };
@@ -153,7 +222,7 @@ export function buildTrafficAutopilotPlan({ now = new Date(), existingSlugs = []
     return {
       ...basePlan,
       primaryTask:
-        "Doc ket qua Sunday strategy, chon 1 insight can hanh dong: refresh title/meta, them link noi bo, hoac ghi nhan blocker GSC/Lighthouse.",
+        "Doc ket qua Sunday strategy va daily publisher, chon 1 URL hoac insight de bien thanh lich video short cho tuan toi.",
       why:
         "Sunday is for measurement and next-week prioritization; keep it light unless a public SEO regression is visible.",
       commands: ["npm run traffic:autopilot"],
@@ -167,9 +236,9 @@ export function buildTrafficAutopilotPlan({ now = new Date(), existingSlugs = []
   return {
     ...basePlan,
     primaryTask:
-      `Tao 1 goi phan phoi organic cho ${article.url}: community post, short-video outline, va 1 internal-link/CTA task.`,
+      `Tao 1 goi video short organic cho ${article.url}: 1 script goc, 3 caption rieng cho TikTok/YouTube Shorts/Facebook Reels, va CTA ve website.`,
     why:
-      "Non-publisher days should extract more traffic from existing content before creating more pages.",
+      "Current phase prioritizes short-form video to pull new visitors to the website before testing paid ads.",
     commands: ["npm run traffic:autopilot"],
   };
 }
@@ -195,7 +264,7 @@ export function buildMarketingFrameworks({ hasProductMarketingContext = false } 
     },
     appliedPrinciples: [
       "Content strategy: every asset should be searchable, shareable, or both; search traffic remains the foundation.",
-      "Social: repurpose pillar content into standalone content atoms instead of creating disconnected posts from scratch.",
+      "Social: repurpose pillar content into short-video atoms for TikTok, YouTube Shorts, and Facebook Reels.",
       "Free tools: prefer simple tools adjacent to chart creation with immediate value and low maintenance.",
       "Community: provide member value before promotion; no link drops without useful context.",
       "CRO: keep one clear primary CTA and reduce friction toward free chart creation.",
@@ -203,6 +272,11 @@ export function buildMarketingFrameworks({ hasProductMarketingContext = false } 
       "AI SEO: use structured, source-backed, brand-consistent explanations that can be cited, not generic filler.",
     ],
   };
+}
+
+function buildTrackedUrl({ target, source, content }) {
+  const separator = target.includes("?") ? "&" : "?";
+  return `${target}${separator}utm_source=${source}&utm_medium=organic_short_video&utm_campaign=shorts_phase_1&utm_content=${content}`;
 }
 
 export function readExistingArticleSlugs(contentPath = CONTENT_PATH) {
@@ -219,9 +293,71 @@ export function readSeoState(statePath = SEO_STATE_PATH) {
   }
 }
 
+export function createTrafficReport({ plan, reportsDir = TRAFFIC_REPORTS_DIR } = {}) {
+  if (!plan) {
+    throw new Error("createTrafficReport requires a plan.");
+  }
+
+  const reportDate = String(plan.generatedAt || new Date().toISOString()).slice(0, 10);
+  const filePath = resolve(reportsDir, `${reportDate}-${plan.selectedArticle.slug}.md`);
+  mkdirSync(reportsDir, { recursive: true });
+
+  const shortVideoPack = plan.shortVideoPack;
+  const article = plan.selectedArticle;
+  const youtubeTitle = `${article.title} | 3 dieu can kiem tra truoc khi doc la so`;
+  const youtubeCaption =
+    `${shortVideoPack.platformCaptions.youtubeShorts}\n` +
+    `Doc bai goc: ${article.absoluteUrl}`;
+  const facebookCaption =
+    `${shortVideoPack.platformCaptions.facebookReels}\n` +
+    `Cau hoi goi binh luan: Ban hay bi roi o thong tin nao khi moi lap la so?`;
+
+  const lines = [
+    "# Traffic Autopilot Report",
+    `Generated: ${plan.generatedAt}`,
+    `Status: OK`,
+    `Mode: ${plan.mode}`,
+    `Primary task: ${plan.primaryTask}`,
+    `Why: ${plan.why}`,
+    "## Evidence",
+    `- Weekday: ${plan.weekday}`,
+    `- Selected article: ${article.absoluteUrl}`,
+    `- Product context: ${plan.marketingFrameworks.context.available ? "available" : "missing"}`,
+    `- Framework source: ${plan.marketingFrameworks.source}`,
+    "## Ready-To-Record Short Video Pack",
+    `- Source article: ${article.title}`,
+    `- Article URL: ${article.absoluteUrl}`,
+    `- Website CTA: ${shortVideoPack.landingUrl}`,
+    `- Target length: ${shortVideoPack.format.targetLengthSeconds}s`,
+    "### Script",
+    ...shortVideoPack.script.map((line) => `- ${line}`),
+    "### Shot List",
+    ...shortVideoPack.shotList.map((line) => `- ${line}`),
+    "### TikTok Caption",
+    shortVideoPack.platformCaptions.tiktok,
+    "### YouTube Shorts Title",
+    youtubeTitle,
+    "### YouTube Shorts Caption",
+    youtubeCaption,
+    "### Facebook Reels Caption",
+    facebookCaption,
+    "### UTM Links",
+    `- TikTok: ${extractUrl(shortVideoPack.platformCaptions.tiktok)}`,
+    `- YouTube Shorts: ${extractUrl(shortVideoPack.platformCaptions.youtubeShorts)}`,
+    `- Facebook Reels: ${extractUrl(shortVideoPack.platformCaptions.facebookReels)}`,
+    "## Metrics To Watch",
+    ...shortVideoPack.metrics.map((line) => `- ${line}`),
+    "## Next 24h Priority",
+    "Xem publisher toi 21:00 va uu tien dang 1 video native clean len 3 kenh, sau do theo doi UTM sessions va chart creation starts.",
+    "",
+  ];
+
+  writeFileSync(filePath, `${lines.join("\n")}\n`, "utf8");
+  return filePath;
+}
+
 function getModeForWeekday(weekday) {
-  if (["Mon", "Wed", "Fri"].includes(weekday)) return "seo-publisher-followup";
-  if (weekday === "Sun") return "weekly-measurement";
+  if (["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].includes(weekday)) return "seo-publisher-followup";
   return "organic-distribution";
 }
 
@@ -233,13 +369,18 @@ function titleFromSlug(slug) {
     .join(" ");
 }
 
+function extractUrl(text) {
+  return text.match(/https?:\/\/\S+/)?.[0] || "";
+}
+
 function main() {
   const existingSlugs = readExistingArticleSlugs();
   const seoState = readSeoState();
   const plan = buildTrafficAutopilotPlan({ existingSlugs, seoState });
-  process.stdout.write(`${JSON.stringify(plan, null, 2)}\n`);
+  const reportPath = createTrafficReport({ plan });
+  process.stdout.write(`${JSON.stringify({ ...plan, artifacts: { reportPath } }, null, 2)}\n`);
 }
 
-if (process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1])) {
+if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
   main();
 }

@@ -490,7 +490,7 @@ export function buildContentBrief(opportunity) {
   };
 }
 
-export function planSeoAutopilotRun({ snapshot, existingSlugs, keywordRows, searchConsole, articlesPerWeek = 3 }) {
+export function planSeoAutopilotRun({ snapshot, existingSlugs, keywordRows, searchConsole, articlesPerWeek = 7 }) {
   const currentSlugs = new Set(existingSlugs || []);
   const snapshotOpportunities = Array.isArray(snapshot?.opportunities) ? snapshot.opportunities : [];
   const inputKeywordRows = Array.isArray(keywordRows) ? keywordRows : [];
@@ -543,9 +543,10 @@ export function planSeoAutopilotRun({ snapshot, existingSlugs, keywordRows, sear
   };
 }
 
-export function buildWeeklyContentPlan({ opportunities, articlesPerWeek = 3 }) {
+export function buildWeeklyContentPlan({ opportunities, articlesPerWeek = 7 }) {
   const selected = (opportunities?.length ? opportunities : DEFAULT_TOPIC_OPPORTUNITIES).slice(0, articlesPerWeek);
   const stages = ["top", "middle", "conversion-support"];
+  const dayLabels = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
   return {
     strategy: selected.some((topic) => topic.keywordEvidence) ? "semrush-keyword-intent-funnel" : "topic-cluster-funnel",
     articlesPerWeek,
@@ -560,7 +561,7 @@ export function buildWeeklyContentPlan({ opportunities, articlesPerWeek = 3 }) {
       const funnelStage = topic.funnelStage || stages[index] || "top";
       const brief = buildContentBrief({ ...topic, funnelStage });
       return {
-        day: ["Monday", "Wednesday", "Friday"][index] || `Slot ${index + 1}`,
+        day: dayLabels[index] || `Slot ${index + 1}`,
         funnelStage,
         slug: brief.slug,
         focusKeyword: brief.focusKeyword,
@@ -983,7 +984,7 @@ function buildPillarFunnel(clusters) {
     },
     cadence: [
       "Daily audit: refresh live SEO signals, keyword clusters, duplicate-intent risks, and production content gaps.",
-      "Monday/Wednesday/Friday publish: one strong article or material refresh per run, never thin pages just to fill schedule.",
+      "Daily publish: one strong article or material refresh per run, never thin pages just to fill schedule.",
       "Weekly measurement: inspect impressions, clicks, CTR, average position, indexed status, and internal clicks toward /#lap-la-so.",
     ],
     doNotPublishPatterns: [

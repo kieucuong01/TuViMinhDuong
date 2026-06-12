@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-label="Minh họa tử vi tháng 6 năm 2026 theo lá số cá nhân và vận tháng">
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#fff7e6"/><stop offset="0.58" stop-color="#fffaf1"/><stop offset="1" stop-color="#e8f3e6"/></linearGradient>
+    <radialGradient id="glow" cx="76%" cy="34%" r="52%"><stop offset="0" stop-color="#c08a2d" stop-opacity="0.25"/><stop offset="1" stop-color="#c08a2d" stop-opacity="0"/></radialGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="18" stdDeviation="24" flood-color="#3a2a18" flood-opacity="0.18"/></filter>
+  </defs>
+  <rect width="1200" height="675" fill="url(#bg)"/>
+  <rect width="1200" height="675" fill="url(#glow)"/>
+  <path d="M-60 560C160 480 250 650 430 570C620 486 710 604 880 516C1040 432 1120 470 1260 400V735H-60Z" fill="#0f5132" opacity="0.07"/>
+  <g opacity="0.18" stroke="#0f5132" stroke-width="1.2" fill="none">
+    <path d="M80 120c70-60 150-64 228-10M900 92c96 30 160 90 190 180M160 602c160-84 280-68 420 0"/>
+    <circle cx="1010" cy="138" r="82"/><circle cx="1010" cy="138" r="118"/>
+  </g>
+  <g filter="url(#shadow)">
+    <rect x="82" y="98" width="500" height="420" rx="34" fill="#fffdf6" stroke="#c08a2d" stroke-width="3"/>
+    <rect x="130" y="156" width="318" height="46" rx="18" fill="#e8f3e6" stroke="#0f5132" stroke-opacity="0.18"/>
+    <rect x="130" y="228" width="186" height="42" rx="16" fill="#fff8eb" stroke="#0f5132" stroke-opacity="0.18"/>
+    <rect x="340" y="228" width="184" height="42" rx="16" fill="#fff8eb" stroke="#0f5132" stroke-opacity="0.18"/>
+    <rect x="130" y="300" width="394" height="42" rx="16" fill="#e8f3e6" stroke="#0f5132" stroke-opacity="0.18"/>
+    <rect x="164" y="374" width="150" height="120" rx="18" fill="none" stroke="#0f5132" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><path d="M164 408h150" fill="none" stroke="#0f5132" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><path d="M202 360v34M276 360v34" fill="none" stroke="#0f5132" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="209" cy="446" r="10" fill="#0f5132" opacity="0.18"/><circle cx="250" cy="446" r="10" fill="#0f5132" opacity="0.18"/><circle cx="288" cy="470" r="10" fill="#0f5132" opacity="0.18"/>
+    <text x="130" y="116" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#0f5132" opacity="0.72">Lá số tinh hoa</text>
+    <text x="130" y="472" font-family="Arial, sans-serif" font-size="38" font-weight="800" fill="#0f5132">Tử vi tháng 6</text>
+  </g>
+  <g filter="url(#shadow)">
+    <circle cx="835" cy="332" r="230" fill="#fffdf7" stroke="#c08a2d" stroke-width="8"/>
+    <g><circle cx="835" cy="332" r="215.0" fill="none" stroke="#0f5132" stroke-opacity="0.45" stroke-width="2"/><circle cx="835" cy="332" r="154.8" fill="none" stroke="#0f5132" stroke-opacity="0.45" stroke-width="2"/><circle cx="835" cy="332" r="96.8" fill="none" stroke="#0f5132" stroke-opacity="0.45" stroke-width="2"/><circle cx="835" cy="332" r="38.7" fill="none" stroke="#0f5132" stroke-opacity="0.45" stroke-width="2"/><path d="M835 332L835.0 117.0" stroke="#0f5132" stroke-opacity="0.22" stroke-width="1.5"/><path d="M835 332L942.5 145.8" stroke="#0f5132" stroke-opacity="0.22" stroke-width="1.5"/><path d="M835 332L1021.2 224.5" stroke="#0f5132" stroke-opacity="0.22" stroke-width="1.5"/><path d="M835 332L1050.0 332.0" stroke="#0f5132" stroke-opacity="0.22" stroke-width="1.5"/><path d="M835 332L1021.2 439.5" stroke="#0f5132" stroke-opacity="0.22" stroke-width="1.5"/><path d="M835 332L942.5 518.2" stroke="#0f5132" stroke-opacity="0.22" stroke-width="1.5"/><path d="M835 332L835.0 547.0" stroke="#0f5132" stroke-opacity="0.22" stroke-width="1.5"/><path d="M835 332L727.5 518.2" stroke="#0f5132" stroke-opacity="0.22" stroke-width="1.5"/><path d="M835 332L648.8 439.5" stroke="#0f5132" stroke-opacity="0.22" stroke-width="1.5"/><path d="M835 332L620.0 332.0" stroke="#0f5132" stroke-opacity="0.22" stroke-width="1.5"/><path d="M835 332L648.8 224.5" stroke="#0f5132" stroke-opacity="0.22" stroke-width="1.5"/><path d="M835 332L727.5 145.8" stroke="#0f5132" stroke-opacity="0.22" stroke-width="1.5"/><circle cx="882.9" cy="153.4" r="7" fill="#c08a2d" opacity="0.7"/><circle cx="965.7" cy="201.3" r="7" fill="#c08a2d" opacity="0.7"/><circle cx="1013.6" cy="284.1" r="7" fill="#c08a2d" opacity="0.7"/><circle cx="1013.6" cy="379.9" r="7" fill="#c08a2d" opacity="0.7"/><circle cx="965.7" cy="462.7" r="7" fill="#c08a2d" opacity="0.7"/><circle cx="882.9" cy="510.6" r="7" fill="#c08a2d" opacity="0.7"/><circle cx="787.1" cy="510.6" r="7" fill="#c08a2d" opacity="0.7"/><circle cx="704.3" cy="462.7" r="7" fill="#c08a2d" opacity="0.7"/><circle cx="656.4" cy="379.9" r="7" fill="#c08a2d" opacity="0.7"/><circle cx="656.4" cy="284.1" r="7" fill="#c08a2d" opacity="0.7"/><circle cx="704.3" cy="201.3" r="7" fill="#c08a2d" opacity="0.7"/><circle cx="787.1" cy="153.4" r="7" fill="#c08a2d" opacity="0.7"/><path d="M835 306l11 22 25 4-18 17 4 25-22-12-22 12 4-25-18-17 25-4z" fill="#c08a2d"/></g>
+    <circle cx="835" cy="332" r="64" fill="#0f5132" opacity="0.9"/>
+    <path d="M835 280l14 34 37 4-28 24 8 36-31-18-31 18 8-36-28-24 37-4z" fill="#c08a2d"/>
+  </g>
+</svg>

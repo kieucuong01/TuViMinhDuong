@@ -7,6 +7,8 @@ import {
   PAID_READING_CHAPTER_MAX_TOKENS,
   type PaidReadingChapter,
   type PaidReadingGenerationProgress,
+  buildInstantFreeOverview,
+  countWords,
   generateFreeOverview,
   generateReading,
   generateReadingWithProgress,
@@ -238,11 +240,32 @@ describe("AI reading format", () => {
 
     expect(prompt).toContain(String(FREE_OVERVIEW_MIN_WORDS));
     expect(prompt).toContain(String(FREE_OVERVIEW_MAX_WORDS));
+    expect(FREE_OVERVIEW_MIN_WORDS).toBeLessThanOrEqual(900);
+    expect(FREE_OVERVIEW_MAX_WORDS).toBeLessThanOrEqual(1200);
+    expect(FREE_OVERVIEW_MAX_TOKENS).toBeLessThanOrEqual(5000);
     expect(prompt).toContain("1 prompt");
     expect(prompt).toContain("Tóm tắt nhanh");
     expect(prompt).toContain("**Điểm nổi bật:**");
     expect(prompt).toContain("**Cần lưu ý:**");
     expect(prompt).toContain("QUY TẮC ĐỘ DÀI");
+  });
+
+  it("renders a useful instant free overview before the background LLM finishes", () => {
+    const chart = sampleChart("male");
+    const content = buildInstantFreeOverview(chart);
+
+    expect(countWords(content)).toBeGreaterThanOrEqual(600);
+    expect(countWords(content)).toBeLessThanOrEqual(950);
+    expect(content).toContain("## Tổng quan miễn phí");
+    expect(content).toContain("## Mệnh và Thân nói gì");
+    expect(content).toContain("## Điểm mạnh dễ phát huy");
+    expect(content).toContain("## Điều nên lưu ý");
+    expect(content).toContain(`## Gợi ý cho năm ${chart.input.viewYear}`);
+    expect(content).toContain(chart.input.fullName);
+    expect(content).toContain(chart.menh);
+    expect(content).toContain(chart.than);
+    expect(content).not.toContain(PAID_FULL_WORD_TARGET);
+    expect(content).not.toContain("## Luận giải chính");
   });
 
   it("uses the default Groq-first router for free overview", async () => {

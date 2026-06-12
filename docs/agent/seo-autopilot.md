@@ -6,7 +6,7 @@ This workflow lets Codex Automation operate as the SEO Growth Agent for `https:/
 
 Increase qualified organic traffic for the Tu vi site and move readers toward the chart creation flow. The agent may decide what SEO/content/performance work is most valuable, implement safe changes, verify them, and report what changed.
 
-The default publishing target is **3 high-quality articles per week**, not more. If the agent cannot produce useful people-first content for all 3, it should publish fewer and explain why.
+The default publishing target is **1 high-quality article or material refresh per day**. If the agent cannot produce useful people-first content on a given day because of quality, evidence, or verification blockers, it must report the blocker instead of publishing thin content.
 
 ## Autonomy Scope
 
@@ -81,7 +81,7 @@ $env:PATH="C:\Users\ASUS\.cache\codex-runtimes\codex-primary-runtime\dependencie
 npm run seo:autopilot:execute
 ```
 
-For a publisher run that should consider and write only the next production article/refresh, use the token-conscious single-task command:
+For the daily publisher run that should consider and write only the next production article/refresh, use the token-conscious single-task command:
 
 ```powershell
 $env:PATH="C:\Users\ASUS\.cache\codex-runtimes\codex-primary-runtime\dependencies\node\bin;$env:PATH"
@@ -94,7 +94,7 @@ This writes:
 - `docs/seo-autopilot/reports/<date>-<slug>.md`
 - `docs/seo-autopilot/state.json`
 
-For daily traffic growth beyond publishing, use the lightweight Traffic Autopilot coordinator:
+For daily traffic growth beyond publishing, use the lightweight Traffic Autopilot coordinator after the daily publisher:
 
 ```powershell
 $env:PATH="C:\Users\ASUS\.cache\codex-runtimes\codex-primary-runtime\dependencies\node\bin;$env:PATH"
@@ -123,10 +123,10 @@ Goal: improve qualified organic traffic and route readers toward free chart crea
 Start by reading AGENTS.md, docs/agent/quickstart.md, docs/agent/playbooks.md#seo--cms, and docs/agent/seo-autopilot.md.
 
 Then:
-1. Run `npm run seo:autopilot:publisher` for Mon/Wed/Fri publisher runs, or `npm run seo:autopilot:execute` for the Sunday strategy batch.
+1. Run `npm run seo:autopilot:publisher` for daily publisher runs, or `npm run seo:autopilot:execute` for the Sunday strategy batch.
 2. Inspect the generated draft/report and repo SEO/content files only as needed.
-3. For publisher runs, implement at most one selected article/refresh. For Sunday strategy, use plan.weeklyContentPlan as the 3-slot weekly queue unless live evidence points to a higher-impact safe task.
-4. Implement up to 3 SEO/content articles per week without asking first, but never more than one production article/refresh per automation run.
+3. For publisher runs, implement at most one selected article/refresh. For Sunday strategy, use plan.weeklyContentPlan as the 7-slot weekly queue unless live evidence points to a higher-impact safe task.
+4. Implement one SEO/content article or material refresh per day without asking first, but never more than one production article/refresh per automation run.
 5. Each article must follow the brief:
    - target character range from brief.targetCharacterRange
    - at least 5 contextual internal links
@@ -168,17 +168,15 @@ Automation should avoid repeated heavy work. Use the smallest useful loop:
 - Do not run `npm test`, `npm run build`, deploy, or live smoke when no repo/content files changed.
 - Prefer targeted tests and targeted ESLint for touched files; run full build only before release.
 - If GSC, SEMrush, sitemap, and content inventory are unchanged from the latest `docs/seo-autopilot/state.json`, do a short report/skip instead of repeating the same draft.
-- Keep useful repetition: weekly measurement, GSC opportunity checks, and one publish/refresh slot per scheduled publisher run are worth keeping because they catch trend changes and prevent stale content.
+- Keep useful repetition: weekly measurement, GSC opportunity checks, and one daily publish/refresh slot are worth keeping because they catch trend changes and prevent stale content.
 
 ## Suggested Schedule
 
-- Daily 08:00: audit live SEO, keyword clusters, duplicate-intent risk, and content gaps without publishing unless scheduled.
-- Monday 08:00: publish article 1, usually the highest-value pillar/conversion-support topic.
-- Wednesday 08:00: publish article 2, usually middle-funnel explanation/comparison.
-- Friday 08:00: publish article 3, usually conversion-support or practical preparation.
-- Sunday 21:00: measurement report, refresh recommendations, and next-week priorities.
+- Daily 21:00: publish or materially refresh exactly one SEO article when quality and verification pass.
+- Daily 21:20: turn the published/refreshed URL into one TikTok/YouTube Shorts/Facebook Reels pack.
+- Sunday 20:30: measurement report, refresh recommendations, and next-week 7-slot priorities.
 
-Each publish automation should create or update only one production article. Do not batch all 3 articles in one run unless the user explicitly asks for a one-time batch.
+Each publish automation should create or update only one production article. Do not batch multiple articles in one run unless the user explicitly asks for a one-time batch.
 
 ## Level 5 SEO Agent Workflow
 
@@ -234,11 +232,12 @@ Policy basis:
 
 ## Keyword Funnel Strategy
 
-Default weekly batch:
+Default weekly queue:
 
 1. Top funnel: broad informational topic that can earn impressions.
 2. Middle funnel: topic that helps readers understand how to interpret a chart.
 3. Conversion-support: topic that naturally leads to creating a chart or checking a personal case.
+4. Repeat the funnel mix across seven daily slots while avoiding duplicate intent and thin pages.
 
 Measure weekly:
 
@@ -314,7 +313,7 @@ The live site already has working robots, sitemap, canonical metadata, and JSON-
       "approvalRequired": false
     },
     "weeklyContentPlan": {
-      "articlesPerWeek": 3,
+      "articlesPerWeek": 7,
       "strategy": "topic-cluster-funnel",
       "articles": [
         {
@@ -331,4 +330,4 @@ The live site already has working robots, sitemap, canonical metadata, and JSON-
 }
 ```
 
-If the action is `weekly_content_batch`, create or update up to 3 seeded articles, run the listed verification commands, then commit/push/deploy only if verification passes.
+If the action is `weekly_content_batch`, the Sunday strategy may prepare a 7-slot queue, but publisher automation should still create or update only one production article per daily run, then commit/push/deploy only if verification passes.

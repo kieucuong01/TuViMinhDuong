@@ -120,7 +120,7 @@ export default async function ChartPage({
             </>
           ) : (
             <>
-              <FreeOverviewLoader chartId={id} initialOverview={freeOverviewStatus} deferUntilVisible />
+              <FreeOverviewLoader chartId={id} initialOverview={freeOverviewStatus} />
             </>
           )}
         </section>

@@ -16,7 +16,7 @@ description: Use for autonomous SEO/content growth work on lasotinhhoa.vn and th
 
 The user allows SEO Autopilot to choose and implement safe SEO/content improvements, then report after completion.
 
-Default throughput: publish or prepare **3 high-quality articles per week**. Do not exceed this by creating thin content. If quality or evidence is insufficient, publish fewer and report why.
+Default throughput: publish or materially refresh **1 high-quality SEO article per day**. Do not turn this into thin daily output. If quality, evidence, or verification is insufficient, report the blocker instead of publishing filler.
 
 Safe without asking:
 
@@ -47,7 +47,7 @@ For scheduled automation runs that should leave durable artifacts:
 npm run seo:autopilot:execute
 ```
 
-For Mon/Wed/Fri publisher runs, prefer the single-task, summary-output command to save tokens:
+For daily publisher runs, prefer the single-task, summary-output command to save tokens:
 
 ```powershell
 npm run seo:autopilot:publisher
@@ -65,13 +65,13 @@ For the daily traffic coordinator that repurposes SEO work into organic distribu
 npm run traffic:autopilot
 ```
 
-Traffic work should read `.agents/product-marketing.md` and apply the imported `coreyhaines31/marketingskills` subset only as lightweight frameworks: content-strategy, social, community-marketing, free-tools, CRO, analytics, and AI SEO. Keep the daily limit to one primary task.
+Traffic work should read `.agents/product-marketing.md` and apply the imported `coreyhaines31/marketingskills` subset only as lightweight frameworks: content-strategy, social, community-marketing, free-tools, CRO, analytics, and AI SEO. Current traffic phase is organic short-video first: one TikTok/YouTube Shorts/Facebook Reels pack per day, ads later. Keep the daily limit to one primary task.
 
 Then choose the highest-impact safe SEO task, implement it, verify, and report:
 
 - use `plan.nextAction` and `plan.brief` from the command output as the default decision
-- publisher runs should act on one selected article/refresh only; Sunday strategy can inspect the full 3-slot weekly plan
-- daily traffic runs should execute at most one primary follow-up task and must not rerun the Mon/Wed/Fri publisher unless that automation failed or is disabled
+- publisher runs should act on one selected article/refresh only; Sunday strategy can inspect the full 7-slot weekly plan
+- daily traffic runs should execute at most one primary follow-up task and must not rerun the daily publisher unless that automation failed or is disabled
 - Lighthouse CI is weekly/manual; do not run it for every publisher task unless public SEO layout, metadata, structured data, or page experience changed
 - if `nextAction.type` is `weekly_content_batch`, create or update up to 3 seeded articles, then verify
 - each article must follow `brief.targetCharacterRange`, `brief.internalLinkPolicy`, `brief.googleQualityPolicy`, and the funnel stage in `plan.weeklyContentPlan`

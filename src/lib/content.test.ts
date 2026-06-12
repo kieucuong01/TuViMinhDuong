@@ -33,6 +33,33 @@ describe("SEO content cluster", () => {
     expect(preciseSetup?.content).toContain("/kien-thuc-tu-vi/gio-sinh-trong-tu-vi");
   });
 
+  it("uses dedicated SEO images for every public knowledge article", () => {
+    const coverImages = new Set<string>();
+
+    for (const article of seedArticles) {
+      expect(article.coverImage, `${article.slug} should have a local thumbnail`).toMatch(/^\/articles\/.+\.(svg|png)$/);
+      expect(article.ogImage, `${article.slug} should use the same image for social sharing`).toBe(article.coverImage);
+      expect(article.coverAlt, `${article.slug} should have descriptive alt text`).toMatch(/^Minh họa .{24,}$/);
+      expect(article.coverAlt, `${article.slug} alt should not contain mojibake`).not.toMatch(/Ã|Â|á»|Ä|Æ|�|\?/);
+      expect(article.content, `${article.slug} should include the cover as an in-article illustration`).toContain(
+        `![${article.coverAlt}](${article.coverImage})`,
+      );
+      coverImages.add(article.coverImage || "");
+    }
+
+    expect(coverImages.size).toBe(seedArticles.length);
+  });
+
+  it("uses a dedicated raster SEO cover for the precise chart setup article", () => {
+    const preciseSetup = seedArticles.find((article) => article.slug === "lap-la-so-tu-vi-chuan");
+
+    expect(preciseSetup?.coverImage).toBe("/articles/lap-la-so-tu-vi-chuan.png");
+    expect(preciseSetup?.ogImage).toBe("/articles/lap-la-so-tu-vi-chuan.png");
+    expect(preciseSetup?.coverAlt).toContain("lập lá số tử vi chuẩn");
+    expect(preciseSetup?.coverAlt).toContain("ngày giờ sinh");
+    expect(preciseSetup?.coverAlt).toContain("bàn lá số 12 cung");
+  });
+
   it("does not expose SEO implementation notes in public article copy", () => {
     for (const article of seedArticles) {
       expect(article.content).not.toContain("Nguồn tham khảo và kỹ thuật SEO");

@@ -10,8 +10,6 @@ describe("FreeOverviewLoader fast-first flow", () => {
   it("renders fallback content while starting the background overview process", () => {
     expect(loaderSource).toContain('status: "fallback"');
     expect(loaderSource).toContain("/free-overview/process");
-    expect(loaderSource).toContain("deferUntilVisible");
-    expect(loaderSource).toContain("IntersectionObserver");
     expect(loaderSource).toContain("schedulePoll()");
     expect(loaderSource).toContain("free-overview-inline-status");
   });
@@ -21,7 +19,21 @@ describe("FreeOverviewLoader fast-first flow", () => {
     expect(loaderSource).toContain("useState<FreeOverviewState>(() =>");
     expect(chartPageSource).toContain("getFreeOverviewStatus(record.chart)");
     expect(chartPageSource).toContain("initialOverview={freeOverviewStatus}");
-    expect(chartPageSource).toContain("deferUntilVisible");
+    expect(chartPageSource).not.toContain("deferUntilVisible");
+  });
+
+  it("polls with no-store and refreshes the route when the full overview is ready", () => {
+    expect(loaderSource).toContain('import { useRouter } from "next/navigation"');
+    expect(loaderSource).toContain("router.refresh()");
+    expect(loaderSource).toContain('cache: "no-store"');
+    expect(loaderSource).toContain("MAX_POLL_ATTEMPTS = 72");
+  });
+
+  it("lets readers retry failed or stale background overview jobs without reloading", () => {
+    expect(loaderSource).toContain("retryOverview");
+    expect(loaderSource).toContain("Thử viết lại");
+    expect(loaderSource).toContain('state.jobStatus === "stale"');
+    expect(loaderSource).toContain('state.jobStatus === "failed"');
   });
 
   it("has inline status styling for the fast overview state", () => {

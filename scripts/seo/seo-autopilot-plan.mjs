@@ -12,7 +12,7 @@ import {
 const args = parseArgs(process.argv.slice(2));
 const baseUrl = normalizeBaseUrl(args.baseUrl || "https://lasotinhhoa.vn");
 const sampleSize = Number.parseInt(args.sampleSize || "8", 10);
-const articlesPerWeek = clampArticleCount(args.articles || args.articlesPerWeek || "3");
+const articlesPerWeek = clampArticleCount(args.articles || args.articlesPerWeek || "7");
 
 try {
   const snapshot = await buildSnapshot({ baseUrl, sampleSize });
@@ -149,8 +149,8 @@ function parseArgs(values) {
 
 function clampArticleCount(value) {
   const parsed = Number.parseInt(value, 10);
-  if (!Number.isFinite(parsed)) return 3;
-  return Math.min(Math.max(parsed, 1), 3);
+  if (!Number.isFinite(parsed)) return 7;
+  return Math.min(Math.max(parsed, 1), 7);
 }
 
 function keywordSourceLine(result) {

@@ -275,10 +275,19 @@ export const seedArticles = [
     expect(plan.mode).toBe("auto-safe");
     expect(plan.nextAction).toMatchObject({
       type: "weekly_content_batch",
-      slugs: ["sao-tu-vi", "sao-thien-co", "sao-thai-duong"],
       approvalRequired: false,
     });
-    expect(plan.weeklyContentPlan.articles).toHaveLength(3);
+    expect(plan.nextAction.slugs.slice(0, 3)).toEqual(["sao-tu-vi", "sao-thien-co", "sao-thai-duong"]);
+    expect(plan.weeklyContentPlan.articles).toHaveLength(7);
+    expect(plan.weeklyContentPlan.articles.map((item) => item.day)).toEqual([
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+      "Sunday",
+    ]);
     expect(plan.brief.focusKeyword).toBe("sao Tử Vi");
     expect(plan.verificationCommands).toEqual(
       expect.arrayContaining([

@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { MarkdownContent } from "@/components/markdown-content";
 
@@ -22,7 +23,7 @@ type FreeOverviewPayload =
     };
 
 const POLL_DELAY_MS = 2500;
-const MAX_POLL_ATTEMPTS = 24;
+const MAX_POLL_ATTEMPTS = 72;
 
 function initialOverviewState(initialOverview?: FreeOverviewPayload | null): FreeOverviewState {
   if (!initialOverview?.content) return { status: "loading" };
@@ -38,42 +39,28 @@ function initialOverviewState(initialOverview?: FreeOverviewPayload | null): Fre
 export function FreeOverviewLoader({
   chartId,
   initialOverview,
-  deferUntilVisible = false,
 }: {
   chartId: string;
   initialOverview?: FreeOverviewPayload | null;
-  deferUntilVisible?: boolean;
 }) {
+  const router = useRouter();
   const [state, setState] = useState<FreeOverviewState>(() => initialOverviewState(initialOverview));
-  const [shouldStart, setShouldStart] = useState(!deferUntilVisible);
+  const [runKey, setRunKey] = useState(0);
   const rootRef = useRef<HTMLElement | null>(null);
   const setRootNode = (node: HTMLElement | null) => {
     rootRef.current = node;
   };
 
-  useEffect(() => {
-    if (!deferUntilVisible || shouldStart) return;
-    const target = rootRef.current;
-    if (!target || !("IntersectionObserver" in window)) {
-      setShouldStart(true);
-      return;
-    }
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (!entry?.isIntersecting) return;
-        setShouldStart(true);
-        observer.disconnect();
-      },
-      { rootMargin: "650px 0px" },
+  function retryOverview() {
+    setState((current) =>
+      current.status === "fallback"
+        ? { ...current, jobStatus: "processing" as const, error: undefined }
+        : { status: "loading" },
     );
-
-    observer.observe(target);
-    return () => observer.disconnect();
-  }, [deferUntilVisible, shouldStart]);
+    setRunKey((value) => value + 1);
+  }
 
   useEffect(() => {
-    if (!shouldStart) return;
     const controller = new AbortController();
     let processStarted = false;
     let pollAttempts = 0;
@@ -99,6 +86,7 @@ export function FreeOverviewLoader({
       try {
         const response = await fetch(`/api/charts/${encodeURIComponent(chartId)}/free-overview/process`, {
           method: "POST",
+          cache: "no-store",
           signal: controller.signal,
           headers: { accept: "application/json" },
         });
@@ -113,6 +101,7 @@ export function FreeOverviewLoader({
       try {
         const response = await fetch(`/api/charts/${encodeURIComponent(chartId)}/free-overview`, {
           method: "GET",
+          cache: "no-store",
           signal: controller.signal,
           headers: { accept: "application/json" },
         });
@@ -122,6 +111,7 @@ export function FreeOverviewLoader({
         if (payload.status === "ready") {
           clearPollTimer();
           setState({ status: "ready", content: String(payload.content || "") });
+          router.refresh();
           return;
         }
 
@@ -146,18 +136,26 @@ export function FreeOverviewLoader({
       controller.abort();
       clearPollTimer();
     };
-  }, [chartId, shouldStart]);
+  }, [chartId, router, runKey]);
 
   if (state.status === "ready" || state.status === "fallback") {
+    const canRetry = state.status === "fallback" && (state.jobStatus === "stale" || state.jobStatus === "failed");
     return (
       <article ref={setRootNode} className="free-reading-summary">
         {state.status === "fallback" ? (
           <div className="free-overview-inline-status" role="status" aria-live="polite">
-            {!shouldStart
-              ? "Bản tóm tắt nhanh đã sẵn sàng. Bản chi tiết hơn sẽ được viết ở nền khi bạn kéo tới phần này."
-              : state.jobStatus === "failed"
-              ? "Đang hiển thị bản tóm tắt nhanh. Bản chi tiết sẽ được thử lại khi bạn mở lại trang."
-              : "Đang viết bản chi tiết hơn ở nền. Bạn có thể đọc bản tóm tắt này trước."}
+            {state.jobStatus === "failed"
+              ? "Đang hiển thị bản tổng quan nhanh. Bản chi tiết hơn bị gián đoạn và có thể thử viết lại."
+              : state.jobStatus === "stale"
+                ? "Đang hiển thị bản tổng quan nhanh. Job nền trước đó quá lâu chưa xong, bạn có thể thử viết lại."
+                : state.jobStatus === "processing"
+                  ? "Đang viết bản chi tiết hơn ở nền. Bạn có thể đọc bản tổng quan này trước."
+                  : "Bản tổng quan nhanh đã sẵn sàng. Hệ thống đang chuẩn bị bản chi tiết hơn ở nền."}
+            {canRetry ? (
+              <button type="button" className="btn btn-small btn-ghost" onClick={retryOverview}>
+                Thử viết lại
+              </button>
+            ) : null}
           </div>
         ) : null}
         <MarkdownContent content={state.content} />
@@ -170,6 +168,9 @@ export function FreeOverviewLoader({
       <div ref={setRootNode} className="free-overview-error" role="status">
         <strong>Chưa tải được luận giải miễn phí.</strong>
         <span>{state.error} Bạn có thể tải lại trang hoặc xem trước bàn lá số bên trên.</span>
+        <button type="button" className="btn btn-small btn-ghost" onClick={retryOverview}>
+          Thử viết lại
+        </button>
       </div>
     );
   }

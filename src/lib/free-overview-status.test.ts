@@ -41,12 +41,14 @@ ${filler}`;
 
 describe("free overview status", () => {
   it("returns instant fallback when the AI overview is not cached yet", async () => {
+    const { countWords } = await import("@/lib/ai");
     const { getFreeOverviewStatus } = await import("@/lib/data");
     const status = getFreeOverviewStatus(chartFixture());
 
     expect(status.status).toBe("fallback");
     expect(status.source).toBe("instant-template");
     expect(status.content).toContain("## Tổng quan miễn phí");
+    expect(countWords(status.content)).toBeGreaterThanOrEqual(600);
   });
 
   it("treats complete matching-version AI content as ready", async () => {
@@ -67,5 +69,64 @@ describe("free overview status", () => {
     expect(status.status).toBe("ready");
     expect(status.source).toBe("ai-cache");
     expect(status.model).toBe("test-model");
+  });
+
+  it("marks current pending overview jobs as processing", async () => {
+    const { FREE_OVERVIEW_VERSION } = await import("@/lib/ai");
+    const { getFreeOverviewStatus } = await import("@/lib/data");
+    const chart = {
+      ...chartFixture(),
+      freeOverviewJob: {
+        status: "PENDING",
+        startedAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        version: FREE_OVERVIEW_VERSION,
+      },
+    } as TuViChart;
+
+    const status = getFreeOverviewStatus(chart);
+
+    expect(status.status).toBe("fallback");
+    expect(status.jobStatus).toBe("processing");
+  });
+
+  it("marks old pending overview jobs as stale so they can be retried", async () => {
+    const { FREE_OVERVIEW_VERSION } = await import("@/lib/ai");
+    const { getFreeOverviewStatus } = await import("@/lib/data");
+    const chart = {
+      ...chartFixture(),
+      freeOverviewJob: {
+        status: "PENDING",
+        startedAt: "2026-01-01T00:00:00.000Z",
+        updatedAt: "2026-01-01T00:00:00.000Z",
+        version: FREE_OVERVIEW_VERSION,
+      },
+    } as TuViChart;
+
+    const status = getFreeOverviewStatus(chart);
+
+    expect(status.status).toBe("fallback");
+    expect(status.jobStatus).toBe("stale");
+  });
+
+  it("keeps failed overview errors visible while serving the instant fallback", async () => {
+    const { FREE_OVERVIEW_VERSION } = await import("@/lib/ai");
+    const { getFreeOverviewStatus } = await import("@/lib/data");
+    const chart = {
+      ...chartFixture(),
+      freeOverviewJob: {
+        status: "FAILED",
+        startedAt: "2026-06-02T00:00:00.000Z",
+        updatedAt: "2026-06-02T00:01:00.000Z",
+        version: FREE_OVERVIEW_VERSION,
+        error: "LLM timed out",
+      },
+    } as TuViChart;
+
+    const status = getFreeOverviewStatus(chart);
+
+    expect(status.status).toBe("fallback");
+    expect(status.jobStatus).toBe("failed");
+    expect(status.error).toBe("LLM timed out");
   });
 });
