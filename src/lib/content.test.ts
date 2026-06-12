@@ -14,11 +14,13 @@ describe("SEO content cluster", () => {
     expect(slugs).toContain("cung-no-boc-trong-tu-vi");
     expect(slugs).toContain("cung-tat-ach-trong-tu-vi");
     expect(slugs).toContain("cung-thien-di-trong-tu-vi");
+    expect(slugs).toContain("lap-la-so-tu-vi-chuan");
   });
 
   it("links the beginner cluster back to conversion and related evergreen pages", () => {
     const hub = seedArticles.find((article) => article.slug === "la-so-tu-vi-la-gi");
     const guide = seedArticles.find((article) => article.slug === "cach-doc-la-so-tu-vi-cho-nguoi-moi");
+    const preciseSetup = seedArticles.find((article) => article.slug === "lap-la-so-tu-vi-chuan");
 
     expect(hub?.content).toContain("/#lap-la-so");
     expect(hub?.content).toContain("/kien-thuc-tu-vi/cung-menh-cung-than");
@@ -26,6 +28,9 @@ describe("SEO content cluster", () => {
     expect(guide?.content).toContain("/kien-thuc-tu-vi/cung-phu-the-trong-tu-vi");
     expect(guide?.content).toContain("/kien-thuc-tu-vi/cung-tat-ach-trong-tu-vi");
     expect(guide?.content).toContain("/kien-thuc-tu-vi/cung-thien-di-trong-tu-vi");
+    expect(preciseSetup?.content).toContain("/#lap-la-so");
+    expect(preciseSetup?.content).toContain("/kien-thuc-tu-vi/tao-la-so-tu-vi");
+    expect(preciseSetup?.content).toContain("/kien-thuc-tu-vi/gio-sinh-trong-tu-vi");
   });
 
   it("does not expose SEO implementation notes in public article copy", () => {
@@ -49,6 +54,7 @@ describe("SEO content cluster", () => {
           "cung-no-boc-trong-tu-vi",
           "cung-tat-ach-trong-tu-vi",
           "cung-thien-di-trong-tu-vi",
+          "lap-la-so-tu-vi-chuan",
         ].includes(article.slug),
       )
       .map(articleWithScore);

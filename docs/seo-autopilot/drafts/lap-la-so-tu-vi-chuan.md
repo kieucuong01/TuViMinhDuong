@@ -6,7 +6,7 @@ focusKeyword: lập lá số tử vi chuẩn
 canonicalUrl: /kien-thuc-tu-vi/lap-la-so-tu-vi-chuan
 funnelStage: conversion-support
 targetCharacters: 4500-7000
-generatedAt: 2026-06-10T10:36:13.895Z
+generatedAt: 2026-06-12T07:04:39.834Z
 ---
 
 # Lập lá số tử vi chuẩn: cần chuẩn bị gì để xem đúng hơn?
@@ -56,6 +56,34 @@ Maximum exact-match anchors: 2
 - Không đặt word count cố định như tín hiệu ranking; range ký tự chỉ để tránh bài quá mỏng so với intent.
 - Không lặp keyword máy móc, không cloaking, không doorway page, không nội dung sao chép.
 - Bài phải có trải nghiệm/giải thích riêng cho Lá số tinh hoa và đường dẫn hữu ích cho người đọc.
+
+## Programmatic SEO Guardrails
+- Doorway Pages: do not create near-duplicate pages by swapping star, palace, birth-year, or keyword variables into the same frame.
+- Helpful Content: reject thin generic AI advice; every publishable article must add structured data, expert causal logic, and a next useful action.
+- One search intent, one useful URL: merge close variants instead of making separate pages for lap, lay, tao, tra, ve, or ke when the user need is the same.
+- Programmatic content needs unique value from the product: score tables, modifier-star context, chart-form interaction, and clear limits of interpretation.
+
+## Unique Value Requirements
+
+Minimum data enrichment blocks: 2
+
+Required data blocks:
+- structured-score-table
+- modifier-stars-or-context
+- algorithmic-source-notes
+
+Data enrichment examples:
+- Create a compact score table for lập lá số tử vi chuẩn: risk, stability, accumulation/relationship/career fit, and reading confidence.
+- List modifier stars, palace context, or chart conditions that can change the interpretation; do not present one-star claims as absolute.
+- Name the internal calculation/data source when relevant, such as chart input, palace position, star state, companion stars, or date-fortune output.
+
+expert prompt frame:
+- Expert prompt frame for Lập lá số tử vi chuẩn: analyze by logic nhan qua from star/palace nature, activation condition, likely expression, limitation, then practical advice.
+- Force three concrete sections: what pattern can be read, what can reverse or weaken it, and what the reader should check in their own chart.
+- Use objective, bounded language; no vague AI filler like 'be careful with money' unless the causal reason is explained.
+
+interactive CTA: Invite the reader to enter birth date/time to check whether lập lá số tử vi chuẩn appears in their chart and what palace/modifier context changes the reading.
+interactive target: /#lap-la-so
 
 ## CTA
 

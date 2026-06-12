@@ -1,13 +1,13 @@
 {
-  "lastRunAt": "2026-06-11T15:07:35.069Z",
+  "lastRunAt": "2026-06-12T07:04:39.834Z",
   "lastStatus": "warning",
   "lastAction": {
     "type": "weekly_content_batch",
-    "slug": "tao-la-so-tu-vi",
+    "slug": "lap-la-so-tu-vi-chuan",
     "slugs": [
-      "tao-la-so-tu-vi"
+      "lap-la-so-tu-vi-chuan"
     ],
-    "reason": "Publish 1 people-first articles from SEMrush intent clusters; first topic: Người đọc muốn tạo lá số tử vi online nhưng cần hiểu nên chuẩn bị ngày giờ sinh, giới tính và cách đọc kết quả.",
+    "reason": "Publish 1 people-first articles from SEMrush intent clusters; first topic: Người đọc muốn biết lập lá số tử vi chuẩn cần thông tin nào và vì sao giờ sinh, lịch sinh ảnh hưởng kết quả.",
     "approvalRequired": false,
     "allowedToCommitDeployAfterVerification": true
   },
@@ -20,8 +20,8 @@
     "status": "unavailable",
     "siteUrl": "https://lasotinhhoa.vn/",
     "dateRange": {
-      "startDate": "2026-05-12",
-      "endDate": "2026-06-08"
+      "startDate": "2026-05-13",
+      "endDate": "2026-06-09"
     },
     "totals": {
       "clicks": 0,
@@ -35,9 +35,9 @@
     ]
   },
   "lastDraftPaths": [
-    "docs/seo-autopilot/drafts/tao-la-so-tu-vi.md"
+    "docs/seo-autopilot/drafts/lap-la-so-tu-vi-chuan.md"
   ],
-  "lastReportPath": "docs/seo-autopilot/reports/2026-06-11-weekly-content-batch.md",
+  "lastReportPath": "docs/seo-autopilot/reports/2026-06-12-weekly-content-batch.md",
   "nextVerificationCommands": [
     "npm run seo:autopilot",
     "npm test -- src/lib/content.test.ts src/lib/seo-autopilot-core.test.ts",
