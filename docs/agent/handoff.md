@@ -7,7 +7,7 @@ Use this when starting a new AI-agent session. Paste the short bootstrap plus th
 ```text
 You are working in C:\Users\ASUS\Documents\Claude\Projects\Tu vi.
 Start by reading AGENTS.md, then docs/agent/quickstart.md, then only the relevant playbook in docs/agent/playbooks.md.
-This is the Lá số tinh hoa Next.js 16 app. The primary production URL is lasotinhhoa.vn; tu-vi-minh-duong.vercel.app remains the Vercel fallback URL.
+This is the Lá số tinh hoa Next.js 16 app. The production URL is lasotinhhoa.vn. Production is self-hosted on the VPS behind Nginx, with PM2 process `lasotinhhoa` serving `127.0.0.1:4100` from `/opt/lasotinhhoa/current`.
 Follow existing patterns, preserve unrelated dirty changes, and verify with the smallest sufficient ladder from docs/agent/verification.md.
 ```
 

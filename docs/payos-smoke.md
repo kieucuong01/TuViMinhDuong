@@ -47,7 +47,7 @@ Kết quả pass khi:
 - `checks.creditedExactCoins` là `true`.
 - `checks.duplicateWebhookDidNotDoubleCredit` là `true`.
 
-Nếu vừa thanh toán xong mà `status` vẫn `PENDING`, kiểm tra webhook URL trong PayOS dashboard và logs Vercel route `/api/webhooks/payos`.
+Nếu vừa thanh toán xong mà `status` vẫn `PENDING`, kiểm tra webhook URL trong PayOS dashboard, `pm2 logs lasotinhhoa`, Nginx logs và route `/api/webhooks/payos`.
 
 ## 4. Smoke mở luận giải
 

@@ -262,7 +262,6 @@ export async function generateReadingWithProgress(
   scopeKey: string,
   onProgress?: (progress: PaidReadingGenerationProgress) => Promise<void> | void,
 ) {
-  const gatewayModel = process.env.AI_MODEL || "openai/gpt-5.4";
   const focus = getFocusData(chart, type, scopeKey);
   const chapters = paidReadingChapters(chart, type);
   const summary = getDeepReadingSummary(chart);
@@ -277,7 +276,7 @@ export async function generateReadingWithProgress(
     });
   };
 
-  if (isLlmDisabledForSmoke() || (!hasExternalLlmProvider() && !process.env.VERCEL_OIDC_TOKEN && !process.env.AI_GATEWAY_API_KEY)) {
+  if (isLlmDisabledForSmoke() || !hasExternalLlmProvider()) {
     const outputs: PaidReadingChapterOutput[] = [];
     for (const [index, chapter] of chapters.entries()) {
       const prompt = paidReadingChapterPrompt(chart, type, scopeKey, focus, chapter, index, chapters.length);
@@ -312,7 +311,7 @@ export async function generateReadingWithProgress(
     let generated: Awaited<ReturnType<typeof generatePaidChapter>> = null;
     let chapterError: string | null = null;
     try {
-      generated = await generatePaidChapter(prompt, gatewayModel, maxTokens, initialGeminiModel);
+      generated = await generatePaidChapter(prompt, maxTokens, initialGeminiModel);
     } catch (error) {
       chapterError = error instanceof Error ? error.message : String(error);
     }
@@ -321,7 +320,7 @@ export async function generateReadingWithProgress(
 
     if (!hasCompleteContent && initialGeminiModel !== escalationGeminiModel) {
       try {
-        const escalated = await generatePaidChapter(prompt, gatewayModel, maxTokens, escalationGeminiModel);
+        const escalated = await generatePaidChapter(prompt, maxTokens, escalationGeminiModel);
         const escalatedContent = escalated?.content?.trim() || "";
         if (escalatedContent) {
           generated = escalated;
@@ -1071,24 +1070,7 @@ Khi gặp sao hãm, sát tinh, Tuần/Triệt hoặc sao lưu gây áp lực, ph
 - Với quan hệ, nên nói rõ nhu cầu bằng lời nhẹ, tránh im lặng kéo dài thành hiểu nhầm.${monthAdvice}`;
 }
 
-async function generateViaGateway(prompt: string, model: string, maxTokens: number) {
-  if (!process.env.VERCEL_OIDC_TOKEN && !process.env.AI_GATEWAY_API_KEY) return null;
-
-  try {
-    const { generateText } = await import("ai");
-    const result = await generateText({
-      model,
-      prompt,
-      temperature: 0.55,
-      maxOutputTokens: maxTokens,
-    });
-    return { content: result.text, model };
-  } catch {
-    return null;
-  }
-}
-
-async function generatePaidChapter(prompt: string, gatewayModel: string, maxTokens: number, geminiModel?: string) {
+async function generatePaidChapter(prompt: string, maxTokens: number, geminiModel?: string) {
   const routed = await generateWithLlmRouter({
     prompt,
     maxTokens,
@@ -1096,5 +1078,5 @@ async function generatePaidChapter(prompt: string, gatewayModel: string, maxToke
     geminiModel,
   });
   if (routed) return { content: routed.text, model: routed.model };
-  return generateViaGateway(prompt, gatewayModel, maxTokens);
+  return null;
 }

@@ -5,11 +5,11 @@ Purpose: this is the first low-token context file for any new AI agent. Read thi
 ## Product In One Screen
 
 - App: `La so tinh hoa`, Vietnamese tu vi web app for adults 30-60.
-- Primary URL: `https://lasotinhhoa.vn`; Vercel fallback: `https://tu-vi-minh-duong.vercel.app`.
+- Primary URL: `https://lasotinhhoa.vn`.
 - Main funnel: free chart creation -> saved chart -> paid/coin readings.
 - Product marketing context: `.agents/product-marketing.md`.
 - Trust model: clear Vietnamese copy, no exaggerated fortune promises, money/policy surfaces hidden from guests unless needed for public compliance.
-- Stack: Next.js 16 App Router, React 19, TypeScript, Tailwind v4, Prisma 7/Postgres, PayOS/VietQR, Vitest, ESLint, Vercel.
+- Stack: Next.js 16 App Router, React 19, TypeScript, Tailwind v4, Prisma 7/Postgres, PayOS/VietQR, Vitest, ESLint, VPS self-hosting with Nginx and PM2.
 
 ## Read Only What You Need
 
@@ -52,6 +52,8 @@ Purpose: this is the first low-token context file for any new AI agent. Read thi
 ## Current Operational Notes
 
 - Use port `4000` for local app checks.
+- Production is on the VPS at `/opt/lasotinhhoa/current`, served by Nginx at `https://lasotinhhoa.vn`, and run by PM2 process `lasotinhhoa` on `127.0.0.1:4100`.
+- The database is still the remote PostgreSQL URL from env until a VPS-local DB migration is explicitly requested.
 - In Codex on this Windows workspace, `npm` may use Node 18. Next.js 16 needs Node >=20.9. Prefer the bundled Node path from `docs/agent/verification.md` when checks fail with Node/runtime errors.
 - Google Ads env values are not committed. Required public envs are documented in `docs/google-ads.md`.
 - Purchase conversion must wait for `/api/payments/status?orderCode=...` to return `verified: true`.

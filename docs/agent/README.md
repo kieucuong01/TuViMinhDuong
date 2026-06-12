@@ -21,7 +21,7 @@ Use this README only when the quickstart is not enough. For current project drif
 
 - Brand: **Lá số tinh hoa**
 - Domain chính: `lasotinhhoa.vn`
-- Domain Vercel dự phòng: `tu-vi-minh-duong.vercel.app`
+- Production host: VPS self-hosted behind Nginx, PM2 process `lasotinhhoa`, internal port `4100`
 - Audience: Vietnamese adults, mostly 30-60, who want a clear tử vi chart and plain-language readings.
 - Main conversion: create a free chart first, then open paid full readings.
 - UX tone: calm, readable, trustworthy, less "AI/SaaS", more "easy tử vi tool".
@@ -34,9 +34,9 @@ Use this README only when the quickstart is not enough. For current project drif
 - Prisma `7.8.0` with PostgreSQL
 - Email/password auth, optional Google OAuth by env
 - PayOS/VietQR checkout and webhook
-- AI SDK `ai` plus fallback template readings
+- Gemini/Groq LLM router plus fallback template readings
 - Vitest, ESLint, TypeScript checks
-- Vercel deploy target
+- VPS deploy target with Nginx and PM2
 
 ## Core Flows
 

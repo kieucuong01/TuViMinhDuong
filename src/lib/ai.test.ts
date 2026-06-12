@@ -31,8 +31,6 @@ vi.mock("@/lib/llm-router", () => ({
   hasExternalLlmProvider: llmRouterMocks.hasExternalLlmProvider,
 }));
 
-const oldGatewayKey = process.env.AI_GATEWAY_API_KEY;
-const oldOidcToken = process.env.VERCEL_OIDC_TOKEN;
 const oldGeminiKey = process.env.GEMINI_API_KEY;
 const oldGeminiKeys = process.env.GEMINI_API_KEYS;
 const oldGroqKey = process.env.GROQ_API_KEY;
@@ -42,8 +40,6 @@ const oldPaidEscalationGeminiModel = process.env.PAID_READING_ESCALATION_GEMINI_
 const oldPaidYearlyGeminiModel = process.env.PAID_READING_YEARLY_GEMINI_MODEL;
 
 function clearProviderEnv() {
-  delete process.env.AI_GATEWAY_API_KEY;
-  delete process.env.VERCEL_OIDC_TOKEN;
   delete process.env.GEMINI_API_KEY;
   delete process.env.GEMINI_API_KEYS;
   delete process.env.GROQ_API_KEY;
@@ -102,8 +98,6 @@ beforeEach(() => {
 });
 
 afterEach(() => {
-  restore("AI_GATEWAY_API_KEY", oldGatewayKey);
-  restore("VERCEL_OIDC_TOKEN", oldOidcToken);
   restore("GEMINI_API_KEY", oldGeminiKey);
   restore("GEMINI_API_KEYS", oldGeminiKeys);
   restore("GROQ_API_KEY", oldGroqKey);

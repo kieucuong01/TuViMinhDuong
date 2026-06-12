@@ -6,7 +6,7 @@ This version has breaking changes - APIs, conventions, and file structure may di
 
 # Agent Router
 
-This repo is the production app for **Lá số tinh hoa** (`tu-vi-minh-duong.vercel.app` for now; `lasotinhhoa.vn` is planned after DNS is stable): a Vietnamese tử vi website with chart creation, paid readings, date fortune, CMS/SEO, PayOS/VietQR, and admin tooling.
+This repo is the production app for **Lá số tinh hoa** (`https://lasotinhhoa.vn`): a Vietnamese tử vi website with chart creation, paid readings, date fortune, CMS/SEO, PayOS/VietQR, and admin tooling. Production is self-hosted on the VPS, served by Nginx, and run by PM2 as process `lasotinhhoa` on internal port `4100`.
 
 Use this file as the map, not the encyclopedia. Load only the docs and files needed for the current task.
 
@@ -27,6 +27,7 @@ Use this file as the map, not the encyclopedia. Load only the docs and files nee
 - Do not change the chart/date engines casually. Add or update fixtures/tests when touching astrology logic.
 - Do not bypass coin/payment gates unless the user explicitly asks for a temporary free mode.
 - Keep SEO surfaces aligned when brand, domain, routes, or article rendering change.
+- Do not route deploy, env, logs, or analytics work through old hosted-platform assumptions; use the VPS/PM2/Nginx production path documented in `docs/agent/playbooks.md`.
 - Do not commit generated files, local env files, `.next`, logs, or unrelated dirty work.
 
 ## Fast File Map

@@ -188,7 +188,7 @@ Use this workflow for autonomous SEO operations:
 4. Content decision: pick one of three safe actions: refresh an existing pillar, publish one support article, or improve internal links/metadata if no article is strong enough.
 5. Production writing: write useful Vietnamese copy for adults 30-60, add contextual internal links, visible FAQ only when useful, and at least one natural conversion path to `/#lap-la-so`.
 6. Verification: run targeted tests plus `npm test` and `npm run build` before commit/deploy.
-7. Release: commit, push `master`, deploy Vercel production, and smoke test the live home, hub, and changed article URL.
+7. Release: commit, push `master`, deploy the VPS production release, and smoke test the live home, hub, and changed article URL.
 8. Measurement: use Search Console impressions, clicks, CTR, average position, indexed status, and internal clicks toward chart creation to decide whether to refresh a page, add support content, or continue the planned funnel.
 
 This workflow is intentionally not fully hands-off when verification fails. A failed test/build/deploy is a hard stop, not permission to force a production release.

@@ -10,7 +10,7 @@ Muc tieu: chay quang cao dua nguoi dung vao form lap la so, do duoc cac moc chuy
 
 ## Conversion Actions
 
-Tao cac conversion trong Google Ads, roi dien label vao Vercel env:
+Tao cac conversion trong Google Ads, roi dien label vao production env:
 
 | Event | Env label | Vai tro |
 | --- | --- | --- |
@@ -31,14 +31,15 @@ NEXT_PUBLIC_GOOGLE_ADS_PAID_READING_LABEL="..."
 
 `NEXT_PUBLIC_GA_ID` van duoc dung cho GA4 page view va event funnel.
 
-Khong commit cac gia tri nay vao repo. Set tren Vercel Production/Preview bang dashboard hoac CLI:
+Khong commit cac gia tri nay vao repo. Set trong `.env` production tren VPS, roi deploy/restart PM2 de Next.js doc lai public env luc build:
 
 ```powershell
-vercel env add NEXT_PUBLIC_GOOGLE_ADS_ID production
-vercel env add NEXT_PUBLIC_GOOGLE_ADS_CREATE_CHART_LABEL production
-vercel env add NEXT_PUBLIC_GOOGLE_ADS_BEGIN_CHECKOUT_LABEL production
-vercel env add NEXT_PUBLIC_GOOGLE_ADS_PURCHASE_LABEL production
-vercel env add NEXT_PUBLIC_GOOGLE_ADS_PAID_READING_LABEL production
+# VPS production env
+NEXT_PUBLIC_GOOGLE_ADS_ID="AW-XXXXXXXXXX"
+NEXT_PUBLIC_GOOGLE_ADS_CREATE_CHART_LABEL="..."
+NEXT_PUBLIC_GOOGLE_ADS_BEGIN_CHECKOUT_LABEL="..."
+NEXT_PUBLIC_GOOGLE_ADS_PURCHASE_LABEL="..."
+NEXT_PUBLIC_GOOGLE_ADS_PAID_READING_LABEL="..."
 ```
 
 ## Current Tracking

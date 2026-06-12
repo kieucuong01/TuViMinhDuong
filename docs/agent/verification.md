@@ -31,6 +31,13 @@ Production-like local server after build:
 npx next start -p 4000
 ```
 
+Production smoke target:
+
+```powershell
+$env:PERF_BASE_URL="https://lasotinhhoa.vn"
+npm run perf:smoke
+```
+
 ## Check Ladder
 
 Docs-only:
@@ -118,7 +125,7 @@ Never commit:
 
 - `.env*`
 - `.next/`
-- `.vercel/`
+- local deployment metadata directories or release scratch folders
 - `.next-start-*.log`
 - `node_modules/`
 - generated Prisma client under `src/generated/prisma/`

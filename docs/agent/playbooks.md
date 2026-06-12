@@ -163,7 +163,7 @@ Read first:
 
 Rules:
 
-- Never invent `AW-...` IDs or conversion labels. They must come from the user's Google Ads account or Vercel env.
+- Never invent `AW-...` IDs or conversion labels. They must come from the user's Google Ads account or production env.
 - Do not commit `.env*`; `.env.example` may document variable names only.
 - `create_chart` fires after chart creation redirect with `created=1`.
 - `begin_checkout` marks checkout intent only.
@@ -180,7 +180,7 @@ Done:
 
 ## Deployment / Production
 
-Trigger: Vercel, DATABASE_URL, AUTH_SECRET, migrations, seed admin, live smoke test.
+Trigger: VPS deploy, Nginx, PM2, DATABASE_URL, AUTH_SECRET, migrations, seed admin, live smoke test.
 
 Read first:
 
@@ -190,14 +190,21 @@ Read first:
 - `scripts/seed-production.mjs`
 - `src/lib/env.ts`
 - `src/lib/db.ts`
+- `docs/agent/verification.md`
 
 Rules:
 
+- Production URL is `https://lasotinhhoa.vn`.
+- Production app path is `/opt/lasotinhhoa/current`; releases should update that symlink or directory deliberately.
+- PM2 process name is `lasotinhhoa`; internal app port is `127.0.0.1:4100`.
+- Nginx owns public HTTP/HTTPS and reverse proxies to the internal app port. Avoid port collisions with the other VPS app on `127.0.0.1:5000`.
 - Production DB is PostgreSQL, not local demo fallback.
+- DB currently remains remote through `DATABASE_URL`; do not assume a VPS-local database exists until the migration is requested.
 - Required envs: `DATABASE_URL`, `NEXT_PUBLIC_APP_URL`, `AUTH_SECRET`, `ADMIN_EMAIL`, `ADMIN_PASSWORD`.
 - PayOS and Google OAuth only work when their envs exist.
 - Run migrations before trusting production data flows.
-- For post-deploy health, use Vercel Web Analytics, Speed Insights, runtime logs, and `npm run perf:smoke`.
+- For post-deploy health, use `pm2 status`, `pm2 logs lasotinhhoa`, Nginx logs, live HTTP checks, and `npm run perf:smoke`.
+- Restart PM2 from the active release directory so the process cwd and `.next` build match the deployed release.
 
 Done:
 
@@ -205,6 +212,7 @@ Done:
 - Create chart, persist chart, read after restart/deploy.
 - CMS article save/read works.
 - Payment smoke path is tested with a safe/mock or real PayOS flow as appropriate.
+- Live route smoke returns 200 for `/`, `/lap-la-so`, `/kien-thuc-tu-vi/tao-la-so-tu-vi`, `/sitemap.xml`, and `/api/me`.
 
 ## Performance
 
@@ -232,4 +240,4 @@ Done:
 
 - Build passes.
 - Above-the-fold content loads without relying on heavy client JS.
-- Analytics and Speed Insights are mounted once in the root layout.
+- Analytics is deferred so it does not block first render, and no obsolete hosted-platform analytics package is mounted in the root layout.

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getChart } from "@/lib/data";
+import { generateWithLlmRouter } from "@/lib/llm-router";
 
 function fallbackAssistantAnswer(question: string, chartName: string, summary: string[]) {
   const normalized = question.toLowerCase();
@@ -45,15 +46,14 @@ Yêu cầu:
 - Nếu cần luận sâu, gợi ý người dùng mở đúng mục: Luận cung, Đại vận, Nguyệt vận, Nhật vận hoặc Luận giải toàn bộ.
 - Không tự tính lại lá số.`;
 
-    if (process.env.VERCEL_OIDC_TOKEN || process.env.AI_GATEWAY_API_KEY) {
-      try {
-        const { generateText } = await import("ai");
-        const model = process.env.AI_MODEL || "openai/gpt-5.4";
-        const result = await generateText({ model, prompt });
-        return NextResponse.json({ answer: result.text, model });
-      } catch {
-        // Fall through to deterministic local answer for dev/build safety.
-      }
+    const generated = await generateWithLlmRouter({
+      prompt,
+      temperature: 0.5,
+      maxTokens: 500,
+    });
+
+    if (generated) {
+      return NextResponse.json({ answer: generated.text, model: generated.model });
     }
 
     return NextResponse.json({

@@ -1,11 +1,11 @@
 # PayOS Smoke Evidence - 2026-05-22
 
-Environment: `https://tu-vi-minh-duong.vercel.app`
+Environment: legacy production smoke evidence, now mapped to `https://lasotinhhoa.vn`
 
 Webhook expected:
 
 ```text
-https://tu-vi-minh-duong.vercel.app/api/webhooks/payos
+https://lasotinhhoa.vn/api/webhooks/payos
 ```
 
 ## Create Checkout
@@ -13,7 +13,7 @@ https://tu-vi-minh-duong.vercel.app/api/webhooks/payos
 Command:
 
 ```bash
-npm run smoke:payos -- create --package full-reading --app-url https://tu-vi-minh-duong.vercel.app
+npm run smoke:payos -- create --package full-reading --app-url https://lasotinhhoa.vn
 ```
 
 Result:

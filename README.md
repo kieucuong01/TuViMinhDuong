@@ -11,10 +11,10 @@ Web tra cứu tử vi AI dùng Next.js App Router, TypeScript, Tailwind CSS, Pri
 - Database: `PostgreSQL` (Prisma datasource provider: `postgresql`)
 - Authentication: email/password nội bộ, hỗ trợ Google OAuth theo env
 - Thanh toán: `PayOS` / `VietQR` (checkout + webhook)
-- AI luận giải: router `Gemini/Groq`, Vercel AI Gateway fallback và template fallback
+- AI luận giải: router `Gemini/Groq` và template fallback
 - SEO: Next Metadata API, `robots`, `sitemap`, OG image route
 - Quality: `Vitest`, `ESLint`, `TypeScript`
-- Deploy target: `Vercel`
+- Deploy target: VPS self-hosted với Nginx + PM2
 
 ## Tính năng chính
 
@@ -97,7 +97,7 @@ npm run test:e2e
 Mặc định Playwright tự bật dev server tại `http://127.0.0.1:4000`. Nếu muốn smoke một site đã chạy sẵn:
 
 ```powershell
-$env:PLAYWRIGHT_BASE_URL="https://tu-vi-minh-duong.vercel.app"
+$env:PLAYWRIGHT_BASE_URL="https://lasotinhhoa.vn"
 npm run test:e2e
 ```
 
@@ -106,7 +106,7 @@ Admin smoke sẽ tự skip nếu chưa có `PLAYWRIGHT_ADMIN_EMAIL` và `PLAYWRI
 Kiểm tra tốc độ phản hồi các trang public sau deploy:
 
 ```powershell
-$env:PERF_BASE_URL="https://tu-vi-minh-duong.vercel.app"
+$env:PERF_BASE_URL="https://lasotinhhoa.vn"
 npm run perf:smoke
 ```
 
@@ -119,7 +119,9 @@ npm run perf:smoke
 
 ## Deploy
 
-Target deploy là Vercel + Postgres. Các env quan trọng:
+Target deploy là VPS self-hosted + Postgres. App production chạy tại `/opt/lasotinhhoa/current`, PM2 process `lasotinhhoa`, internal port `127.0.0.1:4100`; Nginx phục vụ public HTTPS tại `https://lasotinhhoa.vn`.
+
+Các env quan trọng:
 
 - `DATABASE_URL`
 - `NEXT_PUBLIC_APP_URL`
@@ -136,36 +138,30 @@ Target deploy là Vercel + Postgres. Các env quan trọng:
 - `GEMINI_API_KEY` hoặc `GEMINI_API_KEYS` cho Gemini
 - `GROQ_API_KEY` hoặc `GROQ_API_KEYS` cho Groq
 - `LLM_PROVIDER_ORDER` mặc định `groq,gemini`
-- `AI_GATEWAY_API_KEY` nếu muốn dùng Vercel AI Gateway fallback
 - `PAID_READING_PRIMARY_GEMINI_MODEL` tùy chọn, mặc định `gemini-2.5-flash` khi paid reading phải fallback từ Groq sang Gemini
 - `PAID_READING_ESCALATION_GEMINI_MODEL` tùy chọn, mặc định `gemini-3.5-flash` cho lần retry chương lỗi format/quá ngắn nếu router phải dùng Gemini
 - `PAID_READING_YEARLY_GEMINI_MODEL` tùy chọn, mặc định theo model escalation cho Chương 8 vận năm + 12 tháng nếu router phải dùng Gemini
-- `ERROR_WEBHOOK_URL` nếu muốn chuyển tiếp lỗi client ra hệ thống ngoài; để trống thì lỗi vẫn được ghi trong Vercel Runtime Logs.
+- `ERROR_WEBHOOK_URL` nếu muốn chuyển tiếp lỗi client ra hệ thống ngoài; để trống thì lỗi vẫn được ghi vào log app/server.
 
 `GEMINI_API_KEYS` và `GROQ_API_KEYS` nhận danh sách key phân tách bằng dấu phẩy hoặc xuống dòng. Chỉ dùng các key/tài khoản hợp lệ bạn sở hữu để dự phòng và chia tải trong giới hạn nhà cung cấp, không dùng để né quota.
 
 ### Theo dõi sau deploy
 
-- Vercel Web Analytics và Speed Insights đã được gắn ở root layout.
+- GA/Google Ads được defer để không chặn render ban đầu.
 - Google Ads/GA4 funnel tracking được ghi trong `docs/google-ads.md`; landing Search Ads chính là `/lap-la-so`.
-- Lỗi client được gửi về `/api/telemetry/error`, rút gọn payload và ghi vào runtime logs.
+- Lỗi client được gửi về `/api/telemetry/error`, rút gọn payload và ghi vào log app/server.
 - Sau deploy, chạy `npm run perf:smoke` với `PERF_BASE_URL` là domain production.
-- Khi cần rà lỗi nhanh trên Vercel, dùng `npx vercel logs <deployment-url> --level error --since 1h`.
+- Khi cần rà lỗi nhanh trên production, kiểm tra `pm2 logs lasotinhhoa`, `pm2 status`, Nginx logs và live HTTP smoke.
 
 ### Checklist production tối thiểu
 
-1. Tạo Postgres thật, ưu tiên Neon qua Vercel Marketplace.
-2. Set `DATABASE_URL` trên Vercel cho Production.
-3. Set `AUTH_SECRET`, `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `NEXT_PUBLIC_APP_URL`.
-4. Pull env production về local nếu cần chạy migration từ máy:
-
-```powershell
-npx vercel env pull .env.local --environment=production --yes
-npm run db:setup
-```
-
-5. Deploy lại production sau khi DB đã migrate.
-6. Test luồng login admin, tạo lá số, lưu lịch sử, đọc lại sau restart/deploy mới.
+1. Đảm bảo `.env` production trên VPS có `DATABASE_URL`, `NEXT_PUBLIC_APP_URL`, `AUTH_SECRET`, `ADMIN_EMAIL`, `ADMIN_PASSWORD` và các env PayOS/Google/LLM cần dùng.
+2. DB hiện vẫn trỏ remote qua `DATABASE_URL`; chỉ tạo DB local trên VPS khi có yêu cầu migration riêng.
+3. Chạy migration/seed khi schema hoặc seed thay đổi: `npm run db:deploy` và `npm run db:seed`.
+4. Build release bằng Node >=20.9: `npm ci`, `npm run build`.
+5. Cập nhật release tại `/opt/lasotinhhoa/current`, restart PM2 process `lasotinhhoa` từ đúng thư mục release, giữ app nghe `127.0.0.1:4100`.
+6. Kiểm tra Nginx đang proxy `https://lasotinhhoa.vn` về app, không trùng port với app khác trên VPS.
+7. Test luồng login admin, tạo lá số, lưu lịch sử, đọc lại sau restart/deploy mới.
 
 ## Ghi chú sản phẩm
 

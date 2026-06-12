@@ -12,7 +12,7 @@
 
 - Google Ads purchase conversion should be tied to verified payment state, not the PayOS return URL alone.
 - `src/app/api/payments/status/route.ts` exposes a current-user order status check for conversion verification.
-- Google Ads setup and smoke instructions live in `docs/google-ads.md`; real `AW-...` IDs and labels must stay in env/Vercel, not the repo.
+- Google Ads setup and smoke instructions live in `docs/google-ads.md`; real `AW-...` IDs and labels must stay in production env, not the repo.
 - Public trust pages now include privacy, terms, contact, and an authenticated payment/refund policy page.
 - `/chinh-sach-thanh-toan-hoan-xu` is a logged-in route and is intentionally kept out of the guest footer and sitemap.
 - Guest contact/footer surfaces should not expose topup/refund/money-only links. Logged-in footer should expose payment/refund policy. Logged-in account menu should expose coin balance/topup, saved charts, and logout.
@@ -47,7 +47,7 @@ Tài liệu này là ảnh chụp nhanh trạng thái dự án **Lá số tinh h
 
 - Brand: **Lá số tinh hoa**
 - Domain chính: `lasotinhhoa.vn`
-- Domain Vercel dự phòng: `tu-vi-minh-duong.vercel.app`
+- Production host: VPS self-hosted behind Nginx, PM2 process `lasotinhhoa`, internal port `4100`
 - Đối tượng chính: người Việt 30-60 tuổi, muốn lập lá số dễ hiểu, ít thuật ngữ kỹ thuật.
 - Hướng UX: form-first, chữ rõ, CTA dễ bấm, giải thích ngắn, không tạo cảm giác quá "AI/SaaS".
 - Conversion chính: lập lá số miễn phí trước, sau đó mở luận giải toàn bộ hoặc các phần trả phí.
@@ -59,9 +59,9 @@ Tài liệu này là ảnh chụp nhanh trạng thái dự án **Lá số tinh h
 - Prisma 7 + PostgreSQL
 - Email/password auth, Google OAuth tùy env
 - PayOS/VietQR checkout + webhook
-- AI SDK `ai` + fallback template
+- Gemini/Groq LLM router + fallback template
 - Vitest, ESLint, Next build
-- Vercel deploy target
+- VPS deploy target with Nginx and PM2
 
 ## Đã có
 
@@ -73,7 +73,7 @@ Tài liệu này là ảnh chụp nhanh trạng thái dự án **Lá số tinh h
 - Modal nạp xu để giữ ngữ cảnh tốt hơn.
 - CMS/admin có bài viết, SEO score, metadata.
 - Seed articles cho cụm kiến thức tử vi.
-- Vercel Analytics, Speed Insights, client error telemetry tối thiểu.
+- Deferred GA/Google Ads tracking and client error telemetry tối thiểu.
 - Docs agent: playbooks, roadmap, test strategy, verification, handoff.
 
 ## Đang đáng tin tương đối
