@@ -1,5 +1,12 @@
 # SEO Autopilot
 
+## Search Console Phase
+
+- Dự án đang trong giai đoạn khởi động nên tập trung **content SEO** trong 2 tháng đầu.
+- Trong giai đoạn này, workflow tự động **skip Search Console** và chỉ tối ưu nội dung, sitemap, metadata và luồng nội bộ sang `/#lap-la-so`.
+- Mặc định: `SEO_GSC_LAUNCH_DATE=2026-06-14` và `SEO_GSC_GRACE_DAYS=60`.
+- Trước khi ra mắt chính thức vượt qua giai đoạn này, có thể giữ/điều chỉnh bằng `SEO_GSC_SKIP_UNTIL` (ví dụ `2026-08-14`).
+
 This workflow lets Codex Automation operate as the SEO Growth Agent for `https://lasotinhhoa.vn`.
 
 ## Mission
@@ -62,6 +69,11 @@ The command returns JSON with:
 If live network access is blocked, continue with repo-local checks and say that live snapshot was unavailable.
 
 Search Console defaults:
+
+- Tạm thời: đặt mặc định theo chế độ khởi động
+  - `SEO_GSC_LAUNCH_DATE=2026-06-14`
+  - `SEO_GSC_GRACE_DAYS=60`
+  - `SEO_GSC_SKIP_UNTIL=2026-08-14` nếu cần khóa cứng theo ngày.
 
 - OAuth client path: `SEO_GSC_CLIENT_PATH`, then `%USERPROFILE%\.codex\secrets\lasotinhhoa-gsc-oauth-client.json`, then `%USERPROFILE%\.codex\secrets\bandothanso-gsc-oauth-client.json`
 - OAuth token path: `SEO_GSC_TOKEN_PATH`, then `%USERPROFILE%\.codex\secrets\lasotinhhoa-gsc-token.json`, then `%USERPROFILE%\.codex\secrets\bandothanso-gsc-token.json`
@@ -182,14 +194,14 @@ Each publish automation should create or update only one production article. Do 
 
 Use this workflow for autonomous SEO operations:
 
-1. Daily/weekly audit: run `npm run seo:autopilot` or `npm run seo:autopilot:execute`, inspect live snapshot, sitemap, article inventory, SEMrush keyword clusters, and Search Console feedback.
+1. Daily/weekly audit: run `npm run seo:autopilot` or `npm run seo:autopilot:execute`, inspect live snapshot, sitemap, article inventory, SEMrush keyword clusters, and Search Console feedback when the warm-up phase is over.
 2. Strategy selection: choose one intent cluster, not one raw keyword. Prefer the `lá số tử vi` pillar funnel first because the SEMrush export shows the largest qualified demand there.
 3. Google-safe filtering: skip stale year pages, competitor-navigation pages, mass birth-year pages, and near-duplicate variants such as separate pages for `lập`, `lấy`, `tạo`, `tra`, `vẽ`, `kẻ` when they answer the same user need.
 4. Content decision: pick one of three safe actions: refresh an existing pillar, publish one support article, or improve internal links/metadata if no article is strong enough.
 5. Production writing: write useful Vietnamese copy for adults 30-60, add contextual internal links, visible FAQ only when useful, and at least one natural conversion path to `/#lap-la-so`.
 6. Verification: run targeted tests plus `npm test` and `npm run build` before commit/deploy.
 7. Release: commit, push `master`, deploy the VPS production release, and smoke test the live home, hub, and changed article URL.
-8. Measurement: use Search Console impressions, clicks, CTR, average position, indexed status, and internal clicks toward chart creation to decide whether to refresh a page, add support content, or continue the planned funnel.
+8. Measurement: in the first 2 months, theo dõi live snapshot + nội dung + hành vi nội bộ; sau khi mở Search Console sẽ bổ sung đo tiếp bằng impressions/clicks/CTR/average position và indexed status.
 
 This workflow is intentionally not fully hands-off when verification fails. A failed test/build/deploy is a hard stop, not permission to force a production release.
 

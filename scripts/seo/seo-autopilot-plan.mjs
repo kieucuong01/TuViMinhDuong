@@ -8,17 +8,19 @@ import {
   planSeoAutopilotRun,
   readSemrushKeywordRows,
 } from "./seo-autopilot-core.mjs";
+import { shouldSkipSearchConsole } from "./search-console-policy.mjs";
 
 const args = parseArgs(process.argv.slice(2));
 const baseUrl = normalizeBaseUrl(args.baseUrl || "https://lasotinhhoa.vn");
 const sampleSize = Number.parseInt(args.sampleSize || "8", 10);
 const articlesPerWeek = clampArticleCount(args.articles || args.articlesPerWeek || "7");
+const skipSearchConsole = shouldSkipSearchConsole({ explicitSkip: args.skipSearchConsole });
 
 try {
   const snapshot = await buildSnapshot({ baseUrl, sampleSize });
   const existingSlugs = await readExistingSlugs();
   const keywordSource = readSemrushKeywordRows({ csvPath: args.keywordCsv });
-  const searchConsole = args.skipSearchConsole
+  const searchConsole = skipSearchConsole
     ? null
     : await buildSearchConsoleInsights({ siteUrl: args.gscSiteUrl || `${baseUrl}/` });
   const plan = planSeoAutopilotRun({

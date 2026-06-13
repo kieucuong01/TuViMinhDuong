@@ -1,5 +1,12 @@
 # Traffic Autopilot
 
+Trong giai đoạn khởi động SEO 2 tháng đầu, ưu tiên tiếp tục:
+- bản đồ nội dung,
+- luồng short-video,
+- tăng liền mạch nội bộ.
+
+Search Console tạm thời không bắt buộc cho quyết định hàng ngày; dùng snapshot/sitemap/content evidence trước, bật lại Search Console sau giai đoạn 2 tháng.
+
 This is the lightweight daily traffic workflow for `https://lasotinhhoa.vn`.
 
 The goal is qualified traffic, not activity volume. The system should perform one useful 80/20 action per day and reuse the existing SEO Autopilot instead of creating duplicate work.
