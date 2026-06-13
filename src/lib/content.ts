@@ -35,6 +35,8 @@ export type ArticleCategoryView = {
 };
 
 function article(input: Omit<ArticleView, "id" | "status" | "robots" | "schemaType" | "publishedAt" | "updatedAt"> & { date: string }): ArticleView {
+  const refreshedDate = thinArticleRefreshDates[input.slug] || input.date;
+
   return {
     id: `seed-${input.slug}`,
     status: "published",
@@ -42,14 +44,527 @@ function article(input: Omit<ArticleView, "id" | "status" | "robots" | "schemaTy
     robots: "index,follow",
     schemaType: "Article",
     publishedAt: new Date(`${input.date}T00:00:00+07:00`),
-    updatedAt: new Date(`${input.date}T00:00:00+07:00`),
+    updatedAt: new Date(`${refreshedDate}T00:00:00+07:00`),
     ...input,
+    content: enrichThinArticleContent(input.slug, input.content),
   };
 }
 
 const cta = `## Thực hành trên lá số cá nhân
 
 Ý nghĩa cung và vận hạn sẽ rõ hơn khi đối chiếu với lá số riêng. Bạn có thể [lập lá số tử vi miễn phí](/#lap-la-so), sau đó đọc tiếp các phần [luận cung](/kien-thuc-tu-vi/12-cung-trong-la-so-tu-vi), [đại vận](/kien-thuc-tu-vi/dai-van-la-gi) và [xem ngày](/xem-ngay) để hiểu nhịp vận theo từng lớp thời gian.`;
+
+const thinArticleRefreshDates: Record<string, string> = {
+  "nguyet-van-nhat-van": "2026-06-13",
+  "dai-van-la-gi": "2026-06-13",
+  "cung-quan-loc-trong-tu-vi": "2026-06-13",
+  "cung-tai-bach-trong-tu-vi": "2026-06-13",
+  "tu-vi-hang-ngay-cach-doc-van-khi": "2026-06-13",
+  "cung-tat-ach-trong-tu-vi": "2026-06-13",
+  "cung-thien-di-trong-tu-vi": "2026-06-13",
+  "cung-phu-the-trong-tu-vi": "2026-06-13",
+  "xem-ngay-tot-xau-theo-tuoi": "2026-06-13",
+  "tuan-triet-trong-la-so-tu-vi": "2026-06-13",
+  "sao-chinh-tinh-tu-vi": "2026-06-13",
+  "gio-sinh-trong-tu-vi": "2026-06-13",
+  "cach-doc-la-so-tu-vi-cho-nguoi-moi": "2026-06-13",
+  "seo-cho-website-tu-vi": "2026-06-13",
+};
+
+type ThinArticleRefresh = {
+  focus: string;
+  readerNeed: string;
+  safeFrame: string;
+  signals: string[];
+  modifiers: string[];
+  checklist: string[];
+  relatedLinks: { href: string; label: string }[];
+  ctaNote: string;
+};
+
+const thinArticleRefreshes: Record<string, ThinArticleRefresh> = {
+  "nguyet-van-nhat-van": {
+    focus: "nguyệt vận và nhật vận",
+    readerNeed: "Người đọc thường muốn biết tháng này nên làm gì, ngày nào nên tiến, ngày nào nên chậm lại. Bài này cần giúp họ dùng vận tháng và vận ngày như một lớp lịch tham khảo, không biến mỗi ngày thành lời phán tuyệt đối.",
+    safeFrame: "Nguyệt vận và Nhật vận chỉ có ý nghĩa khi đặt dưới Đại vận, tiểu hạn, cung đang được kích hoạt và hoàn cảnh thật. Một ngày đẹp nhưng kế hoạch chưa chuẩn bị xong vẫn không nên làm vội; một ngày điểm thấp nhưng chỉ xử lý việc nhỏ thì không cần lo quá.",
+    signals: [
+      "Nguyệt vận phù hợp để nhìn nhịp chung của 3-4 tuần: tháng nên mở rộng quan hệ, tháng nên rà soát tiền bạc, tháng nên giữ sức hoặc tháng nên hoàn thiện việc cũ.",
+      "Nhật vận phù hợp cho quyết định ngắn: hẹn gặp, ký giấy tờ nhỏ, đi lại, bắt đầu một đầu việc hoặc chọn ngày trao đổi chuyện quan trọng.",
+      "Nếu cung Mệnh, Thân, Quan Lộc hoặc Tài Bạch đang có nhiều tín hiệu bị kích hoạt, nên xem vận ngày như lớp xác nhận cuối, không đọc tách rời.",
+      "Những ngày có nhiều sao hỗ trợ giao tiếp thường hợp việc gặp gỡ, thương lượng, trình bày; những ngày thiên về tĩnh nên ưu tiên chuẩn bị, sửa lỗi, dọn tồn đọng.",
+    ],
+    modifiers: [
+      "Một tháng tốt vẫn có vài ngày cần tránh việc lớn nếu ngày đó xung tuổi, trực xấu hoặc tâm thế cá nhân chưa ổn.",
+      "Một ngày chưa đẹp vẫn có thể dùng cho việc nhỏ, việc nội bộ hoặc việc đã chuẩn bị kỹ; không nên biến tử vi hằng ngày thành lý do trì hoãn mọi thứ.",
+      "Nếu dữ liệu giờ sinh chưa chắc, hãy đọc xu hướng rộng thay vì bám vào chi tiết quá nhỏ của từng ngày.",
+      "Kế hoạch liên quan sức khỏe, pháp lý, tiền lớn hoặc hôn nhân nên ưu tiên chuyên gia và điều kiện thực tế trước khi dựa vào vận ngày.",
+    ],
+    checklist: [
+      "Xác định việc cần làm thuộc nhóm nào: gặp gỡ, tài chính, di chuyển, ký kết, nghỉ ngơi hay học tập.",
+      "Xem Đại vận và bối cảnh tháng trước, sau đó mới dùng Nguyệt vận để chọn trọng tâm trong tháng.",
+      "Dùng Nhật vận để chọn thời điểm thực hiện, nhưng luôn kiểm tra lịch làm việc, sức khỏe và mức chuẩn bị.",
+      "Ghi lại kết quả sau 2-3 tuần để biết cách mình phản ứng với vận tháng, thay vì chỉ đọc rồi quên.",
+    ],
+    relatedLinks: [
+      { href: "/kien-thuc-tu-vi/dai-van-la-gi", label: "Đại vận là lớp nền trước khi xét vận ngắn" },
+      { href: "/kien-thuc-tu-vi/tu-vi-hang-ngay-cach-doc-van-khi", label: "cách đọc tử vi hằng ngày không mê tín" },
+      { href: "/xem-ngay", label: "công cụ xem ngày tốt xấu" },
+      { href: "/kien-thuc-tu-vi/gio-sinh-trong-tu-vi", label: "vì sao giờ sinh ảnh hưởng đến lá số" },
+      { href: "/kien-thuc-tu-vi/cach-doc-la-so-tu-vi-cho-nguoi-moi", label: "quy trình đọc lá số cho người mới" },
+    ],
+    ctaNote: "Nếu muốn dùng vận tháng và vận ngày thực tế hơn, hãy lập lá số trước rồi đối chiếu từng lớp thời gian với Mệnh, Thân và cung đang hỏi.",
+  },
+  "dai-van-la-gi": {
+    focus: "đại vận",
+    readerNeed: "Người mới thường hỏi Đại vận có quyết định 10 năm cuộc đời hay không. Bài này cần giải thích Đại vận như một giai đoạn khí hậu dài hạn: có xu hướng, có cơ hội, có áp lực, nhưng vẫn cần hành động và hoàn cảnh cụ thể.",
+    safeFrame: "Không nên dùng Đại vận để kết luận chắc chắn giàu nghèo, hôn nhân hay sự nghiệp. Đại vận tốt mà không chuẩn bị thì cơ hội trôi qua; Đại vận khó nhưng biết thu hẹp rủi ro, học kỹ năng và chọn nhịp đi phù hợp vẫn có thể đi qua ổn hơn.",
+    signals: [
+      "Đại vận cho biết giai đoạn nào nên tích lũy, giai đoạn nào dễ mở rộng, giai đoạn nào nên thay đổi môi trường hoặc cách làm việc.",
+      "Khi đọc công việc, cần đặt Đại vận cạnh Cung Quan Lộc, Mệnh - Thân và các sao chủ trách nhiệm, cạnh tranh, danh tiếng.",
+      "Khi đọc tài chính, cần xem Cung Tài Bạch, Điền Trạch và cách người đó quản trị rủi ro, không chỉ nhìn một sao tốt xấu.",
+      "Khi đọc quan hệ, Đại vận chỉ cho thấy môi trường và tâm thế thay đổi; chất lượng giao tiếp vẫn nằm ở lựa chọn của hai người.",
+    ],
+    modifiers: [
+      "Tiểu vận, Nguyệt vận và Nhật vận có thể làm một năm hoặc một tháng nổi bật hơn trong Đại vận, nên không phải cả 10 năm đều giống nhau.",
+      "Sao tốt gặp cung yếu, bị xung phá hoặc thiếu chuẩn bị thực tế thì kết quả thường chậm hơn kỳ vọng.",
+      "Sao khó trong Đại vận không đồng nghĩa thất bại; nhiều khi đó là giai đoạn buộc người xem đổi chiến lược, học kỷ luật hoặc bớt ôm đồm.",
+      "Độ chính xác phụ thuộc giờ sinh và cách an sao, vì sai giờ có thể làm Mệnh - Thân và trục vận lệch đáng kể.",
+    ],
+    checklist: [
+      "Xác định tuổi hiện tại đang nằm trong Đại vận nào, rồi đọc chủ đề chính của cung Đại vận.",
+      "So sánh Đại vận với câu hỏi thật: công việc, tiền, nhà cửa, quan hệ hay sức khỏe.",
+      "Chia 10 năm thành các mốc nhỏ: năm mở việc, năm học thêm, năm ổn định, năm cần giữ tiền.",
+      "Viết ra một hành động thực tế cho giai đoạn này thay vì chỉ hỏi tốt hay xấu.",
+    ],
+    relatedLinks: [
+      { href: "/kien-thuc-tu-vi/cung-menh-cung-than", label: "Cung Mệnh và Cung Thân" },
+      { href: "/kien-thuc-tu-vi/cung-quan-loc-trong-tu-vi", label: "Cung Quan Lộc khi xét sự nghiệp" },
+      { href: "/kien-thuc-tu-vi/cung-tai-bach-trong-tu-vi", label: "Cung Tài Bạch khi xét tiền bạc" },
+      { href: "/kien-thuc-tu-vi/nguyet-van-nhat-van", label: "Nguyệt vận và Nhật vận để chọn nhịp ngắn" },
+      { href: "/kien-thuc-tu-vi/lap-la-so-tu-vi-chuan", label: "chuẩn bị dữ liệu để lập lá số chính xác" },
+    ],
+    ctaNote: "Muốn đọc Đại vận có ích, hãy lập lá số cá nhân rồi nhìn 10 năm hiện tại như bản đồ ưu tiên, không phải bản án cố định.",
+  },
+  "cung-quan-loc-trong-tu-vi": {
+    focus: "cung Quan Lộc",
+    readerNeed: "Người đọc tìm Cung Quan Lộc thường đang hỏi về nghề nghiệp, thăng tiến, chuyển việc hoặc hướng làm ăn. Bài cần giúp họ đọc đúng môi trường làm việc và năng lực chịu trách nhiệm, thay vì chỉ hỏi có làm quan hay giàu không.",
+    safeFrame: "Cung Quan Lộc không thay thế tư vấn nghề nghiệp, năng lực chuyên môn hay tình hình thị trường. Nó hữu ích nhất khi giúp người xem hiểu kiểu công việc hợp nhịp, cách chịu áp lực và điểm cần rèn để đi đường dài.",
+    signals: [
+      "Cung Quan Lộc mạnh thường cho thấy người xem dễ đặt nặng trách nhiệm, danh tiếng, tiêu chuẩn nghề nghiệp hoặc mong muốn tạo dấu ấn rõ ràng.",
+      "Nếu chính tinh thiên về tổ chức, người xem có thể hợp môi trường quy trình, quản lý, vận hành, hành chính hoặc công việc cần kỷ luật.",
+      "Nếu bộ sao thiên về biến động, sáng tạo hoặc giao tiếp, nên chú ý các nghề cần thích nghi, tư vấn, kinh doanh, nội dung, công nghệ hoặc làm việc với nhiều nhóm người.",
+      "Quan Lộc cần đọc cùng Mệnh - Thân vì cùng một cung nghề nghiệp, người chủ động và người thận trọng sẽ biểu hiện rất khác.",
+    ],
+    modifiers: [
+      "Tài Bạch tốt nhưng Quan Lộc yếu có thể kiếm được tiền nhờ cơ hội, nhưng cần rèn hệ thống làm việc để bền.",
+      "Quan Lộc nhiều áp lực không có nghĩa nghề xấu; có thể là nghề đòi hỏi tiêu chuẩn cao, cạnh tranh hoặc trách nhiệm lớn.",
+      "Đại vận thuận có thể mở cơ hội chuyển vai trò, nhưng nếu kỹ năng chưa đủ thì vẫn cần học thêm trước khi nhảy việc.",
+      "Các quyết định hợp đồng, pháp lý, đầu tư nghề nghiệp nên dựa trên thông tin thực tế, không chỉ dựa vào lá số.",
+    ],
+    checklist: [
+      "Bạn đang hỏi định hướng dài hạn, cơ hội thăng tiến, hay thời điểm đổi việc?",
+      "Công việc hiện tại cần điều gì nhất: chuyên môn, giao tiếp, quản lý, sáng tạo hay sức bền?",
+      "Quan Lộc đang được Đại vận hoặc Nguyệt vận kích hoạt không?",
+      "Có mâu thuẫn giữa điều mình muốn và môi trường mình đang chọn không?",
+    ],
+    relatedLinks: [
+      { href: "/kien-thuc-tu-vi/cung-menh-cung-than", label: "đọc Mệnh - Thân trước khi kết luận nghề nghiệp" },
+      { href: "/kien-thuc-tu-vi/cung-tai-bach-trong-tu-vi", label: "Cung Tài Bạch để hiểu cách kiếm tiền" },
+      { href: "/kien-thuc-tu-vi/dai-van-la-gi", label: "Đại vận khi cân nhắc đổi việc" },
+      { href: "/kien-thuc-tu-vi/12-cung-trong-la-so-tu-vi", label: "12 cung trong lá số tử vi" },
+      { href: "/kien-thuc-tu-vi/cach-doc-la-so-tu-vi-cho-nguoi-moi", label: "cách đọc lá số theo thứ tự" },
+    ],
+    ctaNote: "Nếu đang phân vân nghề nghiệp, hãy lập lá số rồi xem Quan Lộc cùng Tài Bạch và Đại vận hiện tại để có bức tranh rõ hơn.",
+  },
+  "cung-tai-bach-trong-tu-vi": {
+    focus: "cung Tài Bạch",
+    readerNeed: "Người đọc thường muốn biết mình có số kiếm tiền không, có giữ tiền được không, nên làm công hay kinh doanh. Bài cần chuyển câu hỏi đó thành cách đọc năng lực tạo nguồn lực, thói quen tài chính và mức chịu rủi ro.",
+    safeFrame: "Cung Tài Bạch không phải lời khuyên đầu tư. Nó không đảm bảo lợi nhuận, không thay thế kế hoạch tài chính, luật thuế, hợp đồng hay tư vấn chuyên môn. Giá trị của bài là giúp người đọc hiểu kiểu kiếm tiền và điểm cần quản trị.",
+    signals: [
+      "Tài Bạch sáng thường cho thấy người xem nhạy với nguồn lực, biết nhìn cơ hội hoặc có động lực cải thiện thu nhập.",
+      "Nếu bộ sao thiên về tích lũy, người xem hợp chiến lược bền, ngân sách rõ, tài sản dài hạn và quản trị chi tiêu.",
+      "Nếu bộ sao thiên về biến động, người xem có thể kiếm tiền tốt theo dự án, kinh doanh, hoa hồng hoặc nghề cần linh hoạt, nhưng phải có kỷ luật rủi ro.",
+      "Cung Tài Bạch nên đọc cùng Điền Trạch để xem xu hướng tài sản, cùng Quan Lộc để hiểu nguồn tiền đến từ nghề hay cơ hội ngoài nghề.",
+    ],
+    modifiers: [
+      "Một cung Tài Bạch đẹp vẫn có thể hao nếu thói quen chi tiêu lỏng, vay nợ cảm tính hoặc đầu tư theo đám đông.",
+      "Tài Bạch nhiều sao khó không có nghĩa nghèo; nhiều trường hợp đó là bài học về kỷ luật tiền, minh bạch giấy tờ và kiên nhẫn tích lũy.",
+      "Đại vận có thể làm cơ hội tiền bạc nổi bật hơn, nhưng cần phân biệt cơ hội thật với cảm giác hưng phấn nhất thời.",
+      "Các quyết định đầu tư, vay mượn, bảo hiểm hoặc mua tài sản nên có số liệu và chuyên gia phù hợp.",
+    ],
+    checklist: [
+      "Nguồn tiền chính đến từ lương, kinh doanh, dự án, tài sản hay quan hệ?",
+      "Bạn đang cần tăng thu nhập, giữ tiền, trả nợ hay mua tài sản?",
+      "Rủi ro lớn nhất hiện tại là thiếu thông tin, thiếu kỷ luật hay quá tham cơ hội?",
+      "Cung Tài Bạch có liên hệ gì với Quan Lộc và Điền Trạch trong lá số của bạn?",
+    ],
+    relatedLinks: [
+      { href: "/kien-thuc-tu-vi/cung-quan-loc-trong-tu-vi", label: "Cung Quan Lộc để hiểu nguồn thu từ nghề" },
+      { href: "/kien-thuc-tu-vi/cung-dien-trach-trong-tu-vi", label: "Cung Điền Trạch khi xét tài sản và nhà cửa" },
+      { href: "/kien-thuc-tu-vi/dai-van-la-gi", label: "Đại vận khi xét chu kỳ tiền bạc" },
+      { href: "/kien-thuc-tu-vi/12-cung-trong-la-so-tu-vi", label: "12 cung cần đọc liên kết với nhau" },
+      { href: "/kien-thuc-tu-vi/la-so-tu-vi-la-gi", label: "lá số tử vi là gì" },
+    ],
+    ctaNote: "Muốn dùng Cung Tài Bạch thực tế hơn, hãy lập lá số rồi đối chiếu với nghề hiện tại, kế hoạch tài chính và Đại vận đang đi qua.",
+  },
+  "tu-vi-hang-ngay-cach-doc-van-khi": {
+    focus: "tử vi hằng ngày",
+    readerNeed: "Người đọc muốn có gợi ý cho một ngày cụ thể nhưng không muốn bị dọa hoặc phụ thuộc. Bài cần giải thích cách dùng tử vi hằng ngày như công cụ tự kiểm tra nhịp hành động.",
+    safeFrame: "Tử vi hằng ngày chỉ nên dùng cho việc điều chỉnh mức ưu tiên. Nó không thay thế lịch làm việc, sức khỏe, pháp lý, tài chính hay trách nhiệm cá nhân. Ngày nào cũng có việc nên làm và việc nên tránh tùy hoàn cảnh.",
+    signals: [
+      "Ngày thuận giao tiếp thường hợp hẹn gặp, thương lượng, trình bày ý tưởng, xử lý việc cần sự mềm mỏng.",
+      "Ngày thuận hoàn thiện hợp rà soát giấy tờ, sửa lỗi, dọn việc cũ, sắp xếp lịch và chuẩn bị trước khi công bố.",
+      "Ngày có nhiều tín hiệu căng nên giảm việc quyết định vội, tránh nói lời quá nặng, ưu tiên việc chắc chắn và có dữ liệu.",
+      "Nếu một ngày trùng mốc quan trọng trong Nguyệt vận, cảm giác về nhịp vận thường rõ hơn ngày bình thường.",
+    ],
+    modifiers: [
+      "Một ngày điểm cao không cứu được kế hoạch thiếu chuẩn bị.",
+      "Một ngày điểm thấp không làm hỏng việc nhỏ nếu bạn giữ nhịp chậm, kiểm tra kỹ và không đặt cược quá lớn.",
+      "Người có công việc vận hành hằng ngày nên dùng tử vi như checklist tinh thần, không phải lý do nghỉ hoặc né trách nhiệm.",
+      "Việc lớn nên xem thêm tuổi, giờ, lịch thực tế và ý kiến chuyên môn khi cần.",
+    ],
+    checklist: [
+      "Sáng nay việc quan trọng nhất là gì?",
+      "Việc đó cần giao tiếp, tiền bạc, di chuyển, sức khỏe hay giấy tờ?",
+      "Mình có đủ thông tin để quyết định chưa?",
+      "Nếu vận ngày chưa thuận, có thể chuyển sang chuẩn bị, kiểm tra hoặc làm bước nhỏ hơn không?",
+    ],
+    relatedLinks: [
+      { href: "/xem-ngay", label: "xem ngày tốt xấu theo tuổi" },
+      { href: "/kien-thuc-tu-vi/nguyet-van-nhat-van", label: "Nguyệt vận và Nhật vận" },
+      { href: "/kien-thuc-tu-vi/xem-ngay-tot-xau-theo-tuoi", label: "cách hiểu ngày tốt xấu theo tuổi" },
+      { href: "/kien-thuc-tu-vi/dai-van-la-gi", label: "Đại vận để nhìn nhịp dài" },
+      { href: "/kien-thuc-tu-vi/cach-doc-la-so-tu-vi-cho-nguoi-moi", label: "cách đọc lá số cho người mới" },
+    ],
+    ctaNote: "Nếu chỉ đọc tử vi hằng ngày chung, lời khuyên thường khá rộng. Lập lá số cá nhân giúp bạn biết ngày đó chạm vào cung nào của mình.",
+  },
+  "cung-tat-ach-trong-tu-vi": {
+    focus: "cung Tật Ách",
+    readerNeed: "Người đọc tìm Cung Tật Ách thường lo về sức khỏe, áp lực tinh thần hoặc điểm yếu cần phòng. Bài cần giúp họ đọc cung này bình tĩnh, không tự chẩn đoán và không sợ hãi.",
+    safeFrame: "Cung Tật Ách không thay thế bác sĩ, xét nghiệm, trị liệu hoặc lời khuyên y khoa. Nếu có triệu chứng, đau kéo dài, rối loạn giấc ngủ, lo âu nặng hoặc dấu hiệu bất thường, hãy ưu tiên chuyên gia sức khỏe.",
+    signals: [
+      "Tật Ách cho thấy cách cơ thể và tinh thần phản ứng với áp lực: dễ căng, dễ tích tụ, dễ bùng lên hay hồi phục nhanh.",
+      "Một số bộ sao gợi ý nên chú ý thói quen sinh hoạt, giấc ngủ, ăn uống, vận động, nhịp làm việc hoặc xu hướng ôm việc.",
+      "Nếu Tật Ách liên hệ mạnh với Quan Lộc, áp lực nghề nghiệp có thể là nguồn hao sức chính.",
+      "Nếu liên hệ với Phu Thê, Nô Bộc hoặc Phúc Đức, cảm xúc và quan hệ có thể ảnh hưởng rõ tới trạng thái tinh thần.",
+    ],
+    modifiers: [
+      "Sao khó ở Tật Ách không có nghĩa chắc chắn bệnh nặng; đó thường là lời nhắc về vùng cần chăm sóc sớm.",
+      "Sao tốt không có nghĩa được chủ quan; thói quen xấu kéo dài vẫn tạo hệ quả ngoài lá số.",
+      "Đại vận hoặc Nguyệt vận căng có thể làm áp lực rõ hơn, nên dùng để điều chỉnh lịch nghỉ và mức tải công việc.",
+      "Khi đọc sức khỏe, ngôn ngữ cần thận trọng, không dọa, không hứa chữa lành và không thay kết luận chuyên môn.",
+    ],
+    checklist: [
+      "Mình đang hỏi về sức khỏe thể chất, tinh thần hay thói quen sinh hoạt?",
+      "Áp lực đến từ công việc, quan hệ, tiền bạc hay môi trường sống?",
+      "Có dấu hiệu nào cần đi khám hoặc hỏi chuyên gia ngay không?",
+      "Trong 2 tuần tới, mình có thể giảm một nguồn hao sức nào trước?",
+    ],
+    relatedLinks: [
+      { href: "/kien-thuc-tu-vi/cung-quan-loc-trong-tu-vi", label: "Cung Quan Lộc khi áp lực đến từ công việc" },
+      { href: "/kien-thuc-tu-vi/cung-phuc-duc-trong-tu-vi", label: "Cung Phúc Đức và nền tinh thần" },
+      { href: "/kien-thuc-tu-vi/nguyet-van-nhat-van", label: "vận tháng, vận ngày để điều chỉnh nhịp sinh hoạt" },
+      { href: "/kien-thuc-tu-vi/cung-menh-cung-than", label: "Mệnh - Thân để hiểu khí chất phản ứng" },
+      { href: "/kien-thuc-tu-vi/cach-doc-la-so-tu-vi-cho-nguoi-moi", label: "cách đọc lá số có thứ tự" },
+    ],
+    ctaNote: "Hãy dùng lá số như lời nhắc chăm sóc bản thân tốt hơn, không dùng để tự chẩn đoán hay bỏ qua dấu hiệu cần hỗ trợ y tế.",
+  },
+  "cung-thien-di-trong-tu-vi": {
+    focus: "cung Thiên Di",
+    readerNeed: "Người đọc muốn biết khi ra ngoài, đi xa, đổi môi trường hoặc làm việc với người lạ thì thuận hay khó. Bài cần giúp họ hiểu Thiên Di như năng lực tương tác với thế giới bên ngoài.",
+    safeFrame: "Thiên Di không quyết định một người bắt buộc phải đi xa hay ở gần. Nó cho thấy kiểu cơ hội và va chạm thường xuất hiện khi người đó rời vùng quen thuộc, gặp môi trường mới hoặc phải đại diện bản thân trước người ngoài.",
+    signals: [
+      "Thiên Di sáng thường cho thấy ra ngoài dễ gặp người hỗ trợ, dễ học từ môi trường mới hoặc có cơ hội qua di chuyển và giao tiếp.",
+      "Thiên Di nhiều thử thách có thể khiến người xem cần chuẩn bị kỹ hơn khi đi xa, ký kết, làm việc với đối tác lạ hoặc bước vào tập thể mới.",
+      "Nếu Thiên Di liên hệ Quan Lộc, cơ hội nghề nghiệp có thể đến từ thị trường bên ngoài, khách hàng, đối tác hoặc vai trò cần xuất hiện trước công chúng.",
+      "Nếu Thiên Di liên hệ Nô Bộc, mạng lưới bạn bè, đồng nghiệp và cộng đồng có ảnh hưởng mạnh đến cơ hội.",
+    ],
+    modifiers: [
+      "Ra ngoài thuận không có nghĩa lúc nào cũng nên rời quê hoặc đổi việc; cần xem Đại vận và điều kiện sống thật.",
+      "Thiên Di khó không có nghĩa nên khép mình; nhiều khi chỉ cần chuẩn bị kỹ giấy tờ, kỹ năng giao tiếp và ranh giới cá nhân.",
+      "Nguyệt vận tốt cho di chuyển chỉ là lớp thời điểm, không thay thế an toàn, pháp lý, sức khỏe và kế hoạch tài chính.",
+      "Nếu hỏi chuyện định cư, du học, chuyển vùng, nên đọc thêm Điền Trạch, Quan Lộc và Tài Bạch.",
+    ],
+    checklist: [
+      "Câu hỏi là đi xa, đổi việc, mở rộng quan hệ hay làm việc với khách hàng?",
+      "Môi trường mới cần kỹ năng gì: ngôn ngữ, giao tiếp, chuyên môn, tài chính hay giấy tờ?",
+      "Cơ hội đến qua ai và mình có đang phụ thuộc quá nhiều vào một người không?",
+      "Thời điểm hiện tại nên thử bước nhỏ, đi khảo sát hay chuyển hẳn?",
+    ],
+    relatedLinks: [
+      { href: "/kien-thuc-tu-vi/cung-no-boc-trong-tu-vi", label: "Cung Nô Bộc khi cơ hội đến qua con người" },
+      { href: "/kien-thuc-tu-vi/cung-quan-loc-trong-tu-vi", label: "Cung Quan Lộc khi đổi môi trường nghề" },
+      { href: "/kien-thuc-tu-vi/cung-dien-trach-trong-tu-vi", label: "Cung Điền Trạch nếu câu hỏi là nơi ở" },
+      { href: "/kien-thuc-tu-vi/dai-van-la-gi", label: "Đại vận để xét thời điểm đi xa" },
+      { href: "/kien-thuc-tu-vi/12-cung-trong-la-so-tu-vi", label: "12 cung trong lá số tử vi" },
+    ],
+    ctaNote: "Nếu đang cân nhắc đi xa hoặc đổi môi trường, hãy lập lá số để xem Thiên Di đang liên hệ với cung nào và Đại vận hiện tại ra sao.",
+  },
+  "cung-phu-the-trong-tu-vi": {
+    focus: "cung Phu Thê",
+    readerNeed: "Người đọc thường hỏi hôn nhân có tốt không, người đồng hành ra sao, có muộn hay dễ xung khắc không. Bài cần giúp họ đọc cung Phu Thê với thái độ trưởng thành, không dùng lá số để kết án một mối quan hệ.",
+    safeFrame: "Cung Phu Thê không thay thế giao tiếp, trị liệu cặp đôi, pháp lý hôn nhân hoặc lựa chọn cá nhân. Nó chỉ gợi ý kiểu nhu cầu tình cảm, cách gắn bó và bài học quan hệ dễ lặp lại.",
+    signals: [
+      "Phu Thê ổn thường cho thấy người xem dễ học được sự đồng hành, biết chia vai hoặc có xu hướng coi trọng cam kết.",
+      "Phu Thê nhiều biến động có thể cho thấy quan hệ cần giao tiếp rõ, ranh giới lành mạnh và thời gian kiểm chứng trước khi quyết định lớn.",
+      "Nếu Phu Thê liên hệ Mệnh - Thân, hôn nhân ảnh hưởng mạnh đến bản sắc, lựa chọn sống hoặc cách người đó trưởng thành.",
+      "Nếu liên hệ Tài Bạch, Điền Trạch hoặc Quan Lộc, tiền bạc, nhà cửa và sự nghiệp có thể là chủ đề quan trọng trong quan hệ.",
+    ],
+    modifiers: [
+      "Một cung Phu Thê đẹp không đảm bảo hôn nhân tự tốt nếu hai người thiếu tôn trọng và kỹ năng đối thoại.",
+      "Một cung Phu Thê khó không có nghĩa phải chia tay hoặc không nên kết hôn; nó nhắc về điểm cần trưởng thành khi yêu.",
+      "Đại vận và Nguyệt vận có thể làm chuyện tình cảm nổi bật trong từng giai đoạn, nhưng không nên quyết định hấp tấp theo một ngày.",
+      "Các vấn đề bạo lực, kiểm soát, pháp lý hoặc an toàn cá nhân cần được xử lý bằng hỗ trợ thực tế trước.",
+    ],
+    checklist: [
+      "Mình đang hỏi về người phù hợp, thời điểm kết hôn, xung đột hay cách giữ quan hệ?",
+      "Mẫu xung đột lặp lại là tiền bạc, gia đình hai bên, thời gian, niềm tin hay giao tiếp?",
+      "Cung Phu Thê đang được Đại vận kích hoạt hay chỉ là lo lắng nhất thời?",
+      "Bài học của mình trong quan hệ là mềm lại, rõ ràng hơn hay biết đặt ranh giới?",
+    ],
+    relatedLinks: [
+      { href: "/kien-thuc-tu-vi/cung-menh-cung-than", label: "Mệnh - Thân khi đọc cách yêu và trưởng thành" },
+      { href: "/kien-thuc-tu-vi/cung-tai-bach-trong-tu-vi", label: "Tài Bạch khi quan hệ chạm đến tiền bạc" },
+      { href: "/kien-thuc-tu-vi/cung-phuc-duc-trong-tu-vi", label: "Phúc Đức và nền gia đạo" },
+      { href: "/kien-thuc-tu-vi/dai-van-la-gi", label: "Đại vận khi tình cảm bước vào giai đoạn mới" },
+      { href: "/kien-thuc-tu-vi/cach-doc-la-so-tu-vi-cho-nguoi-moi", label: "cách đọc lá số không vội kết luận" },
+    ],
+    ctaNote: "Muốn hiểu Cung Phu Thê đúng hơn, hãy lập lá số rồi đọc cùng Mệnh - Thân, Phúc Đức và Đại vận thay vì chỉ nhìn một cung.",
+  },
+  "xem-ngay-tot-xau-theo-tuoi": {
+    focus: "xem ngày tốt xấu theo tuổi",
+    readerNeed: "Người đọc muốn chọn ngày cho cưới hỏi, khai trương, ký kết, chuyển nhà hoặc xuất hành. Bài cần giúp họ hiểu ngày tốt theo tuổi là lớp hỗ trợ quyết định, không phải công thức đảm bảo thành công.",
+    safeFrame: "Ngày tốt xấu chỉ nên dùng cùng điều kiện thực tế: lịch của các bên, thời tiết, pháp lý, tài chính, sức khỏe và mức chuẩn bị. Một ngày hợp tuổi nhưng mọi thứ chưa sẵn sàng vẫn không nên ép làm.",
+    signals: [
+      "Lớp tổng quát gồm can chi ngày, trực, hoàng đạo - hắc đạo, sao tốt xấu và việc nên làm.",
+      "Lớp cá nhân gồm tuổi người đứng việc, xung hợp, vai trò trong sự kiện và mục tiêu cụ thể của việc đó.",
+      "Việc khai trương nên ưu tiên ngày hỗ trợ mở việc, giao tiếp, tài khí và sự ổn định vận hành.",
+      "Việc cưới hỏi, ký kết, chuyển nhà hoặc xuất hành cần xét thêm gia đình, giấy tờ, đường đi và khả năng phối hợp.",
+    ],
+    modifiers: [
+      "Không có ngày nào tốt tuyệt đối cho mọi người và mọi việc.",
+      "Nếu ngày đẹp nhưng giờ xấu, việc quá gấp hoặc người đứng việc đang mệt, nên cân nhắc giờ khác hoặc ngày khác.",
+      "Nếu không chọn được ngày hoàn hảo, hãy chọn ngày ít xung nhất và chuẩn bị kỹ các bước quan trọng.",
+      "Các quyết định lớn vẫn cần hợp đồng, ngân sách, sức khỏe và sự đồng thuận của người liên quan.",
+    ],
+    checklist: [
+      "Việc cần làm thuộc nhóm khai trương, cưới hỏi, ký kết, chuyển nhà, xuất hành hay việc cá nhân?",
+      "Ai là người đứng việc chính và tuổi của người đó có xung mạnh với ngày không?",
+      "Có khung giờ nào thuận hơn trong cùng ngày không?",
+      "Nếu ngày chưa đẹp, có thể tách việc thành bước nhỏ: chuẩn bị trước, công bố sau, ký chính thức vào ngày khác không?",
+    ],
+    relatedLinks: [
+      { href: "/xem-ngay", label: "công cụ xem ngày tốt xấu" },
+      { href: "/kien-thuc-tu-vi/xem-ngay-tot-thang-6-2026", label: "ví dụ xem ngày tốt trong một tháng cụ thể" },
+      { href: "/kien-thuc-tu-vi/tu-vi-hang-ngay-cach-doc-van-khi", label: "cách đọc vận khí hằng ngày" },
+      { href: "/kien-thuc-tu-vi/nguyet-van-nhat-van", label: "Nguyệt vận và Nhật vận" },
+      { href: "/kien-thuc-tu-vi/lap-la-so-tu-vi-chuan", label: "lập lá số chuẩn trước khi đối chiếu tuổi" },
+    ],
+    ctaNote: "Nếu muốn chọn ngày theo tuổi sát hơn, hãy xem ngày trên công cụ và đối chiếu với lá số cá nhân thay vì dùng một danh sách chung.",
+  },
+  "tuan-triet-trong-la-so-tu-vi": {
+    focus: "Tuần Triệt",
+    readerNeed: "Người mới nhìn thấy Tuần hoặc Triệt thường lo bị chặn hết đường. Bài cần giải thích đây là yếu tố làm chậm, lọc, đổi cách biểu hiện hoặc buộc đi đường vòng, không phải dấu hiệu xấu tuyệt đối.",
+    safeFrame: "Tuần Triệt phải đọc cùng cung bị ảnh hưởng, chính tinh, phụ tinh, Đại vận và câu hỏi cụ thể. Một vị trí bị chặn ở mặt này có thể lại giúp giảm bớt cực đoan ở mặt khác.",
+    signals: [
+      "Tuần thường gợi ý sự chậm, khoảng trống, việc cần thời gian tích lũy hoặc điều chưa hiện rõ ngay từ đầu.",
+      "Triệt thường gợi ý sự cắt, đổi hướng, giảm lực hoặc buộc người xem học cách thực tế hơn.",
+      "Khi gặp Mệnh hoặc Thân, người xem có thể thấy mình trưởng thành chậm, tự nghi ngờ hoặc phải đi qua nhiều lần thử mới rõ đường.",
+      "Khi gặp Quan Lộc, Tài Bạch, Phu Thê hoặc Điền Trạch, cần đọc theo chủ đề từng cung thay vì kết luận chung là xấu.",
+    ],
+    modifiers: [
+      "Tuần Triệt có thể làm giảm bớt sức mạnh của sao xấu, nhưng cũng có thể làm sao tốt biểu hiện chậm hơn.",
+      "Nếu Đại vận đi qua cung có Tuần Triệt, cảm giác bị trì hoãn có thể rõ hơn, nhưng đó cũng là thời gian học cách chọn lọc.",
+      "Một cung có Tuần Triệt mà vẫn có bộ sao hỗ trợ, môi trường tốt và hành động đúng thì vẫn có kết quả.",
+      "Không nên dùng Tuần Triệt để tự dán nhãn mình kém may hoặc bỏ cuộc sớm.",
+    ],
+    checklist: [
+      "Tuần hay Triệt nằm ở cung nào?",
+      "Cung đó đang trả lời câu hỏi gì: bản thân, nghề, tiền, hôn nhân, nhà cửa hay sức khỏe?",
+      "Sao chính trong cung vốn mạnh hay yếu, có bị giảm cực đoan hay bị chậm biểu hiện?",
+      "Đại vận hiện tại có kích hoạt cung đó không?",
+    ],
+    relatedLinks: [
+      { href: "/kien-thuc-tu-vi/sao-chinh-tinh-tu-vi", label: "chính tinh để đọc nền cung trước" },
+      { href: "/kien-thuc-tu-vi/cung-menh-cung-than", label: "Mệnh - Thân nếu Tuần Triệt nằm ở trục chính" },
+      { href: "/kien-thuc-tu-vi/dai-van-la-gi", label: "Đại vận khi cảm giác bị chậm rõ hơn" },
+      { href: "/kien-thuc-tu-vi/12-cung-trong-la-so-tu-vi", label: "12 cung để xác định chủ đề bị ảnh hưởng" },
+      { href: "/kien-thuc-tu-vi/cach-doc-la-so-tu-vi-cho-nguoi-moi", label: "quy trình đọc lá số không vội kết luận" },
+    ],
+    ctaNote: "Nếu thấy Tuần Triệt trong lá số, hãy xem nó đang nằm ở cung nào và đang làm chậm điều gì, thay vì coi đó là dấu chấm hết.",
+  },
+  "sao-chinh-tinh-tu-vi": {
+    focus: "chính tinh tử vi",
+    readerNeed: "Người đọc muốn biết 14 chính tinh có ý nghĩa gì và nên bắt đầu đọc sao ra sao. Bài cần giúp họ hiểu chính tinh là trục ý nghĩa lớn, nhưng không được đọc rời khỏi cung, trạng thái và bộ sao đi kèm.",
+    safeFrame: "Không nên dùng tên một sao để kết luận tính cách, nghề nghiệp, hôn nhân hay vận mệnh. Chính tinh giống vai chính trong một bối cảnh; cung vị, trạng thái, phụ tinh và vận hạn mới cho biết vai đó đang diễn như thế nào.",
+    signals: [
+      "Nhóm sao thiên về lãnh đạo, tổ chức và trách nhiệm thường nổi bật khi đọc Mệnh, Quan Lộc hoặc cung đang hỏi về vai trò xã hội.",
+      "Nhóm sao thiên về trí tuệ, biến hóa, học hỏi thường cần xem thêm môi trường, nghề nghiệp và khả năng thích nghi.",
+      "Nhóm sao thiên về tài chính, hưởng thụ, quan hệ hoặc cảm xúc cần đọc kỹ Tài Bạch, Phu Thê, Nô Bộc và Phúc Đức.",
+      "Một chính tinh ở cung này có thể rất hợp, nhưng sang cung khác lại biểu hiện theo cách cần tiết chế.",
+    ],
+    modifiers: [
+      "Miếu, vượng, đắc, hãm là lớp trạng thái quan trọng, nhưng vẫn không thay thế toàn bộ bối cảnh.",
+      "Phụ tinh có thể làm sắc thái thay đổi mạnh: tăng sự mềm mại, tăng cạnh tranh, tăng biến động hoặc tăng khả năng tích lũy.",
+      "Đại vận có thể kích hoạt một chính tinh vốn ít nổi bật trong giai đoạn trước.",
+      "Người mới nên học từng nhóm ý nghĩa trước, tránh ghi nhớ máy móc từng câu phú.",
+    ],
+    checklist: [
+      "Chính tinh nằm ở cung nào và cung đó đang trả lời câu hỏi gì?",
+      "Trạng thái của sao mạnh, vừa hay yếu?",
+      "Có phụ tinh nào đi cùng làm tăng hoặc giảm tính chất chính không?",
+      "Đại vận hiện tại có làm sao đó nổi bật hơn không?",
+    ],
+    relatedLinks: [
+      { href: "/kien-thuc-tu-vi/12-cung-trong-la-so-tu-vi", label: "12 cung để đặt chính tinh vào đúng bối cảnh" },
+      { href: "/kien-thuc-tu-vi/cung-menh-cung-than", label: "Mệnh - Thân khi đọc chính tinh chủ khí chất" },
+      { href: "/kien-thuc-tu-vi/cung-quan-loc-trong-tu-vi", label: "Quan Lộc khi chính tinh liên quan sự nghiệp" },
+      { href: "/kien-thuc-tu-vi/tuan-triet-trong-la-so-tu-vi", label: "Tuần Triệt có thể làm sao biểu hiện khác đi" },
+      { href: "/kien-thuc-tu-vi/cach-doc-la-so-tu-vi-cho-nguoi-moi", label: "cách đọc lá số cho người mới" },
+    ],
+    ctaNote: "Hãy lập lá số để biết chính tinh của bạn nằm ở cung nào, trạng thái ra sao và đang được vận hạn nào kích hoạt.",
+  },
+  "gio-sinh-trong-tu-vi": {
+    focus: "giờ sinh trong tử vi",
+    readerNeed: "Người đọc muốn biết vì sao chỉ lệch một giờ mà lá số có thể khác. Bài cần giải thích vai trò của giờ sinh, cách xử lý khi không nhớ chính xác và khi nào nên đọc thận trọng.",
+    safeFrame: "Nếu không chắc giờ sinh, không nên ép lá số theo cảm giác thích câu nào thì chọn câu đó. Hãy dùng khoảng giờ có bằng chứng tốt nhất, đọc xu hướng rộng và kiểm tra bằng các mốc đời sống lớn.",
+    signals: [
+      "Giờ sinh có thể làm thay đổi Cung Mệnh, Cung Thân và cách an nhiều sao, từ đó đổi trọng tâm đọc lá số.",
+      "Người sinh gần ranh giờ âm lịch càng cần cẩn trọng vì chỉ sai một chút có thể sang giờ khác.",
+      "Nếu cha mẹ nhớ theo khoảng như gần sáng, đầu trưa, tối muộn, nên ghi chú mức độ tin cậy thay vì coi là tuyệt đối.",
+      "Các mốc lớn như đổi nghề, hôn nhân, chuyển nhà, bệnh nặng hoặc biến động gia đình có thể giúp kiểm tra lá số nào khớp hơn.",
+    ],
+    modifiers: [
+      "Giấy khai sinh cũng có thể ghi giờ làm thủ tục hoặc giờ làm tròn, nên vẫn cần hỏi lại nguồn nhớ nếu có.",
+      "Nếu chỉ biết ngày sinh, bài luận vẫn có ích ở mức tổng quan nhưng không nên đi quá sâu vào cung vị chi tiết.",
+      "Sai giờ sinh thường làm phần Mệnh - Thân và vận hạn dễ lệch hơn các mô tả chung về năm sinh.",
+      "Không nên đổi giờ sinh chỉ vì muốn lá số đẹp hơn; mục tiêu là đọc sát thực tế, không phải chọn kết quả dễ nghe.",
+    ],
+    checklist: [
+      "Bạn có giấy khai sinh, sổ gia đình, lời nhớ của cha mẹ hay chỉ là ước lượng?",
+      "Giờ sinh nằm gần ranh giờ không?",
+      "Hai lá số ở hai khung giờ khác nhau khác nhau ở điểm nào?",
+      "Lá số nào khớp hơn với mốc trưởng thành, công việc, quan hệ và cách phản ứng của bạn?",
+    ],
+    relatedLinks: [
+      { href: "/kien-thuc-tu-vi/lap-la-so-tu-vi-chuan", label: "lập lá số tử vi chuẩn cần chuẩn bị gì" },
+      { href: "/kien-thuc-tu-vi/tao-la-so-tu-vi", label: "tạo lá số tử vi đúng dữ liệu" },
+      { href: "/kien-thuc-tu-vi/cung-menh-cung-than", label: "Mệnh - Thân thay đổi khi giờ sinh lệch" },
+      { href: "/kien-thuc-tu-vi/cach-doc-la-so-tu-vi-cho-nguoi-moi", label: "cách đọc lá số khi dữ liệu chưa chắc" },
+      { href: "/kien-thuc-tu-vi/12-cung-trong-la-so-tu-vi", label: "12 cung trong lá số tử vi" },
+    ],
+    ctaNote: "Khi lập lá số, hãy nhập giờ sinh tốt nhất bạn có và ghi nhớ mức độ chắc chắn của dữ liệu để đọc kết quả đúng mức.",
+  },
+  "cach-doc-la-so-tu-vi-cho-nguoi-moi": {
+    focus: "cách đọc lá số tử vi",
+    readerNeed: "Người mới thường bị rối vì thấy quá nhiều cung, sao, vận hạn và lời giải khác nhau. Bài cần đưa ra một quy trình đọc đủ chậm, giúp họ biết bắt đầu từ đâu và khi nào nên dừng kết luận.",
+    safeFrame: "Cách đọc lá số tốt không phải là gom thật nhiều câu phán. Đọc đúng là biết câu hỏi đang thuộc cung nào, dữ liệu có chắc không, yếu tố nào là chính, yếu tố nào chỉ là phụ và hành động thực tế tiếp theo là gì.",
+    signals: [
+      "Bắt đầu từ Mệnh - Thân để hiểu khí chất, cách phản ứng và giai đoạn trưởng thành.",
+      "Sau đó chọn cung theo câu hỏi: Quan Lộc cho nghề, Tài Bạch cho tiền, Phu Thê cho quan hệ, Tật Ách cho sức khỏe, Thiên Di cho môi trường bên ngoài.",
+      "Đọc chính tinh trước để nắm trục ý nghĩa lớn, rồi mới xem phụ tinh, Tuần Triệt và vận hạn.",
+      "Cuối cùng dùng Đại vận, Nguyệt vận, Nhật vận để xem thời điểm, không đảo ngược thứ tự bằng cách đọc ngày trước rồi kết luận cả đời.",
+    ],
+    modifiers: [
+      "Nếu giờ sinh chưa chắc, chỉ đọc phần tổng quan và tránh kết luận chi tiết theo cung.",
+      "Nếu câu hỏi liên quan sức khỏe, tiền lớn, pháp lý hoặc hôn nhân, luôn đặt lá số sau dữ liệu thực tế và chuyên gia phù hợp.",
+      "Một sao tốt trong một cung không tự động làm cả đời tốt; một sao khó cũng không xóa hết nỗ lực cá nhân.",
+      "Khi hai dấu hiệu mâu thuẫn, hãy xem dấu hiệu nào thuộc lớp nền, dấu hiệu nào chỉ là vận ngắn.",
+    ],
+    checklist: [
+      "Câu hỏi thật của mình là gì?",
+      "Cung nào trả lời câu hỏi đó?",
+      "Mệnh - Thân có ủng hộ hay làm lệch cách biểu hiện của cung đang hỏi không?",
+      "Vận hiện tại đang mở cơ hội, tạo áp lực hay chỉ nhắc cần chuẩn bị?",
+    ],
+    relatedLinks: [
+      { href: "/kien-thuc-tu-vi/la-so-tu-vi-la-gi", label: "lá số tử vi là gì" },
+      { href: "/kien-thuc-tu-vi/cung-menh-cung-than", label: "Cung Mệnh và Cung Thân" },
+      { href: "/kien-thuc-tu-vi/12-cung-trong-la-so-tu-vi", label: "12 cung trong lá số tử vi" },
+      { href: "/kien-thuc-tu-vi/sao-chinh-tinh-tu-vi", label: "14 chính tinh nên biết" },
+      { href: "/kien-thuc-tu-vi/dai-van-la-gi", label: "Đại vận để hiểu chu kỳ dài" },
+    ],
+    ctaNote: "Hãy dùng bài này như checklist đọc lá số: lập lá số trước, chọn đúng cung theo câu hỏi, rồi mới đi vào sao và vận.",
+  },
+  "seo-cho-website-tu-vi": {
+    focus: "SEO website tử vi",
+    readerNeed: "Người làm website tử vi cần traffic nhưng dễ rơi vào bẫy viết hàng loạt bài mỏng theo năm sinh, sao, cung hoặc từ khóa biến thể. Bài cần chỉ ra cách xây topical authority mà vẫn hữu ích và đáng tin.",
+    safeFrame: "SEO cho chủ đề tử vi phải tránh nội dung gây sợ, hứa chắc tương lai hoặc nhồi từ khóa. Trang nên giải thích rõ đây là nội dung tham khảo, có giới hạn, có đường dẫn để người đọc tự kiểm tra lá số và không thay thế chuyên gia khi chạm sức khỏe, tài chính, pháp lý.",
+    signals: [
+      "Một cụm nội dung tốt nên có pillar lớn, bài hỗ trợ theo intent và liên kết nội bộ tự nhiên giữa các bài.",
+      "Từ khóa có volume cao chưa chắc nên viết riêng nếu intent trùng nhau; nên gộp biến thể lập, lấy, tạo, tra lá số vào một trang mạnh khi nhu cầu giống nhau.",
+      "Bài tử vi cần có giá trị riêng: quy trình đọc, ví dụ ngữ cảnh, checklist, giới hạn diễn giải và CTA kiểm tra lá số cá nhân.",
+      "Schema, sitemap, canonical và tốc độ hỗ trợ crawler hiểu trang, nhưng nội dung mỏng vẫn khó giữ người đọc.",
+    ],
+    modifiers: [
+      "Không nên tạo hàng loạt trang đổi mỗi năm sinh hoặc mỗi sao nếu phần lớn nội dung giống nhau.",
+      "Không nên viết kiểu phán chắc bệnh tật, ly hôn, phá sản hoặc thành công để kéo click.",
+      "Không nên dùng cùng anchor exact-match lặp lại quá nhiều; anchor nên nói rõ ngữ cảnh bài liên quan.",
+      "Khi dùng AI để hỗ trợ viết, cần biên tập lại bằng hiểu biết sản phẩm, ví dụ thực tế và cấu trúc người đọc cần.",
+    ],
+    checklist: [
+      "Mỗi URL có một intent rõ không?",
+      "Bài có tối thiểu 5 internal links hữu ích và một đường về công cụ lập lá số không?",
+      "Bài có ví dụ, checklist hoặc khung đọc riêng, hay chỉ diễn giải chung chung?",
+      "Meta title, description, H1, H2, canonical và JSON-LD có khớp nhau không?",
+    ],
+    relatedLinks: [
+      { href: "/kien-thuc-tu-vi/la-so-tu-vi-la-gi", label: "pillar lá số tử vi là gì" },
+      { href: "/kien-thuc-tu-vi/lap-la-so-tu-vi-chuan", label: "bài chuyển đổi lập lá số tử vi chuẩn" },
+      { href: "/kien-thuc-tu-vi/cach-doc-la-so-tu-vi-cho-nguoi-moi", label: "bài hướng dẫn đọc lá số cho người mới" },
+      { href: "/kien-thuc-tu-vi/12-cung-trong-la-so-tu-vi", label: "cluster 12 cung trong lá số" },
+      { href: "/kien-thuc-tu-vi/sao-chinh-tinh-tu-vi", label: "cluster chính tinh" },
+    ],
+    ctaNote: "Với website tử vi, traffic bền hơn khi mỗi bài giúp người đọc hiểu thêm một bước và dẫn họ về công cụ lập lá số để tự kiểm tra.",
+  },
+};
+
+function renderThinArticleRefresh(refresh: ThinArticleRefresh) {
+  const relatedLinks = refresh.relatedLinks.map((link) => `- [${link.label}](${link.href})`).join("\n");
+  const signals = refresh.signals.map((item) => `- ${item}`).join("\n");
+  const modifiers = refresh.modifiers.map((item) => `- ${item}`).join("\n");
+  const checklist = refresh.checklist.map((item) => `- ${item}`).join("\n");
+
+  return `## Người đọc nên tìm gì trong ${refresh.focus}
+
+${refresh.readerNeed}
+
+${refresh.safeFrame}
+
+## Các tín hiệu nên quan sát
+
+${signals}
+
+## Yếu tố có thể làm kết quả đổi khác
+
+${modifiers}
+
+## Khung kiểm tra nhanh trước khi kết luận
+
+${checklist}
+
+## Cách dùng bài viết này để ra quyết định
+
+Khi đọc ${refresh.focus}, đừng dừng ở câu hỏi "tốt hay xấu". Một bài luận có ích nên giúp bạn gọi đúng vấn đề, biết lớp nào là nền, lớp nào chỉ là thời điểm, và nhận ra phần nào cần kiểm chứng bằng đời sống thật. Nếu một đoạn trong bài khớp với bạn, hãy hỏi tiếp: dấu hiệu đó đến từ cung nào, đang được vận nào kích hoạt, và mình có dữ liệu thực tế nào xác nhận không.
+
+Bạn cũng nên ghi lại 2-3 hành động nhỏ sau khi đọc. Ví dụ: kiểm tra lại giờ sinh, đọc thêm cung liên quan, xem Đại vận trước khi xét vận ngày, hoặc chuẩn bị câu hỏi cụ thể trước khi mở luận giải sâu. Cách làm này giúp ${refresh.focus} trở thành công cụ tự hiểu mình hơn, thay vì một danh sách câu phán rời rạc.
+
+Nếu bài viết chạm đến tiền bạc, sức khỏe, hôn nhân, nghề nghiệp hoặc quyết định pháp lý, hãy coi nội dung tử vi là lớp tham khảo. Quyết định cuối cùng vẫn nên dựa trên thông tin thực tế, trao đổi với người liên quan và hỗ trợ chuyên môn khi cần.
+
+## Nên đọc tiếp bài nào
+
+${relatedLinks}
+
+${cta}
+
+${refresh.ctaNote}`;
+}
+
+function enrichThinArticleContent(slug: string, content: string) {
+  const refresh = thinArticleRefreshes[slug];
+  if (!refresh) return content;
+  return `${content.trim()}\n\n${renderThinArticleRefresh(refresh)}`;
+}
 
 export const seedArticles: ArticleView[] = [
   article({

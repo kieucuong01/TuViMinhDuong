@@ -91,6 +91,22 @@ describe("SEO content cluster", () => {
     }
   });
 
+  it("keeps public knowledge articles above thin-content thresholds", () => {
+    for (const article of seedArticles) {
+      const plainText = article.content
+        .replace(/\[[^\]]+]\([^)]+\)/g, " ")
+        .replace(/[#>*`|\-]+/g, " ");
+      const wordCount = plainText.match(/[\wÀ-ỹ]+/gu)?.length ?? 0;
+      const internalLinks = article.content.match(/]\(\/[^)]+\)/g)?.length ?? 0;
+      const h2Count = article.content.match(/^##\s+/gm)?.length ?? 0;
+
+      expect(article.content.length, `${article.slug} should not be thin`).toBeGreaterThanOrEqual(4500);
+      expect(wordCount, `${article.slug} should have enough editorial depth`).toBeGreaterThanOrEqual(800);
+      expect(internalLinks, `${article.slug} should have contextual internal links`).toBeGreaterThanOrEqual(5);
+      expect(h2Count, `${article.slug} should have a scannable H2 structure`).toBeGreaterThanOrEqual(5);
+    }
+  });
+
   it("refreshes the core pillars with depth, trust framing, and contextual anchors", () => {
     const corePillars = [
       "la-so-tu-vi-la-gi",
