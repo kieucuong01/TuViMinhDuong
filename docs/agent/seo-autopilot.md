@@ -139,7 +139,10 @@ Then:
 2. Inspect the generated draft/report and repo SEO/content files only as needed.
 3. For publisher runs, implement at most one selected article/refresh. For Sunday strategy, use plan.weeklyContentPlan as the 7-slot weekly queue unless live evidence points to a higher-impact safe task.
 4. Implement one SEO/content article or material refresh per day without asking first, but never more than one production article/refresh per automation run.
-5. Each article must follow the brief:
+5. Treat the draft as input, not as finished output. If the selected article is too thin, weakly linked, missing data blocks, weak on causal analysis, or not strong enough to publish, rewrite and improve it in the production content system during the same run until it clears the SEO quality gate or a real blocker is found.
+6. A daily publisher run is not complete when it only leaves markdown draft artifacts. If verification passes, it should end with one production article/refresh committed, pushed, deployed, and smoke-tested on the live URL.
+7. Only skip publishing when there is a real blocker: failed verification, unchanged task with no new signal, or insufficient content quality that cannot be fixed safely in the same run.
+8. Each article must follow the brief:
    - target character range from brief.targetCharacterRange
    - at least 5 contextual internal links
    - at least 1 conversion link to /#lap-la-so where relevant
@@ -150,10 +153,10 @@ Then:
    - FAQ content only when visible FAQ is included
    - no exact-match anchor stuffing
    - no copied, thin, doorway, or mass-produced search-first content
-6. Do not touch payment, auth, DB schema, chart/date engine rules, or large URL structure.
-7. Run targeted tests, targeted ESLint, npm run build, and live checks when practical.
-8. Commit/push/deploy SEO/content-only changes if verification passes.
-9. Report what changed, why, verification results, expected SEO impact, measurement plan, and next priority.
+9. Do not touch payment, auth, DB schema, chart/date engine rules, or large URL structure.
+10. Run targeted tests, targeted ESLint, npm run build, and live checks when practical.
+11. Commit/push/deploy SEO/content-only changes if verification passes.
+12. Report what changed, why, verification results, expected SEO impact, measurement plan, and next priority.
 
 Keep content useful for Vietnamese adults 30-60. Avoid generic AI filler, exaggerated claims, and hidden SEO notes in public copy. Follow Google Search Central's people-first guidance and spam policies: do not create scaled low-value content to manipulate ranking.
 ```
@@ -179,6 +182,7 @@ Automation should avoid repeated heavy work. Use the smallest useful loop:
 - Lighthouse CI is weekly/manual only. Do not run it inside every publisher automation unless the task changed public SEO layout, metadata, structured data, or page experience.
 - Do not run `npm test`, `npm run build`, deploy, or live smoke when no repo/content files changed.
 - Prefer targeted tests and targeted ESLint for touched files; run full build only before release.
+- When repo/content files did change for the selected slug, the automation should keep iterating on that one article until it is publishable or a concrete blocker is proven. Do not stop at a draft-only handoff just because the first draft is weak.
 - If GSC, SEMrush, sitemap, and content inventory are unchanged from the latest `docs/seo-autopilot/state.json`, do a short report/skip instead of repeating the same draft.
 - Keep useful repetition: weekly measurement, GSC opportunity checks, and one daily publish/refresh slot are worth keeping because they catch trend changes and prevent stale content.
 

@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-label="Minh họa phân tích lá số tử vi theo thứ tự Mệnh Thân, 12 cung và vận hạn">
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#f8f1e3"/>
+      <stop offset="0.58" stop-color="#fffaf3"/>
+      <stop offset="1" stop-color="#efe1c6"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="74%" cy="28%" r="56%">
+      <stop offset="0" stop-color="#c98347" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#c98347" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="18" stdDeviation="24" flood-color="#2f2619" flood-opacity="0.16"/>
+    </filter>
+  </defs>
+  <rect width="1200" height="675" fill="url(#bg)"/>
+  <rect width="1200" height="675" fill="url(#glow)"/>
+  <path d="M-40 585C130 520 250 652 414 592C560 538 660 472 818 490C972 508 1092 430 1240 384V740H-40Z" fill="#23422f" opacity="0.08"/>
+  <g opacity="0.16" stroke="#23422f" stroke-width="1.4" fill="none">
+    <path d="M96 132c68-56 148-60 220-8M942 88c98 36 152 92 184 176M172 592c160-72 290-54 434 14"/>
+    <circle cx="1000" cy="142" r="76"/>
+    <circle cx="1000" cy="142" r="112"/>
+  </g>
+  <g filter="url(#shadow)">
+    <rect x="72" y="90" width="444" height="482" rx="34" fill="#fffdf8" stroke="#c98347" stroke-width="3"/>
+    <text x="116" y="128" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#23422f" opacity="0.72">Lá số tinh hoa</text>
+    <text x="116" y="184" font-family="Arial, sans-serif" font-size="42" font-weight="800" fill="#23422f">Phân tích lá số</text>
+    <text x="116" y="224" font-family="Arial, sans-serif" font-size="22" font-weight="600" fill="#7d5733">Đọc từ nền lá số tới vận hạn</text>
+    <rect x="116" y="266" width="356" height="60" rx="18" fill="#f6ecdb"/>
+    <rect x="116" y="346" width="356" height="60" rx="18" fill="#fff7ea"/>
+    <rect x="116" y="426" width="356" height="60" rx="18" fill="#f6ecdb"/>
+    <circle cx="154" cy="296" r="12" fill="#c98347"/>
+    <circle cx="154" cy="376" r="12" fill="#c98347"/>
+    <circle cx="154" cy="456" r="12" fill="#c98347"/>
+    <text x="184" y="303" font-family="Arial, sans-serif" font-size="24" font-weight="700" fill="#23422f">1. Mệnh - Thân và 12 cung</text>
+    <text x="184" y="383" font-family="Arial, sans-serif" font-size="24" font-weight="700" fill="#23422f">2. Chính tinh và trạng thái sao</text>
+    <text x="184" y="463" font-family="Arial, sans-serif" font-size="24" font-weight="700" fill="#23422f">3. Đại vận và bối cảnh thật</text>
+    <text x="116" y="534" font-family="Arial, sans-serif" font-size="20" font-weight="600" fill="#7d5733">Tránh kết luận từ một câu luận rời rạc</text>
+  </g>
+  <g filter="url(#shadow)">
+    <rect x="590" y="92" width="534" height="492" rx="36" fill="#fffdf8" stroke="#c98347" stroke-width="3"/>
+    <rect x="654" y="156" width="406" height="344" rx="28" fill="#fbf4e7" stroke="#23422f" stroke-opacity="0.14"/>
+    <g transform="translate(857 328)">
+      <circle r="164" fill="#fffdf7" stroke="#23422f" stroke-opacity="0.48" stroke-width="3"/>
+      <circle r="112" fill="none" stroke="#23422f" stroke-opacity="0.42" stroke-width="2.4"/>
+      <circle r="64" fill="none" stroke="#23422f" stroke-opacity="0.34" stroke-width="2"/>
+      <path d="M0-164V164M-164 0H164M-116-116L116 116M116-116L-116 116" stroke="#23422f" stroke-opacity="0.16" stroke-width="2"/>
+      <g fill="#c98347">
+        <circle cx="0" cy="-164" r="8"/>
+        <circle cx="82" cy="-142" r="8"/>
+        <circle cx="142" cy="-82" r="8"/>
+        <circle cx="164" cy="0" r="8"/>
+        <circle cx="142" cy="82" r="8"/>
+        <circle cx="82" cy="142" r="8"/>
+        <circle cx="0" cy="164" r="8"/>
+        <circle cx="-82" cy="142" r="8"/>
+        <circle cx="-142" cy="82" r="8"/>
+        <circle cx="-164" cy="0" r="8"/>
+        <circle cx="-142" cy="-82" r="8"/>
+        <circle cx="-82" cy="-142" r="8"/>
+      </g>
+      <circle r="34" fill="#23422f"/>
+      <path d="M0-22l8 16 18 3-13 12 3 18-16-9-16 9 3-18-13-12 18-3z" fill="#c98347"/>
+    </g>
+    <path d="M682 498c54-58 118-90 176-96 78-8 124 28 174 20 38-6 70-28 100-64" fill="none" stroke="#23422f" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" opacity="0.72"/>
+    <circle cx="682" cy="498" r="10" fill="#c98347"/>
+    <circle cx="858" cy="402" r="10" fill="#c98347"/>
+    <circle cx="1032" cy="422" r="10" fill="#c98347"/>
+  </g>
+</svg>

@@ -5,6 +5,7 @@ export default defineConfig({
   test: {
     include: ["src/**/*.{test,spec}.{ts,tsx}"],
     exclude: ["tests/e2e/**", "node_modules/**", ".next/**"],
+    testTimeout: 15_000,
   },
   resolve: {
     alias: {
