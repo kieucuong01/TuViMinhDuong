@@ -39,7 +39,12 @@ export function getHoChiMinhWeekday(now = new Date()) {
 
 export function pickTrafficArticle({ existingSlugs = [], preferredSlug, seoState } = {}) {
   const uniqueSlugs = [...new Set(existingSlugs.filter(Boolean))];
-  const stateSlug = seoState?.lastPublishedSlug || seoState?.selectedSlug || seoState?.slug;
+  const stateSlug =
+    seoState?.lastPublishedSlug ||
+    seoState?.lastAction?.slug ||
+    seoState?.lastAction?.slugs?.[0] ||
+    seoState?.selectedSlug ||
+    seoState?.slug;
   const candidates = [preferredSlug, stateSlug, ...PREFERRED_TRAFFIC_SLUGS, ...uniqueSlugs].filter(Boolean);
   const slug = candidates.find((candidate) => uniqueSlugs.includes(candidate)) || candidates[0] || "la-so-tu-vi-la-gi";
 

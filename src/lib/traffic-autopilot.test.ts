@@ -108,6 +108,20 @@ describe("Traffic Autopilot", () => {
     expect(combinedCopy).not.toMatch(/chac chan|bao dam|doi doi/i);
   });
 
+  it("uses the latest SEO publisher state action before static fallback articles", () => {
+    const article = pickTrafficArticle({
+      existingSlugs: [...existingSlugs, "phan-tich-la-so-tu-vi"],
+      seoState: {
+        lastAction: {
+          slug: "phan-tich-la-so-tu-vi",
+        },
+      },
+    });
+
+    expect(article.slug).toBe("phan-tich-la-so-tu-vi");
+    expect(article.url).toBe("/kien-thuc-tu-vi/phan-tich-la-so-tu-vi");
+  });
+
   it("writes a durable short-video report with captions, UTM links, and website CTA", () => {
     const plan = buildTrafficAutopilotPlan({
       existingSlugs,

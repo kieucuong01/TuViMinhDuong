@@ -19,6 +19,7 @@ const skipSearchConsole = shouldSkipSearchConsole({ explicitSkip: args.skipSearc
 try {
   const snapshot = await buildSnapshot({ baseUrl, sampleSize });
   const existingSlugs = await readExistingSlugs();
+  const previousState = await readPreviousState();
   const keywordSource = readSemrushKeywordRows({ csvPath: args.keywordCsv });
   const searchConsole = skipSearchConsole
     ? null
@@ -29,6 +30,7 @@ try {
     keywordRows: keywordSource.rows,
     searchConsole,
     articlesPerWeek,
+    previousState,
   });
   const result = {
     generatedAt: new Date().toISOString(),
@@ -61,6 +63,17 @@ async function readExistingSlugs() {
   const contentPath = resolve(process.cwd(), "src/lib/content.ts");
   const source = await readFile(contentPath, "utf8");
   return extractSeedArticleSlugs(source);
+}
+
+async function readPreviousState() {
+  const statePath = resolve(process.cwd(), "docs/seo-autopilot/state.json");
+  try {
+    const source = await readFile(statePath, "utf8");
+    return JSON.parse(source);
+  } catch (error) {
+    if (error?.code === "ENOENT") return null;
+    throw error;
+  }
 }
 
 function formatMarkdown(result) {

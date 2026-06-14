@@ -1,13 +1,13 @@
 {
-  "lastRunAt": "2026-06-13T07:02:31.740Z",
+  "lastRunAt": "2026-06-14T14:03:01.435Z",
   "lastStatus": "ok",
   "lastAction": {
     "type": "weekly_content_batch",
-    "slug": "la-so-bat-tu-va-tu-vi",
+    "slug": "phan-tich-la-so-tu-vi",
     "slugs": [
-      "la-so-bat-tu-va-tu-vi"
+      "phan-tich-la-so-tu-vi"
     ],
-    "reason": "Publish 1 people-first articles from SEMrush intent clusters; first topic: Người đọc tìm lá số bát tự và cần phân biệt bát tự, tứ trụ với lá số tử vi trước khi chọn cách xem phù hợp.",
+    "reason": "Publish 1 people-first articles from SEMrush intent clusters; first topic: Người đọc đã có lá số và muốn biết nên phân tích Mệnh, Thân, 12 cung, chính tinh và vận hạn theo thứ tự nào.",
     "approvalRequired": false,
     "allowedToCommitDeployAfterVerification": true
   },
@@ -17,27 +17,12 @@
     "warning": null
   },
   "lastSearchConsole": {
-    "status": "unavailable",
-    "siteUrl": "https://lasotinhhoa.vn/",
-    "dateRange": {
-      "startDate": "2026-05-14",
-      "endDate": "2026-06-10"
-    },
-    "totals": {
-      "clicks": 0,
-      "impressions": 0,
-      "ctr": 0,
-      "position": 0
-    },
-    "topOpportunities": [],
-    "warnings": [
-      "OAuth refresh failed: Unauthorized"
-    ]
+    "status": "skipped"
   },
   "lastDraftPaths": [
-    "docs/seo-autopilot/drafts/la-so-bat-tu-va-tu-vi.md"
+    "docs/seo-autopilot/drafts/phan-tich-la-so-tu-vi.md"
   ],
-  "lastReportPath": "docs/seo-autopilot/reports/2026-06-13-weekly-content-batch.md",
+  "lastReportPath": "docs/seo-autopilot/reports/2026-06-14-weekly-content-batch.md",
   "nextVerificationCommands": [
     "npm run seo:autopilot",
     "npm test -- src/lib/content.test.ts src/lib/seo-autopilot-core.test.ts",

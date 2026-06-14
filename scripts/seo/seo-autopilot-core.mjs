@@ -490,7 +490,14 @@ export function buildContentBrief(opportunity) {
   };
 }
 
-export function planSeoAutopilotRun({ snapshot, existingSlugs, keywordRows, searchConsole, articlesPerWeek = 7 }) {
+export function planSeoAutopilotRun({
+  snapshot,
+  existingSlugs,
+  keywordRows,
+  searchConsole,
+  articlesPerWeek = 7,
+  previousState,
+}) {
   const currentSlugs = new Set(existingSlugs || []);
   const snapshotOpportunities = Array.isArray(snapshot?.opportunities) ? snapshot.opportunities : [];
   const inputKeywordRows = Array.isArray(keywordRows) ? keywordRows : [];
@@ -503,7 +510,12 @@ export function planSeoAutopilotRun({ snapshot, existingSlugs, keywordRows, sear
     : snapshotOpportunities.length
       ? snapshotOpportunities.filter((item) => !currentSlugs.has(item.slug))
       : rankTopicOpportunities([...currentSlugs]);
-  const weeklyContentPlan = buildWeeklyContentPlan({ opportunities, articlesPerWeek });
+  const normalizedOpportunities = avoidImmediateRepeat({
+    opportunities,
+    previousState,
+    articlesPerWeek,
+  });
+  const weeklyContentPlan = buildWeeklyContentPlan({ opportunities: normalizedOpportunities, articlesPerWeek });
   const selected = weeklyContentPlan.articles[0]?.brief || buildContentBrief(rankTopicOpportunities([...currentSlugs])[0]);
   const brief = buildContentBrief(selected);
   const slugs = weeklyContentPlan.articles.map((item) => item.slug);
@@ -576,6 +588,21 @@ export function buildWeeklyContentPlan({ opportunities, articlesPerWeek = 7 }) {
       };
     }),
   };
+}
+
+function avoidImmediateRepeat({ opportunities, previousState, articlesPerWeek }) {
+  if (articlesPerWeek !== 1 || !Array.isArray(opportunities) || opportunities.length < 2) {
+    return opportunities;
+  }
+
+  const lastSlug = previousState?.lastAction?.slug;
+  if (!lastSlug || opportunities[0]?.slug !== lastSlug) {
+    return opportunities;
+  }
+
+  const nextTopics = opportunities.filter((item) => item.slug !== lastSlug);
+  const repeatedTopics = opportunities.filter((item) => item.slug === lastSlug);
+  return nextTopics.length ? [...nextTopics, ...repeatedTopics] : opportunities;
 }
 
 export function renderContentDraft(brief, { generatedAt } = {}) {

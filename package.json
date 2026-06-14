@@ -30,7 +30,8 @@
     "seo:autopilot:snapshot": "node scripts/seo/seo-autopilot-snapshot.mjs --json",
     "traffic:autopilot": "node scripts/traffic/traffic-autopilot.mjs",
     "smoke:google-ads": "node scripts/smoke-google-ads.mjs",
-    "smoke:payos": "node scripts/smoke-payos-checkout.mjs"
+    "smoke:payos": "node scripts/smoke-payos-checkout.mjs",
+    "env:check:production": "node scripts/check-production-env.mjs"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.8.0",

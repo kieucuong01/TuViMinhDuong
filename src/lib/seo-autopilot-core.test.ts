@@ -314,6 +314,45 @@ export const seedArticles = [
     expect(plan.nextAction.reason).toContain("Publish 1 people-first");
   });
 
+  it("falls back to the next publisher slug when the last single-task run picked the same article", () => {
+    const plan = planSeoAutopilotRun({
+      snapshot: {
+        status: "ok",
+        sitemapUrlCount: 30,
+        warnings: [],
+        opportunities: [
+          {
+            slug: "tao-la-so-tu-vi",
+            cluster: "Lá số tử vi",
+            priority: 98,
+            focusKeyword: "tạo lá số tử vi",
+            intent: "Người đọc muốn tạo lá số tử vi online.",
+            funnelStage: "conversion-support",
+          },
+          {
+            slug: "la-so-bat-tu-va-tu-vi",
+            cluster: "Bát tự và tử vi",
+            priority: 94,
+            focusKeyword: "lá số bát tự",
+            intent: "Người đọc cần phân biệt bát tự với lá số tử vi.",
+            funnelStage: "middle",
+          },
+        ],
+      },
+      existingSlugs: ["la-so-tu-vi-la-gi"],
+      articlesPerWeek: 1,
+      previousState: {
+        lastAction: {
+          slug: "tao-la-so-tu-vi",
+        },
+      },
+    });
+
+    expect(plan.nextAction.slug).toBe("la-so-bat-tu-va-tu-vi");
+    expect(plan.nextAction.slugs).toEqual(["la-so-bat-tu-va-tu-vi"]);
+    expect(plan.brief.slug).toBe("la-so-bat-tu-va-tu-vi");
+  });
+
   it("renders a content draft artifact that automation can publish later", () => {
     const draft = renderContentDraft(
       buildContentBrief({

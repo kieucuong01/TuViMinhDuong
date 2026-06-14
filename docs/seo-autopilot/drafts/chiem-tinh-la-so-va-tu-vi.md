@@ -1,39 +1,39 @@
 ---
-slug: la-so-bat-tu-va-tu-vi
+slug: chiem-tinh-la-so-va-tu-vi
 status: draft
-cluster: Bát tự và tử vi
-focusKeyword: lá số bát tự
-canonicalUrl: /kien-thuc-tu-vi/la-so-bat-tu-va-tu-vi
-funnelStage: middle
+cluster: So sánh hệ thống lá số
+focusKeyword: chiêm tinh lá số
+canonicalUrl: /kien-thuc-tu-vi/chiem-tinh-la-so-va-tu-vi
+funnelStage: top
 targetCharacters: 5500-8500
 generatedAt: 2026-06-14T13:58:50.725Z
 ---
 
-# Lá số bát tự: khác gì với lá số tử vi?
+# Chiêm tinh lá số: khác gì với lá số tử vi?
 
-**Intent:** Người đọc tìm lá số bát tự và cần phân biệt bát tự, tứ trụ với lá số tử vi trước khi chọn cách xem phù hợp.
+**Intent:** Người đọc đang tìm lá số chiêm tinh và cần hiểu khác biệt giữa chiêm tinh, tử vi và bát tự trước khi đi sâu.
 
 ## Keyword Evidence
 
-Cluster: bat-tu-tu-tru
-Cluster volume: 22370
-Keyword count: 15
-Average KD: 28
+Cluster: chiem-tinh
+Cluster volume: 31360
+Keyword count: 6
+Average KD: 56
 
 Top source keywords:
-- lá số bát tự (volume 12100, KD 30)
-- lập lá số bát tự (volume 5400, KD 22)
-- lấy lá số tử tru Vä bình giải miễn phí (volume 1300, KD 50)
-- lập lá số tử try (volume 1000, KD 19)
-- lấy lá số bát tự (volume 720, KD 15)
-- bát tự lá số (volume 390, KD 34)
+- chiêm tinh lá số (volume 27100, KD 57)
+- lá số chiêm tinh (volume 3600, KD 51)
+- chöi chiêm tinh lập lá số (volume 210, KD 50)
+- chiêm tinh lá số tử vi (volume 170, KD 52)
+- lập lá số chiêm tinh (volume 170, KD 28)
+- xem lá số chiêm tinh (volume 110, KD 51)
 
-**Meta title:** Lá số bát tự: khác gì với tử vi? | Lá số tinh hoa
+**Meta title:** Chiêm tinh lá số: khác gì với tử vi? | Lá số tinh hoa
 
-**Meta description:** So sánh lá số bát tự với lá số tử vi theo dữ liệu đầu vào, cách đọc, điểm mạnh và giới hạn để người mới chọn hướng tìm hiểu phù hợp.
+**Meta description:** So sánh chiêm tinh lá số với lá số tử vi theo dữ liệu đầu vào, cách đọc, điểm mạnh và giới hạn để người mới chọn hướng tìm hiểu phù hợp.
 
 ## Outline
-- Lá số bát tự là gì và vì sao người đọc hay nhầm với tử vi
+- Chiêm tinh lá số là gì và vì sao người đọc hay nhầm với tử vi
 - Dữ liệu đầu vào: ngày sinh, giờ sinh, lịch âm dương và hệ quy chiếu
 - Cách đọc kết quả: điểm giống và khác với lá số tử vi
 - Nên dùng bài viết này để chọn hướng học, không dùng để kết luận số phận
@@ -72,16 +72,16 @@ Required data blocks:
 - algorithmic-source-notes
 
 Data enrichment examples:
-- Create a compact score table for lá số bát tự: risk, stability, accumulation/relationship/career fit, and reading confidence.
+- Create a compact score table for chiêm tinh lá số: risk, stability, accumulation/relationship/career fit, and reading confidence.
 - List modifier stars, palace context, or chart conditions that can change the interpretation; do not present one-star claims as absolute.
 - Name the internal calculation/data source when relevant, such as chart input, palace position, star state, companion stars, or date-fortune output.
 
 expert prompt frame:
-- Expert prompt frame for Lá số bát tự: analyze by logic nhan qua from star/palace nature, activation condition, likely expression, limitation, then practical advice.
+- Expert prompt frame for Chiêm tinh lá số: analyze by logic nhan qua from star/palace nature, activation condition, likely expression, limitation, then practical advice.
 - Force three concrete sections: what pattern can be read, what can reverse or weaken it, and what the reader should check in their own chart.
 - Use objective, bounded language; no vague AI filler like 'be careful with money' unless the causal reason is explained.
 
-interactive CTA: Invite the reader to enter birth date/time to check whether lá số bát tự appears in their chart and what palace/modifier context changes the reading.
+interactive CTA: Invite the reader to enter birth date/time to check whether chiêm tinh lá số appears in their chart and what palace/modifier context changes the reading.
 interactive target: /#lap-la-so
 
 ## CTA
@@ -89,11 +89,11 @@ interactive target: /#lap-la-so
 Nếu mục tiêu của bạn là đọc theo tử vi, hãy lập lá số tử vi miễn phí trước để có dữ liệu 12 cung rồi mới đối chiếu các bài giải nghĩa.
 
 ## FAQ
-- **Lá số bát tự có phải luôn tốt không?**
+- **Chiêm tinh lá số có phải luôn tốt không?**
   Không nên đọc một sao theo kiểu tốt xấu tuyệt đối. Cần xem sao nằm ở cung nào, trạng thái mạnh yếu, bộ sao đi cùng và vận hạn đang kích hoạt.
-- **Muốn biết mình có lá số bát tự thì làm gì?**
+- **Muốn biết mình có chiêm tinh lá số thì làm gì?**
   Bạn cần lập lá số bằng ngày sinh, giờ sinh, giới tính và lịch sinh. Sau đó kiểm tra vị trí sao trong từng cung và đọc cùng cung Mệnh, Thân, Quan Lộc, Tài Bạch.
-- **Lá số bát tự nên đọc cùng phần nào?**
+- **Chiêm tinh lá số nên đọc cùng phần nào?**
   Nên đọc cùng chính tinh, 12 cung, đại vận và các bài hướng dẫn đọc lá số cho người mới để tránh kết luận rời rạc.
 
 ## Safety Guards
