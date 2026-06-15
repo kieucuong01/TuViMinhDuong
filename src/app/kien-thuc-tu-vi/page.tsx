@@ -18,6 +18,12 @@ function formatArticleDate(date?: Date | null) {
   return date ? articleDateFormatter.format(new Date(date)) : null;
 }
 
+function normalizeArticleDate(date?: Date | string | null) {
+  if (!date) return null;
+  const normalized = new Date(date);
+  return Number.isNaN(normalized.getTime()) ? null : normalized;
+}
+
 export const metadata = routeMetadata({
   title: "Kiến thức tử vi cho người mới",
   description: "Bài viết kiến thức tử vi dễ đọc về cách lập lá số, cung mệnh, vận hạn, xem ngày và ứng dụng trong đời sống.",
@@ -131,7 +137,8 @@ export default async function KnowledgePage({ searchParams }: { searchParams: Pr
         </nav>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {visibleArticles.map((article) => {
-            const publishedDate = formatArticleDate(article.publishedAt || article.updatedAt);
+            const articleDate = normalizeArticleDate(article.publishedAt || article.updatedAt);
+            const publishedDate = formatArticleDate(articleDate);
 
             return (
               <Link key={article.slug} href={`/kien-thuc-tu-vi/${article.slug}`} className="article-card">
@@ -143,7 +150,7 @@ export default async function KnowledgePage({ searchParams }: { searchParams: Pr
                 {article.category ? <span className="article-category-label">{article.category.name}</span> : null}
                 <h2>{article.title}</h2>
                 <span className="article-card-meta">
-                  {publishedDate ? <time dateTime={(article.publishedAt || article.updatedAt)?.toISOString()}>{publishedDate}</time> : null}
+                  {publishedDate && articleDate ? <time dateTime={articleDate.toISOString()}>{publishedDate}</time> : null}
                   <span>Người đăng: {ARTICLE_AUTHOR}</span>
                 </span>
                 <p>{article.excerpt}</p>
