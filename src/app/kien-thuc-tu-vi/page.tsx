@@ -6,6 +6,18 @@ import { itemListJsonLd, webPageJsonLd } from "@/lib/seo";
 
 export const revalidate = 300;
 
+const ARTICLE_AUTHOR = "Admin";
+const articleDateFormatter = new Intl.DateTimeFormat("vi-VN", {
+  day: "2-digit",
+  month: "2-digit",
+  year: "numeric",
+  timeZone: "Asia/Ho_Chi_Minh",
+});
+
+function formatArticleDate(date?: Date | null) {
+  return date ? articleDateFormatter.format(new Date(date)) : null;
+}
+
 export const metadata = routeMetadata({
   title: "Kiến thức tử vi cho người mới",
   description: "Bài viết kiến thức tử vi dễ đọc về cách lập lá số, cung mệnh, vận hạn, xem ngày và ứng dụng trong đời sống.",
@@ -118,18 +130,26 @@ export default async function KnowledgePage({ searchParams }: { searchParams: Pr
           ))}
         </nav>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {visibleArticles.map((article) => (
-            <Link key={article.slug} href={`/kien-thuc-tu-vi/${article.slug}`} className="article-card">
-              {article.coverImage ? (
-                <span className="article-thumb image">
-                  <Image src={article.coverImage} alt={article.coverAlt || article.title} width={600} height={338} sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw" />
+          {visibleArticles.map((article) => {
+            const publishedDate = formatArticleDate(article.publishedAt || article.updatedAt);
+
+            return (
+              <Link key={article.slug} href={`/kien-thuc-tu-vi/${article.slug}`} className="article-card">
+                {article.coverImage ? (
+                  <span className="article-thumb image">
+                    <Image src={article.coverImage} alt={article.coverAlt || article.title} width={600} height={338} sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw" />
+                  </span>
+                ) : null}
+                {article.category ? <span className="article-category-label">{article.category.name}</span> : null}
+                <h2>{article.title}</h2>
+                <span className="article-card-meta">
+                  {publishedDate ? <time dateTime={(article.publishedAt || article.updatedAt)?.toISOString()}>{publishedDate}</time> : null}
+                  <span>Người đăng: {ARTICLE_AUTHOR}</span>
                 </span>
-              ) : null}
-              {article.category ? <span className="article-category-label">{article.category.name}</span> : null}
-              <h2>{article.title}</h2>
-              <p>{article.excerpt}</p>
-            </Link>
-          ))}
+                <p>{article.excerpt}</p>
+              </Link>
+            );
+          })}
         </div>
         {visibleArticles.length === 0 ? (
           <div className="knowledge-empty-state">
