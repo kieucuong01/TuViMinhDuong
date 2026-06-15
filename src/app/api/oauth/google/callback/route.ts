@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
-import { ADMIN_EMAIL, isGoogleOAuthEnabled } from "@/lib/env";
+import { ADMIN_EMAIL, APP_URL, isGoogleOAuthEnabled } from "@/lib/env";
 import { getDb } from "@/lib/db";
 import { setSession, type SessionUser } from "@/lib/auth";
 import {
@@ -110,7 +110,7 @@ export async function GET(request: Request) {
     }
 
     await setSession(user);
-    return NextResponse.redirect(new URL(parsed.next, url.origin));
+    return NextResponse.redirect(new URL(parsed.next, APP_URL));
   } catch (error) {
     console.error("google_oauth_callback_failed", error);
     return NextResponse.redirect(googleOAuthErrorUrl("Đăng nhập Google tạm thời chưa hoàn tất. Bạn thử lại giúp mình nhé.", parsed.next));
