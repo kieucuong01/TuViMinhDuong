@@ -70,4 +70,11 @@ describe("chart form compact picker UI", () => {
     expect(globalsCss).toMatch(/\.hero-form-card \.chart-form label,[\s\S]*\.hero-form-card \.birth-date-group\s*{[\s\S]*animation:\s*none/);
     expect(globalsCss).toMatch(/\.hero-form-card \.chart-form label:focus-within,[\s\S]*\.hero-form-card \.birth-date-group:focus-within\s*{[\s\S]*transform:\s*none/);
   });
+
+  it("disables expensive hero form effects on touch devices to avoid iOS focus crashes", () => {
+    expect(globalsCss).toContain("@media (hover: none) and (pointer: coarse), (max-width: 768px)");
+    expect(globalsCss).toMatch(/\.hero-form-card::before,[\s\S]*\.hero-form-card::after,[\s\S]*\.hero-form-card \.chart-form \.btn-primary::after\s*{[\s\S]*animation:\s*none !important/);
+    expect(globalsCss).toMatch(/\.hero-form-card\s*{[\s\S]*backdrop-filter:\s*none !important/);
+    expect(globalsCss).toMatch(/\.hero-form-card::before,[\s\S]*\.hero-form-card::after\s*{[\s\S]*content:\s*none/);
+  });
 });

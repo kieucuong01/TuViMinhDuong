@@ -1,12 +1,13 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { MarkdownContent } from "@/components/markdown-content";
 
 type FreeOverviewState =
-  | { status: "loading"; content?: undefined; error?: undefined }
-  | { status: "ready"; content: string; error?: undefined }
+  | { status: "loading"; content?: string; error?: undefined }
+  | { status: "ready"; content: string; detailContent: string; error?: undefined }
   | { status: "fallback"; content: string; jobStatus: "idle" | "processing" | "stale" | "failed"; error?: string }
   | { status: "error"; content?: string; error: string };
 
@@ -25,9 +26,22 @@ type FreeOverviewPayload =
 const POLL_DELAY_MS = 2500;
 const MAX_POLL_ATTEMPTS = 72;
 
-function initialOverviewState(initialOverview?: FreeOverviewPayload | null): FreeOverviewState {
-  if (!initialOverview?.content) return { status: "loading" };
-  if (initialOverview.status === "ready") return { status: "ready", content: initialOverview.content };
+function initialOverviewState(
+  initialOverview?: FreeOverviewPayload | null,
+  instantOverviewContent?: string | null,
+): FreeOverviewState {
+  if (!initialOverview?.content) {
+    return instantOverviewContent
+      ? { status: "fallback", content: instantOverviewContent, jobStatus: "idle" }
+      : { status: "loading" };
+  }
+  if (initialOverview.status === "ready") {
+    return {
+      status: "ready",
+      content: instantOverviewContent || initialOverview.content,
+      detailContent: initialOverview.content,
+    };
+  }
   return {
     status: "fallback",
     content: initialOverview.content,
@@ -39,12 +53,16 @@ function initialOverviewState(initialOverview?: FreeOverviewPayload | null): Fre
 export function FreeOverviewLoader({
   chartId,
   initialOverview,
+  instantOverviewContent,
+  isSignedIn = false,
 }: {
   chartId: string;
   initialOverview?: FreeOverviewPayload | null;
+  instantOverviewContent?: string | null;
+  isSignedIn?: boolean;
 }) {
   const router = useRouter();
-  const [state, setState] = useState<FreeOverviewState>(() => initialOverviewState(initialOverview));
+  const [state, setState] = useState<FreeOverviewState>(() => initialOverviewState(initialOverview, instantOverviewContent));
   const [runKey, setRunKey] = useState(0);
   const rootRef = useRef<HTMLElement | null>(null);
   const setRootNode = (node: HTMLElement | null) => {
@@ -110,7 +128,14 @@ export function FreeOverviewLoader({
 
         if (payload.status === "ready") {
           clearPollTimer();
-          setState({ status: "ready", content: String(payload.content || "") });
+          setState((current) => ({
+            status: "ready",
+            content:
+              current.status === "fallback" || current.status === "ready"
+                ? current.content
+                : instantOverviewContent || String(payload.content || ""),
+            detailContent: String(payload.content || ""),
+          }));
           router.refresh();
           return;
         }
@@ -136,12 +161,16 @@ export function FreeOverviewLoader({
       controller.abort();
       clearPollTimer();
     };
-  }, [chartId, router, runKey]);
+  }, [chartId, instantOverviewContent, router, runKey]);
 
   if (state.status === "ready" || state.status === "fallback") {
     const canRetry = state.status === "fallback" && (state.jobStatus === "stale" || state.jobStatus === "failed");
+    const loginHref = `/dang-nhap?next=${encodeURIComponent(`/la-so/${chartId}`)}`;
+    const detailHref = isSignedIn ? `/la-so/${chartId}/nang-cao` : loginHref;
+    const detailCta = isSignedIn ? "Xem luận giải chi tiết" : "Đăng nhập để xem chi tiết";
     return (
       <article ref={setRootNode} className="free-reading-summary">
+        <MarkdownContent content={state.content} />
         {state.status === "fallback" ? (
           <div className="free-overview-inline-status" role="status" aria-live="polite">
             {state.jobStatus === "failed"
@@ -156,9 +185,32 @@ export function FreeOverviewLoader({
                 Thử viết lại
               </button>
             ) : null}
+            {state.jobStatus === "processing" || state.jobStatus === "idle" ? (
+              <span className="free-overview-detail-loader" aria-hidden="true">
+                <i />
+                <i />
+                <i />
+              </span>
+            ) : null}
+            <Link className="btn btn-small btn-primary" href={detailHref}>
+              {detailCta}
+            </Link>
           </div>
         ) : null}
-        <MarkdownContent content={state.content} />
+        {state.status === "ready" && state.detailContent !== state.content ? (
+          <section className="free-overview-detail-block" aria-labelledby="free-overview-detail-title">
+            <div className="free-overview-detail-heading">
+              <div>
+                <p className="eyebrow">Bản chi tiết hơn</p>
+                <h2 id="free-overview-detail-title">Luận giải tổng quan mở rộng</h2>
+              </div>
+              <Link className="btn btn-small btn-primary" href={detailHref}>
+                {detailCta}
+              </Link>
+            </div>
+            <MarkdownContent content={state.detailContent} />
+          </section>
+        ) : null}
       </article>
     );
   }

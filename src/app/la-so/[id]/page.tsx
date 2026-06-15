@@ -18,6 +18,7 @@ import { ChartRetentionPanel } from "@/components/chart-retention-panel";
 import { PaywallPopup } from "@/components/paywall-popup";
 import { FreeOverviewLoader } from "@/components/free-overview-loader";
 import { MarkdownContent } from "@/components/markdown-content";
+import { buildInstantFreeOverview } from "@/lib/ai";
 
 export const metadata: Metadata = {
   title: "Lá số tử vi",
@@ -60,6 +61,7 @@ export default async function ChartPage({
   const hasAdvancedReading = Boolean(fullReading);
   const activeLabel = activeReading ? readingLabels[activeReading.type] : "Luận giải tổng quan";
   const freeOverviewStatus = activeReading || isScopedReadingView ? null : getFreeOverviewStatus(record.chart);
+  const instantFreeOverviewContent = activeReading || isScopedReadingView ? null : buildInstantFreeOverview(record.chart);
 
   return (
     <main className="chart-page" data-testid="chart-page">
@@ -120,7 +122,12 @@ export default async function ChartPage({
             </>
           ) : (
             <>
-              <FreeOverviewLoader chartId={id} initialOverview={freeOverviewStatus} />
+              <FreeOverviewLoader
+                chartId={id}
+                initialOverview={freeOverviewStatus}
+                instantOverviewContent={instantFreeOverviewContent}
+                isSignedIn={Boolean(user)}
+              />
             </>
           )}
         </section>

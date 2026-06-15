@@ -1955,6 +1955,54 @@ button.is-loading:not(.icon-button)::before {
   font-style: italic;
 }
 
+@media (hover: none) and (pointer: coarse), (max-width: 768px) {
+  .hero-band::before,
+  .hero-form-card::before,
+  .hero-form-card::after,
+  .hero-form-card .chart-form .btn-primary::after {
+    animation: none !important;
+  }
+
+  .hero-band::before {
+    opacity: 0.28;
+  }
+
+  .hero-form-card {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    overflow: visible;
+    transition: border-color 120ms ease, box-shadow 120ms ease;
+  }
+
+  .hero-form-card::before,
+  .hero-form-card::after {
+    content: none;
+  }
+
+  .hero-form-card:focus-within {
+    border-color: #a91624;
+    box-shadow: 0 16px 38px rgb(120 53 15 / 0.12), 0 0 0 1px rgb(169 22 36 / 0.2);
+  }
+
+  .hero-form-card .chart-form input,
+  .hero-form-card .chart-form select,
+  .hero-form-card .chart-name-control {
+    transition: border-color 120ms ease, background 120ms ease, box-shadow 120ms ease;
+    transform: none !important;
+  }
+
+  .hero-form-card .chart-form input:focus,
+  .hero-form-card .chart-form select:focus {
+    box-shadow: 0 0 0 3px rgb(169 22 36 / 0.12);
+  }
+
+  .hero-form-card .chart-form input:hover,
+  .hero-form-card .chart-form select:hover {
+    transform: none;
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.82);
+  }
+}
+
 .chart-form-error {
   margin: -0.25rem 0 1rem;
   border: 1px solid rgb(248 113 113 / 0.34);
@@ -5880,15 +5928,88 @@ button.is-loading:not(.icon-button)::before {
 }
 
 .free-overview-inline-status {
-  margin-bottom: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 0.9rem;
+  margin: 1.2rem 0 1rem;
   border-radius: 1rem;
   border: 1px solid #fed7aa;
   background: #fff7ed;
   color: #9a3412;
   font-size: 0.95rem;
-  font-weight: 700;
   line-height: 1.55;
   padding: 0.85rem 1rem;
+}
+
+.free-overview-detail-status-copy {
+  display: grid;
+  flex: 1 1 18rem;
+  gap: 0.15rem;
+}
+
+.free-overview-detail-status-copy strong {
+  font-weight: 800;
+}
+
+.free-overview-detail-status-copy span {
+  color: #7c2d12;
+  font-weight: 600;
+}
+
+.free-overview-detail-loader {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.32rem;
+  min-height: 2rem;
+}
+
+.free-overview-detail-loader i {
+  display: block;
+  width: 0.46rem;
+  height: 0.46rem;
+  border-radius: 999px;
+  background: #ea580c;
+  animation: free-overview-dot 0.9s ease-in-out infinite alternate;
+}
+
+.free-overview-detail-loader i:nth-child(2) {
+  animation-delay: 120ms;
+}
+
+.free-overview-detail-loader i:nth-child(3) {
+  animation-delay: 240ms;
+}
+
+.free-overview-detail-block {
+  margin-top: 1.5rem;
+  border-top: 1px solid #fed7aa;
+  padding-top: 1.3rem;
+}
+
+.free-overview-detail-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.free-overview-detail-heading h2 {
+  margin: 0.2rem 0 0;
+  color: #2f241d;
+  font-size: clamp(1.2rem, 2.2vw, 1.55rem);
+}
+
+@keyframes free-overview-dot {
+  from {
+    opacity: 0.35;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(-0.22rem);
+  }
 }
 
 .free-overview-loading,
