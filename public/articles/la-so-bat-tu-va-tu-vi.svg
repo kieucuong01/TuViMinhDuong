@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-label="Minh họa so sánh lá số bát tự và lá số tử vi theo dữ liệu đầu vào, câu hỏi đọc và hướng bắt đầu cho người mới">
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#f7efe1"/>
+      <stop offset="0.55" stop-color="#fffaf4"/>
+      <stop offset="1" stop-color="#e8dbc1"/>
+    </linearGradient>
+    <linearGradient id="panel" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0" stop-color="#fffdf8"/>
+      <stop offset="1" stop-color="#f8f0e2"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="18" stdDeviation="22" flood-color="#2c2418" flood-opacity="0.16"/>
+    </filter>
+  </defs>
+  <rect width="1200" height="675" fill="url(#bg)"/>
+  <path d="M0 565C120 520 204 500 300 520C410 544 500 612 628 594C760 576 864 450 1008 448C1082 446 1146 474 1200 510V675H0Z" fill="#214231" opacity="0.08"/>
+  <g opacity="0.15" stroke="#214231" stroke-width="1.4" fill="none">
+    <circle cx="1024" cy="124" r="84"/>
+    <circle cx="1024" cy="124" r="118"/>
+    <path d="M76 120c84-64 180-72 278-18M118 584c146-66 284-62 424 10M790 86c92 24 172 86 238 176"/>
+  </g>
+  <g filter="url(#shadow)">
+    <rect x="72" y="92" width="476" height="494" rx="36" fill="url(#panel)" stroke="#c78649" stroke-width="3"/>
+    <text x="116" y="140" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#214231" opacity="0.72">Lá số tinh hoa</text>
+    <text x="116" y="198" font-family="Arial, sans-serif" font-size="42" font-weight="800" fill="#214231">Bát tự và tử vi</text>
+    <text x="116" y="236" font-family="Arial, sans-serif" font-size="22" font-weight="600" fill="#7b5836">Hiểu đúng hệ trước khi đọc sâu</text>
+    <rect x="116" y="282" width="388" height="72" rx="22" fill="#f3e6d1"/>
+    <rect x="116" y="374" width="388" height="72" rx="22" fill="#fff7ec"/>
+    <rect x="116" y="466" width="388" height="72" rx="22" fill="#f3e6d1"/>
+    <circle cx="154" cy="318" r="12" fill="#c78649"/>
+    <circle cx="154" cy="410" r="12" fill="#c78649"/>
+    <circle cx="154" cy="502" r="12" fill="#c78649"/>
+    <text x="184" y="312" font-family="Arial, sans-serif" font-size="23" font-weight="700" fill="#214231">1. Xác định câu hỏi thật</text>
+    <text x="184" y="338" font-family="Arial, sans-serif" font-size="18" fill="#4d3a27">Đọc khí chất hoặc từng mảng đời sống</text>
+    <text x="184" y="404" font-family="Arial, sans-serif" font-size="23" font-weight="700" fill="#214231">2. Kiểm tra dữ liệu đầu vào</text>
+    <text x="184" y="430" font-family="Arial, sans-serif" font-size="18" fill="#4d3a27">Ngày sinh, giờ sinh, loại lịch phải đủ chắc</text>
+    <text x="184" y="496" font-family="Arial, sans-serif" font-size="23" font-weight="700" fill="#214231">3. Chọn đúng hệ để bắt đầu</text>
+    <text x="184" y="522" font-family="Arial, sans-serif" font-size="18" fill="#4d3a27">Bát tự cho cấu trúc khí, tử vi cho 12 cung</text>
+  </g>
+  <g filter="url(#shadow)">
+    <rect x="594" y="96" width="530" height="486" rx="36" fill="url(#panel)" stroke="#c78649" stroke-width="3"/>
+    <rect x="646" y="152" width="180" height="356" rx="28" fill="#fbf3e6" stroke="#214231" stroke-opacity="0.16"/>
+    <rect x="892" y="152" width="180" height="356" rx="28" fill="#fff8ee" stroke="#214231" stroke-opacity="0.16"/>
+    <text x="702" y="196" font-family="Arial, sans-serif" font-size="28" font-weight="800" fill="#214231">Bát tự</text>
+    <text x="942" y="196" font-family="Arial, sans-serif" font-size="28" font-weight="800" fill="#214231">Tử vi</text>
+    <g transform="translate(736 314)" stroke="#214231" fill="none">
+      <rect x="-54" y="-116" width="108" height="54" rx="14" stroke-opacity="0.3"/>
+      <rect x="-54" y="-44" width="108" height="54" rx="14" stroke-opacity="0.3"/>
+      <rect x="-54" y="28" width="108" height="54" rx="14" stroke-opacity="0.3"/>
+      <rect x="-54" y="100" width="108" height="54" rx="14" stroke-opacity="0.3"/>
+      <path d="M0-62V100" stroke-opacity="0.18" stroke-width="2"/>
+      <text x="0" y="-82" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#214231">Tứ trụ</text>
+      <text x="0" y="-22" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#214231">Ngũ hành</text>
+      <text x="0" y="50" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#214231">Quan hệ khí</text>
+      <text x="0" y="122" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#214231">Nhịp thịnh suy</text>
+    </g>
+    <g transform="translate(982 330)" stroke="#214231" fill="none">
+      <circle r="136" fill="#fffdf7" stroke-opacity="0.42" stroke-width="3"/>
+      <circle r="90" stroke-opacity="0.28" stroke-width="2.4"/>
+      <path d="M0-136V136M-136 0H136M-96-96L96 96M96-96L-96 96" stroke-opacity="0.16" stroke-width="2"/>
+      <g fill="#c78649" stroke="none">
+        <circle cx="0" cy="-136" r="7"/>
+        <circle cx="68" cy="-118" r="7"/>
+        <circle cx="118" cy="-68" r="7"/>
+        <circle cx="136" cy="0" r="7"/>
+        <circle cx="118" cy="68" r="7"/>
+        <circle cx="68" cy="118" r="7"/>
+        <circle cx="0" cy="136" r="7"/>
+        <circle cx="-68" cy="118" r="7"/>
+        <circle cx="-118" cy="68" r="7"/>
+        <circle cx="-136" cy="0" r="7"/>
+        <circle cx="-118" cy="-68" r="7"/>
+        <circle cx="-68" cy="-118" r="7"/>
+      </g>
+      <circle r="28" fill="#214231" stroke="none"/>
+    </g>
+    <text x="650" y="540" font-family="Arial, sans-serif" font-size="20" font-weight="600" fill="#7b5836">Đừng trộn hai hệ khi câu hỏi và dữ liệu chưa rõ</text>
+  </g>
+</svg>
