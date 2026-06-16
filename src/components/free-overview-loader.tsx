@@ -168,9 +168,10 @@ export function FreeOverviewLoader({
     const loginHref = `/dang-nhap?next=${encodeURIComponent(`/la-so/${chartId}`)}`;
     const detailHref = isSignedIn ? `/la-so/${chartId}/nang-cao` : loginHref;
     const detailCta = isSignedIn ? "Xem luận giải chi tiết" : "Đăng nhập để xem chi tiết";
+    const hasExpandedOverview = state.status === "ready" && state.detailContent !== state.content;
     return (
       <article ref={setRootNode} className="free-reading-summary">
-        <MarkdownContent content={state.content} />
+        {!hasExpandedOverview ? <MarkdownContent content={state.content} /> : null}
         {state.status === "fallback" ? (
           <div className="free-overview-inline-status" role="status" aria-live="polite">
             {state.jobStatus === "failed"
@@ -197,7 +198,7 @@ export function FreeOverviewLoader({
             </Link>
           </div>
         ) : null}
-        {state.status === "ready" && state.detailContent !== state.content ? (
+        {hasExpandedOverview ? (
           <section className="free-overview-detail-block" aria-labelledby="free-overview-detail-title">
             <div className="free-overview-detail-heading">
               <div>

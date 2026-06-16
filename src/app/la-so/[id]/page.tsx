@@ -13,7 +13,6 @@ import { DailyFateView, MajorFateView, MinorFateView, MonthlyFateView } from "@/
 import { PalaceFateView } from "@/components/palace-fate-view";
 import { PremiumReadingCta } from "@/components/premium-reading-cta";
 import { DeferredChartActionPanel } from "@/components/deferred-chart-action-panel";
-import { ChartReadingRoadmap } from "@/components/chart-reading-roadmap";
 import { ChartRetentionPanel } from "@/components/chart-retention-panel";
 import { PaywallPopup } from "@/components/paywall-popup";
 import { FreeOverviewLoader } from "@/components/free-overview-loader";
@@ -78,8 +77,6 @@ export default async function ChartPage({
         <div className="chart-titlebar">
           <h1>Tổng quan lá số của {record.chart.input.fullName}</h1>
         </div>
-
-        <ChartReadingRoadmap chartId={id} chart={record.chart} />
 
         <ChartRetentionPanel chartId={id} chart={record.chart} isSignedIn={Boolean(user)} />
 

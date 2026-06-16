@@ -29,6 +29,12 @@ describe("FreeOverviewLoader fast-first flow", () => {
     expect(loaderSource).toContain("MAX_POLL_ATTEMPTS = 72");
   });
 
+  it("hides the instant free template once the expanded LLM overview is ready", () => {
+    expect(loaderSource).toContain("const hasExpandedOverview = state.status === \"ready\" && state.detailContent !== state.content");
+    expect(loaderSource).toContain("{!hasExpandedOverview ? <MarkdownContent content={state.content} /> : null}");
+    expect(loaderSource).toContain("{hasExpandedOverview ? (");
+  });
+
   it("lets readers retry failed or stale background overview jobs without reloading", () => {
     expect(loaderSource).toContain("retryOverview");
     expect(loaderSource).toContain("Thử viết lại");

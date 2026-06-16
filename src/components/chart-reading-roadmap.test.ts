@@ -16,9 +16,9 @@ describe("ChartReadingRoadmap", () => {
     expect(roadmapSource).toContain("Vận tháng/ngày");
   });
 
-  it("appears near the top of the chart result page", () => {
-    expect(chartPageSource).toContain("ChartReadingRoadmap");
-    expect(chartPageSource.indexOf("<ChartReadingRoadmap")).toBeLessThan(chartPageSource.indexOf("<MobileChartReader"));
+  it("is not mounted on the chart result page", () => {
+    expect(chartPageSource).not.toContain("ChartReadingRoadmap");
+    expect(chartPageSource).not.toContain("<ChartReadingRoadmap");
   });
 
   it("collapses roadmap steps on narrow screens", () => {
