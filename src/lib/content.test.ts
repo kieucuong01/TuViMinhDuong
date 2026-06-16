@@ -17,6 +17,7 @@ describe("SEO content cluster", () => {
     expect(slugs).toContain("lap-la-so-tu-vi-chuan");
     expect(slugs).toContain("phan-tich-la-so-tu-vi");
     expect(slugs).toContain("la-so-bat-tu-va-tu-vi");
+    expect(slugs).toContain("chiem-tinh-la-so-va-tu-vi");
   });
 
   it("links the beginner cluster back to conversion and related evergreen pages", () => {
@@ -25,6 +26,7 @@ describe("SEO content cluster", () => {
     const preciseSetup = seedArticles.find((article) => article.slug === "lap-la-so-tu-vi-chuan");
     const analysisGuide = seedArticles.find((article) => article.slug === "phan-tich-la-so-tu-vi");
     const batTuGuide = seedArticles.find((article) => article.slug === "la-so-bat-tu-va-tu-vi");
+    const astrologyGuide = seedArticles.find((article) => article.slug === "chiem-tinh-la-so-va-tu-vi");
 
     expect(hub?.content).toContain("/#lap-la-so");
     expect(hub?.content).toContain("/kien-thuc-tu-vi/cung-menh-cung-than");
@@ -41,6 +43,9 @@ describe("SEO content cluster", () => {
     expect(batTuGuide?.content).toContain("/#lap-la-so");
     expect(batTuGuide?.content).toContain("/kien-thuc-tu-vi/la-so-tu-vi-la-gi");
     expect(batTuGuide?.content).toContain("/kien-thuc-tu-vi/cung-menh-cung-than");
+    expect(astrologyGuide?.content).toContain("/#lap-la-so");
+    expect(astrologyGuide?.content).toContain("/kien-thuc-tu-vi/la-so-bat-tu-va-tu-vi");
+    expect(astrologyGuide?.content).toContain("/kien-thuc-tu-vi/lap-la-so-tu-vi-chuan");
   });
 
   it("uses dedicated SEO images for every public knowledge article", () => {
@@ -94,6 +99,7 @@ describe("SEO content cluster", () => {
           "lap-la-so-tu-vi-chuan",
           "phan-tich-la-so-tu-vi",
           "la-so-bat-tu-va-tu-vi",
+          "chiem-tinh-la-so-va-tu-vi",
         ].includes(article.slug),
       )
       .map(articleWithScore);

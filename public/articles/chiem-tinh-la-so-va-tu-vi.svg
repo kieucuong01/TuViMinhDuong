@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" fill="none" role="img" aria-label="Minh họa so sánh chiêm tinh lá số với lá số tử vi và bát tự theo dữ liệu đầu vào, hệ quy chiếu và cách bắt đầu cho người mới">
+  <rect width="1200" height="630" rx="36" fill="#F4E7CF"/>
+  <rect x="36" y="36" width="1128" height="558" rx="28" fill="url(#bg)"/>
+  <circle cx="182" cy="142" r="58" fill="#F6C453" fill-opacity="0.92"/>
+  <circle cx="1012" cy="126" r="42" fill="#A45C40" fill-opacity="0.24"/>
+  <circle cx="1062" cy="488" r="74" fill="#2D5B5B" fill-opacity="0.16"/>
+  <path d="M132 470C132 434.654 160.654 406 196 406H470C505.346 406 534 434.654 534 470V486C534 521.346 505.346 550 470 550H196C160.654 550 132 521.346 132 486V470Z" fill="#FFF5E7"/>
+  <path d="M666 180C666 140.235 698.235 108 738 108H1004C1043.76 108 1076 140.235 1076 180V430C1076 469.765 1043.76 502 1004 502H738C698.235 502 666 469.765 666 430V180Z" fill="#FFF6EB"/>
+  <path d="M172 168C172 134.863 198.863 108 232 108H524C557.137 108 584 134.863 584 168V342C584 375.137 557.137 402 524 402H232C198.863 402 172 375.137 172 342V168Z" fill="#1F444A"/>
+  <path d="M224 166H530" stroke="#F6C453" stroke-width="3" stroke-linecap="round"/>
+  <path d="M224 232H530" stroke="#F6C453" stroke-width="3" stroke-linecap="round"/>
+  <path d="M224 298H530" stroke="#F6C453" stroke-width="3" stroke-linecap="round"/>
+  <path d="M288 110V402" stroke="#F6C453" stroke-width="3" stroke-linecap="round"/>
+  <path d="M406 110V402" stroke="#F6C453" stroke-width="3" stroke-linecap="round"/>
+  <path d="M524 110V402" stroke="#F6C453" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="812" cy="216" r="78" stroke="#A45C40" stroke-width="5"/>
+  <circle cx="812" cy="216" r="30" fill="#F6C453"/>
+  <path d="M812 138V294" stroke="#A45C40" stroke-width="4" stroke-linecap="round"/>
+  <path d="M734 216H890" stroke="#A45C40" stroke-width="4" stroke-linecap="round"/>
+  <path d="M760 164L864 268" stroke="#A45C40" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M864 164L760 268" stroke="#A45C40" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M738 338C738 321.431 751.431 308 768 308H974C990.569 308 1004 321.431 1004 338V410C1004 426.569 990.569 440 974 440H768C751.431 440 738 426.569 738 410V338Z" fill="#F4E7CF"/>
+  <path d="M772 346H962" stroke="#A45C40" stroke-width="3" stroke-linecap="round"/>
+  <path d="M772 374H962" stroke="#A45C40" stroke-width="3" stroke-linecap="round"/>
+  <path d="M772 402H922" stroke="#A45C40" stroke-width="3" stroke-linecap="round"/>
+  <text x="132" y="84" fill="#FFF8EF" font-family="Georgia, 'Times New Roman', serif" font-size="30" font-weight="700" letter-spacing="1.5">
+    KIẾN THỨC TỬ VI
+  </text>
+  <text x="132" y="430" fill="#153439" font-family="Georgia, 'Times New Roman', serif" font-size="58" font-weight="700">
+    Chiêm tinh lá số
+  </text>
+  <text x="132" y="486" fill="#153439" font-family="Georgia, 'Times New Roman', serif" font-size="34">
+    Khác gì với tử vi và bát tự
+  </text>
+  <text x="164" y="454" fill="#A45C40" font-family="Arial, sans-serif" font-size="22" font-weight="700">
+    Chọn đúng hệ trước khi đọc sâu
+  </text>
+  <defs>
+    <linearGradient id="bg" x1="112" y1="72" x2="1088" y2="558" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#49676E"/>
+      <stop offset="0.56" stop-color="#26484D"/>
+      <stop offset="1" stop-color="#17353A"/>
+    </linearGradient>
+  </defs>
+</svg>
