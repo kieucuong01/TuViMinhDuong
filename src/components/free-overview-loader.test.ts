@@ -30,9 +30,12 @@ describe("FreeOverviewLoader fast-first flow", () => {
   });
 
   it("hides the instant free template once the expanded LLM overview is ready", () => {
+    expect(loaderSource).toContain("function hideFreeOverviewTemplateHeading(content: string)");
+    expect(loaderSource).toContain("Tổng quan miễn phí");
     expect(loaderSource).toContain("const hasExpandedOverview = state.status === \"ready\" && state.detailContent !== state.content");
+    expect(loaderSource).toContain("const expandedOverviewContent = hasExpandedOverview ? hideFreeOverviewTemplateHeading(state.detailContent) : \"\"");
     expect(loaderSource).toContain("{!hasExpandedOverview ? <MarkdownContent content={state.content} /> : null}");
-    expect(loaderSource).toContain("{hasExpandedOverview ? (");
+    expect(loaderSource).toContain("<MarkdownContent content={expandedOverviewContent} />");
   });
 
   it("lets readers retry failed or stale background overview jobs without reloading", () => {

@@ -26,6 +26,14 @@ type FreeOverviewPayload =
 const POLL_DELAY_MS = 2500;
 const MAX_POLL_ATTEMPTS = 72;
 
+function hideFreeOverviewTemplateHeading(content: string) {
+  return content
+    .split(/\r?\n/)
+    .filter((line) => !/^#{1,6}\s*Tổng quan miễn phí\s*$/i.test(line.trim()))
+    .join("\n")
+    .trimStart();
+}
+
 function initialOverviewState(
   initialOverview?: FreeOverviewPayload | null,
   instantOverviewContent?: string | null,
@@ -169,6 +177,7 @@ export function FreeOverviewLoader({
     const detailHref = isSignedIn ? `/la-so/${chartId}/nang-cao` : loginHref;
     const detailCta = isSignedIn ? "Xem luận giải chi tiết" : "Đăng nhập để xem chi tiết";
     const hasExpandedOverview = state.status === "ready" && state.detailContent !== state.content;
+    const expandedOverviewContent = hasExpandedOverview ? hideFreeOverviewTemplateHeading(state.detailContent) : "";
     return (
       <article ref={setRootNode} className="free-reading-summary">
         {!hasExpandedOverview ? <MarkdownContent content={state.content} /> : null}
@@ -209,7 +218,7 @@ export function FreeOverviewLoader({
                 {detailCta}
               </Link>
             </div>
-            <MarkdownContent content={state.detailContent} />
+            <MarkdownContent content={expandedOverviewContent} />
           </section>
         ) : null}
       </article>
