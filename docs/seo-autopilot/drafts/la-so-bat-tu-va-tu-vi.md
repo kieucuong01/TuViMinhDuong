@@ -6,7 +6,7 @@ focusKeyword: lá số bát tự
 canonicalUrl: /kien-thuc-tu-vi/la-so-bat-tu-va-tu-vi
 funnelStage: middle
 targetCharacters: 5500-8500
-generatedAt: 2026-06-14T13:58:50.725Z
+generatedAt: 2026-06-15T14:03:21.563Z
 ---
 
 # Lá số bát tự: khác gì với lá số tử vi?

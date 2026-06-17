@@ -121,6 +121,8 @@ npm run perf:smoke
 
 Target deploy là VPS self-hosted + Postgres. App production chạy tại `/opt/lasotinhhoa/current`, PM2 process `lasotinhhoa`, internal port `127.0.0.1:4100`; Nginx phục vụ public HTTPS tại `https://lasotinhhoa.vn`.
 
+Điểm vào SSH an toàn trên máy Windows này là `ssh tuvi-vps`. Alias này nên trỏ tới key riêng `C:\Users\ASUS\.ssh\id_ed25519_tuvi_vps`, bật `IdentitiesOnly yes`, và giữ `StrictHostKeyChecking yes`.
+
 Các env quan trọng:
 
 - `DATABASE_URL`
@@ -158,10 +160,12 @@ Các env quan trọng:
 1. Đảm bảo `.env` production trên VPS có `DATABASE_URL`, `NEXT_PUBLIC_APP_URL`, `AUTH_SECRET`, `ADMIN_EMAIL`, `ADMIN_PASSWORD` và các env PayOS/Google/LLM cần dùng.
 2. DB hiện vẫn trỏ remote qua `DATABASE_URL`; chỉ tạo DB local trên VPS khi có yêu cầu migration riêng.
 3. Chạy migration/seed khi schema hoặc seed thay đổi: `npm run db:deploy` và `npm run db:seed`.
-4. Build release bằng Node >=20.9: `npm ci`, `npm run build`.
-5. Cập nhật release tại `/opt/lasotinhhoa/current`, restart PM2 process `lasotinhhoa` từ đúng thư mục release, giữ app nghe `127.0.0.1:4100`.
-6. Kiểm tra Nginx đang proxy `https://lasotinhhoa.vn` về app, không trùng port với app khác trên VPS.
-7. Test luồng login admin, tạo lá số, lưu lịch sử, đọc lại sau restart/deploy mới.
+4. Build release bằng Node >=20.9 trong thư mục mới `/opt/lasotinhhoa/releases/<timestamp>-<sha>`: `npm ci`, `npm run build`.
+5. Copy production `.env*` từ release đang chạy sang release mới trước khi build hoặc start.
+6. Trỏ lại symlink `/opt/lasotinhhoa/current` sang release mới, rồi restart PM2 process `lasotinhhoa` từ đúng thư mục release, giữ app nghe `127.0.0.1:4100`.
+7. Kiểm tra `pm2 describe lasotinhhoa` đang trỏ `exec cwd` hoặc script path vào release mới. Nếu vẫn trỏ release cũ, xóa và tạo lại process từ `/opt/lasotinhhoa/current`, sau đó `pm2 save`.
+8. Kiểm tra Nginx đang proxy `https://lasotinhhoa.vn` về app, không trùng port với app khác trên VPS.
+9. Smoke `https://lasotinhhoa.vn`, `https://lasotinhhoa.vn/kien-thuc-tu-vi`, và URL vừa đổi; sau đó test luồng login admin, tạo lá số, lưu lịch sử, đọc lại sau restart/deploy mới.
 
 ## Ghi chú sản phẩm
 

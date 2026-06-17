@@ -22,6 +22,7 @@ The agent may do these without asking first:
 - Audit `robots.txt`, `sitemap.xml`, canonical URLs, metadata, H1s, JSON-LD, and article readability.
 - Pick SEO topics from missing clusters or Search Console opportunities.
 - Draft or update evergreen articles under `/kien-thuc-tu-vi/[slug]`.
+- Create or refresh local article cover assets under `public/articles/<slug>.webp` plus matching `coverAlt` and `ogImage`.
 - Improve titles, meta descriptions, internal links, FAQ content, Article/Breadcrumb/FAQ schema, and conversion CTAs.
 - Run targeted tests, ESLint on touched files, `npm run build`, and live HTTP checks.
 - Commit, push, and deploy SEO/content-only changes after verification passes.
@@ -123,7 +124,7 @@ scripts/seo/install-windows-seo-autopilot-task.ps1
 
 That installs `LaSoTinhHoa_SEO_Autopilot`, which runs `scripts/seo/run-seo-autopilot.ps1` every Monday at 08:00 as a planning heartbeat. This only creates SEO Autopilot artifacts; Codex Automation is still the preferred runner for making code/content changes and deploying them.
 
-## Weekly Automation Prompt
+## Daily Publisher Automation Prompt
 
 Use this prompt for Codex Automation:
 
@@ -132,31 +133,24 @@ You are SEO Autopilot for lasotinhhoa.vn.
 
 Goal: improve qualified organic traffic and route readers toward free chart creation.
 
-Start by reading AGENTS.md, docs/agent/quickstart.md, docs/agent/playbooks.md#seo--cms, and docs/agent/seo-autopilot.md.
+Start by reading AGENTS.md, docs/agent/quickstart.md, docs/agent/playbooks.md#seo--cms, docs/agent/playbooks.md#deployment--production, docs/agent/verification.md, and docs/agent/seo-autopilot.md.
 
 Then:
-1. Run `npm run seo:autopilot:publisher` for daily publisher runs, or `npm run seo:autopilot:execute` for the Sunday strategy batch.
-2. Inspect the generated draft/report and repo SEO/content files only as needed.
-3. For publisher runs, implement at most one selected article/refresh. For Sunday strategy, use plan.weeklyContentPlan as the 7-slot weekly queue unless live evidence points to a higher-impact safe task.
-4. Implement one SEO/content article or material refresh per day without asking first, but never more than one production article/refresh per automation run.
-5. Treat the draft as input, not as finished output. If the selected article is too thin, weakly linked, missing data blocks, weak on causal analysis, or not strong enough to publish, rewrite and improve it in the production content system during the same run until it clears the SEO quality gate or a real blocker is found.
-6. A daily publisher run is not complete when it only leaves markdown draft artifacts. If verification passes, it should end with one production article/refresh committed, pushed, deployed, and smoke-tested on the live URL.
-7. Only skip publishing when there is a real blocker: failed verification, unchanged task with no new signal, or insufficient content quality that cannot be fixed safely in the same run.
-8. Each article must follow the brief:
-   - target character range from brief.targetCharacterRange
-   - at least 5 contextual internal links
-   - at least 1 conversion link to /#lap-la-so where relevant
-   - at least 2 related knowledge links
-   - at least 2 unique-value data blocks from brief.uniqueValueRequirements, such as a score table, modifier-star/context notes, or algorithmic source notes
-   - an expert-frame analysis that explains causal logic, not generic AI advice
-   - a compact interactive CTA that sends the reader to /#lap-la-so to check the personal chart context
-   - FAQ content only when visible FAQ is included
-   - no exact-match anchor stuffing
-   - no copied, thin, doorway, or mass-produced search-first content
-9. Do not touch payment, auth, DB schema, chart/date engine rules, or large URL structure.
-10. Run targeted tests, targeted ESLint, npm run build, and live checks when practical.
-11. Commit/push/deploy SEO/content-only changes if verification passes.
-12. Report what changed, why, verification results, expected SEO impact, measurement plan, and next priority.
+1. Ensure the repo is on `master` and inspect the dirty state before editing.
+2. Read `docs/seo-autopilot/state.json` first. Use the newest Sunday weekly handoff if present, then run `npm run seo:autopilot:publisher` for daily runs or `npm run seo:autopilot:execute` only for the Sunday strategy batch.
+3. Inspect only the generated draft/report, `docs/seo-autopilot/state.json`, and the repo SEO/content files needed for the selected task.
+4. During the launch warm-up window, do not block daily decisions on Search Console. If GSC is skipped, continue with SEMrush, sitemap, live snapshot, and content-inventory evidence and report that GSC was skipped.
+5. For publisher runs, ship at most one selected article or material refresh under `/kien-thuc-tu-vi/[slug]`. No batches.
+6. Treat the draft as input, not as finished output. If the selected article is thin, weakly linked, generic, or missing data blocks, rewrite it in production content files during the same run until it passes the quality gate or a real blocker is proven.
+7. Each article must match the funnel brief and include the target character range, at least 5 contextual internal links, at least 1 conversion link to `/#lap-la-so`, at least 2 related knowledge links, at least 2 unique-value data blocks, an expert causal-analysis frame, a compact interactive CTA to `/#lap-la-so`, and visible FAQ only when FAQ schema is used.
+8. Create or refresh a local article cover asset for the published slug. The final publish state should prefer a raster `.webp` cover under `public/articles/<slug>.webp` that looks like a real scene or realistic editorial illustration tied to the article topic, matches the warm premium site style, and is suitable for both list-card thumbnail and social sharing. Use descriptive `coverAlt`, and keep `coverImage` and `ogImage` aligned unless there is a concrete reason not to.
+9. Do not ship a fresh production SEO article with a generic flat placeholder or text-only SVG unless the user explicitly approves a draft-only exception.
+10. Skip only for a real blocker: failed verification, identical task with no content/sitemap/GSC change, or content quality that cannot be fixed safely in the same run.
+11. Do not touch payment, auth, DB schema, chart/date engine rules, or large URL structure.
+12. Run targeted tests and targeted ESLint for touched files. When article content or cover assets changed, include `src/lib/content.test.ts` and `src/lib/article-cover-assets.test.ts`. Run `npm test` and `npm run build` only when production content/code changed and before commit/deploy.
+13. If verification passes, commit only relevant SEO/content changes, push `origin master`, and deploy through the VPS release path over `ssh tuvi-vps`: new release dir under `/opt/lasotinhhoa/releases`, copy production `.env*`, `npm ci`, `npm run build`, switch `/opt/lasotinhhoa/current`, restart PM2 `lasotinhhoa`, then verify `pm2 describe lasotinhhoa` points at the new release. If PM2 still points at the old release, recreate the process from `/opt/lasotinhhoa/current` and `pm2 save`.
+14. Smoke `https://lasotinhhoa.vn`, `https://lasotinhhoa.vn/kien-thuc-tu-vi`, and the published URL. A publisher run is not complete when it leaves only markdown draft artifacts.
+15. Report the production URL or skip reason, article title, funnel keyword, main internal links, cover asset path, evidence used, tests/build/deploy/live smoke results, and what to measure next week: impressions, clicks, CTR, average position.
 
 Keep content useful for Vietnamese adults 30-60. Avoid generic AI filler, exaggerated claims, and hidden SEO notes in public copy. Follow Google Search Central's people-first guidance and spam policies: do not create scaled low-value content to manipulate ranking.
 ```
@@ -170,6 +164,7 @@ Every automatically drafted article must include:
 - Data enrichment: at least two structured blocks, such as score/risk tables, companion-star modifiers, palace context, chart-input logic, or source notes from the app's calculation/data layer.
 - Expert prompt frame: analysis must follow causal logic from star/palace nature -> condition/modifier -> likely expression -> limit of interpretation -> practical next step.
 - Interactive element: include a concise CTA asking readers to enter birth date/time at `/#lap-la-so` to check whether the discussed pattern appears in their own chart and whether modifiers change the reading.
+- A local cover asset plan: subject, composition, and file target under `public/articles/` so the daily publisher does not finish with text-only output.
 
 Stop or downgrade to draft/report-only when the topic would produce thin advice, doorway variants, or a page that cannot add data/tool value.
 
@@ -179,11 +174,14 @@ Automation should avoid repeated heavy work. Use the smallest useful loop:
 
 - Publisher runs use `npm run seo:autopilot:publisher`, which limits planning to one selected task and prints summary JSON instead of the full plan.
 - Sunday strategy may use the full batch planner because it is the handoff for the week.
+- Read `docs/seo-autopilot/state.json` before rerunning the publisher so the automation can short-report unchanged selections instead of regenerating the same draft.
 - Lighthouse CI is weekly/manual only. Do not run it inside every publisher automation unless the task changed public SEO layout, metadata, structured data, or page experience.
 - Do not run `npm test`, `npm run build`, deploy, or live smoke when no repo/content files changed.
 - Prefer targeted tests and targeted ESLint for touched files; run full build only before release.
 - When repo/content files did change for the selected slug, the automation should keep iterating on that one article until it is publishable or a concrete blocker is proven. Do not stop at a draft-only handoff just because the first draft is weak.
+- When a new article or material refresh changed the cover asset, verify the local image through `src/lib/article-cover-assets.test.ts` and keep the output suitable for card thumbnails and OG sharing.
 - If GSC, SEMrush, sitemap, and content inventory are unchanged from the latest `docs/seo-autopilot/state.json`, do a short report/skip instead of repeating the same draft.
+- Use `ssh tuvi-vps` as the default production entrypoint from this Windows machine; do not fall back to password-only SSH unless the user explicitly rotates the key path.
 - Keep useful repetition: weekly measurement, GSC opportunity checks, and one daily publish/refresh slot are worth keeping because they catch trend changes and prevent stale content.
 
 ## Suggested Schedule
@@ -202,9 +200,9 @@ Use this workflow for autonomous SEO operations:
 2. Strategy selection: choose one intent cluster, not one raw keyword. Prefer the `lá số tử vi` pillar funnel first because the SEMrush export shows the largest qualified demand there.
 3. Google-safe filtering: skip stale year pages, competitor-navigation pages, mass birth-year pages, and near-duplicate variants such as separate pages for `lập`, `lấy`, `tạo`, `tra`, `vẽ`, `kẻ` when they answer the same user need.
 4. Content decision: pick one of three safe actions: refresh an existing pillar, publish one support article, or improve internal links/metadata if no article is strong enough.
-5. Production writing: write useful Vietnamese copy for adults 30-60, add contextual internal links, visible FAQ only when useful, and at least one natural conversion path to `/#lap-la-so`.
-6. Verification: run targeted tests plus `npm test` and `npm run build` before commit/deploy.
-7. Release: commit, push `master`, deploy the VPS production release, and smoke test the live home, hub, and changed article URL.
+5. Production writing: write useful Vietnamese copy for adults 30-60, add contextual internal links, visible FAQ only when useful, at least one natural conversion path to `/#lap-la-so`, and a matching local cover asset that feels like a real scene or realistic editorial illustration for the topic.
+6. Verification: run targeted tests plus `npm test` and `npm run build` before commit/deploy, including article cover asset checks when the image changed.
+7. Release: commit, push `master`, deploy the VPS production release over `ssh tuvi-vps`, verify PM2 is running from the new release, and smoke test the live home, hub, and changed article URL.
 8. Measurement: in the first 2 months, theo dõi live snapshot + nội dung + hành vi nội bộ; sau khi mở Search Console sẽ bổ sung đo tiếp bằng impressions/clicks/CTR/average position và indexed status.
 
 This workflow is intentionally not fully hands-off when verification fails. A failed test/build/deploy is a hard stop, not permission to force a production release.
@@ -224,6 +222,7 @@ Every article must include:
 - one primary keyword and natural variants
 - title, meta title, meta description, canonical URL
 - clear H2 sections matching the outline
+- one local thumbnail or cover asset suitable for both article cards and OG sharing, with descriptive `coverAlt`
 - at least 5 contextual internal links
 - no more than 2 exact-match anchors for the same keyword
 - at least one useful conversion path to `/#lap-la-so` when relevant
@@ -239,6 +238,7 @@ Do not publish:
 - low-value AI mass content
 - claims that guarantee outcomes
 - articles written only to hit a word count
+- new production articles that still lack a real local cover asset or rely on a generic placeholder visual
 
 Policy basis:
 

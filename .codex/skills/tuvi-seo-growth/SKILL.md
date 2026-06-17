@@ -21,6 +21,7 @@ Default throughput: publish or materially refresh **1 high-quality SEO article p
 Safe without asking:
 
 - article drafts and refreshes under `/kien-thuc-tu-vi/[slug]`
+- local article cover and thumbnail assets under `public/articles/<slug>.webp` plus matching `coverAlt`
 - metadata, canonical, JSON-LD, FAQ, internal links, article CTA improvements
 - sitemap/robots consistency fixes
 - safe performance improvements for public SEO pages
@@ -87,6 +88,7 @@ Content quality rules:
 
 - Write people-first content for a real reader question, not content made only for rankings.
 - Use at least 5 contextual internal links and at least one useful conversion path to `/#lap-la-so` when relevant.
+- For new publisher articles, create a local raster cover asset that feels like a real scene or realistic editorial illustration tied to the article topic. Prefer `.webp`, keep the visual language aligned with the site, and avoid shipping a fresh SEO article with a generic flat SVG unless the run is explicitly draft-only.
 - Do not stuff exact-match anchors, copy competitor content, create doorway pages, or mass-produce low-value articles.
 - For programmatic SEO topics, require unique value beyond prose: at least two structured data/tool blocks, an expert causal-analysis frame, and an interactive chart-form CTA. If the topic cannot support that, publish fewer articles or create a draft/report only.
 - Treat character ranges as anti-thin-content safeguards, not as Google ranking requirements.

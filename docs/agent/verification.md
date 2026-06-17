@@ -46,6 +46,21 @@ Docs-only:
 git diff --check
 ```
 
+SEO article content plus cover-asset changes:
+
+```powershell
+npm test -- src/lib/content.test.ts src/lib/article-cover-assets.test.ts
+```
+
+Deploy/docs/automation workflow changes:
+
+```powershell
+git diff --check
+ssh tuvi-vps "pm2 describe lasotinhhoa"
+curl.exe -L -s -o NUL -w "%{http_code}\n" https://lasotinhhoa.vn
+curl.exe -L -s -o NUL -w "%{http_code}\n" https://lasotinhhoa.vn/kien-thuc-tu-vi
+```
+
 UI or component changes:
 
 ```powershell
@@ -90,6 +105,12 @@ Admin/CMS:
 - Save or preview an article.
 - Confirm public article metadata and content render.
 
+Article cover assets:
+
+- Confirm the changed article references a local `coverImage` under `/articles/`.
+- Confirm `coverAlt` is descriptive and matches the actual visual subject.
+- Confirm the article body includes the same image when that is the current content pattern.
+
 Payments:
 
 - Use a safe PayOS/mock flow unless the user asks for a real transaction test.
@@ -109,6 +130,11 @@ Public trust policy:
 - As guest, `/chinh-sach-thanh-toan-hoan-xu` should redirect to `/dang-nhap?next=/chinh-sach-thanh-toan-hoan-xu`.
 - As guest, `/lien-he` should not show refund/topup-only CTA.
 - `sitemap.xml` should not include authenticated/money-only policy routes.
+
+Deploy path:
+
+- After any production release, confirm `pm2 describe lasotinhhoa` shows `exec cwd` or script path under the latest `/opt/lasotinhhoa/releases/<timestamp>-<sha>`, not an older release.
+- Smoke `https://lasotinhhoa.vn`, `https://lasotinhhoa.vn/kien-thuc-tu-vi`, and the changed public URL before claiming deploy success.
 
 ## Git Hygiene
 

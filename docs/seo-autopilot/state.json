@@ -1,13 +1,13 @@
 {
-  "lastRunAt": "2026-06-14T14:03:01.435Z",
+  "lastRunAt": "2026-06-16T15:10:20.486Z",
   "lastStatus": "ok",
   "lastAction": {
     "type": "weekly_content_batch",
-    "slug": "phan-tich-la-so-tu-vi",
+    "slug": "chiem-tinh-la-so-va-tu-vi",
     "slugs": [
-      "phan-tich-la-so-tu-vi"
+      "chiem-tinh-la-so-va-tu-vi"
     ],
-    "reason": "Publish 1 people-first articles from SEMrush intent clusters; first topic: Người đọc đã có lá số và muốn biết nên phân tích Mệnh, Thân, 12 cung, chính tinh và vận hạn theo thứ tự nào.",
+    "reason": "Publish 1 people-first articles from SEMrush intent clusters; first topic: Người đọc đang tìm lá số chiêm tinh và cần hiểu khác biệt giữa chiêm tinh, tử vi và bát tự trước khi đi sâu.",
     "approvalRequired": false,
     "allowedToCommitDeployAfterVerification": true
   },
@@ -20,9 +20,9 @@
     "status": "skipped"
   },
   "lastDraftPaths": [
-    "docs/seo-autopilot/drafts/phan-tich-la-so-tu-vi.md"
+    "docs/seo-autopilot/drafts/chiem-tinh-la-so-va-tu-vi.md"
   ],
-  "lastReportPath": "docs/seo-autopilot/reports/2026-06-14-weekly-content-batch.md",
+  "lastReportPath": "docs/seo-autopilot/reports/2026-06-16-weekly-content-batch.md",
   "nextVerificationCommands": [
     "npm run seo:autopilot",
     "npm test -- src/lib/content.test.ts src/lib/seo-autopilot-core.test.ts",

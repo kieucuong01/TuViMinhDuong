@@ -135,6 +135,8 @@ Rules:
 - Public article URLs are `/kien-thuc-tu-vi/[slug]`.
 - For SEO Autopilot runs, start with `npm run seo:autopilot` and use the snapshot to pick the safest highest-impact task.
 - Include natural visible copy first; metadata and schema support it, not the reverse.
+- New or materially refreshed SEO articles should ship with a local cover asset under `public/articles/`, preferably a raster `.webp` that looks like a real scene or realistic editorial illustration related to the topic.
+- Match article thumbnails to the existing site language: warm gold/ink palette, calm premium tone, practical astrology context, and no generic stock-collage feel. Reuse the same asset for `coverImage` and `ogImage` unless there is a specific reason not to.
 - Keep personal chart pages `noindex` unless explicitly changed.
 - Keep authenticated/money-only policy routes out of public sitemap unless the user asks otherwise.
 - Seed evergreen articles should create an internal link cluster back to `/#lap-la-so`, `/xem-ngay`, and related knowledge articles.
@@ -145,6 +147,7 @@ Rules:
 Done:
 
 - Metadata, canonical, OG/Twitter, sitemap, robots, and JSON-LD stay consistent.
+- The published article has a real local thumbnail or cover asset, descriptive alt text, and the same visual can safely represent the page in list cards and social sharing.
 - Article pages remain fast and readable on mobile.
 
 ## Google Ads / Conversion Tracking
@@ -196,6 +199,7 @@ Rules:
 
 - Production URL is `https://lasotinhhoa.vn`.
 - Production app path is `/opt/lasotinhhoa/current`; releases should update that symlink or directory deliberately.
+- Preferred SSH entrypoint from this workspace is `ssh tuvi-vps`; keep strict host-key checking and use the dedicated key in the local SSH config instead of password-only SSH.
 - PM2 process name is `lasotinhhoa`; internal app port is `127.0.0.1:4100`.
 - Nginx owns public HTTP/HTTPS and reverse proxies to the internal app port. Avoid port collisions with the other VPS app on `127.0.0.1:5000`.
 - Production DB is PostgreSQL, not local demo fallback.
@@ -203,8 +207,10 @@ Rules:
 - Required envs: `DATABASE_URL`, `NEXT_PUBLIC_APP_URL`, `AUTH_SECRET`, `ADMIN_EMAIL`, `ADMIN_PASSWORD`.
 - PayOS and Google OAuth only work when their envs exist.
 - Run migrations before trusting production data flows.
+- The safe release shape is: create `/opt/lasotinhhoa/releases/<timestamp>-<sha>`, clone or export the target commit there, copy the production `.env*` files from the current release, run `npm ci` and `npm run build`, then switch `/opt/lasotinhhoa/current` to the new release.
 - For post-deploy health, use `pm2 status`, `pm2 logs lasotinhhoa`, Nginx logs, live HTTP checks, and `npm run perf:smoke`.
 - Restart PM2 from the active release directory so the process cwd and `.next` build match the deployed release.
+- After restart, verify `pm2 describe lasotinhhoa` points `exec cwd` and script path at the new release. If PM2 still points at an older release, recreate the process from `/opt/lasotinhhoa/current` and `pm2 save` instead of trusting a plain restart.
 
 Done:
 
@@ -212,7 +218,7 @@ Done:
 - Create chart, persist chart, read after restart/deploy.
 - CMS article save/read works.
 - Payment smoke path is tested with a safe/mock or real PayOS flow as appropriate.
-- Live route smoke returns 200 for `/`, `/lap-la-so`, `/kien-thuc-tu-vi/tao-la-so-tu-vi`, `/sitemap.xml`, and `/api/me`.
+- Live route smoke returns 200 for `/`, `/lap-la-so`, `/kien-thuc-tu-vi`, the changed article URL, `/sitemap.xml`, and `/api/me`.
 
 ## Performance
 

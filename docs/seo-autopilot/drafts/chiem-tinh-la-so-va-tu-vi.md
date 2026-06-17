@@ -6,7 +6,7 @@ focusKeyword: chiêm tinh lá số
 canonicalUrl: /kien-thuc-tu-vi/chiem-tinh-la-so-va-tu-vi
 funnelStage: top
 targetCharacters: 5500-8500
-generatedAt: 2026-06-14T13:58:50.725Z
+generatedAt: 2026-06-16T15:10:20.486Z
 ---
 
 # Chiêm tinh lá số: khác gì với lá số tử vi?
