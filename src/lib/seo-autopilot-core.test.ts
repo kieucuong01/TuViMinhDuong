@@ -224,6 +224,21 @@ export const seedArticles = [
       expect.arrayContaining(["structured-score-table", "modifier-stars-or-context"]),
     );
     expect(brief.uniqueValueRequirements.expertPromptFrame.join(" ")).toContain("logic nhan qua");
+    expect(brief.coverAssetRequirements).toMatchObject({
+      preferredPath: "public/articles/sao-tu-vi.webp",
+      publicPath: "/articles/sao-tu-vi.webp",
+      format: "webp",
+      dimensions: { width: 1200, height: 675 },
+    });
+    expect(brief.coverAssetRequirements.subject).toContain("la so context");
+    expect(brief.coverAssetRequirements.composition).toContain(
+      "Prefer no text overlay on the image; let the scene carry the meaning when possible.",
+    );
+    expect(brief.coverAssetRequirements.usage).toContain(
+      "If the cover includes visible text, it must be proper Vietnamese with diacritics; never ship ASCII-only Vietnamese text on the final asset.",
+    );
+    expect(brief.coverAssetRequirements.noGo.join(" ")).toContain("text-only SVG");
+    expect(brief.coverAssetRequirements.noGo.join(" ")).toContain("without diacritics");
     expect(brief.programmaticSeoGuardrails.join(" ")).toContain("Doorway");
     expect(brief.googleQualityPolicy).toEqual(
       expect.arrayContaining([
@@ -292,7 +307,7 @@ export const seedArticles = [
     expect(plan.verificationCommands).toEqual(
       expect.arrayContaining([
         "npm run seo:autopilot",
-        "npm test -- src/lib/content.test.ts src/lib/seo-autopilot-core.test.ts",
+        "npm test -- src/lib/content.test.ts src/lib/article-cover-assets.test.ts src/lib/seo-autopilot-core.test.ts",
         "npm run build",
       ]),
     );
@@ -310,6 +325,7 @@ export const seedArticles = [
     });
 
     expect(plan.nextAction.slugs).toHaveLength(1);
+    expect(plan.nextAction.type).toBe("single_article_publish");
     expect(plan.weeklyContentPlan.articles).toHaveLength(1);
     expect(plan.nextAction.reason).toContain("Publish 1 people-first");
   });
@@ -373,6 +389,9 @@ export const seedArticles = [
     expect(draft).toContain("structured-score-table");
     expect(draft).toContain("expert prompt frame");
     expect(draft).toContain("interactive CTA");
+    expect(draft).toContain("## Cover Asset Requirements");
+    expect(draft).toContain("Preferred file: public/articles/sao-tu-vi.webp");
+    expect(draft).toContain("Public path: /articles/sao-tu-vi.webp");
     expect(draft).toContain("/#lap-la-so");
     expect(draft).toContain("Không hứa chắc kết quả hôn nhân, tài chính, sức khỏe hoặc vận mệnh.");
   });

@@ -143,7 +143,7 @@ Then:
 5. For publisher runs, ship at most one selected article or material refresh under `/kien-thuc-tu-vi/[slug]`. No batches.
 6. Treat the draft as input, not as finished output. If the selected article is thin, weakly linked, generic, or missing data blocks, rewrite it in production content files during the same run until it passes the quality gate or a real blocker is proven.
 7. Each article must match the funnel brief and include the target character range, at least 5 contextual internal links, at least 1 conversion link to `/#lap-la-so`, at least 2 related knowledge links, at least 2 unique-value data blocks, an expert causal-analysis frame, a compact interactive CTA to `/#lap-la-so`, and visible FAQ only when FAQ schema is used.
-8. Create or refresh a local article cover asset for the published slug. The final publish state should prefer a raster `.webp` cover under `public/articles/<slug>.webp` that looks like a real scene or realistic editorial illustration tied to the article topic, matches the warm premium site style, and is suitable for both list-card thumbnail and social sharing. Use descriptive `coverAlt`, and keep `coverImage` and `ogImage` aligned unless there is a concrete reason not to.
+8. Create or refresh a local article cover asset for the published slug. The final publish state should prefer a raster `.webp` cover under `public/articles/<slug>.webp` that looks like a real scene or realistic editorial illustration tied to the article topic, matches the warm premium site style, and is suitable for both list-card thumbnail and social sharing. Prefer no text on the image; if the cover includes visible text, it must be proper Vietnamese with diacritics. Use descriptive `coverAlt`, and keep `coverImage` and `ogImage` aligned unless there is a concrete reason not to.
 9. Do not ship a fresh production SEO article with a generic flat placeholder or text-only SVG unless the user explicitly approves a draft-only exception.
 10. Skip only for a real blocker: failed verification, identical task with no content/sitemap/GSC change, or content quality that cannot be fixed safely in the same run.
 11. Do not touch payment, auth, DB schema, chart/date engine rules, or large URL structure.
@@ -290,6 +290,9 @@ Verification:
 - npm run build: ...
 - live checks: ...
 
+Cover asset:
+- ...
+
 Expected SEO impact:
 - ...
 
@@ -346,4 +349,4 @@ The live site already has working robots, sitemap, canonical metadata, and JSON-
 }
 ```
 
-If the action is `weekly_content_batch`, the Sunday strategy may prepare a 7-slot queue, but publisher automation should still create or update only one production article per daily run, then commit/push/deploy only if verification passes.
+If the action is `single_article_publish`, publisher automation should create or update only that one production article/refresh, including its local cover asset, then commit/push/deploy only if verification passes. If the action is `weekly_content_batch`, the Sunday strategy may prepare a 7-slot queue, but it must not publish the batch unless the user explicitly asks for a one-time batch.

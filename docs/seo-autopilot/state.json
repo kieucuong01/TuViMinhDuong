@@ -1,13 +1,13 @@
 {
-  "lastRunAt": "2026-06-16T15:10:20.486Z",
+  "lastRunAt": "2026-06-17T01:32:54.535Z",
   "lastStatus": "ok",
   "lastAction": {
-    "type": "weekly_content_batch",
-    "slug": "chiem-tinh-la-so-va-tu-vi",
+    "type": "single_article_publish",
+    "slug": "la-so-tu-vi-mien-phi",
     "slugs": [
-      "chiem-tinh-la-so-va-tu-vi"
+      "la-so-tu-vi-mien-phi"
     ],
-    "reason": "Publish 1 people-first articles from SEMrush intent clusters; first topic: Người đọc đang tìm lá số chiêm tinh và cần hiểu khác biệt giữa chiêm tinh, tử vi và bát tự trước khi đi sâu.",
+    "reason": "Publish 1 people-first articles from SEMrush intent clusters; first topic: Người đọc muốn biết lá số tử vi miễn phí xem được phần nào và khi nào nên đọc thêm phần phân tích chuyên sâu.",
     "approvalRequired": false,
     "allowedToCommitDeployAfterVerification": true
   },
@@ -20,12 +20,12 @@
     "status": "skipped"
   },
   "lastDraftPaths": [
-    "docs/seo-autopilot/drafts/chiem-tinh-la-so-va-tu-vi.md"
+    "docs/seo-autopilot/drafts/la-so-tu-vi-mien-phi.md"
   ],
-  "lastReportPath": "docs/seo-autopilot/reports/2026-06-16-weekly-content-batch.md",
+  "lastReportPath": "docs/seo-autopilot/reports/2026-06-17-weekly-content-batch.md",
   "nextVerificationCommands": [
     "npm run seo:autopilot",
-    "npm test -- src/lib/content.test.ts src/lib/seo-autopilot-core.test.ts",
+    "npm test -- src/lib/content.test.ts src/lib/article-cover-assets.test.ts src/lib/seo-autopilot-core.test.ts",
     "npm run build"
   ]
 }

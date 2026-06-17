@@ -187,11 +187,13 @@ function summarizeExecutionOutput(result) {
       funnelStage: article.funnelStage,
       focusKeyword: article.focusKeyword,
       targetCharacterRange: article.brief.targetCharacterRange,
+      coverAsset: article.brief.coverAssetRequirements,
     })) || [],
     qualityGate: {
       minDataEnrichmentBlocks: plan.brief?.uniqueValueRequirements?.minDataEnrichmentBlocks,
       requiredDataBlocks: plan.brief?.uniqueValueRequirements?.requiredDataBlocks,
       interactiveTarget: plan.brief?.uniqueValueRequirements?.interactiveElement?.targetLink,
+      coverAssetPath: plan.brief?.coverAssetRequirements?.publicPath,
       programmaticGuardrailCount: plan.brief?.programmaticSeoGuardrails?.length || 0,
     },
     artifacts: result.artifacts,

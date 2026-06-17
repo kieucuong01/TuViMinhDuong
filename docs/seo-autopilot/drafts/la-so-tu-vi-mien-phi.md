@@ -6,7 +6,7 @@ focusKeyword: lá số tử vi miễn phí
 canonicalUrl: /kien-thuc-tu-vi/la-so-tu-vi-mien-phi
 funnelStage: conversion-support
 targetCharacters: 4500-7000
-generatedAt: 2026-06-14T13:58:50.725Z
+generatedAt: 2026-06-17T01:32:54.535Z
 ---
 
 # Lá số tử vi miễn phí: cần chuẩn bị gì để xem đúng hơn?
@@ -84,6 +84,28 @@ expert prompt frame:
 
 interactive CTA: Invite the reader to enter birth date/time to check whether lá số tử vi miễn phí appears in their chart and what palace/modifier context changes the reading.
 interactive target: /#lap-la-so
+
+## Cover Asset Requirements
+
+Preferred file: public/articles/la-so-tu-vi-mien-phi.webp
+Public path: /articles/la-so-tu-vi-mien-phi.webp
+Format: webp
+Dimensions: 1200x675
+Subject: Create a realistic editorial cover for Lá số tử vi miễn phí: a calm Vietnamese astrology study scene connected to lá số tử vi miễn phí, with a chart/tablet or paper la so context visible.
+Style: Warm premium editorial style aligned with lasotinhhoa.vn: gold accents, ink lines, natural light, practical astrology context, no generic stock collage.
+Composition:
+- Use a real-scene or realistic editorial illustration, not a flat placeholder.
+- Leave enough uncluttered space for article-card cropping and social previews.
+- Show the topic context visually: chart grid, birth-time notes, comparison table, palace/star cue, or reading workflow.
+Usage:
+- Set article.coverImage to the public path.
+- Set article.ogImage to the same public path unless a separate social asset is intentionally created.
+- Use a descriptive coverAlt that starts with Minh hoa and names the actual visual subject.
+- Include the image in the article body when following the current content pattern.
+No-go:
+- No generic gradient, text-only SVG, horoscope clipart, or unrelated stock photo.
+- No fear-based fate, money, marriage, career, or health promise in the visual.
+- No unreadable embedded text that carries SEO meaning.
 
 ## CTA
 

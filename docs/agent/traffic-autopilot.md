@@ -60,6 +60,7 @@ Primary channel: SEO content compounding.
 Current priority channel: organic short-form video.
 
 - Turn one useful article or chart concept into a 20-35 second video.
+- Use the final published article cover asset as the visual anchor when it fits the short-video angle, so the article thumbnail, social pack, and landing page feel connected.
 - Cross-post a clean native version to TikTok, YouTube Shorts, and Facebook Reels.
 - Use one script idea, then adapt caption/CTA/UTM per platform.
 - Push viewers to the website for free chart creation, not straight to paid reading.
@@ -120,16 +121,18 @@ Goal: grow qualified traffic with organic short-form video first: TikTok, YouTub
 Start by reading AGENTS.md, docs/agent/quickstart.md, .agents/product-marketing.md, docs/agent/seo-autopilot.md, and docs/agent/traffic-autopilot.md.
 
 Then:
-1. Run `npm run traffic:autopilot`.
-2. Execute only the one primary task in the JSON plan if it is safe and useful.
-3. Do not rerun `npm run seo:autopilot:publisher` because the dedicated daily publisher automation already handles it at 21:00. Only run it if that automation failed or was disabled.
-4. Apply the imported `coreyhaines31/marketingskills` frameworks from the plan: product context first, content must be searchable/shareable, social should repurpose content atoms into short videos, community should provide value before promotion, CRO should keep one clear CTA, and analytics should name what to measure.
-5. Produce one ready-to-record short-video pack: 20-35s script, shot list, TikTok caption, YouTube Shorts title/caption, Facebook Reels caption, UTM links, and website CTA. Do not auto-post externally.
-6. On Sunday, use the weekly strategy and measurement signals to choose next week's short-video angles. Run Lighthouse CI only when useful, not daily.
-7. Do not touch payment, auth, DB schema, coin gates, chart engine, or date engine.
-8. If no useful change is available, report a skip with the reason instead of inventing work.
-9. Verify touched files with targeted tests/checks. Run build only before release-worthy repo changes.
-10. Report status, evidence, output link/file, verification, and next 24h priority.
+1. Read `docs/seo-autopilot/state.json` and the latest publisher report so the traffic task follows the real published or refreshed URL.
+2. Run `npm run traffic:autopilot`.
+3. Execute only the one primary task in the JSON plan if it is safe and useful.
+4. Do not rerun `npm run seo:autopilot:publisher` because the dedicated daily publisher automation already handles it at 21:00. Only run it if that automation failed or was disabled.
+5. Apply the imported `coreyhaines31/marketingskills` frameworks from the plan: product context first, content must be searchable/shareable, social should repurpose content atoms into short videos, community should provide value before promotion, CRO should keep one clear CTA, and analytics should name what to measure.
+6. Use the final published cover asset as the visual anchor for the short-video pack when useful, and keep captions or shot ideas aligned with that article thumbnail direction.
+7. Produce one ready-to-record short-video pack: 20-35s script, shot list, TikTok caption, YouTube Shorts title/caption, Facebook Reels caption, UTM links, and website CTA. Do not auto-post externally.
+8. On Sunday, use the weekly strategy and measurement signals to choose next week's short-video angles. Run Lighthouse CI only when useful, not daily.
+9. Do not touch payment, auth, DB schema, coin gates, chart engine, or date engine.
+10. If no useful change is available, report a skip with the reason instead of inventing work.
+11. Verify touched files with targeted tests/checks. Run build only before release-worthy repo changes.
+12. Report status, evidence, output link/file, verification, and next 24h priority.
 ```
 
 ## Policy Basis

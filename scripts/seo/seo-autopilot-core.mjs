@@ -415,6 +415,7 @@ export function buildContentBrief(opportunity) {
     `Tìm hiểu ${focusKeyword} trong tử vi, ý nghĩa khi nằm ở các cung quan trọng, cách tự kiểm tra trên lá số và những điểm cần đọc cùng vận hạn.`;
 
   const uniqueValueRequirements = buildUniqueValueRequirements({ focusKeyword, titleTopic, topic });
+  const coverAssetRequirements = buildCoverAssetRequirements({ focusKeyword, titleTopic, topic });
 
   return {
     slug: topic.slug,
@@ -447,6 +448,7 @@ export function buildContentBrief(opportunity) {
     ],
     programmaticSeoGuardrails: PROGRAMMATIC_SEO_GUARDRAILS,
     uniqueValueRequirements,
+    coverAssetRequirements,
     outline: overrides.outline || [
       `${titleTopic} là gì?`,
       `Ý nghĩa ${focusKeyword} tại Mệnh, Quan Lộc, Tài Bạch và Phu Thê`,
@@ -520,6 +522,7 @@ export function planSeoAutopilotRun({
   const brief = buildContentBrief(selected);
   const slugs = weeklyContentPlan.articles.map((item) => item.slug);
   const keywordIntelligence = keywordPlan?.intelligence || null;
+  const isSinglePublisherRun = articlesPerWeek === 1;
 
   return {
     mode: "auto-safe",
@@ -529,7 +532,7 @@ export function planSeoAutopilotRun({
       ...(snapshot?.warnings || []),
     ],
     nextAction: {
-      type: "weekly_content_batch",
+      type: isSinglePublisherRun ? "single_article_publish" : "weekly_content_batch",
       slug: brief.slug,
       slugs,
       reason: keywordIntelligence
@@ -544,7 +547,7 @@ export function planSeoAutopilotRun({
     searchConsole,
     verificationCommands: [
       "npm run seo:autopilot",
-      "npm test -- src/lib/content.test.ts src/lib/seo-autopilot-core.test.ts",
+      "npm test -- src/lib/content.test.ts src/lib/article-cover-assets.test.ts src/lib/seo-autopilot-core.test.ts",
       "npm run build",
     ],
     hardStops: [
@@ -674,6 +677,21 @@ export function renderContentDraft(brief, { generatedAt } = {}) {
     `interactive CTA: ${brief.uniqueValueRequirements?.interactiveElement?.prompt || brief.conversionCta}`,
     `interactive target: ${brief.uniqueValueRequirements?.interactiveElement?.targetLink || "/#lap-la-so"}`,
     "",
+    "## Cover Asset Requirements",
+    "",
+    `Preferred file: ${brief.coverAssetRequirements?.preferredPath}`,
+    `Public path: ${brief.coverAssetRequirements?.publicPath}`,
+    `Format: ${brief.coverAssetRequirements?.format}`,
+    `Dimensions: ${brief.coverAssetRequirements?.dimensions?.width}x${brief.coverAssetRequirements?.dimensions?.height}`,
+    `Subject: ${brief.coverAssetRequirements?.subject}`,
+    `Style: ${brief.coverAssetRequirements?.style}`,
+    "Composition:",
+    ...(brief.coverAssetRequirements?.composition || []).map((item) => `- ${item}`),
+    "Usage:",
+    ...(brief.coverAssetRequirements?.usage || []).map((item) => `- ${item}`),
+    "No-go:",
+    ...(brief.coverAssetRequirements?.noGo || []).map((item) => `- ${item}`),
+    "",
     "## CTA",
     "",
     brief.conversionCta,
@@ -755,7 +773,7 @@ export function renderRunReport(result) {
     ...(plan.weeklyContentPlan?.articles?.length
       ? plan.weeklyContentPlan.articles.map(
           (article) =>
-            `- ${article.day}: \`${article.slug}\` (${article.funnelStage}, ${article.brief.targetCharacterRange.min}-${article.brief.targetCharacterRange.max} chars)`,
+            `- ${article.day}: \`${article.slug}\` (${article.funnelStage}, ${article.brief.targetCharacterRange.min}-${article.brief.targetCharacterRange.max} chars, cover ${article.brief.coverAssetRequirements?.publicPath})`,
         )
       : ["- Not generated"]),
     "",
@@ -844,6 +862,41 @@ function buildUniqueValueRequirements({ focusKeyword, titleTopic, topic }) {
       `Do not make a separate thin page for every minor variant of ${topic?.slug || focusKeyword}.`,
       "Do not rewrite the same article by replacing only star, palace, or year variables.",
       "Do not publish until the page has at least one data block and one interactive next step that help the reader beyond plain prose.",
+    ],
+  };
+}
+
+function buildCoverAssetRequirements({ focusKeyword, titleTopic, topic }) {
+  const slug = topic?.slug || normalizeSearchText(focusKeyword).replace(/\s+/g, "-");
+  return {
+    preferredPath: `public/articles/${slug}.webp`,
+    publicPath: `/articles/${slug}.webp`,
+    format: "webp",
+    dimensions: {
+      width: 1200,
+      height: 675,
+    },
+    subject: `Create a realistic editorial cover for ${titleTopic}: a calm Vietnamese astrology study scene connected to ${focusKeyword}, with a chart/tablet or paper la so context visible.`,
+    style:
+      "Warm premium editorial style aligned with lasotinhhoa.vn: gold accents, ink lines, natural light, practical astrology context, no generic stock collage.",
+    composition: [
+      "Use a real-scene or realistic editorial illustration, not a flat placeholder.",
+      "Leave enough uncluttered space for article-card cropping and social previews.",
+      "Show the topic context visually: chart grid, birth-time notes, comparison table, palace/star cue, or reading workflow.",
+      "Prefer no text overlay on the image; let the scene carry the meaning when possible.",
+    ],
+    usage: [
+      "Set article.coverImage to the public path.",
+      "Set article.ogImage to the same public path unless a separate social asset is intentionally created.",
+      "Use a descriptive coverAlt that starts with Minh hoa and names the actual visual subject.",
+      "Include the image in the article body when following the current content pattern.",
+      "If the cover includes visible text, it must be proper Vietnamese with diacritics; never ship ASCII-only Vietnamese text on the final asset.",
+    ],
+    noGo: [
+      "No generic gradient, text-only SVG, horoscope clipart, or unrelated stock photo.",
+      "No fear-based fate, money, marriage, career, or health promise in the visual.",
+      "No unreadable embedded text that carries SEO meaning.",
+      "No Vietnamese text without diacritics on the final thumbnail or OG asset.",
     ],
   };
 }
