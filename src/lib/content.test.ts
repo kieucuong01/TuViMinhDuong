@@ -20,6 +20,7 @@ describe("SEO content cluster", () => {
     expect(slugs).toContain("chiem-tinh-la-so-va-tu-vi");
     expect(slugs).toContain("la-so-tu-vi-mien-phi");
     expect(slugs).toContain("an-sao-la-so-tu-vi");
+    expect(slugs).toContain("sao-tu-vi");
   });
 
   it("links the beginner cluster back to conversion and related evergreen pages", () => {
@@ -31,6 +32,7 @@ describe("SEO content cluster", () => {
     const astrologyGuide = seedArticles.find((article) => article.slug === "chiem-tinh-la-so-va-tu-vi");
     const freeGuide = seedArticles.find((article) => article.slug === "la-so-tu-vi-mien-phi");
     const starPlacementGuide = seedArticles.find((article) => article.slug === "an-sao-la-so-tu-vi");
+    const saoTuViGuide = seedArticles.find((article) => article.slug === "sao-tu-vi");
 
     expect(hub?.content).toContain("/#lap-la-so");
     expect(hub?.content).toContain("/kien-thuc-tu-vi/cung-menh-cung-than");
@@ -56,6 +58,9 @@ describe("SEO content cluster", () => {
     expect(starPlacementGuide?.content).toContain("/#lap-la-so");
     expect(starPlacementGuide?.content).toContain("/kien-thuc-tu-vi/cung-menh-cung-than");
     expect(starPlacementGuide?.content).toContain("/kien-thuc-tu-vi/gio-sinh-trong-tu-vi");
+    expect(saoTuViGuide?.content).toContain("/#lap-la-so");
+    expect(saoTuViGuide?.content).toContain("/kien-thuc-tu-vi/sao-chinh-tinh-tu-vi");
+    expect(saoTuViGuide?.content).toContain("/kien-thuc-tu-vi/cung-quan-loc-trong-tu-vi");
   });
 
   it("uses dedicated SEO images for every public knowledge article", () => {
@@ -112,6 +117,7 @@ describe("SEO content cluster", () => {
           "chiem-tinh-la-so-va-tu-vi",
           "la-so-tu-vi-mien-phi",
           "an-sao-la-so-tu-vi",
+          "sao-tu-vi",
         ].includes(article.slug),
       )
       .map(articleWithScore);
@@ -166,6 +172,21 @@ describe("SEO content cluster", () => {
     expect(starPlacementGuide?.content).toContain("/kien-thuc-tu-vi/lap-la-so-tu-vi-chuan");
     expect(starPlacementGuide?.content).toContain("năm lớp");
     expect(starPlacementGuide?.faqs?.length).toBeGreaterThanOrEqual(3);
+  });
+
+  it("keeps the sao Tu Vi primer tied to context, data blocks, and next-step links", () => {
+    const saoTuViGuide = seedArticles.find((article) => article.slug === "sao-tu-vi");
+
+    expect(saoTuViGuide).toBeTruthy();
+    expect(saoTuViGuide?.coverImage).toBe("/articles/sao-tu-vi.webp");
+    expect(saoTuViGuide?.ogImage).toBe("/articles/sao-tu-vi.webp");
+    expect(saoTuViGuide?.content).toContain("| Câu hỏi thật của người đọc |");
+    expect(saoTuViGuide?.content).toContain("| Điều kiện cần kiểm tra |");
+    expect(saoTuViGuide?.content).toContain("/kien-thuc-tu-vi/cung-menh-cung-than");
+    expect(saoTuViGuide?.content).toContain("/kien-thuc-tu-vi/cung-phu-the-trong-tu-vi");
+    expect(saoTuViGuide?.content).toContain("/kien-thuc-tu-vi/gio-sinh-trong-tu-vi");
+    expect(saoTuViGuide?.content).toContain("## Thử ngay trên lá số của bạn");
+    expect(saoTuViGuide?.faqs?.length).toBeGreaterThanOrEqual(3);
   });
 
   it("refreshes the core pillars with depth, trust framing, and contextual anchors", () => {
