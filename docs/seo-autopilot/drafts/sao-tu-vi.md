@@ -6,7 +6,7 @@ focusKeyword: sao Tử Vi
 canonicalUrl: /kien-thuc-tu-vi/sao-tu-vi
 funnelStage: top
 targetCharacters: 6500-9500
-generatedAt: 2026-06-09T00:54:36.564Z
+generatedAt: 2026-06-18T23:22:35.441Z
 ---
 
 # Sao Tử Vi trong lá số: ý nghĩa và cách đọc dễ hiểu
@@ -40,6 +40,59 @@ Maximum exact-match anchors: 2
 - Không đặt word count cố định như tín hiệu ranking; range ký tự chỉ để tránh bài quá mỏng so với intent.
 - Không lặp keyword máy móc, không cloaking, không doorway page, không nội dung sao chép.
 - Bài phải có trải nghiệm/giải thích riêng cho Lá số tinh hoa và đường dẫn hữu ích cho người đọc.
+
+## Programmatic SEO Guardrails
+- Doorway Pages: do not create near-duplicate pages by swapping star, palace, birth-year, or keyword variables into the same frame.
+- Helpful Content: reject thin generic AI advice; every publishable article must add structured data, expert causal logic, and a next useful action.
+- One search intent, one useful URL: merge close variants instead of making separate pages for lap, lay, tao, tra, ve, or ke when the user need is the same.
+- Programmatic content needs unique value from the product: score tables, modifier-star context, chart-form interaction, and clear limits of interpretation.
+
+## Unique Value Requirements
+
+Minimum data enrichment blocks: 2
+
+Required data blocks:
+- structured-score-table
+- modifier-stars-or-context
+- algorithmic-source-notes
+
+Data enrichment examples:
+- Create a compact score table for sao Tử Vi: risk, stability, accumulation/relationship/career fit, and reading confidence.
+- List modifier stars, palace context, or chart conditions that can change the interpretation; do not present one-star claims as absolute.
+- Name the internal calculation/data source when relevant, such as chart input, palace position, star state, companion stars, or date-fortune output.
+
+expert prompt frame:
+- Expert prompt frame for Sao Tử Vi: analyze by logic nhan qua from star/palace nature, activation condition, likely expression, limitation, then practical advice.
+- Force three concrete sections: what pattern can be read, what can reverse or weaken it, and what the reader should check in their own chart.
+- Use objective, bounded language; no vague AI filler like 'be careful with money' unless the causal reason is explained.
+
+interactive CTA: Invite the reader to enter birth date/time to check whether sao Tử Vi appears in their chart and what palace/modifier context changes the reading.
+interactive target: /#lap-la-so
+
+## Cover Asset Requirements
+
+Preferred file: public/articles/sao-tu-vi.webp
+Public path: /articles/sao-tu-vi.webp
+Format: webp
+Dimensions: 1200x675
+Subject: Create a realistic editorial cover for Sao Tử Vi: a calm Vietnamese astrology study scene connected to sao Tử Vi, with a chart/tablet or paper la so context visible.
+Style: Warm premium editorial style aligned with lasotinhhoa.vn: gold accents, ink lines, natural light, practical astrology context, no generic stock collage.
+Composition:
+- Use a real-scene or realistic editorial illustration, not a flat placeholder.
+- Leave enough uncluttered space for article-card cropping and social previews.
+- Show the topic context visually: chart grid, birth-time notes, comparison table, palace/star cue, or reading workflow.
+- Prefer no text overlay on the image; let the scene carry the meaning when possible.
+Usage:
+- Set article.coverImage to the public path.
+- Set article.ogImage to the same public path unless a separate social asset is intentionally created.
+- Use a descriptive coverAlt that starts with Minh hoa and names the actual visual subject.
+- Include the image in the article body when following the current content pattern.
+- If the cover includes visible text, it must be proper Vietnamese with diacritics; never ship ASCII-only Vietnamese text on the final asset.
+No-go:
+- No generic gradient, text-only SVG, horoscope clipart, or unrelated stock photo.
+- No fear-based fate, money, marriage, career, or health promise in the visual.
+- No unreadable embedded text that carries SEO meaning.
+- No Vietnamese text without diacritics on the final thumbnail or OG asset.
 
 ## CTA
 

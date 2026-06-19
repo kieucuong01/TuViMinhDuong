@@ -1,13 +1,13 @@
 {
-  "lastRunAt": "2026-06-17T01:32:54.535Z",
+  "lastRunAt": "2026-06-18T23:22:35.441Z",
   "lastStatus": "ok",
   "lastAction": {
     "type": "single_article_publish",
-    "slug": "la-so-tu-vi-mien-phi",
+    "slug": "sao-tu-vi",
     "slugs": [
-      "la-so-tu-vi-mien-phi"
+      "sao-tu-vi"
     ],
-    "reason": "Publish 1 people-first articles from SEMrush intent clusters; first topic: Người đọc muốn biết lá số tử vi miễn phí xem được phần nào và khi nào nên đọc thêm phần phân tích chuyên sâu.",
+    "reason": "Publish 1 people-first articles from SEMrush intent clusters; first topic: Người đọc muốn hiểu ý nghĩa sao Tử Vi trong lá số và cách đọc theo cung.",
     "approvalRequired": false,
     "allowedToCommitDeployAfterVerification": true
   },
@@ -20,9 +20,9 @@
     "status": "skipped"
   },
   "lastDraftPaths": [
-    "docs/seo-autopilot/drafts/la-so-tu-vi-mien-phi.md"
+    "docs/seo-autopilot/drafts/sao-tu-vi.md"
   ],
-  "lastReportPath": "docs/seo-autopilot/reports/2026-06-17-weekly-content-batch.md",
+  "lastReportPath": "docs/seo-autopilot/reports/2026-06-18-weekly-content-batch.md",
   "nextVerificationCommands": [
     "npm run seo:autopilot",
     "npm test -- src/lib/content.test.ts src/lib/article-cover-assets.test.ts src/lib/seo-autopilot-core.test.ts",
