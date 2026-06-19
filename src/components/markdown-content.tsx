@@ -54,6 +54,19 @@ function plainInlineText(text: string) {
   }).join("");
 }
 
+function isTableSeparator(line: string) {
+  return /^\|?(?:\s*:?-{3,}:?\s*\|)+\s*:?-{3,}:?\s*\|?$/.test(line);
+}
+
+function parseTableRow(line: string) {
+  return line
+    .trim()
+    .replace(/^\|/, "")
+    .replace(/\|$/, "")
+    .split("|")
+    .map((cell) => cell.trim());
+}
+
 function baseHeadingId(text: string) {
   return text
     .toLowerCase()
@@ -196,10 +209,76 @@ export function MarkdownContent({ content, afterFirstSection }: MarkdownContentP
       continue;
     }
 
+    if (/^\d+\.\s+/.test(text)) {
+      const items: string[] = [];
+      while (index < lines.length && /^\d+\.\s+/.test(lines[index].trim())) {
+        items.push(lines[index].trim().replace(/^\d+\.\s+/, ""));
+        index += 1;
+      }
+      nodes.push(
+        <ol key={nodeKey}>
+          {items.map((item) => (
+            <li key={item}>{renderInline(item)}</li>
+          ))}
+        </ol>,
+      );
+      nodeKey += 1;
+      continue;
+    }
+
+    if (text.includes("|") && index + 1 < lines.length && isTableSeparator(lines[index + 1].trim())) {
+      const headers = parseTableRow(text);
+      index += 2;
+      const rows: string[][] = [];
+      while (index < lines.length) {
+        const row = lines[index].trim();
+        if (!row || !row.includes("|") || row.startsWith("#") || row.startsWith("- ") || /^\d+\.\s+/.test(row)) {
+          break;
+        }
+        rows.push(parseTableRow(row));
+        index += 1;
+      }
+      nodes.push(
+        <div key={nodeKey} className="prose-table-wrap">
+          <table>
+            <thead>
+              <tr>
+                {headers.map((header, headerIndex) => (
+                  <th key={`${header}-${headerIndex}`} scope="col">
+                    {renderInline(header)}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((row, rowIndex) => (
+                <tr key={`${rowIndex}-${row.join("|")}`}>
+                  {row.map((cell, cellIndex) => (
+                    <td key={`${rowIndex}-${cellIndex}`}>{renderInline(cell)}</td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>,
+      );
+      nodeKey += 1;
+      continue;
+    }
+
     const paragraphLines: string[] = [];
     while (index < lines.length) {
       const line = lines[index].trim();
-      if (!line || line.startsWith("# ") || line.startsWith("## ") || line.startsWith("### ") || line.startsWith("- ") || /^!\[([^\]]*)]\(([^)]+)\)$/.test(line)) {
+      if (
+        !line ||
+        line.startsWith("# ") ||
+        line.startsWith("## ") ||
+        line.startsWith("### ") ||
+        line.startsWith("- ") ||
+        /^\d+\.\s+/.test(line) ||
+        /^!\[([^\]]*)]\(([^)]+)\)$/.test(line) ||
+        (line.includes("|") && index + 1 < lines.length && isTableSeparator(lines[index + 1].trim()))
+      ) {
         break;
       }
       paragraphLines.push(line);

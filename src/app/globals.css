@@ -6071,6 +6071,59 @@ button.is-loading:not(.icon-button)::before {
   list-style: disc;
 }
 
+.prose-content ol {
+  display: grid;
+  gap: 0.55rem;
+  padding-left: 1.35rem;
+  list-style: decimal;
+}
+
+.prose-table-wrap {
+  margin-top: 1.15rem;
+  overflow-x: auto;
+  border: 1px solid #fed7aa;
+  border-radius: 1rem;
+  background: linear-gradient(180deg, rgb(255 247 237 / 0.72), rgb(255 255 255 / 0.96));
+  box-shadow: 0 14px 34px rgb(120 53 15 / 0.05);
+}
+
+.prose-table-wrap table {
+  width: 100%;
+  min-width: 42rem;
+  border-collapse: collapse;
+}
+
+.prose-table-wrap th,
+.prose-table-wrap td {
+  padding: 0.9rem 1rem;
+  border-bottom: 1px solid #ffedd5;
+  vertical-align: top;
+  text-align: left;
+}
+
+.prose-table-wrap th {
+  background: rgb(255 237 213 / 0.62);
+  color: #7c2d12;
+  font-size: 0.96rem;
+  font-weight: 800;
+  line-height: 1.45;
+}
+
+.prose-table-wrap td {
+  color: #57534e;
+  font-size: 0.98rem;
+  line-height: 1.72;
+}
+
+.prose-table-wrap tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.prose-table-wrap td strong,
+.prose-table-wrap th strong {
+  color: inherit;
+}
+
 .free-reading-summary .prose-content ul {
   gap: 0.62rem;
   padding-left: 0;

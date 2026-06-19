@@ -51,6 +51,35 @@ Lá số này nên đọc từ phần tổng quan.
     expect(html.indexOf("Đoạn mở đầu.")).toBeLessThan(html.indexOf("mid-cta"));
     expect(html.indexOf("mid-cta")).toBeLessThan(html.indexOf("Phần tiếp theo"));
   });
+  it("renders markdown tables as real table elements", () => {
+    const html = renderToStaticMarkup(
+      createElement(MarkdownContent, {
+        content: `| Cá»™t 1 | Cá»™t 2 |
+| --- | --- |
+| [Cung Má»‡nh](/kien-thuc-tu-vi/cung-menh-cung-than) | **Giáº£i thÃ­ch** |`,
+      }),
+    );
+
+    expect(html).toContain('<div class="prose-table-wrap"><table>');
+    expect(html).toContain('<thead><tr><th scope="col">Cá»™t 1</th><th scope="col">Cá»™t 2</th></tr></thead>');
+    expect(html).toContain('href="/kien-thuc-tu-vi/cung-menh-cung-than"');
+    expect(html).toContain("<strong>Giáº£i thÃ­ch</strong>");
+  });
+
+  it("renders ordered markdown lists as ol/li instead of paragraph text", () => {
+    const html = renderToStaticMarkup(
+      createElement(MarkdownContent, {
+        content: `1. BÆ°á»›c má»™t
+2. BÆ°á»›c hai
+3. BÆ°á»›c ba`,
+      }),
+    );
+
+    expect(html).toContain("<ol>");
+    expect(html).toContain("<li>BÆ°á»›c má»™t</li>");
+    expect(html).toContain("<li>BÆ°á»›c hai</li>");
+    expect(html).not.toContain("<p>1. BÆ°á»›c má»™t 2. BÆ°á»›c hai 3. BÆ°á»›c ba</p>");
+  });
 });
 
 describe("extractMarkdownHeadings", () => {
