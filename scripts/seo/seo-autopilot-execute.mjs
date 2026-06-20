@@ -5,6 +5,7 @@ import { buildSnapshot } from "./seo-autopilot-snapshot.mjs";
 import { buildSearchConsoleInsights } from "./search-console.mjs";
 import {
   extractSeedArticleSlugs,
+  normalizePublisherSelection,
   planSeoAutopilotRun,
   readSemrushKeywordRows,
   renderContentDraft,
@@ -15,7 +16,11 @@ import { shouldSkipSearchConsole } from "./search-console-policy.mjs";
 const args = parseArgs(process.argv.slice(2));
 const baseUrl = normalizeBaseUrl(args.baseUrl || "https://lasotinhhoa.vn");
 const sampleSize = Number.parseInt(args.sampleSize || "8", 10);
-const articlesPerWeek = clampArticleCount(args.articles || args.articlesPerWeek || "7");
+const publisherSelection = normalizePublisherSelection({
+  articles: args.articles || args.articlesPerWeek || (args.cluster ? "5" : "7"),
+  clusterMode: args.cluster,
+});
+const articlesPerWeek = publisherSelection.articles;
 const dryRun = Boolean(args.dryRun);
 const skipSearchConsole = shouldSkipSearchConsole({ explicitSkip: args.skipSearchConsole });
 
@@ -35,6 +40,7 @@ try {
     searchConsole,
     articlesPerWeek,
     previousState,
+    clusterMode: publisherSelection.clusterMode,
   });
   const draftPaths = plan.weeklyContentPlan.articles.map((article) =>
     resolve(process.cwd(), "docs/seo-autopilot/drafts", `${article.slug}.md`),
@@ -139,6 +145,8 @@ function parseArgs(values) {
     const value = values[index];
     if (value === "--dry-run") {
       parsed.dryRun = true;
+    } else if (value === "--cluster") {
+      parsed.cluster = true;
     } else if (value === "--base-url") {
       parsed.baseUrl = values[index + 1];
       index += 1;
@@ -161,12 +169,6 @@ function parseArgs(values) {
     }
   }
   return parsed;
-}
-
-function clampArticleCount(value) {
-  const parsed = Number.parseInt(value, 10);
-  if (!Number.isFinite(parsed)) return 7;
-  return Math.min(Math.max(parsed, 1), 7);
 }
 
 function summarizeExecutionOutput(result) {

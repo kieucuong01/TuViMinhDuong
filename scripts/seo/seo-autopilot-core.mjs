@@ -492,6 +492,19 @@ export function buildContentBrief(opportunity) {
   };
 }
 
+export function normalizePublisherSelection({ articles, clusterMode = false }) {
+  const parsed = Number.parseInt(String(articles), 10);
+  const fallback = clusterMode ? 2 : 7;
+  const normalized = Number.isFinite(parsed) ? parsed : fallback;
+  if (clusterMode && normalized < 2) {
+    throw new Error("Cluster mode requires between 2 and 5 articles.");
+  }
+  return {
+    articles: clusterMode ? Math.min(normalized, 5) : Math.min(Math.max(normalized, 1), 7),
+    clusterMode: Boolean(clusterMode),
+  };
+}
+
 export function planSeoAutopilotRun({
   snapshot,
   existingSlugs,
@@ -499,7 +512,10 @@ export function planSeoAutopilotRun({
   searchConsole,
   articlesPerWeek = 7,
   previousState,
+  clusterMode = false,
 }) {
+  const publisherSelection = normalizePublisherSelection({ articles: articlesPerWeek, clusterMode });
+  articlesPerWeek = publisherSelection.articles;
   const currentSlugs = new Set(existingSlugs || []);
   const snapshotOpportunities = Array.isArray(snapshot?.opportunities) ? snapshot.opportunities : [];
   const inputKeywordRows = Array.isArray(keywordRows) ? keywordRows : [];
@@ -523,6 +539,7 @@ export function planSeoAutopilotRun({
   const slugs = weeklyContentPlan.articles.map((item) => item.slug);
   const keywordIntelligence = keywordPlan?.intelligence || null;
   const isSinglePublisherRun = articlesPerWeek === 1;
+  if (clusterMode) assertDistinctClusterArticles(weeklyContentPlan.articles);
 
   return {
     mode: "auto-safe",
@@ -532,7 +549,11 @@ export function planSeoAutopilotRun({
       ...(snapshot?.warnings || []),
     ],
     nextAction: {
-      type: isSinglePublisherRun ? "single_article_publish" : "weekly_content_batch",
+      type: clusterMode
+        ? "cluster_article_publish"
+        : isSinglePublisherRun
+          ? "single_article_publish"
+          : "weekly_content_batch",
       slug: brief.slug,
       slugs,
       reason: keywordIntelligence
@@ -540,6 +561,13 @@ export function planSeoAutopilotRun({
         : `Publish ${slugs.length} people-first articles this week across the keyword funnel; first topic: ${brief.intent}`,
       approvalRequired: false,
       allowedToCommitDeployAfterVerification: true,
+      ...(clusterMode
+        ? {
+            explicitAuthorizationRequired: true,
+            atomicRelease: true,
+            distinctIntentRequired: true,
+          }
+        : {}),
     },
     brief,
     weeklyContentPlan,
@@ -556,6 +584,19 @@ export function planSeoAutopilotRun({
       "Do not deploy if tests or build fail.",
     ],
   };
+}
+
+function assertDistinctClusterArticles(articles) {
+  const slugs = new Set();
+  const intents = new Set();
+  for (const article of articles) {
+    const slug = article.slug?.trim();
+    const intent = article.brief?.intent?.trim().toLocaleLowerCase("vi");
+    if (!slug || slugs.has(slug)) throw new Error(`Cluster mode contains a duplicate slug: ${slug || "unknown"}`);
+    if (!intent || intents.has(intent)) throw new Error(`Cluster mode contains a duplicate intent: ${intent || "unknown"}`);
+    slugs.add(slug);
+    intents.add(intent);
+  }
 }
 
 export function buildWeeklyContentPlan({ opportunities, articlesPerWeek = 7 }) {

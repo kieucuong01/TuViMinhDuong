@@ -54,6 +54,14 @@ For daily publisher runs, prefer the single-task, summary-output command to save
 npm run seo:autopilot:publisher
 ```
 
+For a one-time cluster explicitly authorized by the user:
+
+```powershell
+npm run seo:autopilot:cluster
+```
+
+Cluster mode may select 2-5 articles only. Every slug must have a distinct reader intent, article-specific data blocks and cover, and the complete selection must pass one atomic verification and release.
+
 For an external technical SEO regression audit, use Lighthouse CI only when useful:
 
 ```powershell
@@ -71,10 +79,10 @@ Traffic work should read `.agents/product-marketing.md` and apply the imported `
 Then choose the highest-impact safe SEO task, implement it, verify, and report:
 
 - use `plan.nextAction` and `plan.brief` from the command output as the default decision
-- publisher runs should act on one selected article/refresh only; Sunday strategy can inspect the full 7-slot weekly plan
+- scheduled publisher runs should act on one selected article/refresh only; an explicit user-authorized cluster run may act on 2-5 distinct articles
 - daily traffic runs should execute at most one primary follow-up task and must not rerun the daily publisher unless that automation failed or is disabled
 - Lighthouse CI is weekly/manual; do not run it for every publisher task unless public SEO layout, metadata, structured data, or page experience changed
-- publisher runs should treat `single_article_publish` as the one selected production article/refresh; Sunday strategy may inspect `weekly_content_batch` but should not publish it
+- publisher runs should treat `single_article_publish` as one production article/refresh; `cluster_article_publish` is allowed only with explicit user authorization; Sunday strategy may inspect `weekly_content_batch` but should not publish it
 - each article must follow `brief.targetCharacterRange`, `brief.internalLinkPolicy`, `brief.googleQualityPolicy`, and the funnel stage in `plan.weeklyContentPlan`
 - if live evidence contradicts the generated plan, choose the safer higher-impact SEO task and explain why
 

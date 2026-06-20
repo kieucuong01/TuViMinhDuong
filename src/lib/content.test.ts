@@ -1,7 +1,14 @@
 import { describe, expect, it } from "vitest";
+import { auditArticles } from "@/lib/content-audit";
 import { articleWithScore, seedArticles } from "@/lib/content";
 
 describe("SEO content cluster", () => {
+  it("passes the production content quality audit", () => {
+    const errors = auditArticles(seedArticles).filter((finding) => finding.severity === "error");
+
+    expect(errors).toEqual([]);
+  });
+
   it("contains the beginner hub and palace support articles", () => {
     const slugs = new Set(seedArticles.map((article) => article.slug));
 
@@ -21,6 +28,8 @@ describe("SEO content cluster", () => {
     expect(slugs).toContain("la-so-tu-vi-mien-phi");
     expect(slugs).toContain("an-sao-la-so-tu-vi");
     expect(slugs).toContain("sao-tu-vi");
+    expect(slugs).toContain("sao-thien-co");
+    expect(slugs).toContain("sao-thai-duong");
   });
 
   it("links the beginner cluster back to conversion and related evergreen pages", () => {
@@ -33,6 +42,9 @@ describe("SEO content cluster", () => {
     const freeGuide = seedArticles.find((article) => article.slug === "la-so-tu-vi-mien-phi");
     const starPlacementGuide = seedArticles.find((article) => article.slug === "an-sao-la-so-tu-vi");
     const saoTuViGuide = seedArticles.find((article) => article.slug === "sao-tu-vi");
+    const mainStarsPillar = seedArticles.find((article) => article.slug === "sao-chinh-tinh-tu-vi");
+    const saoThienCoGuide = seedArticles.find((article) => article.slug === "sao-thien-co");
+    const saoThaiDuongGuide = seedArticles.find((article) => article.slug === "sao-thai-duong");
 
     expect(hub?.content).toContain("/#lap-la-so");
     expect(hub?.content).toContain("/kien-thuc-tu-vi/cung-menh-cung-than");
@@ -61,6 +73,15 @@ describe("SEO content cluster", () => {
     expect(saoTuViGuide?.content).toContain("/#lap-la-so");
     expect(saoTuViGuide?.content).toContain("/kien-thuc-tu-vi/sao-chinh-tinh-tu-vi");
     expect(saoTuViGuide?.content).toContain("/kien-thuc-tu-vi/cung-quan-loc-trong-tu-vi");
+    expect(mainStarsPillar?.content).toContain("/kien-thuc-tu-vi/sao-tu-vi");
+    expect(mainStarsPillar?.content).toContain("/kien-thuc-tu-vi/sao-thien-co");
+    expect(mainStarsPillar?.content).toContain("/kien-thuc-tu-vi/sao-thai-duong");
+    expect(saoThienCoGuide?.content).toContain("/kien-thuc-tu-vi/sao-chinh-tinh-tu-vi");
+    expect(saoThienCoGuide?.content).toContain("| Tình huống cần đọc |");
+    expect(saoThienCoGuide?.content).toContain("| Điều kiện làm Thiên Cơ đổi sắc thái |");
+    expect(saoThaiDuongGuide?.content).toContain("/kien-thuc-tu-vi/sao-chinh-tinh-tu-vi");
+    expect(saoThaiDuongGuide?.content).toContain("| Câu hỏi về vai trò |");
+    expect(saoThaiDuongGuide?.content).toContain("| Bối cảnh làm Thái Dương biểu hiện khác |");
   });
 
   it("uses dedicated SEO images for every public knowledge article", () => {

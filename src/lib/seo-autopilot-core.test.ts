@@ -7,6 +7,7 @@ import {
   buildKeywordDrivenOpportunities,
   buildWeeklyContentPlan,
   extractSeedArticleSlugs,
+  normalizePublisherSelection,
   planSeoAutopilotRun,
   parseSemrushKeywordCsv,
   rankTopicOpportunities,
@@ -328,6 +329,41 @@ export const seedArticles = [
     expect(plan.nextAction.type).toBe("single_article_publish");
     expect(plan.weeklyContentPlan.articles).toHaveLength(1);
     expect(plan.nextAction.reason).toContain("Publish 1 people-first");
+  });
+
+  it("requires an explicit bounded cluster mode for multi-article publishing", () => {
+    expect(normalizePublisherSelection({ articles: 5, clusterMode: true })).toEqual({
+      articles: 5,
+      clusterMode: true,
+    });
+    expect(normalizePublisherSelection({ articles: 9, clusterMode: true })).toEqual({
+      articles: 5,
+      clusterMode: true,
+    });
+    expect(() => normalizePublisherSelection({ articles: 1, clusterMode: true })).toThrow(
+      "Cluster mode requires between 2 and 5 articles.",
+    );
+  });
+
+  it("marks an explicitly authorized cluster as one atomic publish action", () => {
+    const plan = planSeoAutopilotRun({
+      snapshot: {
+        status: "ok",
+        sitemapUrlCount: 30,
+        warnings: [],
+      },
+      existingSlugs: ["la-so-tu-vi-la-gi"],
+      articlesPerWeek: 3,
+      clusterMode: true,
+    });
+
+    expect(plan.nextAction.type).toBe("cluster_article_publish");
+    expect(plan.nextAction.slugs).toHaveLength(3);
+    expect(plan.nextAction).toMatchObject({
+      explicitAuthorizationRequired: true,
+      atomicRelease: true,
+      distinctIntentRequired: true,
+    });
   });
 
   it("falls back to the next publisher slug when the last single-task run picked the same article", () => {

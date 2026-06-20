@@ -94,8 +94,8 @@ Paid channel: phase next, manual only.
 
 ## Cadence
 
-- Daily 21:00: SEO publisher runs separately and creates or refreshes exactly one SEO article when quality and verification pass.
-- Daily 21:20: Traffic Autopilot turns the newly published/refreshed URL into one TikTok/YouTube Shorts/Facebook Reels pack. It must not rerun the publisher unless the dedicated automation failed or was disabled.
+- Daily 21:00: SEO publisher runs separately and creates or refreshes exactly one SEO article when quality and verification pass. A one-time cluster release may contain 2-5 distinct articles only when the user explicitly authorizes `npm run seo:autopilot:cluster`.
+- Daily 21:20: Traffic Autopilot turns one priority URL from the newly published/refreshed release into one TikTok/YouTube Shorts/Facebook Reels pack. It must not rerun the publisher unless the dedicated automation failed or was disabled, including after an authorized cluster release.
 - Sunday 20:30: weekly SEO strategy prepares the next seven daily SEO slots before the Sunday publisher run.
 
 ## Hard Stops
@@ -124,7 +124,7 @@ Then:
 1. Read `docs/seo-autopilot/state.json` and the latest publisher report so the traffic task follows the real published or refreshed URL.
 2. Run `npm run traffic:autopilot`.
 3. Execute only the one primary task in the JSON plan if it is safe and useful.
-4. Do not rerun `npm run seo:autopilot:publisher` because the dedicated daily publisher automation already handles it at 21:00. Only run it if that automation failed or was disabled.
+4. Do not rerun `npm run seo:autopilot:publisher` or `npm run seo:autopilot:cluster` because the dedicated SEO release already handles publishing. Only rerun the single publisher if that automation failed or was disabled; never infer cluster authorization from a traffic task.
 5. Apply the imported `coreyhaines31/marketingskills` frameworks from the plan: product context first, content must be searchable/shareable, social should repurpose content atoms into short videos, community should provide value before promotion, CRO should keep one clear CTA, and analytics should name what to measure.
 6. Use the final published cover asset as the visual anchor for the short-video pack when useful, and keep captions or shot ideas aligned with that article thumbnail direction.
 7. Produce one ready-to-record short-video pack: 20-35s script, shot list, TikTok caption, YouTube Shorts title/caption, Facebook Reels caption, UTM links, and website CTA. Do not auto-post externally.
