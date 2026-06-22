@@ -29,6 +29,7 @@ describe("SEO content cluster", () => {
     expect(slugs).toContain("an-sao-la-so-tu-vi");
     expect(slugs).toContain("sao-tu-vi");
     expect(slugs).toContain("menh-vo-chinh-dieu");
+    expect(slugs).toContain("tieu-van-la-gi");
     expect(slugs).toContain("sao-thien-co");
     expect(slugs).toContain("sao-thai-duong");
   });
@@ -44,6 +45,7 @@ describe("SEO content cluster", () => {
     const starPlacementGuide = seedArticles.find((article) => article.slug === "an-sao-la-so-tu-vi");
     const saoTuViGuide = seedArticles.find((article) => article.slug === "sao-tu-vi");
     const menhVoChinhDieuGuide = seedArticles.find((article) => article.slug === "menh-vo-chinh-dieu");
+    const tieuVanGuide = seedArticles.find((article) => article.slug === "tieu-van-la-gi");
     const mainStarsPillar = seedArticles.find((article) => article.slug === "sao-chinh-tinh-tu-vi");
     const saoThienCoGuide = seedArticles.find((article) => article.slug === "sao-thien-co");
     const saoThaiDuongGuide = seedArticles.find((article) => article.slug === "sao-thai-duong");
@@ -78,6 +80,9 @@ describe("SEO content cluster", () => {
     expect(menhVoChinhDieuGuide?.content).toContain("/#lap-la-so");
     expect(menhVoChinhDieuGuide?.content).toContain("/kien-thuc-tu-vi/cung-menh-cung-than");
     expect(menhVoChinhDieuGuide?.content).toContain("/kien-thuc-tu-vi/cung-quan-loc-trong-tu-vi");
+    expect(tieuVanGuide?.content).toContain("/#lap-la-so");
+    expect(tieuVanGuide?.content).toContain("/kien-thuc-tu-vi/dai-van-la-gi");
+    expect(tieuVanGuide?.content).toContain("/kien-thuc-tu-vi/nguyet-van-nhat-van");
     expect(mainStarsPillar?.content).toContain("/kien-thuc-tu-vi/sao-tu-vi");
     expect(mainStarsPillar?.content).toContain("/kien-thuc-tu-vi/sao-thien-co");
     expect(mainStarsPillar?.content).toContain("/kien-thuc-tu-vi/sao-thai-duong");
@@ -145,6 +150,7 @@ describe("SEO content cluster", () => {
           "an-sao-la-so-tu-vi",
           "sao-tu-vi",
           "menh-vo-chinh-dieu",
+          "tieu-van-la-gi",
         ].includes(article.slug),
       )
       .map(articleWithScore);
@@ -229,6 +235,20 @@ describe("SEO content cluster", () => {
     expect(menhVoChinhDieuGuide?.content).toContain("/kien-thuc-tu-vi/phan-tich-la-so-tu-vi");
     expect(menhVoChinhDieuGuide?.content).toContain("## Khung causal analysis");
     expect(menhVoChinhDieuGuide?.faqs?.length).toBeGreaterThanOrEqual(3);
+  });
+
+  it("keeps the tiểu vận guide tied to yearly context, time-layer comparisons, and reader workflow", () => {
+    const tieuVanGuide = seedArticles.find((article) => article.slug === "tieu-van-la-gi");
+
+    expect(tieuVanGuide).toBeTruthy();
+    expect(tieuVanGuide?.coverImage).toBe("/articles/tieu-van-la-gi.webp");
+    expect(tieuVanGuide?.ogImage).toBe("/articles/tieu-van-la-gi.webp");
+    expect(tieuVanGuide?.content).toContain("| Lớp vận |");
+    expect(tieuVanGuide?.content).toContain("| Điều kiện cần kiểm tra |");
+    expect(tieuVanGuide?.content).toContain("/kien-thuc-tu-vi/cung-tai-bach-trong-tu-vi");
+    expect(tieuVanGuide?.content).toContain("/kien-thuc-tu-vi/cung-thien-di-trong-tu-vi");
+    expect(tieuVanGuide?.content).toContain("## Khung causal analysis");
+    expect(tieuVanGuide?.faqs?.length).toBeGreaterThanOrEqual(3);
   });
 
   it("refreshes the core pillars with depth, trust framing, and contextual anchors", () => {
