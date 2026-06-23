@@ -135,8 +135,9 @@ Rules:
 - Public article URLs are `/kien-thuc-tu-vi/[slug]`.
 - For SEO Autopilot runs, start with `npm run seo:autopilot` and use the snapshot to pick the safest highest-impact task.
 - Include natural visible copy first; metadata and schema support it, not the reverse.
-- New or materially refreshed SEO articles should ship with a local cover asset under `public/articles/`, preferably a raster `.webp` that looks like a real scene or realistic editorial illustration related to the topic.
+- New or materially refreshed SEO articles should ship with a local cover asset under `public/articles/`, preferably a raster `.webp` that reads as a believable real photo or photo-editorial scene related to the topic.
 - Match article thumbnails to the existing site language: warm gold/ink palette, calm premium tone, practical astrology context, and no generic stock-collage feel. Reuse the same asset for `coverImage` and `ogImage` unless there is a specific reason not to.
+- Do not accept symbolic/vector-like covers for fresh production SEO articles. If the image still reads as iconography, abstract placeholder art, or a staged flat illustration, replace it before release.
 - Keep personal chart pages `noindex` unless explicitly changed.
 - Keep authenticated/money-only policy routes out of public sitemap unless the user asks otherwise.
 - Seed evergreen articles should create an internal link cluster back to `/#lap-la-so`, `/xem-ngay`, and related knowledge articles.

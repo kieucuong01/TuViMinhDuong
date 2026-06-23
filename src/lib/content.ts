@@ -3171,7 +3171,7 @@ ${cta}`,
     focusKeyword: "cung Phụ Mẫu",
     coverImage: "/articles/cung-phu-mau-trong-tu-vi.webp",
     coverAlt:
-      "Minh họa bàn làm việc ấm sáng với lá số tử vi, ảnh gia đình và ghi chú dùng để đọc Cung Phụ Mẫu trong ngữ cảnh nền gia đình",
+      "Minh họa góc gia đình với album ảnh, chân dung trưởng bối, bình hoa và lá số tử vi dùng để đọc nền Phụ Mẫu",
     metaTitle: "Cung Phụ Mẫu trong tử vi: ý nghĩa và cách đọc dễ hiểu",
     metaDescription:
       "Tìm hiểu Cung Phụ Mẫu trong tử vi là gì, nên đọc cùng cung nào, khi nào phản ánh nền gia đình hay sự hỗ trợ trưởng bối và cách tự kiểm tra trên lá số cá nhân.",
@@ -3200,7 +3200,7 @@ ${cta}`,
     ],
     content: `Khi tìm "Cung Phụ Mẫu", nhiều người thực ra đang hỏi những điều rất đời thường: vì sao mình vừa cần vừa ngại dựa vào gia đình, vì sao mỗi lần bàn chuyện công việc lại chạm vào kỳ vọng của cha mẹ, hoặc vì sao có người lớn lên trong nhà đủ đầy nhưng vẫn thấy thiếu điểm tựa tinh thần. Cung này không chỉ để đoán "hợp hay khắc" với cha mẹ. Nó giúp người đọc nhìn nền gia đình, cách tiếp nhận sự chăm sóc, kiểu ảnh hưởng của trưởng bối và dấu vết của việc nuôi dạy trong cách mình trưởng thành.
 
-![Minh họa bàn làm việc ấm sáng với lá số tử vi, ảnh gia đình và ghi chú dùng để đọc Cung Phụ Mẫu trong ngữ cảnh nền gia đình](/articles/cung-phu-mau-trong-tu-vi.webp)
+![Minh họa góc gia đình với album ảnh, chân dung trưởng bối, bình hoa và lá số tử vi dùng để đọc nền Phụ Mẫu](/articles/cung-phu-mau-trong-tu-vi.webp)
 
 Trên lasotinhhoa.vn, cách đọc an toàn hơn luôn là bắt đầu từ [lập lá số tử vi miễn phí](/#lap-la-so), kiểm tra lại [giờ sinh trong tử vi](/kien-thuc-tu-vi/gio-sinh-trong-tu-vi), rồi quay về trục [Cung Mệnh và Cung Thân](/kien-thuc-tu-vi/cung-menh-cung-than). Sau đó mới dùng bài này để đặt Cung Phụ Mẫu vào đúng ngữ cảnh: nó không thay thế [Cung Phúc Đức](/kien-thuc-tu-vi/cung-phuc-duc-trong-tu-vi), không đứng riêng với [12 cung trong lá số tử vi](/kien-thuc-tu-vi/12-cung-trong-la-so-tu-vi), và càng không nên dùng để kết luận một câu cố định về hiếu thuận, hôn nhân hay sự nghiệp.
 

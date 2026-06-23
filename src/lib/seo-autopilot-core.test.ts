@@ -231,14 +231,19 @@ export const seedArticles = [
       format: "webp",
       dimensions: { width: 1200, height: 675 },
     });
-    expect(brief.coverAssetRequirements.subject).toContain("la so context");
+    expect(brief.coverAssetRequirements.subject).toContain("photo-editorial");
+    expect(brief.coverAssetRequirements.subject).toContain("real-world Vietnamese scene");
     expect(brief.coverAssetRequirements.composition).toContain(
       "Prefer no text overlay on the image; let the scene carry the meaning when possible.",
     );
+    expect(brief.coverAssetRequirements.composition.join(" ")).toContain("real-looking photographic");
+    expect(brief.coverAssetRequirements.composition.join(" ")).toContain("vector art");
     expect(brief.coverAssetRequirements.usage).toContain(
       "If the cover includes visible text, it must be proper Vietnamese with diacritics; never ship ASCII-only Vietnamese text on the final asset.",
     );
     expect(brief.coverAssetRequirements.noGo.join(" ")).toContain("text-only SVG");
+    expect(brief.coverAssetRequirements.noGo.join(" ")).toContain("vector-style layout");
+    expect(brief.coverAssetRequirements.noGo.join(" ")).toContain("abstract stand-in scene");
     expect(brief.coverAssetRequirements.noGo.join(" ")).toContain("without diacritics");
     expect(brief.programmaticSeoGuardrails.join(" ")).toContain("Doorway");
     expect(brief.googleQualityPolicy).toEqual(

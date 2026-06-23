@@ -917,14 +917,15 @@ function buildCoverAssetRequirements({ focusKeyword, titleTopic, topic }) {
       width: 1200,
       height: 675,
     },
-    subject: `Create a realistic editorial cover for ${titleTopic}: a calm Vietnamese astrology study scene connected to ${focusKeyword}, with a chart/tablet or paper la so context visible.`,
+    subject: `Create a photo-editorial cover for ${titleTopic}: a believable real-world Vietnamese scene connected to ${focusKeyword}, with a chart, paper la so, family/home/work object, or reading context visible.`,
     style:
-      "Warm premium editorial style aligned with lasotinhhoa.vn: gold accents, ink lines, natural light, practical astrology context, no generic stock collage.",
+      "Warm premium photo-editorial style aligned with lasotinhhoa.vn: natural light, grounded Vietnamese context, practical astrology details, no generic stock collage.",
     composition: [
-      "Use a real-scene or realistic editorial illustration, not a flat placeholder.",
+      "Use a real-looking photographic or photo-editorial scene, not a symbolic illustration.",
       "Leave enough uncluttered space for article-card cropping and social previews.",
       "Show the topic context visually: chart grid, birth-time notes, comparison table, palace/star cue, or reading workflow.",
       "Prefer no text overlay on the image; let the scene carry the meaning when possible.",
+      "Before release, visually inspect the local cover and reject it if it still reads like vector art, iconography, abstract symbolism, or a flat AI illustration.",
     ],
     usage: [
       "Set article.coverImage to the public path.",
@@ -935,6 +936,7 @@ function buildCoverAssetRequirements({ focusKeyword, titleTopic, topic }) {
     ],
     noGo: [
       "No generic gradient, text-only SVG, horoscope clipart, or unrelated stock photo.",
+      "No vector-style layout, flat symbolic objects, icon-only composition, or abstract stand-in scene that avoids showing a believable real setting.",
       "No fear-based fate, money, marriage, career, or health promise in the visual.",
       "No unreadable embedded text that carries SEO meaning.",
       "No Vietnamese text without diacritics on the final thumbnail or OG asset.",
