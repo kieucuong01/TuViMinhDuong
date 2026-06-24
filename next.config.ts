@@ -18,7 +18,6 @@ const nextConfig: NextConfig = {
     ];
   },
   experimental: {
-    inlineCss: true,
     optimizePackageImports: ["lucide-react"],
   },
 };

@@ -19,6 +19,11 @@ describe("site footer SEO surface", () => {
     }
   });
 
+  it("does not expose authenticated routes as public crawl links", () => {
+    expect(footerSource).not.toContain('{ href: "/la-so"');
+    expect(footerSource).toContain("/dang-nhap?next=/la-so");
+  });
+
   it("links to the core knowledge cluster with descriptive Vietnamese anchor text", () => {
     const clusterLinks = [
       "Lá số tử vi là gì?",

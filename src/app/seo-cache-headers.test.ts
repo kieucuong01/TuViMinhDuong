@@ -12,4 +12,8 @@ describe("public SEO cache headers", () => {
 
     expect(nextConfigSource).toContain("public, s-maxage=300, stale-while-revalidate=31536000");
   });
+
+  it("keeps the global stylesheet external instead of duplicating it in HTML and RSC payloads", () => {
+    expect(nextConfigSource).not.toContain("inlineCss: true");
+  });
 });

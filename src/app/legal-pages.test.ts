@@ -53,6 +53,7 @@ describe("legal and trust pages for ads readiness", () => {
     expect(pageSource("chinh-sach-thanh-toan-hoan-xu")).toContain('redirect("/dang-nhap?next=/chinh-sach-thanh-toan-hoan-xu")');
     expect(pageSource("lien-he")).not.toContain("getCurrentUser");
     expect(pageSource("lien-he")).not.toContain("visibleSupportItems");
+    expect(pageSource("lien-he")).not.toContain('href="/chinh-sach-thanh-toan-hoan-xu"');
     expect(footerAccountPolicySource).toContain("fetchClientSession");
     expect(footerAccountPolicySource).toContain("Boolean(data.user)");
     expect(footerAccountPolicySource).toContain('href="/chinh-sach-thanh-toan-hoan-xu"');

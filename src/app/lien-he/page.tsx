@@ -94,9 +94,6 @@ export default function ContactPage() {
           </section>
 
           <div className="mt-6 flex flex-wrap justify-center gap-3">
-            <Link href="/chinh-sach-thanh-toan-hoan-xu" className="btn btn-secondary" prefetch={false}>
-                Chính sách hoàn xu
-            </Link>
             <Link href="/chinh-sach-bao-mat" className="btn btn-ghost" prefetch={false}>
               Chính sách bảo mật
             </Link>

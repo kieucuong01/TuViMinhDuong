@@ -21,7 +21,7 @@ const knowledgeLinks = [
 ];
 
 const trustLinks = [
-  { href: "/la-so", label: "Lá số đã lưu" },
+  { href: "/dang-nhap?next=/la-so", label: "Đăng nhập để xem lá số đã lưu" },
   { href: "/kien-thuc-tu-vi", label: "Kiến thức tử vi" },
 ];
 
