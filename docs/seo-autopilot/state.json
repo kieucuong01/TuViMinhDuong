@@ -1,13 +1,13 @@
 {
-  "lastRunAt": "2026-06-18T23:22:35.441Z",
+  "lastRunAt": "2026-06-24T06:35:09.523Z",
   "lastStatus": "ok",
   "lastAction": {
     "type": "single_article_publish",
-    "slug": "sao-tu-vi",
+    "slug": "lap-la-so-tu-vi-can-gi",
     "slugs": [
-      "sao-tu-vi"
+      "lap-la-so-tu-vi-can-gi"
     ],
-    "reason": "Publish 1 people-first articles from SEMrush intent clusters; first topic: Người đọc muốn hiểu ý nghĩa sao Tử Vi trong lá số và cách đọc theo cung.",
+    "reason": "Publish 1 people-first articles from SEMrush intent clusters; first topic: Người đọc muốn biết cần ngày giờ sinh nào trước khi lập lá số.",
     "approvalRequired": false,
     "allowedToCommitDeployAfterVerification": true
   },
@@ -20,9 +20,9 @@
     "status": "skipped"
   },
   "lastDraftPaths": [
-    "docs/seo-autopilot/drafts/sao-tu-vi.md"
+    "docs/seo-autopilot/drafts/lap-la-so-tu-vi-can-gi.md"
   ],
-  "lastReportPath": "docs/seo-autopilot/reports/2026-06-18-weekly-content-batch.md",
+  "lastReportPath": "docs/seo-autopilot/reports/2026-06-24-weekly-content-batch.md",
   "nextVerificationCommands": [
     "npm run seo:autopilot",
     "npm test -- src/lib/content.test.ts src/lib/article-cover-assets.test.ts src/lib/seo-autopilot-core.test.ts",
