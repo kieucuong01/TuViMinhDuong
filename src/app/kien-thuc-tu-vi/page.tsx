@@ -1,28 +1,11 @@
 import Link from "next/link";
-import Image from "next/image";
+import { KnowledgeArticleList } from "@/components/knowledge-article-list";
+import { KNOWLEDGE_PAGE_SIZE, paginateArticles, toKnowledgeArticleListItem } from "@/lib/article-pagination";
 import { listArticleCategories, listArticles } from "@/lib/data";
 import { routeMetadata } from "@/lib/metadata";
 import { itemListJsonLd, webPageJsonLd } from "@/lib/seo";
 
 export const revalidate = 300;
-
-const ARTICLE_AUTHOR = "Admin";
-const articleDateFormatter = new Intl.DateTimeFormat("vi-VN", {
-  day: "2-digit",
-  month: "2-digit",
-  year: "numeric",
-  timeZone: "Asia/Ho_Chi_Minh",
-});
-
-function formatArticleDate(date?: Date | null) {
-  return date ? articleDateFormatter.format(new Date(date)) : null;
-}
-
-function normalizeArticleDate(date?: Date | string | null) {
-  if (!date) return null;
-  const normalized = new Date(date);
-  return Number.isNaN(normalized.getTime()) ? null : normalized;
-}
 
 export const metadata = routeMetadata({
   title: "Kiến thức tử vi cho người mới",
@@ -31,8 +14,13 @@ export const metadata = routeMetadata({
   imageSubtitle: "Học cách đọc lá số, 12 cung, đại vận, nguyệt vận và nhật vận",
 });
 
-export default async function KnowledgePage({ searchParams }: { searchParams: Promise<{ category?: string }> }) {
-  const [{ category }, articles, categories] = await Promise.all([searchParams, listArticles(), listArticleCategories()]);
+export default async function KnowledgePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ category?: string; page?: string }>;
+}) {
+  const [{ category, page }, articles, categories] = await Promise.all([searchParams, listArticles(), listArticleCategories()]);
+  const pagination = paginateArticles(articles, { category, page, pageSize: KNOWLEDGE_PAGE_SIZE });
   const visibleArticles = category ? articles.filter((article) => article.category?.slug === category) : articles;
   const pageLd = webPageJsonLd({
     name: "Kiến thức tử vi cho người mới",
@@ -113,6 +101,29 @@ export default async function KnowledgePage({ searchParams }: { searchParams: Pr
             </Link>
           </aside>
         </section>
+        <nav className="knowledge-category-nav" aria-label="Danh mục kiến thức">
+          <Link href="/kien-thuc-tu-vi" className={!category ? "active" : ""}>Tất cả</Link>
+          {categories.map((item) => (
+            <Link key={item.id} href={`/kien-thuc-tu-vi?category=${item.slug}`} className={category === item.slug ? "active" : ""}>
+              {item.name}
+            </Link>
+          ))}
+        </nav>
+        {pagination.totalItems > 0 ? (
+          <KnowledgeArticleList
+            key={`${category || "all"}-${pagination.page}`}
+            initialArticles={pagination.items.map(toKnowledgeArticleListItem)}
+            category={category}
+            page={pagination.page}
+            pageSize={pagination.pageSize}
+            totalPages={pagination.totalPages}
+          />
+        ) : (
+          <div className="knowledge-empty-state">
+            <h2>Chưa có bài trong danh mục này</h2>
+            <p>Hãy chọn “Tất cả” để xem toàn bộ bài đang xuất bản.</p>
+          </div>
+        )}
         <section className="knowledge-cta-band" aria-label="Lập lá số sau khi đọc kiến thức">
           <div>
             <p className="eyebrow">Đọc theo đúng lá số của bạn</p>
@@ -127,43 +138,6 @@ export default async function KnowledgePage({ searchParams }: { searchParams: Pr
             </Link>
           </div>
         </section>
-        <nav className="knowledge-category-nav" aria-label="Danh mục kiến thức">
-          <Link href="/kien-thuc-tu-vi" className={!category ? "active" : ""}>Tất cả</Link>
-          {categories.map((item) => (
-            <Link key={item.id} href={`/kien-thuc-tu-vi?category=${item.slug}`} className={category === item.slug ? "active" : ""}>
-              {item.name}
-            </Link>
-          ))}
-        </nav>
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {visibleArticles.map((article) => {
-            const articleDate = normalizeArticleDate(article.publishedAt || article.updatedAt);
-            const publishedDate = formatArticleDate(articleDate);
-
-            return (
-              <Link key={article.slug} href={`/kien-thuc-tu-vi/${article.slug}`} className="article-card">
-                {article.coverImage ? (
-                  <span className="article-thumb image">
-                    <Image src={article.coverImage} alt={article.coverAlt || article.title} width={600} height={338} sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw" />
-                  </span>
-                ) : null}
-                {article.category ? <span className="article-category-label">{article.category.name}</span> : null}
-                <h2>{article.title}</h2>
-                <span className="article-card-meta">
-                  {publishedDate && articleDate ? <time dateTime={articleDate.toISOString()}>{publishedDate}</time> : null}
-                  <span>Người đăng: {ARTICLE_AUTHOR}</span>
-                </span>
-                <p>{article.excerpt}</p>
-              </Link>
-            );
-          })}
-        </div>
-        {visibleArticles.length === 0 ? (
-          <div className="knowledge-empty-state">
-            <h2>Chưa có bài trong danh mục này</h2>
-            <p>Hãy chọn “Tất cả” để xem toàn bộ bài đang xuất bản.</p>
-          </div>
-        ) : null}
       </div>
     </main>
   );

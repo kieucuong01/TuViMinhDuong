@@ -32,7 +32,8 @@
     "traffic:autopilot": "node scripts/traffic/traffic-autopilot.mjs",
     "smoke:google-ads": "node scripts/smoke-google-ads.mjs",
     "smoke:payos": "node scripts/smoke-payos-checkout.mjs",
-    "env:check:production": "node scripts/check-production-env.mjs"
+    "env:check:production": "node scripts/check-production-env.mjs",
+    "release:production": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/release-production.ps1"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.8.0",

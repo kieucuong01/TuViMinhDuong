@@ -121,6 +121,14 @@ npm run perf:smoke
 
 Target deploy là VPS self-hosted + Postgres. App production chạy tại `/opt/lasotinhhoa/current`, PM2 process `lasotinhhoa`, internal port `127.0.0.1:4100`; Nginx phục vụ public HTTPS tại `https://lasotinhhoa.vn`.
 
+Quy trình commit, push và deploy production một lệnh:
+
+```powershell
+npm run release:production -- "feat: mô tả thay đổi"
+```
+
+Xem hướng dẫn và tùy chọn migration tại `docs/agent/manual-release.md`.
+
 Điểm vào SSH an toàn trên máy Windows này là `ssh tuvi-vps`. Alias này nên trỏ tới key riêng `C:\Users\ASUS\.ssh\id_ed25519_tuvi_vps`, bật `IdentitiesOnly yes`, và giữ `StrictHostKeyChecking yes`.
 
 Các env quan trọng:

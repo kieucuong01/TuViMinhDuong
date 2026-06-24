@@ -7033,7 +7033,7 @@ button.is-loading:not(.icon-button)::before {
   grid-template-columns: minmax(0, 1fr) auto;
   gap: 1rem;
   align-items: center;
-  margin: 0 0 1.5rem;
+  margin: 1.5rem 0 0;
   border: 1px solid #fed7aa;
   border-radius: 1.25rem;
   background:
@@ -7064,6 +7064,10 @@ button.is-loading:not(.icon-button)::before {
   flex-wrap: wrap;
   gap: 0.65rem;
   justify-content: flex-end;
+}
+
+.knowledge-cta-actions .btn {
+  min-width: 0;
 }
 
 .knowledge-category-nav {
@@ -7152,6 +7156,104 @@ button.is-loading:not(.icon-button)::before {
 .knowledge-empty-state p {
   margin-top: 0.35rem;
   color: #78716c;
+}
+
+.knowledge-article-grid {
+  display: grid;
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.knowledge-desktop-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.knowledge-desktop-pagination a,
+.knowledge-desktop-pagination span {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #fed7aa;
+  border-radius: 999px;
+  background: #fff;
+  padding: 0 1rem;
+  color: #7c2d12;
+  font-size: 0.9rem;
+  font-weight: 850;
+}
+
+.knowledge-desktop-pagination a:hover {
+  border-color: #fb923c;
+  background: #fff7ed;
+  color: #c2410c;
+}
+
+.knowledge-desktop-pagination a.disabled {
+  pointer-events: none;
+  opacity: 0.45;
+}
+
+.knowledge-mobile-load-more {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .knowledge-article-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .knowledge-article-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 767px) {
+  .knowledge-desktop-pagination {
+    display: none;
+  }
+
+  .knowledge-mobile-load-more {
+    display: flex;
+    min-height: 4rem;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem 0;
+    color: #78716c;
+    font-size: 0.9rem;
+    font-weight: 750;
+    text-align: center;
+  }
+
+  .knowledge-cta-band {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1rem;
+    padding: 1rem;
+  }
+
+  .knowledge-cta-band h2 {
+    overflow-wrap: anywhere;
+    font-size: clamp(1.3rem, 7vw, 1.7rem);
+  }
+
+  .knowledge-cta-actions {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    width: 100%;
+  }
+
+  .knowledge-cta-actions .btn {
+    width: 100%;
+    min-width: 0;
+    white-space: normal;
+    text-align: center;
+  }
 }
 
 .chart-history-primary {
