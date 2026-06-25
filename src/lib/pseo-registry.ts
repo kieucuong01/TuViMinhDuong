@@ -43,6 +43,16 @@ export type PseoPageDraft = {
   updatedAt: Date;
 };
 
+export function pseoEntityPath(kind: PseoEntityKind, slug: string) {
+  if (kind === "MAIN_STAR") return `/tra-cuu/sao-${slug}`;
+  if (kind === "PALACE") return `/tra-cuu/cung-${slug}`;
+  return undefined;
+}
+
+export function pseoEntityRouteSlug(kind: PseoEntityKind, slug: string) {
+  return pseoEntityPath(kind, slug)?.replace("/tra-cuu/", "");
+}
+
 export const MAIN_STARS: PseoEntityDefinition[] = [
   ["tu-vi", "Tử Vi", "Thổ", "khả năng tổ chức, dẫn dắt và giữ trật tự", ["biết quy tụ nguồn lực", "có ý thức trách nhiệm"], ["dễ ôm việc", "dễ đặt nặng vị thế"]],
   ["thien-co", "Thiên Cơ", "Mộc", "tư duy, tính toán và khả năng thay đổi phương án", ["nhạy với dữ kiện", "giỏi tìm lối đi khác"], ["dễ phân tán", "cần tránh đổi hướng liên tục"]],
@@ -66,7 +76,7 @@ export const MAIN_STARS: PseoEntityDefinition[] = [
   summary: String(summary),
   strengths: strengths as string[],
   cautions: cautions as string[],
-  canonicalPath: `/kien-thuc-tu-vi/sao-${slug}`,
+  canonicalPath: pseoEntityPath("MAIN_STAR", String(slug)),
 }));
 
 export const PALACES: PseoEntityDefinition[] = [
@@ -90,7 +100,7 @@ export const PALACES: PseoEntityDefinition[] = [
   summary: String(summary),
   strengths: [`làm rõ ${String(summary)}`, "tạo một góc nhìn thực tế để đối chiếu"],
   cautions: ["không đọc tách khỏi toàn lá số", "không dùng một cung để kết luận chắc chắn"],
-  canonicalPath: `/kien-thuc-tu-vi/cung-${slug}-trong-tu-vi`,
+  canonicalPath: pseoEntityPath("PALACE", String(slug)),
 }));
 
 export const SUPPORT_STARS: PseoEntityDefinition[] = [

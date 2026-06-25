@@ -25,7 +25,7 @@ export function PseoHub({
               <h2>{entity.name}</h2>
               <p>{entity.summary}</p>
               {entity.canonicalPath ? (
-                <Link href={entity.canonicalPath}>Đọc ý nghĩa tổng quan <ArrowRight size={17} /></Link>
+                <Link href={entity.canonicalPath}>Xem trang tra cứu <ArrowRight size={17} /></Link>
               ) : null}
             </article>
           ))}

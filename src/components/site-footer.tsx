@@ -13,19 +13,19 @@ const primaryLinks = [
 
 const palaceLinks = [
   { href: "/tra-cuu/y-nghia-12-cung", label: "Tra cứu đầy đủ 12 cung" },
-  { href: "/kien-thuc-tu-vi/cung-menh-cung-than", label: "Cung Mệnh và Cung Thân" },
-  { href: "/kien-thuc-tu-vi/cung-tai-bach-trong-tu-vi", label: "Cung Tài Bạch" },
-  { href: "/kien-thuc-tu-vi/cung-quan-loc-trong-tu-vi", label: "Cung Quan Lộc" },
-  { href: "/kien-thuc-tu-vi/cung-phu-the-trong-tu-vi", label: "Cung Phu Thê" },
-  { href: "/kien-thuc-tu-vi/12-cung-trong-la-so-tu-vi", label: "12 cung trong lá số tử vi" },
+  { href: "/tra-cuu/cung-menh", label: "Cung Mệnh" },
+  { href: "/tra-cuu/cung-tai-bach", label: "Cung Tài Bạch" },
+  { href: "/tra-cuu/cung-quan-loc", label: "Cung Quan Lộc" },
+  { href: "/tra-cuu/cung-phu-the", label: "Cung Phu Thê" },
+  { href: "/tra-cuu/cung-phuc-duc", label: "Cung Phúc Đức" },
 ];
 
 const starLinks = [
   { href: "/tra-cuu/y-nghia-14-chinh-tinh", label: "Tra cứu đầy đủ 14 Chính Tinh" },
-  { href: "/kien-thuc-tu-vi/sao-chinh-tinh-tu-vi", label: "Ý nghĩa 14 chính tinh" },
-  { href: "/kien-thuc-tu-vi/sao-tu-vi", label: "Sao Tử Vi" },
-  { href: "/kien-thuc-tu-vi/sao-thien-co", label: "Sao Thiên Cơ" },
-  { href: "/kien-thuc-tu-vi/sao-thai-duong", label: "Sao Thái Dương" },
+  { href: "/tra-cuu/sao-tu-vi", label: "Sao Tử Vi" },
+  { href: "/tra-cuu/sao-thien-co", label: "Sao Thiên Cơ" },
+  { href: "/tra-cuu/sao-thai-am", label: "Sao Thái Âm" },
+  { href: "/tra-cuu/sao-that-sat", label: "Sao Thất Sát" },
   { href: "/tra-cuu/phu-tinh", label: "Tra cứu Phụ Tinh" },
 ];
 

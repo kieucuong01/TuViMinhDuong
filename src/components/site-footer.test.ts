@@ -28,7 +28,6 @@ describe("site footer SEO surface", () => {
     const clusterLinks = [
       "Lá số tử vi là gì?",
       "Cách đọc lá số tử vi",
-      "12 cung trong lá số tử vi",
       "Đại vận là gì?",
     ];
 
@@ -37,12 +36,16 @@ describe("site footer SEO surface", () => {
     }
   });
 
-  it("exposes four crawlable SEO silos without dumping leaf combinations", () => {
+  it("exposes four crawlable SEO silos without dumping leaf combinations or crossing lookup entities into knowledge articles", () => {
     for (const heading of ["Ý nghĩa các Cung", "Ý nghĩa Chính Tinh", "Vận Hạn & Lưu Niên", "Tiện ích"]) {
       expect(footerSource).toContain(heading);
     }
     expect(footerSource).toContain("/tra-cuu/y-nghia-12-cung");
     expect(footerSource).toContain("/tra-cuu/y-nghia-14-chinh-tinh");
+    expect(footerSource).toContain("/tra-cuu/cung-tai-bach");
+    expect(footerSource).toContain("/tra-cuu/sao-thai-am");
+    expect(footerSource).not.toContain("/kien-thuc-tu-vi/cung-tai-bach-trong-tu-vi");
+    expect(footerSource).not.toContain("/kien-thuc-tu-vi/sao-tu-vi");
     expect(footerSource).not.toContain("sao-thai-am-cung-tai-bach");
   });
 });

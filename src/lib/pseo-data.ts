@@ -4,6 +4,8 @@ import {
   PALACES,
   SUPPORT_STARS,
   buildPseoCombinations,
+  pseoEntityPath,
+  pseoEntityRouteSlug,
   type PseoEntityDefinition,
   type PseoEntityKind,
   type PseoPageDraft,
@@ -21,6 +23,18 @@ function fallbackEntities(kind?: PseoEntityKind) {
   const entities = [...MAIN_STARS, ...PALACES, ...SUPPORT_STARS];
   return kind ? entities.filter((item) => item.kind === kind) : entities;
 }
+
+export type PseoEntityPageView = {
+  kind: Extract<PseoEntityKind, "MAIN_STAR" | "PALACE">;
+  entity: PseoEntityDefinition;
+  routeSlug: string;
+  canonicalUrl: string;
+  title: string;
+  description: string;
+  hubHref: string;
+  hubLabel: string;
+  relatedPages: PseoPageDraft[];
+};
 
 function jsonArray(value: unknown) {
   return Array.isArray(value) ? value.map(String) : [];
@@ -63,6 +77,21 @@ function dbPageToView(record: Record<string, unknown>): PseoPageDraft {
   };
 }
 
+function dbEntityToDefinition(record: Record<string, unknown>): PseoEntityDefinition {
+  const kind = String(record.kind) as PseoEntityKind;
+  const slug = String(record.slug);
+  return {
+    kind,
+    slug,
+    name: String(record.name),
+    element: String(record.element || ""),
+    summary: String(record.summary),
+    strengths: jsonArray(record.strengths),
+    cautions: jsonArray(record.cautions),
+    canonicalPath: pseoEntityPath(kind, slug),
+  };
+}
+
 export async function listPseoEntities(kind?: PseoEntityKind): Promise<PseoEntityDefinition[]> {
   const db = globalPseo.dbUnavailable ? null : getDb();
   if (!db) return fallbackEntities(kind);
@@ -78,16 +107,7 @@ export async function listPseoEntities(kind?: PseoEntityKind): Promise<PseoEntit
     globalPseo.dbUnavailable = true;
     return fallbackEntities(kind);
   }
-  return records.map((record) => ({
-    kind: String(record.kind) as PseoEntityKind,
-    slug: String(record.slug),
-    name: String(record.name),
-    element: String(record.element || ""),
-    summary: String(record.summary),
-    strengths: jsonArray(record.strengths),
-    cautions: jsonArray(record.cautions),
-    canonicalPath: record.canonicalPath ? String(record.canonicalPath) : undefined,
-  }));
+  return records.map(dbEntityToDefinition);
 }
 
 export async function listPublishedPseoPages(): Promise<PseoPageDraft[]> {
@@ -111,6 +131,60 @@ export async function listPublishedPseoPages(): Promise<PseoPageDraft[]> {
 
 export async function listPublishedPseoSlugs() {
   return (await listPublishedPseoPages()).map((page) => page.slug);
+}
+
+export async function listPublishedPseoRouteSlugs() {
+  const [pageSlugs, stars, palaces] = await Promise.all([
+    listPublishedPseoSlugs(),
+    listPseoEntities("MAIN_STAR"),
+    listPseoEntities("PALACE"),
+  ]);
+  return [
+    ...pageSlugs,
+    ...stars.map((entity) => pseoEntityRouteSlug(entity.kind, entity.slug)).filter(Boolean),
+    ...palaces.map((entity) => pseoEntityRouteSlug(entity.kind, entity.slug)).filter(Boolean),
+  ] as string[];
+}
+
+export async function getPseoEntityPage(routeSlug: string): Promise<PseoEntityPageView | null> {
+  const [stars, palaces, pages] = await Promise.all([
+    listPseoEntities("MAIN_STAR"),
+    listPseoEntities("PALACE"),
+    listPublishedPseoPages(),
+  ]);
+  if (routeSlug.startsWith("sao-")) {
+    const slug = routeSlug.replace(/^sao-/, "");
+    const entity = stars.find((item) => item.slug === slug);
+    if (!entity) return null;
+    return {
+      kind: "MAIN_STAR",
+      entity,
+      routeSlug,
+      canonicalUrl: `/tra-cuu/${routeSlug}`,
+      title: `Sao ${entity.name} trong tử vi`,
+      description: `Tra cứu ý nghĩa sao ${entity.name}, ngũ hành, điểm mạnh, điểm cần lưu ý và 12 tổ hợp cung liên quan.`,
+      hubHref: "/tra-cuu/y-nghia-14-chinh-tinh",
+      hubLabel: "Ý nghĩa 14 Chính Tinh",
+      relatedPages: pages.filter((page) => page.starSlug === entity.slug).slice(0, 12),
+    };
+  }
+  if (routeSlug.startsWith("cung-")) {
+    const slug = routeSlug.replace(/^cung-/, "");
+    const entity = palaces.find((item) => item.slug === slug);
+    if (!entity) return null;
+    return {
+      kind: "PALACE",
+      entity,
+      routeSlug,
+      canonicalUrl: `/tra-cuu/${routeSlug}`,
+      title: `Cung ${entity.name} trong lá số tử vi`,
+      description: `Tra cứu ý nghĩa cung ${entity.name}, vai trò trong lá số và 14 tổ hợp chính tinh liên quan.`,
+      hubHref: "/tra-cuu/y-nghia-12-cung",
+      hubLabel: "Ý nghĩa 12 Cung",
+      relatedPages: pages.filter((page) => page.palaceSlug === entity.slug).slice(0, 14),
+    };
+  }
+  return null;
 }
 
 export async function getPublishedPseoPage(slug: string) {
