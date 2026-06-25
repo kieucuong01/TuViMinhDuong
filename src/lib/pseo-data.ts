@@ -3,7 +3,7 @@ import {
   MAIN_STARS,
   PALACES,
   SUPPORT_STARS,
-  buildPseoCombinations,
+  buildPseoInventory,
   pseoEntityPath,
   pseoEntityRouteSlug,
   type PseoEntityDefinition,
@@ -15,7 +15,7 @@ import { auditPseoPage } from "@/lib/pseo-audit";
 const globalPseo = globalThis as unknown as { demoPseoPages?: Map<string, PseoPageDraft>; dbUnavailable?: boolean };
 
 function demoPseoPages() {
-  globalPseo.demoPseoPages ||= new Map(buildPseoCombinations().map((page) => [page.slug, page]));
+  globalPseo.demoPseoPages ||= new Map(buildPseoInventory().map((page) => [page.slug, page]));
   return globalPseo.demoPseoPages;
 }
 

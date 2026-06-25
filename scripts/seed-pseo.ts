@@ -1,7 +1,7 @@
 import "dotenv/config";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "../src/generated/prisma/client.ts";
-import { MAIN_STARS, PALACES, SUPPORT_STARS, buildPseoCombinations } from "../src/lib/pseo-registry.ts";
+import { MAIN_STARS, PALACES, SUPPORT_STARS, buildPseoInventory } from "../src/lib/pseo-registry.ts";
 
 const databaseUrl = process.env.DATABASE_URL || "";
 if (!databaseUrl || databaseUrl.includes("johndoe:randompassword")) {
@@ -38,7 +38,7 @@ try {
 
   const entities = await prisma.pseoEntity.findMany();
   const bySlug = new Map(entities.map((entity) => [entity.slug, entity]));
-  for (const page of buildPseoCombinations()) {
+  for (const page of buildPseoInventory()) {
     const star = bySlug.get(page.starSlug);
     const palace = bySlug.get(page.palaceSlug);
     if (!star || !palace) throw new Error(`Missing entity for ${page.slug}`);
@@ -59,16 +59,16 @@ try {
         metaTitle: page.metaTitle,
         metaDescription: page.metaDescription,
         canonicalUrl: page.canonicalUrl,
-        status: "PUBLISHED",
-        robots: "index,follow",
-        auditScore: 100,
+        status: page.status,
+        robots: page.robots,
+        auditScore: page.status === "PUBLISHED" ? 100 : 0,
         auditFindings: [],
         generationMeta: { source: "curated-matrix-v1" },
-        publishedAt: page.publishedAt,
+        publishedAt: page.status === "PUBLISHED" ? page.publishedAt : null,
       },
       create: {
         kind: "COMBINATION",
-        status: "PUBLISHED",
+        status: page.status,
         slug: page.slug,
         title: page.title,
         excerpt: page.excerpt,
@@ -84,11 +84,11 @@ try {
         metaTitle: page.metaTitle,
         metaDescription: page.metaDescription,
         canonicalUrl: page.canonicalUrl,
-        robots: "index,follow",
-        auditScore: 100,
+        robots: page.robots,
+        auditScore: page.status === "PUBLISHED" ? 100 : 0,
         auditFindings: [],
         generationMeta: { source: "curated-matrix-v1" },
-        publishedAt: page.publishedAt,
+        publishedAt: page.status === "PUBLISHED" ? page.publishedAt : null,
       },
     });
   }

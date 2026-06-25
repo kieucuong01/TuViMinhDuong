@@ -1,3 +1,5 @@
+import { CURATED_PSEO_SLUGS, getCuratedPseoContent } from "./pseo-curated.ts";
+
 export type PseoEntityKind = "MAIN_STAR" | "PALACE" | "SUPPORT_STAR";
 export type PseoPageKind = "HUB" | "ENTITY" | "COMBINATION";
 export type PseoStatus = "DRAFT" | "PUBLISHED" | "ARCHIVED";
@@ -245,4 +247,29 @@ export function buildPseoDraft(starSlug: string, palaceSlug: string): PseoPageDr
 
 export function buildPseoCombinations() {
   return MAIN_STARS.flatMap((star) => PALACES.map((palace) => buildPseoDraft(star.slug, palace.slug)));
+}
+
+export { CURATED_PSEO_SLUGS };
+
+export function buildPseoInventory() {
+  const curated = new Set<string>(CURATED_PSEO_SLUGS);
+  return buildPseoCombinations().map((page) => {
+    const content = getCuratedPseoContent(page.slug);
+    if (!curated.has(page.slug) || !content) {
+      return {
+        ...page,
+        status: "DRAFT" as const,
+        robots: "noindex,follow",
+        publishedAt: new Date("2026-06-25T00:00:00+07:00"),
+      };
+    }
+    return {
+      ...page,
+      ...content,
+      status: "PUBLISHED" as const,
+      robots: "index,follow",
+      publishedAt: new Date("2026-06-25T00:00:00+07:00"),
+      updatedAt: new Date("2026-06-25T00:00:00+07:00"),
+    };
+  });
 }

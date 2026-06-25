@@ -18,11 +18,10 @@ export async function generatePseoBatch(
       findings = auditPseoPage(candidate);
       if (!findings.some((finding) => finding.severity === "error")) break;
     }
-    const hasErrors = findings.some((finding) => finding.severity === "error");
     results.push({
       ...candidate,
-      status: hasErrors ? "DRAFT" : "PUBLISHED",
-      robots: hasErrors ? "noindex,follow" : "index,follow",
+      status: "DRAFT",
+      robots: "noindex,follow",
       auditFindings: findings,
     });
   }

@@ -40,20 +40,19 @@ ${base.body}`,
       model = result.model;
       findings = auditPseoPage({ ...base, body });
     }
-    const publish = findings.every((item) => item.severity !== "error");
     await prisma.pseoPage.update({
       where: { id: record.id },
       data: {
         body,
-        status: publish ? "PUBLISHED" : "DRAFT",
-        robots: publish ? "index,follow" : "noindex,follow",
+        status: "DRAFT",
+        robots: "noindex,follow",
         auditScore: Math.max(0, 100 - findings.filter((item) => item.severity === "error").length * 25),
         auditFindings: findings,
         generationMeta: { source: "llm-router", model, generatedAt: new Date().toISOString() },
-        publishedAt: publish ? record.publishedAt || new Date() : null,
+        publishedAt: null,
       },
     });
-    console.log(`${record.slug}: ${publish ? "published" : "draft"} (${model})`);
+    console.log(`${record.slug}: draft-review (${model})`);
   }
 } finally {
   await prisma.$disconnect();

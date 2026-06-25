@@ -3,7 +3,7 @@ import { buildPseoDraft } from "@/lib/pseo-registry";
 import { generatePseoBatch } from "@/lib/pseo-generation";
 
 describe("pSEO generation gate", () => {
-  it("retries generation twice and publishes only audited output", async () => {
+  it("retries generation twice but keeps audited generated output in review draft", async () => {
     let attempts = 0;
     const result = await generatePseoBatch([buildPseoDraft("thai-am", "tai-bach")], async (page) => {
       attempts += 1;
@@ -11,7 +11,8 @@ describe("pSEO generation gate", () => {
       return page.body;
     });
     expect(attempts).toBe(3);
-    expect(result[0].status).toBe("PUBLISHED");
+    expect(result[0].status).toBe("DRAFT");
+    expect(result[0].robots).toBe("noindex,follow");
     expect(result[0].auditFindings).toEqual([]);
   });
 

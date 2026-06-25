@@ -18,6 +18,31 @@ function words(value: string) {
   return value.trim().split(/\s+/).filter(Boolean).length;
 }
 
+function shingles(value: string, size = 7) {
+  const tokens = value
+    .toLowerCase()
+    .replace(/[^\p{L}\p{N}\s]/gu, " ")
+    .split(/\s+/)
+    .filter((token) => token.length > 2);
+  const result = new Set<string>();
+  for (let index = 0; index <= tokens.length - size; index += 1) {
+    result.add(tokens.slice(index, index + size).join(" "));
+  }
+  return result;
+}
+
+export function contentSimilarityScore(first: string, second: string) {
+  const firstSet = shingles(first);
+  const secondSet = shingles(second);
+  if (firstSet.size === 0 && secondSet.size === 0) return 1;
+  let intersection = 0;
+  for (const item of firstSet) {
+    if (secondSet.has(item)) intersection += 1;
+  }
+  const union = new Set([...firstSet, ...secondSet]).size;
+  return union === 0 ? 0 : intersection / union;
+}
+
 export function auditPseoPage(page: PseoPageDraft): PseoAuditFinding[] {
   const findings: PseoAuditFinding[] = [];
   const h2Count = (page.body.match(/^##\s+/gm) || []).length;
@@ -42,7 +67,8 @@ export function auditPseoPage(page: PseoPageDraft): PseoAuditFinding[] {
 }
 
 export function auditPseoInventory(pages: PseoPageDraft[]) {
-  const findings = pages.flatMap(auditPseoPage);
+  const publishedPages = pages.filter((page) => page.status === "PUBLISHED");
+  const findings = publishedPages.flatMap(auditPseoPage);
   const slugs = new Set<string>();
   const canonicals = new Set<string>();
   for (const page of pages) {
@@ -50,6 +76,21 @@ export function auditPseoInventory(pages: PseoPageDraft[]) {
     if (canonicals.has(page.canonicalUrl)) findings.push({ severity: "error", code: "duplicate-canonical", slug: page.slug, message: "Canonical bị trùng." });
     slugs.add(page.slug);
     canonicals.add(page.canonicalUrl);
+  }
+  for (let firstIndex = 0; firstIndex < publishedPages.length; firstIndex += 1) {
+    for (let secondIndex = firstIndex + 1; secondIndex < publishedPages.length; secondIndex += 1) {
+      const first = publishedPages[firstIndex];
+      const second = publishedPages[secondIndex];
+      const score = contentSimilarityScore(first.body, second.body);
+      if (score >= 0.42) {
+        findings.push({
+          severity: "error",
+          code: "duplicate-template",
+          slug: second.slug,
+          message: `Nội dung quá giống ${first.slug}; không publish trang tra cứu dạng template.`,
+        });
+      }
+    }
   }
   return findings;
 }
