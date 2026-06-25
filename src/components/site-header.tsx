@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Suspense } from "react";
-import { BookOpenText, CalendarDays } from "lucide-react";
+import { BookOpenText, CalendarDays, ChevronDown, Search } from "lucide-react";
 import { UserHeaderBadge } from "@/components/user-header-badge";
 import { MobileSiteMenu } from "@/components/mobile-site-menu";
 import { APP_NAME } from "@/lib/env";
@@ -12,6 +12,12 @@ const baseNav = [
   { href: "/kien-thuc-tu-vi", label: "Kiến thức", tone: "knowledge" },
 ];
 
+const lookupLinks = [
+  { href: "/tra-cuu/y-nghia-14-chinh-tinh", label: "Tra cứu Ý nghĩa 14 Chính Tinh" },
+  { href: "/tra-cuu/y-nghia-12-cung", label: "Tra cứu Ý nghĩa 12 Cung" },
+  { href: "/tra-cuu/phu-tinh", label: "Tra cứu Phụ Tinh" },
+];
+
 export async function SiteHeader() {
   const nav = baseNav;
 
@@ -19,7 +25,7 @@ export async function SiteHeader() {
     <header className="site-header sticky top-0 z-50 border-b border-orange-100/70 bg-white/75 shadow-sm shadow-orange-950/5 backdrop-blur-2xl supports-[backdrop-filter]:bg-white/70">
       <div className="site-header-shell mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <div className="site-header-menu-slot">
-          <MobileSiteMenu items={nav} />
+          <MobileSiteMenu items={nav} lookupLinks={lookupLinks} />
         </div>
 
         <Link href="/" className="site-brand group flex min-w-0 items-center gap-2 font-semibold text-stone-950" prefetch={false}>
@@ -44,6 +50,18 @@ export async function SiteHeader() {
               </Link>
             );
           })}
+          <details className="site-lookup-menu">
+            <summary className="site-nav-link site-nav-lookup rounded-full px-3.5 py-2">
+              <Search aria-hidden="true" size={16} strokeWidth={2.4} />
+              <span>Tra cứu</span>
+              <ChevronDown aria-hidden="true" size={14} />
+            </summary>
+            <div className="site-lookup-panel">
+              {lookupLinks.map((item) => (
+                <Link key={item.href} href={item.href} prefetch={false}>{item.label}</Link>
+              ))}
+            </div>
+          </details>
         </nav>
 
         <div className="site-header-actions flex items-center gap-2">

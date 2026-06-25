@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BookOpenText, CalendarDays, Menu, Sparkles } from "lucide-react";
+import { BookOpenText, CalendarDays, ChevronDown, Menu, Search, Sparkles } from "lucide-react";
 import { useEffect, useRef } from "react";
 import { CoinTopupLink } from "@/components/coin-topup-link";
 import { useCloseDetailsOnOutsideClick } from "@/components/use-close-details-on-outside-click";
@@ -16,9 +16,10 @@ type MobileSiteMenuItem = {
 
 type MobileSiteMenuProps = {
   items: MobileSiteMenuItem[];
+  lookupLinks: { href: string; label: string }[];
 };
 
-export function MobileSiteMenu({ items }: MobileSiteMenuProps) {
+export function MobileSiteMenu({ items, lookupLinks }: MobileSiteMenuProps) {
   const pathname = usePathname();
   const detailsRef = useRef<HTMLDetailsElement>(null);
   useCloseDetailsOnOutsideClick(detailsRef);
@@ -53,6 +54,20 @@ export function MobileSiteMenu({ items }: MobileSiteMenuProps) {
             </Link>
           );
         })}
+        <details className="mobile-lookup-group">
+          <summary className="mobile-menu-link rounded-xl px-3 py-2.5 text-sm font-semibold text-stone-700">
+            <Search aria-hidden="true" size={16} strokeWidth={2.4} />
+            <span>Tra cứu</span>
+            <ChevronDown aria-hidden="true" size={15} />
+          </summary>
+          <div>
+            {lookupLinks.map((item) => (
+              <Link key={item.href} href={item.href} prefetch={false} onClick={closeMenu}>
+                {item.label}
+              </Link>
+            ))}
+          </div>
+        </details>
       </div>
     </details>
   );

@@ -26,6 +26,15 @@ describe("site header featured nav effects", () => {
     expect(headerSource).toContain('href: "/kien-thuc-tu-vi"');
   });
 
+  it("adds a three-hub lookup dropdown without leaf links", () => {
+    expect(headerSource).toContain("Tra cứu");
+    expect(headerSource).toContain("/tra-cuu/y-nghia-14-chinh-tinh");
+    expect(headerSource).toContain("/tra-cuu/y-nghia-12-cung");
+    expect(headerSource).toContain("/tra-cuu/phu-tinh");
+    expect(headerSource).not.toContain("sao-thai-am-cung-tai-bach");
+    expect(mobileMenuSource).toContain("mobile-lookup-group");
+  });
+
   it("removes the mobile bottom nav in favor of a three-zone mobile header", () => {
     expect(layoutSource).not.toContain("MobileBottomNav");
     expect(headerSource).toContain("site-header-menu-slot");

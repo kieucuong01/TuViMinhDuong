@@ -21,6 +21,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: APP_URL, lastModified: STATIC_LAST_MODIFIED, changeFrequency: "daily", priority: 1 },
     { url: `${APP_URL}/kien-thuc-tu-vi`, lastModified: STATIC_LAST_MODIFIED, changeFrequency: "daily", priority: 0.8 },
     { url: `${APP_URL}/xem-ngay`, lastModified: STATIC_LAST_MODIFIED, changeFrequency: "daily", priority: 0.8 },
+    { url: `${APP_URL}/tra-cuu`, lastModified: STATIC_LAST_MODIFIED, changeFrequency: "weekly", priority: 0.85 },
+    { url: `${APP_URL}/tra-cuu/y-nghia-14-chinh-tinh`, lastModified: STATIC_LAST_MODIFIED, changeFrequency: "weekly", priority: 0.8 },
+    { url: `${APP_URL}/tra-cuu/y-nghia-12-cung`, lastModified: STATIC_LAST_MODIFIED, changeFrequency: "weekly", priority: 0.8 },
+    { url: `${APP_URL}/tra-cuu/phu-tinh`, lastModified: STATIC_LAST_MODIFIED, changeFrequency: "weekly", priority: 0.75 },
     ...TRUST_ROUTES.map((route) => ({
       url: `${APP_URL}${route.path}`,
       lastModified: STATIC_LAST_MODIFIED,

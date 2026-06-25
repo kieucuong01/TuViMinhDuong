@@ -36,4 +36,13 @@ describe("site footer SEO surface", () => {
       expect(footerSource).toContain(label);
     }
   });
+
+  it("exposes four crawlable SEO silos without dumping leaf combinations", () => {
+    for (const heading of ["Ý nghĩa các Cung", "Ý nghĩa Chính Tinh", "Vận Hạn & Lưu Niên", "Tiện ích"]) {
+      expect(footerSource).toContain(heading);
+    }
+    expect(footerSource).toContain("/tra-cuu/y-nghia-12-cung");
+    expect(footerSource).toContain("/tra-cuu/y-nghia-14-chinh-tinh");
+    expect(footerSource).not.toContain("sao-thai-am-cung-tai-bach");
+  });
 });

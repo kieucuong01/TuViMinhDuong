@@ -192,6 +192,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
     <main className="section" data-testid="admin-page">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="admin-hero">
+          <Link href="/admin/tra-cuu" className="btn btn-ghost">Tra cứu pSEO</Link>
           <div>
             <p className="eyebrow">Admin</p>
             <h1 className="section-title">Quản trị hệ thống Lá số tinh hoa</h1>

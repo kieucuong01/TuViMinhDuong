@@ -16,6 +16,7 @@ import { isReadingBundleKey } from "@/lib/reading-bundles";
 import { adminAdjustUserCoins, adminDeleteUser } from "@/lib/admin-user-management";
 import { createPerfTimer, logPerfEvent } from "@/lib/perf";
 import { ActionTimeoutError, withActionTimeout } from "@/lib/action-timeout";
+import { savePseoPageFromForm } from "@/lib/pseo-data";
 
 function createChartTimeoutMs(value = process.env.CREATE_CHART_ACTION_TIMEOUT_MS) {
   const parsed = Number(value);
@@ -388,6 +389,16 @@ export async function saveArticleAction(formData: FormData) {
   if (originalSlug && originalSlug !== article.slug) revalidatePath(`/kien-thuc-tu-vi/${originalSlug}`);
   revalidatePath(`/kien-thuc-tu-vi/${article.slug}`);
   redirect(`/admin?tab=content&edit=${article.slug}&saved=${article.slug}`);
+}
+
+export async function savePseoPageAction(formData: FormData) {
+  const user = await getCurrentUser();
+  if (user?.role !== "ADMIN") redirect("/dang-nhap?next=/admin/tra-cuu");
+  const result = await savePseoPageFromForm(formData);
+  revalidatePath("/tra-cuu");
+  revalidatePath(`/tra-cuu/${result.page.slug}`);
+  revalidatePath("/sitemap-index.xml");
+  redirect(`/admin/tra-cuu?edit=${encodeURIComponent(result.page.slug)}&saved=${encodeURIComponent(result.page.slug)}`);
 }
 
 export async function deleteArticleAction(formData: FormData) {

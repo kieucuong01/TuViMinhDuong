@@ -20,7 +20,7 @@
     "db:migrate": "prisma migrate dev",
     "db:deploy": "prisma migrate deploy",
     "db:seed": "node scripts/seed-production.mjs",
-    "db:setup": "npm run db:deploy && npm run db:seed",
+    "db:setup": "npm run db:deploy && npm run db:seed && npm run pseo:seed",
     "analyze": "ANALYZE=true next build",
     "perf:smoke": "node scripts/smoke-performance.mjs",
     "seo:autopilot": "node scripts/seo/seo-autopilot-plan.mjs --json",
@@ -32,6 +32,8 @@
     "traffic:autopilot": "node scripts/traffic/traffic-autopilot.mjs",
     "smoke:google-ads": "node scripts/smoke-google-ads.mjs",
     "smoke:payos": "node scripts/smoke-payos-checkout.mjs",
+    "pseo:seed": "node --experimental-strip-types scripts/seed-pseo.ts",
+    "pseo:generate": "node --experimental-strip-types scripts/generate-pseo.ts",
     "env:check:production": "node scripts/check-production-env.mjs",
     "release:production": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/release-production.ps1"
   },

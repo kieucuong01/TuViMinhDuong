@@ -43,6 +43,24 @@ enum LedgerType {
   ADJUSTMENT
 }
 
+enum PseoEntityKind {
+  MAIN_STAR
+  PALACE
+  SUPPORT_STAR
+}
+
+enum PseoPageKind {
+  HUB
+  ENTITY
+  COMBINATION
+}
+
+enum PseoStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
 model User {
   id           String       @id @default(cuid())
   email        String       @unique
@@ -214,6 +232,59 @@ model Article {
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
   category        ArticleCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+}
+
+model PseoEntity {
+  id             String         @id @default(cuid())
+  kind           PseoEntityKind
+  slug           String         @unique
+  name           String
+  element        String?
+  summary        String
+  strengths      Json?
+  cautions       Json?
+  canonicalPath  String?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  pagesAsStar    PseoPage[]     @relation("PseoStar")
+  pagesAsPalace  PseoPage[]     @relation("PseoPalace")
+
+  @@index([kind, name])
+}
+
+model PseoPage {
+  id              String       @id @default(cuid())
+  kind            PseoPageKind
+  status          PseoStatus   @default(DRAFT)
+  slug            String       @unique
+  title           String
+  excerpt         String
+  body            String
+  starId          String?
+  palaceId        String?
+  element         String?
+  goodPoints      Json?
+  cautionPoints   Json?
+  scores          Json?
+  faqs            Json?
+  focusKeyword    String?
+  metaTitle       String?
+  metaDescription String?
+  canonicalUrl    String?
+  robots          String       @default("noindex,follow")
+  auditScore       Int          @default(0)
+  auditFindings    Json?
+  generationMeta  Json?
+  publishedAt     DateTime?
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+  star            PseoEntity?  @relation("PseoStar", fields: [starId], references: [id], onDelete: SetNull)
+  palace          PseoEntity?  @relation("PseoPalace", fields: [palaceId], references: [id], onDelete: SetNull)
+
+  @@unique([starId, palaceId])
+  @@index([status, kind, updatedAt])
+  @@index([starId, status])
+  @@index([palaceId, status])
 }
 
 model AuditLog {
