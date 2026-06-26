@@ -225,11 +225,16 @@ describe("SEO content cluster", () => {
     expect(saoTuViGuide).toBeTruthy();
     expect(saoTuViGuide?.coverImage).toBe("/articles/sao-tu-vi.webp");
     expect(saoTuViGuide?.ogImage).toBe("/articles/sao-tu-vi.webp");
+    expect(saoTuViGuide?.coverAlt).toContain("laptop");
     expect(saoTuViGuide?.content).toContain("| Câu hỏi thật của người đọc |");
     expect(saoTuViGuide?.content).toContain("| Điều kiện cần kiểm tra |");
+    expect(saoTuViGuide?.content).toContain("## Trước khi luận sao Tử Vi, hãy khóa ba dữ liệu nền");
+    expect(saoTuViGuide?.content).toContain("| Dữ liệu nền cần khóa |");
     expect(saoTuViGuide?.content).toContain("/kien-thuc-tu-vi/cung-menh-cung-than");
     expect(saoTuViGuide?.content).toContain("/kien-thuc-tu-vi/cung-phu-the-trong-tu-vi");
     expect(saoTuViGuide?.content).toContain("/kien-thuc-tu-vi/gio-sinh-trong-tu-vi");
+    expect(saoTuViGuide?.content).toContain("/kien-thuc-tu-vi/lap-la-so-tu-vi-can-gi");
+    expect(saoTuViGuide?.content).toContain("/kien-thuc-tu-vi/an-sao-la-so-tu-vi");
     expect(saoTuViGuide?.content).toContain("## Thử ngay trên lá số của bạn");
     expect(saoTuViGuide?.faqs?.length).toBeGreaterThanOrEqual(3);
   });
