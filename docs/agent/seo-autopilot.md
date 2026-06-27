@@ -154,7 +154,7 @@ Then:
 8. Create or refresh a local article cover asset for the published slug. The final publish state should prefer a raster `.webp` cover under `public/articles/<slug>.webp` that reads as a believable real photo or photo-editorial scene tied to the article topic, matches the warm premium site style, and is suitable for both list-card thumbnail and social sharing. Prefer no text on the image; if the cover includes visible text, it must be proper Vietnamese with diacritics. Use descriptive `coverAlt`, and keep `coverImage` and `ogImage` aligned unless there is a concrete reason not to.
 9. Treat symbolic illustration as a release blocker for fresh production SEO articles. Do not ship a cover that still reads like vector art, iconography, abstract symbolism, generic placeholder art, or text-only SVG unless the user explicitly approves a draft-only exception.
 10. Visually inspect the local cover before release. If it does not look like a believable real-world scene, replace it during the same run instead of rationalizing it as “realistic enough”.
-11. Skip only for a real blocker: failed verification, identical task with no content/sitemap/GSC change, duplicate cluster intent, or content quality that cannot be fixed safely in the same run. In cluster mode, one failing article blocks the atomic release unless it is explicitly removed from scope with a documented reason.
+11. Skip only for a real blocker: failed verification, duplicate cluster intent, or content quality that cannot be fixed safely in the same run. For normal scheduled publisher runs, the same slug is not a skip reason by itself. If the planner selects the same slug again, treat that run as a required material refresh and ship a real production update for that article in the same session. In cluster mode, one failing article blocks the atomic release unless it is explicitly removed from scope with a documented reason.
 12. Do not touch payment, auth, DB schema, chart/date engine rules, or large URL structure.
 13. Run targeted tests and targeted ESLint for touched files. When article content or cover assets changed, include `src/lib/content.test.ts` and `src/lib/article-cover-assets.test.ts`. Run `npm test` and `npm run build` only when production content/code changed and before commit/deploy.
 14. If verification passes, commit only relevant SEO/content changes, push `origin master`, and deploy through the VPS release path over `ssh tuvi-vps`: new release dir under `/opt/lasotinhhoa/releases`, copy production `.env*`, `npm ci`, `npm run build`, switch `/opt/lasotinhhoa/current`, restart PM2 `lasotinhhoa`, then verify `pm2 describe lasotinhhoa` points at the new release. If PM2 still points at the old release, recreate the process from `/opt/lasotinhhoa/current` and `pm2 save`.
@@ -184,13 +184,13 @@ Automation should avoid repeated heavy work. Use the smallest useful loop:
 - Publisher runs use `npm run seo:autopilot:publisher`, which limits planning to one selected task and prints summary JSON instead of the full plan.
 - Explicit user-authorized cluster runs use `npm run seo:autopilot:cluster`, cap selection at five distinct intents, and share one test/build/commit/deploy sequence.
 - Sunday strategy may use the full batch planner because it is the handoff for the week.
-- Read `docs/seo-autopilot/state.json` before rerunning the publisher so the automation can short-report unchanged selections instead of regenerating the same draft.
+- Read `docs/seo-autopilot/state.json` before rerunning the publisher so the automation can detect when the planner selected the same slug again and convert that into a deliberate material refresh instead of regenerating the same draft blindly.
 - Lighthouse CI is weekly/manual only. Do not run it inside every publisher automation unless the task changed public SEO layout, metadata, structured data, or page experience.
 - Do not run `npm test`, `npm run build`, deploy, or live smoke when no repo/content files changed.
 - Prefer targeted tests and targeted ESLint for touched files; run full build only before release.
 - When repo/content files did change for the selected slug, the automation should keep iterating on that one article until it is publishable or a concrete blocker is proven. Do not stop at a draft-only handoff just because the first draft is weak.
 - When a new article or material refresh changed the cover asset, verify the local image through `src/lib/article-cover-assets.test.ts` and keep the output suitable for card thumbnails and OG sharing.
-- If GSC, SEMrush, sitemap, and content inventory are unchanged from the latest `docs/seo-autopilot/state.json`, do a short report/skip instead of repeating the same draft.
+- If GSC, SEMrush, sitemap, and content inventory are unchanged from the latest `docs/seo-autopilot/state.json`, do not stop at a short report by default. Refresh the selected live article anyway with a concrete production improvement such as a sharper opening, stronger internal links, a tighter CTA, stronger data blocks, FAQ cleanup, or a better cover if the current one is weak. Report a skip only when a real blocker prevents a safe refresh.
 - Use `ssh tuvi-vps` as the default production entrypoint from this Windows machine; do not fall back to password-only SSH unless the user explicitly rotates the key path.
 - Keep useful repetition: weekly measurement, GSC opportunity checks, and one daily publish/refresh slot are worth keeping because they catch trend changes and prevent stale content.
 
@@ -200,7 +200,7 @@ Automation should avoid repeated heavy work. Use the smallest useful loop:
 - Daily 21:20: turn the published/refreshed URL into one TikTok/YouTube Shorts/Facebook Reels pack.
 - Sunday 20:30: measurement report, refresh recommendations, and next-week 7-slot priorities.
 
-Each scheduled publish automation should create or update only one production article. A one-time batch is allowed only when the user explicitly asks, uses cluster mode, and every selected page has distinct intent and article-specific value.
+Each scheduled publish automation should create or update exactly one production article or material refresh. A repeated slug still counts as a required refresh run, not as permission to skip. A one-time batch is allowed only when the user explicitly asks, uses cluster mode, and every selected page has distinct intent and article-specific value.
 
 ## Level 5 SEO Agent Workflow
 
@@ -209,7 +209,7 @@ Use this workflow for autonomous SEO operations:
 1. Daily/weekly audit: run `npm run seo:autopilot` or `npm run seo:autopilot:execute`, inspect live snapshot, sitemap, article inventory, SEMrush keyword clusters, and Search Console feedback when the warm-up phase is over.
 2. Strategy selection: choose one intent cluster, not one raw keyword. Normal scheduled runs select one page; an explicit cluster run may select 2-5 non-overlapping pages from that cluster.
 3. Google-safe filtering: skip stale year pages, competitor-navigation pages, mass birth-year pages, and near-duplicate variants such as separate pages for `lập`, `lấy`, `tạo`, `tra`, `vẽ`, `kẻ` when they answer the same user need.
-4. Content decision: pick one of three safe actions: refresh an existing pillar, publish support content with distinct intent, or improve internal links/metadata if no article is strong enough. Cluster mode must reject pages that differ only by swapped star, palace, year, or synonym.
+4. Content decision: pick one of three safe actions: refresh an existing pillar, publish support content with distinct intent, or improve internal links/metadata if no article is strong enough. For the daily publisher automation, one of those actions must become a real production change in the same run unless a hard blocker stops release. Cluster mode must reject pages that differ only by swapped star, palace, year, or synonym.
 5. Production writing: write useful Vietnamese copy for adults 30-60, add contextual internal links, visible FAQ only when useful, at least one natural conversion path to `/#lap-la-so`, and a matching local cover asset that feels like a real scene or realistic editorial illustration for the topic.
 6. Verification: run targeted tests plus `npm test` and `npm run build` before commit/deploy, including article cover asset checks when the image changed.
 7. Release: commit, push `master`, deploy the VPS production release over `ssh tuvi-vps`, verify PM2 is running from the new release, and smoke test the live home, hub, and changed article URL.

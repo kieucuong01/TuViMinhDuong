@@ -322,6 +322,22 @@ export function buildKeywordDrivenOpportunities({ keywordRows, existingSlugs = [
   return { opportunities, intelligence };
 }
 
+function rankRefreshTopicOpportunities(existingSlugs, keywordPlan) {
+  const existing = new Set(existingSlugs || []);
+  const keywordRefreshes = (keywordPlan?.intelligence?.clusters || [])
+    .map((cluster) => cluster.opportunity)
+    .filter((item) => existing.has(item.slug))
+    .sort((left, right) => right.priority - left.priority);
+
+  if (keywordRefreshes.length) {
+    return keywordRefreshes;
+  }
+
+  return DEFAULT_TOPIC_OPPORTUNITIES.filter((item) => existing.has(item.slug)).sort(
+    (left, right) => right.priority - left.priority,
+  );
+}
+
 export function extractSitemapUrls(xml) {
   if (!xml) return [];
   return [...xml.matchAll(/<loc>\s*([^<]+?)\s*<\/loc>/gi)].map((match) => decodeHtml(match[1].trim()));
@@ -523,11 +539,14 @@ export function planSeoAutopilotRun({
     ? buildKeywordDrivenOpportunities({ keywordRows: inputKeywordRows, existingSlugs: [...currentSlugs] })
     : null;
   const keywordOpportunities = keywordPlan?.opportunities || [];
+  const refreshOpportunities = rankRefreshTopicOpportunities([...currentSlugs], keywordPlan);
   const opportunities = keywordOpportunities.length
     ? keywordOpportunities
     : snapshotOpportunities.length
       ? snapshotOpportunities.filter((item) => !currentSlugs.has(item.slug))
-      : rankTopicOpportunities([...currentSlugs]);
+      : rankTopicOpportunities([...currentSlugs]).length
+        ? rankTopicOpportunities([...currentSlugs])
+        : refreshOpportunities;
   const normalizedOpportunities = avoidImmediateRepeat({
     opportunities,
     previousState,

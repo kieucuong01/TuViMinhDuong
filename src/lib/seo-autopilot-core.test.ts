@@ -410,6 +410,54 @@ export const seedArticles = [
     expect(plan.brief.slug).toBe("la-so-bat-tu-va-tu-vi");
   });
 
+  it("chooses a different candidate when the last publisher slug repeats", () => {
+    const rows = parseSemrushKeywordCsv(
+      [
+        "keyword,intent,volume,kd_percent,cpc_usd",
+        "lá số tử vi,I,368.0K,61,0.01",
+        "tạo lá số tử vi,I,8.1K,44,0.01",
+        "lá số bát tự,I,12.1K,30,0.01",
+        "chiêm tinh lá số,I,4.2K,40,0.01",
+        "an sao lá số tử vi,I,3.0K,35,0.01",
+      ].join("\n"),
+    );
+
+    const plan = planSeoAutopilotRun({
+      snapshot: {
+        status: "warning",
+        sitemapUrlCount: 47,
+        warnings: ["4 pages have no JSON-LD"],
+        opportunities: [],
+      },
+      existingSlugs: [
+        "lap-la-so-tu-vi-chuan",
+        "tao-la-so-tu-vi",
+        "la-so-bat-tu-va-tu-vi",
+        "chiem-tinh-la-so-va-tu-vi",
+        "an-sao-la-so-tu-vi",
+        "sao-tu-vi",
+        "sao-thien-co",
+        "sao-thai-duong",
+        "menh-vo-chinh-dieu",
+        "cung-phu-mau-trong-tu-vi",
+        "tieu-van-la-gi",
+        "lap-la-so-tu-vi-can-gi",
+      ],
+      keywordRows: rows,
+      articlesPerWeek: 1,
+      previousState: {
+        lastAction: {
+          slug: "sao-tu-vi",
+        },
+      },
+    });
+
+    expect(plan.nextAction.type).toBe("single_article_publish");
+    expect(plan.nextAction.slug).not.toBe("sao-tu-vi");
+    expect(plan.nextAction.slugs).toHaveLength(1);
+    expect(plan.brief.slug).toBe(plan.nextAction.slug);
+  });
+
   it("renders a content draft artifact that automation can publish later", () => {
     const draft = renderContentDraft(
       buildContentBrief({
