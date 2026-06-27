@@ -10414,6 +10414,383 @@ button.is-loading:not(.icon-button)::before {
   color: #c2410c;
 }
 
+.pseo-lookup-hub {
+  background:
+    radial-gradient(circle at 88% 4%, rgb(251 146 60 / 0.13), transparent 28rem),
+    linear-gradient(180deg, #fffaf0, #fff 35rem, #f8faf9);
+}
+
+.pseo-lookup-hero {
+  padding-top: 0.75rem;
+}
+
+.pseo-lookup-eyebrow,
+.pseo-lookup-form-copy > span,
+.pseo-lookup-result-heading > div > span,
+.pseo-lookup-guide > header > span {
+  color: #c2410c;
+  font-size: 0.78rem;
+  font-weight: 950;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
+.pseo-lookup-tool {
+  display: grid;
+  grid-template-columns: minmax(15rem, 0.8fr) minmax(22rem, 1.2fr);
+  gap: clamp(1rem, 3vw, 2rem);
+  align-items: center;
+  border: 1px solid #fdba74;
+  border-radius: 1.35rem;
+  background: linear-gradient(135deg, #fff7ed, #fffbeb);
+  padding: clamp(1.1rem, 3vw, 1.75rem);
+  box-shadow: 0 22px 55px rgb(154 52 18 / 0.11);
+}
+
+.pseo-lookup-form-copy h2 {
+  margin-top: 0.35rem;
+  color: #1c1917;
+  font-size: clamp(1.45rem, 3vw, 2rem);
+  font-weight: 950;
+  line-height: 1.12;
+}
+
+.pseo-lookup-form-copy p {
+  margin-top: 0.55rem;
+  color: #57534e;
+  line-height: 1.65;
+}
+
+.pseo-lookup-form {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.pseo-lookup-form > label {
+  color: #7c2d12;
+  font-size: 0.88rem;
+  font-weight: 900;
+}
+
+.pseo-lookup-form > div {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.65rem;
+}
+
+.pseo-lookup-form select {
+  min-height: 3.5rem;
+  border-color: #fdba74;
+  background-color: #fff;
+  font-size: 1.05rem;
+  font-weight: 760;
+}
+
+.pseo-lookup-form button {
+  display: inline-flex;
+  min-height: 3.5rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 0.85rem;
+  background: #c2410c;
+  padding: 0 1.2rem;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 950;
+  box-shadow: 0 10px 24px rgb(194 65 12 / 0.2);
+  transition: background 160ms ease, transform 160ms ease;
+}
+
+.pseo-lookup-form button:hover {
+  background: #9a3412;
+  transform: translateY(-1px);
+}
+
+.pseo-lookup-form button:focus-visible,
+.pseo-lookup-detail-link:focus-visible {
+  outline: 3px solid rgb(249 115 22 / 0.32);
+  outline-offset: 3px;
+}
+
+.pseo-lookup-result {
+  margin-top: 1.25rem;
+  border: 1px solid #fed7aa;
+  border-radius: 1.35rem;
+  background: rgb(255 255 255 / 0.96);
+  padding: clamp(1.1rem, 3vw, 1.75rem);
+  box-shadow: 0 20px 50px rgb(120 53 15 / 0.08);
+}
+
+.pseo-lookup-result-heading {
+  display: flex;
+  gap: 1rem;
+  align-items: start;
+  justify-content: space-between;
+}
+
+.pseo-lookup-result-heading h2 {
+  margin-top: 0.2rem;
+  color: #1c1917;
+  font-size: clamp(1.85rem, 4vw, 2.65rem);
+  font-weight: 950;
+  letter-spacing: -0.035em;
+  line-height: 1.05;
+}
+
+.pseo-lookup-result-heading > strong {
+  border-radius: 999px;
+  background: #ffedd5;
+  padding: 0.35rem 0.75rem;
+  color: #9a3412;
+  font-size: 0.83rem;
+  font-weight: 950;
+  white-space: nowrap;
+}
+
+.pseo-lookup-summary {
+  max-width: 62rem;
+  margin-top: 0.9rem;
+  color: #292524;
+  font-size: 1.16rem;
+  font-weight: 720;
+  line-height: 1.7;
+}
+
+.pseo-lookup-context {
+  max-width: 68rem;
+  margin-top: 0.75rem;
+  border-left: 4px solid #fb923c;
+  background: #fff7ed;
+  padding: 0.8rem 0.95rem;
+  color: #57534e;
+  line-height: 1.7;
+}
+
+.pseo-lookup-lists {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  margin-top: 1.15rem;
+}
+
+.pseo-lookup-lists section {
+  border-top: 1px solid #e7e5e4;
+  padding-top: 0.95rem;
+}
+
+.pseo-lookup-lists h3 {
+  display: flex;
+  gap: 0.45rem;
+  align-items: center;
+  color: #292524;
+  font-size: 1rem;
+  font-weight: 950;
+}
+
+.pseo-lookup-lists section:first-child h3 {
+  color: #047857;
+}
+
+.pseo-lookup-lists section:last-child h3 {
+  color: #b45309;
+}
+
+.pseo-lookup-lists ul {
+  display: grid;
+  gap: 0.4rem;
+  margin-top: 0.65rem;
+  padding-left: 1.2rem;
+  color: #57534e;
+  list-style: disc;
+}
+
+.pseo-lookup-detail-link {
+  display: inline-flex;
+  min-height: 3rem;
+  align-items: center;
+  gap: 0.45rem;
+  margin-top: 1.1rem;
+  border-radius: 0.75rem;
+  background: #f0fdf4;
+  padding: 0 0.9rem;
+  color: #047857;
+  font-weight: 900;
+}
+
+.pseo-lookup-guide {
+  display: grid;
+  grid-template-columns: minmax(16rem, 0.72fr) minmax(0, 1.28fr);
+  gap: clamp(1.25rem, 4vw, 3rem);
+  margin-top: clamp(2.75rem, 7vw, 5rem);
+  align-items: start;
+}
+
+.pseo-lookup-guide > header {
+  position: sticky;
+  top: 6rem;
+}
+
+.pseo-lookup-guide h2,
+.pseo-lookup-principles > h2,
+.pseo-lookup-index h2,
+.pseo-lookup-faq > h2 {
+  margin-top: 0.35rem;
+  color: #1c1917;
+  font-size: clamp(1.65rem, 3.5vw, 2.5rem);
+  font-weight: 950;
+  letter-spacing: -0.035em;
+  line-height: 1.1;
+}
+
+.pseo-lookup-guide > header p,
+.pseo-lookup-index > header p {
+  margin-top: 0.75rem;
+  color: #57534e;
+  line-height: 1.75;
+}
+
+.pseo-lookup-guide ol {
+  display: grid;
+  gap: 0;
+  border-top: 1px solid #d6d3d1;
+}
+
+.pseo-lookup-guide li {
+  display: grid;
+  grid-template-columns: 3rem minmax(0, 1fr);
+  gap: 0.9rem;
+  border-bottom: 1px solid #d6d3d1;
+  padding: 1.15rem 0;
+}
+
+.pseo-lookup-guide li > span {
+  display: grid;
+  width: 2.5rem;
+  height: 2.5rem;
+  place-items: center;
+  border-radius: 999px;
+  background: #292524;
+  color: #fff7ed;
+  font-weight: 950;
+}
+
+.pseo-lookup-guide h3,
+.pseo-lookup-principles h3 {
+  color: #292524;
+  font-size: 1.08rem;
+  font-weight: 950;
+}
+
+.pseo-lookup-guide li p,
+.pseo-lookup-principles article p {
+  margin-top: 0.35rem;
+  color: #57534e;
+  line-height: 1.7;
+}
+
+.pseo-lookup-principles,
+.pseo-lookup-index,
+.pseo-lookup-faq {
+  margin-top: clamp(2.75rem, 7vw, 5rem);
+}
+
+.pseo-lookup-principles > div {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  margin-top: 1.25rem;
+}
+
+.pseo-lookup-principles article {
+  border-top: 4px solid #fb923c;
+  background: #fff;
+  padding: 1.1rem 0.2rem 0;
+}
+
+.pseo-lookup-index > header {
+  max-width: 52rem;
+}
+
+.pseo-lookup-index > ul {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: 1.25rem;
+  border: 1px solid #e7e5e4;
+  border-radius: 1.1rem;
+  background: rgb(255 255 255 / 0.88);
+}
+
+.pseo-lookup-index li {
+  min-width: 0;
+  border-bottom: 1px solid #e7e5e4;
+  padding: 1rem;
+}
+
+.pseo-lookup-index li:nth-child(odd) {
+  border-right: 1px solid #e7e5e4;
+}
+
+.pseo-lookup-index li > div {
+  display: flex;
+  gap: 0.55rem;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.pseo-lookup-index li strong {
+  color: #292524;
+  font-size: 1.02rem;
+  font-weight: 950;
+}
+
+.pseo-lookup-index li span {
+  color: #c2410c;
+  font-size: 0.76rem;
+  font-weight: 900;
+}
+
+.pseo-lookup-index li p {
+  margin-top: 0.35rem;
+  color: #57534e;
+  line-height: 1.55;
+}
+
+.pseo-lookup-index li > a {
+  display: inline-flex;
+  margin-top: 0.55rem;
+  color: #c2410c;
+  font-size: 0.9rem;
+  font-weight: 900;
+}
+
+.pseo-lookup-faq > div {
+  display: grid;
+  gap: 0.65rem;
+  margin-top: 1.1rem;
+}
+
+.pseo-lookup-faq details {
+  border: 1px solid #e7e5e4;
+  border-radius: 0.9rem;
+  background: #fff;
+  padding: 0 1rem;
+}
+
+.pseo-lookup-faq summary {
+  cursor: pointer;
+  padding: 1rem 0;
+  color: #292524;
+  font-weight: 900;
+}
+
+.pseo-lookup-faq details p {
+  border-top: 1px solid #f5f5f4;
+  padding: 0.9rem 0 1rem;
+  color: #57534e;
+  line-height: 1.7;
+}
+
 .pseo-hub-cta {
   display: flex;
   gap: 1rem;
@@ -10429,6 +10806,12 @@ button.is-loading:not(.icon-button)::before {
 .pseo-hub-cta h2 {
   font-size: 1.35rem;
   font-weight: 950;
+}
+
+.pseo-hub-cta p {
+  margin-top: 0.25rem;
+  color: #d6d3d1;
+  font-size: 0.94rem;
 }
 
 .admin-pseo-filter {
@@ -10511,6 +10894,18 @@ button.is-loading:not(.icon-button)::before {
   .admin-pseo-editor {
     position: static;
   }
+
+  .pseo-lookup-guide {
+    grid-template-columns: 1fr;
+  }
+
+  .pseo-lookup-guide > header {
+    position: static;
+  }
+
+  .pseo-lookup-principles > div {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 1023px) {
@@ -10529,6 +10924,38 @@ button.is-loading:not(.icon-button)::before {
 }
 
 @media (max-width: 720px) {
+  .pseo-lookup-tool {
+    grid-template-columns: 1fr;
+    border-radius: 1rem;
+  }
+
+  .pseo-lookup-form > div,
+  .pseo-lookup-lists,
+  .pseo-lookup-index > ul {
+    grid-template-columns: 1fr;
+  }
+
+  .pseo-lookup-form button {
+    width: 100%;
+  }
+
+  .pseo-lookup-result {
+    border-radius: 1rem;
+  }
+
+  .pseo-lookup-result-heading {
+    align-items: flex-start;
+    flex-direction: column-reverse;
+  }
+
+  .pseo-lookup-index li:nth-child(odd) {
+    border-right: 0;
+  }
+
+  .pseo-lookup-guide li {
+    grid-template-columns: 2.5rem minmax(0, 1fr);
+  }
+
   .pseo-sticky-banner {
     top: 4rem;
     align-items: stretch;

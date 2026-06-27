@@ -19,4 +19,27 @@ describe("pSEO route structure", () => {
     expect(funnel).toContain("samePalace");
     expect(funnel).toContain('adSource="pseo_inline"');
   });
+
+  it("turns all three entity hubs into server-rendered lookup forms with distinct guidance", () => {
+    const routes = [
+      {
+        path: "src/app/tra-cuu/y-nghia-12-cung/page.tsx",
+        markers: ["PseoLookupHub", "searchParams: Promise", "muc", "Cách chọn cung theo câu hỏi thật"],
+      },
+      {
+        path: "src/app/tra-cuu/y-nghia-14-chinh-tinh/page.tsx",
+        markers: ["PseoLookupHub", "searchParams: Promise", "muc", "Cách đọc chính tinh đúng bối cảnh"],
+      },
+      {
+        path: "src/app/tra-cuu/phu-tinh/page.tsx",
+        markers: ["PseoLookupHub", "searchParams: Promise", "muc", "Cách đọc phụ tinh mà không kết luận vội"],
+      },
+    ];
+
+    for (const route of routes) {
+      const source = readFileSync(route.path, "utf8");
+      for (const marker of route.markers) expect(source).toContain(marker);
+      expect(source).toContain("routeMetadata");
+    }
+  });
 });
