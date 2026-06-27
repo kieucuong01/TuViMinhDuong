@@ -22,6 +22,7 @@ Use this file as the map, not the encyclopedia. Load only the docs and files nee
 ## Operating Rules
 
 - Make surgical changes that trace directly to the user request.
+- For large logs, JSON, database rows, or long tool output, prefer the Headroom MCP tools documented in `docs/agent/headroom.md`; retrieve the original when exact evidence is required.
 - Prefer existing patterns in `src/app`, `src/components`, `src/lib`, and `prisma`.
 - Keep public Vietnamese copy clear for adults 30-60: simple wording, large touch targets, no technical jargon.
 - Do not change the chart/date engines casually. Add or update fixtures/tests when touching astrology logic.

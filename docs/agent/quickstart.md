@@ -21,6 +21,7 @@ Purpose: this is the first low-token context file for any new AI agent. Read thi
 - Daily traffic workflow: `docs/agent/traffic-autopilot.md`
 - Google Ads/tracking: `docs/agent/playbooks.md#google-ads--conversion-tracking` and `docs/google-ads.md`
 - Deploy/prod/env: `docs/agent/playbooks.md#deployment--production`
+- Token-efficient Codex/Claude workflow: `docs/agent/headroom.md`
 - Verification commands: `docs/agent/verification.md`
 - Long-handoff prompt: `docs/agent/handoff.md`
 

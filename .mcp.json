@@ -1,0 +1,19 @@
+{
+  "mcpServers": {
+    "headroom": {
+      "type": "stdio",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "scripts/headroom-agent.ps1",
+        "mcp"
+      ],
+      "env": {
+        "HEADROOM_TELEMETRY": "off"
+      }
+    }
+  }
+}
