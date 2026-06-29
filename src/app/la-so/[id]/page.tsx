@@ -18,6 +18,10 @@ import { PaywallPopup } from "@/components/paywall-popup";
 import { FreeOverviewLoader } from "@/components/free-overview-loader";
 import { MarkdownContent } from "@/components/markdown-content";
 import { buildInstantFreeOverview } from "@/lib/ai";
+import { PersonalizedReportOutline } from "@/components/personalized-report-outline";
+import { buildPersonalizedReportOutline } from "@/lib/chart-evidence";
+import { listAssistantQuestions } from "@/lib/chart-assistant-store";
+import type { AssistantAccess } from "@/components/assistant-widget";
 
 export const metadata: Metadata = {
   title: "Lá số tử vi",
@@ -58,6 +62,23 @@ export default async function ChartPage({
     : null;
   const activeReading = selectedReading || fullReading;
   const hasAdvancedReading = Boolean(fullReading);
+  const assistantFullReading = user
+    ? fullReading ||
+      (await getCachedReading(user.id, id, "FULL", "all")) ||
+      (user.role === "ADMIN" ? await getAnyCompletedReading(id, "FULL", "all") : null)
+    : null;
+  const assistantHistory = user && assistantFullReading ? await listAssistantQuestions(user.id, id) : [];
+  const assistantRemaining = Math.max(0, 3 - assistantHistory.length);
+  const assistantAccess: AssistantAccess = !user
+    ? { status: "login-required", remaining: 0, history: [] }
+    : !assistantFullReading
+      ? { status: "full-required", remaining: 0, history: [] }
+      : {
+          status: assistantRemaining > 0 ? "ready" : "exhausted",
+          remaining: assistantRemaining,
+          history: assistantHistory,
+        };
+  const reportOutline = buildPersonalizedReportOutline(record.chart);
   const activeLabel = activeReading ? readingLabels[activeReading.type] : "Luận giải tổng quan";
   const freeOverviewStatus = activeReading || isScopedReadingView ? null : getFreeOverviewStatus(record.chart);
   const instantFreeOverviewContent = activeReading || isScopedReadingView ? null : buildInstantFreeOverview(record.chart);
@@ -131,8 +152,18 @@ export default async function ChartPage({
 
         {paidFeaturesVisible ? (
           <>
+            <PersonalizedReportOutline
+              chartId={id}
+              items={reportOutline}
+              unlocked={hasAdvancedReading}
+              priceCoins={featurePrices?.FULL.priceCoins ?? 199}
+            />
             {featurePrices ? <ReadingTabs chartId={id} chart={record.chart} featurePrices={featurePrices} /> : null}
-            {featurePrices ? <PremiumReadingCta chartId={id} fullName={record.chart.input.fullName} hasAdvancedReading={hasAdvancedReading} fullPriceCoins={featurePrices.FULL.priceCoins} /> : null}
+            {featurePrices ? (
+              <div id="mo-khoa-ho-so-vip">
+                <PremiumReadingCta chartId={id} fullName={record.chart.input.fullName} hasAdvancedReading={hasAdvancedReading} fullPriceCoins={featurePrices.FULL.priceCoins} />
+              </div>
+            ) : null}
           </>
         ) : null}
         </>
@@ -141,7 +172,7 @@ export default async function ChartPage({
       <Suspense fallback={null}>
         <PaywallPopup />
       </Suspense>
-      <DeferredAssistantWidget chartId={id} />
+      <DeferredAssistantWidget chartId={id} initialAccess={assistantAccess} />
     </main>
   );
 }

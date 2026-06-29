@@ -3,6 +3,7 @@
 import dynamic from "next/dynamic";
 import { Bot } from "lucide-react";
 import { useEffect, useState } from "react";
+import type { AssistantAccess } from "@/components/assistant-widget";
 
 const AssistantWidget = dynamic(
   () => import("@/components/assistant-widget").then((mod) => mod.AssistantWidget),
@@ -19,7 +20,13 @@ const AssistantWidget = dynamic(
   },
 );
 
-export function DeferredAssistantWidget({ chartId }: { chartId: string }) {
+export function DeferredAssistantWidget({
+  chartId,
+  initialAccess,
+}: {
+  chartId: string;
+  initialAccess: AssistantAccess;
+}) {
   const [enabled, setEnabled] = useState(false);
 
   useEffect(() => {
@@ -27,5 +34,5 @@ export function DeferredAssistantWidget({ chartId }: { chartId: string }) {
     return () => window.clearTimeout(timer);
   }, []);
 
-  return enabled ? <AssistantWidget chartId={chartId} /> : null;
+  return enabled ? <AssistantWidget chartId={chartId} initialAccess={initialAccess} /> : null;
 }

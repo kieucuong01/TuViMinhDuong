@@ -184,12 +184,12 @@ export function FreeOverviewLoader({
         {state.status === "fallback" ? (
           <div className="free-overview-inline-status" role="status" aria-live="polite">
             {state.jobStatus === "failed"
-              ? "Đang hiển thị bản tổng quan nhanh. Bản chi tiết hơn bị gián đoạn và có thể thử viết lại."
+              ? "Đang hiển thị mini-report dự phòng. Bản cá nhân hóa bị gián đoạn và có thể thử viết lại."
               : state.jobStatus === "stale"
-                ? "Đang hiển thị bản tổng quan nhanh. Job nền trước đó quá lâu chưa xong, bạn có thể thử viết lại."
+                ? "Đang hiển thị mini-report dự phòng. Tiến trình trước đó quá lâu chưa xong, bạn có thể thử viết lại."
                 : state.jobStatus === "processing"
-                  ? "Đang viết bản chi tiết hơn ở nền. Bạn có thể đọc bản tổng quan này trước."
-                  : "Bản tổng quan nhanh đã sẵn sàng. Hệ thống đang chuẩn bị bản chi tiết hơn ở nền."}
+                  ? "Đang viết mini-report cá nhân hóa ở nền. Bạn có thể đọc bản dự phòng này trước."
+                  : "Bản dự phòng đã sẵn sàng. Hệ thống đang chuẩn bị mini-report cá nhân hóa ở nền."}
             {canRetry ? (
               <button type="button" className="btn btn-small btn-ghost" onClick={retryOverview}>
                 Thử viết lại
@@ -211,8 +211,8 @@ export function FreeOverviewLoader({
           <section className="free-overview-detail-block" aria-labelledby="free-overview-detail-title">
             <div className="free-overview-detail-heading">
               <div>
-                <p className="eyebrow">Bản chi tiết hơn</p>
-                <h2 id="free-overview-detail-title">Luận giải tổng quan mở rộng</h2>
+                <p className="eyebrow">Mini-report miễn phí</p>
+                <h2 id="free-overview-detail-title">Hồ sơ cá nhân từ dữ liệu lá số</h2>
               </div>
               <Link className="btn btn-small btn-primary" href={detailHref}>
                 {detailCta}
@@ -240,8 +240,8 @@ export function FreeOverviewLoader({
   return (
     <div ref={setRootNode} className="free-overview-loading" role="status" aria-live="polite">
       <div>
-        <strong>Đang chuẩn bị luận giải miễn phí...</strong>
-        <span>Lá số đã hiển thị trước để bạn xem ngay. Phần luận giải đang được viết ở nền.</span>
+        <strong>Đang chuẩn bị mini-report cá nhân...</strong>
+        <span>Lá số đã hiển thị trước để bạn xem ngay. Hồ sơ miễn phí đang được viết từ dữ liệu lá số.</span>
       </div>
       <i />
       <i />
