@@ -349,9 +349,11 @@ Expected: PASS.
 Commit:
 
 ```powershell
-git add prisma/schema.prisma prisma/migrations/20260629000000_add_assistant_questions/migration.sql src/generated/prisma src/lib/data.ts src/lib/chart-assistant.ts src/lib/chart-assistant.test.ts
+git add prisma/schema.prisma prisma/migrations/20260629000000_add_assistant_questions/migration.sql src/lib/data.ts src/lib/chart-assistant.ts src/lib/chart-assistant.test.ts
 git commit -m "feat: persist three chart assistant questions"
 ```
+
+`src/generated/prisma/` is regenerated for local type-checking but must remain uncommitted per `docs/agent/verification.md`.
 
 ### Task 5: Enforce assistant access in the API
 
