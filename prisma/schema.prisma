@@ -78,6 +78,7 @@ model User {
   ledgers      CoinLedger[]
   payments     PaymentOrder[]
   auditLogs    AuditLog[]
+  assistantQuestions AssistantQuestion[]
 }
 
 model Account {
@@ -113,6 +114,7 @@ model Chart {
   updatedAt DateTime  @updatedAt
   user      User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
   readings  Reading[]
+  assistantQuestions AssistantQuestion[]
 
   @@index([userId, createdAt])
 }
@@ -133,10 +135,30 @@ model Reading {
   updatedAt   DateTime      @updatedAt
   user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   chart       Chart         @relation(fields: [chartId], references: [id], onDelete: Cascade)
+  assistantQuestions AssistantQuestion[]
 
   @@unique([userId, chartId, type, scopeKey])
   @@index([userId, type, scopeKey, status, createdAt])
   @@index([chartId, type, scopeKey, status])
+}
+
+model AssistantQuestion {
+  id        String   @id @default(cuid())
+  userId    String
+  chartId   String
+  readingId String
+  slot      Int
+  question  String
+  answer    String?
+  model     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  chart     Chart    @relation(fields: [chartId], references: [id], onDelete: Cascade)
+  reading   Reading  @relation(fields: [readingId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, chartId, slot])
+  @@index([userId, chartId, createdAt])
 }
 
 model CoinLedger {
