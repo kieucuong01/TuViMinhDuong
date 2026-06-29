@@ -21,12 +21,12 @@ export async function getOwnedAssistantChart(user: SessionUser, chartId: string)
   return record?.chart ? (record.chart as TuViChart) : null;
 }
 
-export async function getCompletedAssistantReading(userId: string, chartId: string) {
+export async function getCompletedAssistantReading(user: SessionUser, chartId: string) {
   const db = getDb();
   if (!db) return null;
   return db.reading.findFirst({
     where: {
-      userId,
+      ...(user.role === "ADMIN" ? {} : { userId: user.id }),
       chartId,
       type: "FULL",
       scopeKey: "all",

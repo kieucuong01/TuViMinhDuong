@@ -44,7 +44,7 @@ describe("chart assistant store", () => {
     const findFirst = vi.fn(async () => ({ id: "reading-1", content: "VIP report" }));
     mocks.getDb.mockReturnValue({ reading: { findFirst } });
 
-    await expect(getCompletedAssistantReading("user-1", "chart-1")).resolves.toEqual({
+    await expect(getCompletedAssistantReading(user, "chart-1")).resolves.toEqual({
       id: "reading-1",
       content: "VIP report",
     });

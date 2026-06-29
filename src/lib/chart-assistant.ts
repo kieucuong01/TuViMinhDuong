@@ -32,7 +32,7 @@ type CompletedFullReading = {
 
 export type ChartAssistantDeps = {
   getOwnedChart: (user: SessionUser, chartId: string) => Promise<TuViChart | null>;
-  getCompletedFullReading: (userId: string, chartId: string) => Promise<CompletedFullReading | null>;
+  getCompletedFullReading: (user: SessionUser, chartId: string) => Promise<CompletedFullReading | null>;
   listQuestionHistory: (userId: string, chartId: string) => Promise<AssistantHistoryItem[]>;
   reserveQuestionSlot: (
     userId: string,
@@ -105,7 +105,7 @@ export async function answerChartQuestion(
   const chart = await deps.getOwnedChart(input.user, input.chartId);
   if (!chart) throw new ChartAssistantError("NOT_FOUND");
 
-  const paidReading = await deps.getCompletedFullReading(input.user.id, input.chartId);
+  const paidReading = await deps.getCompletedFullReading(input.user, input.chartId);
   if (!paidReading) throw new ChartAssistantError("FULL_REQUIRED");
 
   const history = await deps.listQuestionHistory(input.user.id, input.chartId);
