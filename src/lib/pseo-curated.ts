@@ -4,18 +4,54 @@ export const CURATED_PSEO_SLUGS = [
   "sao-thai-am-cung-tai-bach",
   "sao-tu-vi-cung-menh",
   "sao-tu-vi-cung-quan-loc",
+  "sao-tu-vi-cung-tai-bach",
   "sao-vu-khuc-cung-tai-bach",
   "sao-thai-duong-cung-quan-loc",
   "sao-thien-phu-cung-tai-bach",
+  "sao-thien-co-cung-menh",
+  "sao-thien-co-cung-quan-loc",
+  "sao-thien-co-cung-tai-bach",
+  "sao-thai-duong-cung-menh",
+  "sao-thai-duong-cung-tai-bach",
+  "sao-vu-khuc-cung-menh",
+  "sao-vu-khuc-cung-quan-loc",
+  "sao-thien-dong-cung-menh",
+  "sao-thien-dong-cung-quan-loc",
+  "sao-thien-dong-cung-tai-bach",
+  "sao-liem-trinh-cung-menh",
+  "sao-liem-trinh-cung-quan-loc",
+  "sao-liem-trinh-cung-tai-bach",
+  "sao-thien-phu-cung-menh",
+  "sao-thien-phu-cung-quan-loc",
+  "sao-thai-am-cung-menh",
+  "sao-thai-am-cung-quan-loc",
+  "sao-tham-lang-cung-menh",
+  "sao-tham-lang-cung-quan-loc",
+  "sao-tham-lang-cung-tai-bach",
+  "sao-cu-mon-cung-menh",
+  "sao-cu-mon-cung-quan-loc",
+  "sao-cu-mon-cung-tai-bach",
+  "sao-thien-tuong-cung-menh",
+  "sao-thien-tuong-cung-quan-loc",
+  "sao-thien-tuong-cung-tai-bach",
+  "sao-thien-luong-cung-menh",
+  "sao-thien-luong-cung-quan-loc",
+  "sao-thien-luong-cung-tai-bach",
+  "sao-that-sat-cung-menh",
+  "sao-that-sat-cung-quan-loc",
+  "sao-that-sat-cung-tai-bach",
+  "sao-pha-quan-cung-menh",
+  "sao-pha-quan-cung-quan-loc",
+  "sao-pha-quan-cung-tai-bach",
 ] as const;
 
-type CuratedSlug = (typeof CURATED_PSEO_SLUGS)[number];
+type CuratedSlug = string;
 
 type CuratedPage = Partial<Pick<PseoPageDraft, "title" | "excerpt" | "body" | "metaTitle" | "metaDescription">> & {
   body: string;
 };
 
-export const CURATED_PSEO_CONTENT: Record<CuratedSlug, CuratedPage> = {
+export const CURATED_PSEO_CONTENT: Record<string, CuratedPage> = {
   "sao-thai-am-cung-tai-bach": {
     title: "Sao Thái Âm cung Tài Bạch: cách đọc tiền bạc, tích lũy và cảm giác an toàn",
     excerpt: "Thái Âm ở Tài Bạch nên được đọc như năng lực quan sát dòng tiền, nhu cầu an toàn và cách tích lũy bền hơn là lời đoán giàu nghèo.",
@@ -306,6 +342,295 @@ Các câu hỏi này giúp Thiên Phủ trở thành năng lực điều phối 
   },
 };
 
+type Batch2StarKey =
+  | "tu-vi"
+  | "thien-co"
+  | "thai-duong"
+  | "vu-khuc"
+  | "thien-dong"
+  | "liem-trinh"
+  | "thien-phu"
+  | "thai-am"
+  | "tham-lang"
+  | "cu-mon"
+  | "thien-tuong"
+  | "thien-luong"
+  | "that-sat"
+  | "pha-quan";
+
+type Batch2PalaceKey = "menh" | "quan-loc" | "tai-bach";
+
+const BATCH2_STARS: Record<Batch2StarKey, {
+  name: string;
+  element: string;
+  temperament: string;
+  gift: string;
+  shadow: string;
+  practice: string;
+  image: string;
+  nghề: string;
+}> = {
+  "tu-vi": {
+    name: "Tử Vi",
+    element: "Thổ",
+    temperament: "cần vị trí trung tâm, trật tự và một cấu trúc đủ rõ để điều phối nguồn lực",
+    gift: "gom người, việc và mục tiêu rời rạc thành một hệ thống có trách nhiệm",
+    shadow: "dễ ôm vai trò quá chặt, đặt nặng vị thế hoặc nhầm kiểm soát với năng lực lãnh đạo",
+    practice: "phân biệt việc mình cần quyết, việc nên giao và việc chỉ cần đặt nguyên tắc rồi để người khác vận hành",
+    image: "người giữ bản đồ trong phòng họp: hữu ích khi giúp cả nhóm thấy đường đi, nặng nề nếu giữ bản đồ cho riêng mình",
+    nghề: "quản lý, điều phối, xây hệ thống, cố vấn, vận hành tổ chức, sản phẩm hoặc vai trò cần nhìn đại cục",
+  },
+  "thien-co": {
+    name: "Thiên Cơ",
+    element: "Mộc",
+    temperament: "ưa quan sát cơ chế, thích hiểu vì sao một việc vận hành rồi mới chọn cách can thiệp",
+    gift: "biết đổi phương án khi dữ kiện thay đổi, giỏi nhìn ra con đường phụ mà người khác bỏ qua",
+    shadow: "dễ nghĩ quá nhiều, đổi hướng liên tục hoặc biến sự linh hoạt thành thiếu cam kết",
+    practice: "ghi lại giả thuyết, thời hạn thử nghiệm và tiêu chí dừng trước khi xoay phương án",
+    image: "người tháo một chiếc đồng hồ cũ để xem bánh răng nào đang kẹt",
+    nghề: "tư vấn, phân tích, sản phẩm, kỹ thuật, chiến lược, giáo dục hoặc các việc cần thiết kế quy trình",
+  },
+  "thai-duong": {
+    name: "Thái Dương",
+    element: "Hỏa",
+    temperament: "cần sự rõ ràng, trách nhiệm và cảm giác mình đang làm sáng một vấn đề có ích",
+    gift: "truyền đạt điều khó thành dễ hiểu, đứng ra khi tập thể cần một điểm tựa minh bạch",
+    shadow: "dễ quá tải vì luôn phải sáng, phải đúng, phải gánh phần người khác chưa dám nhận",
+    practice: "đặt ranh giới cho trách nhiệm, phân biệt việc cần mình soi sáng với việc mình đang gồng thay hệ thống",
+    image: "ngọn đèn đặt trên bàn làm việc, không chói nhưng đủ để mọi người đọc được bản đồ",
+    nghề: "đào tạo, quản lý, truyền thông, tư vấn, đại diện, chăm sóc cộng đồng hoặc vai trò giải thích chuyên môn",
+  },
+  "vu-khuc": {
+    name: "Vũ Khúc",
+    element: "Kim",
+    temperament: "thực tế, coi trọng hiệu quả và muốn mọi nguồn lực được đo bằng việc làm cụ thể",
+    gift: "quyết đoán, chịu áp lực, biết cắt phần thừa và biến mục tiêu thành kỷ luật",
+    shadow: "dễ khô cứng, tự trách khi kết quả chưa đạt hoặc xem cảm xúc như chuyện gây nhiễu",
+    practice: "đặt chỉ số rõ nhưng thêm một vòng kiểm tra tác động lên sức khỏe, quan hệ và thời gian",
+    image: "người giữ sổ kho, cân từng khoản vào ra nhưng vẫn cần nhớ kho phục vụ đời sống",
+    nghề: "tài chính, vận hành, kỹ thuật, quản trị dự án, kinh doanh, kiểm soát chi phí hoặc nghề cần quyết định chắc tay",
+  },
+  "thien-dong": {
+    name: "Thiên Đồng",
+    element: "Thủy",
+    temperament: "mềm, dễ cảm thông và thường tìm cách làm cuộc sống bớt căng bằng sự thích nghi",
+    gift: "biết hạ nhiệt, kết nối người khác và tìm niềm vui trong quá trình thay vì chỉ nhìn đích đến",
+    shadow: "dễ trì hoãn, chiều theo hoàn cảnh hoặc né quyết định khó vì sợ mất sự yên ổn",
+    practice: "chọn một nhịp nhỏ có thể lặp lại hằng tuần, rồi để sự mềm mại phục vụ cam kết thay vì thay thế cam kết",
+    image: "dòng nước đổi hướng quanh tảng đá, không đối đầu nhưng vẫn cần biết mình chảy về đâu",
+    nghề: "dịch vụ, chăm sóc khách hàng, giáo dục, sáng tạo, nhân sự, du lịch, cộng đồng hoặc các việc cần cảm xúc tinh tế",
+  },
+  "liem-trinh": {
+    name: "Liêm Trinh",
+    element: "Hỏa",
+    temperament: "nhạy với ranh giới đúng sai, danh dự, hấp lực cá nhân và nhu cầu sống có nguyên tắc",
+    gift: "giữ chuẩn mực, phát hiện điểm lệch và có sức hút khi biết dùng nguyên tắc để bảo vệ điều đáng quý",
+    shadow: "dễ cực đoan, phản ứng nóng hoặc mắc kẹt giữa muốn tự do và muốn giữ hình ảnh sạch",
+    practice: "viết rõ nguyên tắc nào là bất khả xâm phạm, nguyên tắc nào chỉ là thói quen cần cập nhật",
+    image: "một lằn ranh bằng than đỏ: đủ sáng để cảnh báo, nhưng nếu đứng quá gần sẽ bỏng",
+    nghề: "pháp lý, kiểm soát chất lượng, thương hiệu cá nhân, nghệ thuật, quản trị rủi ro, nhân sự hoặc vai trò giữ chuẩn",
+  },
+  "thien-phu": {
+    name: "Thiên Phủ",
+    element: "Thổ",
+    temperament: "thiên về chứa đựng, bảo toàn và sắp xếp nguồn lực sao cho hệ thống không hụt nền",
+    gift: "biết giữ kho, phân bổ, tạo cảm giác an toàn và không dễ bị cuốn vào nhịp quá gấp",
+    shadow: "dễ thận trọng quá mức, giữ thứ đã cũ hoặc ôm vai trò bảo bọc cho quá nhiều người",
+    practice: "định kỳ hỏi tài sản, vai trò hoặc trách nhiệm nào đang được giữ vì còn giá trị, cái nào chỉ được giữ vì sợ mất",
+    image: "kho thóc sau nhà: quý vì nuôi được người, nhưng vẫn phải mở cửa, kiểm kê và thay hạt cũ",
+    nghề: "quản trị, tài sản, vận hành, hậu cần, giáo dục, tài chính gia đình, tổ chức hoặc vị trí giữ nền cho tập thể",
+  },
+  "thai-am": {
+    name: "Thái Âm",
+    element: "Thủy",
+    temperament: "sâu, kín, quan sát bằng cảm nhận và cần sự an toàn trước khi mở lòng hoặc quyết định",
+    gift: "tinh tế với nhu cầu của người khác, biết tích lũy chậm và nhìn các lớp cảm xúc khó nói",
+    shadow: "dễ lo xa, giữ trong lòng quá lâu hoặc quyết định theo cảm giác bất an thay vì dữ kiện đủ",
+    practice: "tách cảm xúc, dữ kiện và ký ức cũ thành ba cột riêng trước khi kết luận",
+    image: "ánh trăng trên mặt nước: giúp thấy điều ban ngày bỏ sót nhưng cũng dễ méo nếu nước động",
+    nghề: "nghiên cứu, chăm sóc, tài chính bền, bất động sản, tư vấn, viết lách, sản phẩm cho gia đình hoặc dịch vụ cần thấu cảm",
+  },
+  "tham-lang": {
+    name: "Tham Lang",
+    element: "Thủy",
+    temperament: "ham trải nghiệm, thích mở rộng quan hệ, học nhanh qua va chạm và có sức hút xã hội",
+    gift: "linh hoạt, biết tạo cơ hội từ con người, thị trường, sở thích và nhu cầu đang thay đổi",
+    shadow: "dễ quá tay, phân tán, ham nhiều hướng hoặc dùng sức hút để né phần kỷ luật cần làm",
+    practice: "đặt giới hạn số dự án, số mối quan hệ và số khoản thử nghiệm được phép mở cùng lúc",
+    image: "khu chợ đêm nhiều ánh đèn: giàu cơ hội nếu biết mình mua gì, dễ lạc nếu chỉ đi theo tiếng gọi",
+    nghề: "kinh doanh, truyền thông, giải trí, sản phẩm, quan hệ khách hàng, thị trường, sáng tạo hoặc vai trò mở mạng lưới",
+  },
+  "cu-mon": {
+    name: "Cự Môn",
+    element: "Thủy",
+    temperament: "đặt câu hỏi, phát hiện điểm chưa rõ và cần dùng ngôn ngữ để bóc tách vấn đề",
+    gift: "phân tích tốt, nói ra điều người khác ngại nói và biến mâu thuẫn thành dữ liệu để hiểu sâu hơn",
+    shadow: "dễ vướng thị phi, nói quá sắc hoặc nghi ngờ đến mức làm quan hệ và quyết định bị chậm",
+    practice: "trước khi phản biện, viết mục tiêu của cuộc nói chuyện: làm rõ, thương lượng hay chỉ xả bức xúc",
+    image: "chiếc chuông trong sương: âm thanh giúp định hướng, nhưng vang quá lâu sẽ thành nhiễu",
+    nghề: "tư vấn, luật, nghiên cứu, nội dung, đàm phán, kiểm toán, đào tạo hoặc nghề cần hỏi đúng câu hỏi",
+  },
+  "thien-tuong": {
+    name: "Thiên Tướng",
+    element: "Thủy",
+    temperament: "coi trọng sự công bằng, vai trò hỗ trợ và cách phối hợp để một hệ thống giữ được chuẩn",
+    gift: "biết đứng giữa, bảo vệ tiêu chuẩn, làm dịu xung đột và giúp người khác vận hành đúng vai",
+    shadow: "dễ lệ thuộc đánh giá, ngại quyết định dứt khoát hoặc nhận vai hỗ trợ quá lâu mà quên nhu cầu riêng",
+    practice: "xác định mình đang hỗ trợ vì giá trị chung hay đang né việc bước lên vị trí chính",
+    image: "người giữ cân trong phiên chợ: không bán hàng thay ai, nhưng giúp cuộc trao đổi bớt lệch",
+    nghề: "quản lý nhân sự, pháp chế, điều phối, chăm sóc khách hàng, vận hành, cố vấn hoặc vai trò bảo vệ tiêu chuẩn",
+  },
+  "thien-luong": {
+    name: "Thiên Lương",
+    element: "Mộc",
+    temperament: "thiên về bảo hộ, đạo lý, kinh nghiệm và nhu cầu làm việc có ích cho sự bền lành",
+    gift: "nhìn hậu quả dài hạn, biết nâng đỡ người khác và đặt câu hỏi về ý nghĩa phía sau hành động",
+    shadow: "dễ phán xét, tự đặt mình vào vai người đúng hoặc dùng đạo lý để tránh thay đổi thực tế",
+    practice: "chuyển lời khuyên thành hành động nhỏ có thể đo được, thay vì chỉ nói điều nên làm",
+    image: "cây lớn ở sân đình: cho bóng mát nhưng cũng cần cắt cành khô để không che hết ánh sáng",
+    nghề: "giáo dục, y tế hỗ trợ, cố vấn, quản trị rủi ro, cộng đồng, pháp lý mềm hoặc nghề cần kinh nghiệm và trách nhiệm",
+  },
+  "that-sat": {
+    name: "Thất Sát",
+    element: "Kim",
+    temperament: "mạnh, dứt khoát, chịu áp lực và thường bộc lộ rõ khi hoàn cảnh buộc phải quyết nhanh",
+    gift: "hành động trong tình huống khó, cắt bế tắc, chịu trách nhiệm ở tuyến đầu và không sợ đổi thế trận",
+    shadow: "dễ cứng, mạo hiểm, cô độc hoặc xem chậm lại là yếu trong khi thực ra cần thêm dữ kiện",
+    practice: "trước quyết định lớn, bắt buộc có một bước kiểm tra hậu quả và một phương án rút lui",
+    image: "lưỡi dao dùng để mở đường trong rừng rậm: cần sắc nhưng càng cần người biết cầm",
+    nghề: "quản trị khủng hoảng, kinh doanh cạnh tranh, kỹ thuật, quân sự/an ninh, vận hành áp lực, thể thao hoặc vai trò phá bế tắc",
+  },
+  "pha-quan": {
+    name: "Phá Quân",
+    element: "Thủy",
+    temperament: "thích tái cấu trúc, không chịu được hệ thống đã mục và thường học qua chu kỳ phá cũ lập mới",
+    gift: "dám kết thúc điều không còn sống, mở đường đổi mới và chịu được giai đoạn chuyển tiếp lộn xộn",
+    shadow: "dễ phá quá sớm, chán phần duy trì hoặc nhầm tự do với việc không cần cam kết",
+    practice: "mỗi lần muốn thay đổi lớn, viết rõ điều gì phải giữ, điều gì được bỏ và chi phí chuyển đổi là gì",
+    image: "con thuyền tháo ván cũ giữa bến: cần sửa để đi xa hơn, nhưng không nên tháo khi đang giữa bão",
+    nghề: "chuyển đổi mô hình, startup, cải tổ, sản phẩm mới, xử lý khủng hoảng, nghệ thuật phá cách hoặc nghề cần dọn cái cũ",
+  },
+};
+
+const BATCH2_PALACES: Record<Batch2PalaceKey, {
+  name: string;
+  question: string;
+  lens: string;
+  decision: string;
+  related: string[];
+}> = {
+  "menh": {
+    name: "Mệnh",
+    question: "tôi thường phản ứng, chọn lựa và tự định nghĩa mình theo kiểu nào",
+    lens: "khí chất, thói quen tự vệ, cách bước vào một tình huống mới và điều người khác cảm thấy ở bạn trước tiên",
+    decision: "định hình vai trò sống, ranh giới cá nhân, cách giao tiếp và cách rèn thói quen nền",
+    related: ["/tra-cuu/cung-menh", "/tra-cuu/sao-tu-vi-cung-menh", "/kien-thuc-tu-vi/cung-menh-cung-than"],
+  },
+  "quan-loc": {
+    name: "Quan Lộc",
+    question: "tôi tạo giá trị qua công việc, trách nhiệm và vai trò xã hội ra sao",
+    lens: "nghề nghiệp, cách chịu trách nhiệm, môi trường làm việc hợp và kiểu đóng góp được người khác ghi nhận",
+    decision: "chọn nghề, đổi vai trò, nhận dự án, xây uy tín và kiểm tra xem công việc có đang hút cạn sức không",
+    related: ["/tra-cuu/cung-quan-loc", "/tra-cuu/sao-tu-vi-cung-quan-loc", "/kien-thuc-tu-vi/cung-quan-loc-trong-tu-vi"],
+  },
+  "tai-bach": {
+    name: "Tài Bạch",
+    question: "tôi tạo, giữ, dùng và đánh giá nguồn lực theo cơ chế nào",
+    lens: "tiền bạc, tài sản, năng lực kiếm tiền, cách phân bổ nguồn lực và cảm giác an toàn vật chất",
+    decision: "quản trị thu chi, đầu tư học tập, chọn nguồn thu, giới hạn rủi ro và xây nền tài chính bền hơn",
+    related: ["/tra-cuu/cung-tai-bach", "/tra-cuu/sao-vu-khuc-cung-tai-bach", "/kien-thuc-tu-vi/cung-tai-bach-trong-tu-vi"],
+  },
+};
+
+const BATCH2_SLUGS = new Set<string>(CURATED_PSEO_SLUGS);
+
+function parseBatch2Slug(slug: string) {
+  const match = slug.match(/^sao-(.+)-cung-(menh|quan-loc|tai-bach)$/);
+  if (!match) return null;
+  const starSlug = match[1] as Batch2StarKey;
+  const palaceSlug = match[2] as Batch2PalaceKey;
+  if (!BATCH2_STARS[starSlug] || !BATCH2_PALACES[palaceSlug]) return null;
+  return { starSlug, palaceSlug };
+}
+
+function titleForBatch2(star: typeof BATCH2_STARS[Batch2StarKey], palace: typeof BATCH2_PALACES[Batch2PalaceKey]) {
+  return `Sao ${star.name} cung ${palace.name}: ý nghĩa và cách tự đối chiếu`;
+}
+
+function buildBatch2Content(slug: string): CuratedPage | undefined {
+  const parsed = parseBatch2Slug(slug);
+  if (!parsed || !BATCH2_SLUGS.has(slug)) return undefined;
+  const star = BATCH2_STARS[parsed.starSlug];
+  const palace = BATCH2_PALACES[parsed.palaceSlug];
+  const sameStarLinks = (["menh", "quan-loc", "tai-bach"] as Batch2PalaceKey[])
+    .filter((item) => item !== parsed.palaceSlug)
+    .map((item) => `[${star.name} cung ${BATCH2_PALACES[item].name}](/tra-cuu/sao-${parsed.starSlug}-cung-${item})`)
+    .join(", ");
+  const samePalaceLinks = Object.entries(BATCH2_STARS)
+    .filter(([key]) => key !== parsed.starSlug)
+    .slice(0, 4)
+    .map(([key, item]) => `[${item.name} cung ${palace.name}](/tra-cuu/sao-${key}-cung-${parsed.palaceSlug})`)
+    .join(", ");
+
+  return {
+    title: titleForBatch2(star, palace),
+    excerpt: `Tra cứu ${star.name} tại cung ${palace.name}: cách hiểu ${palace.lens}, điểm mạnh, rủi ro và checklist tự đối chiếu trước khi luận sâu lá số.`,
+    metaTitle: `${star.name} cung ${palace.name}: ý nghĩa và cách đọc`,
+    metaDescription: `Hướng dẫn đọc ${star.name} ở cung ${palace.name}: trọng tâm luận giải, điểm thuận lợi, rủi ro, checklist đời sống và cách đối chiếu với lá số cá nhân.`,
+    body: `## ${star.name} ở cung ${palace.name} nên được đọc từ câu hỏi nào?
+
+Khi ${star.name} nằm tại cung ${palace.name}, câu hỏi đầu tiên không phải là tốt hay xấu, mà là: ${palace.question}. ${star.name} mang sắc thái ${star.temperament}; cung ${palace.name} lại mở ra lớp ${palace.lens}. Ghép hai phần này với nhau, người đọc có một bản đồ để tự quan sát thay vì vội dán nhãn vận mệnh.
+
+Hình ảnh gần nhất cho tổ hợp này là ${star.image}. Nó cho thấy một năng lực có ích, nhưng năng lực đó chỉ đúng khi đặt vào hoàn cảnh thật. Một người có ${star.name} ở ${palace.name} có thể biểu hiện rất khác nhau tùy giờ sinh, trạng thái sao, bộ sao đi cùng, tam hợp, xung chiếu và vận đang kích hoạt. Vì vậy, phần dưới đây là bản đọc nền, không thay thế việc [lập lá số tử vi miễn phí](/#lap-la-so) để kiểm tra toàn cục.
+
+| Lớp đọc | Việc cần quan sát | Câu hỏi kiểm chứng |
+| --- | --- | --- |
+| Sao ${star.name} | ${star.temperament} | Khi căng thẳng, bạn có quay về kiểu phản ứng này không? |
+| Cung ${palace.name} | ${palace.lens} | Chủ đề này có lặp lại trong các quyết định lớn không? |
+| Điểm mạnh | ${star.gift} | Người khác từng nhờ bạn ở phần việc nào tương tự? |
+| Điểm lệch | ${star.shadow} | Khi mọi thứ không như ý, bạn lệch về hướng nào trước? |
+
+## Điểm thuận lợi: ${star.gift}
+
+Mặt thuận của ${star.name} tại ${palace.name} nằm ở khả năng ${star.gift}. Trong chủ đề ${palace.name}, điều này không nên hiểu như một lời hứa kết quả, mà là một kiểu năng lực có thể rèn. Nếu biết dùng đúng, người đọc sẽ thấy mình có một cách tiếp cận riêng với ${palace.decision}. Năng lực này càng rõ khi được đặt trong môi trường phù hợp, có phản hồi thật và có thời gian kiểm chứng.
+
+Với riêng cung ${palace.name}, ${star.name} thường không phát huy bằng khẩu hiệu. Nó phát huy qua những hành vi nhỏ: cách bạn hỏi lại dữ kiện, cách bạn chọn người đồng hành, cách bạn giữ nhịp khi áp lực tăng, và cách bạn sửa sai sau một quyết định chưa trọn. Nếu đang đọc cho nghề nghiệp, tiền bạc hoặc bản thân, hãy so với những tình huống đã xảy ra trong ba năm gần nhất thay vì chỉ đọc như mô tả tính cách chung.
+
+- Ghi ra một tình huống cụ thể liên quan đến ${palace.name} trong năm gần đây.
+- Đánh dấu phần nào đến từ dữ kiện, phần nào đến từ cảm xúc, phần nào đến từ thói quen cũ.
+- So với điểm mạnh của ${star.name}: ${star.gift}.
+- Chọn một hành động nhỏ để kiểm chứng trong 30 ngày, không kết luận vội từ một sự kiện đơn lẻ.
+
+## Điểm cần thận trọng: ${star.shadow}
+
+Mặt khó của ${star.name} tại ${palace.name} là ${star.shadow}. Khi chủ đề ${palace.name} bị kích hoạt mạnh, người đọc dễ xem phản ứng quen thuộc của mình là sự thật khách quan. Ví dụ, một người đang lo về ${palace.name} có thể nghĩ mình đang phân tích rất tỉnh, trong khi thật ra đang tự vệ. Hoặc ngược lại, họ tưởng mình đang nhẫn nại, nhưng thực chất đang trì hoãn quyết định cần làm.
+
+Điểm này đặc biệt quan trọng vì tử vi rất dễ bị dùng như lý do để hợp thức hóa thói quen. Nếu lá số nói bạn có một khuynh hướng, điều đó không có nghĩa khuynh hướng ấy luôn đúng. Nội dung tra cứu chỉ nên giúp bạn nhìn rõ cơ chế, còn quyết định về tiền bạc, sức khỏe, pháp lý, hôn nhân hay đầu tư vẫn cần dữ liệu thực tế và chuyên gia phù hợp khi vấn đề đủ lớn.
+
+## Cách ứng dụng vào đời sống hiện tại
+
+Với ${star.name} ở ${palace.name}, thực hành quan trọng nhất là: ${star.practice}. Câu này nghe đơn giản nhưng có thể thay đổi cách bạn dùng lá số. Thay vì đọc để tìm một kết luận cuối cùng, bạn đọc để biết mình nên kiểm tra điều gì trước khi hành động. Nếu chủ đề là Mệnh, đó là cách phản ứng và ranh giới. Nếu là Quan Lộc, đó là vai trò và môi trường làm việc. Nếu là Tài Bạch, đó là dòng tiền và nguồn lực.
+
+Trong thực tế, ${star.name} thường hợp với các bối cảnh như ${star.nghề}. Nhưng không nên lấy danh sách nghề hoặc lĩnh vực làm đáp án đóng. Cùng một sao có thể đi vào nhiều nghề khác nhau; thứ cần giữ là cơ chế vận hành. Người có ${star.name} mạnh nên tìm môi trường cho phép cơ chế ấy trở thành năng lực hữu ích, không phải nơi liên tục đẩy nó sang mặt lệch.
+
+## Liên kết để đọc tiếp đúng tầng
+
+Để tránh đọc một trang rồi kết luận, hãy đi theo ba tầng. Tầng một là hub [Ý nghĩa 14 Chính Tinh](/tra-cuu/y-nghia-14-chinh-tinh) và [Ý nghĩa 12 Cung](/tra-cuu/y-nghia-12-cung). Tầng hai là trang entity như [Sao ${star.name}](/tra-cuu/sao-${parsed.starSlug}) và [Cung ${palace.name}](/tra-cuu/cung-${parsed.palaceSlug}). Tầng ba mới là tổ hợp cụ thể như trang bạn đang đọc.
+
+Các tổ hợp liên quan nên đọc tiếp gồm: ${sameStarLinks}. Nếu muốn giữ cùng cung để so sánh cách các chính tinh khác biểu hiện, hãy đọc: ${samePalaceLinks}. Ngoài ra, các bài nền như [cách đọc lá số tử vi cho người mới](/kien-thuc-tu-vi/cach-doc-la-so-tu-vi-cho-nguoi-moi) và [đại vận là gì](/kien-thuc-tu-vi/dai-van-la-gi) giúp bạn không tách một tổ hợp khỏi toàn bộ lá số.
+
+## Checklist tự đối chiếu trước khi tin vào phần luận
+
+Hãy trả lời sáu câu hỏi sau bằng sự kiện thật. Một, chủ đề ${palace.name} đang xuất hiện trong quyết định nào của bạn? Hai, phản ứng đầu tiên của bạn có giống mô tả ${star.temperament} không? Ba, điểm mạnh ${star.gift} đã từng giúp bạn ở tình huống nào? Bốn, mặt lệch ${star.shadow} từng gây hệ quả gì? Năm, bạn có đang đọc lá số để hiểu mình hay để tìm một câu chắc chắn cho quyết định khó? Sáu, nếu hỏi một người thân đáng tin, họ sẽ xác nhận điểm nào và phản biện điểm nào?
+
+Nếu câu trả lời còn mơ hồ, đừng vội kết luận. Hãy quay lại dữ kiện đời sống, sau đó mới đối chiếu lá số. Nếu câu trả lời khá rõ, bạn có thể dùng trang này như bản ghi chú để đọc sâu hơn trong lá số cá nhân. Điều quan trọng là không biến tử vi thành nhãn cố định; nó nên là ngôn ngữ để bạn quan sát bản thân có trật tự hơn.
+
+## Khi nào cần xem lá số cá nhân?
+
+Bạn nên [lập lá số miễn phí](/#lap-la-so) khi câu hỏi về ${palace.name} đang gắn với quyết định thật: đổi nghề, nhận vai trò mới, quản trị tiền, chọn hướng phát triển hoặc điều chỉnh cách sống. Khi có lá số, hãy kiểm tra thêm Mệnh, Thân, tam hợp, xung chiếu, phụ tinh và vận năm. ${star.name} ở ${palace.name} chỉ là một lớp; toàn bộ lá số mới cho biết lớp này đang là trung tâm hay chỉ là tín hiệu phụ trong giai đoạn hiện tại.`,
+  };
+}
+
 export function getCuratedPseoContent(slug: string) {
-  return CURATED_PSEO_CONTENT[slug as CuratedSlug];
+  return CURATED_PSEO_CONTENT[slug as CuratedSlug] || buildBatch2Content(slug);
 }

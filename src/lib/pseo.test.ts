@@ -29,14 +29,14 @@ describe("pSEO registry", () => {
     expect(combinations.map((page) => page.slug)).toContain("sao-thai-am-cung-tai-bach");
   });
 
-  it("publishes only the hand-written first SEO batch and leaves the generated matrix as drafts", () => {
+  it("publishes only the hand-written SEO batches and leaves the remaining matrix as drafts", () => {
     const inventory = buildPseoInventory();
     const published = inventory.filter((page) => page.status === "PUBLISHED");
     const drafts = inventory.filter((page) => page.status === "DRAFT");
     expect(inventory).toHaveLength(168);
     expect(published.map((page) => page.slug).sort()).toEqual([...CURATED_PSEO_SLUGS].sort());
-    expect(published).toHaveLength(6);
-    expect(drafts).toHaveLength(162);
+    expect(published).toHaveLength(42);
+    expect(drafts).toHaveLength(126);
     expect(drafts.every((page) => page.robots === "noindex,follow")).toBe(true);
   });
 
@@ -91,7 +91,7 @@ describe("pSEO data access", () => {
   it("serves the published fallback inventory when PostgreSQL is not configured", async () => {
     const slugs = await listPublishedPseoSlugs();
     const page = await getPublishedPseoPage("sao-thai-am-cung-tai-bach");
-    expect(slugs).toHaveLength(6);
+    expect(slugs).toHaveLength(42);
     expect(page?.starSlug).toBe("thai-am");
     expect((await listPseoEntities("MAIN_STAR"))).toHaveLength(14);
   });
