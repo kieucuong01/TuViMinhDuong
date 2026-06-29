@@ -45,6 +45,10 @@ Rules:
 
 - Treat this as the most sensitive domain logic. Do not "make it look right" without updating engine data and tests.
 - Preserve structured chart JSON for readings.
+- Build free, paid, preview, and assistant copy from the shared chart evidence profile; the LLM interprets engine output and never recalculates star placement.
+- Reading-related LLM calls use DeepSeek first, Groq second, then the deterministic chart-based fallback. Keep provider keys server-side.
+- The guest mini-report targets 450-550 Vietnamese words and must connect each important claim to supplied chart evidence.
+- Chart AI chat requires a completed `FULL/all` reading for the same user/chart and is limited to three persisted questions.
 - If changing a rule, add a named fixture or assertion that explains the convention.
 - UI may be modern, but core labels should keep Vietnamese tử vi terminology.
 - AI/fallback reading output must keep this fixed order: `Tổng quan`, `Điểm mạnh`, `Điều cần lưu ý`, `Công việc`, `Tài chính`, `Tình cảm`, `Sức khỏe`, `Vận hạn năm`.

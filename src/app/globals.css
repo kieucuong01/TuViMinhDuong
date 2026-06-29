@@ -9759,10 +9759,6 @@ button.is-loading:not(.icon-button)::before {
     display: none !important;
   }
 
-  .chart-page .assistant-widget {
-    display: none !important;
-  }
-
   .date-picker-card .btn {
     width: 100%;
   }

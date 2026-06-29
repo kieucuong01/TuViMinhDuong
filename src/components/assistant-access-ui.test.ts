@@ -5,6 +5,7 @@ import { describe, expect, it } from "vitest";
 const widgetSource = readFileSync(fileURLToPath(new URL("./assistant-widget.tsx", import.meta.url)), "utf8");
 const deferredSource = readFileSync(fileURLToPath(new URL("./deferred-assistant-widget.tsx", import.meta.url)), "utf8");
 const chartPageSource = readFileSync(fileURLToPath(new URL("../app/la-so/[id]/page.tsx", import.meta.url)), "utf8");
+const globalStyles = readFileSync(fileURLToPath(new URL("../app/globals.css", import.meta.url)), "utf8");
 
 describe("assistant entitlement UI", () => {
   it("renders server-owned access and remaining quota", () => {
@@ -23,5 +24,8 @@ describe("assistant entitlement UI", () => {
     expect(chartPageSource).toContain("listAssistantQuestions");
     expect(chartPageSource).toContain("<PersonalizedReportOutline");
     expect(chartPageSource).toContain('id="mo-khoa-ho-so-vip"');
+    expect(globalStyles).not.toMatch(
+      /\.chart-page \.assistant-widget\s*\{\s*display:\s*none\s*!important;\s*\}/,
+    );
   });
 });

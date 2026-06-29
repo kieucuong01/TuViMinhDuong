@@ -107,7 +107,10 @@ describe("chart-aware assistant", () => {
   });
 
   it("includes chart evidence, paid context, and earlier questions in the prompt", async () => {
-    const generate = vi.fn(async (_prompt: string) => ({ text: "Câu trả lời", model: "groq/test" }));
+    const generate = vi.fn(async (prompt: string) => ({
+      text: prompt ? "Câu trả lời" : "Không có ngữ cảnh",
+      model: "groq/test",
+    }));
     const harness = deps({
       listQuestionHistory: vi.fn(async () => [
         {
