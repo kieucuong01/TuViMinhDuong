@@ -6,7 +6,7 @@ focusKeyword: sao Tử Vi
 canonicalUrl: /kien-thuc-tu-vi/sao-tu-vi
 funnelStage: top
 targetCharacters: 6500-9500
-generatedAt: 2026-06-26T03:04:20.741Z
+generatedAt: 2026-06-27T22:22:31.030Z
 ---
 
 # Sao Tử Vi trong lá số: ý nghĩa và cách đọc dễ hiểu

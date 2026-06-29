@@ -33,6 +33,18 @@ DB rows hoặc kết quả audit, agent nên gọi:
 Không cần đổi model provider hoặc `OPENAI_BASE_URL`. Sau khi đăng ký MCP, mở
 thread Codex mới để tool được load.
 
+## Mặc định cho agent
+
+Agent không cần chờ user nhắc Headroom. Trong repo này, Headroom là default cho:
+
+- log build/lint/test/deploy, PM2 hoặc server log dài hơn khoảng 120 dòng;
+- JSON array, API payload, DB rows hoặc audit output lớn hơn khoảng 10 KB;
+- output lặp, stack trace dài, SEO/analytics/crawler dump.
+
+Không dùng Headroom cho diff nhỏ, file code ngắn, `rg` output gọn, hoặc khi cần
+đọc nguyên bản từ đầu. Sau khi dùng Headroom đáng kể, cuối task nên gọi
+`headroom_stats` hoặc `npm run agent:headroom:stats` và báo tokens saved.
+
 ## Dùng với Claude Code
 
 Máy hiện tại chưa có lệnh `claude`. Sau khi cài Claude Code:

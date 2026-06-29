@@ -57,6 +57,7 @@ Purpose: this is the first low-token context file for any new AI agent. Read thi
 - Preferred SSH entrypoint from this Windows machine is `ssh tuvi-vps`; the alias should keep strict host-key checking and the dedicated key `C:\Users\ASUS\.ssh\id_ed25519_tuvi_vps`.
 - The database is still the remote PostgreSQL URL from env until a VPS-local DB migration is explicitly requested.
 - In Codex on this Windows workspace, `npm` may use Node 18. Next.js 16 needs Node >=20.9. Prefer the bundled Node path from `docs/agent/verification.md` when checks fail with Node/runtime errors.
+- Headroom is the default for large logs, JSON arrays, DB rows, audit dumps, and long tool output; see `docs/agent/headroom.md`.
 - Google Ads env values are not committed. Required public envs are documented in `docs/google-ads.md`.
 - Purchase conversion must wait for `/api/payments/status?orderCode=...` to return `verified: true`.
 

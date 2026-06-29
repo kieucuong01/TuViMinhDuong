@@ -6,7 +6,7 @@ focusKeyword: an sao lá số tử vi
 canonicalUrl: /kien-thuc-tu-vi/an-sao-la-so-tu-vi
 funnelStage: middle
 targetCharacters: 5500-8500
-generatedAt: 2026-06-18T00:47:10.604Z
+generatedAt: 2026-06-28T18:51:49.473Z
 ---
 
 # An sao lá số tử vi: nên đọc theo thứ tự nào?
@@ -91,13 +91,14 @@ Preferred file: public/articles/an-sao-la-so-tu-vi.webp
 Public path: /articles/an-sao-la-so-tu-vi.webp
 Format: webp
 Dimensions: 1200x675
-Subject: Create a realistic editorial cover for An sao lá số tử vi: a calm Vietnamese astrology study scene connected to an sao lá số tử vi, with a chart/tablet or paper la so context visible.
-Style: Warm premium editorial style aligned with lasotinhhoa.vn: gold accents, ink lines, natural light, practical astrology context, no generic stock collage.
+Subject: Create a photo-editorial cover for An sao lá số tử vi: a believable real-world Vietnamese scene connected to an sao lá số tử vi, with a chart, paper la so, family/home/work object, or reading context visible.
+Style: Warm premium photo-editorial style aligned with lasotinhhoa.vn: natural light, grounded Vietnamese context, practical astrology details, no generic stock collage.
 Composition:
-- Use a real-scene or realistic editorial illustration, not a flat placeholder.
+- Use a real-looking photographic or photo-editorial scene, not a symbolic illustration.
 - Leave enough uncluttered space for article-card cropping and social previews.
 - Show the topic context visually: chart grid, birth-time notes, comparison table, palace/star cue, or reading workflow.
 - Prefer no text overlay on the image; let the scene carry the meaning when possible.
+- Before release, visually inspect the local cover and reject it if it still reads like vector art, iconography, abstract symbolism, or a flat AI illustration.
 Usage:
 - Set article.coverImage to the public path.
 - Set article.ogImage to the same public path unless a separate social asset is intentionally created.
@@ -106,6 +107,7 @@ Usage:
 - If the cover includes visible text, it must be proper Vietnamese with diacritics; never ship ASCII-only Vietnamese text on the final asset.
 No-go:
 - No generic gradient, text-only SVG, horoscope clipart, or unrelated stock photo.
+- No vector-style layout, flat symbolic objects, icon-only composition, or abstract stand-in scene that avoids showing a believable real setting.
 - No fear-based fate, money, marriage, career, or health promise in the visual.
 - No unreadable embedded text that carries SEO meaning.
 - No Vietnamese text without diacritics on the final thumbnail or OG asset.
