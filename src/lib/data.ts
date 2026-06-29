@@ -472,6 +472,17 @@ function articleWithNormalizedRelations(article: ArticleRecord): ArticleView {
   });
 }
 
+function fresherSeedArticle(slug: string, candidateUpdatedAt?: Date | null) {
+  const seed = seedArticles.find((article) => article.slug === slug);
+  if (!seed) return null;
+
+  const normalizedSeed = articleWithNormalizedRelations(seed);
+  const seedUpdatedAt = normalizedSeed.updatedAt?.getTime() || normalizedSeed.publishedAt?.getTime() || 0;
+  const candidateTime = candidateUpdatedAt?.getTime() || 0;
+
+  return seedUpdatedAt > candidateTime ? normalizedSeed : null;
+}
+
 function usesInMemoryUser(userId: string) {
   return userId.startsWith("demo-") || userId.startsWith("guest-");
 }
@@ -1417,6 +1428,11 @@ async function readArticlesFromDb() {
       bySlug.delete(article.slug);
       continue;
     }
+    const fresherSeed = fresherSeedArticle(article.slug, article.updatedAt || article.publishedAt);
+    if (fresherSeed) {
+      bySlug.set(article.slug, fresherSeed);
+      continue;
+    }
     bySlug.set(article.slug, articleWithNormalizedRelations(article));
   }
   return sortArticlesNewestFirst(Array.from(bySlug.values()));
@@ -1446,6 +1462,11 @@ export async function listAdminArticles() {
         bySlug.delete(article.slug);
         continue;
       }
+      const fresherSeed = fresherSeedArticle(article.slug, article.updatedAt || article.publishedAt);
+      if (fresherSeed) {
+        bySlug.set(article.slug, fresherSeed);
+        continue;
+      }
       bySlug.set(article.slug, articleWithNormalizedRelations(article));
     }
     return sortArticlesNewestFirst(Array.from(bySlug.values()));
@@ -1463,6 +1484,8 @@ async function readArticleBySlugFromDb(slug: string) {
   try {
     const article = await db.article.findUnique({ where: { slug }, include: { category: true } });
     if (article) {
+      const fresherSeed = fresherSeedArticle(article.slug, article.updatedAt || article.publishedAt);
+      if (fresherSeed) return fresherSeed;
       const scored = articleWithNormalizedRelations(article as unknown as ArticleRecord);
       return scored.status === "published" ? scored : null;
     }
@@ -1491,7 +1514,12 @@ export async function getAdminArticleBySlug(slug: string) {
   try {
     const article = await db.article.findUnique({ where: { slug }, include: { category: true } });
     if (article?.status === DELETED_ARTICLE_STATUS) return null;
-    return article ? articleWithNormalizedRelations(article as unknown as ArticleRecord) : seedArticles.map(articleWithNormalizedRelations).find((item) => item.slug === slug) || null;
+    if (article) {
+      const fresherSeed = fresherSeedArticle(article.slug, article.updatedAt || article.publishedAt);
+      if (fresherSeed) return fresherSeed;
+      return articleWithNormalizedRelations(article as unknown as ArticleRecord);
+    }
+    return seedArticles.map(articleWithNormalizedRelations).find((item) => item.slug === slug) || null;
   } catch {
     return seedArticles.map(articleWithNormalizedRelations).find((item) => item.slug === slug) || null;
   }
