@@ -6,7 +6,7 @@ focusKeyword: tạo lá số tử vi
 canonicalUrl: /kien-thuc-tu-vi/tao-la-so-tu-vi
 funnelStage: conversion-support
 targetCharacters: 4500-7000
-generatedAt: 2026-06-28T18:51:49.473Z
+generatedAt: 2026-06-29T23:49:47.399Z
 ---
 
 # Tạo lá số tử vi: cần chuẩn bị gì để xem đúng hơn?

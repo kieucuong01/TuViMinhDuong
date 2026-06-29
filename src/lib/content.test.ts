@@ -147,6 +147,19 @@ describe("SEO content cluster", () => {
     expect(preciseSetup?.content).toContain("/kien-thuc-tu-vi/la-so-tu-vi-tron-doi");
   });
 
+  it("keeps the create-chart article as a material refresh with decision support", () => {
+    const creationGuide = seedArticles.find((article) => article.slug === "tao-la-so-tu-vi");
+
+    expect(creationGuide?.updatedAt?.toISOString()).toContain("2026-06-29T17:00:00.000Z");
+    expect(creationGuide?.content).toContain("## Tạo ngay hay xác minh lại trước?");
+    expect(creationGuide?.content).toContain(
+      "| Tình huống trước khi nhập lá số | Bạn có thể tạo ngay | Nên dừng lại kiểm tra thêm |",
+    );
+    expect(creationGuide?.content).toContain("## Ba lỗi người mới hay gặp khi tạo lá số online");
+    expect(creationGuide?.content).toContain("/kien-thuc-tu-vi/lap-la-so-tu-vi-chuan");
+    expect(creationGuide?.content).toContain("/kien-thuc-tu-vi/phan-tich-la-so-tu-vi");
+  });
+
   it("does not expose SEO implementation notes in public article copy", () => {
     for (const article of seedArticles) {
       expect(article.content).not.toContain("Nguồn tham khảo và kỹ thuật SEO");

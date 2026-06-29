@@ -1,13 +1,13 @@
 {
-  "lastRunAt": "2026-06-29T03:06:40.936Z",
+  "lastRunAt": "2026-06-29T23:49:47.399Z",
   "lastStatus": "warning",
   "lastAction": {
     "type": "single_article_publish",
-    "slug": "lap-la-so-tu-vi-chuan",
+    "slug": "tao-la-so-tu-vi",
     "slugs": [
-      "lap-la-so-tu-vi-chuan"
+      "tao-la-so-tu-vi"
     ],
-    "reason": "Publish 1 people-first articles from SEMrush intent clusters; first topic: Người đọc muốn biết lập lá số tử vi chuẩn cần thông tin nào và vì sao giờ sinh, lịch sinh ảnh hưởng kết quả.",
+    "reason": "Publish 1 people-first articles from SEMrush intent clusters; first topic: Người đọc muốn tạo lá số tử vi online nhưng cần hiểu nên chuẩn bị ngày giờ sinh, giới tính và cách đọc kết quả.",
     "approvalRequired": false,
     "allowedToCommitDeployAfterVerification": true
   },
@@ -20,7 +20,7 @@
     "status": "skipped"
   },
   "lastDraftPaths": [
-    "docs/seo-autopilot/drafts/lap-la-so-tu-vi-chuan.md"
+    "docs/seo-autopilot/drafts/tao-la-so-tu-vi.md"
   ],
   "lastReportPath": "docs/seo-autopilot/reports/2026-06-29-weekly-content-batch.md",
   "nextVerificationCommands": [

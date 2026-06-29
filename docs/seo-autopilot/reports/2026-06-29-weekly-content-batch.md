@@ -1,5 +1,5 @@
 # SEO Autopilot Report
-Generated: 2026-06-29T03:06:40.936Z
+Generated: 2026-06-29T23:49:47.399Z
 Base URL: https://lasotinhhoa.vn
 Status: warning
 Mode: auto-safe
@@ -31,10 +31,10 @@ Do not publish:
 ## Search Console Feedback
 - Skipped or not configured.
 ## Next Action
-Next action: single_article_publish `lap-la-so-tu-vi-chuan`
-Weekly batch: `lap-la-so-tu-vi-chuan`
+Next action: single_article_publish `tao-la-so-tu-vi`
+Weekly batch: `tao-la-so-tu-vi`
 Approval required: no
-Reason: Publish 1 people-first articles from SEMrush intent clusters; first topic: Người đọc muốn biết lập lá số tử vi chuẩn cần thông tin nào và vì sao giờ sinh, lịch sinh ảnh hưởng kết quả.
+Reason: Publish 1 people-first articles from SEMrush intent clusters; first topic: Người đọc muốn tạo lá số tử vi online nhưng cần hiểu nên chuẩn bị ngày giờ sinh, giới tính và cách đọc kết quả.
 ## Warnings
 - 4 pages have no JSON-LD
 ## Programmatic SEO Guardrails
@@ -43,9 +43,9 @@ Reason: Publish 1 people-first articles from SEMrush intent clusters; first topi
 - One search intent, one useful URL: merge close variants instead of making separate pages for lap, lay, tao, tra, ve, or ke when the user need is the same.
 - Programmatic content needs unique value from the product: score tables, modifier-star context, chart-form interaction, and clear limits of interpretation.
 ## Artifacts
-- Batch draft: `docs/seo-autopilot/drafts/lap-la-so-tu-vi-chuan.md`
+- Batch draft: `docs/seo-autopilot/drafts/tao-la-so-tu-vi.md`
 ## Weekly Content Plan
-- Monday: `lap-la-so-tu-vi-chuan` (conversion-support, 4500-7000 chars, cover /articles/lap-la-so-tu-vi-chuan.webp)
+- Monday: `tao-la-so-tu-vi` (conversion-support, 4500-7000 chars, cover /articles/tao-la-so-tu-vi.webp)
 ## Verification Checklist
 - npm run seo:autopilot
 - npm test -- src/lib/content.test.ts src/lib/article-cover-assets.test.ts src/lib/seo-autopilot-core.test.ts
