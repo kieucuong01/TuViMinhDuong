@@ -34,6 +34,7 @@ describe("chart evidence profile", () => {
     expect(profile.palaces.every((palace) => palace.stars.length <= 10)).toBe(true);
     expect(profile.signals).toHaveLength(3);
     expect(profile.signals.every((signal) => signal.evidence.length > 0)).toBe(true);
+    expect(profile.signals[0].evidence.join(" ")).not.toContain("chưa có dữ liệu");
     expect(formatChartEvidence(profile)).toContain("Tài Bạch");
   });
 

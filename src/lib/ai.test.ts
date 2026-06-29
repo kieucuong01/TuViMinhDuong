@@ -13,6 +13,7 @@ import {
   generateReading,
   generateReadingWithProgress,
   getDeepReadingSummary,
+  isCompleteFreeOverview,
   isCompletePaidChapter,
   paidReadingChapterPrompt,
   paidReadingChapters,
@@ -174,7 +175,7 @@ describe("AI reading format", () => {
     expect(progressSnapshots.at(-1)?.completedChapters).toHaveLength(8);
   });
 
-  it("routes paid chapters through Groq first while preserving Gemini model choices for fallback", async () => {
+  it("routes paid chapters through DeepSeek then Groq", async () => {
     clearProviderEnv();
     llmRouterMocks.hasExternalLlmProvider.mockReturnValue(true);
 
@@ -217,8 +218,8 @@ describe("AI reading format", () => {
     );
 
     expect(weakChapterCalls).toHaveLength(2);
-    expect((weakChapterCalls[0][0] as { providerOrder?: string[] }).providerOrder).toBeUndefined();
-    expect((weakChapterCalls[1][0] as { providerOrder?: string[] }).providerOrder).toBeUndefined();
+    expect((weakChapterCalls[0][0] as { providerOrder?: string[] }).providerOrder).toEqual(["deepseek", "groq"]);
+    expect((weakChapterCalls[1][0] as { providerOrder?: string[] }).providerOrder).toEqual(["deepseek", "groq"]);
     expect((weakChapterCalls[0][0] as { geminiModel?: string }).geminiModel).toBe("gemini-2.5-flash");
     expect((weakChapterCalls[1][0] as { geminiModel?: string }).geminiModel).toBe("gemini-3.5-flash");
     expect(yearlyCalls).toHaveLength(1);
@@ -227,34 +228,34 @@ describe("AI reading format", () => {
     expect(weakChapterMeta).toMatchObject({ key: weakChapter.key, model: "groq/llama-3.1-8b-instant", formatGuarded: false });
   });
 
-  it("asks the free overview LLM prompt for a long single-request reading", async () => {
+  it("asks the free overview LLM for a 450-550 word personal mini-report", async () => {
     clearProviderEnv();
 
     const { prompt } = await generateFreeOverview(sampleChart());
 
     expect(prompt).toContain(String(FREE_OVERVIEW_MIN_WORDS));
     expect(prompt).toContain(String(FREE_OVERVIEW_MAX_WORDS));
-    expect(FREE_OVERVIEW_MIN_WORDS).toBeLessThanOrEqual(900);
-    expect(FREE_OVERVIEW_MAX_WORDS).toBeLessThanOrEqual(1200);
+    expect(FREE_OVERVIEW_MIN_WORDS).toBe(400);
+    expect(FREE_OVERVIEW_MAX_WORDS).toBe(650);
     expect(FREE_OVERVIEW_MAX_TOKENS).toBeLessThanOrEqual(5000);
-    expect(prompt).toContain("1 prompt");
-    expect(prompt).toContain("Tóm tắt nhanh");
-    expect(prompt).toContain("**Điểm nổi bật:**");
-    expect(prompt).toContain("**Cần lưu ý:**");
-    expect(prompt).toContain("QUY TẮC ĐỘ DÀI");
+    expect(prompt).toContain("450-550");
+    expect(prompt).toContain("Chân dung nổi bật");
+    expect(prompt).toContain("Cơ hội công việc và tài chính");
+    expect(prompt).toContain("Không viết như bài blog");
+    expect(prompt).toContain("Tín hiệu ưu tiên");
   });
 
   it("renders a useful instant free overview before the background LLM finishes", () => {
     const chart = sampleChart("male");
     const content = buildInstantFreeOverview(chart);
 
-    expect(countWords(content)).toBeGreaterThanOrEqual(600);
-    expect(countWords(content)).toBeLessThanOrEqual(950);
-    expect(content).toContain("## Tổng quan miễn phí");
-    expect(content).toContain("## Mệnh và Thân nói gì");
-    expect(content).toContain("## Điểm mạnh dễ phát huy");
-    expect(content).toContain("## Điều nên lưu ý");
-    expect(content).toContain(`## Gợi ý cho năm ${chart.input.viewYear}`);
+    expect(countWords(content)).toBeGreaterThanOrEqual(FREE_OVERVIEW_MIN_WORDS);
+    expect(countWords(content)).toBeLessThanOrEqual(FREE_OVERVIEW_MAX_WORDS);
+    expect(content).toContain("## Chân dung nổi bật");
+    expect(content).toContain("## Điểm mạnh nên phát huy");
+    expect(content).toContain("## Cơ hội công việc và tài chính");
+    expect(content).toContain("## Điều cần thận trọng");
+    expect(content).toContain(`## Gợi ý hành động trong năm ${chart.input.viewYear}`);
     expect(content).toContain(chart.input.fullName);
     expect(content).toContain(chart.menh);
     expect(content).toContain(chart.than);
@@ -262,7 +263,7 @@ describe("AI reading format", () => {
     expect(content).not.toContain("## Luận giải chính");
   });
 
-  it("uses the default Groq-first router for free overview", async () => {
+  it("uses the explicit DeepSeek-to-Groq router for free overview", async () => {
     clearProviderEnv();
     llmRouterMocks.hasExternalLlmProvider.mockReturnValue(true);
     llmRouterMocks.generateWithLlmRouter.mockResolvedValue({
@@ -277,9 +278,33 @@ describe("AI reading format", () => {
     expect(llmRouterMocks.generateWithLlmRouter).toHaveBeenCalledWith(
       expect.objectContaining({
         maxTokens: FREE_OVERVIEW_MAX_TOKENS,
+        providerOrder: ["deepseek", "groq"],
       }),
     );
-    expect(llmRouterMocks.generateWithLlmRouter.mock.calls[0][0]).not.toHaveProperty("providerOrder");
+  });
+
+  it("accepts only evidence-based mini-reports within the guard range", () => {
+    const filler = Array.from({ length: 430 }, (_, index) => `dữ-liệu-${index}`).join(" ");
+    const content = `## Chân dung nổi bật
+Cung Mệnh có Tử Vi. ${filler}
+
+## Điểm mạnh nên phát huy
+Cung Quan Lộc cho thấy khả năng tổ chức.
+
+## Cơ hội công việc và tài chính
+Cung Tài Bạch cần được đối chiếu trước quyết định.
+
+## Điều cần thận trọng
+Tuần tại Thiên Di là tín hiệu nên kiểm chứng.
+
+## Gợi ý hành động trong năm 2026
+- Giữ quỹ dự phòng.
+- Kiểm tra giấy tờ.
+- Chia quyết định lớn thành bước nhỏ.`;
+
+    expect(isCompleteFreeOverview(content)).toBe(true);
+    expect(isCompleteFreeOverview(content.replace("## Điều cần thận trọng", "## Ghi chú"))).toBe(false);
+    expect(isCompleteFreeOverview(`${content} ${Array.from({ length: 250 }, () => "quá-dài").join(" ")}`)).toBe(false);
   });
 
   it("defines the full paid reading as 8 fixed chapters", () => {
@@ -518,7 +543,7 @@ ${filler}
     const monthBodies = Array.from(content.matchAll(/^- Tháng \d+:\s*(.+)$/gm), (match) => match[1]);
     expect(monthBodies).toHaveLength(12);
     expect(new Set(monthBodies).size).toBe(12);
-    expect(prompt).toContain("paid-reading-chapters-v3");
+    expect(prompt).toContain("paid-personal-dossier-v4");
   });
 
   it("computes 5 directional score groups for the advanced report header", () => {

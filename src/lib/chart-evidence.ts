@@ -44,11 +44,15 @@ function palaceStars(palace: Palace, limit = 10) {
     });
 }
 
+function palaceEvidenceLine(palace: Palace, limit = 4) {
+  const stars = palaceStars(palace, limit);
+  return `Cung ${palace.name} tại ${palace.branch}: ${stars.join(", ") || "không có sao nổi bật"}`;
+}
+
 function palaceEvidence(chart: TuViChart, name: string, limit = 4) {
   const palace = chart.palaces.find((item) => item.name === name);
   if (!palace) return [`Cung ${name}: chưa có dữ liệu`];
-  const stars = palaceStars(palace, limit);
-  return [`Cung ${name} tại ${palace.branch}: ${stars.join(", ") || "không có sao nổi bật"}`];
+  return [palaceEvidenceLine(palace, limit)];
 }
 
 function cautionEvidence(chart: TuViChart) {
@@ -64,6 +68,7 @@ function cautionEvidence(chart: TuViChart) {
 }
 
 export function buildChartEvidenceProfile(chart: TuViChart): ChartEvidenceProfile {
+  const thanPalace = chart.palaces.find((palace) => palace.isThan);
   const palaces = chart.palaces.map((palace) => ({
     name: palace.name,
     branch: palace.branch,
@@ -84,7 +89,10 @@ export function buildChartEvidenceProfile(chart: TuViChart): ChartEvidenceProfil
         kind: "strength",
         area: "identity",
         summary: "Năng lực cốt lõi cần đối chiếu từ Mệnh và Thân",
-        evidence: [...palaceEvidence(chart, "Mệnh"), ...palaceEvidence(chart, chart.than.replace(/^Thân cư\s+/, ""))],
+        evidence: [
+          ...palaceEvidence(chart, "Mệnh"),
+          thanPalace ? palaceEvidenceLine(thanPalace) : `Thân tại ${chart.than}: chưa có dữ liệu cung`,
+        ],
       },
       {
         kind: "opportunity",

@@ -22,33 +22,34 @@ function chartFixture(): TuViChart {
 }
 
 function completeOverviewContent() {
-  const filler = Array.from({ length: 260 }, () => "noi dung luan giai ro rang").join(" ");
-  return `## Tổng quan miễn phí
+  const filler = Array.from({ length: 80 }, () => "dữ-liệu").join(" ");
+  return `## Chân dung nổi bật
+Cung Mệnh có Tử Vi. ${filler}
+
+## Điểm mạnh nên phát huy
 ${filler}
 
-## Mệnh và Thân nói gì
+## Cơ hội công việc và tài chính
 ${filler}
 
-## Điểm mạnh dễ phát huy
+## Điều cần thận trọng
 ${filler}
 
-## Điều nên lưu ý
-${filler}
-
-## Gợi ý cho năm
+## Gợi ý hành động trong năm 2026
 ${filler}`;
 }
 
 describe("free overview status", () => {
   it("returns instant fallback when the AI overview is not cached yet", async () => {
-    const { countWords } = await import("@/lib/ai");
+    const { countWords, FREE_OVERVIEW_MIN_WORDS, FREE_OVERVIEW_MAX_WORDS } = await import("@/lib/ai");
     const { getFreeOverviewStatus } = await import("@/lib/data");
     const status = getFreeOverviewStatus(chartFixture());
 
     expect(status.status).toBe("fallback");
     expect(status.source).toBe("instant-template");
-    expect(status.content).toContain("## Tổng quan miễn phí");
-    expect(countWords(status.content)).toBeGreaterThanOrEqual(600);
+    expect(status.content).toContain("## Chân dung nổi bật");
+    expect(countWords(status.content)).toBeGreaterThanOrEqual(FREE_OVERVIEW_MIN_WORDS);
+    expect(countWords(status.content)).toBeLessThanOrEqual(FREE_OVERVIEW_MAX_WORDS);
   });
 
   it("treats complete matching-version AI content as ready", async () => {

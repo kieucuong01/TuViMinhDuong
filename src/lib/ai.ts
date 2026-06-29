@@ -1,14 +1,16 @@
 import { type TuViChart } from "@/lib/chart";
+import { buildChartEvidenceProfile, formatChartEvidence } from "@/lib/chart-evidence";
 import { generateWithLlmRouter, hasExternalLlmProvider } from "@/lib/llm-router";
 import { FEATURE_PRICES, type ReadingKey } from "@/lib/pricing";
 
-export const FREE_OVERVIEW_MIN_WORDS = 900;
-export const FREE_OVERVIEW_MAX_WORDS = 1200;
+export const FREE_OVERVIEW_MIN_WORDS = 400;
+export const FREE_OVERVIEW_MAX_WORDS = 650;
 export const FREE_OVERVIEW_MAX_TOKENS = 4500;
 export const PAID_READING_CHAPTER_MAX_TOKENS = 7000;
-export const FREE_OVERVIEW_VERSION = "free-overview-llm-v3";
-export const PAID_READING_VERSION = "paid-reading-chapters-v3";
+export const FREE_OVERVIEW_VERSION = "free-mini-report-v4";
+export const PAID_READING_VERSION = "paid-personal-dossier-v4";
 export const PAID_FULL_WORD_TARGET = "8.000-12.000 từ";
+export const READING_PROVIDER_ORDER = ["deepseek", "groq"] as const;
 const PAID_READING_DEFAULT_GEMINI_MODEL = "gemini-2.5-flash";
 const PAID_READING_DEFAULT_ESCALATION_GEMINI_MODEL = "gemini-3.5-flash";
 
@@ -93,14 +95,21 @@ export function isCompletePaidChapter(content: string, chapter: PaidReadingChapt
 
 export function isCompleteFreeOverview(content: string) {
   const requiredHeadings = [
-    "## Tổng quan miễn phí",
-    "## Mệnh và Thân nói gì",
-    "## Điểm mạnh dễ phát huy",
-    "## Điều nên lưu ý",
-    "## Gợi ý cho năm",
+    "## Chân dung nổi bật",
+    "## Điểm mạnh nên phát huy",
+    "## Cơ hội công việc và tài chính",
+    "## Điều cần thận trọng",
+    "## Gợi ý hành động trong năm",
   ];
+  const wordCount = countWords(content);
+  const hasChartEvidence = /(cung|mệnh|thân|sao|đại vận|tuần|triệt)/i.test(content);
 
-  return countWords(content) >= FREE_OVERVIEW_MIN_WORDS && requiredHeadings.every((heading) => content.includes(heading));
+  return (
+    wordCount >= FREE_OVERVIEW_MIN_WORDS &&
+    wordCount <= FREE_OVERVIEW_MAX_WORDS &&
+    hasChartEvidence &&
+    requiredHeadings.every((heading) => content.includes(heading))
+  );
 }
 
 function clampScore(value: number) {
@@ -232,7 +241,7 @@ function paidReadingPromptMeta(
     wordTarget: type === "FULL" ? PAID_FULL_WORD_TARGET : "theo phạm vi mở khóa",
     maxTokensPerChapter: PAID_READING_CHAPTER_MAX_TOKENS,
     concurrency: paidReadingConcurrencyLimit(type),
-    providerOrder: process.env.LLM_PROVIDER_ORDER || "groq,gemini",
+    providerOrder: READING_PROVIDER_ORDER.join(","),
     modelPolicy: {
       primaryGeminiModel: paidReadingPrimaryGeminiModel(),
       escalationGeminiModel: paidReadingEscalationGeminiModel(),
@@ -654,119 +663,75 @@ function getFocusData(chart: TuViChart, type: ReadingKey, scopeKey: string) {
 }
 
 function freeOverviewPrompt(chart: TuViChart) {
-  const menhPalace = chart.palaces.find((item) => item.name === "Mệnh");
-  const thanPalace = palaceByName(chart, "Thân");
+  const profile = buildChartEvidenceProfile(chart);
   const decade = compactDecadeContext(chart);
-  const mainEvidence = [
-    `Họ tên: ${chart.input.fullName}`,
-    `Giới tính: ${chart.input.gender === "male" ? "Nam" : "Nữ"}`,
-    `Dương lịch: ${chart.solar.day}/${chart.solar.month}/${chart.solar.year}`,
-    `Âm lịch: ${chart.lunar.day}/${chart.lunar.month}/${chart.lunar.year}`,
-    `Can chi năm/tháng/ngày/giờ: ${chart.canChi.year} / ${chart.canChi.month} / ${chart.canChi.day} / ${chart.canChi.hour}`,
-    `Năm xem: ${chart.input.viewYear}, tuổi xem: ${decade.currentAge}`,
-    `Mệnh: ${chart.menh}`,
-    `Thân: ${chart.than}`,
-    `Cục: ${chart.cuc}`,
-    `Bản mệnh: ${chart.banMenh}`,
-    `Mệnh chủ: ${chart.menhChu}`,
-    `Thân chủ: ${chart.thanChu}`,
-    `Mệnh cục: ${chart.menhCucRelation}`,
-    `Âm dương: ${chart.amDuong}`,
-    `Cân lượng: ${chart.boneWeight?.label || "đang cập nhật"}`,
-    `Lai nhân cung: ${chart.laiNhan || "đang cập nhật"}`,
-    `Đại vận hiện tại: ${decade.current}`,
-    menhPalace ? `Cung Mệnh: ${starsWithStates(chart, menhPalace.mainStars, menhPalace.name, "vô chính diệu")}` : "",
-    thanPalace ? `Cung Thân: ${starsWithStates(chart, thanPalace.mainStars, thanPalace.name, "vô chính diệu")}` : "",
-    `Tóm tắt engine: ${chart.summary.join(" ")}`,
-  ].filter(Boolean);
 
-  return `Bạn là chuyên gia tử vi Việt Nam. Viết phần luận giải tổng quan MIỄN PHÍ cho người đọc 30-60 tuổi, rõ ràng, nhẹ nhàng, không mê tín cực đoan.
+  return `Bạn là chuyên gia tử vi Việt Nam có 30 năm kinh nghiệm tư vấn đời sống. Hãy đọc dữ liệu lá số đã được hệ thống tính sẵn và viết một hồ sơ cá nhân ngắn. Không viết như bài blog.
 
-Dữ liệu được phép dùng:
-- ${mainEvidence.join("\n- ")}
+Hồ sơ bằng chứng:
+${formatChartEvidence(profile)}
+- Đại vận hiện tại: ${decade.current}
+- Tuổi trong năm xem: ${decade.currentAge}
 
-Dữ liệu 12 cung đã an sao, dùng để hiểu tổng quan nhưng KHÔNG luận chi tiết từng cung trong bản miễn phí:
-${compactPalaceContext(chart)}
+Yêu cầu bắt buộc:
+- Chỉ dùng bằng chứng đã cấp; không tự an sao, không tự thêm sự kiện.
+- Mục tiêu 450-550 từ tiếng Việt. Hệ thống chấp nhận trong khoảng ${FREE_OVERVIEW_MIN_WORDS}-${FREE_OVERVIEW_MAX_WORDS} từ.
+- Mỗi nhận định quan trọng phải gắn với một cung, sao, trạng thái sao, Tuần/Triệt hoặc đại vận trong hồ sơ.
+- Không dùng lời khen chung chung, không dọa nạt, không khẳng định chắc chắn tương lai.
+- Dùng ngôn ngữ tư vấn tài chính/đời sống: nêu xu hướng, điều kiện, cách kiểm chứng và hành động thực tế.
+- Nêu một cơ hội cụ thể và một vùng rủi ro cụ thể, nhưng luôn diễn đạt là tín hiệu cần đối chiếu.
+- Không chào hỏi dài, không giải thích tử vi như kiến thức phổ thông, không quảng cáo quá mức.
+- Dùng đúng năm xem ${chart.input.viewYear}.
+- Kết thúc bằng 3 bullet hành động ngắn.
 
-Đại vận toàn cục:
-${decade.allPeriods}
-
-Yêu cầu:
-- Không tự tính lại lá số, chỉ dùng dữ liệu trên.
-- Đây là 1 prompt duy nhất cho bản miễn phí; hãy tự tổng hợp đủ thông tin từ dữ liệu đã cấp.
-- Không hứa chắc kết quả, không dọa nạt.
-- BẮT BUỘC viết từ ${FREE_OVERVIEW_MIN_WORDS} đến ${FREE_OVERVIEW_MAX_WORDS} từ tiếng Việt, không được trả lời ngắn và không vượt quá ${FREE_OVERVIEW_MAX_WORDS} từ.
-- Mỗi mục chính tối thiểu 150 từ, có nội dung thực tế dựa trên lá số.
-- Đây là bản miễn phí: chỉ nêu tổng quan và gợi ý đọc lá số, không luận chi tiết đủ 12 cung.
-- Ngay sau heading "## Tổng quan miễn phí", viết một cụm "Tóm tắt nhanh" gồm đúng 3 bullet sau, dùng đúng nhãn Markdown:
-  - **Điểm nổi bật:** nêu 1 điểm sáng chính của lá số, có dẫn chứng từ Mệnh/Thân/cục hoặc đại vận.
-  - **Nên ưu tiên:** nêu việc người đọc nên đọc hoặc làm trước để có giá trị thực tế.
-  - **Cần lưu ý:** nêu 1 rủi ro cần quản trị bằng giọng bình tĩnh, không dọa.
-- Trong toàn bài chỉ in đậm 15-20% ý quan trọng bằng cú pháp **...**; ưu tiên in đậm nhãn, thuật ngữ chính hoặc lời khuyên ngắn, không in đậm cả đoạn dài.
-- Mỗi mục còn lại nên có 1-2 cụm nhấn mạnh như **khí chất chính**, **điểm nên phát huy**, **điều cần quản trị**, **gợi ý đọc tiếp** để người đọc dễ quét trên điện thoại.
-- Markdown đúng thứ tự:
-  ## Tổng quan miễn phí
-  ## Mệnh và Thân nói gì
-  ## Điểm mạnh dễ phát huy
-  ## Điều nên lưu ý
-  ## Gợi ý cho năm ${chart.input.viewYear}
-- Không kết thúc khi chưa đủ ${FREE_OVERVIEW_MIN_WORDS} từ.
-
-QUY TẮC ĐỘ DÀI BẮT BUỘC GHI ĐÈ MỌI DÒNG KHÁC:
-- Viết từ ${FREE_OVERVIEW_MIN_WORDS} đến ${FREE_OVERVIEW_MAX_WORDS} từ tiếng Việt.
-- Không vượt quá ${FREE_OVERVIEW_MAX_WORDS} từ.
-- Nếu các dòng trước có nhắc mốc ngắn hơn, bỏ qua mốc đó và tuân theo quy tắc này.`;
+Markdown đúng thứ tự:
+## Chân dung nổi bật
+## Điểm mạnh nên phát huy
+## Cơ hội công việc và tài chính
+## Điều cần thận trọng
+## Gợi ý hành động trong năm ${chart.input.viewYear}`;
 }
 
 export function buildInstantFreeOverview(chart: TuViChart) {
-  const menhPalace = chart.palaces.find((item) => item.name === "Mệnh");
-  const thanPalace = palaceByName(chart, "Thân");
-  const quanPalace = palaceByName(chart, "Quan Lộc");
-  const taiPalace = palaceByName(chart, "Tài Bạch");
+  const profile = buildChartEvidenceProfile(chart);
   const decade = compactDecadeContext(chart);
-  const menhStars = menhPalace ? starsWithStates(chart, menhPalace.mainStars, menhPalace.name, "vô chính diệu") : "đang cập nhật";
-  const thanStars = thanPalace ? starsWithStates(chart, thanPalace.mainStars, thanPalace.name, "vô chính diệu") : "đang cập nhật";
-  const quanStars = quanPalace ? starsWithStates(chart, [...quanPalace.mainStars, ...quanPalace.supportStars].slice(0, 5), quanPalace.name, "đang cập nhật") : "đang cập nhật";
-  const taiStars = taiPalace ? starsWithStates(chart, [...taiPalace.mainStars, ...taiPalace.supportStars].slice(0, 5), taiPalace.name, "đang cập nhật") : "đang cập nhật";
-  const summary = chart.summary.join(" ");
-  const firstSignal = chart.summary[0] || `Mệnh ${chart.menh}, Thân ${chart.than} và ${chart.cuc} là trục chính cần đọc trước.`;
-  const viewerAddress = chart.input.gender === "female" ? "chị/bạn" : "anh/bạn";
+  const menh = profile.palaces.find((palace) => palace.name === "Mệnh");
+  const thanPalace = chart.palaces.find((palace) => palace.isThan);
+  const than = profile.palaces.find((palace) => palace.name === thanPalace?.name);
+  const career = profile.palaces.find((palace) => palace.name === "Quan Lộc");
+  const money = profile.palaces.find((palace) => palace.name === "Tài Bạch");
+  const health = profile.palaces.find((palace) => palace.name === "Tật Ách");
+  const caution = profile.signals.find((signal) => signal.kind === "caution");
 
-  return `## Tổng quan miễn phí
-Lá số của ${chart.input.fullName} được lập theo năm xem ${chart.input.viewYear}. Phần miễn phí này là bản định hướng ban đầu: đọc để biết trục nào nên ưu tiên, vùng nào cần đi chậm, và khi mở bản luận sâu thì nên bắt đầu từ đâu. Bản này không thay cho luận giải toàn bộ, nhưng vẫn đủ để ${viewerAddress} có một cái nhìn rõ trước khi đọc tiếp.
+  return `## Chân dung nổi bật
+Lá số của ${chart.input.fullName} được đọc trên trục Mệnh ${chart.menh}, Thân tại ${chart.than} và ${chart.cuc}. Cung Mệnh tại ${menh?.branch || chart.menh} có ${menh?.stars.slice(0, 4).join(", ") || "dữ liệu đang cập nhật"}; cung Thân thuộc ${than?.name || "cung đang cập nhật"} tại ${than?.branch || chart.than} có ${than?.stars.slice(0, 4).join(", ") || "dữ liệu đang cập nhật"}. Hai nhóm dữ kiện này cho thấy cách phù hợp nhất không phải là chạy theo một lời phán cố định, mà là nhận diện môi trường nào giúp năng lực phát huy ổn định. Đại vận hiện tại ${decade.current} đặt trọng tâm vào việc lựa chọn đúng người đồng hành, phạm vi cam kết và nhịp phát triển vừa sức.
 
-${summary}
+## Điểm mạnh nên phát huy
+Điểm mạnh đáng dùng của lá số nằm ở khả năng kết hợp khí chất Mệnh với cách hành động của Thân. Khi một quyết định quan trọng xuất hiện, ${chart.input.fullName} nên tách rõ mục tiêu, nguồn lực và mốc kiểm tra thay vì chỉ dựa vào cảm giác ban đầu. Dữ kiện tại Mệnh và Thân là cơ sở để ưu tiên những công việc có cấu trúc, có quyền chủ động và có phản hồi cụ thể. Nếu sao có trạng thái sáng, hãy dùng nó như lợi thế; nếu có trạng thái hãm hoặc tín hiệu căng, hãy biến nó thành quy trình kiểm tra chứ không xem là điểm yếu cố định.
 
-Tóm tắt nhanh:
-- **Điểm nổi bật:** ${firstSignal}
-- **Nên ưu tiên:** đọc Mệnh, Thân và đại vận hiện tại trước, rồi mới đi vào từng cung như Quan Lộc, Tài Bạch, Phu Thê hoặc Tật Ách.
-- **Cần lưu ý:** mọi tín hiệu trong tử vi nên dùng như bản đồ tham khảo để quản trị lựa chọn, không xem như kết luận tuyệt đối về tương lai.
+## Cơ hội công việc và tài chính
+Cung Quan Lộc tại ${career?.branch || "đang cập nhật"} có ${career?.stars.slice(0, 5).join(", ") || "chưa có sao nổi bật"}; cung Tài Bạch tại ${money?.branch || "đang cập nhật"} có ${money?.stars.slice(0, 5).join(", ") || "chưa có sao nổi bật"}. Hai cung cần được đọc cùng nhau: cơ hội tốt hơn thường đến khi năng lực nghề nghiệp tạo ra dòng tiền có thể đo được, không phải khi mở rộng quá nhanh. Trong năm ${chart.input.viewYear}, nên ưu tiên dự án có phạm vi rõ, thử ở quy mô nhỏ và đặt hạn mức rủi ro trước khi đầu tư. Nếu muốn đổi việc hoặc kinh doanh, hãy so sánh ba yếu tố: dòng tiền dự phòng, người hỗ trợ thực tế và thời điểm có thể dừng mà không tạo áp lực nợ.
 
-## Mệnh và Thân nói gì
-**Khí chất chính** của lá số nằm ở Mệnh ${chart.menh}, Cục ${chart.cuc}, bản mệnh ${chart.banMenh} và thế âm dương ${chart.amDuong}. Cung Mệnh có ${menhStars}; đây là lớp tín hiệu đầu tiên để đọc cách phản ứng, khí chất tự nhiên và kiểu năng lượng người này dễ mang vào các quyết định quan trọng. Nếu Mệnh có tín hiệu căng, nên hiểu đó là lời nhắc về cách dùng sức, chọn môi trường và giữ nhịp ổn định.
+## Điều cần thận trọng
+Tín hiệu cần quản trị là ${caution?.evidence.join("; ") || `cung Tật Ách có ${health?.stars.slice(0, 4).join(", ") || "dữ liệu đang cập nhật"}`}. Đây không phải dự báo chắc chắn về biến cố. Nó là lời nhắc tránh quyết định lớn khi thông tin chưa đủ, cảm xúc đang cao hoặc lịch sinh hoạt đã quá tải. Với tài chính, cần đọc kỹ điều khoản, giấy tờ và nghĩa vụ dài hạn. Với quan hệ, nên nói rõ kỳ vọng thay vì để suy đoán kéo dài. Với sức khỏe, cung Tật Ách chỉ giúp nhắc nhịp nghỉ ngơi và dấu hiệu quá sức, không thay thế tư vấn y khoa.
 
-Cung Thân ở ${chart.than} có ${thanStars}. Thân thường thể hiện rõ hơn sau khi người đọc đã bước vào tuổi trưởng thành, khi trách nhiệm, nghề nghiệp và các mối quan hệ thực tế bắt đầu định hình. Vì vậy, khi đọc lá số này không nên chỉ hỏi "mình là người thế nào", mà nên hỏi thêm "mình phát huy tốt trong bối cảnh nào, với nhịp nào, cùng kiểu người nào". Đại vận hiện tại là ${decade.current}; đây là nền quan trọng để nối Mệnh và Thân với câu chuyện năm ${chart.input.viewYear}.
+## Gợi ý hành động trong năm ${chart.input.viewYear}
+Năm ${chart.input.viewYear}, mục tiêu hợp lý là biến lợi thế của Mệnh và Thân thành các bước có thể kiểm chứng. Hãy chọn một ưu tiên chính cho mỗi giai đoạn, giữ quỹ dự phòng và rà soát lại sau mỗi quyết định quan trọng. Bản mini-report này giúp xác định điểm bắt đầu; hồ sơ VIP sẽ nối đủ 12 cung, đại vận và các mốc trong năm thành một kế hoạch chi tiết hơn.
 
-## Điểm mạnh dễ phát huy
-**Điểm nên phát huy** của lá số này là khả năng đi đường dài khi mục tiêu được chia nhỏ và có mốc kiểm chứng. Với trục Mệnh - Thân - Cục như trên, người đọc nên ưu tiên việc có cấu trúc, có lịch rõ, có người phản hồi đáng tin và có tiêu chuẩn đo tiến triển. Khi chưa chắc hướng, đừng vội mở quá nhiều nhánh; hãy chọn một việc quan trọng, thử trong phạm vi nhỏ, rồi mới tăng cam kết.
-
-Về công việc, cung Quan Lộc có tín hiệu ${quanStars}. Đây không phải kết luận nghề nghiệp cố định, nhưng là gợi ý rằng khi đọc sâu nên chú ý đến môi trường làm việc, vai trò phù hợp và cách ra quyết định dưới áp lực. Về tiền bạc, cung Tài Bạch có ${taiStars}; phần này nên đọc theo hướng quản trị dòng tiền, cách tích lũy và cách kiểm tra rủi ro trước khi đầu tư hoặc vay mượn.
-
-## Điều nên lưu ý
-**Điều cần quản trị** là xu hướng nhìn lá số như một câu trả lời cuối cùng. Cách đọc tốt hơn là xem mỗi tín hiệu như một câu hỏi thực tế: việc gì đang thuận để làm kỹ hơn, việc gì cần thêm dữ liệu, việc gì nên chậm lại để tránh sai vì cảm xúc. Nếu gặp sao hãm, vận căng hoặc cung có nhiều dấu hiệu xung đột, không nên hiểu là "xấu chắc chắn"; hãy xem đó là lời nhắc đặt quy trình, kiểm tra giấy tờ, quản trị tiền bạc và giữ khoảng nghỉ trước quyết định lớn.
-
-Trong quan hệ và gia đình, lá số cũng nên được đọc bằng giọng bình tĩnh. Không dùng một cung hay một sao để phán xét người khác. Nếu muốn đọc sâu về tình cảm, nên xem Phu Thê, Phúc Đức, Mệnh, Thân và vận hiện tại cùng nhau. Với sức khỏe, Tật Ách chỉ là lời nhắc về nhịp sống và áp lực, không thay thế tư vấn y tế.
-
-## Gợi ý cho năm ${chart.input.viewYear}
-Năm ${chart.input.viewYear} nên được đọc trên nền tuổi xem ${decade.currentAge} và đại vận ${decade.current}. **Ưu tiên** là những việc có nền tảng, có người hỗ trợ, có kế hoạch dự phòng và có thời điểm rà soát lại. Nếu đang định đổi việc, đầu tư hoặc mở rộng kinh doanh, nên chia thành từng bước: thu thập thông tin, thử nhỏ, kiểm chứng, rồi mới cam kết lớn.
-
-**Gợi ý đọc tiếp:** nếu chỉ cần định hướng nhanh, hãy quay lại phần bản đồ 12 cung phía trên và xem kỹ Mệnh, Thân, Quan Lộc, Tài Bạch. Nếu muốn hiểu đầy đủ hơn, bản luận giải toàn bộ sẽ nối Mệnh, Thân, 12 cung, đại vận và vận năm thành một mạch đọc liền, giúp phân biệt đâu là lợi thế nên phát huy, đâu là rủi ro cần quản trị và đâu là việc nên ưu tiên trong năm ${chart.input.viewYear}.`;
+- Chọn một mục tiêu công việc hoặc tài chính trong 30 ngày và đặt tiêu chí đo kết quả.
+- Giữ hạn mức rủi ro, kiểm tra giấy tờ và xin ý kiến chuyên môn trước cam kết lớn.
+- Theo dõi nhịp ngủ nghỉ, cảm xúc và dòng tiền để điều chỉnh sớm thay vì xử lý khi đã quá tải.`;
 }
 
 export async function generateFreeOverview(chart: TuViChart) {
   const prompt = freeOverviewPrompt(chart);
   if (isLlmDisabledForSmoke()) return { content: buildInstantFreeOverview(chart), model: "template-fallback", prompt };
-  const routed = await generateWithLlmRouter({ prompt, maxTokens: FREE_OVERVIEW_MAX_TOKENS, temperature: 0.55 });
+  const routed = await generateWithLlmRouter({
+    prompt,
+    maxTokens: FREE_OVERVIEW_MAX_TOKENS,
+    temperature: 0.55,
+    providerOrder: [...READING_PROVIDER_ORDER],
+  });
   if (routed) return { content: routed.text, model: routed.model, prompt };
   return { content: buildInstantFreeOverview(chart), model: "template-fallback", prompt };
 }
@@ -954,6 +919,7 @@ export function paidReadingChapterPrompt(
   const startLine = isFullReport ? `# ${chapter.title}` : `# ${FEATURE_PRICES[type].label}: ${scopeKey}`;
   const temporalGuidance = paidTemporalGuidance(chart, type, scopeKey);
   const dataContext = paidReadingDataContext(chart, type, scopeKey, focus);
+  const evidenceProfile = formatChartEvidence(buildChartEvidenceProfile(chart));
   const yearlyMonthContext = chapter.key === "yearly-months" ? `\n\n${yearlyMonthContextBlock(chart)}` : "";
 
   return `Bạn là chuyên gia tử vi Việt Nam. Hãy viết ${unitName} ${isFullReport ? `${chapter.title} (${index + 1}/${total})` : "đang mở khóa"} cho báo cáo trả phí.
@@ -973,6 +939,9 @@ Trọng tâm dữ liệu: ${focus.title}
 Dữ liệu nổi bật:
 - ${focus.evidence.join("\n- ")}
 
+Hồ sơ bằng chứng dùng chung:
+${evidenceProfile}
+
 ${paidReadingQualityRules()}
 
 ${temporalGuidance}
@@ -981,6 +950,9 @@ ${dataContext}${yearlyMonthContext}
 
 Yêu cầu bắt buộc:
 - Chỉ viết ${unitName} này, không viết lan sang phạm vi khác.
+- Viết như hồ sơ tư vấn riêng cho ${chart.input.fullName}; không viết như bài blog kiến thức chung.
+- Mỗi kết luận quan trọng phải nối với ít nhất một bằng chứng cung, sao, trạng thái sao, Tuần/Triệt hoặc đại vận đã cấp.
+- Phân tích rõ điểm mạnh, điểm yếu cần quản trị, cơ hội tài chính/đời sống và thời điểm rủi ro khi phù hợp với chương.
 - Không tự tính lại lá số, không đổi ngày giờ, không tự thêm sao ngoài dữ liệu đã cấp.
 - Không lặp lại lời chào ở đầu chương: chỉ Chương 1 được chào rất ngắn nếu thật cần, các chương 2-8 đi thẳng vào vấn đề.
 - Tuyệt đối không được in lại nhãn nội bộ hoặc câu lệnh prompt như "Loại luận", "Phạm vi", "Chiến lược prompt", "Trọng tâm dữ liệu", "Trọng tâm nội dung", "Dữ liệu nổi bật", "Dữ liệu 12 cung", "Dữ liệu lá số JSON"; chỉ xuất bản văn hoàn chỉnh cho khách hàng.
@@ -1076,6 +1048,7 @@ async function generatePaidChapter(prompt: string, maxTokens: number, geminiMode
     maxTokens,
     temperature: 0.55,
     geminiModel,
+    providerOrder: [...READING_PROVIDER_ORDER],
   });
   if (routed) return { content: routed.text, model: routed.model };
   return null;
