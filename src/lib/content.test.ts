@@ -136,6 +136,17 @@ describe("SEO content cluster", () => {
     expect(preciseSetup?.coverAlt).toContain("bàn lá số 12 cung");
   });
 
+  it("keeps the precise chart setup article as a material refresh instead of a thin duplicate", () => {
+    const preciseSetup = seedArticles.find((article) => article.slug === "lap-la-so-tu-vi-chuan");
+
+    expect(preciseSetup?.date).toBe("2026-06-29");
+    expect(preciseSetup?.content).toContain("## Nếu bạn đang phân vân giữa hai khung giờ sinh sát nhau");
+    expect(preciseSetup?.content).toContain(
+      "| Dấu hiệu khi đối chiếu | Nghiêng về giữ nguyên giờ đang nhập | Nên lập thêm lá số thứ hai để so |",
+    );
+    expect(preciseSetup?.content).toContain("/kien-thuc-tu-vi/la-so-tu-vi-tron-doi");
+  });
+
   it("does not expose SEO implementation notes in public article copy", () => {
     for (const article of seedArticles) {
       expect(article.content).not.toContain("Nguồn tham khảo và kỹ thuật SEO");
