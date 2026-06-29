@@ -1,7 +1,10 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { generateWithLlmRouter, hasExternalLlmProvider } from "@/lib/llm-router";
 
 const oldEnv = {
+  DEEPSEEK_API_KEY: process.env.DEEPSEEK_API_KEY,
+  DEEPSEEK_API_KEYS: process.env.DEEPSEEK_API_KEYS,
+  DEEPSEEK_MODEL: process.env.DEEPSEEK_MODEL,
   GEMINI_API_KEY: process.env.GEMINI_API_KEY,
   GEMINI_API_KEYS: process.env.GEMINI_API_KEYS,
   GEMINI_MODEL: process.env.GEMINI_MODEL,
@@ -10,6 +13,15 @@ const oldEnv = {
   GROQ_MODEL: process.env.GROQ_MODEL,
   LLM_PROVIDER_ORDER: process.env.LLM_PROVIDER_ORDER,
 };
+
+beforeEach(() => {
+  process.env.DEEPSEEK_API_KEY = "";
+  process.env.DEEPSEEK_API_KEYS = "";
+  process.env.GEMINI_API_KEY = "";
+  process.env.GEMINI_API_KEYS = "";
+  process.env.GROQ_API_KEY = "";
+  process.env.GROQ_API_KEYS = "";
+});
 
 function restoreEnv() {
   for (const [key, value] of Object.entries(oldEnv)) {
@@ -24,14 +36,66 @@ afterEach(() => {
 });
 
 describe("LLM router", () => {
-  it("returns null when no Gemini or Groq key is configured", async () => {
-    process.env.GEMINI_API_KEY = "";
-    process.env.GEMINI_API_KEYS = "";
-    process.env.GROQ_API_KEY = "";
-    process.env.GROQ_API_KEYS = "";
-
+  it("returns null when no external provider key is configured", async () => {
     expect(hasExternalLlmProvider()).toBe(false);
     await expect(generateWithLlmRouter({ prompt: "hello" })).resolves.toBeNull();
+  });
+
+  it("uses DeepSeek with the current V4 Flash model", async () => {
+    process.env.DEEPSEEK_API_KEY = "deepseek-test-key";
+
+    vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          choices: [{ message: { content: "Bản luận giải cá nhân" } }],
+        }),
+        { status: 200, headers: { "content-type": "application/json" } },
+      ),
+    );
+
+    const result = await generateWithLlmRouter({
+      prompt: "Luận giải lá số",
+      providerOrder: ["deepseek", "groq"],
+    });
+
+    expect(hasExternalLlmProvider()).toBe(true);
+    expect(result).toMatchObject({
+      provider: "deepseek",
+      model: "deepseek/deepseek-v4-flash",
+      text: "Bản luận giải cá nhân",
+    });
+    expect(fetch).toHaveBeenCalledWith(
+      "https://api.deepseek.com/chat/completions",
+      expect.objectContaining({
+        method: "POST",
+        headers: expect.objectContaining({ authorization: "Bearer deepseek-test-key" }),
+      }),
+    );
+  });
+
+  it("falls back from DeepSeek rate limit to Groq", async () => {
+    process.env.DEEPSEEK_API_KEY = "deepseek-test-key";
+    process.env.GROQ_API_KEY = "groq-test-key";
+
+    vi.spyOn(globalThis, "fetch")
+      .mockResolvedValueOnce(new Response(JSON.stringify({ error: "rate" }), { status: 429 }))
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            choices: [{ message: { content: "Groq fallback answer" } }],
+          }),
+          { status: 200, headers: { "content-type": "application/json" } },
+        ),
+      );
+
+    const result = await generateWithLlmRouter({
+      prompt: "Luận giải lá số",
+      providerOrder: ["deepseek", "groq"],
+    });
+
+    expect(result?.provider).toBe("groq");
+    expect(result?.text).toBe("Groq fallback answer");
+    expect(fetch).toHaveBeenCalledTimes(2);
   });
 
   it("uses Gemini when configured", async () => {

@@ -1,4 +1,4 @@
-type LlmProvider = "gemini" | "groq";
+export type LlmProvider = "deepseek" | "gemini" | "groq";
 
 export type LlmResult = {
   text: string;
@@ -28,7 +28,7 @@ function providerOrder(override?: LlmProvider[]): LlmProvider[] {
   const configured = (override?.length ? override.join(",") : process.env.LLM_PROVIDER_ORDER || "groq,gemini")
     .split(/[\n,;]+/)
     .map((item) => item.trim().toLowerCase())
-    .filter((item): item is LlmProvider => item === "gemini" || item === "groq");
+    .filter((item): item is LlmProvider => item === "deepseek" || item === "gemini" || item === "groq");
 
   return configured.length ? configured : ["groq", "gemini"];
 }
@@ -111,25 +111,53 @@ async function callGroq(options: GenerateOptions, key: string): Promise<LlmResul
   return { text: assertText(text, "groq"), model: `groq/${model}`, provider: "groq" };
 }
 
+async function callDeepSeek(options: GenerateOptions, key: string): Promise<LlmResult> {
+  const model = process.env.DEEPSEEK_MODEL || "deepseek-v4-flash";
+  const response = await fetch("https://api.deepseek.com/chat/completions", {
+    method: "POST",
+    headers: {
+      "authorization": `Bearer ${key}`,
+      "content-type": "application/json",
+    },
+    body: JSON.stringify({
+      model,
+      messages: [{ role: "user", content: options.prompt }],
+      temperature: options.temperature ?? 0.55,
+      max_tokens: options.maxTokens ?? 1200,
+    }),
+  });
+
+  if (response.status === 429) throw new ProviderRateLimitError("DeepSeek rate limited");
+  if (!response.ok) throw new Error(`DeepSeek error ${response.status}: ${await parseError(response)}`);
+
+  const json = await response.json();
+  const text = json.choices?.[0]?.message?.content;
+  return { text: assertText(text, "deepseek"), model: `deepseek/${model}`, provider: "deepseek" };
+}
+
 export function hasExternalLlmProvider() {
   return Boolean(
-    keysFromEnv("GEMINI_API_KEY", "GEMINI_API_KEYS").length ||
+    keysFromEnv("DEEPSEEK_API_KEY", "DEEPSEEK_API_KEYS").length ||
+      keysFromEnv("GEMINI_API_KEY", "GEMINI_API_KEYS").length ||
       keysFromEnv("GROQ_API_KEY", "GROQ_API_KEYS").length,
   );
 }
 
 export async function generateWithLlmRouter(options: GenerateOptions): Promise<LlmResult | null> {
+  const deepSeekKeys = keysFromEnv("DEEPSEEK_API_KEY", "DEEPSEEK_API_KEYS");
   const geminiKeys = keysFromEnv("GEMINI_API_KEY", "GEMINI_API_KEYS");
   const groqKeys = keysFromEnv("GROQ_API_KEY", "GROQ_API_KEYS");
   const errors: string[] = [];
 
   for (const provider of providerOrder(options.providerOrder)) {
-    const keys = provider === "gemini" ? geminiKeys : groqKeys;
+    const keys = provider === "deepseek" ? deepSeekKeys : provider === "gemini" ? geminiKeys : groqKeys;
     const key = selectKey(keys, options.prompt);
     if (!key) continue;
 
     try {
-      return provider === "gemini" ? await callGemini(options, key) : await callGroq(options, key);
+      if (provider === "deepseek") return await callDeepSeek(options, key);
+      if (provider === "gemini") return await callGemini(options, key);
+      return await callGroq(options, key);
     } catch (error) {
       errors.push(error instanceof Error ? error.message : String(error));
       if (error instanceof ProviderRateLimitError) continue;
