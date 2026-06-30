@@ -38,6 +38,7 @@ yarn-error.log*
 .npm-cache/
 .lighthouseci/
 .codex/tools*/
+.worktrees/
 deploy-tmp/
 vps_*_tmp.py
 .next-home-*.html
