@@ -47,6 +47,9 @@ describe("PseoLookupHub", () => {
     expect(html).toContain("Thái Âm");
     expect(html).toContain("Điểm nên phát huy");
     expect(html).toContain("Điều cần lưu ý");
+    expect(html).not.toContain("Công cụ tra cứu tử vi");
+    expect(html).not.toContain("Bước 1");
+    expect(html).toContain('class="pseo-lookup-result-meta"');
   });
 
   it("keeps substantial guidance, FAQ and the complete entity index in HTML", () => {
@@ -66,6 +69,7 @@ describe("PseoLookupHub", () => {
     expect(html).toContain("Một chính tinh có quyết định toàn bộ lá số không?");
     expect(MAIN_STARS.every((entity) => html.includes(entity.name) && html.includes(entity.summary))).toBe(true);
     expect(html).toContain(MAIN_STARS[0]!.name);
+    expect(html).toContain('class="pseo-index-row"');
   });
 
   it("has dedicated responsive styles for the form, result and mobile layout", () => {
@@ -73,6 +77,8 @@ describe("PseoLookupHub", () => {
     expect(css).toContain(".pseo-lookup-tool");
     expect(css).toContain(".pseo-lookup-form");
     expect(css).toContain(".pseo-lookup-result");
+    expect(css).toContain("--pseo-ink:");
     expect(css).toMatch(/@media \(max-width: 720px\)[\s\S]*\.pseo-lookup-tool/);
+    expect(css).toMatch(/@media \(max-width: 720px\)[\s\S]*\.pseo-sticky-banner\s*\{[\s\S]*position:\s*static/);
   });
 });

@@ -83,6 +83,48 @@ describe("SEO Autopilot core", () => {
     expect(plan.brief.keywordEvidence.topKeywords[0].keyword).toBe("lá số tử vi");
   });
 
+  it("uses the next new CSV-derived topic when the primary cluster slugs already exist", () => {
+    const rows = parseSemrushKeywordCsv(
+      [
+        "keyword,intent,volume,kd_percent,cpc_usd",
+        "lÃ¡ sá»‘ tá»­ vi,I,368.0K,61,0.01",
+        "táº¡o lÃ¡ sá»‘ tá»­ vi,I,8.1K,44,0.01",
+        "xem lÃ¡ sá»‘ tá»­ vi,I,6.6K,54,0.01",
+        "cÃ¡ch xem lÃ¡ sá»‘ tá»­ vi,I,2.9K,51,0.01",
+        "lÃ¡ sá»‘ tá»­ vi online,I,3.6K,57,0.01",
+        "luen giáº£i lÃ¡ sá»‘ tá»­ vi,I,2.9K,50,0.01",
+      ].join("\n"),
+    );
+
+    const plan = planSeoAutopilotRun({
+      snapshot: { status: "ok", sitemapUrlCount: 30, warnings: [] },
+      existingSlugs: [
+        "la-so-tu-vi-la-gi",
+        "tao-la-so-tu-vi",
+        "phan-tich-la-so-tu-vi",
+        "la-so-tu-vi-mien-phi",
+        "sao-tu-vi",
+        "sao-thien-co",
+        "sao-thai-duong",
+        "menh-vo-chinh-dieu",
+        "cung-phu-mau-trong-tu-vi",
+        "tieu-van-la-gi",
+        "lap-la-so-tu-vi-can-gi",
+      ],
+      keywordRows: rows,
+      articlesPerWeek: 1,
+    });
+
+    expect(plan.nextAction.type).toBe("single_article_publish");
+    expect(plan.nextAction.slug).not.toBe("tao-la-so-tu-vi");
+    expect(plan.nextAction.slug).not.toBe("phan-tich-la-so-tu-vi");
+    expect(["xem-la-so-tu-vi-online", "xem-la-so-tu-vi-mien-phi", "la-so-tu-vi-online"]).toContain(
+      plan.nextAction.slug,
+    );
+    expect(plan.nextAction.slugs).toEqual([plan.nextAction.slug]);
+    expect(plan.brief.slug).toBe(plan.nextAction.slug);
+  });
+
   it("extracts page SEO signals from rendered HTML", () => {
     const html = `
       <html>
@@ -334,6 +376,41 @@ export const seedArticles = [
     expect(plan.nextAction.type).toBe("single_article_publish");
     expect(plan.weeklyContentPlan.articles).toHaveLength(1);
     expect(plan.nextAction.reason).toContain("Publish 1 people-first");
+  });
+
+  it("does not fall back to refreshing an existing article during the daily publisher run", () => {
+    const rows = parseSemrushKeywordCsv(
+      [
+        "keyword,intent,volume,kd_percent,cpc_usd",
+        "lÃ¡ sá»‘ tá»­ vi,I,368.0K,61,0.01",
+        "táº¡o lÃ¡ sá»‘ tá»­ vi,I,8.1K,44,0.01",
+        "phÃ¢n tÃ­ch lÃ¡ sá»‘ tá»­ vi,I,590,33,0.02",
+      ].join("\n"),
+    );
+
+    expect(() =>
+      planSeoAutopilotRun({
+        snapshot: {
+          status: "ok",
+          sitemapUrlCount: 30,
+          warnings: [],
+        },
+        existingSlugs: [
+          "la-so-tu-vi-la-gi",
+          "tao-la-so-tu-vi",
+          "phan-tich-la-so-tu-vi",
+          "sao-tu-vi",
+          "sao-thien-co",
+          "sao-thai-duong",
+          "menh-vo-chinh-dieu",
+          "cung-phu-mau-trong-tu-vi",
+          "tieu-van-la-gi",
+          "lap-la-so-tu-vi-can-gi",
+        ],
+        keywordRows: rows,
+        articlesPerWeek: 1,
+      }),
+    ).toThrow("No new SEO article opportunities remain for the daily publisher run.");
   });
 
   it("requires an explicit bounded cluster mode for multi-article publishing", () => {

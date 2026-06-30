@@ -11,6 +11,8 @@ type PseoArticleFunnelProps = {
 };
 
 function RelatedList({ title, pages }: { title: string; pages: PseoPageDraft[] }) {
+  if (pages.length === 0) return null;
+
   return (
     <section className="pseo-related-group">
       <h2>{title}</h2>
@@ -28,6 +30,7 @@ function RelatedList({ title, pages }: { title: string; pages: PseoPageDraft[] }
 
 export function PseoArticleFunnel({ page, sameStar, samePalace }: PseoArticleFunnelProps) {
   const year = new Date().getFullYear();
+  const hasRelatedPages = sameStar.length > 0 || samePalace.length > 0;
   const inlineForm = (
     <section id="lap-la-so-ca-nhan" className="pseo-inline-form" aria-labelledby="pseo-form-heading">
       <div className="pseo-inline-form-copy">
@@ -48,36 +51,61 @@ export function PseoArticleFunnel({ page, sameStar, samePalace }: PseoArticleFun
       <article className="pseo-article-shell">
         <main>
           <nav className="article-breadcrumb" aria-label="Breadcrumb">
-            <Link href="/">Trang chủ</Link><span>/</span>
-            <Link href="/tra-cuu">Tra cứu</Link><span>/</span>
+            <Link href="/">Trang chủ</Link>
+            <span>/</span>
+            <Link href="/tra-cuu">Tra cứu</Link>
+            <span>/</span>
             <span>{page.title}</span>
           </nav>
           <header className="pseo-hero">
             <h1>{page.title}</h1>
             <p>{page.excerpt}</p>
           </header>
-          <dl className="pseo-summary-table">
-            <div><dt>Điểm tốt</dt><dd>{page.goodPoints.join("; ")}</dd></div>
-            <div><dt>Cần lưu ý</dt><dd>{page.cautionPoints.join("; ")}</dd></div>
-            <div><dt>Ngũ hành</dt><dd>{page.element}</dd></div>
-            <div><dt>Tiềm năng</dt><dd>{page.scores.potential}/10</dd></div>
+          <dl className="pseo-data-strip">
+            <div>
+              <dt>Điểm tốt</dt>
+              <dd>{page.goodPoints.join("; ")}</dd>
+            </div>
+            <div>
+              <dt>Cần lưu ý</dt>
+              <dd>{page.cautionPoints.join("; ")}</dd>
+            </div>
+            <div>
+              <dt>Ngũ hành</dt>
+              <dd>{page.element}</dd>
+            </div>
+            <div>
+              <dt>Tiềm năng</dt>
+              <dd>{page.scores.potential}/10</dd>
+            </div>
           </dl>
           <MarkdownContent content={page.body} afterFirstSection={inlineForm} />
           <div className="pseo-mobile-vip">
-            <Link href="/pricing" className="btn btn-primary">Xem luận giải VIP</Link>
+            <Link href="/pricing" className="btn btn-primary">
+              Xem luận giải VIP
+            </Link>
           </div>
-          <section className="pseo-related">
-            <RelatedList title="Cùng sao, khác cung" pages={sameStar} />
-            <RelatedList title="Cùng cung, khác sao" pages={samePalace} />
-          </section>
+          {hasRelatedPages ? (
+            <section className="pseo-related">
+              <RelatedList title="Cùng sao, khác cung" pages={sameStar} />
+              <RelatedList title="Cùng cung, khác sao" pages={samePalace} />
+            </section>
+          ) : null}
         </main>
         <aside className="pseo-vip-sidebar">
           <Sparkles aria-hidden="true" size={28} />
           <h2>Luận giải VIP theo lá số riêng</h2>
           <p>Đọc sâu công việc, tài chính, tình cảm và vận năm dựa trên toàn bộ lá số của bạn.</p>
-          <a href="#lap-la-so-ca-nhan" className="btn btn-primary">Lập lá số trước</a>
-          <Link href="/pricing" className="pseo-vip-link">Xem các gói luận giải</Link>
-          <span><BookOpenText size={16} /> Nội dung tham khảo, không thay thế tư vấn chuyên môn.</span>
+          <a href="#lap-la-so-ca-nhan" className="btn btn-primary">
+            Lập lá số trước
+          </a>
+          <Link href="/pricing" className="pseo-vip-link">
+            Xem các gói luận giải
+          </Link>
+          <span>
+            <BookOpenText size={16} />
+            Nội dung tham khảo, không thay thế tư vấn chuyên môn.
+          </span>
         </aside>
       </article>
     </>

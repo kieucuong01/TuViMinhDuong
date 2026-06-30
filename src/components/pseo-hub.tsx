@@ -18,21 +18,33 @@ export function PseoHub({
           <h1>{title}</h1>
           <p>{description}</p>
         </header>
-        <div className="pseo-hub-grid">
-          {entities.map((entity) => (
+
+        <div className="pseo-hub-index">
+          {entities.map((entity, index) => (
             <article key={entity.slug}>
-              <span>{entity.element}</span>
-              <h2>{entity.name}</h2>
-              <p>{entity.summary}</p>
+              <span className="pseo-hub-index-number" aria-hidden="true">
+                {String(index + 1).padStart(2, "0")}
+              </span>
+              <div>
+                <span>{entity.element}</span>
+                <h2>{entity.name}</h2>
+                <p>{entity.summary}</p>
+              </div>
               {entity.canonicalPath ? (
-                <Link href={entity.canonicalPath}>Xem trang tra cứu <ArrowRight size={17} /></Link>
+                <Link href={entity.canonicalPath}>
+                  Xem trang tra cứu
+                  <ArrowRight size={17} />
+                </Link>
               ) : null}
             </article>
           ))}
         </div>
+
         <section className="pseo-hub-cta">
           <h2>Muốn xem đúng vị trí sao trong lá số của bạn?</h2>
-          <Link href="/#lap-la-so" className="btn btn-primary">Lập lá số miễn phí</Link>
+          <Link href="/#lap-la-so" className="btn btn-primary">
+            Lập lá số miễn phí
+          </Link>
         </section>
       </div>
     </main>

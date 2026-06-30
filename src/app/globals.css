@@ -11161,6 +11161,410 @@ button.is-loading:not(.icon-button)::before {
   }
 }
 
+.pseo-page,
+.pseo-hub {
+  --pseo-ink: #211a17;
+  --pseo-muted: #675f5a;
+  --pseo-accent: #b94b1f;
+  --pseo-accent-strong: #913515;
+  --pseo-line: #e7ded7;
+  --pseo-paper: #fff;
+  --pseo-wash: #fbf8f5;
+}
+
+.pseo-page {
+  color: var(--pseo-ink);
+  background:
+    radial-gradient(circle at 84% 0%, rgb(185 75 31 / 0.08), transparent 24rem),
+    linear-gradient(180deg, var(--pseo-paper), var(--pseo-wash) 34rem, var(--pseo-paper));
+}
+
+.pseo-hub {
+  color: var(--pseo-ink);
+  background: linear-gradient(180deg, var(--pseo-paper), var(--pseo-wash) 42rem, var(--pseo-paper));
+}
+
+.pseo-page *,
+.pseo-hub * {
+  min-width: 0;
+}
+
+.pseo-article-shell {
+  width: min(100%, 76rem);
+}
+
+.pseo-article-shell > main {
+  border-color: var(--pseo-line);
+  background: var(--pseo-paper);
+  box-shadow: 0 20px 54px rgb(33 26 23 / 0.06);
+}
+
+.pseo-hero h1,
+.pseo-hub header h1 {
+  color: var(--pseo-ink);
+  letter-spacing: -0.04em;
+}
+
+.pseo-hero p,
+.pseo-hub header p,
+.pseo-root-guide p {
+  color: var(--pseo-muted);
+}
+
+.pseo-data-strip {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  overflow: hidden;
+  margin-top: 1.75rem;
+  border: 1px solid var(--pseo-line);
+  border-radius: 1rem;
+  background: var(--pseo-wash);
+}
+
+.pseo-data-strip div {
+  display: grid;
+  grid-template-columns: 8rem minmax(0, 1fr);
+  gap: 0.7rem;
+  border-bottom: 1px solid var(--pseo-line);
+  padding: 0.9rem 1rem;
+}
+
+.pseo-data-strip div:nth-child(odd) {
+  border-right: 1px solid var(--pseo-line);
+}
+
+.pseo-data-strip dt {
+  color: var(--pseo-accent-strong);
+  font-weight: 900;
+}
+
+.pseo-data-strip dd {
+  color: var(--pseo-ink);
+}
+
+.pseo-root-grid > a {
+  display: grid;
+  min-height: 13.5rem;
+  border-color: var(--pseo-line);
+  background: var(--pseo-paper);
+  box-shadow: none;
+  transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+
+.pseo-root-grid > a:hover {
+  border-color: rgb(185 75 31 / 0.36);
+  box-shadow: 0 18px 44px rgb(33 26 23 / 0.08);
+  transform: translateY(-2px);
+}
+
+.pseo-root-grid > a > svg {
+  color: var(--pseo-accent);
+}
+
+.pseo-root-grid span,
+.pseo-hub-index a,
+.pseo-lookup-index li > a {
+  color: var(--pseo-accent);
+}
+
+.pseo-root-guide {
+  display: grid;
+  grid-template-columns: minmax(16rem, 0.75fr) minmax(0, 1.2fr) auto;
+  gap: clamp(1rem, 3vw, 2rem);
+  align-items: center;
+  margin-top: clamp(2rem, 5vw, 3.5rem);
+  border-block: 1px solid var(--pseo-line);
+  padding-block: clamp(1.25rem, 3vw, 2rem);
+}
+
+.pseo-root-guide h2 {
+  color: var(--pseo-ink);
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  font-weight: 950;
+  letter-spacing: -0.035em;
+  line-height: 1.08;
+}
+
+.pseo-root-guide ol {
+  display: grid;
+  gap: 0.85rem;
+  counter-reset: root-guide;
+}
+
+.pseo-root-guide li {
+  display: grid;
+  gap: 0.15rem;
+  position: relative;
+  padding-left: 2.15rem;
+}
+
+.pseo-root-guide li::before {
+  position: absolute;
+  left: 0;
+  top: 0.1rem;
+  display: grid;
+  width: 1.55rem;
+  height: 1.55rem;
+  place-items: center;
+  border-radius: 999px;
+  background: var(--pseo-ink);
+  color: var(--pseo-paper);
+  content: counter(root-guide);
+  counter-increment: root-guide;
+  font-size: 0.76rem;
+  font-weight: 950;
+}
+
+.pseo-root-guide strong {
+  color: var(--pseo-ink);
+  font-weight: 950;
+}
+
+.pseo-root-guide span {
+  color: var(--pseo-muted);
+  line-height: 1.55;
+}
+
+.pseo-hub-index {
+  display: grid;
+  border-top: 1px solid var(--pseo-line);
+}
+
+.pseo-hub-index article {
+  display: grid;
+  grid-template-columns: 4.2rem minmax(0, 1fr) auto;
+  gap: clamp(0.9rem, 2vw, 1.5rem);
+  align-items: center;
+  border-bottom: 1px solid var(--pseo-line);
+  padding-block: 1.15rem;
+}
+
+.pseo-hub-index-number {
+  color: rgb(33 26 23 / 0.28);
+  font-size: 1.35rem;
+  font-weight: 950;
+  letter-spacing: -0.04em;
+}
+
+.pseo-hub-index article div > span {
+  color: var(--pseo-accent);
+  font-size: 0.82rem;
+  font-weight: 900;
+}
+
+.pseo-hub-index h2 {
+  color: var(--pseo-ink);
+  font-size: 1.3rem;
+  font-weight: 950;
+}
+
+.pseo-hub-index p {
+  color: var(--pseo-muted);
+  line-height: 1.65;
+}
+
+.pseo-hub-index a {
+  display: inline-flex;
+  min-height: 3rem;
+  align-items: center;
+  gap: 0.35rem;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.pseo-lookup-hub {
+  background: linear-gradient(180deg, var(--pseo-paper), var(--pseo-wash) 44rem, var(--pseo-paper));
+}
+
+.pseo-lookup-tool,
+.pseo-lookup-result {
+  border-color: var(--pseo-line);
+  background: var(--pseo-paper);
+  box-shadow: 0 22px 54px rgb(33 26 23 / 0.07);
+}
+
+.pseo-lookup-form button {
+  background: var(--pseo-accent);
+}
+
+.pseo-lookup-form button:hover {
+  background: var(--pseo-accent-strong);
+}
+
+.pseo-lookup-result-heading > div > span,
+.pseo-lookup-guide > header > span {
+  color: var(--pseo-accent);
+}
+
+.pseo-lookup-result-meta {
+  border-radius: 999px;
+  background: var(--pseo-wash);
+  padding: 0.35rem 0.75rem;
+  color: var(--pseo-accent-strong);
+  font-size: 0.83rem;
+  font-weight: 950;
+  white-space: nowrap;
+}
+
+.pseo-lookup-index > ul {
+  border-color: var(--pseo-line);
+  background: var(--pseo-paper);
+}
+
+.pseo-lookup-index li,
+.pseo-index-row {
+  border-color: var(--pseo-line);
+}
+
+.pseo-lookup-index li:nth-child(odd) {
+  border-right-color: var(--pseo-line);
+}
+
+.pseo-entity-summary {
+  border-color: var(--pseo-line);
+  background: var(--pseo-wash);
+}
+
+.pseo-entity-content article {
+  max-width: 46rem;
+}
+
+.pseo-entity-reading-note {
+  border-left: 4px solid var(--pseo-accent);
+  background: var(--pseo-wash);
+  padding: 0.9rem 1rem;
+  color: var(--pseo-muted);
+  font-size: 1.04rem;
+  line-height: 1.7;
+}
+
+.pseo-related {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.pseo-related-group {
+  border: 0;
+  border-top: 1px solid var(--pseo-line);
+  border-radius: 0;
+  padding: 1rem 0 0;
+}
+
+.pseo-related-group a {
+  border-bottom: 1px solid var(--pseo-line);
+  border-radius: 0;
+}
+
+.pseo-page .prose-table-wrap {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.pseo-page .prose-table-wrap table {
+  min-width: 0;
+  table-layout: fixed;
+}
+
+.pseo-page .prose-table-wrap th,
+.pseo-page .prose-table-wrap td {
+  overflow-wrap: anywhere;
+}
+
+.pseo-inline-form .chart-form,
+.pseo-inline-form .form-grid,
+.pseo-inline-form .birth-date-group,
+.pseo-inline-form .birth-date-grid,
+.pseo-inline-form label,
+.pseo-inline-form select,
+.pseo-inline-form input {
+  min-width: 0;
+}
+
+.pseo-hub-cta {
+  background: var(--pseo-ink);
+}
+
+@media (max-width: 900px) {
+  .pseo-inline-form .chart-form.compact .form-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .pseo-inline-form .chart-birth-field,
+  .pseo-inline-form .chart-hour-field {
+    grid-column: 1 / -1;
+  }
+
+  .pseo-inline-form .chart-birth-field .birth-date-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 721px) {
+  .pseo-lookup-index > ul {
+    content-visibility: auto;
+    contain-intrinsic-size: 72rem;
+  }
+}
+
+@media (max-width: 720px) {
+  .pseo-page,
+  .pseo-hub {
+    font-size: 1.0625rem;
+  }
+
+  .pseo-root-guide,
+  .pseo-hub-index article,
+  .pseo-data-strip,
+  .pseo-lookup-form > div,
+  .pseo-lookup-lists,
+  .pseo-lookup-index > ul {
+    grid-template-columns: 1fr;
+  }
+
+  .pseo-root-guide {
+    align-items: stretch;
+  }
+
+  .pseo-hub-index article {
+    gap: 0.4rem;
+  }
+
+  .pseo-hub-index a,
+  .pseo-root-guide .btn,
+  .pseo-hub .btn,
+  .pseo-lookup-form button {
+    width: 100%;
+    min-height: 3rem;
+    justify-content: center;
+  }
+
+  .pseo-data-strip div,
+  .pseo-data-strip div:nth-child(odd) {
+    grid-template-columns: 6.5rem minmax(0, 1fr);
+    border-right: 0;
+  }
+
+  .pseo-lookup-index > ul {
+    content-visibility: visible;
+    contain-intrinsic-size: auto;
+  }
+
+  .pseo-page .prose-table-wrap th,
+  .pseo-page .prose-table-wrap td {
+    padding: 0.72rem 0.68rem;
+    font-size: 0.92rem;
+  }
+
+  .pseo-inline-form .chart-form.compact .form-grid,
+  .pseo-inline-form .chart-birth-field .birth-date-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .pseo-sticky-banner {
+    position: static;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

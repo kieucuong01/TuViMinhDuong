@@ -73,6 +73,17 @@ const KEYWORD_CLUSTER_RULES = [
       funnelStage: "conversion-support",
       priority: 98,
     },
+    secondaryOpportunities: [
+      {
+        slug: "la-so-tu-vi-online",
+        cluster: "LÃ¡ sá»‘ tá»­ vi",
+        focusKeyword: "lÃ¡ sá»‘ tá»­ vi online",
+        intent:
+          "NgÆ°á»i Ä‘á»c muá»‘n xem lÃ¡ sá»‘ tá»­ vi online nhÆ°ng cáº§n biáº¿t nÃªn chuáº©n bá»‹ dá»¯ liá»‡u nÃ o, kÃ¬ vá»ng Ä‘Æ°á»£c gÃ¬ vÃ  giá»›i háº¡n cá»§a cÃ´ng cá»¥ online á»Ÿ Ä‘Ã¢u.",
+        funnelStage: "conversion-support",
+        priority: 93,
+      },
+    ],
   },
   {
     id: "lap-lay-tao-la-so",
@@ -105,6 +116,17 @@ const KEYWORD_CLUSTER_RULES = [
       funnelStage: "middle",
       priority: 90,
     },
+    secondaryOpportunities: [
+      {
+        slug: "xem-la-so-tu-vi-online",
+        cluster: "Äá»c vÃ  giáº£i lÃ¡ sá»‘",
+        focusKeyword: "xem lÃ¡ sá»‘ tá»­ vi",
+        intent:
+          "NgÆ°á»i Ä‘á»c Ä‘Ã£ cÃ³ lÃ¡ sá»‘ vÃ  muá»‘n biáº¿t nÃªn xem online pháº§n nÃ o trÆ°á»›c, Ä‘á»‘i chiáº¿u Má»‡nh - ThÃ¢n ra sao vÃ  trÃ¡nh hiá»ƒu sai khi tá»± Ä‘á»c.",
+        funnelStage: "middle",
+        priority: 89,
+      },
+    ],
   },
   {
     id: "bat-tu-tu-tru",
@@ -121,6 +143,17 @@ const KEYWORD_CLUSTER_RULES = [
       funnelStage: "middle",
       priority: 94,
     },
+    secondaryOpportunities: [
+      {
+        slug: "lap-la-so-bat-tu",
+        cluster: "BÃ¡t tá»± vÃ  tá»­ vi",
+        focusKeyword: "láº­p lÃ¡ sá»‘ bÃ¡t tá»±",
+        intent:
+          "NgÆ°á»i Ä‘á»c muá»‘n láº­p lÃ¡ sá»‘ bÃ¡t tá»± vÃ  cáº§n hiá»ƒu dÃ¹ng ngÃ y giá» sinh ra sao, khÃ¡c gÃ¬ vá»›i tá»­ vi vÃ  khi nÃ o nÃªn chá»n bÃ¡t tá»±.",
+        funnelStage: "middle",
+        priority: 87,
+      },
+    ],
   },
   {
     id: "mien-phi-online",
@@ -137,6 +170,17 @@ const KEYWORD_CLUSTER_RULES = [
       funnelStage: "conversion-support",
       priority: 88,
     },
+    secondaryOpportunities: [
+      {
+        slug: "xem-la-so-tu-vi-mien-phi",
+        cluster: "LÃ¡ sá»‘ tá»­ vi miá»…n phÃ­",
+        focusKeyword: "xem lÃ¡ sá»‘ tá»­ vi miá»…n phÃ­",
+        intent:
+          "NgÆ°á»i Ä‘á»c muá»‘n xem lÃ¡ sá»‘ tá»­ vi miá»…n phÃ­ online vÃ  cáº§n biáº¿t nÃªn xem pháº§n nÃ o trÆ°á»›c, pháº§n nÃ o chá»‰ nÃªn dÃ¹ng nhÆ° tham kháº£o.",
+        funnelStage: "conversion-support",
+        priority: 85,
+      },
+    ],
   },
   {
     id: "tron-doi",
@@ -185,6 +229,17 @@ const KEYWORD_CLUSTER_RULES = [
       funnelStage: "middle",
       priority: 80,
     },
+    secondaryOpportunities: [
+      {
+        slug: "cac-sao-trong-la-so-tu-vi",
+        cluster: "Äá»c vÃ  giáº£i lÃ¡ sá»‘",
+        focusKeyword: "cÃ¡c sao trong lÃ¡ sá»‘ tá»­ vi",
+        intent:
+          "NgÆ°á»i Ä‘á»c muá»‘n hiá»ƒu nhÃ³m sao trong lÃ¡ sá»‘ tá»­ vi nÃªn Ä‘á»c theo thá»© tá»± nÃ o, sao nÃ o lÃ  chá»§ tinh vÃ  sao nÃ o chá»‰ nÃªn xem nhÆ° yáº¿u tá»‘ bá»• sung.",
+        funnelStage: "middle",
+        priority: 78,
+      },
+    ],
   },
 ];
 
@@ -267,6 +322,19 @@ export function buildKeywordIntelligence(keywordRows = []) {
         intent: row.intent,
       }));
     const opportunityScore = Math.round(totalVolume / Math.max(1, weightedKd || 35));
+    const opportunities = [rule.opportunity, ...(rule.secondaryOpportunities || [])].map((opportunity, index) => ({
+      ...opportunity,
+      funnelStage: opportunity.funnelStage || rule.stage,
+      priority: opportunity.priority + opportunityScore - index,
+      keywordEvidence: {
+        clusterId: rule.id,
+        totalVolume,
+        keywordCount: matches.length,
+        averageKd: weightedKd,
+        topKeywords,
+      },
+    }));
+
     return {
       id: rule.id,
       label: rule.label,
@@ -277,18 +345,8 @@ export function buildKeywordIntelligence(keywordRows = []) {
       averageKd: weightedKd,
       opportunityScore,
       topKeywords,
-      opportunity: {
-        ...rule.opportunity,
-        funnelStage: rule.opportunity.funnelStage || rule.stage,
-        priority: rule.opportunity.priority + opportunityScore,
-        keywordEvidence: {
-          clusterId: rule.id,
-          totalVolume,
-          keywordCount: matches.length,
-          averageKd: weightedKd,
-          topKeywords,
-        },
-      },
+      opportunity: opportunities[0],
+      opportunities,
     };
   })
     .filter((cluster) => cluster.keywordCount > 0)
@@ -315,10 +373,19 @@ export function buildKeywordIntelligence(keywordRows = []) {
 export function buildKeywordDrivenOpportunities({ keywordRows, existingSlugs = [] } = {}) {
   const intelligence = buildKeywordIntelligence(keywordRows || []);
   const existing = new Set(existingSlugs || []);
-  const opportunities = intelligence.clusters
-    .map((cluster) => cluster.opportunity)
-    .filter((item) => !existing.has(item.slug))
-    .sort((left, right) => right.priority - left.priority);
+  const dedupedOpportunities = new Map();
+
+  for (const cluster of intelligence.clusters) {
+    for (const item of cluster.opportunities || [cluster.opportunity]) {
+      if (!item?.slug || existing.has(item.slug)) continue;
+      const current = dedupedOpportunities.get(item.slug);
+      if (!current || item.priority > current.priority) {
+        dedupedOpportunities.set(item.slug, item);
+      }
+    }
+  }
+
+  const opportunities = [...dedupedOpportunities.values()].sort((left, right) => right.priority - left.priority);
   return { opportunities, intelligence };
 }
 
@@ -532,6 +599,7 @@ export function planSeoAutopilotRun({
 }) {
   const publisherSelection = normalizePublisherSelection({ articles: articlesPerWeek, clusterMode });
   articlesPerWeek = publisherSelection.articles;
+  const isSinglePublisherRun = articlesPerWeek === 1 && !clusterMode;
   const currentSlugs = new Set(existingSlugs || []);
   const snapshotOpportunities = Array.isArray(snapshot?.opportunities) ? snapshot.opportunities : [];
   const inputKeywordRows = Array.isArray(keywordRows) ? keywordRows : [];
@@ -546,18 +614,22 @@ export function planSeoAutopilotRun({
       ? snapshotOpportunities.filter((item) => !currentSlugs.has(item.slug))
       : rankTopicOpportunities([...currentSlugs]).length
         ? rankTopicOpportunities([...currentSlugs])
-        : refreshOpportunities;
+        : isSinglePublisherRun
+          ? []
+          : refreshOpportunities;
   const normalizedOpportunities = avoidImmediateRepeat({
     opportunities,
     previousState,
     articlesPerWeek,
   });
+  if (isSinglePublisherRun && normalizedOpportunities.length === 0) {
+    throw new Error("No new SEO article opportunities remain for the daily publisher run.");
+  }
   const weeklyContentPlan = buildWeeklyContentPlan({ opportunities: normalizedOpportunities, articlesPerWeek });
   const selected = weeklyContentPlan.articles[0]?.brief || buildContentBrief(rankTopicOpportunities([...currentSlugs])[0]);
   const brief = buildContentBrief(selected);
   const slugs = weeklyContentPlan.articles.map((item) => item.slug);
   const keywordIntelligence = keywordPlan?.intelligence || null;
-  const isSinglePublisherRun = articlesPerWeek === 1;
   if (clusterMode) assertDistinctClusterArticles(weeklyContentPlan.articles);
 
   return {
