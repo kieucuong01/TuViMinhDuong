@@ -1,6 +1,6 @@
 # Product Marketing Context
 
-Last updated: 2026-06-11
+Last updated: 2026-07-01
 
 ## Product Overview
 
@@ -84,3 +84,24 @@ Last updated: 2026-06-11
 **Secondary actions:** Read related articles, save a chart, return for date fortune, unlock a deeper reading.
 
 **Measurement focus:** Organic impressions/clicks, article engagement, internal clicks to chart creation, account creation, saved charts, paid reading unlocks.
+
+## Daily SEO Publishing Strategy
+
+**Publishing commitment:** The 21:00 publisher must attempt to publish exactly one new, high-quality production article every calendar day. A repeated slug, unchanged Search Console data, or unchanged sitemap is not a valid skip reason. If the first candidate already exists or overlaps an existing intent, continue to the next distinct SEMrush-backed topic.
+
+**Keyword selection:**
+
+- Start from `D:\DU AN CA NHAN WEBSITE\tsh\semrush_la_so_keywords.csv`, the latest Sunday handoff, the live sitemap, and the production content inventory.
+- Group keyword variants by reader intent. Publish one complete page for the intent instead of separate doorway pages for synonyms such as `lập`, `lấy`, `tạo`, `tra`, `vẽ`, or `kẻ lá số`.
+- Rotate the funnel across informational discovery, interpretation support, and conversion-support topics. Prefer topics that naturally lead to free chart creation at `/#lap-la-so`.
+- Exclude stale year pages, competitor-navigation queries, mass birth-year variants, and topics that cannot support article-specific analysis or useful data blocks.
+
+**Production quality gate:**
+
+- Match the target character range for the topic and write for Vietnamese adults aged 30-60 in calm, plain language.
+- Include at least 5 contextual internal links, at least 2 related knowledge links, and at least 1 useful conversion link to `/#lap-la-so`.
+- Include at least 2 article-specific structured data blocks and explain the causal chain from chart factor to context, likely expression, interpretation limit, and practical next step.
+- Use a dedicated realistic editorial `.webp` cover under `public/articles/<slug>.webp`, descriptive alt text, and aligned `coverImage`/`ogImage`.
+- Treat generated briefs and drafts as inputs only. Rewrite in production content until the article passes content audit, tests, build, deploy, and live URL/sitemap verification.
+
+**Allowed stop condition:** Report `Blocked`, not `Skipped`, only when no safe distinct topic remains or content quality, tests, build, deployment, or live verification cannot be fixed safely during the run. Never publish filler merely to satisfy the daily cadence.

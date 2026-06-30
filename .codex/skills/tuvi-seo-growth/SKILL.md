@@ -79,11 +79,11 @@ Traffic work should read `.agents/product-marketing.md` and apply the imported `
 Then choose the highest-impact safe SEO task, implement it, verify, and report:
 
 - use `plan.nextAction` and `plan.brief` from the command output as the default decision
-- scheduled publisher runs should act on one selected article/refresh only; an explicit user-authorized cluster run may act on 2-5 distinct articles
+- scheduled publisher runs should act on one selected new article only; an explicit user-authorized cluster run may act on 2-5 distinct articles
 - daily traffic runs should execute at most one primary follow-up task and must not rerun the daily publisher unless that automation failed or is disabled
 - Lighthouse CI is weekly/manual; do not run it for every publisher task unless public SEO layout, metadata, structured data, or page experience changed
-- publisher runs should treat `single_article_publish` as one production article/refresh; `cluster_article_publish` is allowed only with explicit user authorization; Sunday strategy may inspect `weekly_content_batch` but should not publish it
-- for normal daily publisher runs, the same slug is not a skip reason by itself; if the planner selects the same slug again, ship a material refresh rather than a no-op report
+- publisher runs should treat `single_article_publish` as one new production article; `cluster_article_publish` is allowed only with explicit user authorization; Sunday strategy may inspect `weekly_content_batch` but should not publish it
+- for normal daily publisher runs, an existing or repeated slug is not publishable output; continue to the next distinct SEMrush-backed topic instead of refreshing or returning a no-op report
 - each article must follow `brief.targetCharacterRange`, `brief.internalLinkPolicy`, `brief.googleQualityPolicy`, and the funnel stage in `plan.weeklyContentPlan`
 - if live evidence contradicts the generated plan, choose the safer higher-impact SEO task and explain why
 
@@ -101,5 +101,5 @@ Content quality rules:
 - Treat vector-like, symbolic, icon-only, abstract, or flat illustrative covers as failed output for fresh production SEO articles. If the image still looks like a stand-in concept instead of a real scene, replace it before release.
 - Do not stuff exact-match anchors, copy competitor content, create doorway pages, or mass-produce low-value articles.
 - For programmatic SEO topics, require unique value beyond prose: at least two structured data/tool blocks, an expert causal-analysis frame, and an interactive chart-form CTA. If the topic cannot support that, publish fewer articles or create a draft/report only.
-- Do not return a short duplicate-run skip just because GSC, SEMrush, sitemap, and content inventory look unchanged. On publisher runs, convert that situation into a concrete article refresh unless a real blocker prevents safe release.
+- Do not return a short duplicate-run skip just because GSC, SEMrush, sitemap, and content inventory look unchanged. Continue through the topic queue until one distinct new article is publishable or a real blocker prevents safe release.
 - Treat character ranges as anti-thin-content safeguards, not as Google ranking requirements.
