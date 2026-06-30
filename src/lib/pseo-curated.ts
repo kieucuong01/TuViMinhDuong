@@ -1,5 +1,5 @@
 import type { PseoPageDraft } from "./pseo-registry.ts";
-import MANUAL_PSEO_BATCH_3 from "./pseo-manual-batch-3.json";
+import MANUAL_PSEO_BATCH_3 from "./pseo-manual-batch-3.json" with { type: "json" };
 
 type ManualPseoBatchItem = {
   body: string;
