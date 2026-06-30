@@ -22,6 +22,7 @@ describe("SEO content cluster", () => {
     expect(slugs).toContain("cung-tat-ach-trong-tu-vi");
     expect(slugs).toContain("cung-thien-di-trong-tu-vi");
     expect(slugs).toContain("lap-la-so-tu-vi-chuan");
+    expect(slugs).toContain("la-so-tu-vi-online");
     expect(slugs).toContain("phan-tich-la-so-tu-vi");
     expect(slugs).toContain("la-so-bat-tu-va-tu-vi");
     expect(slugs).toContain("chiem-tinh-la-so-va-tu-vi");
@@ -160,6 +161,24 @@ describe("SEO content cluster", () => {
     expect(creationGuide?.content).toContain("/kien-thuc-tu-vi/phan-tich-la-so-tu-vi");
   });
 
+  it("ships the online chart article as a distinct conversion-support guide with data blocks", () => {
+    const onlineGuide = seedArticles.find((article) => article.slug === "la-so-tu-vi-online");
+
+    expect(onlineGuide).toBeTruthy();
+    expect(onlineGuide?.coverImage).toBe("/articles/la-so-tu-vi-online.webp");
+    expect(onlineGuide?.ogImage).toBe("/articles/la-so-tu-vi-online.webp");
+    expect(onlineGuide?.coverAlt).toContain("lá số tử vi online");
+    expect(onlineGuide?.coverAlt).toContain("giờ sinh");
+    expect(onlineGuide?.content).toContain("| Dữ liệu cần khóa | Vì sao ảnh hưởng mạnh đến phần online | Nếu chưa chắc thì xử lý thế nào |");
+    expect(onlineGuide?.content).toContain("| Mục tiêu khi xem | Bản online làm tốt | Khi nào cần đối chiếu thêm |");
+    expect(onlineGuide?.content).toContain("/kien-thuc-tu-vi/tao-la-so-tu-vi");
+    expect(onlineGuide?.content).toContain("/kien-thuc-tu-vi/lap-la-so-tu-vi-chuan");
+    expect(onlineGuide?.content).toContain("/kien-thuc-tu-vi/phan-tich-la-so-tu-vi");
+    expect(onlineGuide?.content).toContain("/kien-thuc-tu-vi/la-so-bat-tu-va-tu-vi");
+    expect(onlineGuide?.content).toContain("/#lap-la-so");
+    expect(onlineGuide?.faqs?.length).toBeGreaterThanOrEqual(3);
+  });
+
   it("does not expose SEO implementation notes in public article copy", () => {
     for (const article of seedArticles) {
       expect(article.content).not.toContain("Nguồn tham khảo và kỹ thuật SEO");
@@ -181,6 +200,7 @@ describe("SEO content cluster", () => {
           "cung-no-boc-trong-tu-vi",
           "cung-tat-ach-trong-tu-vi",
           "cung-thien-di-trong-tu-vi",
+          "la-so-tu-vi-online",
           "lap-la-so-tu-vi-chuan",
           "phan-tich-la-so-tu-vi",
           "la-so-bat-tu-va-tu-vi",
