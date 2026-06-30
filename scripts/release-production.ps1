@@ -128,7 +128,7 @@ if ($branch -ne "master") {
   throw "Release production only runs from master. Current branch: $branch"
 }
 
-$statusLines = Get-RepositoryStatus
+$statusLines = @(Get-RepositoryStatus)
 if ($statusLines.Count -eq 0) {
   throw "No repository changes to commit."
 }
@@ -197,6 +197,8 @@ RELEASE_DIR="$APP_ROOT/releases/$RELEASE_NAME"
 CURRENT_DIR="$APP_ROOT/current"
 REPO_URL="https://github.com/kieucuong01/TuViMinhDuong.git"
 PREVIOUS_RELEASE="$(readlink -f "$CURRENT_DIR" 2>/dev/null || true)"
+RELEASES_TO_KEEP=3
+deploy_succeeded="0"
 
 start_app() {
   local app_dir="$1"
@@ -205,7 +207,70 @@ start_app() {
   pm2 start node_modules/next/dist/bin/next --name lasotinhhoa -- start -p 4100 -H 127.0.0.1
 }
 
+cleanup_npm_cache() {
+  npm cache clean --force >/dev/null 2>&1 || true
+  rm -rf -- /root/.npm/_cacache/tmp 2>/dev/null || true
+}
+
+cleanup_old_releases() {
+  mkdir -p "$APP_ROOT/releases"
+
+  local current_release
+  current_release="$(readlink -f "$CURRENT_DIR" 2>/dev/null || true)"
+
+  local release_rows=()
+  local release_path
+  if [ -n "$current_release" ] && [ -d "$current_release" ]; then
+    release_rows+=("9999999999 $current_release")
+  fi
+  while IFS= read -r release_path; do
+    if [ "$release_path" = "$current_release" ]; then
+      continue
+    fi
+    if [ -f "$release_path/.next/BUILD_ID" ] && [ -f "$release_path/node_modules/next/dist/bin/next" ]; then
+      release_rows+=("$(stat -c '%Y' "$release_path") $release_path")
+    fi
+  done < <(find "$APP_ROOT/releases" -maxdepth 1 -mindepth 1 -type d -print)
+
+  mapfile -t keep_releases < <(printf '%s\n' "${release_rows[@]}" | sort -rn | head -n "$RELEASES_TO_KEEP" | cut -d' ' -f2-)
+
+  for release_path in "$APP_ROOT"/releases/*; do
+    [ -d "$release_path" ] || continue
+    local keep="0"
+    local keep_release
+    for keep_release in "${keep_releases[@]}"; do
+      if [ "$release_path" = "$keep_release" ]; then
+        keep="1"
+        break
+      fi
+    done
+    if [ "$keep" != "1" ]; then
+      echo "Removing old or incomplete release: $release_path"
+      rm -rf -- "$release_path"
+    fi
+  done
+}
+
+cleanup_failed_release() {
+  if [ "$deploy_succeeded" = "1" ]; then
+    return
+  fi
+
+  if [ -d "$RELEASE_DIR" ]; then
+    local active_release
+    active_release="$(readlink -f "$CURRENT_DIR" 2>/dev/null || true)"
+    if [ "$active_release" != "$RELEASE_DIR" ]; then
+      echo "Removing failed release: $RELEASE_DIR"
+      rm -rf -- "$RELEASE_DIR"
+    fi
+  fi
+}
+
+trap cleanup_failed_release EXIT
+
 mkdir -p "$APP_ROOT/releases"
+cleanup_old_releases
+cleanup_npm_cache
 if [ -e "$RELEASE_DIR" ]; then
   echo "Release already exists: $RELEASE_DIR" >&2
   exit 1
@@ -218,6 +283,7 @@ if [ "$ACTUAL_SHA" != "$EXPECTED_SHA" ]; then
   echo "Expected commit $EXPECTED_SHA but cloned $ACTUAL_SHA" >&2
   exit 1
 fi
+rm -rf -- "$RELEASE_DIR/.git"
 
 if [ -d "$CURRENT_DIR" ]; then
   for env_file in "$CURRENT_DIR"/.env "$CURRENT_DIR"/.env.*; do
@@ -260,6 +326,9 @@ pm2 save
 pm2 describe lasotinhhoa
 pm2 describe lasotinhhoa | grep -F "$RELEASE_DIR" >/dev/null
 echo "DEPLOYED_RELEASE=$RELEASE_DIR"
+deploy_succeeded="1"
+cleanup_old_releases
+cleanup_npm_cache
 '@
 
 Write-Host ""
