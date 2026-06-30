@@ -31,6 +31,19 @@ describe("knowledge article pagination", () => {
     expect(routeSource).toContain("paginateArticles");
   });
 
+  it("replaces desktop cards, updates history, and returns focus to the list", () => {
+    const componentSource = readFileSync(fileURLToPath(componentUrl), "utf8");
+
+    expect(componentSource).toContain('mode: "replace" | "append"');
+    expect(componentSource).toContain("window.history.pushState");
+    expect(componentSource).toContain('window.addEventListener("popstate"');
+    expect(componentSource).toContain("scrollKnowledgeListIntoView");
+    expect(componentSource).toContain("aria-busy={isLoading}");
+    expect(componentSource).toContain('className="knowledge-article-region"');
+    expect(globalsCss).toContain(".knowledge-article-region");
+    expect(globalsCss).toContain("scroll-margin-top:");
+  });
+
   it("places the repaired CTA after the article list", () => {
     expect(pageSource).toContain("KnowledgeArticleList");
     expect(pageSource.indexOf("KnowledgeArticleList")).toBeLessThan(pageSource.indexOf("knowledge-cta-band"));

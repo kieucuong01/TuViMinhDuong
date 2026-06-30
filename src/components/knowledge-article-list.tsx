@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, type MouseEvent as ReactMouseEvent } from "react";
 import type { KnowledgeArticleListItem } from "@/lib/article-pagination";
 
 const ARTICLE_AUTHOR = "Admin";
@@ -81,39 +81,109 @@ export function KnowledgeArticleList({
   totalPages,
 }: KnowledgeArticleListProps) {
   const [articles, setArticles] = useState(initialArticles);
+  const [currentPage, setCurrentPage] = useState(page);
+  const [currentTotalPages, setCurrentTotalPages] = useState(totalPages);
   const [nextPage, setNextPage] = useState(page + 1);
   const [hasMore, setHasMore] = useState(page < totalPages);
   const [isLoading, setIsLoading] = useState(false);
+  const [loadingMode, setLoadingMode] = useState<"replace" | "append" | null>(null);
   const [loadError, setLoadError] = useState(false);
+  const regionRef = useRef<HTMLElement>(null);
   const sentinelRef = useRef<HTMLDivElement>(null);
 
-  const loadMore = useCallback(async () => {
-    if (!hasMore || isLoading) return;
-    setIsLoading(true);
-    setLoadError(false);
+  const scrollKnowledgeListIntoView = useCallback(() => {
+    const region = regionRef.current;
+    if (!region) return;
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    region.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "start" });
+    region.focus({ preventScroll: true });
+  }, []);
 
-    try {
-      const params = new URLSearchParams({
-        page: String(nextPage),
-        pageSize: String(pageSize),
-      });
-      if (category) params.set("category", category);
-      const response = await fetch(`/api/knowledge-articles?${params.toString()}`);
-      if (!response.ok) throw new Error("Không thể tải thêm bài viết.");
-      const payload = (await response.json()) as KnowledgeArticlesResponse;
+  const loadPage = useCallback(
+    async (targetPage: number, mode: "replace" | "append", updateHistory = false) => {
+      if (isLoading) return;
+      setIsLoading(true);
+      setLoadingMode(mode);
+      setLoadError(false);
 
-      setArticles((current) => {
-        const existingSlugs = new Set(current.map((article) => article.slug));
-        return [...current, ...payload.items.filter((article) => !existingSlugs.has(article.slug))];
-      });
-      setNextPage(payload.page + 1);
-      setHasMore(payload.page < payload.totalPages);
-    } catch {
-      setLoadError(true);
-    } finally {
-      setIsLoading(false);
+      try {
+        const params = new URLSearchParams({
+          page: String(targetPage),
+          pageSize: String(pageSize),
+        });
+        if (category) params.set("category", category);
+        const response = await fetch(`/api/knowledge-articles?${params.toString()}`, {
+          headers: { accept: "application/json" },
+        });
+        if (!response.ok) throw new Error("Không thể tải bài viết.");
+        const payload = (await response.json()) as KnowledgeArticlesResponse;
+
+        if (mode === "replace") {
+          setArticles(payload.items);
+          setCurrentPage(payload.page);
+          setNextPage(payload.page + 1);
+          setCurrentTotalPages(payload.totalPages);
+          setHasMore(payload.page < payload.totalPages);
+          if (updateHistory) {
+            window.history.pushState(
+              { knowledgePage: payload.page },
+              "",
+              buildKnowledgePageHref(payload.page, category),
+            );
+          }
+          requestAnimationFrame(scrollKnowledgeListIntoView);
+        } else {
+          setArticles((current) => {
+            const existingSlugs = new Set(current.map((article) => article.slug));
+            return [...current, ...payload.items.filter((article) => !existingSlugs.has(article.slug))];
+          });
+          setNextPage(payload.page + 1);
+          setCurrentTotalPages(payload.totalPages);
+          setHasMore(payload.page < payload.totalPages);
+        }
+      } catch {
+        setLoadError(true);
+      } finally {
+        setIsLoading(false);
+        setLoadingMode(null);
+      }
+    },
+    [category, isLoading, pageSize, scrollKnowledgeListIntoView],
+  );
+
+  const loadMore = useCallback(() => {
+    if (!hasMore) return Promise.resolve();
+    return loadPage(nextPage, "append");
+  }, [hasMore, loadPage, nextPage]);
+
+  function handleDesktopPageClick(event: ReactMouseEvent<HTMLAnchorElement>, targetPage: number) {
+    if (
+      event.button !== 0 ||
+      event.metaKey ||
+      event.ctrlKey ||
+      event.shiftKey ||
+      event.altKey ||
+      isLoading ||
+      targetPage === currentPage
+    ) {
+      return;
     }
-  }, [category, hasMore, isLoading, nextPage, pageSize]);
+    event.preventDefault();
+    void loadPage(targetPage, "replace", true);
+  }
+
+  useEffect(() => {
+    function restoreHistoryPage() {
+      const params = new URLSearchParams(window.location.search);
+      const requestedPage = Math.max(1, Number(params.get("page") || 1) || 1);
+      if (requestedPage !== currentPage) {
+        void loadPage(requestedPage, "replace");
+      }
+    }
+
+    window.addEventListener("popstate", restoreHistoryPage);
+    return () => window.removeEventListener("popstate", restoreHistoryPage);
+  }, [currentPage, loadPage]);
 
   useEffect(() => {
     const sentinel = sentinelRef.current;
@@ -131,39 +201,53 @@ export function KnowledgeArticleList({
   }, [hasMore, isLoading, loadMore]);
 
   return (
-    <>
+    <section
+      ref={regionRef}
+      className="knowledge-article-region"
+      tabIndex={-1}
+      aria-busy={isLoading}
+      aria-label="Danh sách bài viết"
+    >
       <div className="knowledge-article-grid">
         {articles.map((article) => (
           <KnowledgeArticleCard key={article.slug} article={article} />
         ))}
       </div>
 
-      {totalPages > 1 ? (
+      {currentTotalPages > 1 ? (
         <nav className="knowledge-desktop-pagination" aria-label="Phân trang bài viết">
           <Link
-            href={buildKnowledgePageHref(Math.max(1, page - 1), category)}
-            className={page <= 1 ? "disabled" : ""}
-            aria-disabled={page <= 1}
-            tabIndex={page <= 1 ? -1 : undefined}
+            href={buildKnowledgePageHref(Math.max(1, currentPage - 1), category)}
+            className={currentPage <= 1 ? "disabled" : ""}
+            aria-disabled={currentPage <= 1}
+            tabIndex={currentPage <= 1 ? -1 : undefined}
+            prefetch={false}
+            onClick={(event) => handleDesktopPageClick(event, Math.max(1, currentPage - 1))}
           >
             Trang trước
           </Link>
           <span>
-            Trang {page}/{totalPages}
+            Trang {currentPage}/{currentTotalPages}
           </span>
           <Link
-            href={buildKnowledgePageHref(Math.min(totalPages, page + 1), category)}
-            className={page >= totalPages ? "disabled" : ""}
-            aria-disabled={page >= totalPages}
-            tabIndex={page >= totalPages ? -1 : undefined}
+            href={buildKnowledgePageHref(Math.min(currentTotalPages, currentPage + 1), category)}
+            className={currentPage >= currentTotalPages ? "disabled" : ""}
+            aria-disabled={currentPage >= currentTotalPages}
+            tabIndex={currentPage >= currentTotalPages ? -1 : undefined}
+            prefetch={false}
+            onClick={(event) => handleDesktopPageClick(event, Math.min(currentTotalPages, currentPage + 1))}
           >
             Trang sau
           </Link>
         </nav>
       ) : null}
 
+      <div className="knowledge-desktop-pagination-status" aria-live="polite">
+        {isLoading && loadingMode === "replace" ? "Đang tải trang bài viết..." : null}
+      </div>
+
       <div ref={sentinelRef} className="knowledge-mobile-load-more" aria-live="polite">
-        {isLoading ? <span>Đang tải thêm bài viết...</span> : null}
+        {isLoading && loadingMode === "append" ? <span>Đang tải thêm bài viết...</span> : null}
         {loadError ? (
           <button type="button" className="btn btn-ghost" onClick={() => void loadMore()}>
             Thử tải lại
@@ -171,6 +255,6 @@ export function KnowledgeArticleList({
         ) : null}
         {!hasMore && articles.length > 0 ? <span>Bạn đã xem hết bài viết.</span> : null}
       </div>
-    </>
+    </section>
   );
 }
