@@ -23,6 +23,7 @@ describe("SEO content cluster", () => {
     expect(slugs).toContain("cung-thien-di-trong-tu-vi");
     expect(slugs).toContain("lap-la-so-tu-vi-chuan");
     expect(slugs).toContain("la-so-tu-vi-online");
+    expect(slugs).toContain("lap-la-so-bat-tu");
     expect(slugs).toContain("phan-tich-la-so-tu-vi");
     expect(slugs).toContain("la-so-bat-tu-va-tu-vi");
     expect(slugs).toContain("chiem-tinh-la-so-va-tu-vi");
@@ -44,6 +45,7 @@ describe("SEO content cluster", () => {
     const preciseSetup = seedArticles.find((article) => article.slug === "lap-la-so-tu-vi-chuan");
     const analysisGuide = seedArticles.find((article) => article.slug === "phan-tich-la-so-tu-vi");
     const batTuGuide = seedArticles.find((article) => article.slug === "la-so-bat-tu-va-tu-vi");
+    const lapBatTuGuide = seedArticles.find((article) => article.slug === "lap-la-so-bat-tu");
     const astrologyGuide = seedArticles.find((article) => article.slug === "chiem-tinh-la-so-va-tu-vi");
     const freeGuide = seedArticles.find((article) => article.slug === "la-so-tu-vi-mien-phi");
     const starPlacementGuide = seedArticles.find((article) => article.slug === "an-sao-la-so-tu-vi");
@@ -72,6 +74,9 @@ describe("SEO content cluster", () => {
     expect(batTuGuide?.content).toContain("/#lap-la-so");
     expect(batTuGuide?.content).toContain("/kien-thuc-tu-vi/la-so-tu-vi-la-gi");
     expect(batTuGuide?.content).toContain("/kien-thuc-tu-vi/cung-menh-cung-than");
+    expect(lapBatTuGuide?.content).toContain("/#lap-la-so");
+    expect(lapBatTuGuide?.content).toContain("/kien-thuc-tu-vi/la-so-bat-tu-va-tu-vi");
+    expect(lapBatTuGuide?.content).toContain("/kien-thuc-tu-vi/lap-la-so-tu-vi-can-gi");
     expect(astrologyGuide?.content).toContain("/#lap-la-so");
     expect(astrologyGuide?.content).toContain("/kien-thuc-tu-vi/la-so-bat-tu-va-tu-vi");
     expect(astrologyGuide?.content).toContain("/kien-thuc-tu-vi/lap-la-so-tu-vi-chuan");
@@ -179,6 +184,24 @@ describe("SEO content cluster", () => {
     expect(onlineGuide?.faqs?.length).toBeGreaterThanOrEqual(3);
   });
 
+  it("ships the bat tu setup article as a distinct workflow guide with data blocks", () => {
+    const lapBatTuGuide = seedArticles.find((article) => article.slug === "lap-la-so-bat-tu");
+
+    expect(lapBatTuGuide).toBeTruthy();
+    expect(lapBatTuGuide?.coverImage).toBe("/articles/lap-la-so-bat-tu.webp");
+    expect(lapBatTuGuide?.ogImage).toBe("/articles/lap-la-so-bat-tu.webp");
+    expect(lapBatTuGuide?.coverAlt).toContain("lập lá số bát tự");
+    expect(lapBatTuGuide?.coverAlt).toContain("giờ sinh");
+    expect(lapBatTuGuide?.content).toContain("| Bước chuẩn bị | Vì sao cần làm trước khi lập bát tự | Nếu còn mơ hồ thì xử lý thế nào |");
+    expect(lapBatTuGuide?.content).toContain("| Tình huống người đọc | Nên bắt đầu bằng bát tự | Nên quay về tử vi hoặc kiểm tra thêm |");
+    expect(lapBatTuGuide?.content).toContain("/kien-thuc-tu-vi/la-so-bat-tu-va-tu-vi");
+    expect(lapBatTuGuide?.content).toContain("/kien-thuc-tu-vi/lap-la-so-tu-vi-can-gi");
+    expect(lapBatTuGuide?.content).toContain("/kien-thuc-tu-vi/gio-sinh-trong-tu-vi");
+    expect(lapBatTuGuide?.content).toContain("/#lap-la-so");
+    expect(lapBatTuGuide?.content).toContain("## Quy trình 5 bước để lập lá số bát tự mà không bị trộn hệ");
+    expect(lapBatTuGuide?.faqs?.length).toBeGreaterThanOrEqual(3);
+  });
+
   it("does not expose SEO implementation notes in public article copy", () => {
     for (const article of seedArticles) {
       expect(article.content).not.toContain("Nguồn tham khảo và kỹ thuật SEO");
@@ -201,6 +224,7 @@ describe("SEO content cluster", () => {
           "cung-tat-ach-trong-tu-vi",
           "cung-thien-di-trong-tu-vi",
           "la-so-tu-vi-online",
+          "lap-la-so-bat-tu",
           "lap-la-so-tu-vi-chuan",
           "phan-tich-la-so-tu-vi",
           "la-so-bat-tu-va-tu-vi",

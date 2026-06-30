@@ -1,13 +1,13 @@
 {
-  "lastRunAt": "2026-06-30T00:52:06.011Z",
+  "lastRunAt": "2026-06-30T23:15:57.838Z",
   "lastStatus": "warning",
   "lastAction": {
     "type": "single_article_publish",
-    "slug": "la-so-tu-vi-online",
+    "slug": "lap-la-so-bat-tu",
     "slugs": [
-      "la-so-tu-vi-online"
+      "lap-la-so-bat-tu"
     ],
-    "reason": "Publish 1 people-first articles from SEMrush intent clusters; first topic: NgÆ°á»i Ä‘á»c muá»‘n xem lÃ¡ sá»‘ tá»­ vi online nhÆ°ng cáº§n biáº¿t nÃªn chuáº©n bá»‹ dá»¯ liá»‡u nÃ o, kÃ¬ vá»ng Ä‘Æ°á»£c gÃ¬ vÃ  giá»›i háº¡n cá»§a cÃ´ng cá»¥ online á»Ÿ Ä‘Ã¢u.",
+    "reason": "Publish 1 people-first articles from SEMrush intent clusters; first topic: NgÆ°á»i Ä‘á»c muá»‘n láº­p lÃ¡ sá»‘ bÃ¡t tá»± vÃ  cáº§n hiá»ƒu dÃ¹ng ngÃ y giá» sinh ra sao, khÃ¡c gÃ¬ vá»›i tá»­ vi vÃ  khi nÃ o nÃªn chá»n bÃ¡t tá»±.",
     "approvalRequired": false,
     "allowedToCommitDeployAfterVerification": true
   },
@@ -20,7 +20,7 @@
     "status": "skipped"
   },
   "lastDraftPaths": [
-    "docs/seo-autopilot/drafts/la-so-tu-vi-online.md"
+    "docs/seo-autopilot/drafts/lap-la-so-bat-tu.md"
   ],
   "lastReportPath": "docs/seo-autopilot/reports/2026-06-30-weekly-content-batch.md",
   "nextVerificationCommands": [

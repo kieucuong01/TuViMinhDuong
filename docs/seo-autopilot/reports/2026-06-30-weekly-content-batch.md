@@ -1,10 +1,10 @@
 # SEO Autopilot Report
-Generated: 2026-06-30T00:52:06.011Z
+Generated: 2026-06-30T23:15:57.838Z
 Base URL: https://lasotinhhoa.vn
 Status: warning
 Mode: auto-safe
-Sitemap URLs: 48
-Seed articles: 37
+Sitemap URLs: 49
+Seed articles: 38
 ## Keyword Intelligence
 Source: D:\DU AN CA NHAN WEBSITE\tsh\semrush_la_so_keywords.csv (396 rows)
 Included keyword volume: 666780
@@ -31,10 +31,10 @@ Do not publish:
 ## Search Console Feedback
 - Skipped or not configured.
 ## Next Action
-Next action: single_article_publish `la-so-tu-vi-online`
-Weekly batch: `la-so-tu-vi-online`
+Next action: single_article_publish `lap-la-so-bat-tu`
+Weekly batch: `lap-la-so-bat-tu`
 Approval required: no
-Reason: Publish 1 people-first articles from SEMrush intent clusters; first topic: NgÆ°á»i Ä‘á»c muá»‘n xem lÃ¡ sá»‘ tá»­ vi online nhÆ°ng cáº§n biáº¿t nÃªn chuáº©n bá»‹ dá»¯ liá»‡u nÃ o, kÃ¬ vá»ng Ä‘Æ°á»£c gÃ¬ vÃ  giá»›i háº¡n cá»§a cÃ´ng cá»¥ online á»Ÿ Ä‘Ã¢u.
+Reason: Publish 1 people-first articles from SEMrush intent clusters; first topic: NgÆ°á»i Ä‘á»c muá»‘n láº­p lÃ¡ sá»‘ bÃ¡t tá»± vÃ  cáº§n hiá»ƒu dÃ¹ng ngÃ y giá» sinh ra sao, khÃ¡c gÃ¬ vá»›i tá»­ vi vÃ  khi nÃ o nÃªn chá»n bÃ¡t tá»±.
 ## Warnings
 - 4 pages have no JSON-LD
 ## Programmatic SEO Guardrails
@@ -43,9 +43,9 @@ Reason: Publish 1 people-first articles from SEMrush intent clusters; first topi
 - One search intent, one useful URL: merge close variants instead of making separate pages for lap, lay, tao, tra, ve, or ke when the user need is the same.
 - Programmatic content needs unique value from the product: score tables, modifier-star context, chart-form interaction, and clear limits of interpretation.
 ## Artifacts
-- Batch draft: `docs/seo-autopilot/drafts/la-so-tu-vi-online.md`
+- Batch draft: `docs/seo-autopilot/drafts/lap-la-so-bat-tu.md`
 ## Weekly Content Plan
-- Monday: `la-so-tu-vi-online` (conversion-support, 5500-8500 chars, cover /articles/la-so-tu-vi-online.webp)
+- Monday: `lap-la-so-bat-tu` (middle, 5500-8500 chars, cover /articles/lap-la-so-bat-tu.webp)
 ## Verification Checklist
 - npm run seo:autopilot
 - npm test -- src/lib/content.test.ts src/lib/article-cover-assets.test.ts src/lib/seo-autopilot-core.test.ts
