@@ -1,4 +1,8 @@
-import { CURATED_PSEO_SLUGS, getCuratedPseoContent } from "./pseo-curated.ts";
+import {
+  CURATED_PSEO_SLUGS,
+  MANUAL_PSEO_BATCH_3_SLUGS,
+  getCuratedPseoContent,
+} from "./pseo-curated.ts";
 
 export type PseoEntityKind = "MAIN_STAR" | "PALACE" | "SUPPORT_STAR";
 export type PseoPageKind = "HUB" | "ENTITY" | "COMBINATION";
@@ -249,7 +253,7 @@ export function buildPseoCombinations() {
   return MAIN_STARS.flatMap((star) => PALACES.map((palace) => buildPseoDraft(star.slug, palace.slug)));
 }
 
-export { CURATED_PSEO_SLUGS };
+export { CURATED_PSEO_SLUGS, MANUAL_PSEO_BATCH_3_SLUGS };
 
 export function buildPseoInventory() {
   const curated = new Set<string>(CURATED_PSEO_SLUGS);

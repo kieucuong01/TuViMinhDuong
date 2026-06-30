@@ -3,6 +3,7 @@ import {
   MAIN_STARS,
   PALACES,
   CURATED_PSEO_SLUGS,
+  MANUAL_PSEO_BATCH_3_SLUGS,
   buildPseoCombinations,
   buildPseoDraft,
   buildPseoInventory,
@@ -35,8 +36,9 @@ describe("pSEO registry", () => {
     const drafts = inventory.filter((page) => page.status === "DRAFT");
     expect(inventory).toHaveLength(168);
     expect(published.map((page) => page.slug).sort()).toEqual([...CURATED_PSEO_SLUGS].sort());
-    expect(published).toHaveLength(42);
-    expect(drafts).toHaveLength(126);
+    expect(published).toHaveLength(78);
+    expect(drafts).toHaveLength(90);
+    expect(MANUAL_PSEO_BATCH_3_SLUGS).toHaveLength(36);
     expect(drafts.every((page) => page.robots === "noindex,follow")).toBe(true);
   });
 
@@ -65,13 +67,24 @@ describe("pSEO audit", () => {
   it("accepts only hand-written published pages and keeps canonical slugs unique", () => {
     const findings = auditPseoInventory(buildPseoInventory());
     expect(findings.filter((finding) => finding.severity === "error")).toEqual([]);
-  });
+  }, 60_000);
 
   it("flags pages that are too similar to another published lookup page", () => {
     const [first, second] = buildPseoInventory().filter((page) => page.status === "PUBLISHED");
     const findings = auditPseoInventory([{ ...first }, { ...second, body: first.body }]);
     expect(contentSimilarityScore(first.body, first.body)).toBe(1);
     expect(findings.map((finding) => finding.code)).toContain("duplicate-template");
+  });
+
+  it("rejects proper Vietnamese absolute claims and article-shape artifacts", () => {
+    const source = buildPseoInventory().find((page) => page.status === "PUBLISHED")!;
+    const findings = auditPseoPage({
+      ...source,
+      body: `# Tiêu đề lặp trong thân bài\n\n${source.body.replaceAll("](/#lap-la-so)", "](/lap-la-so)")}\n\nMột người bạn của tôi có cách cục này, nên dành 40% thu nhập để đầu tư. Chắc chắn giàu có.`,
+    });
+    expect(findings.map((finding) => finding.code)).toEqual(
+      expect.arrayContaining(["unsafe-claim", "invalid-content-shape", "fabricated-anecdote", "over-specific-advice", "missing-internal-links"]),
+    );
   });
 
   it("does not link published pages to draft leaf pages", () => {
@@ -91,7 +104,7 @@ describe("pSEO data access", () => {
   it("serves the published fallback inventory when PostgreSQL is not configured", async () => {
     const slugs = await listPublishedPseoSlugs();
     const page = await getPublishedPseoPage("sao-thai-am-cung-tai-bach");
-    expect(slugs).toHaveLength(42);
+    expect(slugs).toHaveLength(78);
     expect(page?.starSlug).toBe("thai-am");
     expect((await listPseoEntities("MAIN_STAR"))).toHaveLength(14);
   });

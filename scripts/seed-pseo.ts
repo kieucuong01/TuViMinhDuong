@@ -2,6 +2,7 @@ import "dotenv/config";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "../src/generated/prisma/client.ts";
 import { MAIN_STARS, PALACES, SUPPORT_STARS, buildPseoInventory } from "../src/lib/pseo-registry.ts";
+import { getCuratedPseoGenerationMeta } from "../src/lib/pseo-curated.ts";
 
 const databaseUrl = process.env.DATABASE_URL || "";
 if (!databaseUrl || databaseUrl.includes("johndoe:randompassword")) {
@@ -63,7 +64,7 @@ try {
         robots: page.robots,
         auditScore: page.status === "PUBLISHED" ? 100 : 0,
         auditFindings: [],
-        generationMeta: { source: "curated-matrix-v1" },
+        generationMeta: getCuratedPseoGenerationMeta(page.slug),
         publishedAt: page.status === "PUBLISHED" ? page.publishedAt : null,
       },
       create: {
@@ -87,7 +88,7 @@ try {
         robots: page.robots,
         auditScore: page.status === "PUBLISHED" ? 100 : 0,
         auditFindings: [],
-        generationMeta: { source: "curated-matrix-v1" },
+        generationMeta: getCuratedPseoGenerationMeta(page.slug),
         publishedAt: page.status === "PUBLISHED" ? page.publishedAt : null,
       },
     });
