@@ -333,7 +333,8 @@ cleanup_npm_cache
 
 Write-Host ""
 Write-Host "==> Deploy VPS release $releaseName" -ForegroundColor Cyan
-$remoteScript | & $ssh tuvi-vps "bash -s -- '$commitSha' '$releaseName' '$migrateFlag'"
+$remoteScriptForBash = $remoteScript -replace "`r`n", "`n"
+$remoteScriptForBash | & $ssh tuvi-vps "bash -s -- '$commitSha' '$releaseName' '$migrateFlag'"
 if ($LASTEXITCODE -ne 0) {
   throw "VPS deployment failed with exit code $LASTEXITCODE."
 }
