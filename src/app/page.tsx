@@ -30,6 +30,12 @@ function chartFormErrorMessage(chartError?: string) {
   if (chartError === "failed") {
     return "Chưa lập được lá số trong lượt này. Bạn kiểm tra lại thông tin sinh rồi thử lại giúp mình nhé.";
   }
+  if (chartError === "invalid") {
+    return "Tên trên lá số chứa ký tự không phù hợp. Bạn nhập tên thật hoặc tên gọi ngắn gọn rồi thử lại nhé.";
+  }
+  if (chartError === "rate_limited") {
+    return "Thiết bị này đã lập quá nhiều lá số trong vài phút. Bạn chờ một lúc rồi thử lại nhé.";
+  }
   return "";
 }
 

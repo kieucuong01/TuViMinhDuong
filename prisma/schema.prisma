@@ -104,19 +104,22 @@ model Session {
 }
 
 model Chart {
-  id        String    @id @default(cuid())
-  userId    String?
-  title     String
-  input     Json
-  chart     Json
-  isPrivate Boolean   @default(true)
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  user      User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
-  readings  Reading[]
+  id                String    @id @default(cuid())
+  userId            String?
+  title             String
+  input             Json
+  chart             Json
+  isPrivate         Boolean   @default(true)
+  creationIp        String?
+  creationUserAgent String?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  user              User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  readings          Reading[]
   assistantQuestions AssistantQuestion[]
 
   @@index([userId, createdAt])
+  @@index([creationIp, createdAt])
 }
 
 model Reading {

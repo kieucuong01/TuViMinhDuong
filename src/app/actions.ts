@@ -1,9 +1,10 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { headers } from "next/headers";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { clearSession, createMagicSession, getCurrentUser, getOrCreateEmailUser, loginOrRegister, setSession, type SessionUser } from "@/lib/auth";
-import { ARTICLES_CACHE_TAG, FEATURE_PRICES_CACHE_TAG, OPERATION_SETTINGS_CACHE_TAG, getCachedReading, getChart, getFeaturePrice, getOperationSettings, getUserBalance, saveArticleCategoryFromForm, saveArticleFromForm, saveChart, saveReading, adjustCoins, deleteArticleBySlug, deleteUserChart, getReadingJobByScope, createPendingReading, updateOperationSettings, updateFeaturePrices, getCompletedReadingsForScopes, hasReadingBundleAccess } from "@/lib/data";
+import { ARTICLES_CACHE_TAG, FEATURE_PRICES_CACHE_TAG, OPERATION_SETTINGS_CACHE_TAG, countRecentChartsForIp, getCachedReading, getChart, getFeaturePrice, getOperationSettings, getUserBalance, saveArticleCategoryFromForm, saveArticleFromForm, saveChart, saveReading, adjustCoins, deleteArticleBySlug, deleteUserChart, getReadingJobByScope, createPendingReading, updateOperationSettings, updateFeaturePrices, getCompletedReadingsForScopes, hasReadingBundleAccess, type ChartCreationMetadata } from "@/lib/data";
 import { generateReading } from "@/lib/ai";
 import { getDb } from "@/lib/db";
 import { createPayOSCheckout, createPayOSCustomCheckout } from "@/lib/payos";
@@ -17,6 +18,7 @@ import { adminAdjustUserCoins, adminDeleteUser } from "@/lib/admin-user-manageme
 import { createPerfTimer, logPerfEvent } from "@/lib/perf";
 import { ActionTimeoutError, withActionTimeout } from "@/lib/action-timeout";
 import { savePseoPageFromForm } from "@/lib/pseo-data";
+import { chartCreationRateLimitExceeded, chartCreationRateLimitWindowStart, normalizeRequestIp, normalizeUserAgent, validateChartFullName } from "@/lib/chart-submission-guard";
 
 function createChartTimeoutMs(value = process.env.CREATE_CHART_ACTION_TIMEOUT_MS) {
   const parsed = Number(value);
@@ -24,6 +26,13 @@ function createChartTimeoutMs(value = process.env.CREATE_CHART_ACTION_TIMEOUT_MS
 }
 
 const CREATE_CHART_ACTION_TIMEOUT_MS = createChartTimeoutMs();
+
+class ChartSubmissionRejectedError extends Error {
+  constructor(public code: "invalid" | "rate_limited") {
+    super(code);
+    this.name = "ChartSubmissionRejectedError";
+  }
+}
 
 export async function loginAction(formData: FormData) {
   const email = String(formData.get("email") || "");
@@ -112,6 +121,36 @@ function chartInputFromForm(formData: FormData) {
   };
 }
 
+async function getChartCreationMetadata(): Promise<ChartCreationMetadata> {
+  const headerList = await headers();
+  return {
+    requestIp: normalizeRequestIp(
+      headerList.get("x-forwarded-for") ||
+        headerList.get("x-real-ip") ||
+        headerList.get("cf-connecting-ip") ||
+        headerList.get("x-client-ip"),
+    ),
+    userAgent: normalizeUserAgent(headerList.get("user-agent")),
+  };
+}
+
+async function guardChartSubmission(input: ReturnType<typeof chartInputFromForm>) {
+  const validation = validateChartFullName(input.fullName);
+  if (!validation.ok) throw new ChartSubmissionRejectedError("invalid");
+  input.fullName = validation.fullName;
+
+  const metadata = await getChartCreationMetadata();
+  const recentCount = await countRecentChartsForIp(metadata.requestIp, chartCreationRateLimitWindowStart());
+  if (chartCreationRateLimitExceeded(recentCount)) throw new ChartSubmissionRejectedError("rate_limited");
+  return metadata;
+}
+
+function chartSubmissionErrorParam(error: unknown) {
+  if (error instanceof ChartSubmissionRejectedError) return error.code;
+  if (error instanceof ActionTimeoutError) return "timeout";
+  return "failed";
+}
+
 export async function createChartAction(formData: FormData) {
   const timer = createPerfTimer();
   const input = chartInputFromForm(formData);
@@ -120,21 +159,22 @@ export async function createChartAction(formData: FormData) {
 
   try {
     result = await withActionTimeout("createChartAction", CREATE_CHART_ACTION_TIMEOUT_MS, async () => {
+      const metadata = await timer.time("guardChartSubmission", () => guardChartSubmission(input));
       const user = await timer.time("getCurrentUser", () => getCurrentUser());
-      const chart = await timer.time("saveChart", () => saveChart(input, user));
+      const chart = await timer.time("saveChart", () => saveChart(input, user, metadata));
       return { user, chart };
     });
   } catch (error) {
-    const isTimeout = error instanceof ActionTimeoutError;
+    const chartError = chartSubmissionErrorParam(error);
     logPerfEvent("create_chart_action_failed", timer.total(), {
       force: true,
-      reason: isTimeout ? "timeout" : "error",
+      reason: chartError,
       timeoutMs: CREATE_CHART_ACTION_TIMEOUT_MS,
       dbEnvState: databaseEnvState(),
       error: error instanceof Error ? error.message : String(error),
       timings: timer.timings(),
     });
-    redirect(withQueryParams("/#lap-la-so", { chartError: isTimeout ? "timeout" : "failed", adSource }));
+    redirect(withQueryParams("/#lap-la-so", { chartError, adSource }));
   }
 
   logPerfEvent("create_chart_action_timing", timer.total(), {
@@ -152,11 +192,17 @@ export async function quickReadingCheckoutAction(formData: FormData) {
   if (!operationSettings.paymentsEnabled || !operationSettings.paidReadingsEnabled) redirect("/?paid=disabled");
 
   const input = chartInputFromForm(formData);
+  let metadata: ChartCreationMetadata;
+  try {
+    metadata = await guardChartSubmission(input);
+  } catch (error) {
+    redirect(withQueryParams("/#lap-la-so", { chartError: chartSubmissionErrorParam(error) }));
+  }
   const email = String(formData.get("email") || "");
   const user = await getOrCreateEmailUser(email, input.fullName);
   await setSession(user);
 
-  const chart = await saveChart(input, user);
+  const chart = await saveChart(input, user, metadata);
   const price = await getFeaturePrice("FULL");
   const amountVnd = price.priceCoins * 1000;
   const token = await createMagicSession(user);

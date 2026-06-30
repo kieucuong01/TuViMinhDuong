@@ -18,7 +18,14 @@ type StoredChart = {
   input: ChartInput;
   chart: TuViChart;
   userId?: string;
+  creationIp?: string | null;
+  creationUserAgent?: string | null;
   createdAt: Date;
+};
+
+export type ChartCreationMetadata = {
+  requestIp?: string;
+  userAgent?: string;
 };
 
 export type StoredReading = {
@@ -117,6 +124,8 @@ export type AdminChartSubmission = {
   birthMinute: number;
   viewYear: number;
   timezone: string;
+  creationIp: string | null;
+  creationUserAgent: string | null;
 };
 
 type ChartWithFreeOverview = TuViChart & {
@@ -318,6 +327,8 @@ type AdminChartSubmissionRecord = {
   title: string;
   input: unknown;
   userId?: string | null;
+  creationIp?: string | null;
+  creationUserAgent?: string | null;
   createdAt: Date;
   user?: {
     id?: string;
@@ -347,6 +358,8 @@ function normalizeAdminChartSubmission(record: AdminChartSubmissionRecord): Admi
     birthMinute: input.birthMinute || 0,
     viewYear: input.viewYear,
     timezone: input.timezone || "Asia/Bangkok",
+    creationIp: record.creationIp || null,
+    creationUserAgent: record.creationUserAgent || null,
   };
 }
 
@@ -592,7 +605,21 @@ function upgradeStoredChart(record: StoredChart) {
   };
 }
 
-export async function saveChart(input: ChartInput, user: SessionUser | null) {
+export async function countRecentChartsForIp(requestIp: string | undefined, since: Date) {
+  if (!requestIp) return 0;
+  const db = getDb();
+  if (!db) {
+    return Array.from(charts().values()).filter((chart) => chart.creationIp === requestIp && chart.createdAt >= since).length;
+  }
+  return db.chart.count({
+    where: {
+      creationIp: requestIp,
+      createdAt: { gte: since },
+    },
+  });
+}
+
+export async function saveChart(input: ChartInput, user: SessionUser | null, metadata: ChartCreationMetadata = {}) {
   const timer = createPerfTimer();
   const chart = await timer.time("engine", () => generateTuViChart(input));
   const title = chartTitle(chart);
@@ -609,7 +636,16 @@ export async function saveChart(input: ChartInput, user: SessionUser | null) {
 
   if (!db) {
     const id = `demo-chart-${Date.now()}`;
-    const stored = { id, title, input: chart.input, chart, userId: user?.id, createdAt: new Date() };
+    const stored = {
+      id,
+      title,
+      input: chart.input,
+      chart,
+      userId: user?.id,
+      creationIp: metadata.requestIp,
+      creationUserAgent: metadata.userAgent,
+      createdAt: new Date(),
+    };
     charts().set(id, stored);
     logPerfEvent("save_chart_timing", timer.total(), {
       hasUser: Boolean(user),
@@ -627,6 +663,8 @@ export async function saveChart(input: ChartInput, user: SessionUser | null) {
         chart,
         userId: user?.id,
         isPrivate: true,
+        creationIp: metadata.requestIp,
+        creationUserAgent: metadata.userAgent,
       },
     }),
   );
@@ -636,6 +674,8 @@ export async function saveChart(input: ChartInput, user: SessionUser | null) {
     input: created.input as ChartInput,
     chart: created.chart as TuViChart,
     userId: created.userId || undefined,
+    creationIp: created.creationIp || undefined,
+    creationUserAgent: created.creationUserAgent || undefined,
     createdAt: created.createdAt,
   };
   logPerfEvent("save_chart_timing", timer.total(), {
@@ -1838,6 +1878,8 @@ export async function listAdminChartSubmissions(limit = 80): Promise<AdminChartS
           title: chart.title,
           input: chart.input,
           userId: chart.userId || null,
+          creationIp: chart.creationIp || null,
+          creationUserAgent: chart.creationUserAgent || null,
           createdAt: chart.createdAt,
           user: userEmail ? { email: userEmail, name: null } : null,
         });
@@ -1852,6 +1894,8 @@ export async function listAdminChartSubmissions(limit = 80): Promise<AdminChartS
       title: true,
       input: true,
       userId: true,
+      creationIp: true,
+      creationUserAgent: true,
       createdAt: true,
       user: {
         select: {
