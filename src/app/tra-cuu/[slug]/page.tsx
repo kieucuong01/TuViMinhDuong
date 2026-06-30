@@ -8,6 +8,7 @@ import {
   getRelatedPseoPages,
   listPublishedPseoRouteSlugs,
 } from "@/lib/pseo-data";
+import { getPseoEntityContent } from "@/lib/pseo-entity-content";
 import { absoluteUrl, breadcrumbJsonLd, faqJsonLd, webPageJsonLd } from "@/lib/seo";
 
 export const revalidate = 3600;
@@ -80,10 +81,13 @@ export default async function PseoLeafPage({ params }: { params: Promise<{ slug:
       breadcrumb,
     });
     const breadcrumbLd = breadcrumbJsonLd(breadcrumb);
+    const entityContent = getPseoEntityContent(entityPage.kind, entityPage.entity);
+    const faqLd = faqJsonLd(entityContent.faqs);
     return (
       <>
         <script id="pseo-entity-page-jsonld" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(pageLd) }} />
         <script id="pseo-entity-breadcrumb-jsonld" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
+        <script id="pseo-entity-faq-jsonld" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }} />
         <PseoEntityPage page={entityPage} />
       </>
     );

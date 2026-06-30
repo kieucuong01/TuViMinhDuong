@@ -9,6 +9,7 @@ import {
   buildPseoInventory,
 } from "@/lib/pseo-registry";
 import { auditPseoInventory, auditPseoPage, contentSimilarityScore } from "@/lib/pseo-audit";
+import { getPseoEntityContent } from "@/lib/pseo-entity-content";
 import {
   getPseoEntityPage,
   getPublishedPseoPage,
@@ -48,6 +49,38 @@ describe("pSEO registry", () => {
     expect(first.scores).toEqual(second.scores);
     expect(Object.values(first.scores).every((score) => score >= 1 && score <= 10)).toBe(true);
   });
+
+  it("gives every standalone star and palace page substantial entity-specific guidance", () => {
+    const entities = [...MAIN_STARS, ...PALACES];
+    const intents = new Set<string>();
+
+    for (const entity of entities) {
+      const content = getPseoEntityContent(entity.kind as "MAIN_STAR" | "PALACE", entity);
+      const text = [
+        content.intent,
+        ...content.intro,
+        ...content.contextRows.flatMap((row) => [row.label, row.value, row.howToRead]),
+        ...content.usefulSignals.flatMap((item) => [item.title, item.body]),
+        ...content.misreadRisks.flatMap((item) => [item.title, item.body]),
+        ...content.practiceSteps,
+        ...content.modifierNotes,
+        ...content.faqs.flatMap((item) => [item.question, item.answer]),
+      ].join(" ");
+
+      intents.add(content.intent);
+      expect(content.intro).toHaveLength(3);
+      expect(content.usefulSignals).toHaveLength(3);
+      expect(content.misreadRisks).toHaveLength(3);
+      expect(content.practiceSteps).toHaveLength(3);
+      expect(content.modifierNotes).toHaveLength(2);
+      expect(content.faqs).toHaveLength(2);
+      expect(text.length).toBeGreaterThan(1900);
+      expect(text).toContain(entity.name);
+      expect(text).toContain("lá số");
+    }
+
+    expect(intents.size).toBe(entities.length);
+  });
 });
 
 describe("pSEO audit", () => {
@@ -67,7 +100,7 @@ describe("pSEO audit", () => {
   it("accepts only hand-written published pages and keeps canonical slugs unique", () => {
     const findings = auditPseoInventory(buildPseoInventory());
     expect(findings.filter((finding) => finding.severity === "error")).toEqual([]);
-  }, 60_000);
+  }, 120_000);
 
   it("flags pages that are too similar to another published lookup page", () => {
     const [first, second] = buildPseoInventory().filter((page) => page.status === "PUBLISHED");

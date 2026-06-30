@@ -1,9 +1,13 @@
 import Link from "next/link";
 import { ArrowRight, Sparkles } from "lucide-react";
 import type { PseoEntityPageView } from "@/lib/pseo-data";
+import { getPseoEntityContent } from "@/lib/pseo-entity-content";
 
 export function PseoEntityPage({ page }: { page: PseoEntityPageView }) {
   const isStar = page.kind === "MAIN_STAR";
+  const content = getPseoEntityContent(page.kind, page.entity);
+  const subject = isStar ? `sao ${page.entity.name}` : `cung ${page.entity.name}`;
+
   return (
     <main className="pseo-hub pseo-entity-page section">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -32,33 +36,89 @@ export function PseoEntityPage({ page }: { page: PseoEntityPageView }) {
             <span>Ý nghĩa nền</span>
             <strong>{page.entity.summary}</strong>
           </div>
+          <div>
+            <span>Mục đích tra cứu</span>
+            <strong>{content.intent}</strong>
+          </div>
         </section>
 
         <section className="pseo-entity-content">
           <article>
             <p className="pseo-entity-reading-note">
-              Đây là lớp tra cứu nền. Muốn luận đúng, hãy đặt {isStar ? `sao ${page.entity.name}` : `cung ${page.entity.name}`} vào
-              toàn bộ lá số, bộ sao đi kèm, trạng thái mạnh yếu và câu hỏi thực tế của người xem.
+              Đây là lớp tra cứu nền. Muốn luận đúng, hãy đặt {subject} vào toàn bộ lá số, bộ sao đi kèm, trạng thái mạnh yếu,
+              tam hợp/xung chiếu, vận đang tác động và câu hỏi thực tế của người xem.
             </p>
+
             <h2>{isStar ? `Cách đọc sao ${page.entity.name}` : `Cách đọc cung ${page.entity.name}`}</h2>
-            <p>
-              {isStar
-                ? `Sao ${page.entity.name} cho biết một kiểu năng lượng nền trong lá số. Khi đọc riêng, chỉ nên xem đây là lớp khái quát; muốn luận đúng cần đặt sao vào cung, bộ sao đi kèm và vận đang tác động.`
-                : `Cung ${page.entity.name} là một khu vực đời sống trong lá số. Cung cho biết chủ đề cần quan sát, còn chính tinh và phụ tinh cho biết cách chủ đề đó biểu hiện trong từng trường hợp cụ thể.`}
-            </p>
-            <h2>Điểm mạnh nên quan sát</h2>
-            <ul>
-              {page.entity.strengths.map((item) => (
+            {content.intro.map((paragraph) => (
+              <p key={paragraph}>{paragraph}</p>
+            ))}
+
+            <h2>Ba lớp cần đối chiếu trước khi kết luận</h2>
+            <div className="prose-table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th scope="col">Lớp đọc</th>
+                    <th scope="col">Nội dung</th>
+                    <th scope="col">Cách dùng an toàn</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {content.contextRows.map((row) => (
+                    <tr key={row.label}>
+                      <td>{row.label}</td>
+                      <td>{row.value}</td>
+                      <td>{row.howToRead}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <h2>Khi nào {subject} phát huy rõ?</h2>
+            <div className="pseo-entity-detail-grid">
+              {content.usefulSignals.map((item) => (
+                <section key={item.body}>
+                  <h3>{item.title}</h3>
+                  <p>{item.body}</p>
+                </section>
+              ))}
+            </div>
+
+            <h2>Các lỗi đọc sai thường gặp</h2>
+            <div className="pseo-entity-detail-grid">
+              {content.misreadRisks.map((item) => (
+                <section key={item.body}>
+                  <h3>{item.title}</h3>
+                  <p>{item.body}</p>
+                </section>
+              ))}
+            </div>
+
+            <h2>Cách tự kiểm chứng trên lá số cá nhân</h2>
+            <ol>
+              {content.practiceSteps.map((item) => (
                 <li key={item}>{item}</li>
               ))}
-            </ul>
-            <h2>Điểm cần thận trọng</h2>
-            <ul>
-              {page.entity.cautions.map((item) => (
-                <li key={item}>{item}</li>
+            </ol>
+
+            <h2>Những yếu tố có thể làm đổi nghĩa</h2>
+            {content.modifierNotes.map((paragraph) => (
+              <p key={paragraph}>{paragraph}</p>
+            ))}
+
+            <h2>Câu hỏi thường gặp</h2>
+            <div className="pseo-entity-faq">
+              {content.faqs.map((item) => (
+                <section key={item.question}>
+                  <h3>{item.question}</h3>
+                  <p>{item.answer}</p>
+                </section>
               ))}
-            </ul>
+            </div>
           </article>
+
           <aside>
             <Sparkles aria-hidden="true" size={28} />
             <h2>Muốn đối chiếu với lá số riêng?</h2>

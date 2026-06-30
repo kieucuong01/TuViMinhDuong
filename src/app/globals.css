@@ -11438,6 +11438,41 @@ button.is-loading:not(.icon-button)::before {
   line-height: 1.7;
 }
 
+.pseo-entity-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.85rem;
+  margin: 1.15rem 0 1.8rem;
+}
+
+.pseo-entity-detail-grid section,
+.pseo-entity-faq section {
+  border: 1px solid var(--pseo-line);
+  border-radius: 1.1rem;
+  background: var(--pseo-paper);
+  padding: 1rem;
+  box-shadow: 0 16px 42px rgba(62, 39, 28, 0.06);
+}
+
+.pseo-entity-detail-grid h3,
+.pseo-entity-faq h3 {
+  margin: 0 0 0.45rem;
+  color: var(--pseo-ink);
+  font-size: 1rem;
+  line-height: 1.35;
+}
+
+.pseo-entity-detail-grid p,
+.pseo-entity-faq p {
+  margin: 0;
+}
+
+.pseo-entity-faq {
+  display: grid;
+  gap: 0.85rem;
+  margin-top: 1rem;
+}
+
 .pseo-related {
   grid-template-columns: minmax(0, 1fr);
 }
@@ -11514,6 +11549,7 @@ button.is-loading:not(.icon-button)::before {
 
   .pseo-root-guide,
   .pseo-hub-index article,
+  .pseo-entity-detail-grid,
   .pseo-data-strip,
   .pseo-lookup-form > div,
   .pseo-lookup-lists,
