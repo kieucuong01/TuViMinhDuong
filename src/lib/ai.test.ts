@@ -7,6 +7,7 @@ import {
   PAID_READING_CHAPTER_MAX_TOKENS,
   type PaidReadingChapter,
   type PaidReadingGenerationProgress,
+  buildPaidActionPlanContext,
   buildInstantFreeOverview,
   countWords,
   generateFreeOverview,
@@ -70,23 +71,15 @@ function completeGeneratedChapter(chapter: PaidReadingChapter, marker: string) {
       ? Array.from({ length: 12 }, (_, index) => `- Thang ${index + 1}: uu tien viec ro rang, tranh quyet dinh voi.`).join("\n")
       : "";
 
-  return `# ${chapter.title}
+  const sections = chapter.requiredSections.map((section, index) => {
+    const body = index === 1
+      ? filler
+      : `- **${marker} key ${index + 1}.**
+- ${marker} action ${index + 1}.`;
+    return `## ${section}\n${body}`;
+  }).join("\n\n");
 
-## ${chapter.requiredSections[0]}
-- ${marker} evidence.
-
-## ${chapter.requiredSections[1]}
-${filler}
-
-## ${chapter.requiredSections[2]}
-- ${marker} risk note.
-- Kiem tra tien bac va giay to.
-
-## ${chapter.requiredSections[3]}
-- ${marker} action one.
-- ${marker} action two.
-- ${marker} action three.
-${monthLines ? `\n${monthLines}` : ""}`;
+  return `# ${chapter.title}\n\n${sections}${monthLines ? `\n\n${monthLines}` : ""}`;
 }
 
 beforeEach(() => {
@@ -134,7 +127,7 @@ describe("AI reading format", () => {
     let maxActive = 0;
 
     llmRouterMocks.generateWithLlmRouter.mockImplementation(async ({ prompt }: { prompt: string }) => {
-      const chapter = chapters.find((item) => prompt.includes(item.title));
+      const chapter = chapters.find((item) => prompt.includes(`Hãy viết chương ${item.title} (`));
       if (!chapter) throw new Error("Unknown chapter prompt");
 
       active += 1;
@@ -158,7 +151,7 @@ describe("AI reading format", () => {
     const successfulChapterMeta = promptMeta.chapters.find((chapter: { key: string }) => chapter.key === chapters[0].key);
 
     expect(maxActive).toBeLessThanOrEqual(3);
-    expect(llmRouterMocks.generateWithLlmRouter).toHaveBeenCalledTimes(9);
+    expect(llmRouterMocks.generateWithLlmRouter).toHaveBeenCalledTimes(10);
     expect(result.content).toContain(`generated-${chapters[0].key}`);
     expect(result.content).toContain(`# ${failedChapter.title}`);
     expect(result.content).not.toContain(`generated-${failedChapter.key}`);
@@ -166,8 +159,8 @@ describe("AI reading format", () => {
     expect(String(failedChapterMeta.model)).toContain("template-fallback");
     expect(successfulChapterMeta).toMatchObject({ key: chapters[0].key, formatGuarded: false });
     expect(promptMeta).not.toHaveProperty("modelPolicy");
-    expect(progressSnapshots).toHaveLength(8);
-    expect(progressSnapshots.at(-1)?.completedChapters).toHaveLength(8);
+    expect(progressSnapshots).toHaveLength(9);
+    expect(progressSnapshots.at(-1)?.completedChapters).toHaveLength(9);
   });
 
   it("routes paid chapters through DeepSeek then Groq", async () => {
@@ -181,7 +174,7 @@ describe("AI reading format", () => {
     const attemptsByKey = new Map<string, number>();
 
     llmRouterMocks.generateWithLlmRouter.mockImplementation(async (options: { prompt: string }) => {
-      const chapter = chapters.find((item) => options.prompt.includes(item.title));
+      const chapter = chapters.find((item) => options.prompt.includes(`Hãy viết chương ${item.title} (`));
       if (!chapter) throw new Error("Unknown chapter prompt");
 
       const attempt = (attemptsByKey.get(chapter.key) || 0) + 1;
@@ -206,10 +199,10 @@ describe("AI reading format", () => {
     const promptMeta = JSON.parse(result.prompt);
     const weakChapterMeta = promptMeta.chapters.find((chapter: { key: string }) => chapter.key === weakChapter.key);
     const weakChapterCalls = llmRouterMocks.generateWithLlmRouter.mock.calls.filter(([options]) =>
-      String((options as { prompt: string }).prompt).includes(weakChapter.title),
+      String((options as { prompt: string }).prompt).includes(`Hãy viết chương ${weakChapter.title} (`),
     );
     const yearlyCalls = llmRouterMocks.generateWithLlmRouter.mock.calls.filter(([options]) =>
-      String((options as { prompt: string }).prompt).includes(yearlyChapter.title),
+      String((options as { prompt: string }).prompt).includes(`Hãy viết chương ${yearlyChapter.title} (`),
     );
 
     expect(weakChapterCalls).toHaveLength(2);
@@ -327,11 +320,11 @@ Tuần tại Thiên Di là tín hiệu nên kiểm chứng.
     expect(isCompleteFreeOverview(buildContent(1450))).toBe(false);
   });
 
-  it("defines the full paid reading as 8 fixed chapters", () => {
+  it("defines eight interpretive chapters and one consolidated action chapter", () => {
     const chart = sampleChart();
     const chapters = paidReadingChapters(chart, "FULL");
 
-    expect(chapters).toHaveLength(8);
+    expect(chapters).toHaveLength(9);
     expect(chapters.map((chapter) => chapter.title)).toEqual([
       "Chương 1: Tổng quan lá số",
       "Chương 2: Mệnh, Thân và khí chất cốt lõi",
@@ -341,15 +334,26 @@ Tuần tại Thiên Di là tín hiệu nên kiểm chứng.
       "Chương 6: Tình cảm, hôn nhân, gia đình",
       "Chương 7: Sức khỏe, tinh thần, nhịp sống",
       "Chương 8: Vận hạn năm 2026 và gợi ý theo từng tháng",
+      "Chương 9: Kế hoạch hành động cá nhân",
     ]);
     expect(chapters.some((chapter) => chapter.requiredSections.includes("Dữ kiện lá số đã dùng"))).toBe(false);
     expect(chapters.some((chapter) => chapter.requiredSections.includes("Cơ sở tử vi cần nắm"))).toBe(false);
-    expect(chapters.every((chapter) => chapter.requiredSections.join("|") === "Mỏ neo|Luận giải chi tiết|Cẩm nang hành động")).toBe(true);
+    expect(chapters.slice(0, 8).every((chapter) => chapter.requiredSections.join("|") === "Mỏ neo|Luận giải chi tiết")).toBe(true);
+    expect(chapters[8]).toMatchObject({
+      key: "action-plan",
+      requiredSections: [
+        "Việc cần ưu tiên ngay",
+        "Kế hoạch 30 ngày",
+        "Kế hoạch 90 ngày",
+        "Điều cần tránh",
+        "Mốc tự đánh giá lại",
+      ],
+    });
     expect(chapters.find((chapter) => chapter.key === "relationship")?.targetWords).toBe("650-950 từ");
     expect(chapters.find((chapter) => chapter.key === "health")?.targetWords).toBe("550-850 từ");
   });
 
-  it("moves repeated full-reading evidence into one opening data dashboard", async () => {
+  it("keeps evidence in prose and removes the technical data dashboard", async () => {
     clearProviderEnv();
 
     const chart = sampleChart();
@@ -364,24 +368,33 @@ Tuần tại Thiên Di là tín hiệu nên kiểm chứng.
       chapters.length,
     );
 
-    const { content, prompt: promptMetaJson } = await generateReading(chart, "FULL", "all");
-    const promptMeta = JSON.parse(promptMetaJson);
+    const { content } = await generateReading(chart, "FULL", "all");
 
-    expect(prompt).toContain("Trung tâm dữ liệu lá số");
-    expect(prompt).toContain("Mỏ neo - Độ sâu - Hành động");
+    expect(prompt).not.toContain("Trung tâm dữ liệu lá số");
+    expect(prompt).toContain("Mỏ neo - Độ sâu");
     expect(prompt).toContain("không tạo section dữ kiện");
     expect(prompt).toContain("không lặp lại cùng một nhận định");
+    expect(prompt).toContain("3-6");
+    expect(prompt).toContain("**");
     expect(prompt).not.toContain("Dữ kiện các cung trọng yếu:");
 
     expect(content.match(/## Dữ kiện lá số đã dùng/g)).toBeNull();
-    expect(content.match(/# Trung tâm dữ liệu lá số/g)).toHaveLength(1);
-    expect(content.trim().startsWith("# Trung tâm dữ liệu lá số")).toBe(true);
-    expect(promptMeta.chapters[0]).toMatchObject({
-      key: "data-dashboard",
-      title: "Trung tâm dữ liệu lá số",
-      model: "deterministic-dashboard",
-      formatGuarded: false,
-    });
+    expect(content).not.toContain("# Trung tâm dữ liệu lá số");
+    expect(content).not.toContain("## Cẩm nang hành động");
+  });
+
+  it("builds a bounded action context from prior anchors and bold conclusions", () => {
+    const context = buildPaidActionPlanContext([
+      "# Chương 1\n## Mỏ neo\n**Nội lực bền bỉ.**\n## Luận giải chi tiết\nBỏ qua đoạn dài.",
+      "# Chương 2\n## Mỏ neo\nĐiểm neo thứ hai.\n## Luận giải chi tiết\n**Kiểm tra dữ kiện trước quyết định.**",
+    ]);
+
+    expect(context).toContain("Chương 1");
+    expect(context).toContain("Nội lực bền bỉ");
+    expect(context).toContain("Chương 2");
+    expect(context).toContain("Kiểm tra dữ kiện trước quyết định");
+    expect(context).not.toContain("Bỏ qua đoạn dài");
+    expect(context.length).toBeLessThanOrEqual(12_000);
   });
 
   it("formats strategic full chapters as life pillars and yearly timeline cards", () => {
@@ -420,7 +433,7 @@ Tuần tại Thiên Di là tín hiệu nên kiểm chứng.
   it("builds paid prompts with word target, address, star states and yearly-star requirements", () => {
     const chart = sampleChart("male");
     const chapters = paidReadingChapters(chart, "FULL");
-    const yearlyChapter = chapters.at(-1);
+    const yearlyChapter = chapters.find((chapter) => chapter.key === "yearly-months");
     expect(yearlyChapter).toBeDefined();
 
     const prompt = paidReadingChapterPrompt(
@@ -445,7 +458,7 @@ Tuần tại Thiên Di là tín hiệu nên kiểm chứng.
   it("guides yearly full chapters away from prompt leakage, repeated greetings and robotic monthly loops", () => {
     const chart = sampleChart("male");
     const chapters = paidReadingChapters(chart, "FULL");
-    const yearlyChapter = chapters.at(-1)!;
+    const yearlyChapter = chapters.find((chapter) => chapter.key === "yearly-months")!;
     const prompt = paidReadingChapterPrompt(
       chart,
       "FULL",
@@ -574,7 +587,7 @@ Tuần tại Thiên Di là tín hiệu nên kiểm chứng.
     const chart = sampleChart();
     const fullChapters = paidReadingChapters(chart, "FULL");
     const overviewChapter = fullChapters[0];
-    const fullYearChapter = paidReadingChapters(chart, "FULL").at(-1)!;
+    const fullYearChapter = paidReadingChapters(chart, "FULL").find((chapter) => chapter.key === "yearly-months")!;
     const palaceChapter = paidReadingChapters(chart, "PALACE")[0];
     const dailyChapter = paidReadingChapters(chart, "NHAT_VAN")[0];
 
@@ -613,7 +626,7 @@ ${filler}
     expect(isCompletePaidChapter(complete, chapter)).toBe(true);
   });
 
-  it("returns a structured 8-chapter fallback when no LLM provider is configured", async () => {
+  it("returns a structured 9-chapter fallback when no LLM provider is configured", async () => {
     clearProviderEnv();
 
     const { content, prompt, model } = await generateReading(sampleChart(), "FULL", "all");
@@ -625,8 +638,10 @@ ${filler}
     }
     expect(content).toContain("## Mỏ neo");
     expect(content).toContain("## Luận giải chi tiết");
-    expect(content).toContain("## Cẩm nang hành động");
-    expect(content.trim().startsWith("# Trung tâm dữ liệu lá số")).toBe(true);
+    expect(content).not.toContain("## Cẩm nang hành động");
+    expect(content).not.toContain("# Trung tâm dữ liệu lá số");
+    expect(content).toContain("# Chương 9: Kế hoạch hành động cá nhân");
+    expect(content).toContain("## Kế hoạch 30 ngày");
     expect(content).toContain("Gợi ý 12 tháng");
     expect(content).not.toContain("Chương này được dựng từ dữ liệu lá số");
     expect(content).not.toContain("Dữ kiện trọng yếu");
