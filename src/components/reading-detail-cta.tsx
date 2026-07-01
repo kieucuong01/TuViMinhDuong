@@ -9,9 +9,9 @@ function preferredScrollBehavior(): ScrollBehavior {
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth";
 }
 
-export function scrollToPremiumReading() {
+export function scrollToPremiumReading(behavior = preferredScrollBehavior()) {
   document.getElementById(PREMIUM_READING_TARGET_ID)?.scrollIntoView({
-    behavior: preferredScrollBehavior(),
+    behavior,
     block: "start",
   });
 }
@@ -19,7 +19,44 @@ export function scrollToPremiumReading() {
 export function ReadingHashScrollRestorer() {
   useEffect(() => {
     if (window.location.hash !== PREMIUM_READING_HASH) return;
-    requestAnimationFrame(scrollToPremiumReading);
+
+    let active = true;
+    let firstScroll = true;
+    let frameId = 0;
+
+    function alignTarget() {
+      if (!active) return;
+      cancelAnimationFrame(frameId);
+      frameId = requestAnimationFrame(() => {
+        scrollToPremiumReading(firstScroll ? preferredScrollBehavior() : "auto");
+        firstScroll = false;
+      });
+    }
+
+    const observer = new ResizeObserver(alignTarget);
+    observer.observe(document.body);
+
+    function cancelRestoration() {
+      if (!active) return;
+      active = false;
+      observer.disconnect();
+      cancelAnimationFrame(frameId);
+      window.clearTimeout(stopTimer);
+      window.removeEventListener("wheel", cancelRestoration);
+      window.removeEventListener("touchstart", cancelRestoration);
+      window.removeEventListener("pointerdown", cancelRestoration);
+      window.removeEventListener("keydown", cancelRestoration);
+    }
+
+    window.addEventListener("wheel", cancelRestoration, { passive: true, once: true });
+    window.addEventListener("touchstart", cancelRestoration, { passive: true, once: true });
+    window.addEventListener("pointerdown", cancelRestoration, { passive: true, once: true });
+    window.addEventListener("keydown", cancelRestoration, { once: true });
+
+    const stopTimer = window.setTimeout(cancelRestoration, 4000);
+    alignTarget();
+
+    return cancelRestoration;
   }, []);
 
   return null;
@@ -46,7 +83,7 @@ export function ReadingDetailCta({
   }
 
   return (
-    <button type="button" className="btn btn-small btn-primary" onClick={scrollToPremiumReading}>
+    <button type="button" className="btn btn-small btn-primary" onClick={() => scrollToPremiumReading()}>
       {children}
     </button>
   );

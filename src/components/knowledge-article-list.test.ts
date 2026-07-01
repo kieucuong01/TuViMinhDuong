@@ -40,8 +40,7 @@ describe("knowledge article pagination", () => {
     expect(componentSource).toContain("scrollKnowledgeListIntoView");
     expect(componentSource).toContain("aria-busy={isLoading}");
     expect(componentSource).toContain('className="knowledge-article-region"');
-    expect(globalsCss).toContain(".knowledge-article-region");
-    expect(globalsCss).toContain("scroll-margin-top:");
+    expect(componentSource).toContain('style={{ scrollMarginTop: "6.5rem" }}');
   });
 
   it("places the repaired CTA after the article list", () => {

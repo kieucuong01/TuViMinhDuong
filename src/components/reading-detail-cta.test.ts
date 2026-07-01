@@ -28,8 +28,20 @@ describe("reading detail CTA flow", () => {
     expect(ctaSource).toContain("ReadingHashScrollRestorer");
     expect(ctaSource).toContain("window.location.hash");
     expect(ctaSource).toContain("loginModalHref");
+    expect(ctaSource).toContain("onClick={() => scrollToPremiumReading()}");
     expect(loaderSource).toContain("<ReadingDetailCta");
     expect(chartPageSource).toContain("<ReadingHashScrollRestorer");
+    expect(chartPageSource).toContain('style={{ scrollMarginTop: "7rem" }}');
+  });
+
+  it("keeps the premium target aligned while content above it finishes rendering", () => {
+    expect(existsSync(ctaPath)).toBe(true);
+    if (!existsSync(ctaPath)) return;
+    const ctaSource = readFileSync(ctaPath, "utf8");
+
+    expect(ctaSource).toContain("new ResizeObserver");
+    expect(ctaSource).toContain("cancelRestoration");
+    expect(ctaSource).toContain('"wheel"');
   });
 
   it("keeps the existing premium confirmation form as the only paid action", () => {

@@ -163,7 +163,7 @@ export default async function ChartPage({
             />
             {featurePrices ? <ReadingTabs chartId={id} chart={record.chart} featurePrices={featurePrices} /> : null}
             {featurePrices ? (
-              <div id={PREMIUM_READING_TARGET_ID}>
+              <div id={PREMIUM_READING_TARGET_ID} style={{ scrollMarginTop: "7rem" }}>
                 <PremiumReadingCta chartId={id} fullName={record.chart.input.fullName} hasAdvancedReading={hasAdvancedReading} fullPriceCoins={featurePrices.FULL.priceCoins} />
               </div>
             ) : null}

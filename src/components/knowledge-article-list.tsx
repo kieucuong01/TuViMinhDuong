@@ -204,6 +204,7 @@ export function KnowledgeArticleList({
     <section
       ref={regionRef}
       className="knowledge-article-region"
+      style={{ scrollMarginTop: "6.5rem" }}
       tabIndex={-1}
       aria-busy={isLoading}
       aria-label="Danh sách bài viết"

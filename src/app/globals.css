@@ -7302,15 +7302,6 @@ button.is-loading:not(.icon-button)::before {
   gap: 1rem;
 }
 
-#mo-khoa-ho-so-vip {
-  scroll-margin-top: 7rem;
-}
-
-.knowledge-article-region {
-  scroll-margin-top: 6.5rem;
-  outline: none;
-}
-
 .knowledge-desktop-pagination {
   display: flex;
   align-items: center;
