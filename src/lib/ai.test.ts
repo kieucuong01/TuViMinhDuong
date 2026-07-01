@@ -322,8 +322,79 @@ Tuần tại Thiên Di là tín hiệu nên kiểm chứng.
       "Chương 7: Sức khỏe, tinh thần, nhịp sống",
       "Chương 8: Vận hạn năm 2026 và gợi ý theo từng tháng",
     ]);
-    expect(chapters.every((chapter) => chapter.requiredSections.includes("Dữ kiện lá số đã dùng"))).toBe(true);
-    expect(chapters.every((chapter) => chapter.requiredSections.includes("Gợi ý hành động"))).toBe(true);
+    expect(chapters.some((chapter) => chapter.requiredSections.includes("Dữ kiện lá số đã dùng"))).toBe(false);
+    expect(chapters.some((chapter) => chapter.requiredSections.includes("Cơ sở tử vi cần nắm"))).toBe(false);
+    expect(chapters.every((chapter) => chapter.requiredSections.join("|") === "Mỏ neo|Luận giải chi tiết|Cẩm nang hành động")).toBe(true);
+    expect(chapters.find((chapter) => chapter.key === "relationship")?.targetWords).toBe("650-950 từ");
+    expect(chapters.find((chapter) => chapter.key === "health")?.targetWords).toBe("550-850 từ");
+  });
+
+  it("moves repeated full-reading evidence into one opening data dashboard", async () => {
+    clearProviderEnv();
+
+    const chart = sampleChart();
+    const chapters = paidReadingChapters(chart, "FULL");
+    const prompt = paidReadingChapterPrompt(
+      chart,
+      "FULL",
+      "all",
+      { title: "Luận giải toàn bộ", evidence: ["Mệnh: Sơn đầu Hỏa", "Lưu niên: L.Kình Dương (H)"] },
+      chapters[0],
+      0,
+      chapters.length,
+    );
+
+    const { content, prompt: promptMetaJson } = await generateReading(chart, "FULL", "all");
+    const promptMeta = JSON.parse(promptMetaJson);
+
+    expect(prompt).toContain("Trung tâm dữ liệu lá số");
+    expect(prompt).toContain("Mỏ neo - Độ sâu - Hành động");
+    expect(prompt).toContain("không tạo section dữ kiện");
+    expect(prompt).toContain("không lặp lại cùng một nhận định");
+    expect(prompt).not.toContain("Dữ kiện các cung trọng yếu:");
+
+    expect(content.match(/## Dữ kiện lá số đã dùng/g)).toBeNull();
+    expect(content.match(/# Trung tâm dữ liệu lá số/g)).toHaveLength(1);
+    expect(content.trim().startsWith("# Trung tâm dữ liệu lá số")).toBe(true);
+    expect(promptMeta.chapters[0]).toMatchObject({
+      key: "data-dashboard",
+      title: "Trung tâm dữ liệu lá số",
+      model: "deterministic-dashboard",
+      formatGuarded: false,
+    });
+  });
+
+  it("formats strategic full chapters as life pillars and yearly timeline cards", () => {
+    const chart = sampleChart("male");
+    const chapters = paidReadingChapters(chart, "FULL");
+    const twelvePalacesChapter = chapters.find((chapter) => chapter.key === "twelve-palaces")!;
+    const yearlyChapter = chapters.find((chapter) => chapter.key === "yearly-months")!;
+
+    const twelvePalacesPrompt = paidReadingChapterPrompt(
+      chart,
+      "FULL",
+      "all",
+      { title: "Luận giải toàn bộ", evidence: ["Mệnh: Thiên Đồng (H)", "Tài Bạch: Vô chính diệu"] },
+      twelvePalacesChapter,
+      2,
+      chapters.length,
+    );
+    const yearlyPrompt = paidReadingChapterPrompt(
+      chart,
+      "FULL",
+      "all",
+      { title: "Luận giải toàn bộ", evidence: ["Vận năm: L.Kình Dương", "Đại vận: Quan Lộc"] },
+      yearlyChapter,
+      7,
+      chapters.length,
+    );
+
+    expect(twelvePalacesPrompt).toContain("### Trụ cột 1: Bản Thể & Sức Khỏe");
+    expect(twelvePalacesPrompt).toContain("### Trụ cột 2: Sự Nghiệp & Thịnh Vượng");
+    expect(twelvePalacesPrompt).toContain("### Trụ cột 3: Mạng Lưới Mối Quan Hệ");
+    expect(yearlyPrompt).toContain("Thời tiết vận hạn");
+    expect(yearlyPrompt).toContain("🔻 Vùng nguy hiểm");
+    expect(yearlyPrompt).toContain("🔹 Vùng cơ hội");
   });
 
   it("builds paid prompts with word target, address, star states and yearly-star requirements", () => {
@@ -532,18 +603,20 @@ ${filler}
     for (const chapter of chapters) {
       expect(content).toContain(`# ${chapter.title}`);
     }
-    expect(content).toContain("## Dữ kiện lá số đã dùng");
-    expect(content).toContain("## Luận giải chính");
-    expect(content).toContain("## Điều nên lưu ý");
-    expect(content).toContain("## Gợi ý hành động");
+    expect(content).toContain("## Mỏ neo");
+    expect(content).toContain("## Luận giải chi tiết");
+    expect(content).toContain("## Cẩm nang hành động");
+    expect(content.trim().startsWith("# Trung tâm dữ liệu lá số")).toBe(true);
     expect(content).toContain("Gợi ý 12 tháng");
     expect(content).not.toContain("Chương này được dựng từ dữ liệu lá số");
     expect(content).not.toContain("Dữ kiện trọng yếu");
 
-    const monthBodies = Array.from(content.matchAll(/^- Tháng \d+:\s*(.+)$/gm), (match) => match[1]);
+    const monthBodies = Array.from(content.matchAll(/^### Tháng \d+:\s*(.+)$/gm), (match) => match[1]);
     expect(monthBodies).toHaveLength(12);
     expect(new Set(monthBodies).size).toBe(12);
-    expect(prompt).toContain("paid-personal-dossier-v4");
+    expect(content.match(/🔻 Vùng nguy hiểm/g)).toHaveLength(12);
+    expect(content.match(/🔹 Vùng cơ hội/g)).toHaveLength(12);
+    expect(prompt).toContain("paid-personal-dossier-v5");
   });
 
   it("computes 5 directional score groups for the advanced report header", () => {
