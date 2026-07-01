@@ -298,7 +298,6 @@ Expected: component and CTA tests pass.
 
 **Files:**
 - Verify all modified source/test files
-- Preserve unrelated existing modification in `src/lib/ai.ts` at the Gemini escalation constant unless the user explicitly includes it
 
 - [ ] **Step 1: Inspect the scoped diff**
 

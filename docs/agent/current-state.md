@@ -26,13 +26,12 @@
 - Admin is exempt from the paid-reading shutdown and can still view/unlock advanced readings with zero coin charge.
 - Settings persist in `OperationSettings`; apply migration `20260526162000_add_operation_settings` before relying on this in production.
 
-## Previous Update: Groq-First Reading Model Policy
+## Current Update: Two-provider Reading Policy
 
-- Free and paid readings now use provider order `groq,gemini` by default.
-- FULL paid readings still pass Gemini model hints so provider fallback uses `gemini-2.5-flash` for normal chapters.
-- If a generated paid chapter is too short, misses required headings, or otherwise fails the format guard, that chapter is retried once; if the router has to use Gemini on that retry, it uses `gemini-3.5-flash`.
-- Chapter 8 yearly/month guidance also uses `gemini-3.5-flash` if the router has to fall back from Groq to Gemini.
-- Env overrides: `PAID_READING_PRIMARY_GEMINI_MODEL`, `PAID_READING_ESCALATION_GEMINI_MODEL`, and `PAID_READING_YEARLY_GEMINI_MODEL`.
+- Free readings, paid readings, and the chart assistant use provider order `deepseek,groq`.
+- If a paid chapter is too short, misses required headings, or otherwise fails the format guard, that chapter is retried once through the same provider order.
+- If both attempts fail, only that chapter uses the deterministic template fallback.
+- Provider env overrides are `DEEPSEEK_MODEL`, `GROQ_MODEL`, and `LLM_PROVIDER_ORDER`.
 
 ## Previous Update: Reading Unlock Tests
 
@@ -59,7 +58,7 @@ Tài liệu này là ảnh chụp nhanh trạng thái dự án **Lá số tinh h
 - Prisma 7 + PostgreSQL
 - Email/password auth, Google OAuth tùy env
 - PayOS/VietQR checkout + webhook
-- Gemini/Groq LLM router + fallback template
+- DeepSeek/Groq LLM router + fallback template
 - Vitest, ESLint, Next build
 - VPS deploy target with Nginx and PM2
 

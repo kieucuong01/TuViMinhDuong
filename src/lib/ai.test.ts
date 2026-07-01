@@ -32,17 +32,14 @@ vi.mock("@/lib/llm-router", () => ({
   hasExternalLlmProvider: llmRouterMocks.hasExternalLlmProvider,
 }));
 
-const oldGeminiKey = process.env.GEMINI_API_KEY;
-const oldGeminiKeys = process.env.GEMINI_API_KEYS;
+const oldDeepSeekKey = process.env.DEEPSEEK_API_KEY;
+const oldDeepSeekKeys = process.env.DEEPSEEK_API_KEYS;
 const oldGroqKey = process.env.GROQ_API_KEY;
 const oldGroqKeys = process.env.GROQ_API_KEYS;
-const oldPaidPrimaryGeminiModel = process.env.PAID_READING_PRIMARY_GEMINI_MODEL;
-const oldPaidEscalationGeminiModel = process.env.PAID_READING_ESCALATION_GEMINI_MODEL;
-const oldPaidYearlyGeminiModel = process.env.PAID_READING_YEARLY_GEMINI_MODEL;
 
 function clearProviderEnv() {
-  delete process.env.GEMINI_API_KEY;
-  delete process.env.GEMINI_API_KEYS;
+  delete process.env.DEEPSEEK_API_KEY;
+  delete process.env.DEEPSEEK_API_KEYS;
   delete process.env.GROQ_API_KEY;
   delete process.env.GROQ_API_KEYS;
 }
@@ -99,13 +96,10 @@ beforeEach(() => {
 });
 
 afterEach(() => {
-  restore("GEMINI_API_KEY", oldGeminiKey);
-  restore("GEMINI_API_KEYS", oldGeminiKeys);
+  restore("DEEPSEEK_API_KEY", oldDeepSeekKey);
+  restore("DEEPSEEK_API_KEYS", oldDeepSeekKeys);
   restore("GROQ_API_KEY", oldGroqKey);
   restore("GROQ_API_KEYS", oldGroqKeys);
-  restore("PAID_READING_PRIMARY_GEMINI_MODEL", oldPaidPrimaryGeminiModel);
-  restore("PAID_READING_ESCALATION_GEMINI_MODEL", oldPaidEscalationGeminiModel);
-  restore("PAID_READING_YEARLY_GEMINI_MODEL", oldPaidYearlyGeminiModel);
 });
 
 describe("AI reading format", () => {
@@ -152,7 +146,7 @@ describe("AI reading format", () => {
       return {
         text: completeGeneratedChapter(chapter, `generated-${chapter.key}`),
         model: `mock-${chapter.key}`,
-        provider: "gemini",
+        provider: "deepseek",
       };
     });
 
@@ -171,6 +165,7 @@ describe("AI reading format", () => {
     expect(failedChapterMeta).toMatchObject({ key: failedChapter.key, formatGuarded: true });
     expect(String(failedChapterMeta.model)).toContain("template-fallback");
     expect(successfulChapterMeta).toMatchObject({ key: chapters[0].key, formatGuarded: false });
+    expect(promptMeta).not.toHaveProperty("modelPolicy");
     expect(progressSnapshots).toHaveLength(8);
     expect(progressSnapshots.at(-1)?.completedChapters).toHaveLength(8);
   });
@@ -185,7 +180,7 @@ describe("AI reading format", () => {
     const yearlyChapter = chapters.find((chapter) => chapter.key === "yearly-months")!;
     const attemptsByKey = new Map<string, number>();
 
-    llmRouterMocks.generateWithLlmRouter.mockImplementation(async (options: { prompt: string; geminiModel?: string }) => {
+    llmRouterMocks.generateWithLlmRouter.mockImplementation(async (options: { prompt: string }) => {
       const chapter = chapters.find((item) => options.prompt.includes(item.title));
       if (!chapter) throw new Error("Unknown chapter prompt");
 
@@ -220,12 +215,10 @@ describe("AI reading format", () => {
     expect(weakChapterCalls).toHaveLength(2);
     expect((weakChapterCalls[0][0] as { providerOrder?: string[] }).providerOrder).toEqual(["deepseek", "groq"]);
     expect((weakChapterCalls[1][0] as { providerOrder?: string[] }).providerOrder).toEqual(["deepseek", "groq"]);
-    expect((weakChapterCalls[0][0] as { geminiModel?: string }).geminiModel).toBe("gemini-2.5-flash");
-    expect((weakChapterCalls[1][0] as { geminiModel?: string }).geminiModel).toBe("gemini-3.5-flash");
     expect(yearlyCalls).toHaveLength(1);
-    expect((yearlyCalls[0][0] as { geminiModel?: string }).geminiModel).toBe("gemini-3.5-flash");
     expect(result.content).toContain(`generated-${weakChapter.key}-attempt-2`);
     expect(weakChapterMeta).toMatchObject({ key: weakChapter.key, model: "groq/llama-3.1-8b-instant", formatGuarded: false });
+    expect(promptMeta).not.toHaveProperty("modelPolicy");
   });
 
   it("asks the free overview LLM for a roughly 1,200-word personal mini-report", async () => {

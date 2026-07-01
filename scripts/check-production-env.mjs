@@ -15,7 +15,7 @@ const coreRequired = [
 const googleOAuthVars = ["GOOGLE_CLIENT_ID", "GOOGLE_CLIENT_SECRET"];
 const payosVars = ["PAYOS_CLIENT_ID", "PAYOS_API_KEY", "PAYOS_CHECKSUM_KEY"];
 const llmVarGroups = [
-  ["GEMINI_API_KEY", "GEMINI_API_KEYS"],
+  ["DEEPSEEK_API_KEY", "DEEPSEEK_API_KEYS"],
   ["GROQ_API_KEY", "GROQ_API_KEYS"],
 ];
 
@@ -78,7 +78,7 @@ boolLine(
 );
 
 const llmReady = llmVarGroups.some(hasAnyValue);
-boolLine("LLM", llmReady, llmReady ? "provider key(s) present" : "GEMINI_* and GROQ_* all missing");
+boolLine("LLM", llmReady, llmReady ? "provider key(s) present" : "DEEPSEEK_* and GROQ_* all missing");
 
 if (!hasError && payosReady && llmReady && googleOAuthReady) {
   console.log("✅ Tất cả nhóm env chính đều có mặt.");

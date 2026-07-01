@@ -34,7 +34,7 @@ Use this README only when the quickstart is not enough. For current project drif
 - Prisma `7.8.0` with PostgreSQL
 - Email/password auth, optional Google OAuth by env
 - PayOS/VietQR checkout and webhook
-- Gemini/Groq LLM router plus fallback template readings
+- DeepSeek/Groq LLM router plus fallback template readings
 - Vitest, ESLint, TypeScript checks
 - VPS deploy target with Nginx and PM2
 

@@ -11,7 +11,7 @@ Web tra cứu tử vi AI dùng Next.js App Router, TypeScript, Tailwind CSS, Pri
 - Database: `PostgreSQL` (Prisma datasource provider: `postgresql`)
 - Authentication: email/password nội bộ, hỗ trợ Google OAuth theo env
 - Thanh toán: `PayOS` / `VietQR` (checkout + webhook)
-- AI luận giải: router `Gemini/Groq` và template fallback
+- AI luận giải: router `DeepSeek → Groq` và template fallback
 - SEO: Next Metadata API, `robots`, `sitemap`, OG image route
 - Quality: `Vitest`, `ESLint`, `TypeScript`
 - Deploy target: VPS self-hosted với Nginx + PM2
@@ -145,15 +145,14 @@ Các env quan trọng:
 - `NEXT_PUBLIC_GOOGLE_ADS_ID` và các label conversion `NEXT_PUBLIC_GOOGLE_ADS_*_LABEL` nếu chạy Google Ads
 - `GOOGLE_CLIENT_ID`
 - `GOOGLE_CLIENT_SECRET`
-- `GEMINI_API_KEY` hoặc `GEMINI_API_KEYS` cho Gemini
+- `DEEPSEEK_API_KEY` hoặc `DEEPSEEK_API_KEYS` cho DeepSeek
 - `GROQ_API_KEY` hoặc `GROQ_API_KEYS` cho Groq
-- `LLM_PROVIDER_ORDER` mặc định `groq,gemini`
-- `PAID_READING_PRIMARY_GEMINI_MODEL` tùy chọn, mặc định `gemini-2.5-flash` khi paid reading phải fallback từ Groq sang Gemini
-- `PAID_READING_ESCALATION_GEMINI_MODEL` tùy chọn, mặc định `gemini-3.5-flash` cho lần retry chương lỗi format/quá ngắn nếu router phải dùng Gemini
-- `PAID_READING_YEARLY_GEMINI_MODEL` tùy chọn, mặc định theo model escalation cho Chương 8 vận năm + 12 tháng nếu router phải dùng Gemini
+- `LLM_PROVIDER_ORDER` mặc định `deepseek,groq`
+- `DEEPSEEK_MODEL` tùy chọn, mặc định `deepseek-v4-flash`
+- `GROQ_MODEL` tùy chọn, mặc định `llama-3.1-8b-instant`
 - `ERROR_WEBHOOK_URL` nếu muốn chuyển tiếp lỗi client ra hệ thống ngoài; để trống thì lỗi vẫn được ghi vào log app/server.
 
-`GEMINI_API_KEYS` và `GROQ_API_KEYS` nhận danh sách key phân tách bằng dấu phẩy hoặc xuống dòng. Chỉ dùng các key/tài khoản hợp lệ bạn sở hữu để dự phòng và chia tải trong giới hạn nhà cung cấp, không dùng để né quota.
+`DEEPSEEK_API_KEYS` và `GROQ_API_KEYS` nhận danh sách key phân tách bằng dấu phẩy hoặc xuống dòng. Chỉ dùng các key/tài khoản hợp lệ bạn sở hữu để dự phòng và chia tải trong giới hạn nhà cung cấp, không dùng để né quota.
 
 ### Theo dõi sau deploy
 

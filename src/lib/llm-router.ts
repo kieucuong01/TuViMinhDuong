@@ -1,4 +1,4 @@
-export type LlmProvider = "deepseek" | "gemini" | "groq";
+export type LlmProvider = "deepseek" | "groq";
 
 export type LlmResult = {
   text: string;
@@ -10,7 +10,6 @@ type GenerateOptions = {
   prompt: string;
   temperature?: number;
   maxTokens?: number;
-  geminiModel?: string;
   providerOrder?: LlmProvider[];
 };
 
@@ -25,12 +24,12 @@ function keysFromEnv(singleName: string, listName: string) {
 }
 
 function providerOrder(override?: LlmProvider[]): LlmProvider[] {
-  const configured = (override?.length ? override.join(",") : process.env.LLM_PROVIDER_ORDER || "groq,gemini")
+  const configured = (override?.length ? override.join(",") : process.env.LLM_PROVIDER_ORDER || "deepseek,groq")
     .split(/[\n,;]+/)
     .map((item) => item.trim().toLowerCase())
-    .filter((item): item is LlmProvider => item === "deepseek" || item === "gemini" || item === "groq");
+    .filter((item): item is LlmProvider => item === "deepseek" || item === "groq");
 
-  return configured.length ? configured : ["groq", "gemini"];
+  return configured.length ? configured : ["deepseek", "groq"];
 }
 
 function hashPrompt(value: string) {
@@ -60,31 +59,6 @@ function assertText(text: unknown, provider: LlmProvider) {
     throw new Error(`${provider} returned an empty response`);
   }
   return text.trim();
-}
-
-async function callGemini(options: GenerateOptions, key: string): Promise<LlmResult> {
-  const model = options.geminiModel || process.env.GEMINI_MODEL || "gemini-2.5-flash-lite";
-  const response = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(key)}`,
-    {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({
-        contents: [{ role: "user", parts: [{ text: options.prompt }] }],
-        generationConfig: {
-          temperature: options.temperature ?? 0.55,
-          maxOutputTokens: options.maxTokens ?? 1200,
-        },
-      }),
-    },
-  );
-
-  if (response.status === 429) throw new ProviderRateLimitError("Gemini rate limited");
-  if (!response.ok) throw new Error(`Gemini error ${response.status}: ${await parseError(response)}`);
-
-  const json = await response.json();
-  const text = json.candidates?.[0]?.content?.parts?.map((part: { text?: string }) => part.text || "").join("\n");
-  return { text: assertText(text, "gemini"), model: `gemini/${model}`, provider: "gemini" };
 }
 
 async function callGroq(options: GenerateOptions, key: string): Promise<LlmResult> {
@@ -138,25 +112,22 @@ async function callDeepSeek(options: GenerateOptions, key: string): Promise<LlmR
 export function hasExternalLlmProvider() {
   return Boolean(
     keysFromEnv("DEEPSEEK_API_KEY", "DEEPSEEK_API_KEYS").length ||
-      keysFromEnv("GEMINI_API_KEY", "GEMINI_API_KEYS").length ||
       keysFromEnv("GROQ_API_KEY", "GROQ_API_KEYS").length,
   );
 }
 
 export async function generateWithLlmRouter(options: GenerateOptions): Promise<LlmResult | null> {
   const deepSeekKeys = keysFromEnv("DEEPSEEK_API_KEY", "DEEPSEEK_API_KEYS");
-  const geminiKeys = keysFromEnv("GEMINI_API_KEY", "GEMINI_API_KEYS");
   const groqKeys = keysFromEnv("GROQ_API_KEY", "GROQ_API_KEYS");
   const errors: string[] = [];
 
   for (const provider of providerOrder(options.providerOrder)) {
-    const keys = provider === "deepseek" ? deepSeekKeys : provider === "gemini" ? geminiKeys : groqKeys;
+    const keys = provider === "deepseek" ? deepSeekKeys : groqKeys;
     const key = selectKey(keys, options.prompt);
     if (!key) continue;
 
     try {
       if (provider === "deepseek") return await callDeepSeek(options, key);
-      if (provider === "gemini") return await callGemini(options, key);
       return await callGroq(options, key);
     } catch (error) {
       errors.push(error instanceof Error ? error.message : String(error));

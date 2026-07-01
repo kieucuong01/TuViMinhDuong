@@ -11,8 +11,6 @@ export const FREE_OVERVIEW_VERSION = "free-mini-report-v5";
 export const PAID_READING_VERSION = "paid-personal-dossier-v5";
 export const PAID_FULL_WORD_TARGET = "7.000-10.000 từ";
 export const READING_PROVIDER_ORDER = ["deepseek", "groq"] as const;
-const PAID_READING_DEFAULT_GEMINI_MODEL = "gemini-2.5-flash";
-const PAID_READING_DEFAULT_ESCALATION_GEMINI_MODEL = "gemini-3.5-flash";
 const PAID_DATA_DASHBOARD_TITLE = "Trung tâm dữ liệu lá số";
 
 const IMPORTANT_PALACES = ["Mệnh", "Thân", "Quan Lộc", "Tài Bạch", "Phu Thê", "Tật Ách", "Thiên Di"];
@@ -217,22 +215,6 @@ function paidReadingConcurrencyLimit(type: ReadingKey) {
   return Math.max(1, Math.min(3, Number.isFinite(configured) ? Math.floor(configured) : 3));
 }
 
-function paidReadingPrimaryGeminiModel() {
-  return process.env.PAID_READING_PRIMARY_GEMINI_MODEL || PAID_READING_DEFAULT_GEMINI_MODEL;
-}
-
-function paidReadingEscalationGeminiModel() {
-  return process.env.PAID_READING_ESCALATION_GEMINI_MODEL || PAID_READING_DEFAULT_ESCALATION_GEMINI_MODEL;
-}
-
-function paidReadingYearlyGeminiModel() {
-  return process.env.PAID_READING_YEARLY_GEMINI_MODEL || paidReadingEscalationGeminiModel();
-}
-
-function paidReadingInitialGeminiModel(chapter: PaidReadingChapter) {
-  return chapter.key === "yearly-months" ? paidReadingYearlyGeminiModel() : paidReadingPrimaryGeminiModel();
-}
-
 function paidReadingPromptMeta(
   chart: TuViChart,
   type: ReadingKey,
@@ -248,11 +230,6 @@ function paidReadingPromptMeta(
     maxTokensPerChapter: PAID_READING_CHAPTER_MAX_TOKENS,
     concurrency: paidReadingConcurrencyLimit(type),
     providerOrder: READING_PROVIDER_ORDER.join(","),
-    modelPolicy: {
-      primaryGeminiModel: paidReadingPrimaryGeminiModel(),
-      escalationGeminiModel: paidReadingEscalationGeminiModel(),
-      yearlyGeminiModel: paidReadingYearlyGeminiModel(),
-    },
     chartEngineVersion: chart.engine?.version,
     chartEngineProfile: chart.engine?.starProfile,
     viewYear: chart.input.viewYear,
@@ -381,26 +358,24 @@ export async function generateReadingWithProgress(
   const outputs = await runReadingChapterTasks(chapters, paidReadingConcurrencyLimit(type), async (chapter, index) => {
     const prompt = paidReadingChapterPrompt(chart, type, scopeKey, focus, chapter, index, chapters.length);
     const maxTokens = paidReadingMaxTokens(type, chapter);
-    const initialGeminiModel = paidReadingInitialGeminiModel(chapter);
-    const escalationGeminiModel = paidReadingEscalationGeminiModel();
     let generated: Awaited<ReturnType<typeof generatePaidChapter>> = null;
     let chapterError: string | null = null;
     try {
-      generated = await generatePaidChapter(prompt, maxTokens, initialGeminiModel);
+      generated = await generatePaidChapter(prompt, maxTokens);
     } catch (error) {
       chapterError = error instanceof Error ? error.message : String(error);
     }
     let generatedContent = generated?.content?.trim() || "";
     let hasCompleteContent = generatedContent ? isCompletePaidChapter(generatedContent, chapter) : false;
 
-    if (!hasCompleteContent && initialGeminiModel !== escalationGeminiModel) {
+    if (!hasCompleteContent) {
       try {
-        const escalated = await generatePaidChapter(prompt, maxTokens, escalationGeminiModel);
-        const escalatedContent = escalated?.content?.trim() || "";
-        if (escalatedContent) {
-          generated = escalated;
-          generatedContent = escalatedContent;
-          hasCompleteContent = isCompletePaidChapter(escalatedContent, chapter);
+        const retry = await generatePaidChapter(prompt, maxTokens);
+        const retryContent = retry?.content?.trim() || "";
+        if (retryContent) {
+          generated = retry;
+          generatedContent = retryContent;
+          hasCompleteContent = isCompletePaidChapter(retryContent, chapter);
         }
       } catch (error) {
         chapterError = error instanceof Error ? error.message : String(error);
@@ -1191,12 +1166,11 @@ ${detailedBody}
 - Từ chối các lời mời mở rộng quá nhanh nếu nguồn lực, dòng tiền hoặc trách nhiệm gia đình chưa ổn định.`;
 }
 
-async function generatePaidChapter(prompt: string, maxTokens: number, geminiModel?: string) {
+async function generatePaidChapter(prompt: string, maxTokens: number) {
   const routed = await generateWithLlmRouter({
     prompt,
     maxTokens,
-    temperature: 0.55,
-    geminiModel,
+    temperature: 0.48,
     providerOrder: [...READING_PROVIDER_ORDER],
   });
   if (routed) return { content: routed.text, model: routed.model };
