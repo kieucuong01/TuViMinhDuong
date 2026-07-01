@@ -8,6 +8,8 @@
 
 **Tech Stack:** Next.js 16 App Router, React 19, TypeScript, Prisma 7/PostgreSQL, Vitest, Tailwind/CSS.
 
+**Execution status (2026-07-02):** Completed on `master`. Verified with ESLint, 388 Vitest tests, Prisma client generation, production build, and local desktop/mobile guest-route smoke testing.
+
 ---
 
 ## File map
