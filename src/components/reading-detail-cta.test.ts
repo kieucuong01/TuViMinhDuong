@@ -44,6 +44,13 @@ describe("reading detail CTA flow", () => {
     expect(ctaSource).toContain('"wheel"');
   });
 
+  it("returns guests to the free reading before offering the premium dossier", () => {
+    expect(loaderSource).toContain('const nextPath = `${chartPath}#luan-giai`');
+    expect(loaderSource).toContain("loginModalHref(chartPath, undefined, nextPath)");
+    expect(loaderSource).toContain("Đăng nhập miễn phí để xem toàn bộ luận giải");
+    expect(loaderSource).toContain("Xem hồ sơ luận giải chuyên sâu");
+  });
+
   it("keeps the existing premium confirmation form as the only paid action", () => {
     expect(premiumSource).toContain("premiumReadingModalId(props.chartId)");
     expect(premiumSource.match(/action=\{requestReadingAction\}/g)).toHaveLength(1);

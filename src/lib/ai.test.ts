@@ -228,21 +228,28 @@ describe("AI reading format", () => {
     expect(weakChapterMeta).toMatchObject({ key: weakChapter.key, model: "groq/llama-3.1-8b-instant", formatGuarded: false });
   });
 
-  it("asks the free overview LLM for a 450-550 word personal mini-report", async () => {
+  it("asks the free overview LLM for a roughly 1,200-word personal mini-report", async () => {
     clearProviderEnv();
 
-    const { prompt } = await generateFreeOverview(sampleChart());
+    const chart = sampleChart();
+    const { prompt } = await generateFreeOverview(chart);
 
     expect(prompt).toContain(String(FREE_OVERVIEW_MIN_WORDS));
     expect(prompt).toContain(String(FREE_OVERVIEW_MAX_WORDS));
-    expect(FREE_OVERVIEW_MIN_WORDS).toBe(400);
-    expect(FREE_OVERVIEW_MAX_WORDS).toBe(650);
-    expect(FREE_OVERVIEW_MAX_TOKENS).toBeLessThanOrEqual(5000);
-    expect(prompt).toContain("450-550");
-    expect(prompt).toContain("Chân dung nổi bật");
-    expect(prompt).toContain("Cơ hội công việc và tài chính");
+    expect(FREE_OVERVIEW_MIN_WORDS).toBe(1000);
+    expect(FREE_OVERVIEW_MAX_WORDS).toBe(1400);
+    expect(FREE_OVERVIEW_MAX_TOKENS).toBeLessThanOrEqual(7000);
+    expect(prompt).toContain("1.150-1.250");
+    expect(prompt).toContain("## Mỏ neo");
+    expect(prompt).toContain("## Điểm đáng chú ý nhất");
+    expect(prompt).toContain("## Khí chất và nội lực");
+    expect(prompt).toContain("## Công việc và tài chính");
+    expect(prompt).toContain("## Tình cảm và quan hệ");
+    expect(prompt).toContain("## Sức khỏe và nhịp sống");
+    expect(prompt).toContain(`## Vận năm ${chart.input.viewYear}`);
+    expect(prompt).toContain("## Cẩm nang hành động");
     expect(prompt).toContain("Không viết như bài blog");
-    expect(prompt).toContain("Tín hiệu ưu tiên");
+    expect(prompt).toContain("5-7");
   });
 
   it("renders a useful instant free overview before the background LLM finishes", () => {
@@ -251,11 +258,14 @@ describe("AI reading format", () => {
 
     expect(countWords(content)).toBeGreaterThanOrEqual(FREE_OVERVIEW_MIN_WORDS);
     expect(countWords(content)).toBeLessThanOrEqual(FREE_OVERVIEW_MAX_WORDS);
-    expect(content).toContain("## Chân dung nổi bật");
-    expect(content).toContain("## Điểm mạnh nên phát huy");
-    expect(content).toContain("## Cơ hội công việc và tài chính");
-    expect(content).toContain("## Điều cần thận trọng");
-    expect(content).toContain(`## Gợi ý hành động trong năm ${chart.input.viewYear}`);
+    expect(content).toContain("## Mỏ neo");
+    expect(content).toContain("## Điểm đáng chú ý nhất");
+    expect(content).toContain("## Khí chất và nội lực");
+    expect(content).toContain("## Công việc và tài chính");
+    expect(content).toContain("## Tình cảm và quan hệ");
+    expect(content).toContain("## Sức khỏe và nhịp sống");
+    expect(content).toContain(`## Vận năm ${chart.input.viewYear}`);
+    expect(content).toContain("## Cẩm nang hành động");
     expect(content).toContain(chart.input.fullName);
     expect(content).toContain(chart.menh);
     expect(content).toContain(chart.than);
@@ -284,27 +294,44 @@ describe("AI reading format", () => {
   });
 
   it("accepts only evidence-based mini-reports within the guard range", () => {
-    const filler = Array.from({ length: 430 }, (_, index) => `dữ-liệu-${index}`).join(" ");
-    const content = `## Chân dung nổi bật
-Cung Mệnh có Tử Vi. ${filler}
+    const buildContent = (fillerWords: number) => {
+      const filler = Array.from({ length: fillerWords }, (_, index) => `dữ-liệu-${index}`).join(" ");
+      return `## Mỏ neo
+- **Nội lực: 75/100** — Cung Mệnh có Tử Vi.
+- **Công việc & tài chính: 65/100** — Cung Quan Lộc cần chủ động.
+- **Vận năm 2026: 55/100** — Đại vận nhắc giữ nhịp.
 
-## Điểm mạnh nên phát huy
-Cung Quan Lộc cho thấy khả năng tổ chức.
+## Điểm đáng chú ý nhất
+Cung Mệnh có Tử Vi và đại vận hiện tại tạo ra một điểm chuyển. ${filler}
 
-## Cơ hội công việc và tài chính
-Cung Tài Bạch cần được đối chiếu trước quyết định.
+## Khí chất và nội lực
+Mệnh và Thân cho thấy khả năng tổ chức.
 
-## Điều cần thận trọng
+## Công việc và tài chính
+Cung Quan Lộc và Tài Bạch cần được đối chiếu trước quyết định.
+
+## Tình cảm và quan hệ
+Cung Phu Thê nhắc giữ ranh giới rõ ràng.
+
+## Sức khỏe và nhịp sống
+Cung Tật Ách chỉ dùng để nhắc nhịp nghỉ ngơi, không thay thế tư vấn y khoa.
+
+## Vận năm 2026
 Tuần tại Thiên Di là tín hiệu nên kiểm chứng.
 
-## Gợi ý hành động trong năm 2026
+## Cẩm nang hành động
 - Giữ quỹ dự phòng.
 - Kiểm tra giấy tờ.
-- Chia quyết định lớn thành bước nhỏ.`;
+- Chia quyết định lớn thành bước nhỏ.
+- Đặt mốc rà soát.
+- Nghỉ trước khi quá tải.`;
+    };
+    const content = buildContent(1020);
 
     expect(isCompleteFreeOverview(content)).toBe(true);
-    expect(isCompleteFreeOverview(content.replace("## Điều cần thận trọng", "## Ghi chú"))).toBe(false);
-    expect(isCompleteFreeOverview(`${content} ${Array.from({ length: 250 }, () => "quá-dài").join(" ")}`)).toBe(false);
+    expect(isCompleteFreeOverview(content.replace("## Tình cảm và quan hệ", "## Ghi chú"))).toBe(false);
+    expect(isCompleteFreeOverview(buildContent(650))).toBe(false);
+    expect(isCompleteFreeOverview(buildContent(1450))).toBe(false);
   });
 
   it("defines the full paid reading as 8 fixed chapters", () => {

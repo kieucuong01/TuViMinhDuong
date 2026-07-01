@@ -19,7 +19,8 @@ import { PaywallPopup } from "@/components/paywall-popup";
 import { FreeOverviewLoader } from "@/components/free-overview-loader";
 import { ReadingHashScrollRestorer } from "@/components/reading-detail-cta";
 import { MarkdownContent } from "@/components/markdown-content";
-import { buildInstantFreeOverview } from "@/lib/ai";
+import { buildInstantFreeOverview, countWords } from "@/lib/ai";
+import { buildFreeOverviewTeaser } from "@/lib/free-overview-presentation";
 import { PersonalizedReportOutline } from "@/components/personalized-report-outline";
 import { buildPersonalizedReportOutline } from "@/lib/chart-evidence";
 import { listAssistantQuestions } from "@/lib/chart-assistant-store";
@@ -84,6 +85,15 @@ export default async function ChartPage({
   const activeLabel = activeReading ? readingLabels[activeReading.type] : "Luận giải tổng quan";
   const freeOverviewStatus = activeReading || isScopedReadingView ? null : getFreeOverviewStatus(record.chart);
   const instantFreeOverviewContent = activeReading || isScopedReadingView ? null : buildInstantFreeOverview(record.chart);
+  const guestOverviewContent = !user && freeOverviewStatus?.content
+    ? buildFreeOverviewTeaser(freeOverviewStatus.content)
+    : null;
+  const visibleFreeOverviewStatus = guestOverviewContent && freeOverviewStatus
+    ? { ...freeOverviewStatus, content: guestOverviewContent, wordCount: countWords(guestOverviewContent) }
+    : freeOverviewStatus;
+  const visibleInstantFreeOverviewContent = !user && instantFreeOverviewContent
+    ? buildFreeOverviewTeaser(instantFreeOverviewContent)
+    : instantFreeOverviewContent;
 
   return (
     <main className="chart-page" data-testid="chart-page">
@@ -145,8 +155,8 @@ export default async function ChartPage({
             <>
               <FreeOverviewLoader
                 chartId={id}
-                initialOverview={freeOverviewStatus}
-                instantOverviewContent={instantFreeOverviewContent}
+                initialOverview={visibleFreeOverviewStatus}
+                instantOverviewContent={visibleInstantFreeOverviewContent}
                 isSignedIn={Boolean(user)}
               />
             </>

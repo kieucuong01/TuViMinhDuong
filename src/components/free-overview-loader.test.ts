@@ -18,8 +18,15 @@ describe("FreeOverviewLoader fast-first flow", () => {
     expect(loaderSource).toContain("initialOverview");
     expect(loaderSource).toContain("useState<FreeOverviewState>(() =>");
     expect(chartPageSource).toContain("getFreeOverviewStatus(record.chart)");
-    expect(chartPageSource).toContain("initialOverview={freeOverviewStatus}");
+    expect(chartPageSource).toContain("initialOverview={visibleFreeOverviewStatus}");
     expect(chartPageSource).not.toContain("deferUntilVisible");
+  });
+
+  it("projects guest content before it reaches the page HTML", () => {
+    expect(chartPageSource).toContain('import { buildFreeOverviewTeaser } from "@/lib/free-overview-presentation"');
+    expect(chartPageSource).toContain("!user && freeOverviewStatus?.content");
+    expect(chartPageSource).toContain("buildFreeOverviewTeaser(freeOverviewStatus.content)");
+    expect(chartPageSource).toContain("buildFreeOverviewTeaser(instantFreeOverviewContent)");
   });
 
   it("polls with no-store and refreshes the route when the full overview is ready", () => {
@@ -47,5 +54,27 @@ describe("FreeOverviewLoader fast-first flow", () => {
 
   it("has inline status styling for the fast overview state", () => {
     expect(globalsCss).toContain(".free-overview-inline-status");
+  });
+
+  it("shows guests a locked preview and preserves the chart through login", () => {
+    expect(loaderSource).toContain('import Link from "next/link"');
+    expect(loaderSource).toContain('import { loginModalHref } from "@/components/login-modal-link"');
+    expect(loaderSource).toContain("Đăng nhập miễn phí để xem toàn bộ luận giải");
+    expect(loaderSource).toContain("Lá số này sẽ được giữ nguyên");
+    expect(loaderSource).toContain("free-overview-locked-sections");
+    expect(loaderSource).toContain("Khí chất và nội lực");
+    expect(loaderSource).toContain("Công việc và tài chính");
+    expect(loaderSource).toContain("Tình cảm và quan hệ");
+    expect(loaderSource).toContain("Vận năm và cẩm nang hành động");
+    expect(loaderSource).toContain("#luan-giai");
+    expect(globalsCss).toContain(".free-overview-guest-gate");
+    expect(globalsCss).toContain(".free-overview-locked-row");
+    expect(globalsCss).toContain(".free-overview-login-copy");
+  });
+
+  it("offers the VIP dossier only after the signed-in free report", () => {
+    expect(loaderSource).toContain("free-overview-vip-transition");
+    expect(loaderSource).toContain("Xem hồ sơ luận giải chuyên sâu");
+    expect(globalsCss).toContain(".free-overview-vip-transition");
   });
 });

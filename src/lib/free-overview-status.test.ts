@@ -22,21 +22,36 @@ function chartFixture(): TuViChart {
 }
 
 function completeOverviewContent() {
-  const filler = Array.from({ length: 80 }, () => "dữ-liệu").join(" ");
-  return `## Chân dung nổi bật
-Cung Mệnh có Tử Vi. ${filler}
+  const filler = Array.from({ length: 980 }, () => "dữ-liệu").join(" ");
+  return `## Mỏ neo
+- **Nội lực: 75/100** — Cung Mệnh có Tử Vi.
+- **Công việc & tài chính: 65/100** — Cung Quan Lộc cần chủ động.
+- **Vận năm 2026: 55/100** — Đại vận nhắc giữ nhịp.
 
-## Điểm mạnh nên phát huy
-${filler}
+## Điểm đáng chú ý nhất
+Cung Mệnh và đại vận hiện tại tạo ra một điểm chuyển. ${filler}
 
-## Cơ hội công việc và tài chính
-${filler}
+## Khí chất và nội lực
+Mệnh và Thân cho thấy khả năng tổ chức.
 
-## Điều cần thận trọng
-${filler}
+## Công việc và tài chính
+Cung Quan Lộc và Tài Bạch cần được đối chiếu trước quyết định.
 
-## Gợi ý hành động trong năm 2026
-${filler}`;
+## Tình cảm và quan hệ
+Cung Phu Thê nhắc giữ ranh giới rõ ràng.
+
+## Sức khỏe và nhịp sống
+Cung Tật Ách chỉ dùng để nhắc nhịp nghỉ ngơi.
+
+## Vận năm 2026
+Tuần tại Thiên Di là tín hiệu nên kiểm chứng.
+
+## Cẩm nang hành động
+- Giữ quỹ dự phòng.
+- Kiểm tra giấy tờ.
+- Chia quyết định lớn thành bước nhỏ.
+- Đặt mốc rà soát.
+- Nghỉ trước khi quá tải.`;
 }
 
 describe("free overview status", () => {
@@ -47,7 +62,7 @@ describe("free overview status", () => {
 
     expect(status.status).toBe("fallback");
     expect(status.source).toBe("instant-template");
-    expect(status.content).toContain("## Chân dung nổi bật");
+    expect(status.content).toContain("## Mỏ neo");
     expect(countWords(status.content)).toBeGreaterThanOrEqual(FREE_OVERVIEW_MIN_WORDS);
     expect(countWords(status.content)).toBeLessThanOrEqual(FREE_OVERVIEW_MAX_WORDS);
   });

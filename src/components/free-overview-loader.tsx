@@ -1,7 +1,9 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { loginModalHref } from "@/components/login-modal-link";
 import { MarkdownContent } from "@/components/markdown-content";
 import { ReadingDetailCta } from "@/components/reading-detail-cta";
 
@@ -25,6 +27,12 @@ type FreeOverviewPayload =
 
 const POLL_DELAY_MS = 2500;
 const MAX_POLL_ATTEMPTS = 72;
+const GUEST_LOCKED_SECTIONS = [
+  "Khí chất và nội lực",
+  "Công việc và tài chính",
+  "Tình cảm và quan hệ",
+  "Vận năm và cẩm nang hành động",
+];
 
 function hideFreeOverviewTemplateHeading(content: string) {
   return content
@@ -173,38 +181,73 @@ export function FreeOverviewLoader({
 
   if (state.status === "ready" || state.status === "fallback") {
     const canRetry = state.status === "fallback" && (state.jobStatus === "stale" || state.jobStatus === "failed");
-    const detailCta = isSignedIn ? "Xem luận giải chi tiết" : "Đăng nhập để xem chi tiết";
     const hasExpandedOverview = state.status === "ready" && state.detailContent !== state.content;
     const expandedOverviewContent = hasExpandedOverview ? hideFreeOverviewTemplateHeading(state.detailContent) : "";
+    const visibleContent = hasExpandedOverview ? expandedOverviewContent : state.content;
+    const backgroundStatus = state.status === "fallback" ? (
+      <div className="free-overview-inline-status" role="status" aria-live="polite">
+        {state.jobStatus === "failed"
+          ? "Đang hiển thị mini-report dự phòng. Bản cá nhân hóa bị gián đoạn và có thể thử viết lại."
+          : state.jobStatus === "stale"
+            ? "Đang hiển thị mini-report dự phòng. Tiến trình trước đó quá lâu chưa xong, bạn có thể thử viết lại."
+            : state.jobStatus === "processing"
+              ? "Đang viết mini-report cá nhân hóa ở nền. Bạn có thể đọc bản dự phòng này trước."
+              : "Bản dự phòng đã sẵn sàng. Hệ thống đang chuẩn bị mini-report cá nhân hóa ở nền."}
+        {canRetry ? (
+          <button type="button" className="btn btn-small btn-ghost" onClick={retryOverview}>
+            Thử viết lại
+          </button>
+        ) : null}
+        {state.jobStatus === "processing" || state.jobStatus === "idle" ? (
+          <span className="free-overview-detail-loader" aria-hidden="true">
+            <i />
+            <i />
+            <i />
+          </span>
+        ) : null}
+      </div>
+    ) : null;
+
+    if (!isSignedIn) {
+      const chartPath = `/la-so/${chartId}`;
+      const nextPath = `${chartPath}#luan-giai`;
+
+      return (
+        <article ref={setRootNode} className="free-reading-summary">
+          <MarkdownContent content={visibleContent} />
+          {backgroundStatus}
+          <section className="free-overview-guest-gate" aria-labelledby="free-overview-login-title">
+            <div>
+              <p className="eyebrow">Bản đọc đầy đủ đang chờ bạn</p>
+              <h2 id="free-overview-login-title">Mở tiếp mini-report khoảng 1.200 từ</h2>
+              <p className="free-overview-login-copy">
+                Lá số này sẽ được giữ nguyên. Sau đăng nhập, bạn quay lại đúng vị trí và đọc tiếp toàn bộ luận giải miễn phí.
+              </p>
+            </div>
+            <div className="free-overview-locked-sections" aria-label="Các nội dung mở sau đăng nhập">
+              {GUEST_LOCKED_SECTIONS.map((label) => (
+                <div className="free-overview-locked-row" key={label}>
+                  <span aria-hidden="true">🔒</span>
+                  <strong>{label}</strong>
+                </div>
+              ))}
+            </div>
+            <Link
+              className="btn btn-primary"
+              href={loginModalHref(chartPath, undefined, nextPath)}
+              scroll={false}
+            >
+              Đăng nhập miễn phí để xem toàn bộ luận giải
+            </Link>
+          </section>
+        </article>
+      );
+    }
+
     return (
       <article ref={setRootNode} className="free-reading-summary">
         {!hasExpandedOverview ? <MarkdownContent content={state.content} /> : null}
-        {state.status === "fallback" ? (
-          <div className="free-overview-inline-status" role="status" aria-live="polite">
-            {state.jobStatus === "failed"
-              ? "Đang hiển thị mini-report dự phòng. Bản cá nhân hóa bị gián đoạn và có thể thử viết lại."
-              : state.jobStatus === "stale"
-                ? "Đang hiển thị mini-report dự phòng. Tiến trình trước đó quá lâu chưa xong, bạn có thể thử viết lại."
-                : state.jobStatus === "processing"
-                  ? "Đang viết mini-report cá nhân hóa ở nền. Bạn có thể đọc bản dự phòng này trước."
-                  : "Bản dự phòng đã sẵn sàng. Hệ thống đang chuẩn bị mini-report cá nhân hóa ở nền."}
-            {canRetry ? (
-              <button type="button" className="btn btn-small btn-ghost" onClick={retryOverview}>
-                Thử viết lại
-              </button>
-            ) : null}
-            {state.jobStatus === "processing" || state.jobStatus === "idle" ? (
-              <span className="free-overview-detail-loader" aria-hidden="true">
-                <i />
-                <i />
-                <i />
-              </span>
-            ) : null}
-            <ReadingDetailCta chartId={chartId} isSignedIn={isSignedIn}>
-              {detailCta}
-            </ReadingDetailCta>
-          </div>
-        ) : null}
+        {backgroundStatus}
         {hasExpandedOverview ? (
           <section className="free-overview-detail-block" aria-labelledby="free-overview-detail-title">
             <div className="free-overview-detail-heading">
@@ -212,13 +255,19 @@ export function FreeOverviewLoader({
                 <p className="eyebrow">Mini-report miễn phí</p>
                 <h2 id="free-overview-detail-title">Hồ sơ cá nhân từ dữ liệu lá số</h2>
               </div>
-              <ReadingDetailCta chartId={chartId} isSignedIn={isSignedIn}>
-                {detailCta}
-              </ReadingDetailCta>
             </div>
             <MarkdownContent content={expandedOverviewContent} />
           </section>
         ) : null}
+        <section className="free-overview-vip-transition" aria-label="Luận giải chuyên sâu">
+          <div>
+            <strong>Bạn đã xem các trục chính của lá số.</strong>
+            <p>Hồ sơ VIP mở rộng sang 12 cung, đại vận và các mốc thời gian thành một kế hoạch chi tiết hơn.</p>
+          </div>
+          <ReadingDetailCta chartId={chartId} isSignedIn>
+            Xem hồ sơ luận giải chuyên sâu
+          </ReadingDetailCta>
+        </section>
       </article>
     );
   }

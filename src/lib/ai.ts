@@ -3,11 +3,11 @@ import { buildChartEvidenceProfile, formatChartEvidence } from "@/lib/chart-evid
 import { generateWithLlmRouter, hasExternalLlmProvider } from "@/lib/llm-router";
 import { FEATURE_PRICES, type ReadingKey } from "@/lib/pricing";
 
-export const FREE_OVERVIEW_MIN_WORDS = 400;
-export const FREE_OVERVIEW_MAX_WORDS = 650;
-export const FREE_OVERVIEW_MAX_TOKENS = 4500;
+export const FREE_OVERVIEW_MIN_WORDS = 1000;
+export const FREE_OVERVIEW_MAX_WORDS = 1400;
+export const FREE_OVERVIEW_MAX_TOKENS = 6500;
 export const PAID_READING_CHAPTER_MAX_TOKENS = 7000;
-export const FREE_OVERVIEW_VERSION = "free-mini-report-v4";
+export const FREE_OVERVIEW_VERSION = "free-mini-report-v5";
 export const PAID_READING_VERSION = "paid-personal-dossier-v5";
 export const PAID_FULL_WORD_TARGET = "7.000-10.000 từ";
 export const READING_PROVIDER_ORDER = ["deepseek", "groq"] as const;
@@ -96,19 +96,24 @@ export function isCompletePaidChapter(content: string, chapter: PaidReadingChapt
 
 export function isCompleteFreeOverview(content: string) {
   const requiredHeadings = [
-    "## Chân dung nổi bật",
-    "## Điểm mạnh nên phát huy",
-    "## Cơ hội công việc và tài chính",
-    "## Điều cần thận trọng",
-    "## Gợi ý hành động trong năm",
+    "## Mỏ neo",
+    "## Điểm đáng chú ý nhất",
+    "## Khí chất và nội lực",
+    "## Công việc và tài chính",
+    "## Tình cảm và quan hệ",
+    "## Sức khỏe và nhịp sống",
+    "## Vận năm",
+    "## Cẩm nang hành động",
   ];
   const wordCount = countWords(content);
   const hasChartEvidence = /(cung|mệnh|thân|sao|đại vận|tuần|triệt)/i.test(content);
+  const actionBulletCount = (content.match(/^\s*[-*]\s+\S/gm) || []).length;
 
   return (
     wordCount >= FREE_OVERVIEW_MIN_WORDS &&
     wordCount <= FREE_OVERVIEW_MAX_WORDS &&
     hasChartEvidence &&
+    actionBulletCount >= 5 &&
     requiredHeadings.every((heading) => content.includes(heading))
   );
 }
@@ -729,7 +734,7 @@ function freeOverviewPrompt(chart: TuViChart) {
   const profile = buildChartEvidenceProfile(chart);
   const decade = compactDecadeContext(chart);
 
-  return `Bạn là chuyên gia tử vi Việt Nam có 30 năm kinh nghiệm tư vấn đời sống. Hãy đọc dữ liệu lá số đã được hệ thống tính sẵn và viết một hồ sơ cá nhân ngắn. Không viết như bài blog.
+  return `Bạn là chuyên gia tử vi Việt Nam có 30 năm kinh nghiệm tư vấn đời sống. Hãy đọc dữ liệu lá số đã được hệ thống tính sẵn và viết một mini-report cá nhân có chiều sâu. Không viết như bài blog.
 
 Hồ sơ bằng chứng:
 ${formatChartEvidence(profile)}
@@ -738,52 +743,89 @@ ${formatChartEvidence(profile)}
 
 Yêu cầu bắt buộc:
 - Chỉ dùng bằng chứng đã cấp; không tự an sao, không tự thêm sự kiện.
-- Mục tiêu 450-550 từ tiếng Việt. Hệ thống chấp nhận trong khoảng ${FREE_OVERVIEW_MIN_WORDS}-${FREE_OVERVIEW_MAX_WORDS} từ.
+- Mục tiêu 1.150-1.250 từ tiếng Việt. Hệ thống chấp nhận trong khoảng ${FREE_OVERVIEW_MIN_WORDS}-${FREE_OVERVIEW_MAX_WORDS} từ.
 - Mỗi nhận định quan trọng phải gắn với một cung, sao, trạng thái sao, Tuần/Triệt hoặc đại vận trong hồ sơ.
 - Không dùng lời khen chung chung, không dọa nạt, không khẳng định chắc chắn tương lai.
 - Dùng ngôn ngữ tư vấn tài chính/đời sống: nêu xu hướng, điều kiện, cách kiểm chứng và hành động thực tế.
 - Nêu một cơ hội cụ thể và một vùng rủi ro cụ thể, nhưng luôn diễn đạt là tín hiệu cần đối chiếu.
+- Mở đầu bằng ba mỏ neo /100: Nội lực, Công việc & tài chính, Vận năm. Điểm số là chỉ báo định hướng, không phải xác suất biến cố.
+- Chọn một mâu thuẫn, cơ hội hoặc điểm nghẽn cá nhân làm "Điểm đáng chú ý nhất" để tạo động lực đọc tiếp.
+- Lồng cung và sao tự nhiên vào lời khuyên; không tạo mục liệt kê dữ kiện kỹ thuật.
+- Mỗi phần phải bổ sung một góc nhìn mới, không lặp lại cùng một nhận định bằng cách đổi câu chữ.
+- Phần sức khỏe chỉ đưa khuyến nghị nhịp sống thận trọng, không chẩn đoán và không thay thế tư vấn y khoa.
 - Không chào hỏi dài, không giải thích tử vi như kiến thức phổ thông, không quảng cáo quá mức.
 - Dùng đúng năm xem ${chart.input.viewYear}.
-- Kết thúc bằng 3 bullet hành động ngắn.
+- Kết thúc bằng 5-7 bullet hành động ngắn, cụ thể và có thể kiểm chứng.
 
 Markdown đúng thứ tự:
-## Chân dung nổi bật
-## Điểm mạnh nên phát huy
-## Cơ hội công việc và tài chính
-## Điều cần thận trọng
-## Gợi ý hành động trong năm ${chart.input.viewYear}`;
+## Mỏ neo
+## Điểm đáng chú ý nhất
+## Khí chất và nội lực
+## Công việc và tài chính
+## Tình cảm và quan hệ
+## Sức khỏe và nhịp sống
+## Vận năm ${chart.input.viewYear}
+## Cẩm nang hành động`;
 }
 
 export function buildInstantFreeOverview(chart: TuViChart) {
   const profile = buildChartEvidenceProfile(chart);
   const decade = compactDecadeContext(chart);
+  const summary = getDeepReadingSummary(chart);
   const menh = profile.palaces.find((palace) => palace.name === "Mệnh");
   const thanPalace = chart.palaces.find((palace) => palace.isThan);
   const than = profile.palaces.find((palace) => palace.name === thanPalace?.name);
   const career = profile.palaces.find((palace) => palace.name === "Quan Lộc");
   const money = profile.palaces.find((palace) => palace.name === "Tài Bạch");
+  const relationship = profile.palaces.find((palace) => palace.name === "Phu Thê");
   const health = profile.palaces.find((palace) => palace.name === "Tật Ách");
+  const travel = profile.palaces.find((palace) => palace.name === "Thiên Di");
   const caution = profile.signals.find((signal) => signal.kind === "caution");
+  const scores = Object.fromEntries(summary.scores.map((score) => [score.key, score.value])) as Record<DeepScoreKey, number>;
+  const innerScore = clampScore(Math.round((scores.career + scores.health + scores.love) / 3));
+  const workMoneyScore = clampScore(Math.round((scores.career + scores.money) / 2));
+  const menhStars = menh?.stars.slice(0, 5).join(", ") || "dữ liệu đang cập nhật";
+  const thanStars = than?.stars.slice(0, 5).join(", ") || "dữ liệu đang cập nhật";
+  const careerStars = career?.stars.slice(0, 5).join(", ") || "chưa có sao nổi bật";
+  const moneyStars = money?.stars.slice(0, 5).join(", ") || "chưa có sao nổi bật";
+  const relationshipStars = relationship?.stars.slice(0, 5).join(", ") || "dữ liệu đang cập nhật";
+  const healthStars = health?.stars.slice(0, 5).join(", ") || "dữ liệu đang cập nhật";
+  const travelStars = travel?.stars.slice(0, 5).join(", ") || "dữ liệu đang cập nhật";
 
-  return `## Chân dung nổi bật
-Lá số của ${chart.input.fullName} được đọc trên trục Mệnh ${chart.menh}, Thân tại ${chart.than} và ${chart.cuc}. Cung Mệnh tại ${menh?.branch || chart.menh} có ${menh?.stars.slice(0, 4).join(", ") || "dữ liệu đang cập nhật"}; cung Thân thuộc ${than?.name || "cung đang cập nhật"} tại ${than?.branch || chart.than} có ${than?.stars.slice(0, 4).join(", ") || "dữ liệu đang cập nhật"}. Hai nhóm dữ kiện này cho thấy cách phù hợp nhất không phải là chạy theo một lời phán cố định, mà là nhận diện môi trường nào giúp năng lực phát huy ổn định. Đại vận hiện tại ${decade.current} đặt trọng tâm vào việc lựa chọn đúng người đồng hành, phạm vi cam kết và nhịp phát triển vừa sức.
+  return `## Mỏ neo
+- **Nội lực: ${innerScore}/100** — nền tảng của ${chart.input.fullName} nằm ở cách phối hợp giữa Mệnh ${chart.menh}, ${chart.than} và ${chart.cuc}; càng có quy trình rõ, năng lực càng ổn định.
+- **Công việc & tài chính: ${workMoneyScore}/100** — cơ hội có thật nhưng chỉ trở thành kết quả khi nghề nghiệp, dòng tiền và giới hạn rủi ro được đặt trong cùng một kế hoạch.
+- **Vận năm ${chart.input.viewYear}: ${scores.year}/100** — đây là chỉ báo định hướng để chọn nhịp tiến, không phải xác suất xảy ra biến cố; năm nay nên ưu tiên quyết định có thể thử nhỏ và rà soát sớm.
 
-## Điểm mạnh nên phát huy
-Điểm mạnh đáng dùng của lá số nằm ở khả năng kết hợp khí chất Mệnh với cách hành động của Thân. Khi một quyết định quan trọng xuất hiện, ${chart.input.fullName} nên tách rõ mục tiêu, nguồn lực và mốc kiểm tra thay vì chỉ dựa vào cảm giác ban đầu. Dữ kiện tại Mệnh và Thân là cơ sở để ưu tiên những công việc có cấu trúc, có quyền chủ động và có phản hồi cụ thể. Nếu sao có trạng thái sáng, hãy dùng nó như lợi thế; nếu có trạng thái hãm hoặc tín hiệu căng, hãy biến nó thành quy trình kiểm tra chứ không xem là điểm yếu cố định.
+## Điểm đáng chú ý nhất
+Điểm đáng chú ý nhất trong lá số là khoảng cách giữa điều ${chart.input.fullName} muốn giữ ổn định và cách hoàn cảnh buộc phải thay đổi. Cung Mệnh tại ${menh?.branch || chart.menh} có ${menhStars}, trong khi Thân thuộc ${than?.name || "cung đang cập nhật"} tại ${than?.branch || chart.than} có ${thanStars}. Mệnh mô tả cách nhìn nhận bản thân, còn Thân cho thấy nơi năng lượng được đưa vào hành động. Đại vận hiện tại ${decade.current} làm khoảng cách này rõ hơn: người xem dễ có cảm giác đã suy nghĩ rất kỹ nhưng đến lúc cần quyết lại bị kéo giữa an toàn và mong muốn bứt ra.
 
-## Cơ hội công việc và tài chính
-Cung Quan Lộc tại ${career?.branch || "đang cập nhật"} có ${career?.stars.slice(0, 5).join(", ") || "chưa có sao nổi bật"}; cung Tài Bạch tại ${money?.branch || "đang cập nhật"} có ${money?.stars.slice(0, 5).join(", ") || "chưa có sao nổi bật"}. Hai cung cần được đọc cùng nhau: cơ hội tốt hơn thường đến khi năng lực nghề nghiệp tạo ra dòng tiền có thể đo được, không phải khi mở rộng quá nhanh. Trong năm ${chart.input.viewYear}, nên ưu tiên dự án có phạm vi rõ, thử ở quy mô nhỏ và đặt hạn mức rủi ro trước khi đầu tư. Nếu muốn đổi việc hoặc kinh doanh, hãy so sánh ba yếu tố: dòng tiền dự phòng, người hỗ trợ thực tế và thời điểm có thể dừng mà không tạo áp lực nợ.
+## Khí chất và nội lực
+Trục Mệnh ${chart.menh} với nhóm sao ${menhStars} cho thấy ${chart.input.fullName} có xu hướng quan sát bối cảnh trước khi bộc lộ toàn bộ quan điểm. Đây là lợi thế trong công việc cần phân tích, điều phối hoặc bảo vệ chất lượng, bởi người xem thường nhận ra chi tiết mà người khác bỏ qua. Tuy vậy, khi áp lực tăng, sự thận trọng có thể biến thành nghĩ quá lâu hoặc muốn tự kiểm soát mọi mắt xích. Cách dùng tốt nội lực này không phải ép bản thân quyết nhanh hơn, mà là quy định trước thời hạn thu thập thông tin rồi chốt theo tiêu chí đã chọn.
 
-## Điều cần thận trọng
-Tín hiệu cần quản trị là ${caution?.evidence.join("; ") || `cung Tật Ách có ${health?.stars.slice(0, 4).join(", ") || "dữ liệu đang cập nhật"}`}. Đây không phải dự báo chắc chắn về biến cố. Nó là lời nhắc tránh quyết định lớn khi thông tin chưa đủ, cảm xúc đang cao hoặc lịch sinh hoạt đã quá tải. Với tài chính, cần đọc kỹ điều khoản, giấy tờ và nghĩa vụ dài hạn. Với quan hệ, nên nói rõ kỳ vọng thay vì để suy đoán kéo dài. Với sức khỏe, cung Tật Ách chỉ giúp nhắc nhịp nghỉ ngơi và dấu hiệu quá sức, không thay thế tư vấn y khoa.
+Thân tại ${than?.name || chart.than} với ${thanStars} cho thấy bản lĩnh được hình thành qua việc làm thật hơn là qua hình ảnh bên ngoài. Môi trường phù hợp là nơi vai trò, quyền hạn và kết quả được nói rõ; môi trường nhiều lời hứa nhưng thiếu cách đo lường dễ khiến năng lượng bị phân tán. Khi nhận một việc mới, nên xác định đầu ra, nguồn lực và người ra quyết định cuối cùng. Ba điểm này rõ thì sự kiên trì trở thành lợi thế; ba điểm này mơ hồ thì càng cố gắng càng dễ mệt.
 
-## Gợi ý hành động trong năm ${chart.input.viewYear}
-Năm ${chart.input.viewYear}, mục tiêu hợp lý là biến lợi thế của Mệnh và Thân thành các bước có thể kiểm chứng. Hãy chọn một ưu tiên chính cho mỗi giai đoạn, giữ quỹ dự phòng và rà soát lại sau mỗi quyết định quan trọng. Bản mini-report này giúp xác định điểm bắt đầu; hồ sơ VIP sẽ nối đủ 12 cung, đại vận và các mốc trong năm thành một kế hoạch chi tiết hơn.
+## Công việc và tài chính
+Cung Quan Lộc tại ${career?.branch || "đang cập nhật"} có ${careerStars}. Dữ kiện này nên được đọc như cách tổ chức sự nghiệp, không phải một chức danh cố định. Cơ hội phù hợp thường là công việc cho phép giải quyết vấn đề cụ thể, cải thiện quy trình hoặc chịu trách nhiệm đến cùng cho một kết quả. Nếu muốn chuyển việc hay nhận dự án mới, hãy ưu tiên nơi có phạm vi ba đến sáu tháng, tiêu chí hoàn thành rõ và quyền chủ động đủ dùng. Một cơ hội nghe hấp dẫn nhưng không nói rõ ai quyết định, ngân sách ở đâu và thành công được đo thế nào cần được xem là tín hiệu phải kiểm tra thêm.
 
-- Chọn một mục tiêu công việc hoặc tài chính trong 30 ngày và đặt tiêu chí đo kết quả.
-- Giữ hạn mức rủi ro, kiểm tra giấy tờ và xin ý kiến chuyên môn trước cam kết lớn.
-- Theo dõi nhịp ngủ nghỉ, cảm xúc và dòng tiền để điều chỉnh sớm thay vì xử lý khi đã quá tải.`;
+Cung Tài Bạch tại ${money?.branch || "đang cập nhật"} có ${moneyStars}. Điểm mạnh tài chính không chỉ nằm ở khả năng kiếm tiền mà ở khả năng giữ cấu trúc dòng tiền. Trong năm ${chart.input.viewYear}, nên tách tiền sinh hoạt, quỹ dự phòng và vốn thử nghiệm thành ba phần riêng. Bất kỳ khoản đầu tư hoặc hợp tác nào cũng cần giới hạn thua lỗ có thể chấp nhận, thời hạn đánh giá và giấy tờ xác nhận. Nếu chưa trả lời được ba yếu tố này, lựa chọn hợp lý là trì hoãn chứ không phải từ chối vĩnh viễn.
+
+## Tình cảm và quan hệ
+Cung Phu Thê tại ${relationship?.branch || "đang cập nhật"} có ${relationshipStars}. Trong quan hệ gần gũi, ${chart.input.fullName} cần sự rõ ràng nhưng đôi khi lại kỳ vọng người kia tự hiểu điều mình chưa nói. Khi căng thẳng, vấn đề dễ nằm ở cách phân chia trách nhiệm, tiền bạc hoặc thời gian hơn là ở tình cảm cốt lõi. Một cuộc trao đổi tốt nên đi từ sự kiện cụ thể, cảm nhận cá nhân đến đề nghị có thể thực hiện; tránh dùng những từ tuyệt đối như “luôn luôn” hoặc “không bao giờ”.
+
+## Sức khỏe và nhịp sống
+Cung Tật Ách tại ${health?.branch || "đang cập nhật"} có ${healthStars}. Đây chỉ là tín hiệu để quan sát nhịp sống, không phải chẩn đoán y khoa. Điểm cần lưu ý là xu hướng tiếp tục làm việc khi cơ thể đã phát tín hiệu quá tải: khó tách khỏi công việc, ngủ không sâu, căng vùng vai gáy hoặc dễ cáu khi lịch bị thay đổi. Nếu các dấu hiệu kéo dài hoặc ảnh hưởng sinh hoạt, cần ưu tiên thăm khám chuyên môn thay vì tự quy mọi nguyên nhân cho lá số.
+
+## Vận năm ${chart.input.viewYear}
+Vận năm ở mức ${scores.year}/100 cho thấy năm ${chart.input.viewYear} phù hợp với chiến lược tiến có kiểm soát. Cung Thiên Di tại ${travel?.branch || "đang cập nhật"} có ${travelStars}, vì vậy cơ hội có thể đến từ môi trường mới, người ngoài vòng quen thuộc hoặc một cách làm khác trước. Tuy nhiên, tín hiệu cần quản trị là ${caution?.evidence.join("; ") || `cung Tật Ách có ${healthStars}`}. Điều này không báo trước biến cố; nó yêu cầu kiểm chứng kỹ thông tin, lời hứa và khả năng chịu tải trước cam kết.
+
+## Cẩm nang hành động
+- Chọn một mục tiêu công việc hoặc tài chính quan trọng nhất trong 30 ngày, viết rõ kết quả cần đạt và một chỉ số đo tiến độ.
+- Tách quỹ dự phòng khỏi tài khoản chi tiêu; chưa dùng vốn dài hạn cho một cơ hội chưa được thử ở quy mô nhỏ.
+- Với mọi hợp tác, xác nhận bằng văn bản phạm vi công việc, quyền quyết định, thời hạn và cách dừng khi điều kiện thay đổi.
+- Dành một cuộc trò chuyện thẳng thắn cho quan hệ quan trọng, tập trung vào trách nhiệm và nhu cầu cụ thể thay vì suy đoán động cơ.
+- Theo dõi giờ ngủ, mức năng lượng và thời gian làm việc trong 14 ngày; nếu dấu hiệu bất thường kéo dài, ưu tiên tư vấn chuyên môn.
+- Đặt mốc rà soát sau 30–60 ngày cho quyết định lớn để giữ điều hiệu quả, bỏ điều không còn phù hợp và tránh kéo dài vì tiếc công sức.`;
 }
 
 export async function generateFreeOverview(chart: TuViChart) {
