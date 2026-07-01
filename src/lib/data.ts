@@ -686,6 +686,32 @@ export async function saveChart(input: ChartInput, user: SessionUser | null, met
   return stored;
 }
 
+function chartIdFromChartPath(path: string) {
+  const [withoutHash] = path.split("#");
+  const [pathname] = withoutHash.split("?");
+  const match = /^\/la-so\/([^/?#]+)$/.exec(pathname);
+  return match?.[1] ? decodeURIComponent(match[1]) : null;
+}
+
+export async function claimGuestChartForUserFromPath(path: string, user: SessionUser) {
+  const chartId = chartIdFromChartPath(path);
+  if (!chartId) return false;
+
+  const db = getDb();
+  if (!db || usesInMemoryUser(user.id)) {
+    const chart = charts().get(chartId);
+    if (!chart || chart.userId) return false;
+    charts().set(chartId, { ...chart, userId: user.id });
+    return true;
+  }
+
+  const updated = await db.chart.updateMany({
+    where: { id: chartId, userId: null },
+    data: { userId: user.id },
+  });
+  return updated.count > 0;
+}
+
 export async function getChart(id: string) {
   const db = getDb();
   if (!db) {

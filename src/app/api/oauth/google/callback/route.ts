@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { ADMIN_EMAIL, APP_URL, isGoogleOAuthEnabled } from "@/lib/env";
 import { getDb } from "@/lib/db";
 import { setSession, type SessionUser } from "@/lib/auth";
+import { claimGuestChartForUserFromPath } from "@/lib/data";
 import {
   googleOAuthCallbackUrl,
   googleOAuthErrorUrl,
@@ -110,6 +111,15 @@ export async function GET(request: Request) {
     }
 
     await setSession(user);
+    try {
+      await claimGuestChartForUserFromPath(parsed.next, user);
+    } catch (error) {
+      console.error("claim_guest_chart_after_google_login_failed", {
+        next: parsed.next,
+        userId: user.id,
+        error: error instanceof Error ? error.message : String(error),
+      });
+    }
     return NextResponse.redirect(new URL(parsed.next, APP_URL));
   } catch (error) {
     console.error("google_oauth_callback_failed", error);

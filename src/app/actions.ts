@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { headers } from "next/headers";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { clearSession, createMagicSession, getCurrentUser, getOrCreateEmailUser, loginOrRegister, setSession, type SessionUser } from "@/lib/auth";
-import { ARTICLES_CACHE_TAG, FEATURE_PRICES_CACHE_TAG, OPERATION_SETTINGS_CACHE_TAG, countRecentChartsForIp, getCachedReading, getChart, getFeaturePrice, getOperationSettings, getUserBalance, saveArticleCategoryFromForm, saveArticleFromForm, saveChart, saveReading, adjustCoins, deleteArticleBySlug, deleteUserChart, getReadingJobByScope, createPendingReading, updateOperationSettings, updateFeaturePrices, getCompletedReadingsForScopes, hasReadingBundleAccess, type ChartCreationMetadata } from "@/lib/data";
+import { ARTICLES_CACHE_TAG, FEATURE_PRICES_CACHE_TAG, OPERATION_SETTINGS_CACHE_TAG, claimGuestChartForUserFromPath, countRecentChartsForIp, getCachedReading, getChart, getFeaturePrice, getOperationSettings, getUserBalance, saveArticleCategoryFromForm, saveArticleFromForm, saveChart, saveReading, adjustCoins, deleteArticleBySlug, deleteUserChart, getReadingJobByScope, createPendingReading, updateOperationSettings, updateFeaturePrices, getCompletedReadingsForScopes, hasReadingBundleAccess, type ChartCreationMetadata } from "@/lib/data";
 import { generateReading } from "@/lib/ai";
 import { getDb } from "@/lib/db";
 import { createPayOSCheckout, createPayOSCustomCheckout } from "@/lib/payos";
@@ -39,9 +39,10 @@ export async function loginAction(formData: FormData) {
   const password = String(formData.get("password") || "");
   const next = safeNextPath(formData.get("next"), "/");
   const mode = String(formData.get("mode") || "page");
+  let user: SessionUser | null = null;
 
   try {
-    await loginOrRegister(email, password);
+    user = await loginOrRegister(email, password);
   } catch (error) {
     const rawMessage = error instanceof Error ? error.message : "";
     const isExpectedAuthError =
@@ -65,6 +66,20 @@ export async function loginAction(formData: FormData) {
       redirect(withQueryParams(next, { login: "1", next, authError: message }));
     }
     redirect(`/dang-nhap?next=${encodeURIComponent(next)}&error=${encodeURIComponent(message)}`);
+  }
+
+  if (user) {
+    try {
+      await claimGuestChartForUserFromPath(next, user);
+    } catch (error) {
+      console.error(JSON.stringify({
+        level: "error",
+        event: "claim_guest_chart_after_login_failed",
+        next,
+        userId: user.id,
+        message: error instanceof Error ? error.message : String(error),
+      }));
+    }
   }
 
   redirect(next);
