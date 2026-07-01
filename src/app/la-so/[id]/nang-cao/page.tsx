@@ -1,28 +1,20 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { ArrowLeft, BookOpen, Sparkles } from "lucide-react";
+import { ArrowLeft, Sparkles } from "lucide-react";
 import { ChartBoard } from "@/components/chart-board";
 import { FeedbackActions } from "@/components/feedback-actions";
 import { FullReadingJobPanel } from "@/components/full-reading-job-panel";
-import { MarkdownContent } from "@/components/markdown-content";
+import { PaidReadingExperience } from "@/components/paid-reading-experience";
 import { ReadingPanel } from "@/components/reading-panel";
-import { getDeepReadingSummary, paidReadingChapters } from "@/lib/ai";
+import { getDeepReadingSummary } from "@/lib/ai";
 import { getCurrentUser } from "@/lib/auth";
-import { getAnyCompletedReading, getCachedReading, getChart, getFeaturePrices, getOperationSettings, getReadingJobById, getReadingJobByScope } from "@/lib/data";
+import { getAnyCompletedReading, getCachedReading, getChart, getFeaturePrices, getOperationSettings, getReadingJobById, getReadingJobByScope, getReadingProgress } from "@/lib/data";
+import { normalizePaidReading } from "@/lib/paid-reading-presentation";
 
 export const metadata = {
   title: "Luận giải nâng cao",
   robots: { index: false, follow: false },
 };
-
-function headingId(text: string) {
-  return text
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/\p{Diacritic}/gu, "")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-|-$/g, "");
-}
 
 export default async function AdvancedReadingPage({
   params,
@@ -59,7 +51,8 @@ export default async function AdvancedReadingPage({
   if (!fullReading && !pendingReading) redirect(`/la-so/${id}`);
 
   const summary = getDeepReadingSummary(record.chart);
-  const chapters = paidReadingChapters(record.chart, "FULL");
+  const normalizedReading = fullReading ? normalizePaidReading(fullReading.content) : null;
+  const savedProgress = fullReading ? await getReadingProgress(user.id, fullReading.id) : null;
 
   return (
     <main className="chart-page" data-testid="advanced-reading-page">
@@ -121,25 +114,17 @@ export default async function AdvancedReadingPage({
         </div>
 
         <section className="panel reading-content-panel mt-8" data-testid="advanced-reading-panel">
-          <div className="flex flex-col gap-5 lg:grid lg:grid-cols-[260px_1fr] lg:items-start">
-            <aside className="rounded-2xl border border-orange-100 bg-orange-50/70 p-4 lg:sticky lg:top-24" data-testid="advanced-reading-toc">
-              <p className="inline-flex items-center gap-2 text-sm font-black uppercase tracking-[0.18em] text-orange-800">
-                <BookOpen size={17} /> Mục lục
-              </p>
-              <nav className="mt-3 grid gap-2 text-sm font-bold text-stone-700" aria-label="Mục lục luận giải nâng cao">
-                {chapters.map((chapter) => (
-                  <a key={chapter.key} href={`#${headingId(chapter.title)}`} className="rounded-xl px-3 py-2 hover:bg-white hover:text-orange-800">
-                    {chapter.title}
-                  </a>
-                ))}
-              </nav>
-            </aside>
-
-            <article data-testid="advanced-reading-chapter-list">
-              <p className="eyebrow">Bản luận giải toàn bộ</p>
-              <MarkdownContent content={fullReading?.content || ""} />
-            </article>
-          </div>
+          <PaidReadingExperience
+            readingId={fullReading!.id}
+            content={normalizedReading!.content}
+            chapters={normalizedReading!.chapters}
+            initialProgress={savedProgress ? {
+              chapterKey: savedProgress.chapterKey,
+              chapterIndex: savedProgress.chapterIndex,
+              percent: savedProgress.percent,
+              chapterOffset: savedProgress.chapterOffset,
+            } : null}
+          />
           <FeedbackActions label="luận giải nâng cao" />
         </section>
 
