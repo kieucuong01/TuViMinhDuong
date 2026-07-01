@@ -75,6 +75,7 @@ model User {
   sessions     Session[]
   charts       Chart[]
   readings     Reading[]
+  readingProgress ReadingProgress[]
   ledgers      CoinLedger[]
   payments     PaymentOrder[]
   auditLogs    AuditLog[]
@@ -139,10 +140,28 @@ model Reading {
   user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   chart       Chart         @relation(fields: [chartId], references: [id], onDelete: Cascade)
   assistantQuestions AssistantQuestion[]
+  progress      ReadingProgress[]
 
   @@unique([userId, chartId, type, scopeKey])
   @@index([userId, type, scopeKey, status, createdAt])
   @@index([chartId, type, scopeKey, status])
+}
+
+model ReadingProgress {
+  id            String   @id @default(cuid())
+  userId        String
+  readingId     String
+  chapterKey    String
+  chapterIndex  Int
+  percent       Int
+  chapterOffset Float
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reading       Reading  @relation(fields: [readingId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, readingId])
+  @@index([readingId])
 }
 
 model AssistantQuestion {

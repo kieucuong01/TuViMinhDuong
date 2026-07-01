@@ -11,6 +11,7 @@ import { scoreArticleSeo } from "@/lib/seo";
 import { slugify } from "@/lib/format";
 import type { SessionUser } from "@/lib/auth";
 import { createPerfTimer, logPerfEvent } from "@/lib/perf";
+import type { ReadingProgressInput } from "@/lib/reading-progress";
 
 type StoredChart = {
   id: string;
@@ -106,6 +107,14 @@ export type AdminBusinessDashboard = {
   recentPayments: AdminRecentPayment[];
 };
 
+export type StoredReadingProgress = ReadingProgressInput & {
+  id: string;
+  userId: string;
+  readingId: string;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
 export type AdminChartSubmission = {
   id: string;
   title: string;
@@ -186,6 +195,7 @@ export type ChartHistoryItem = StoredChart & {
 const globalStore = globalThis as unknown as {
   demoCharts?: Map<string, StoredChart>;
   demoReadings?: Map<string, StoredReading>;
+  demoReadingProgress?: Map<string, StoredReadingProgress>;
   demoBalances?: Map<string, number>;
   demoArticles?: Map<string, ArticleView>;
   demoArticleCategories?: Map<string, ArticleCategoryView>;
@@ -296,6 +306,11 @@ type AdminPaymentRecord = {
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return Boolean(value && typeof value === "object");
+}
+
+function readingProgressEntries() {
+  globalStore.demoReadingProgress ||= new Map();
+  return globalStore.demoReadingProgress;
 }
 
 function numberFromRecord(record: Record<string, unknown>, key: string, fallback: number) {
@@ -1225,6 +1240,59 @@ export async function getReadingJobById(userId: string, readingId: string) {
   }
   const reading = await db.reading.findFirst({ where: { id: readingId, userId } });
   return reading ? storedReadingFromDb(reading) : null;
+}
+
+function isMissingReadingProgressTable(error: unknown) {
+  return Boolean(
+    error &&
+    typeof error === "object" &&
+    "code" in error &&
+    (error as { code?: string }).code === "P2021",
+  );
+}
+
+export async function getReadingProgress(userId: string, readingId: string): Promise<StoredReadingProgress | null> {
+  const key = `${userId}:${readingId}`;
+  const db = getDb();
+  if (!db || usesInMemoryUser(userId)) return readingProgressEntries().get(key) || null;
+
+  try {
+    return await db.readingProgress.findUnique({
+      where: { userId_readingId: { userId, readingId } },
+    });
+  } catch (error) {
+    if (isMissingReadingProgressTable(error)) return null;
+    throw error;
+  }
+}
+
+export async function saveReadingProgress(
+  userId: string,
+  readingId: string,
+  input: ReadingProgressInput,
+): Promise<StoredReadingProgress> {
+  const key = `${userId}:${readingId}`;
+  const db = getDb();
+  if (!db || usesInMemoryUser(userId)) {
+    const existing = readingProgressEntries().get(key);
+    const now = new Date();
+    const progress: StoredReadingProgress = {
+      id: existing?.id || `demo-progress-${Date.now()}`,
+      userId,
+      readingId,
+      ...input,
+      createdAt: existing?.createdAt || now,
+      updatedAt: now,
+    };
+    readingProgressEntries().set(key, progress);
+    return progress;
+  }
+
+  return db.readingProgress.upsert({
+    where: { userId_readingId: { userId, readingId } },
+    update: input,
+    create: { userId, readingId, ...input },
+  });
 }
 
 export async function createPendingReading(
