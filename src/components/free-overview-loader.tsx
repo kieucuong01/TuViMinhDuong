@@ -1,9 +1,9 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { MarkdownContent } from "@/components/markdown-content";
+import { ReadingDetailCta } from "@/components/reading-detail-cta";
 
 type FreeOverviewState =
   | { status: "loading"; content?: string; error?: undefined }
@@ -173,8 +173,6 @@ export function FreeOverviewLoader({
 
   if (state.status === "ready" || state.status === "fallback") {
     const canRetry = state.status === "fallback" && (state.jobStatus === "stale" || state.jobStatus === "failed");
-    const loginHref = `/dang-nhap?next=${encodeURIComponent(`/la-so/${chartId}`)}`;
-    const detailHref = isSignedIn ? `/la-so/${chartId}/nang-cao` : loginHref;
     const detailCta = isSignedIn ? "Xem luận giải chi tiết" : "Đăng nhập để xem chi tiết";
     const hasExpandedOverview = state.status === "ready" && state.detailContent !== state.content;
     const expandedOverviewContent = hasExpandedOverview ? hideFreeOverviewTemplateHeading(state.detailContent) : "";
@@ -202,9 +200,9 @@ export function FreeOverviewLoader({
                 <i />
               </span>
             ) : null}
-            <Link className="btn btn-small btn-primary" href={detailHref}>
+            <ReadingDetailCta chartId={chartId} isSignedIn={isSignedIn}>
               {detailCta}
-            </Link>
+            </ReadingDetailCta>
           </div>
         ) : null}
         {hasExpandedOverview ? (
@@ -214,9 +212,9 @@ export function FreeOverviewLoader({
                 <p className="eyebrow">Mini-report miễn phí</p>
                 <h2 id="free-overview-detail-title">Hồ sơ cá nhân từ dữ liệu lá số</h2>
               </div>
-              <Link className="btn btn-small btn-primary" href={detailHref}>
+              <ReadingDetailCta chartId={chartId} isSignedIn={isSignedIn}>
                 {detailCta}
-              </Link>
+              </ReadingDetailCta>
             </div>
             <MarkdownContent content={expandedOverviewContent} />
           </section>

@@ -16,6 +16,7 @@ import { DeferredChartActionPanel } from "@/components/deferred-chart-action-pan
 import { ChartRetentionPanel } from "@/components/chart-retention-panel";
 import { PaywallPopup } from "@/components/paywall-popup";
 import { FreeOverviewLoader } from "@/components/free-overview-loader";
+import { ReadingHashScrollRestorer } from "@/components/reading-detail-cta";
 import { MarkdownContent } from "@/components/markdown-content";
 import { buildInstantFreeOverview } from "@/lib/ai";
 import { PersonalizedReportOutline } from "@/components/personalized-report-outline";
@@ -85,6 +86,7 @@ export default async function ChartPage({
 
   return (
     <main className="chart-page" data-testid="chart-page">
+      <ReadingHashScrollRestorer />
       {paidFeaturesVisible ? <FateTabs chartId={id} active={activeView} /> : null}
 
       <div className="mx-auto max-w-6xl px-3 pb-10 sm:px-6 lg:px-8">
