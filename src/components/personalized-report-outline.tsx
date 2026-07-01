@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { CheckCircle2, LockKeyhole, Sparkles } from "lucide-react";
+import { premiumReadingModalId } from "@/components/premium-reading-target";
 import type { ReportOutlineItem } from "@/lib/chart-evidence";
 
 export function PersonalizedReportOutline({
@@ -60,9 +61,13 @@ export function PersonalizedReportOutline({
             <strong>Đọc lại không mất thêm xu</strong>
             <span>Tặng 3 câu hỏi với Cố vấn AI sau khi hồ sơ hoàn tất.</span>
           </div>
-          <Link className="btn btn-primary personal-report-outline-cta" href="#mo-khoa-ho-so-vip">
+          <button
+            type="button"
+            className="btn btn-primary personal-report-outline-cta"
+            popoverTarget={premiumReadingModalId(chartId)}
+          >
             Mở hồ sơ đầy đủ — {priceCoins} xu
-          </Link>
+          </button>
         </div>
       )}
     </section>

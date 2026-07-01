@@ -15,6 +15,9 @@ describe("assistant entitlement UI", () => {
     expect(widgetSource).toContain("data.remaining");
     expect(widgetSource).toContain("data.history");
     expect(widgetSource).toContain("Mở Hồ sơ VIP");
+    expect(widgetSource).toContain("premiumReadingModalId(chartId)");
+    expect(widgetSource).toContain(".showPopover()");
+    expect(widgetSource).not.toContain('href="#mo-khoa-ho-so-vip"');
   });
 
   it("passes serializable access state from the chart server page", () => {
@@ -23,7 +26,7 @@ describe("assistant entitlement UI", () => {
     expect(chartPageSource).toContain("buildPersonalizedReportOutline(record.chart)");
     expect(chartPageSource).toContain("listAssistantQuestions");
     expect(chartPageSource).toContain("<PersonalizedReportOutline");
-    expect(chartPageSource).toContain('id="mo-khoa-ho-so-vip"');
+    expect(chartPageSource).toContain("id={PREMIUM_READING_TARGET_ID}");
     expect(globalStyles).not.toMatch(
       /\.chart-page \.assistant-widget\s*\{\s*display:\s*none\s*!important;\s*\}/,
     );

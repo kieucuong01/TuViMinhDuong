@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { Bot, Loader2, Send, X } from "lucide-react";
 import { useState, useTransition } from "react";
+import { premiumReadingModalId } from "@/components/premium-reading-target";
 
 const starterQuestions = [
   "Điểm mạnh nào tôi nên dùng nhiều hơn trong công việc?",
@@ -146,9 +147,19 @@ export function AssistantWidget({
 
           {access.status === "full-required" ? (
             <div className="p-4 pt-0">
-              <Link className="btn btn-primary w-full" href="#mo-khoa-ho-so-vip" onClick={() => setOpen(false)}>
+              <button
+                type="button"
+                className="btn btn-primary w-full"
+                onClick={() => {
+                  const modal = document.getElementById(premiumReadingModalId(chartId));
+                  if (modal instanceof HTMLElement && typeof modal.showPopover === "function") {
+                    modal.showPopover();
+                  }
+                  setOpen(false);
+                }}
+              >
                 Mở Hồ sơ VIP
-              </Link>
+              </button>
             </div>
           ) : null}
 

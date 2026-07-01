@@ -4,6 +4,7 @@ import Link from "next/link";
 import { LockKeyhole, Sparkles, X } from "lucide-react";
 import { requestReadingAction } from "@/app/actions";
 import { LoadingSubmitButton } from "@/components/loading-submit-button";
+import { premiumReadingModalId } from "@/components/premium-reading-target";
 import { formatCoins } from "@/lib/format";
 
 type PremiumReadingCtaProps = {
@@ -125,7 +126,7 @@ function PremiumReadingConfirmModal({
 }
 
 export function PremiumReadingCta(props: PremiumReadingCtaProps) {
-  const modalId = `premium-confirm-${props.chartId}`;
+  const modalId = premiumReadingModalId(props.chartId);
 
   return (
     <>

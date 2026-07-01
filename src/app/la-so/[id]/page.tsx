@@ -12,6 +12,7 @@ import { FateTabs, type FateView } from "@/components/fate-tabs";
 import { DailyFateView, MajorFateView, MinorFateView, MonthlyFateView } from "@/components/fate-views";
 import { PalaceFateView } from "@/components/palace-fate-view";
 import { PremiumReadingCta } from "@/components/premium-reading-cta";
+import { PREMIUM_READING_TARGET_ID } from "@/components/premium-reading-target";
 import { DeferredChartActionPanel } from "@/components/deferred-chart-action-panel";
 import { ChartRetentionPanel } from "@/components/chart-retention-panel";
 import { PaywallPopup } from "@/components/paywall-popup";
@@ -162,7 +163,7 @@ export default async function ChartPage({
             />
             {featurePrices ? <ReadingTabs chartId={id} chart={record.chart} featurePrices={featurePrices} /> : null}
             {featurePrices ? (
-              <div id="mo-khoa-ho-so-vip">
+              <div id={PREMIUM_READING_TARGET_ID}>
                 <PremiumReadingCta chartId={id} fullName={record.chart.input.fullName} hasAdvancedReading={hasAdvancedReading} fullPriceCoins={featurePrices.FULL.priceCoins} />
               </div>
             ) : null}

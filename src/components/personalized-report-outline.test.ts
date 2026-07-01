@@ -25,7 +25,8 @@ describe("personalized VIP report outline", () => {
     expect(html).toContain("Mở hồ sơ đầy đủ — 199 xu");
     expect(html).toContain("Đọc lại không mất thêm xu");
     expect(html).toContain("Tặng 3 câu hỏi với Cố vấn AI");
-    expect(html).toContain("href=\"#mo-khoa-ho-so-vip\"");
+    expect(html).toContain('popoverTarget="premium-confirm-chart-1"');
+    expect(html).not.toContain('href="#mo-khoa-ho-so-vip"');
   });
 
   it("turns the preview into an unlocked contents list after purchase", () => {
