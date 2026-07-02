@@ -5,6 +5,7 @@ import {
   CURATED_PSEO_SLUGS,
   MANUAL_PSEO_BATCH_3_SLUGS,
   MANUAL_PSEO_BATCH_4_SLUGS,
+  MANUAL_PSEO_BATCH_5_SLUGS,
   buildPseoCombinations,
   buildPseoDraft,
   buildPseoInventory,
@@ -38,10 +39,11 @@ describe("pSEO registry", () => {
     const drafts = inventory.filter((page) => page.status === "DRAFT");
     expect(inventory).toHaveLength(168);
     expect(published.map((page) => page.slug).sort()).toEqual([...CURATED_PSEO_SLUGS].sort());
-    expect(published).toHaveLength(83);
-    expect(drafts).toHaveLength(85);
+    expect(published).toHaveLength(95);
+    expect(drafts).toHaveLength(73);
     expect(MANUAL_PSEO_BATCH_3_SLUGS).toHaveLength(36);
     expect(MANUAL_PSEO_BATCH_4_SLUGS).toHaveLength(5);
+    expect(MANUAL_PSEO_BATCH_5_SLUGS).toHaveLength(12);
     expect(drafts.every((page) => page.robots === "noindex,follow")).toBe(true);
   });
 
@@ -139,7 +141,7 @@ describe("pSEO data access", () => {
   it("serves the published fallback inventory when PostgreSQL is not configured", async () => {
     const slugs = await listPublishedPseoSlugs();
     const page = await getPublishedPseoPage("sao-thai-am-cung-tai-bach");
-    expect(slugs).toHaveLength(83);
+    expect(slugs).toHaveLength(95);
     expect(page?.starSlug).toBe("thai-am");
     expect((await listPseoEntities("MAIN_STAR"))).toHaveLength(14);
   });
