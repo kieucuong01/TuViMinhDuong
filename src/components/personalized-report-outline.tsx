@@ -52,7 +52,7 @@ export function PersonalizedReportOutline({
       </ol>
 
       {unlocked ? (
-        <Link className="btn btn-primary personal-report-outline-cta" href="#luan-giai">
+        <Link className="btn btn-primary personal-report-outline-cta" href={`/la-so/${chartId}/nang-cao`}>
           Đọc Hồ sơ VIP
         </Link>
       ) : (

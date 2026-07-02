@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { BookOpen, ChevronDown } from "lucide-react";
+import { BookOpen } from "lucide-react";
 import { MarkdownContent } from "@/components/markdown-content";
 import type { PaidReadingDisplayChapter } from "@/lib/paid-reading-presentation";
 import {
@@ -196,22 +196,13 @@ export function PaidReadingExperience({
     Math.max(1, (initialProgress?.chapterIndex || 0) + 1),
   );
   const showResume = Boolean(initialProgress && initialProgress.percent >= 2 && !resumeDismissed);
+  const displayPercent = showResume ? initialProgress!.percent : progress.percent;
+  const displayChapter = showResume
+    ? resumeChapterNumber
+    : Math.min(chapters.length, progress.chapterIndex + 1);
 
   return (
     <div className="paid-reading-experience" ref={rootRef}>
-      {showResume ? (
-        <div className="paid-reading-resume" data-testid="paid-reading-resume">
-          <div>
-            <span>Vị trí đọc đã được đồng bộ</span>
-            <strong>Chương {resumeChapterNumber} · {initialProgress?.percent}%</strong>
-          </div>
-          <button type="button" className="btn btn-primary btn-small" onClick={resumeReading}>
-            Đọc tiếp từ Chương {resumeChapterNumber} — {initialProgress?.percent}%
-            <ChevronDown size={16} aria-hidden="true" />
-          </button>
-        </div>
-      ) : null}
-
       <div className="paid-reading-layout">
         <aside className="paid-reading-toc" data-testid="advanced-reading-toc">
           <p>
@@ -241,22 +232,35 @@ export function PaidReadingExperience({
         </article>
       </div>
 
-      <div
-        className={`paid-reading-progress ${isVisible ? "is-visible" : ""}`}
-        role="progressbar"
-        aria-label="Tiến độ đọc luận giải"
-        aria-valuemin={0}
-        aria-valuemax={100}
-        aria-valuenow={progress.percent}
+      <button
+        type="button"
+        data-testid="paid-reading-progress-fab"
+        className={`paid-reading-progress-fab ${isVisible || showResume ? "is-visible" : ""}`}
+        onClick={() => {
+          if (showResume) {
+            resumeReading();
+            return;
+          }
+          const currentChapter = chapters[progress.chapterIndex] || chapters[0];
+          if (currentChapter) scrollToChapter(chapters[progress.chapterIndex] || chapters[0]);
+        }}
+        aria-label={showResume ? `Đọc tiếp từ chương ${displayChapter}, tiến độ ${displayPercent}%` : `Tiến độ đọc ${displayPercent}%, chương ${displayChapter}`}
       >
-        <div className="paid-reading-progress-label">
-          <span>{progress.percent}%</span>
-          <span>Chương {Math.min(chapters.length, progress.chapterIndex + 1)}/{chapters.length}</span>
-        </div>
-        <div className="paid-reading-progress-track" aria-hidden="true">
-          <span style={{ width: `${progress.percent}%` }} />
-        </div>
-      </div>
+        <span className="paid-reading-progress-fab-copy">
+          <strong>{showResume ? "Đọc tiếp · " : ""}{displayPercent}%</strong>
+          <small>Chương {displayChapter}/{chapters.length}</small>
+        </span>
+        <span
+          className="paid-reading-progress-fab-track"
+          role="progressbar"
+          aria-label="Tiến độ đọc luận giải"
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuenow={displayPercent}
+        >
+          <i style={{ width: `${displayPercent}%` }} />
+        </span>
+      </button>
     </div>
   );
 }

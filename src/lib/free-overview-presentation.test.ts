@@ -39,6 +39,7 @@ describe("free overview guest presentation", () => {
   it("projects only the anchor, main hook and first action", () => {
     const teaser = buildFreeOverviewTeaser(fullReport);
 
+    expect(FREE_OVERVIEW_TEASER_MAX_WORDS).toBe(500);
     expect(teaser).toContain("## Mỏ neo");
     expect(teaser).toContain("## Điểm đáng chú ý nhất");
     expect(teaser).toContain("## Một hành động nên làm ngay");
@@ -49,11 +50,11 @@ describe("free overview guest presentation", () => {
   });
 
   it("returns a bounded teaser when the markdown headings are malformed", () => {
-    const malformed = Array.from({ length: 400 }, (_, index) => `từ-${index}`).join(" ");
+    const malformed = Array.from({ length: 600 }, (_, index) => `từ-${index}`).join(" ");
     const teaser = buildFreeOverviewTeaser(malformed);
 
     expect(teaser).not.toBe("");
     expect(countWords(teaser)).toBe(FREE_OVERVIEW_TEASER_MAX_WORDS);
-    expect(teaser).not.toContain("từ-399");
+    expect(teaser).not.toContain("từ-599");
   });
 });

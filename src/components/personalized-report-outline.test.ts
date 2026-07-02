@@ -41,6 +41,7 @@ describe("personalized VIP report outline", () => {
 
     expect(html).toContain("Hồ sơ đã mở");
     expect(html).not.toContain("Mở hồ sơ đầy đủ");
-    expect(html).toContain("href=\"#luan-giai\"");
+    expect(html).toContain('href="/la-so/chart-1/nang-cao"');
+    expect(html).not.toContain('href="#luan-giai"');
   });
 });

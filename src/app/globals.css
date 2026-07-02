@@ -5973,70 +5973,61 @@ button.is-loading:not(.icon-button)::before {
   padding-inline: 0.08em;
 }
 
-.paid-reading-resume {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  margin-bottom: 1.25rem;
-  border: 1px solid #fed7aa;
-  border-radius: 1rem;
-  background: linear-gradient(135deg, #fff7ed, #fffbeb);
-  padding: 1rem;
-}
-
-.paid-reading-resume > div {
-  display: grid;
-  gap: 0.2rem;
-}
-
-.paid-reading-resume span {
-  color: #78716c;
-  font-size: 0.78rem;
-  font-weight: 750;
-}
-
-.paid-reading-resume strong {
-  color: #7c2d12;
-  font-size: 1rem;
-}
-
-.paid-reading-resume button {
-  min-height: 2.75rem;
-}
-
-.paid-reading-progress {
+.paid-reading-progress-fab {
   position: fixed;
   z-index: 45;
   right: 1rem;
-  bottom: 1rem;
-  width: min(20rem, calc(100vw - 2rem));
+  bottom: calc(1rem + var(--mobile-safe-bottom));
+  display: grid;
+  min-width: 11.5rem;
+  overflow: hidden;
   border: 1px solid rgba(234, 88, 12, 0.24);
-  border-radius: 0.9rem;
+  border-radius: 999px;
   background: rgba(255, 255, 255, 0.96);
-  box-shadow: 0 16px 44px rgba(124, 45, 18, 0.18);
+  box-shadow: 0 16px 44px rgba(124, 45, 18, 0.2);
+  cursor: pointer;
   opacity: 0;
-  padding: 0.7rem 0.85rem;
+  padding: 0.65rem 0.9rem 0.72rem;
   pointer-events: none;
   transform: translateY(0.75rem);
-  transition: opacity 180ms ease, transform 180ms ease;
+  transition: border-color 180ms ease, box-shadow 180ms ease, opacity 180ms ease, transform 180ms ease;
 }
 
-.paid-reading-progress.is-visible {
+.paid-reading-progress-fab:hover,
+.paid-reading-progress-fab:focus-visible {
+  border-color: rgba(194, 65, 12, 0.52);
+  box-shadow: 0 20px 50px rgba(124, 45, 18, 0.26);
+  outline: none;
+}
+
+.paid-reading-progress-fab.is-visible {
   opacity: 1;
+  pointer-events: auto;
   transform: translateY(0);
 }
 
-.paid-reading-progress-label {
+.paid-reading-progress-fab-copy {
   display: flex;
+  align-items: baseline;
   justify-content: space-between;
+  gap: 0.8rem;
   color: #7c2d12;
-  font-size: 0.78rem;
-  font-weight: 850;
+  line-height: 1.2;
 }
 
-.paid-reading-progress-track {
+.paid-reading-progress-fab-copy strong {
+  font-size: 0.86rem;
+  font-weight: 900;
+}
+
+.paid-reading-progress-fab-copy small {
+  color: #9a3412;
+  font-size: 0.74rem;
+  font-weight: 800;
+}
+
+.paid-reading-progress-fab-track {
+  display: block;
   height: 0.32rem;
   margin-top: 0.45rem;
   overflow: hidden;
@@ -6044,7 +6035,7 @@ button.is-loading:not(.icon-button)::before {
   background: #ffedd5;
 }
 
-.paid-reading-progress-track span {
+.paid-reading-progress-fab-track i {
   display: block;
   height: 100%;
   border-radius: inherit;
@@ -6067,18 +6058,10 @@ button.is-loading:not(.icon-button)::before {
 }
 
 @media (max-width: 639px) {
-  .paid-reading-resume {
-    align-items: stretch;
-  }
-
-  .paid-reading-resume button {
-    width: 100%;
-  }
-
-  .paid-reading-progress {
+  .paid-reading-progress-fab {
     right: 0.75rem;
-    bottom: 0.75rem;
-    width: calc(100vw - 1.5rem);
+    bottom: calc(5.25rem + var(--mobile-safe-bottom));
+    min-width: 10.75rem;
   }
 }
 

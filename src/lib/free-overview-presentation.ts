@@ -1,4 +1,4 @@
-export const FREE_OVERVIEW_TEASER_MAX_WORDS = 250;
+export const FREE_OVERVIEW_TEASER_MAX_WORDS = 500;
 
 function extractMarkdownSection(content: string, heading: string) {
   const lines = content.split(/\r?\n/);
