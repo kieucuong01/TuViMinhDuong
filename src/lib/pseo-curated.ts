@@ -1,5 +1,6 @@
 import type { PseoPageDraft } from "./pseo-registry.ts";
 import MANUAL_PSEO_BATCH_3 from "./pseo-manual-batch-3.json" with { type: "json" };
+import { MANUAL_PSEO_BATCH_4 } from "./pseo-manual-batch-4.ts";
 
 type ManualPseoBatchItem = {
   body: string;
@@ -10,7 +11,9 @@ type ManualPseoBatchItem = {
 };
 
 const MANUAL_BATCH_3 = MANUAL_PSEO_BATCH_3 as Record<string, ManualPseoBatchItem>;
+const MANUAL_BATCH_4 = MANUAL_PSEO_BATCH_4 as Record<string, ManualPseoBatchItem>;
 export const MANUAL_PSEO_BATCH_3_SLUGS = Object.keys(MANUAL_BATCH_3);
+export const MANUAL_PSEO_BATCH_4_SLUGS = Object.keys(MANUAL_BATCH_4);
 
 export const CURATED_PSEO_SLUGS = [
   "sao-thai-am-cung-tai-bach",
@@ -56,6 +59,7 @@ export const CURATED_PSEO_SLUGS = [
   "sao-pha-quan-cung-quan-loc",
   "sao-pha-quan-cung-tai-bach",
   ...MANUAL_PSEO_BATCH_3_SLUGS,
+  ...MANUAL_PSEO_BATCH_4_SLUGS,
 ] as const;
 
 type CuratedSlug = string;
@@ -647,12 +651,13 @@ Bạn nên [lập lá số miễn phí](/#lap-la-so) khi câu hỏi về ${palac
 export function getCuratedPseoContent(slug: string) {
   return CURATED_PSEO_CONTENT[slug as CuratedSlug]
     || (MANUAL_BATCH_3[slug] ? { body: MANUAL_BATCH_3[slug].body } : undefined)
+    || (MANUAL_BATCH_4[slug] ? { body: MANUAL_BATCH_4[slug].body } : undefined)
     || buildBatch2Content(slug);
 }
 
 export function getCuratedPseoGenerationMeta(slug: string) {
-  const item = MANUAL_BATCH_3[slug];
+  const item = MANUAL_BATCH_3[slug] || MANUAL_BATCH_4[slug];
   return item
-    ? { source: "manual-llm-batch-3", model: item.generation.model, generatedAt: item.generation.generatedAt }
+    ? { source: MANUAL_BATCH_4[slug] ? "manual-editorial-batch-4" : "manual-llm-batch-3", model: item.generation.model, generatedAt: item.generation.generatedAt }
     : { source: "curated-matrix-v1" };
 }
