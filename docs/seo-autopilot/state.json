@@ -1,13 +1,13 @@
 {
-  "lastRunAt": "2026-06-30T23:15:57.838Z",
+  "lastRunAt": "2026-07-02T09:18:41.695Z",
   "lastStatus": "warning",
   "lastAction": {
     "type": "single_article_publish",
-    "slug": "lap-la-so-bat-tu",
+    "slug": "giai-ma-la-so-tu-vi",
     "slugs": [
-      "lap-la-so-bat-tu"
+      "giai-ma-la-so-tu-vi"
     ],
-    "reason": "Publish 1 people-first articles from SEMrush intent clusters; first topic: NgÆ°á»i Ä‘á»c muá»‘n láº­p lÃ¡ sá»‘ bÃ¡t tá»± vÃ  cáº§n hiá»ƒu dÃ¹ng ngÃ y giá» sinh ra sao, khÃ¡c gÃ¬ vá»›i tá»­ vi vÃ  khi nÃ o nÃªn chá»n bÃ¡t tá»±.",
+    "reason": "Rejected overlapping slug xem-la-so-tu-vi-online because the repo already ships la-so-tu-vi-online for the same reader intent. Published the next distinct SEMrush-backed interpretation-support topic around giai ma la so tu vi and how to decode chart symbols before trusting the luan giai.",
     "approvalRequired": false,
     "allowedToCommitDeployAfterVerification": true
   },
@@ -20,9 +20,9 @@
     "status": "skipped"
   },
   "lastDraftPaths": [
-    "docs/seo-autopilot/drafts/lap-la-so-bat-tu.md"
+    "docs/seo-autopilot/drafts/giai-ma-la-so-tu-vi.md"
   ],
-  "lastReportPath": "docs/seo-autopilot/reports/2026-06-30-weekly-content-batch.md",
+  "lastReportPath": "docs/seo-autopilot/reports/2026-07-02-weekly-content-batch.md",
   "nextVerificationCommands": [
     "npm run seo:autopilot",
     "npm test -- src/lib/content.test.ts src/lib/article-cover-assets.test.ts src/lib/seo-autopilot-core.test.ts",
