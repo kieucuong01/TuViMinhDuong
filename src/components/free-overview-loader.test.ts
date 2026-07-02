@@ -74,6 +74,9 @@ describe("FreeOverviewLoader fast-first flow", () => {
 
   it("offers the VIP dossier only after the signed-in free report", () => {
     expect(loaderSource).toContain("free-overview-vip-transition");
+    expect(loaderSource).toContain('import { premiumReadingModalId } from "@/components/premium-reading-target"');
+    expect(loaderSource).toContain("popoverTarget={premiumReadingModalId(chartId)}");
+    expect(loaderSource).not.toContain("<ReadingDetailCta");
     expect(loaderSource).toContain("Xem hồ sơ luận giải chuyên sâu");
     expect(globalsCss).toContain(".free-overview-vip-transition");
   });

@@ -29,7 +29,6 @@ describe("reading detail CTA flow", () => {
     expect(ctaSource).toContain("window.location.hash");
     expect(ctaSource).toContain("loginModalHref");
     expect(ctaSource).toContain("onClick={() => scrollToPremiumReading()}");
-    expect(loaderSource).toContain("<ReadingDetailCta");
     expect(chartPageSource).toContain("<ReadingHashScrollRestorer");
     expect(chartPageSource).toContain('style={{ scrollMarginTop: "7rem" }}');
   });

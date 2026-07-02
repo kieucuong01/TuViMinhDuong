@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { loginModalHref } from "@/components/login-modal-link";
 import { MarkdownContent } from "@/components/markdown-content";
-import { ReadingDetailCta } from "@/components/reading-detail-cta";
+import { premiumReadingModalId } from "@/components/premium-reading-target";
 
 type FreeOverviewState =
   | { status: "loading"; content?: string; error?: undefined }
@@ -264,9 +264,13 @@ export function FreeOverviewLoader({
             <strong>Bạn đã xem các trục chính của lá số.</strong>
             <p>Hồ sơ VIP mở rộng sang 12 cung, đại vận và các mốc thời gian thành một kế hoạch chi tiết hơn.</p>
           </div>
-          <ReadingDetailCta chartId={chartId} isSignedIn>
+          <button
+            type="button"
+            className="btn btn-small btn-primary"
+            popoverTarget={premiumReadingModalId(chartId)}
+          >
             Xem hồ sơ luận giải chuyên sâu
-          </ReadingDetailCta>
+          </button>
         </section>
       </article>
     );

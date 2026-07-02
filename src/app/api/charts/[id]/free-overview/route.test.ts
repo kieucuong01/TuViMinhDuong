@@ -70,7 +70,7 @@ describe("free overview GET route", () => {
     expect(body.error).toContain("Không tìm thấy");
   });
 
-  it("returns only the projected teaser to a guest", async () => {
+  it("returns the expanded projected teaser to a guest", async () => {
     mocks.getFreeOverviewStatus.mockReturnValue({
       status: "ready",
       content: `## Mỏ neo
@@ -99,9 +99,11 @@ NỘI_DUNG_KHÓA_CÔNG_VIỆC
     const body = await response.json();
 
     expect(body.content).toContain("## Mỏ neo");
+    expect(body.content).toContain("## Khí chất và nội lực");
+    expect(body.content).toContain("## Công việc và tài chính");
     expect(body.content).toContain("## Một hành động nên làm ngay");
-    expect(body.content).not.toContain("NỘI_DUNG_KHÓA");
-    expect(body.wordCount).toBeLessThan(80);
+    expect(body.content).not.toContain("Hành động thứ hai");
+    expect(body.wordCount).toBeLessThanOrEqual(500);
   });
 
   it("returns the complete mini-report to a signed-in user", async () => {
