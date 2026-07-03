@@ -1,6 +1,7 @@
 import { PseoLookupHub } from "@/components/pseo-lookup-hub";
+import { redirect } from "next/navigation";
 import { routeMetadata } from "@/lib/metadata";
-import { PALACES } from "@/lib/pseo-registry";
+import { PALACES, pseoEntityPath } from "@/lib/pseo-registry";
 
 export const metadata = routeMetadata({
   title: "Ý nghĩa 12 Cung trong lá số tử vi",
@@ -14,6 +15,12 @@ export default async function PalacesHubPage({
   searchParams: Promise<{ muc?: string | string[] }>;
 }) {
   const muc = (await searchParams).muc;
+  if (typeof muc === "string") {
+    const entity = PALACES.find((item) => item.slug === muc);
+    const target = entity ? pseoEntityPath(entity.kind, entity.slug) : undefined;
+    if (target) redirect(target);
+  }
+
   return (
     <PseoLookupHub
       title="Ý nghĩa 12 Cung trong lá số tử vi"

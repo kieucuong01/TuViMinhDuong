@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { APP_URL } from "@/lib/env";
 import { listArticles } from "@/lib/data";
+import { SUPPORT_STARS } from "@/lib/pseo-registry";
 import { isSelfCanonicalArticle, robotsAllowsIndex } from "@/lib/seo";
 
 const STATIC_LAST_MODIFIED = new Date("2026-05-21T00:00:00+07:00");
@@ -25,6 +26,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${APP_URL}/tra-cuu/y-nghia-14-chinh-tinh`, lastModified: STATIC_LAST_MODIFIED, changeFrequency: "weekly", priority: 0.8 },
     { url: `${APP_URL}/tra-cuu/y-nghia-12-cung`, lastModified: STATIC_LAST_MODIFIED, changeFrequency: "weekly", priority: 0.8 },
     { url: `${APP_URL}/tra-cuu/phu-tinh`, lastModified: STATIC_LAST_MODIFIED, changeFrequency: "weekly", priority: 0.75 },
+    ...SUPPORT_STARS.flatMap((entity) =>
+      entity.canonicalPath
+        ? [{
+          url: `${APP_URL}${entity.canonicalPath}`,
+          lastModified: STATIC_LAST_MODIFIED,
+          changeFrequency: "monthly" as const,
+          priority: 0.62,
+        }]
+        : [],
+    ),
     ...TRUST_ROUTES.map((route) => ({
       url: `${APP_URL}${route.path}`,
       lastModified: STATIC_LAST_MODIFIED,

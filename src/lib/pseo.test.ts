@@ -149,9 +149,11 @@ describe("pSEO data access", () => {
   it("keeps lookup entity URLs separate from the knowledge article archive", async () => {
     const stars = await listPseoEntities("MAIN_STAR");
     const palaces = await listPseoEntities("PALACE");
+    const supportStars = await listPseoEntities("SUPPORT_STAR");
     expect(stars.every((entity) => entity.canonicalPath?.startsWith("/tra-cuu/sao-"))).toBe(true);
     expect(palaces.every((entity) => entity.canonicalPath?.startsWith("/tra-cuu/cung-"))).toBe(true);
-    expect([...stars, ...palaces].some((entity) => entity.canonicalPath?.includes("/kien-thuc-tu-vi"))).toBe(false);
+    expect(supportStars.every((entity) => entity.canonicalPath?.startsWith("/tra-cuu/phu-tinh/"))).toBe(true);
+    expect([...stars, ...palaces, ...supportStars].some((entity) => entity.canonicalPath?.includes("/kien-thuc-tu-vi"))).toBe(false);
   });
 
   it("serves standalone lookup entity pages for stars and palaces", async () => {

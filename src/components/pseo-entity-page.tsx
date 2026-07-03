@@ -119,12 +119,12 @@ export function PseoEntityPage({ page }: { page: PseoEntityPageView }) {
             </div>
           </article>
 
-          <aside>
+          <aside className="pseo-vip-sidebar">
             <Sparkles aria-hidden="true" size={28} />
-            <h2>Muốn đối chiếu với lá số riêng?</h2>
-            <p>Lập lá số miễn phí để xem sao, cung và vận hạn đang nằm ở vị trí nào trong trường hợp của bạn.</p>
-            <Link href="/#lap-la-so" className="btn btn-primary">
-              Lập lá số miễn phí
+            <h2>Luận giải VIP theo lá số riêng</h2>
+            <p>Trang tra cứu chỉ là lớp nghĩa nền. Hồ sơ VIP sẽ ghép ngày giờ sinh, cung sao và vận hạn để đọc sát trường hợp của bạn hơn.</p>
+            <Link href="/pricing" className="pseo-vip-link">
+              Xem luận giải VIP
             </Link>
           </aside>
         </section>

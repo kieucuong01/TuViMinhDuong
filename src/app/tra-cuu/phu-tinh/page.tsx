@@ -1,6 +1,7 @@
 import { PseoLookupHub } from "@/components/pseo-lookup-hub";
+import { redirect } from "next/navigation";
 import { routeMetadata } from "@/lib/metadata";
-import { SUPPORT_STARS } from "@/lib/pseo-registry";
+import { SUPPORT_STARS, pseoEntityPath } from "@/lib/pseo-registry";
 
 export const metadata = routeMetadata({
   title: "Tra cứu ý nghĩa Phụ Tinh trong tử vi",
@@ -14,6 +15,12 @@ export default async function SupportStarsHubPage({
   searchParams: Promise<{ muc?: string | string[] }>;
 }) {
   const muc = (await searchParams).muc;
+  if (typeof muc === "string") {
+    const entity = SUPPORT_STARS.find((item) => item.slug === muc);
+    const target = entity ? pseoEntityPath(entity.kind, entity.slug) : undefined;
+    if (target) redirect(target);
+  }
+
   return (
     <PseoLookupHub
       title="Tra cứu ý nghĩa Phụ Tinh trong tử vi"

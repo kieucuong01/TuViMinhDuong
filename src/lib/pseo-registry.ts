@@ -54,10 +54,12 @@ export type PseoPageDraft = {
 export function pseoEntityPath(kind: PseoEntityKind, slug: string) {
   if (kind === "MAIN_STAR") return `/tra-cuu/sao-${slug}`;
   if (kind === "PALACE") return `/tra-cuu/cung-${slug}`;
+  if (kind === "SUPPORT_STAR") return `/tra-cuu/phu-tinh/${slug}`;
   return undefined;
 }
 
 export function pseoEntityRouteSlug(kind: PseoEntityKind, slug: string) {
+  if (kind === "SUPPORT_STAR") return undefined;
   return pseoEntityPath(kind, slug)?.replace("/tra-cuu/", "");
 }
 
@@ -126,6 +128,7 @@ export const SUPPORT_STARS: PseoEntityDefinition[] = [
   summary: String(summary),
   strengths: ["tạo thêm lớp ngữ cảnh", "giúp nhận ra điểm cần ưu tiên"],
   cautions: ["không tự đứng một mình", "cần đọc cùng chính tinh và cung"],
+  canonicalPath: pseoEntityPath("SUPPORT_STAR", String(slug)),
 }));
 
 function stableScore(starIndex: number, palaceIndex: number, salt: number) {

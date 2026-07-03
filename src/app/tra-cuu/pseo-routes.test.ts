@@ -40,6 +40,26 @@ describe("pSEO route structure", () => {
       const source = readFileSync(route.path, "utf8");
       for (const marker of route.markers) expect(source).toContain(marker);
       expect(source).toContain("routeMetadata");
+      expect(source).toContain("redirect");
+      expect(source).toContain("pseoEntityPath");
     }
+  });
+
+  it("has static-capable support-star detail routes behind the support-star lookup", () => {
+    const source = readFileSync("src/app/tra-cuu/phu-tinh/[slug]/page.tsx", "utf8");
+
+    expect(source).toContain("generateStaticParams");
+    expect(source).toContain("generateMetadata");
+    expect(source).toContain("SUPPORT_STARS");
+    expect(source).toContain("PseoSupportStarPage");
+    expect(source).toContain("notFound");
+  });
+
+  it("includes support-star detail pages in the core sitemap", () => {
+    const source = readFileSync("src/app/sitemap.ts", "utf8");
+
+    expect(source).toContain("SUPPORT_STARS");
+    expect(source).toContain("entity.canonicalPath");
+    expect(source).toContain("/tra-cuu/phu-tinh");
   });
 });

@@ -6,8 +6,9 @@ import LookupHubPage from "@/app/tra-cuu/page";
 import { PseoArticleFunnel } from "@/components/pseo-article-funnel";
 import { PseoEntityPage } from "@/components/pseo-entity-page";
 import { PseoHub } from "@/components/pseo-hub";
+import { PseoSupportStarPage } from "@/components/pseo-support-star-page";
 import type { PseoEntityPageView } from "@/lib/pseo-data";
-import { buildPseoInventory, MAIN_STARS } from "@/lib/pseo-registry";
+import { buildPseoInventory, MAIN_STARS, SUPPORT_STARS } from "@/lib/pseo-registry";
 
 vi.mock("@/components/chart-form", () => ({
   ChartForm: () => createElement("form", { "data-testid": "chart-form" }),
@@ -61,8 +62,19 @@ describe("pSEO page family UI", () => {
     );
 
     expect(html).toContain('class="pseo-entity-reading-note"');
+    expect(html).toContain('class="pseo-vip-sidebar"');
+    expect(html).toContain('href="/pricing"');
     expect(html).toContain("pseo-related-group");
     expect(withoutRelatedHtml).not.toContain("pseo-related-group");
+  });
+
+  it("renders support-star detail pages with a VIP sidebar CTA", () => {
+    const html = renderToStaticMarkup(createElement(PseoSupportStarPage, { entity: SUPPORT_STARS[0]! }));
+
+    expect(html).toContain('class="pseo-vip-sidebar"');
+    expect(html).toContain('href="/pricing"');
+    expect(html).toContain('href="/tra-cuu/phu-tinh"');
+    expect(html).toContain(SUPPORT_STARS[0]!.name);
   });
 
   it("uses a data strip and omits empty related article groups", () => {

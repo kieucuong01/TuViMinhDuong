@@ -11677,6 +11677,13 @@ button.is-loading:not(.icon-button)::before {
   background: var(--pseo-wash);
 }
 
+.pseo-entity-content {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(16rem, 22rem);
+  gap: 1.5rem;
+  align-items: start;
+}
+
 .pseo-entity-content article {
   max-width: 46rem;
 }
@@ -11801,6 +11808,7 @@ button.is-loading:not(.icon-button)::before {
 
   .pseo-root-guide,
   .pseo-hub-index article,
+  .pseo-entity-content,
   .pseo-entity-detail-grid,
   .pseo-data-strip,
   .pseo-lookup-form > div,
