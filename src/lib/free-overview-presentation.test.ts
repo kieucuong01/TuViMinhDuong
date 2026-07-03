@@ -1,11 +1,20 @@
 import { describe, expect, it } from "vitest";
-import { countWords } from "@/lib/ai";
 import {
-  FREE_OVERVIEW_TEASER_MAX_WORDS,
+  FREE_OVERVIEW_GUEST_TEASER_MAX_CHARS,
+  FREE_OVERVIEW_GUEST_TEASER_MIN_CHARS,
   buildFreeOverviewTeaser,
 } from "@/lib/free-overview-presentation";
 
-const fullReport = `## Mỏ neo
+const guestTeaser = `Cung Mệnh cho thấy đây không phải kiểu lá số nên đi theo cảm hứng nhất thời. Bạn có năng lực nhìn ra vấn đề khá sớm, nhưng càng gặp chuyện lớn càng cần một cấu trúc rõ để không tự ôm hết áp lực. Điểm đáng chú ý là trục công việc và tài chính đang yêu cầu bạn chọn lọc cơ hội kỹ hơn: cơ hội có, nhưng chỉ tốt khi quyền hạn, dòng tiền và người chịu trách nhiệm được nói thẳng từ đầu.
+
+Nếu đoạn này khiến bạn thấy “đúng quá”, phần hồ sơ chuyên sâu sẽ đi tiếp vào từng cung, đại vận và các mốc cần chú ý để biến cảm giác đó thành kế hoạch hành động cụ thể hơn.`;
+const guestTeaserClosing =
+  " Khi mở hồ sơ đầy đủ, người đọc sẽ thấy rõ vì sao cùng một cơ hội có lúc nên tiến nhanh, có lúc nên giữ nhịp chậm để tránh mất sức và mất tiền.";
+
+const fullReport = `## Tín hiệu nổi bật của lá số
+${guestTeaser}${guestTeaserClosing}
+
+## Mỏ neo
 - **Nội lực: 75/100** — Nền tảng vững nhưng cần chọn đúng môi trường.
 - **Công việc & tài chính: 65/100** — Có cơ hội khi kiểm soát phạm vi.
 - **Vận năm 2026: 55/100** — Nên tiến theo từng bước có kiểm chứng.
@@ -36,43 +45,41 @@ NỘI_DUNG_KHÓA_VẬN_NĂM
 - Hành động thứ năm.`;
 
 describe("free overview guest presentation", () => {
-  it("keeps the guest preview as one continuous opening excerpt", () => {
+  it("uses the dedicated LLM guest teaser instead of mechanically cutting the report", () => {
     const teaser = buildFreeOverviewTeaser(fullReport);
 
-    expect(FREE_OVERVIEW_TEASER_MAX_WORDS).toBe(500);
-    expect(teaser).toContain("## Mỏ neo");
-    expect(teaser).toContain("## Điểm đáng chú ý nhất");
-    expect(teaser).toContain("## Khí chất và nội lực");
-    expect(teaser).toContain("## Công việc và tài chính");
-    expect(teaser).toContain("## Tình cảm và quan hệ");
-    expect(teaser).toContain("## Sức khỏe và nhịp sống");
-    expect(teaser).toContain("## Vận năm");
-    expect(teaser).toContain("- Hành động đầu tiên.");
-    expect(teaser).toContain("- Hành động thứ hai.");
-    expect(countWords(teaser)).toBeLessThanOrEqual(FREE_OVERVIEW_TEASER_MAX_WORDS);
+    expect(FREE_OVERVIEW_GUEST_TEASER_MIN_CHARS).toBe(650);
+    expect(FREE_OVERVIEW_GUEST_TEASER_MAX_CHARS).toBe(900);
+    expect(teaser).toContain("Cung Mệnh cho thấy");
+    expect(teaser).toContain("đúng quá");
+    expect(teaser).not.toContain("## Tín hiệu nổi bật");
+    expect(teaser).not.toContain("## Mỏ neo");
+    expect(teaser.length).toBeGreaterThanOrEqual(FREE_OVERVIEW_GUEST_TEASER_MIN_CHARS);
+    expect(teaser.length).toBeLessThanOrEqual(FREE_OVERVIEW_GUEST_TEASER_MAX_CHARS);
   });
 
-  it("returns a bounded teaser when the markdown headings are malformed", () => {
-    const malformed = Array.from({ length: 600 }, (_, index) => `từ-${index}`).join(" ");
+  it("falls back to a natural 800-character opening when old reports lack the guest teaser", () => {
+    const malformed = Array.from({ length: 130 }, (_, index) => `đoạn-cũ-${index}`).join(" ");
     const teaser = buildFreeOverviewTeaser(malformed);
 
     expect(teaser).not.toBe("");
-    expect(countWords(teaser)).toBe(FREE_OVERVIEW_TEASER_MAX_WORDS);
-    expect(teaser).not.toContain("từ-599");
+    expect(teaser.length).toBeLessThanOrEqual(800);
+    expect(teaser).not.toContain("đoạn-cũ-129");
     expect(teaser).not.toContain("…");
   });
 });
 
 describe("free overview guest teaser length", () => {
-  it("cuts only once at the guest budget instead of adding section ellipses", () => {
-    const longReport = Array.from({ length: 620 }, (_, index) => `từ-${index}`).join(" ");
+  it("bounds an overlong LLM teaser without adding ellipses", () => {
+    const longTeaser = Array.from({ length: 180 }, (_, index) => `tín-hiệu-${index}`).join(" ");
+    const longReport = `## Tín hiệu nổi bật của lá số\n${longTeaser}\n\n## Mỏ neo\nPhần còn lại.`;
 
     const teaser = buildFreeOverviewTeaser(longReport);
 
-    expect(countWords(teaser)).toBe(FREE_OVERVIEW_TEASER_MAX_WORDS);
-    expect(teaser).toContain("từ-0");
-    expect(teaser).toContain("từ-499");
-    expect(teaser).not.toContain("từ-500");
+    expect(teaser.length).toBeGreaterThanOrEqual(FREE_OVERVIEW_GUEST_TEASER_MIN_CHARS);
+    expect(teaser.length).toBeLessThanOrEqual(FREE_OVERVIEW_GUEST_TEASER_MAX_CHARS);
+    expect(teaser).toContain("tín-hiệu-0");
+    expect(teaser).not.toContain("## Mỏ neo");
     expect(teaser).not.toContain("…");
   });
 });

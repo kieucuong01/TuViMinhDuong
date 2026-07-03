@@ -73,7 +73,10 @@ describe("free overview GET route", () => {
   it("returns the expanded projected teaser to a guest", async () => {
     mocks.getFreeOverviewStatus.mockReturnValue({
       status: "ready",
-      content: `## Mỏ neo
+      content: `## Tín hiệu nổi bật của lá số
+Cung Mệnh cho thấy đây không phải kiểu lá số nên đi theo cảm hứng nhất thời. Bạn có năng lực nhìn ra vấn đề khá sớm, nhưng càng gặp chuyện lớn càng cần một cấu trúc rõ để không tự ôm hết áp lực. Điểm đáng chú ý là trục công việc và tài chính đang yêu cầu bạn chọn lọc cơ hội kỹ hơn: cơ hội có, nhưng chỉ tốt khi quyền hạn, dòng tiền và người chịu trách nhiệm được nói thẳng từ đầu. Nếu đoạn này khiến bạn thấy đúng quá, phần hồ sơ chuyên sâu sẽ đi tiếp vào từng cung, đại vận và các mốc cần chú ý để biến cảm giác đó thành kế hoạch hành động cụ thể hơn.
+
+## Mỏ neo
 - **Nội lực: 75/100** — Cung Mệnh tạo nền tảng.
 
 ## Điểm đáng chú ý nhất
@@ -98,12 +101,11 @@ NỘI_DUNG_KHÓA_CÔNG_VIỆC
     const response = await getOverview();
     const body = await response.json();
 
-    expect(body.content).toContain("## Mỏ neo");
-    expect(body.content).toContain("## Khí chất và nội lực");
-    expect(body.content).toContain("## Công việc và tài chính");
-    expect(body.content).toContain("## Cẩm nang hành động");
-    expect(body.content).toContain("Hành động thứ hai");
-    expect(body.wordCount).toBeLessThanOrEqual(500);
+    expect(body.content).toContain("Cung Mệnh cho thấy");
+    expect(body.content).toContain("đúng quá");
+    expect(body.content).not.toContain("## Tín hiệu nổi bật");
+    expect(body.content).not.toContain("## Mỏ neo");
+    expect(body.content.length).toBeLessThanOrEqual(900);
   });
 
   it("returns the complete mini-report to a signed-in user", async () => {

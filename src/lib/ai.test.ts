@@ -1,5 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
+  FREE_OVERVIEW_GUEST_TEASER_MAX_CHARS,
+  FREE_OVERVIEW_GUEST_TEASER_MIN_CHARS,
+  buildFreeOverviewTeaser,
+} from "@/lib/free-overview-presentation";
+import {
   FREE_OVERVIEW_MAX_WORDS,
   FREE_OVERVIEW_MAX_TOKENS,
   FREE_OVERVIEW_MIN_WORDS,
@@ -226,6 +231,10 @@ describe("AI reading format", () => {
     expect(FREE_OVERVIEW_MAX_WORDS).toBe(1400);
     expect(FREE_OVERVIEW_MAX_TOKENS).toBeLessThanOrEqual(7000);
     expect(prompt).toContain("1.150-1.250");
+    expect(prompt).toContain("## Tín hiệu nổi bật của lá số");
+    expect(prompt).toContain("650-900 ký tự");
+    expect(prompt).toContain("người đọc thấy đúng");
+    expect(prompt).toContain("muốn mở hồ sơ chuyên sâu");
     expect(prompt).toContain("## Mỏ neo");
     expect(prompt).toContain("## Điểm đáng chú ý nhất");
     expect(prompt).toContain("## Khí chất và nội lực");
@@ -245,6 +254,12 @@ describe("AI reading format", () => {
     expect(countWords(content)).toBeGreaterThanOrEqual(FREE_OVERVIEW_MIN_WORDS);
     expect(countWords(content)).toBeLessThanOrEqual(FREE_OVERVIEW_MAX_WORDS);
     expect(content).toContain("## Mỏ neo");
+    expect(content).toContain("## Tín hiệu nổi bật của lá số");
+    const guestTeaser = buildFreeOverviewTeaser(content);
+    expect(guestTeaser.length).toBeGreaterThanOrEqual(FREE_OVERVIEW_GUEST_TEASER_MIN_CHARS);
+    expect(guestTeaser.length).toBeLessThanOrEqual(FREE_OVERVIEW_GUEST_TEASER_MAX_CHARS);
+    expect(guestTeaser).toContain(chart.input.fullName);
+    expect(guestTeaser).not.toContain("## Mỏ neo");
     expect(content).toContain("## Điểm đáng chú ý nhất");
     expect(content).toContain("## Khí chất và nội lực");
     expect(content).toContain("## Công việc và tài chính");
@@ -282,7 +297,10 @@ describe("AI reading format", () => {
   it("accepts only evidence-based mini-reports within the guard range", () => {
     const buildContent = (fillerWords: number) => {
       const filler = Array.from({ length: fillerWords }, (_, index) => `dữ-liệu-${index}`).join(" ");
-      return `## Mỏ neo
+      return `## Tín hiệu nổi bật của lá số
+Với cung Mệnh có Tử Vi, lá số này không đi theo kiểu may rủi nhất thời mà nghiêng về năng lực dựng khung, nhìn vấn đề và giữ nhịp khi xung quanh bắt đầu rối. Điểm khiến người đọc dễ thấy đúng là bên ngoài có thể khá điềm, nhưng bên trong lại thường tự tính rất nhiều đường trước khi quyết. Trục Quan Lộc và Tài Bạch cho thấy cơ hội không thiếu, nhưng chỉ mở ra giá trị thật khi phạm vi, quyền hạn và dòng tiền được nói rõ từ đầu. Nếu muốn biết nên chọn cơ hội nào, tránh điểm nghẽn nào và năm 2026 nên đi nhanh hay đi chắc, phần hồ sơ chuyên sâu sẽ nối các cung, sao và đại vận thành một bản định hướng cụ thể hơn.
+
+## Mỏ neo
 - **Nội lực: 75/100** — Cung Mệnh có Tử Vi.
 - **Công việc & tài chính: 65/100** — Cung Quan Lộc cần chủ động.
 - **Vận năm 2026: 55/100** — Đại vận nhắc giữ nhịp.
@@ -315,6 +333,7 @@ Tuần tại Thiên Di là tín hiệu nên kiểm chứng.
     const content = buildContent(1020);
 
     expect(isCompleteFreeOverview(content)).toBe(true);
+    expect(isCompleteFreeOverview(content.replace("## Tín hiệu nổi bật của lá số", "## Gợi mở"))).toBe(false);
     expect(isCompleteFreeOverview(content.replace("## Tình cảm và quan hệ", "## Ghi chú"))).toBe(false);
     expect(isCompleteFreeOverview(buildContent(650))).toBe(false);
     expect(isCompleteFreeOverview(buildContent(1450))).toBe(false);

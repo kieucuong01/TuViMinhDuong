@@ -7,7 +7,7 @@ export const FREE_OVERVIEW_MIN_WORDS = 1000;
 export const FREE_OVERVIEW_MAX_WORDS = 1400;
 export const FREE_OVERVIEW_MAX_TOKENS = 6500;
 export const PAID_READING_CHAPTER_MAX_TOKENS = 7000;
-export const FREE_OVERVIEW_VERSION = "free-mini-report-v5";
+export const FREE_OVERVIEW_VERSION = "free-mini-report-v6";
 export const PAID_READING_VERSION = "paid-personal-dossier-v5";
 export const PAID_FULL_WORD_TARGET = "7.000-10.000 từ";
 export const READING_PROVIDER_ORDER = ["deepseek", "groq"] as const;
@@ -93,6 +93,7 @@ export function isCompletePaidChapter(content: string, chapter: PaidReadingChapt
 
 export function isCompleteFreeOverview(content: string) {
   const requiredHeadings = [
+    "## Tín hiệu nổi bật của lá số",
     "## Mỏ neo",
     "## Điểm đáng chú ý nhất",
     "## Khí chất và nội lực",
@@ -686,6 +687,7 @@ ${formatChartEvidence(profile)}
 Yêu cầu bắt buộc:
 - Chỉ dùng bằng chứng đã cấp; không tự an sao, không tự thêm sự kiện.
 - Mục tiêu 1.150-1.250 từ tiếng Việt. Hệ thống chấp nhận trong khoảng ${FREE_OVERVIEW_MIN_WORDS}-${FREE_OVERVIEW_MAX_WORDS} từ.
+- Mở đầu bằng mục "Tín hiệu nổi bật của lá số" dài 650-900 ký tự, viết như một đoạn luận giải cô đọng cho người chưa đăng nhập: nêu 2-3 điểm cá nhân hóa từ Mệnh/Thân/Quan Lộc/Tài Bạch/đại vận, làm người đọc thấy đúng, tò mò và muốn mở hồ sơ chuyên sâu. Không dùng bullet trong mục này.
 - Mỗi nhận định quan trọng phải gắn với một cung, sao, trạng thái sao, Tuần/Triệt hoặc đại vận trong hồ sơ.
 - Không dùng lời khen chung chung, không dọa nạt, không khẳng định chắc chắn tương lai.
 - Dùng ngôn ngữ tư vấn tài chính/đời sống: nêu xu hướng, điều kiện, cách kiểm chứng và hành động thực tế.
@@ -700,6 +702,7 @@ Yêu cầu bắt buộc:
 - Kết thúc bằng 5-7 bullet hành động ngắn, cụ thể và có thể kiểm chứng.
 
 Markdown đúng thứ tự:
+## Tín hiệu nổi bật của lá số
 ## Mỏ neo
 ## Điểm đáng chú ý nhất
 ## Khí chất và nội lực
@@ -734,7 +737,10 @@ export function buildInstantFreeOverview(chart: TuViChart) {
   const healthStars = health?.stars.slice(0, 5).join(", ") || "dữ liệu đang cập nhật";
   const travelStars = travel?.stars.slice(0, 5).join(", ") || "dữ liệu đang cập nhật";
 
-  return `## Mỏ neo
+  return `## Tín hiệu nổi bật của lá số
+Lá số của ${chart.input.fullName} không nghiêng về quyết định theo cảm hứng. Mệnh ${chart.menh} có ${menhStars} cho thấy khả năng quan sát và tự giữ nhịp, nhưng khi áp lực tăng dễ nghĩ quá lâu hoặc ôm trách nhiệm quá mức. Thân tại ${than?.name || chart.than} cùng trục Quan Lộc/Tài Bạch kéo về một bài toán chọn lọc: cơ hội có thể đến, nhưng chỉ đáng đi tiếp khi vai trò, dòng tiền và quyền quyết định rõ từ đầu. Nếu đoạn này khiến bạn thấy đúng với mình, hồ sơ chuyên sâu sẽ nối cung, sao và đại vận ${decade.current} thành định hướng cụ thể cho năm ${chart.input.viewYear}. Đây mới là lát cắt mở đầu, chưa phải toàn bộ bản đồ quyết định.
+
+## Mỏ neo
 - **Nội lực: ${innerScore}/100** — nền tảng của ${chart.input.fullName} nằm ở cách phối hợp giữa Mệnh ${chart.menh}, ${chart.than} và ${chart.cuc}; càng có quy trình rõ, năng lực càng ổn định.
 - **Công việc & tài chính: ${workMoneyScore}/100** — cơ hội có thật nhưng chỉ trở thành kết quả khi nghề nghiệp, dòng tiền và giới hạn rủi ro được đặt trong cùng một kế hoạch.
 - **Vận năm ${chart.input.viewYear}: ${scores.year}/100** — đây là chỉ báo định hướng để chọn nhịp tiến, không phải xác suất xảy ra biến cố; năm nay nên ưu tiên quyết định có thể thử nhỏ và rà soát sớm.
@@ -762,8 +768,8 @@ Cung Tật Ách tại ${health?.branch || "đang cập nhật"} có ${healthStar
 Vận năm ở mức ${scores.year}/100 cho thấy năm ${chart.input.viewYear} phù hợp với chiến lược tiến có kiểm soát. Cung Thiên Di tại ${travel?.branch || "đang cập nhật"} có ${travelStars}, vì vậy cơ hội có thể đến từ môi trường mới, người ngoài vòng quen thuộc hoặc một cách làm khác trước. Tuy nhiên, tín hiệu cần quản trị là ${caution?.evidence.join("; ") || `cung Tật Ách có ${healthStars}`}. Điều này không báo trước biến cố; nó yêu cầu kiểm chứng kỹ thông tin, lời hứa và khả năng chịu tải trước cam kết.
 
 ## Cẩm nang hành động
-- Chọn một mục tiêu công việc hoặc tài chính quan trọng nhất trong 30 ngày, viết rõ kết quả cần đạt và một chỉ số đo tiến độ.
-- Tách quỹ dự phòng khỏi tài khoản chi tiêu; chưa dùng vốn dài hạn cho một cơ hội chưa được thử ở quy mô nhỏ.
+- Chọn một mục tiêu chính trong 30 ngày, ghi kết quả cần đạt và chỉ số đo tiến độ.
+- Tách quỹ dự phòng khỏi chi tiêu; chỉ dùng vốn dài hạn sau khi thử nhỏ.
 - Với mọi hợp tác, xác nhận bằng văn bản phạm vi công việc, quyền quyết định, thời hạn và cách dừng khi điều kiện thay đổi.
 - Dành một cuộc trò chuyện thẳng thắn cho quan hệ quan trọng, tập trung vào trách nhiệm và nhu cầu cụ thể thay vì suy đoán động cơ.
 - Theo dõi giờ ngủ, mức năng lượng và thời gian làm việc trong 14 ngày; nếu dấu hiệu bất thường kéo dài, ưu tiên tư vấn chuyên môn.
