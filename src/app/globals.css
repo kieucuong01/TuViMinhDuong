@@ -5975,7 +5975,7 @@ button.is-loading:not(.icon-button)::before {
 
 .paid-reading-progress-fab {
   position: fixed;
-  z-index: 45;
+  z-index: 80;
   right: 1rem;
   bottom: calc(1rem + var(--mobile-safe-bottom));
   display: grid;

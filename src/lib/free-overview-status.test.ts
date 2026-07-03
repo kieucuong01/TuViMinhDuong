@@ -27,9 +27,9 @@ function completeOverviewContent() {
 Với cung Mệnh có Tử Vi, lá số này không đi theo kiểu may rủi nhất thời mà nghiêng về năng lực dựng khung, nhìn vấn đề và giữ nhịp khi xung quanh bắt đầu rối. Điểm khiến người đọc dễ thấy đúng là bên ngoài có thể khá điềm, nhưng bên trong lại thường tự tính rất nhiều đường trước khi quyết. Trục Quan Lộc và Tài Bạch cho thấy cơ hội không thiếu, nhưng chỉ mở ra giá trị thật khi phạm vi, quyền hạn và dòng tiền được nói rõ từ đầu. Nếu muốn biết nên chọn cơ hội nào, tránh điểm nghẽn nào và năm 2026 nên đi nhanh hay đi chắc, phần hồ sơ chuyên sâu sẽ nối các cung, sao và đại vận thành một bản định hướng cụ thể hơn.
 
 ## Mỏ neo
-- **Nội lực: 75/100** — Cung Mệnh có Tử Vi.
-- **Công việc & tài chính: 65/100** — Cung Quan Lộc cần chủ động.
-- **Vận năm 2026: 55/100** — Đại vận nhắc giữ nhịp.
+- **Năng lượng nội lực: nền ổn định** — Cung Mệnh có Tử Vi.
+- **Nhịp công việc & tài chính: chọn lọc trước khi nhận** — Cung Quan Lộc cần chủ động.
+- **Tín hiệu năm 2026: tiến từng bước có kiểm chứng** — Đại vận nhắc giữ nhịp.
 
 ## Điểm đáng chú ý nhất
 Cung Mệnh và đại vận hiện tại tạo ra một điểm chuyển. ${filler}
@@ -49,12 +49,11 @@ Cung Tật Ách chỉ dùng để nhắc nhịp nghỉ ngơi.
 ## Vận năm 2026
 Tuần tại Thiên Di là tín hiệu nên kiểm chứng.
 
-## Cẩm nang hành động
-- Giữ quỹ dự phòng.
-- Kiểm tra giấy tờ.
-- Chia quyết định lớn thành bước nhỏ.
-- Đặt mốc rà soát.
-- Nghỉ trước khi quá tải.`;
+## Câu hỏi mở trước khi đi sâu
+- Năm 2026, đâu là lựa chọn cần đọc sâu trước khi quyết?
+- Cơ hội nào đang mở ra thật, và cơ hội nào chỉ tạo áp lực?
+- Vì sao cùng một mối quan hệ có lúc hỗ trợ, có lúc làm hao sức?
+- Điểm nghẽn nào cần đối chiếu với đại vận trước khi hành động?`;
 }
 
 describe("free overview status", () => {

@@ -41,7 +41,6 @@ export function PaidReadingExperience({
   const pendingSaveRef = useRef<ReadingProgressInput | null>(null);
   const lastSavedRef = useRef(initialProgress ? progressSignature(initialProgress) : "");
   const [progress, setProgress] = useState(initialState);
-  const [isVisible, setIsVisible] = useState(false);
   const [resumeDismissed, setResumeDismissed] = useState(false);
 
   const persistProgress = useCallback(async (next: ReadingProgressInput, keepalive = false) => {
@@ -109,7 +108,6 @@ export function PaidReadingExperience({
 
       latestProgressRef.current = nextProgress;
       setProgress((current) => progressSignature(current) === progressSignature(nextProgress) ? current : nextProgress);
-      setIsVisible(rect.top < window.innerHeight - 80 && rect.bottom > 100);
     };
 
     const scheduleMeasure = () => {
@@ -235,7 +233,7 @@ export function PaidReadingExperience({
       <button
         type="button"
         data-testid="paid-reading-progress-fab"
-        className={`paid-reading-progress-fab ${isVisible || showResume ? "is-visible" : ""}`}
+        className="paid-reading-progress-fab is-visible"
         onClick={() => {
           if (showResume) {
             resumeReading();

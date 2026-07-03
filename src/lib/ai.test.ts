@@ -69,6 +69,21 @@ function sampleChart(gender: "male" | "female" = "female") {
   });
 }
 
+function youngSampleChart() {
+  return generateTuViChart({
+    fullName: "Nguyễn Hồ Bảo Linh",
+    gender: "female",
+    calendarType: "solar",
+    day: 12,
+    month: 8,
+    year: 2008,
+    birthHour: 7,
+    birthMinute: 0,
+    viewYear: 2026,
+    timezone: "Asia/Bangkok",
+  });
+}
+
 function completeGeneratedChapter(chapter: PaidReadingChapter, marker: string) {
   const filler = Array.from({ length: 720 }, (_, index) => `${marker}-word-${index}`).join(" ");
   const monthLines =
@@ -242,13 +257,18 @@ describe("AI reading format", () => {
     expect(prompt).toContain("## Tình cảm và quan hệ");
     expect(prompt).toContain("## Sức khỏe và nhịp sống");
     expect(prompt).toContain(`## Vận năm ${chart.input.viewYear}`);
-    expect(prompt).toContain("## Cẩm nang hành động");
+    expect(prompt).toContain("không dùng điểm số thô");
+    expect(prompt).toContain("12-21 tuổi");
+    expect(prompt).toContain("tiền tiêu vặt");
+    expect(prompt).toContain("bài tập nhóm");
+    expect(prompt).toContain("## Câu hỏi mở trước khi đi sâu");
+    expect(prompt).not.toContain("## Cẩm nang hành động");
     expect(prompt).toContain("Không viết như bài blog");
-    expect(prompt).toContain("5-7");
+    expect(prompt).toContain("What/Why");
   });
 
   it("renders a useful instant free overview before the background LLM finishes", () => {
-    const chart = sampleChart("male");
+    const chart = youngSampleChart();
     const content = buildInstantFreeOverview(chart);
 
     expect(countWords(content)).toBeGreaterThanOrEqual(FREE_OVERVIEW_MIN_WORDS);
@@ -266,7 +286,15 @@ describe("AI reading format", () => {
     expect(content).toContain("## Tình cảm và quan hệ");
     expect(content).toContain("## Sức khỏe và nhịp sống");
     expect(content).toContain(`## Vận năm ${chart.input.viewYear}`);
-    expect(content).toContain("## Cẩm nang hành động");
+    expect(content).toContain("## Câu hỏi mở trước khi đi sâu");
+    expect(content).not.toContain("## Cẩm nang hành động");
+    expect(content).not.toMatch(/\d+\/100/);
+    expect(content).toContain("tiền tiêu vặt");
+    expect(content).toContain("part-time");
+    expect(content).toContain("bài tập nhóm");
+    expect(content).not.toContain("vốn thử nghiệm");
+    expect(content).not.toContain("văn bản phạm vi công việc");
+    expect(content).not.toContain("dòng tiền");
     expect(content).toContain(chart.input.fullName);
     expect(content).toContain(chart.menh);
     expect(content).toContain(chart.than);
@@ -301,9 +329,9 @@ describe("AI reading format", () => {
 Với cung Mệnh có Tử Vi, lá số này không đi theo kiểu may rủi nhất thời mà nghiêng về năng lực dựng khung, nhìn vấn đề và giữ nhịp khi xung quanh bắt đầu rối. Điểm khiến người đọc dễ thấy đúng là bên ngoài có thể khá điềm, nhưng bên trong lại thường tự tính rất nhiều đường trước khi quyết. Trục Quan Lộc và Tài Bạch cho thấy cơ hội không thiếu, nhưng chỉ mở ra giá trị thật khi phạm vi, quyền hạn và dòng tiền được nói rõ từ đầu. Nếu muốn biết nên chọn cơ hội nào, tránh điểm nghẽn nào và năm 2026 nên đi nhanh hay đi chắc, phần hồ sơ chuyên sâu sẽ nối các cung, sao và đại vận thành một bản định hướng cụ thể hơn.
 
 ## Mỏ neo
-- **Nội lực: 75/100** — Cung Mệnh có Tử Vi.
-- **Công việc & tài chính: 65/100** — Cung Quan Lộc cần chủ động.
-- **Vận năm 2026: 55/100** — Đại vận nhắc giữ nhịp.
+- **Năng lượng nội lực: nền ổn định** — Cung Mệnh có Tử Vi.
+- **Nhịp công việc & tài chính: chọn lọc trước khi nhận** — Cung Quan Lộc cần chủ động.
+- **Tín hiệu năm 2026: tiến từng bước có kiểm chứng** — Đại vận nhắc giữ nhịp.
 
 ## Điểm đáng chú ý nhất
 Cung Mệnh có Tử Vi và đại vận hiện tại tạo ra một điểm chuyển. ${filler}
@@ -323,19 +351,18 @@ Cung Tật Ách chỉ dùng để nhắc nhịp nghỉ ngơi, không thay thế 
 ## Vận năm 2026
 Tuần tại Thiên Di là tín hiệu nên kiểm chứng.
 
-## Cẩm nang hành động
-- Giữ quỹ dự phòng.
-- Kiểm tra giấy tờ.
-- Chia quyết định lớn thành bước nhỏ.
-- Đặt mốc rà soát.
-- Nghỉ trước khi quá tải.`;
+## Câu hỏi mở trước khi đi sâu
+- Năm 2026, đâu là lựa chọn cần đọc sâu trước khi quyết?
+- Cơ hội nào đang mở ra thật, và cơ hội nào chỉ tạo áp lực?
+- Vì sao cùng một mối quan hệ có lúc hỗ trợ, có lúc làm hao sức?
+- Điểm nghẽn nào cần đối chiếu với đại vận trước khi hành động?`;
     };
     const content = buildContent(1020);
 
     expect(isCompleteFreeOverview(content)).toBe(true);
     expect(isCompleteFreeOverview(content.replace("## Tín hiệu nổi bật của lá số", "## Gợi mở"))).toBe(false);
     expect(isCompleteFreeOverview(content.replace("## Tình cảm và quan hệ", "## Ghi chú"))).toBe(false);
-    expect(isCompleteFreeOverview(buildContent(650))).toBe(false);
+    expect(isCompleteFreeOverview(buildContent(500))).toBe(false);
     expect(isCompleteFreeOverview(buildContent(1450))).toBe(false);
   });
 

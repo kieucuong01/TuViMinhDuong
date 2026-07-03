@@ -7,7 +7,7 @@ export const FREE_OVERVIEW_MIN_WORDS = 1000;
 export const FREE_OVERVIEW_MAX_WORDS = 1400;
 export const FREE_OVERVIEW_MAX_TOKENS = 6500;
 export const PAID_READING_CHAPTER_MAX_TOKENS = 7000;
-export const FREE_OVERVIEW_VERSION = "free-mini-report-v6";
+export const FREE_OVERVIEW_VERSION = "free-mini-report-v7";
 export const PAID_READING_VERSION = "paid-personal-dossier-v5";
 export const PAID_FULL_WORD_TARGET = "7.000-10.000 từ";
 export const READING_PROVIDER_ORDER = ["deepseek", "groq"] as const;
@@ -101,17 +101,19 @@ export function isCompleteFreeOverview(content: string) {
     "## Tình cảm và quan hệ",
     "## Sức khỏe và nhịp sống",
     "## Vận năm",
-    "## Cẩm nang hành động",
+    "## Câu hỏi mở trước khi đi sâu",
   ];
   const wordCount = countWords(content);
   const hasChartEvidence = /(cung|mệnh|thân|sao|đại vận|tuần|triệt)/i.test(content);
-  const actionBulletCount = (content.match(/^\s*[-*]\s+\S/gm) || []).length;
+  const questionBulletCount = (content.match(/^\s*[-*]\s+.+\?/gm) || []).length;
+  const hasOldActionChecklist = content.includes("## Cẩm nang hành động");
 
   return (
     wordCount >= FREE_OVERVIEW_MIN_WORDS &&
     wordCount <= FREE_OVERVIEW_MAX_WORDS &&
     hasChartEvidence &&
-    actionBulletCount >= 5 &&
+    questionBulletCount >= 3 &&
+    !hasOldActionChecklist &&
     requiredHeadings.every((heading) => content.includes(heading))
   );
 }
@@ -129,6 +131,56 @@ function viewerAddress(chart: TuViChart) {
   if (age >= 55) return chart.input.gender === "female" ? "cô" : "chú";
   if (age >= 35) return chart.input.gender === "female" ? "chị" : "anh";
   return "bạn";
+}
+
+function freeOverviewAudienceContext(chart: TuViChart) {
+  const age = chartAge(chart);
+  if (age <= 21) {
+    return {
+      lifeStage: "12-21 tuổi, học sinh/sinh viên hoặc mới bắt đầu đi làm thêm",
+      workMoneyLanguage:
+        "học tập, chọn ngành, lịch học, bài tập nhóm, câu lạc bộ, bạn bè, tiền tiêu vặt, tiền làm thêm part-time",
+      workFocus: "học tập, chọn ngành, hoạt động nhóm và việc part-time",
+      moneyFocus: "tiền tiêu vặt, học phí, khoản làm thêm và cách giữ một phần nhỏ để tự chủ",
+      collaborationFocus: "bài tập nhóm, câu lạc bộ, dự án ở trường hoặc cam kết khi nhận việc part-time",
+      decisionFocus: "chọn ngành học, định hướng tương lai gần và cách không bị cuốn theo áp lực bạn bè",
+      anchorWorkLabel: "Nhịp học tập & định hướng",
+      paidTeaser:
+        "hồ sơ chuyên sâu sẽ chỉ ra ba bẫy tâm lý dễ gặp trong giai đoạn chọn ngành, bạn bè, nhóm học và tiền part-time",
+    };
+  }
+  if (age <= 29) {
+    return {
+      lifeStage: "22-29 tuổi, giai đoạn vào nghề và tự lập",
+      workMoneyLanguage:
+        "công việc đầu đời, chọn môi trường, thu nhập mới, quỹ dự phòng nhỏ, hợp tác dự án, kỹ năng và hướng đi 1-3 năm",
+      workFocus: "công việc đầu đời, kỹ năng, môi trường làm việc và hướng đi 1-3 năm",
+      moneyFocus: "thu nhập mới, khoản dự phòng và các quyết định chi tiêu lớn đầu tiên",
+      collaborationFocus: "dự án, hợp đồng thử việc, nhóm làm chung và kỳ vọng giữa đôi bên",
+      decisionFocus: "chọn môi trường, chọn người hướng dẫn và chọn nhịp tăng trưởng",
+      anchorWorkLabel: "Nhịp vào nghề & tài chính",
+      paidTeaser:
+        "hồ sơ chuyên sâu sẽ bóc tách điểm nên tăng tốc, điểm nên giữ nhịp và cách tránh chọn sai môi trường",
+    };
+  }
+  return {
+    lifeStage: "người trưởng thành, cần cân bằng công việc, tài chính, gia đình và sức khỏe",
+    workMoneyLanguage:
+      "vai trò công việc, dòng tiền, ngân sách, hợp tác, ranh giới trách nhiệm, gia đình và nhịp nghỉ",
+    workFocus: "công việc, vai trò, tài chính và các cam kết dài hạn",
+    moneyFocus: "dòng tiền, quỹ dự phòng và khả năng chịu rủi ro",
+    collaborationFocus: "hợp tác, phạm vi trách nhiệm, quyền quyết định và cách dừng khi điều kiện thay đổi",
+    decisionFocus: "ưu tiên sự nghiệp, gia đình, tài chính và sức khỏe trong cùng một nhịp sống",
+    anchorWorkLabel: "Nhịp công việc & tài chính",
+    paidTeaser:
+      "hồ sơ chuyên sâu sẽ nối từng cung, đại vận và vận năm thành một lộ trình ưu tiên rõ hơn",
+  };
+}
+
+function freeOverviewStatusLabel(score: number, strong: string, steady: string, careful: string) {
+  if (score >= 72) return strong;
+  if (score >= 55) return steady;
+  return careful;
 }
 
 function palaceByName(chart: TuViChart, name: string) {
@@ -676,6 +728,7 @@ function getFocusData(chart: TuViChart, type: ReadingKey, scopeKey: string) {
 function freeOverviewPrompt(chart: TuViChart) {
   const profile = buildChartEvidenceProfile(chart);
   const decade = compactDecadeContext(chart);
+  const audience = freeOverviewAudienceContext(chart);
 
   return `Bạn là chuyên gia tử vi Việt Nam có 30 năm kinh nghiệm tư vấn đời sống. Hãy đọc dữ liệu lá số đã được hệ thống tính sẵn và viết một mini-report cá nhân có chiều sâu. Không viết như bài blog.
 
@@ -683,23 +736,24 @@ Hồ sơ bằng chứng:
 ${formatChartEvidence(profile)}
 - Đại vận hiện tại: ${decade.current}
 - Tuổi trong năm xem: ${decade.currentAge}
+- Bối cảnh ngôn ngữ cần dùng: ${audience.lifeStage}. Khi luận công việc/tài chính, hãy dịch sang các tình huống gần với người đọc: ${audience.workMoneyLanguage}.
 
 Yêu cầu bắt buộc:
 - Chỉ dùng bằng chứng đã cấp; không tự an sao, không tự thêm sự kiện.
 - Mục tiêu 1.150-1.250 từ tiếng Việt. Hệ thống chấp nhận trong khoảng ${FREE_OVERVIEW_MIN_WORDS}-${FREE_OVERVIEW_MAX_WORDS} từ.
-- Mở đầu bằng mục "Tín hiệu nổi bật của lá số" dài 650-900 ký tự, viết như một đoạn luận giải cô đọng cho người chưa đăng nhập: nêu 2-3 điểm cá nhân hóa từ Mệnh/Thân/Quan Lộc/Tài Bạch/đại vận, làm người đọc thấy đúng, tò mò và muốn mở hồ sơ chuyên sâu. Không dùng bullet trong mục này.
+- Mở đầu bằng mục "Tín hiệu nổi bật của lá số" dài 650-900 ký tự, viết như một đoạn luận giải cô đọng cho người chưa đăng nhập: đánh trúng một cảm giác tâm lý thật trước, sau đó mới lồng 1-2 thuật ngữ tử vi trong ngoặc nếu cần. Không mở đầu bằng danh sách sao. Làm người đọc thấy đúng, tò mò và muốn mở hồ sơ chuyên sâu. Không dùng bullet trong mục này.
 - Mỗi nhận định quan trọng phải gắn với một cung, sao, trạng thái sao, Tuần/Triệt hoặc đại vận trong hồ sơ.
 - Không dùng lời khen chung chung, không dọa nạt, không khẳng định chắc chắn tương lai.
-- Dùng ngôn ngữ tư vấn tài chính/đời sống: nêu xu hướng, điều kiện, cách kiểm chứng và hành động thực tế.
+- Dùng ngôn ngữ tư vấn đời sống đúng độ tuổi. Nếu người đọc 12-21 tuổi, không dùng giọng của người đi làm lâu năm: "dòng tiền" phải chuyển thành tiền tiêu vặt/tiền part-time; "hợp tác văn bản" chuyển thành bài tập nhóm/câu lạc bộ/cam kết khi làm thêm; "phạm vi công việc" chuyển thành chọn ngành, hướng học, vai trò trong nhóm.
 - Nêu một cơ hội cụ thể và một vùng rủi ro cụ thể, nhưng luôn diễn đạt là tín hiệu cần đối chiếu.
-- Mở đầu bằng ba mỏ neo /100: Nội lực, Công việc & tài chính, Vận năm. Điểm số là chỉ báo định hướng, không phải xác suất biến cố.
+- Mục "Mỏ neo" không dùng điểm số thô kiểu 35/100, 42/100. Hãy dùng nhãn trạng thái trung lập như "Năng lượng tĩnh", "Nhịp độ: cẩn trọng", "Tín hiệu năm: đi chậm để chắc". Nếu bắt buộc nhắc chỉ số, phải giải thích ngay đó là chỉ số biến động/cần đi chậm, không phải điểm kém.
 - Chọn một mâu thuẫn, cơ hội hoặc điểm nghẽn cá nhân làm "Điểm đáng chú ý nhất" để tạo động lực đọc tiếp.
 - Lồng cung và sao tự nhiên vào lời khuyên; không tạo mục liệt kê dữ kiện kỹ thuật.
 - Mỗi phần phải bổ sung một góc nhìn mới, không lặp lại cùng một nhận định bằng cách đổi câu chữ.
 - Phần sức khỏe chỉ đưa khuyến nghị nhịp sống thận trọng, không chẩn đoán và không thay thế tư vấn y khoa.
 - Không chào hỏi dài, không giải thích tử vi như kiến thức phổ thông, không quảng cáo quá mức.
 - Dùng đúng năm xem ${chart.input.viewYear}.
-- Kết thúc bằng 5-7 bullet hành động ngắn, cụ thể và có thể kiểm chứng.
+- Kết thúc bằng mục "Câu hỏi mở trước khi đi sâu": 4-6 câu hỏi gợi mở có dấu hỏi, chỉ nêu What/Why và nhá hàng ${audience.paidTeaser}; không đưa checklist How-to chi tiết trong bản miễn phí.
 
 Markdown đúng thứ tự:
 ## Tín hiệu nổi bật của lá số
@@ -710,7 +764,7 @@ Markdown đúng thứ tự:
 ## Tình cảm và quan hệ
 ## Sức khỏe và nhịp sống
 ## Vận năm ${chart.input.viewYear}
-## Cẩm nang hành động`;
+## Câu hỏi mở trước khi đi sâu`;
 }
 
 export function buildInstantFreeOverview(chart: TuViChart) {
@@ -729,6 +783,10 @@ export function buildInstantFreeOverview(chart: TuViChart) {
   const scores = Object.fromEntries(summary.scores.map((score) => [score.key, score.value])) as Record<DeepScoreKey, number>;
   const innerScore = clampScore(Math.round((scores.career + scores.health + scores.love) / 3));
   const workMoneyScore = clampScore(Math.round((scores.career + scores.money) / 2));
+  const audience = freeOverviewAudienceContext(chart);
+  const innerStatus = freeOverviewStatusLabel(innerScore, "nền ổn định", "cần giữ nhịp", "dễ quá tải nếu vội");
+  const workMoneyStatus = freeOverviewStatusLabel(workMoneyScore, "có cửa mở rộng", "chọn lọc trước khi nhận", "đi chậm để chắc nền");
+  const yearStatus = freeOverviewStatusLabel(scores.year, "thuận để mở thêm cơ hội", "tiến từng bước có kiểm chứng", "ưu tiên quan sát và giữ sức");
   const menhStars = menh?.stars.slice(0, 5).join(", ") || "dữ liệu đang cập nhật";
   const thanStars = than?.stars.slice(0, 5).join(", ") || "dữ liệu đang cập nhật";
   const careerStars = career?.stars.slice(0, 5).join(", ") || "chưa có sao nổi bật";
@@ -738,42 +796,41 @@ export function buildInstantFreeOverview(chart: TuViChart) {
   const travelStars = travel?.stars.slice(0, 5).join(", ") || "dữ liệu đang cập nhật";
 
   return `## Tín hiệu nổi bật của lá số
-Lá số của ${chart.input.fullName} không nghiêng về quyết định theo cảm hứng. Mệnh ${chart.menh} có ${menhStars} cho thấy khả năng quan sát và tự giữ nhịp, nhưng khi áp lực tăng dễ nghĩ quá lâu hoặc ôm trách nhiệm quá mức. Thân tại ${than?.name || chart.than} cùng trục Quan Lộc/Tài Bạch kéo về một bài toán chọn lọc: cơ hội có thể đến, nhưng chỉ đáng đi tiếp khi vai trò, dòng tiền và quyền quyết định rõ từ đầu. Nếu đoạn này khiến bạn thấy đúng với mình, hồ sơ chuyên sâu sẽ nối cung, sao và đại vận ${decade.current} thành định hướng cụ thể cho năm ${chart.input.viewYear}. Đây mới là lát cắt mở đầu, chưa phải toàn bộ bản đồ quyết định.
+${chart.input.fullName}, bạn là kiểu người thường quan sát rất kỹ trước khi nói ra điều mình nghĩ. Điểm mạnh này giúp bạn tránh nhiều quyết định bốc đồng, nhưng đôi khi cũng khiến bạn tự ôm áp lực, sợ chọn sai hoặc thấy mình chậm hơn người khác. Lá số cho thấy mâu thuẫn này đến từ cách Mệnh ${chart.menh} và Thân tại ${than?.name || chart.than} kéo năng lượng về sự thận trọng, trong khi đại vận ${decade.current} lại buộc bạn phải chọn hướng rõ hơn. Với bối cảnh ${audience.lifeStage}, điều đáng đọc tiếp không phải là “tốt hay xấu”, mà là vì sao ${audience.decisionFocus} đang trở thành nút thắt. ${audience.paidTeaser}; phần miễn phí này chỉ mở cánh cửa đầu tiên.
 
 ## Mỏ neo
-- **Nội lực: ${innerScore}/100** — nền tảng của ${chart.input.fullName} nằm ở cách phối hợp giữa Mệnh ${chart.menh}, ${chart.than} và ${chart.cuc}; càng có quy trình rõ, năng lực càng ổn định.
-- **Công việc & tài chính: ${workMoneyScore}/100** — cơ hội có thật nhưng chỉ trở thành kết quả khi nghề nghiệp, dòng tiền và giới hạn rủi ro được đặt trong cùng một kế hoạch.
-- **Vận năm ${chart.input.viewYear}: ${scores.year}/100** — đây là chỉ báo định hướng để chọn nhịp tiến, không phải xác suất xảy ra biến cố; năm nay nên ưu tiên quyết định có thể thử nhỏ và rà soát sớm.
+- **Năng lượng nội lực: ${innerStatus}** — nền tảng của ${chart.input.fullName} nằm ở cách phối hợp giữa Mệnh ${chart.menh}, ${chart.than} và ${chart.cuc}; càng có nhịp rõ, năng lực càng ổn định.
+- **${audience.anchorWorkLabel}: ${workMoneyStatus}** — cơ hội có thật, nhưng chỉ trở thành kết quả khi ${audience.workFocus} được đặt trong một giới hạn đủ rõ.
+- **Tín hiệu năm ${chart.input.viewYear}: ${yearStatus}** — đây là nhịp định hướng để chọn bước đi, không phải lời chấm điểm hay xác suất biến cố.
 
 ## Điểm đáng chú ý nhất
-Điểm đáng chú ý nhất trong lá số là khoảng cách giữa điều ${chart.input.fullName} muốn giữ ổn định và cách hoàn cảnh buộc phải thay đổi. Cung Mệnh tại ${menh?.branch || chart.menh} có ${menhStars}, trong khi Thân thuộc ${than?.name || "cung đang cập nhật"} tại ${than?.branch || chart.than} có ${thanStars}. Mệnh mô tả cách nhìn nhận bản thân, còn Thân cho thấy nơi năng lượng được đưa vào hành động. Đại vận hiện tại ${decade.current} làm khoảng cách này rõ hơn: người xem dễ có cảm giác đã suy nghĩ rất kỹ nhưng đến lúc cần quyết lại bị kéo giữa an toàn và mong muốn bứt ra.
+Điểm đáng chú ý nhất trong lá số là khoảng cách giữa điều ${chart.input.fullName} muốn giữ ổn định và cách hoàn cảnh buộc phải thay đổi. Cung Mệnh tại ${menh?.branch || chart.menh} có ${menhStars}, trong khi Thân thuộc ${than?.name || "cung đang cập nhật"} tại ${than?.branch || chart.than} có ${thanStars}. Đại vận hiện tại ${decade.current} làm khoảng cách này rõ hơn: người xem dễ có cảm giác đã suy nghĩ rất kỹ nhưng đến lúc cần quyết lại bị kéo giữa an toàn và mong muốn bứt ra.
 
 ## Khí chất và nội lực
-Trục Mệnh ${chart.menh} với nhóm sao ${menhStars} cho thấy ${chart.input.fullName} có xu hướng quan sát bối cảnh trước khi bộc lộ toàn bộ quan điểm. Đây là lợi thế trong công việc cần phân tích, điều phối hoặc bảo vệ chất lượng, bởi người xem thường nhận ra chi tiết mà người khác bỏ qua. Tuy vậy, khi áp lực tăng, sự thận trọng có thể biến thành nghĩ quá lâu hoặc muốn tự kiểm soát mọi mắt xích. Cách dùng tốt nội lực này không phải ép bản thân quyết nhanh hơn, mà là quy định trước thời hạn thu thập thông tin rồi chốt theo tiêu chí đã chọn.
+Trục Mệnh ${chart.menh} với nhóm sao ${menhStars} cho thấy ${chart.input.fullName} có xu hướng quan sát bối cảnh trước khi bộc lộ toàn bộ quan điểm. Đây là lợi thế trong ${audience.workFocus}, bởi người xem thường nhận ra chi tiết mà người khác bỏ qua. Nhưng khi áp lực tăng, sự thận trọng có thể biến thành nghĩ quá lâu hoặc muốn tự kiểm soát mọi mắt xích.
 
-Thân tại ${than?.name || chart.than} với ${thanStars} cho thấy bản lĩnh được hình thành qua việc làm thật hơn là qua hình ảnh bên ngoài. Môi trường phù hợp là nơi vai trò, quyền hạn và kết quả được nói rõ; môi trường nhiều lời hứa nhưng thiếu cách đo lường dễ khiến năng lượng bị phân tán. Khi nhận một việc mới, nên xác định đầu ra, nguồn lực và người ra quyết định cuối cùng. Ba điểm này rõ thì sự kiên trì trở thành lợi thế; ba điểm này mơ hồ thì càng cố gắng càng dễ mệt.
+Thân tại ${than?.name || chart.than} với ${thanStars} cho thấy bản lĩnh được hình thành qua trải nghiệm thật hơn là qua hình ảnh bên ngoài. Môi trường phù hợp là nơi ${audience.collaborationFocus} được nói rõ; môi trường nhiều lời hứa nhưng thiếu ranh giới dễ khiến năng lượng bị phân tán. Khi một lựa chọn mới xuất hiện, điều đáng hỏi là lựa chọn đó có giúp ${audience.decisionFocus} rõ hơn hay làm bạn phải gồng thêm.
 
 ## Công việc và tài chính
-Cung Quan Lộc tại ${career?.branch || "đang cập nhật"} có ${careerStars}. Dữ kiện này nên được đọc như cách tổ chức sự nghiệp, không phải một chức danh cố định. Cơ hội phù hợp thường là công việc cho phép giải quyết vấn đề cụ thể, cải thiện quy trình hoặc chịu trách nhiệm đến cùng cho một kết quả. Nếu muốn chuyển việc hay nhận dự án mới, hãy ưu tiên nơi có phạm vi ba đến sáu tháng, tiêu chí hoàn thành rõ và quyền chủ động đủ dùng. Một cơ hội nghe hấp dẫn nhưng không nói rõ ai quyết định, ngân sách ở đâu và thành công được đo thế nào cần được xem là tín hiệu phải kiểm tra thêm.
+Cung Quan Lộc tại ${career?.branch || "đang cập nhật"} có ${careerStars}. Dữ kiện này nên được đọc như cách tổ chức hướng đi, không phải một chức danh cố định. Với bối cảnh ${audience.lifeStage}, trọng tâm nên đặt vào ${audience.workFocus}. Một cơ hội nghe hấp dẫn nhưng làm bạn mơ hồ về vai trò, kỳ vọng và người đồng hành cần được xem là tín hiệu phải kiểm tra thêm.
 
-Cung Tài Bạch tại ${money?.branch || "đang cập nhật"} có ${moneyStars}. Điểm mạnh tài chính không chỉ nằm ở khả năng kiếm tiền mà ở khả năng giữ cấu trúc dòng tiền. Trong năm ${chart.input.viewYear}, nên tách tiền sinh hoạt, quỹ dự phòng và vốn thử nghiệm thành ba phần riêng. Bất kỳ khoản đầu tư hoặc hợp tác nào cũng cần giới hạn thua lỗ có thể chấp nhận, thời hạn đánh giá và giấy tờ xác nhận. Nếu chưa trả lời được ba yếu tố này, lựa chọn hợp lý là trì hoãn chứ không phải từ chối vĩnh viễn.
+Cung Tài Bạch tại ${money?.branch || "đang cập nhật"} có ${moneyStars}. Điểm mạnh tài chính không chỉ nằm ở khả năng kiếm thêm, mà ở cách giữ cho nguồn lực không bị rò rỉ theo cảm xúc. Trong năm ${chart.input.viewYear}, nên đọc chủ đề này qua ${audience.moneyFocus}. Nếu một khoản chi hoặc lời rủ rê làm bạn muốn chứng minh mình ổn, lá số nghiêng về việc quan sát thêm trước khi cam kết.
 
 ## Tình cảm và quan hệ
-Cung Phu Thê tại ${relationship?.branch || "đang cập nhật"} có ${relationshipStars}. Trong quan hệ gần gũi, ${chart.input.fullName} cần sự rõ ràng nhưng đôi khi lại kỳ vọng người kia tự hiểu điều mình chưa nói. Khi căng thẳng, vấn đề dễ nằm ở cách phân chia trách nhiệm, tiền bạc hoặc thời gian hơn là ở tình cảm cốt lõi. Một cuộc trao đổi tốt nên đi từ sự kiện cụ thể, cảm nhận cá nhân đến đề nghị có thể thực hiện; tránh dùng những từ tuyệt đối như “luôn luôn” hoặc “không bao giờ”.
+Cung Phu Thê tại ${relationship?.branch || "đang cập nhật"} có ${relationshipStars}. Trong quan hệ gần gũi, ${chart.input.fullName} cần sự rõ ràng nhưng đôi khi lại kỳ vọng người kia tự hiểu điều mình chưa nói. Khi căng thẳng, vấn đề dễ nằm ở cách phân chia trách nhiệm, tiền bạc hoặc thời gian hơn là ở tình cảm cốt lõi. Đây là vùng nên đọc sâu vì chỉ một hiểu lầm nhỏ cũng có thể làm hao năng lượng.
 
 ## Sức khỏe và nhịp sống
-Cung Tật Ách tại ${health?.branch || "đang cập nhật"} có ${healthStars}. Đây chỉ là tín hiệu để quan sát nhịp sống, không phải chẩn đoán y khoa. Điểm cần lưu ý là xu hướng tiếp tục làm việc khi cơ thể đã phát tín hiệu quá tải: khó tách khỏi công việc, ngủ không sâu, căng vùng vai gáy hoặc dễ cáu khi lịch bị thay đổi. Nếu các dấu hiệu kéo dài hoặc ảnh hưởng sinh hoạt, cần ưu tiên thăm khám chuyên môn thay vì tự quy mọi nguyên nhân cho lá số.
+Cung Tật Ách tại ${health?.branch || "đang cập nhật"} có ${healthStars}. Đây chỉ là tín hiệu để quan sát nhịp sống, không phải chẩn đoán y khoa. Điểm cần lưu ý là xu hướng tiếp tục cố khi cơ thể đã phát tín hiệu quá tải. Nếu các dấu hiệu kéo dài hoặc ảnh hưởng sinh hoạt, cần ưu tiên thăm khám chuyên môn thay vì tự quy mọi nguyên nhân cho lá số.
 
 ## Vận năm ${chart.input.viewYear}
-Vận năm ở mức ${scores.year}/100 cho thấy năm ${chart.input.viewYear} phù hợp với chiến lược tiến có kiểm soát. Cung Thiên Di tại ${travel?.branch || "đang cập nhật"} có ${travelStars}, vì vậy cơ hội có thể đến từ môi trường mới, người ngoài vòng quen thuộc hoặc một cách làm khác trước. Tuy nhiên, tín hiệu cần quản trị là ${caution?.evidence.join("; ") || `cung Tật Ách có ${healthStars}`}. Điều này không báo trước biến cố; nó yêu cầu kiểm chứng kỹ thông tin, lời hứa và khả năng chịu tải trước cam kết.
+Vận năm ${chart.input.viewYear} nghiêng về trạng thái ${yearStatus}. Cung Thiên Di tại ${travel?.branch || "đang cập nhật"} có ${travelStars}, vì vậy cơ hội có thể đến từ môi trường mới, người ngoài vòng quen thuộc hoặc một cách làm khác trước. Tín hiệu cần quản trị là ${caution?.evidence.join("; ") || `cung Tật Ách có ${healthStars}`}: hãy kiểm chứng kỹ thông tin, lời hứa và khả năng chịu tải trước cam kết.
 
-## Cẩm nang hành động
-- Chọn một mục tiêu chính trong 30 ngày, ghi kết quả cần đạt và chỉ số đo tiến độ.
-- Tách quỹ dự phòng khỏi chi tiêu; chỉ dùng vốn dài hạn sau khi thử nhỏ.
-- Với mọi hợp tác, xác nhận bằng văn bản phạm vi công việc, quyền quyết định, thời hạn và cách dừng khi điều kiện thay đổi.
-- Dành một cuộc trò chuyện thẳng thắn cho quan hệ quan trọng, tập trung vào trách nhiệm và nhu cầu cụ thể thay vì suy đoán động cơ.
-- Theo dõi giờ ngủ, mức năng lượng và thời gian làm việc trong 14 ngày; nếu dấu hiệu bất thường kéo dài, ưu tiên tư vấn chuyên môn.
-- Đặt mốc rà soát sau 30–60 ngày cho quyết định lớn để giữ điều hiệu quả, bỏ điều không còn phù hợp và tránh kéo dài vì tiếc công sức.`;
+## Câu hỏi mở trước khi đi sâu
+- Trong năm ${chart.input.viewYear}, đâu là lựa chọn khiến ${chart.input.fullName} vừa thấy muốn tiến lên, vừa sợ mình chọn sai?
+- Khi ${audience.workFocus} xuất hiện một cơ hội mới, dấu hiệu nào cho thấy đó là hướng đáng theo, và dấu hiệu nào chỉ là áp lực từ bên ngoài?
+- Với ${audience.moneyFocus}, vì sao có lúc bạn biết nên giữ lại nhưng vẫn dễ chi hoặc nhận lời vì cảm xúc?
+- Trong ${audience.collaborationFocus}, điểm mù nào khiến bạn dễ gánh nhiều hơn phần mình nên nhận?
+- Đại vận ${decade.current} đang nhấn vào bài học nào về ${audience.decisionFocus}, và vì sao cần đọc sâu theo từng tháng thay vì chỉ đọc một kết luận chung?`;
 }
 
 export async function generateFreeOverview(chart: TuViChart) {

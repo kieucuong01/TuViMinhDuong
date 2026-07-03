@@ -29,6 +29,14 @@ describe("PaidReadingExperience browser contract", () => {
   it("styles one fixed interactive progress control without a report-top resume card", () => {
     expect(css).toContain(".paid-reading-progress-fab");
     expect(css).toContain("position: fixed");
+    expect(css).toContain("z-index: 80");
     expect(css).not.toContain(".paid-reading-resume");
+  });
+
+  it("keeps the floating progress and resume control visible while scrolling", () => {
+    expect(source).toContain('className="paid-reading-progress-fab is-visible"');
+    expect(source).not.toContain('className={`paid-reading-progress-fab ${isVisible || showResume ? "is-visible" : ""}`}');
+    expect(css).toContain(".paid-reading-progress-fab.is-visible");
+    expect(css).toContain("pointer-events: auto");
   });
 });
