@@ -50,9 +50,9 @@ describe("free overview GET route", () => {
     expect(response.status).toBe(200);
     expect(body).toEqual({
       status: "fallback",
-      content: "## Tổng quan miễn phí\nBản nhanh.",
+      content: "Bản nhanh.",
       source: "instant-template",
-      wordCount: 7,
+      wordCount: 2,
       jobStatus: "idle",
     });
     expect(mocks.getFreeOverviewStatus).toHaveBeenCalledTimes(1);
@@ -101,8 +101,8 @@ NỘI_DUNG_KHÓA_CÔNG_VIỆC
     expect(body.content).toContain("## Mỏ neo");
     expect(body.content).toContain("## Khí chất và nội lực");
     expect(body.content).toContain("## Công việc và tài chính");
-    expect(body.content).toContain("## Một hành động nên làm ngay");
-    expect(body.content).not.toContain("Hành động thứ hai");
+    expect(body.content).toContain("## Cẩm nang hành động");
+    expect(body.content).toContain("Hành động thứ hai");
     expect(body.wordCount).toBeLessThanOrEqual(500);
   });
 

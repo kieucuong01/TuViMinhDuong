@@ -5,10 +5,6 @@ import {
   buildFreeOverviewTeaser,
 } from "@/lib/free-overview-presentation";
 
-function repeatedWords(prefix: string, count: number) {
-  return Array.from({ length: count }, (_, index) => `${prefix}-${index}`).join(" ");
-}
-
 const fullReport = `## Mỏ neo
 - **Nội lực: 75/100** — Nền tảng vững nhưng cần chọn đúng môi trường.
 - **Công việc & tài chính: 65/100** — Có cơ hội khi kiểm soát phạm vi.
@@ -40,7 +36,7 @@ NỘI_DUNG_KHÓA_VẬN_NĂM
 - Hành động thứ năm.`;
 
 describe("free overview guest presentation", () => {
-  it("projects the main guest preview sections and first action", () => {
+  it("keeps the guest preview as one continuous opening excerpt", () => {
     const teaser = buildFreeOverviewTeaser(fullReport);
 
     expect(FREE_OVERVIEW_TEASER_MAX_WORDS).toBe(500);
@@ -49,10 +45,10 @@ describe("free overview guest presentation", () => {
     expect(teaser).toContain("## Khí chất và nội lực");
     expect(teaser).toContain("## Công việc và tài chính");
     expect(teaser).toContain("## Tình cảm và quan hệ");
+    expect(teaser).toContain("## Sức khỏe và nhịp sống");
     expect(teaser).toContain("## Vận năm");
-    expect(teaser).toContain("## Một hành động nên làm ngay");
     expect(teaser).toContain("- Hành động đầu tiên.");
-    expect(teaser).not.toContain("Hành động thứ hai");
+    expect(teaser).toContain("- Hành động thứ hai.");
     expect(countWords(teaser)).toBeLessThanOrEqual(FREE_OVERVIEW_TEASER_MAX_WORDS);
   });
 
@@ -63,38 +59,20 @@ describe("free overview guest presentation", () => {
     expect(teaser).not.toBe("");
     expect(countWords(teaser)).toBe(FREE_OVERVIEW_TEASER_MAX_WORDS);
     expect(teaser).not.toContain("từ-599");
+    expect(teaser).not.toContain("…");
   });
 });
 
 describe("free overview guest teaser length", () => {
-  it("uses most of the guest teaser budget when the overview has enough personal content", () => {
-    const longReport = `## Mỏ neo
-${repeatedWords("neo", 130)}
-
-## Điểm đáng chú ý nhất
-${repeatedWords("diem", 150)}
-
-## Khí chất và nội lực
-${repeatedWords("khi-chat", 120)}
-
-## Công việc và tài chính
-${repeatedWords("cong-viec", 110)}
-
-## Tình cảm và quan hệ
-${repeatedWords("tinh-cam", 90)}
-
-## Vận năm 2026
-${repeatedWords("van-nam", 80)}
-
-## Cẩm nang hành động
-- ${repeatedWords("hanh-dong", 60)}`;
+  it("cuts only once at the guest budget instead of adding section ellipses", () => {
+    const longReport = Array.from({ length: 620 }, (_, index) => `từ-${index}`).join(" ");
 
     const teaser = buildFreeOverviewTeaser(longReport);
 
-    expect(countWords(teaser)).toBeGreaterThanOrEqual(450);
-    expect(countWords(teaser)).toBeLessThanOrEqual(FREE_OVERVIEW_TEASER_MAX_WORDS);
-    expect(teaser).toContain("## Khí chất và nội lực");
-    expect(teaser).toContain("## Công việc và tài chính");
-    expect(teaser).not.toContain("van-nam-79");
+    expect(countWords(teaser)).toBe(FREE_OVERVIEW_TEASER_MAX_WORDS);
+    expect(teaser).toContain("từ-0");
+    expect(teaser).toContain("từ-499");
+    expect(teaser).not.toContain("từ-500");
+    expect(teaser).not.toContain("…");
   });
 });
