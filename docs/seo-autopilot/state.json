@@ -1,13 +1,13 @@
 {
-  "lastRunAt": "2026-07-02T09:18:41.695Z",
+  "lastRunAt": "2026-07-04T22:16:55.753Z",
   "lastStatus": "warning",
   "lastAction": {
     "type": "single_article_publish",
-    "slug": "giai-ma-la-so-tu-vi",
+    "slug": "xem-la-so-tu-vi-online",
     "slugs": [
-      "giai-ma-la-so-tu-vi"
+      "xem-la-so-tu-vi-online"
     ],
-    "reason": "Rejected overlapping slug xem-la-so-tu-vi-online because the repo already ships la-so-tu-vi-online for the same reader intent. Published the next distinct SEMrush-backed interpretation-support topic around giai ma la so tu vi and how to decode chart symbols before trusting the luan giai.",
+    "reason": "Publish 1 people-first articles from SEMrush intent clusters; first topic: NgÆ°á»i Ä‘á»c Ä‘Ã£ cÃ³ lÃ¡ sá»‘ vÃ  muá»‘n biáº¿t nÃªn xem online pháº§n nÃ o trÆ°á»›c, Ä‘á»‘i chiáº¿u Má»‡nh - ThÃ¢n ra sao vÃ  trÃ¡nh hiá»ƒu sai khi tá»± Ä‘á»c.",
     "approvalRequired": false,
     "allowedToCommitDeployAfterVerification": true
   },
@@ -20,9 +20,9 @@
     "status": "skipped"
   },
   "lastDraftPaths": [
-    "docs/seo-autopilot/drafts/giai-ma-la-so-tu-vi.md"
+    "docs/seo-autopilot/drafts/xem-la-so-tu-vi-online.md"
   ],
-  "lastReportPath": "docs/seo-autopilot/reports/2026-07-02-weekly-content-batch.md",
+  "lastReportPath": "docs/seo-autopilot/reports/2026-07-04-weekly-content-batch.md",
   "nextVerificationCommands": [
     "npm run seo:autopilot",
     "npm test -- src/lib/content.test.ts src/lib/article-cover-assets.test.ts src/lib/seo-autopilot-core.test.ts",

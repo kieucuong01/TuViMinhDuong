@@ -38,6 +38,7 @@ describe("SEO content cluster", () => {
     expect(slugs).toContain("la-so-tu-vi-tron-doi");
     expect(slugs).toContain("sao-thien-co");
     expect(slugs).toContain("sao-thai-duong");
+    expect(slugs).toContain("sao-tham-lang-trong-tu-vi");
   });
 
   it("links the beginner cluster back to conversion and related evergreen pages", () => {
@@ -60,6 +61,7 @@ describe("SEO content cluster", () => {
     const mainStarsPillar = seedArticles.find((article) => article.slug === "sao-chinh-tinh-tu-vi");
     const saoThienCoGuide = seedArticles.find((article) => article.slug === "sao-thien-co");
     const saoThaiDuongGuide = seedArticles.find((article) => article.slug === "sao-thai-duong");
+    const saoThamLangGuide = seedArticles.find((article) => article.slug === "sao-tham-lang-trong-tu-vi");
 
     expect(hub?.content).toContain("/#lap-la-so");
     expect(hub?.content).toContain("/kien-thuc-tu-vi/cung-menh-cung-than");
@@ -118,6 +120,10 @@ describe("SEO content cluster", () => {
     expect(saoThaiDuongGuide?.content).toContain("/kien-thuc-tu-vi/sao-chinh-tinh-tu-vi");
     expect(saoThaiDuongGuide?.content).toContain("| Câu hỏi về vai trò |");
     expect(saoThaiDuongGuide?.content).toContain("| Bối cảnh làm Thái Dương biểu hiện khác |");
+    expect(saoThamLangGuide?.content).toContain("/#lap-la-so");
+    expect(saoThamLangGuide?.content).toContain("/kien-thuc-tu-vi/an-sao-la-so-tu-vi");
+    expect(saoThamLangGuide?.content).toContain("| Tình huống cần đọc |");
+    expect(saoThamLangGuide?.content).toContain("| Điều kiện làm Tham Lang đổi sắc thái |");
   });
 
   it("uses dedicated SEO images for every public knowledge article", () => {
@@ -243,6 +249,7 @@ describe("SEO content cluster", () => {
           "cung-phu-mau-trong-tu-vi",
           "lap-la-so-tu-vi-can-gi",
           "la-so-tu-vi-tron-doi",
+          "sao-tham-lang-trong-tu-vi",
         ].includes(article.slug),
       )
       .map(articleWithScore);
@@ -336,6 +343,25 @@ describe("SEO content cluster", () => {
     expect(saoTuViGuide?.content).toContain("/kien-thuc-tu-vi/an-sao-la-so-tu-vi");
     expect(saoTuViGuide?.content).toContain("## Thử ngay trên lá số của bạn");
     expect(saoTuViGuide?.faqs?.length).toBeGreaterThanOrEqual(3);
+  });
+
+  it("keeps the sao Tham Lang guide practical, data-rich, and tied to reader intent", () => {
+    const saoThamLangGuide = seedArticles.find((article) => article.slug === "sao-tham-lang-trong-tu-vi");
+
+    expect(saoThamLangGuide).toBeTruthy();
+    expect(saoThamLangGuide?.coverImage).toBe("/articles/sao-tham-lang-trong-tu-vi.webp");
+    expect(saoThamLangGuide?.ogImage).toBe("/articles/sao-tham-lang-trong-tu-vi.webp");
+    expect(saoThamLangGuide?.coverAlt).toContain("sao Tham Lang");
+    expect(saoThamLangGuide?.coverAlt).toContain("tiền bạc");
+    expect(saoThamLangGuide?.content).toContain("| Dữ liệu nền cần khóa |");
+    expect(saoThamLangGuide?.content).toContain("| Tình huống cần đọc |");
+    expect(saoThamLangGuide?.content).toContain("| Điều kiện làm Tham Lang đổi sắc thái |");
+    expect(saoThamLangGuide?.content).toContain("/kien-thuc-tu-vi/cung-tai-bach-trong-tu-vi");
+    expect(saoThamLangGuide?.content).toContain("/kien-thuc-tu-vi/cung-quan-loc-trong-tu-vi");
+    expect(saoThamLangGuide?.content).toContain("/kien-thuc-tu-vi/cung-phu-the-trong-tu-vi");
+    expect(saoThamLangGuide?.content).toContain("/kien-thuc-tu-vi/an-sao-la-so-tu-vi");
+    expect(saoThamLangGuide?.content).toContain("## Khung causal analysis");
+    expect(saoThamLangGuide?.faqs?.length).toBeGreaterThanOrEqual(3);
   });
 
   it("keeps the Mệnh vô chính diệu guide practical, data-rich, and tied to verification steps", () => {
