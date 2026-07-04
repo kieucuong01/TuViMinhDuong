@@ -44,23 +44,18 @@ function hideFreeOverviewTemplateHeading(content: string) {
 
 function initialOverviewState(
   initialOverview?: FreeOverviewPayload | null,
-  instantOverviewContent?: string | null,
 ): FreeOverviewState {
-  if (!initialOverview?.content) {
-    return instantOverviewContent
-      ? { status: "fallback", content: instantOverviewContent, jobStatus: "idle" }
-      : { status: "loading" };
-  }
+  if (!initialOverview) return { status: "loading" };
   if (initialOverview.status === "ready") {
     return {
       status: "ready",
-      content: instantOverviewContent || initialOverview.content,
+      content: initialOverview.content,
       detailContent: initialOverview.content,
     };
   }
   return {
     status: "fallback",
-    content: initialOverview.content,
+    content: "",
     jobStatus: initialOverview.jobStatus || "idle",
     error: initialOverview.error,
   };
@@ -69,16 +64,14 @@ function initialOverviewState(
 export function FreeOverviewLoader({
   chartId,
   initialOverview,
-  instantOverviewContent,
   isSignedIn = false,
 }: {
   chartId: string;
   initialOverview?: FreeOverviewPayload | null;
-  instantOverviewContent?: string | null;
   isSignedIn?: boolean;
 }) {
   const router = useRouter();
-  const [state, setState] = useState<FreeOverviewState>(() => initialOverviewState(initialOverview, instantOverviewContent));
+  const [state, setState] = useState<FreeOverviewState>(() => initialOverviewState(initialOverview));
   const [runKey, setRunKey] = useState(0);
   const rootRef = useRef<HTMLElement | null>(null);
   const setRootNode = (node: HTMLElement | null) => {
@@ -144,21 +137,18 @@ export function FreeOverviewLoader({
 
         if (payload.status === "ready") {
           clearPollTimer();
-          setState((current) => ({
+          setState({
             status: "ready",
-            content:
-              current.status === "fallback" || current.status === "ready"
-                ? current.content
-                : instantOverviewContent || String(payload.content || ""),
+            content: String(payload.content || ""),
             detailContent: String(payload.content || ""),
-          }));
+          });
           router.refresh();
           return;
         }
 
         setState({
           status: "fallback",
-          content: String(payload.content || ""),
+          content: "",
           jobStatus: payload.jobStatus || "idle",
           error: payload.error,
         });
@@ -177,36 +167,44 @@ export function FreeOverviewLoader({
       controller.abort();
       clearPollTimer();
     };
-  }, [chartId, instantOverviewContent, router, runKey]);
+  }, [chartId, router, runKey]);
 
-  if (state.status === "ready" || state.status === "fallback") {
-    const canRetry = state.status === "fallback" && (state.jobStatus === "stale" || state.jobStatus === "failed");
-    const hasExpandedOverview = state.status === "ready" && state.detailContent !== state.content;
-    const expandedOverviewContent = hasExpandedOverview ? hideFreeOverviewTemplateHeading(state.detailContent) : "";
-    const visibleContent = hasExpandedOverview ? expandedOverviewContent : state.content;
-    const backgroundStatus = state.status === "fallback" ? (
-      <div className="free-overview-inline-status" role="status" aria-live="polite">
-        {state.jobStatus === "failed"
-          ? "Đang hiển thị mini-report dự phòng. Bản cá nhân hóa bị gián đoạn và có thể thử viết lại."
-          : state.jobStatus === "stale"
-            ? "Đang hiển thị mini-report dự phòng. Tiến trình trước đó quá lâu chưa xong, bạn có thể thử viết lại."
-            : state.jobStatus === "processing"
-              ? "Đang viết mini-report cá nhân hóa ở nền. Bạn có thể đọc bản dự phòng này trước."
-              : "Bản dự phòng đã sẵn sàng. Hệ thống đang chuẩn bị mini-report cá nhân hóa ở nền."}
-        {canRetry ? (
-          <button type="button" className="btn btn-small btn-ghost" onClick={retryOverview}>
-            Thử viết lại
-          </button>
-        ) : null}
-        {state.jobStatus === "processing" || state.jobStatus === "idle" ? (
-          <span className="free-overview-detail-loader" aria-hidden="true">
-            <i />
-            <i />
-            <i />
+  if (state.status === "fallback") {
+    const canRetry = state.jobStatus === "stale" || state.jobStatus === "failed";
+    return (
+      <div ref={setRootNode} className="free-overview-loading" role="status" aria-live="polite">
+        <div className="free-overview-inline-status">
+          <strong>
+            {state.jobStatus === "failed"
+              ? "Chưa viết xong mini-report bằng LLM."
+              : state.jobStatus === "stale"
+                ? "Tiến trình viết mini-report trước đó quá lâu chưa xong."
+                : "Đang viết mini-report cá nhân hóa bằng LLM."}
+          </strong>
+          <span>
+            {state.jobStatus === "failed"
+              ? "Bản dự phòng không còn được hiển thị. Bạn có thể thử viết lại để nhận đúng bản cá nhân hóa."
+              : "Hệ thống đang dùng dữ liệu lá số để viết bản luận giải miễn phí. Bạn có thể xem bàn lá số phía trên trong lúc chờ."}
           </span>
-        ) : null}
+          {canRetry ? (
+            <button type="button" className="btn btn-small btn-ghost" onClick={retryOverview}>
+              Thử viết lại
+            </button>
+          ) : null}
+          {state.jobStatus === "processing" || state.jobStatus === "idle" ? (
+            <span className="free-overview-detail-loader" aria-hidden="true">
+              <i />
+              <i />
+              <i />
+            </span>
+          ) : null}
+        </div>
       </div>
-    ) : null;
+    );
+  }
+
+  if (state.status === "ready") {
+    const expandedOverviewContent = hideFreeOverviewTemplateHeading(state.detailContent);
 
     if (!isSignedIn) {
       const chartPath = `/la-so/${chartId}`;
@@ -214,8 +212,7 @@ export function FreeOverviewLoader({
 
       return (
         <article ref={setRootNode} className="free-reading-summary">
-          <MarkdownContent content={visibleContent} />
-          {backgroundStatus}
+          <MarkdownContent content={expandedOverviewContent} />
           <section className="free-overview-guest-gate" aria-labelledby="free-overview-login-title">
             <div>
               <p className="eyebrow">Bản đọc đầy đủ đang chờ bạn</p>
@@ -246,19 +243,15 @@ export function FreeOverviewLoader({
 
     return (
       <article ref={setRootNode} className="free-reading-summary">
-        {!hasExpandedOverview ? <MarkdownContent content={state.content} /> : null}
-        {backgroundStatus}
-        {hasExpandedOverview ? (
-          <section className="free-overview-detail-block" aria-labelledby="free-overview-detail-title">
-            <div className="free-overview-detail-heading">
-              <div>
-                <p className="eyebrow">Mini-report miễn phí</p>
-                <h2 id="free-overview-detail-title">Hồ sơ cá nhân từ dữ liệu lá số</h2>
-              </div>
+        <section className="free-overview-detail-block" aria-labelledby="free-overview-detail-title">
+          <div className="free-overview-detail-heading">
+            <div>
+              <p className="eyebrow">Mini-report miễn phí</p>
+              <h2 id="free-overview-detail-title">Hồ sơ cá nhân từ dữ liệu lá số</h2>
             </div>
-            <MarkdownContent content={expandedOverviewContent} />
-          </section>
-        ) : null}
+          </div>
+          <MarkdownContent content={expandedOverviewContent} />
+        </section>
         <section className="free-overview-vip-transition" aria-label="Luận giải chuyên sâu">
           <div>
             <strong>Bạn đã xem các trục chính của lá số.</strong>

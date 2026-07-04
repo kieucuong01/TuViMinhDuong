@@ -868,6 +868,11 @@ export async function generateAndStoreFreeOverview(chartId: string) {
 
   const { generateFreeOverview } = await import("@/lib/ai");
   const result = await generateFreeOverview(record.chart);
+  if (result.model.includes("template-fallback")) {
+    const message = "LLM tong quan chua san sang, khong hien thi ban template.";
+    await failFreeOverviewGeneration(chartId, message);
+    throw new Error(message);
+  }
   if (!isCompleteFreeOverview(result.content)) {
     const message = "Ban AI tong quan chua du do dai hoac thieu muc can thiet.";
     await failFreeOverviewGeneration(chartId, message);

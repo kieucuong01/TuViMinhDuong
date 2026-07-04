@@ -50,9 +50,9 @@ describe("free overview GET route", () => {
     expect(response.status).toBe(200);
     expect(body).toEqual({
       status: "fallback",
-      content: "Bản nhanh.",
+      content: "",
       source: "instant-template",
-      wordCount: 2,
+      wordCount: 0,
       jobStatus: "idle",
     });
     expect(mocks.getFreeOverviewStatus).toHaveBeenCalledTimes(1);

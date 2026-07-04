@@ -261,6 +261,10 @@ describe("AI reading format", () => {
     expect(prompt).toContain("12-21 tuổi");
     expect(prompt).toContain("tiền tiêu vặt");
     expect(prompt).toContain("bài tập nhóm");
+    expect(prompt).toContain("người lớn tuổi");
+    expect(prompt).toContain("câu ngắn");
+    expect(prompt).toContain("giải thích thuật ngữ ngay bằng lời đời thường");
+    expect(prompt).toContain("không dùng giọng học thuật");
     expect(prompt).toContain("## Câu hỏi mở trước khi đi sâu");
     expect(prompt).not.toContain("## Cẩm nang hành động");
     expect(prompt).toContain("Không viết như bài blog");
@@ -395,8 +399,11 @@ Tuần tại Thiên Di là tín hiệu nên kiểm chứng.
         "Mốc tự đánh giá lại",
       ],
     });
-    expect(chapters.find((chapter) => chapter.key === "relationship")?.targetWords).toBe("650-950 từ");
-    expect(chapters.find((chapter) => chapter.key === "health")?.targetWords).toBe("550-850 từ");
+    expect(PAID_FULL_WORD_TARGET).toBe("5.000-7.000 từ");
+    expect(chapters.find((chapter) => chapter.key === "relationship")?.targetWords).toBe("450-700 từ");
+    expect(chapters.find((chapter) => chapter.key === "health")?.targetWords).toBe("400-650 từ");
+    const upperTargets = chapters.map((chapter) => Number(chapter.targetWords.match(/-(\d[\d.]*)/)?.[1].replace(/\./g, "") || 0));
+    expect(Math.max(...upperTargets)).toBeLessThanOrEqual(1300);
   });
 
   it("keeps evidence in prose and removes the technical data dashboard", async () => {
@@ -420,7 +427,7 @@ Tuần tại Thiên Di là tín hiệu nên kiểm chứng.
     expect(prompt).toContain("Mỏ neo - Độ sâu");
     expect(prompt).toContain("không tạo section dữ kiện");
     expect(prompt).toContain("không lặp lại cùng một nhận định");
-    expect(prompt).toContain("3-6");
+    expect(prompt).toContain("2-4");
     expect(prompt).toContain("**");
     expect(prompt).not.toContain("Dữ kiện các cung trọng yếu:");
 
@@ -471,9 +478,9 @@ Tuần tại Thiên Di là tín hiệu nên kiểm chứng.
     expect(twelvePalacesPrompt).toContain("### Trụ cột 1: Bản Thể & Sức Khỏe");
     expect(twelvePalacesPrompt).toContain("### Trụ cột 2: Sự Nghiệp & Thịnh Vượng");
     expect(twelvePalacesPrompt).toContain("### Trụ cột 3: Mạng Lưới Mối Quan Hệ");
-    expect(yearlyPrompt).toContain("Thời tiết vận hạn");
-    expect(yearlyPrompt).toContain("🔻 Vùng nguy hiểm");
-    expect(yearlyPrompt).toContain("🔹 Vùng cơ hội");
+    expect(yearlyPrompt).toContain("nhịp từng tháng");
+    expect(yearlyPrompt).toContain("🔻 Điểm cần chậm lại");
+    expect(yearlyPrompt).toContain("🔹 Việc nên tận dụng");
   });
 
   it("builds paid prompts with word target, address, star states and yearly-star requirements", () => {
@@ -522,7 +529,7 @@ Tuần tại Thiên Di là tín hiệu nên kiểm chứng.
     expect(prompt).toContain("mỗi tháng phải có trọng tâm riêng");
   });
 
-  it("guides paid readings away from generic Barnum copy and toward concrete value", () => {
+  it("guides paid readings toward simple older-reader language and concrete value", () => {
     const chart = sampleChart("male");
     const chapters = paidReadingChapters(chart, "PALACE");
     const prompt = paidReadingChapterPrompt(
@@ -535,12 +542,16 @@ Tuần tại Thiên Di là tín hiệu nên kiểm chứng.
       chapters.length,
     );
 
-    expect(prompt).toContain("Tránh hiệu ứng Barnum");
+    expect(prompt).toContain("người lớn tuổi");
+    expect(prompt).toContain("câu ngắn");
     expect(prompt).toContain("tình huống cụ thể");
-    expect(prompt).toContain("vũ khí");
-    expect(prompt).toContain("cạm bẫy");
-    expect(prompt).toContain("thuật ngữ tử vi phải đi kèm diễn giải đời sống");
-    expect(prompt).toContain("Actionable Advice");
+    expect(prompt).toContain("mỗi thuật ngữ tử vi phải được giải thích ngay bằng lời đời thường");
+    expect(prompt).toContain("tránh từ chuyên môn khi không cần");
+    expect(prompt).toContain("đọc xong hiểu ngay mình nên chú ý điều gì");
+    expect(prompt).not.toContain("Tránh hiệu ứng Barnum");
+    expect(prompt).not.toContain("Actionable Advice");
+    expect(prompt).not.toContain("vũ khí");
+    expect(prompt).not.toContain("cạm bẫy");
   });
 
   it("adapts past fate readings into present-cause and future-direction prompts", () => {
@@ -621,10 +632,11 @@ Tuần tại Thiên Di là tín hiệu nên kiểm chứng.
     expect(prompt).not.toContain("Dữ liệu lá số JSON đầy đủ");
     expect(prompt).not.toContain('"palaces"');
     expect(prompt).toContain("Dữ liệu trọng tâm đã rút gọn");
-    expect(prompt).toContain("Tránh hiệu ứng Barnum");
+    expect(prompt).toContain("người lớn tuổi");
+    expect(prompt).toContain("câu ngắn");
     expect(prompt).toContain("tình huống cụ thể");
-    expect(prompt).toContain("vũ khí");
-    expect(prompt).toContain("Actionable Advice");
+    expect(prompt).toContain("mỗi thuật ngữ tử vi phải được giải thích ngay bằng lời đời thường");
+    expect(prompt).toContain("đọc xong hiểu ngay mình nên chú ý điều gì");
     expect(prompt).toContain("Mệnh");
     expect(prompt).toContain("Thân");
   });
@@ -695,8 +707,8 @@ ${filler}
     const monthBodies = Array.from(content.matchAll(/^### Tháng \d+:\s*(.+)$/gm), (match) => match[1]);
     expect(monthBodies).toHaveLength(12);
     expect(new Set(monthBodies).size).toBe(12);
-    expect(content.match(/🔻 Vùng nguy hiểm/g)).toHaveLength(12);
-    expect(content.match(/🔹 Vùng cơ hội/g)).toHaveLength(12);
+    expect(content.match(/🔻 Điểm cần chậm lại/g)).toHaveLength(12);
+    expect(content.match(/🔹 Việc nên tận dụng/g)).toHaveLength(12);
     expect(prompt).toContain("paid-personal-dossier-v5");
   });
 

@@ -6,27 +6,30 @@ const loaderSource = readFileSync(fileURLToPath(new URL("./free-overview-loader.
 const globalsCss = readFileSync(fileURLToPath(new URL("../app/globals.css", import.meta.url)), "utf8");
 const chartPageSource = readFileSync(fileURLToPath(new URL("../app/la-so/[id]/page.tsx", import.meta.url)), "utf8");
 
-describe("FreeOverviewLoader fast-first flow", () => {
-  it("renders fallback content while starting the background overview process", () => {
+describe("FreeOverviewLoader LLM-only flow", () => {
+  it("shows generation status while starting the background overview process without rendering fallback copy", () => {
     expect(loaderSource).toContain('status: "fallback"');
     expect(loaderSource).toContain("/free-overview/process");
     expect(loaderSource).toContain("schedulePoll()");
     expect(loaderSource).toContain("free-overview-inline-status");
+    expect(loaderSource).toContain('state.status === "fallback"');
+    expect(loaderSource).not.toContain("instantOverviewContent");
   });
 
-  it("renders server-provided instant overview content before client polling finishes", () => {
+  it("does not pass server-generated template copy into the free overview UI", () => {
     expect(loaderSource).toContain("initialOverview");
     expect(loaderSource).toContain("useState<FreeOverviewState>(() =>");
     expect(chartPageSource).toContain("getFreeOverviewStatus(record.chart)");
     expect(chartPageSource).toContain("initialOverview={visibleFreeOverviewStatus}");
+    expect(chartPageSource).not.toContain("buildInstantFreeOverview");
+    expect(chartPageSource).not.toContain("instantOverviewContent=");
     expect(chartPageSource).not.toContain("deferUntilVisible");
   });
 
-  it("projects guest content before it reaches the page HTML", () => {
+  it("projects only ready LLM guest content before it reaches the page HTML", () => {
     expect(chartPageSource).toContain('import { buildFreeOverviewTeaser } from "@/lib/free-overview-presentation"');
-    expect(chartPageSource).toContain("!user && freeOverviewStatus?.content");
+    expect(chartPageSource).toContain('freeOverviewStatus?.status === "ready"');
     expect(chartPageSource).toContain("buildFreeOverviewTeaser(freeOverviewStatus.content)");
-    expect(chartPageSource).toContain("buildFreeOverviewTeaser(instantFreeOverviewContent)");
   });
 
   it("polls with no-store and refreshes the route when the full overview is ready", () => {
@@ -36,12 +39,12 @@ describe("FreeOverviewLoader fast-first flow", () => {
     expect(loaderSource).toContain("MAX_POLL_ATTEMPTS = 72");
   });
 
-  it("hides the instant free template once the expanded LLM overview is ready", () => {
+  it("renders only the ready LLM overview once available", () => {
     expect(loaderSource).toContain("function hideFreeOverviewTemplateHeading(content: string)");
     expect(loaderSource).toContain("Tổng quan miễn phí");
-    expect(loaderSource).toContain("const hasExpandedOverview = state.status === \"ready\" && state.detailContent !== state.content");
-    expect(loaderSource).toContain("const expandedOverviewContent = hasExpandedOverview ? hideFreeOverviewTemplateHeading(state.detailContent) : \"\"");
-    expect(loaderSource).toContain("{!hasExpandedOverview ? <MarkdownContent content={state.content} /> : null}");
+    expect(loaderSource).toContain('if (state.status === "ready")');
+    expect(loaderSource).toContain("const expandedOverviewContent = hideFreeOverviewTemplateHeading(state.detailContent)");
+    expect(loaderSource).not.toContain("{!hasExpandedOverview ? <MarkdownContent content={state.content} /> : null}");
     expect(loaderSource).toContain("<MarkdownContent content={expandedOverviewContent} />");
   });
 
