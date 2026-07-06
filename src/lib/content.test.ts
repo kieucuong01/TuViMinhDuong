@@ -39,6 +39,7 @@ describe("SEO content cluster", () => {
     expect(slugs).toContain("sao-thien-co");
     expect(slugs).toContain("sao-thai-duong");
     expect(slugs).toContain("sao-tham-lang-trong-tu-vi");
+    expect(slugs).toContain("cac-sao-trong-la-so-tu-vi");
   });
 
   it("links the beginner cluster back to conversion and related evergreen pages", () => {
@@ -62,6 +63,7 @@ describe("SEO content cluster", () => {
     const saoThienCoGuide = seedArticles.find((article) => article.slug === "sao-thien-co");
     const saoThaiDuongGuide = seedArticles.find((article) => article.slug === "sao-thai-duong");
     const saoThamLangGuide = seedArticles.find((article) => article.slug === "sao-tham-lang-trong-tu-vi");
+    const allStarsGuide = seedArticles.find((article) => article.slug === "cac-sao-trong-la-so-tu-vi");
 
     expect(hub?.content).toContain("/#lap-la-so");
     expect(hub?.content).toContain("/kien-thuc-tu-vi/cung-menh-cung-than");
@@ -124,6 +126,21 @@ describe("SEO content cluster", () => {
     expect(saoThamLangGuide?.content).toContain("/kien-thuc-tu-vi/an-sao-la-so-tu-vi");
     expect(saoThamLangGuide?.content).toContain("| Tình huống cần đọc |");
     expect(saoThamLangGuide?.content).toContain("| Điều kiện làm Tham Lang đổi sắc thái |");
+  });
+
+  it("keeps the all-stars guide practical, grouped, and tied to reading order", () => {
+    const allStarsGuide = seedArticles.find((article) => article.slug === "cac-sao-trong-la-so-tu-vi");
+
+    expect(allStarsGuide).toBeTruthy();
+    expect(allStarsGuide?.coverImage).toBe("/articles/cac-sao-trong-la-so-tu-vi.webp");
+    expect(allStarsGuide?.ogImage).toBe("/articles/cac-sao-trong-la-so-tu-vi.webp");
+    expect(allStarsGuide?.coverAlt).toContain("các nhóm sao");
+    expect(allStarsGuide?.coverAlt).toContain("thứ tự đọc");
+    expect(allStarsGuide?.content).toContain("/#lap-la-so");
+    expect(allStarsGuide?.content).toContain("/kien-thuc-tu-vi/sao-chinh-tinh-tu-vi");
+    expect(allStarsGuide?.content).toContain("/kien-thuc-tu-vi/an-sao-la-so-tu-vi");
+    expect(allStarsGuide?.content).toContain("| Nhóm sao / dấu hiệu |");
+    expect(allStarsGuide?.content).toContain("| Dữ liệu nền cần khóa |");
   });
 
   it("uses dedicated SEO images for every public knowledge article", () => {
@@ -250,6 +267,7 @@ describe("SEO content cluster", () => {
           "lap-la-so-tu-vi-can-gi",
           "la-so-tu-vi-tron-doi",
           "sao-tham-lang-trong-tu-vi",
+          "cac-sao-trong-la-so-tu-vi",
         ].includes(article.slug),
       )
       .map(articleWithScore);
