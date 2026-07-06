@@ -290,9 +290,12 @@ describe("AI reading format", () => {
     expect(content).toContain("## Tình cảm và quan hệ");
     expect(content).toContain(`## Vận năm ${chart.input.viewYear}`);
     expect(content).toContain("## Câu hỏi mở trước khi đi sâu");
-    expect(content).toContain("**Điểm chính:**");
-    expect(content).toContain("**Cần chú ý:**");
-    expect(content).toContain("**Nên đọc tiếp:**");
+    expect(content).not.toContain("**Điểm chính:**");
+    expect(content).not.toContain("**Cần chú ý:**");
+    expect(content).not.toContain("**Nên đọc tiếp:**");
+    expect(content).not.toContain("**Điểm bổ sung:**");
+    expect(content).not.toMatch(/Căn cứ:/);
+    expect(content).not.toMatch(/\b(vì|và|hoặc|nhưng|là|rằng|khi|nếu|mà)\./i);
     expect(content).toMatch(/\bbạn\b/);
     expect(content).not.toContain("người đọc");
     expect(content).not.toContain("## Cẩm nang hành động");

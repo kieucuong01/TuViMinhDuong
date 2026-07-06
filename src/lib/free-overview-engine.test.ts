@@ -50,6 +50,24 @@ function chartC() {
   });
 }
 
+function normalizedSentences(content: string) {
+  return content
+    .replace(/\*\*/g, "")
+    .split(/(?<=[.!?])\s+/)
+    .map((sentence) => sentence.trim().replace(/\s+/g, " ").toLowerCase())
+    .filter((sentence) => sentence.split(/\s+/).length >= 9);
+}
+
+function repeatedSentences(content: string) {
+  const seen = new Set<string>();
+  const duplicates = new Set<string>();
+  for (const sentence of normalizedSentences(content)) {
+    if (seen.has(sentence)) duplicates.add(sentence);
+    seen.add(sentence);
+  }
+  return duplicates;
+}
+
 describe("free overview interpretation engine", () => {
   it("extracts important chart facts used by rule matching", () => {
     const facts = extractFreeOverviewFacts(chartA());
@@ -90,14 +108,18 @@ describe("free overview interpretation engine", () => {
       expect(overview).toContain("## Tình cảm và quan hệ");
       expect(overview).toContain("## Vận năm 2026");
       expect(overview).toContain("## Câu hỏi mở trước khi đi sâu");
-      expect(overview).toContain("**Điểm chính:**");
-      expect(overview).toContain("**Cần chú ý:**");
-      expect(overview).toContain("**Nên đọc tiếp:**");
       expect(overview).toMatch(/\bbạn\b/);
       expect(overview).not.toContain("người đọc");
       expect(overview).not.toMatch(/\d+\/100/);
-      expect(overview).toMatch(/Căn cứ:/);
-      expect((overview.match(/Căn cứ:/g) || []).length).toBeGreaterThanOrEqual(3);
+      expect(overview).not.toContain("**Điểm chính:**");
+      expect(overview).not.toContain("**Cần chú ý:**");
+      expect(overview).not.toContain("**Nên đọc tiếp:**");
+      expect(overview).not.toContain("**Điểm bổ sung:**");
+      expect(overview).not.toMatch(/Căn cứ:/);
+      expect(overview).toMatch(/lá số cho thấy|trong lá số|dấu hiệu tử vi/i);
+      expect(overview).not.toMatch(/\b(vì|và|hoặc|nhưng|là|rằng|khi|nếu|mà)\./i);
+      expect(overview).not.toMatch(/nhận việc hoặc\.|tưởng là an toàn nhưng lại\./i);
+      expect(repeatedSentences(overview).size).toBe(0);
     }
 
     const openingA = overviewA.split("\n\n")[1];

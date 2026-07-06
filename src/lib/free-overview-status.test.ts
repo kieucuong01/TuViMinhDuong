@@ -81,7 +81,9 @@ describe("free overview status", () => {
     expect(status.source).toBe("template-fallback");
     expect(status.content).toContain("## Tín hiệu nổi bật của lá số");
     expect(status.content).not.toContain("## Mỏ neo");
-    expect(status.content).toContain("**Điểm chính:**");
+    expect(status.content).not.toContain("**Điểm chính:**");
+    expect(status.content).not.toMatch(/Căn cứ:/);
+    expect(status.content).not.toMatch(/\b(vì|và|hoặc|nhưng|là|rằng|khi|nếu|mà)\./i);
     expect(status.content).toContain("bản chi tiết đang được viết tiếp");
     expect(status.wordCount).toBeGreaterThanOrEqual(FREE_OVERVIEW_TEMPLATE_MIN_WORDS);
     expect(status.wordCount).toBeLessThanOrEqual(FREE_OVERVIEW_TEMPLATE_MAX_WORDS);
