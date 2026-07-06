@@ -16,6 +16,23 @@ describe("FreeOverviewLoader LLM-only flow", () => {
     expect(loaderSource).not.toContain("instantOverviewContent");
   });
 
+  it("reveals an LLM preview progressively and keeps polling for the full report", () => {
+    expect(loaderSource).toContain('status: "preview"');
+    expect(loaderSource).toContain("free-overview-writing-cursor");
+    expect(loaderSource).toContain("setVisiblePreviewWords");
+    expect(loaderSource).toContain("schedulePoll()");
+    expect(globalsCss).toContain("@keyframes free-overview-cursor");
+    expect(globalsCss).toContain("prefers-reduced-motion: reduce");
+  });
+
+  it("keeps the login CTA visible for guests while waiting, previewing, or handling an error", () => {
+    expect(loaderSource).toContain("function GuestOverviewLoginCta");
+    expect(loaderSource).toContain("Đăng nhập miễn phí để xem chi tiết");
+    expect(loaderSource).toContain("Đang đọc những tín hiệu nổi bật trong lá số");
+    expect(loaderSource.match(/<GuestOverviewLoginCta/g)?.length).toBeGreaterThanOrEqual(3);
+    expect(loaderSource).toContain("#luan-giai");
+  });
+
   it("does not pass server-generated template copy into the free overview UI", () => {
     expect(loaderSource).toContain("initialOverview");
     expect(loaderSource).toContain("useState<FreeOverviewState>(() =>");

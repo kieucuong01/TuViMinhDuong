@@ -6140,6 +6140,70 @@ button.is-loading:not(.icon-button)::before {
   animation-delay: 240ms;
 }
 
+.free-overview-preview {
+  display: grid;
+  gap: 1rem;
+}
+
+.free-overview-preview-copy {
+  min-height: 8rem;
+  margin: 0;
+  color: #44372f;
+  font-size: clamp(1.05rem, 2vw, 1.14rem);
+  line-height: 1.9;
+}
+
+.free-overview-writing-cursor {
+  display: inline-block;
+  width: 0.16rem;
+  height: 1.15em;
+  margin-left: 0.22rem;
+  border-radius: 999px;
+  background: #ea580c;
+  vertical-align: -0.16em;
+  animation: free-overview-cursor 0.75s steps(1, end) infinite;
+}
+
+.free-overview-preview-note {
+  margin: 0;
+  color: #9a3412;
+  font-size: 0.92rem;
+}
+
+.free-overview-waiting-cta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  border: 1px solid #fdba74;
+  border-radius: 1rem;
+  background: #fffaf5;
+  padding: 1rem;
+}
+
+.free-overview-waiting-cta > div {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.free-overview-waiting-cta strong {
+  color: #7c2d12;
+}
+
+.free-overview-waiting-cta span {
+  color: #6b5c52;
+  line-height: 1.55;
+}
+
+.free-overview-waiting-cta .btn {
+  flex: 0 0 auto;
+  min-height: 3rem;
+}
+
+.free-overview-waiting-cta.is-compact {
+  margin-top: 0.2rem;
+}
+
 .free-overview-detail-block {
   margin-top: 1.5rem;
   border-top: 1px solid #fed7aa;
@@ -6261,6 +6325,24 @@ button.is-loading:not(.icon-button)::before {
   to {
     opacity: 1;
     transform: translateY(-0.22rem);
+  }
+}
+
+@keyframes free-overview-cursor {
+  0%,
+  45% {
+    opacity: 1;
+  }
+  46%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .free-overview-writing-cursor,
+  .free-overview-detail-loader i {
+    animation: none;
   }
 }
 
@@ -7552,6 +7634,17 @@ button.is-loading:not(.icon-button)::before {
   display: grid;
   grid-template-columns: repeat(1, minmax(0, 1fr));
   gap: 1rem;
+}
+
+@media (max-width: 640px) {
+  .free-overview-waiting-cta {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .free-overview-waiting-cta .btn {
+    width: 100%;
+  }
 }
 
 .knowledge-desktop-pagination {

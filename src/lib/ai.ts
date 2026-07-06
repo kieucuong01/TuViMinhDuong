@@ -6,6 +6,9 @@ import { FEATURE_PRICES, type ReadingKey } from "@/lib/pricing";
 export const FREE_OVERVIEW_MIN_WORDS = 1000;
 export const FREE_OVERVIEW_MAX_WORDS = 1400;
 export const FREE_OVERVIEW_MAX_TOKENS = 6500;
+export const FREE_OVERVIEW_PREVIEW_MIN_WORDS = 150;
+export const FREE_OVERVIEW_PREVIEW_MAX_WORDS = 200;
+export const FREE_OVERVIEW_PREVIEW_MAX_TOKENS = 900;
 export const PAID_READING_CHAPTER_MAX_TOKENS = 7000;
 export const FREE_OVERVIEW_VERSION = "free-mini-report-v7";
 export const PAID_READING_VERSION = "paid-personal-dossier-v5";
@@ -115,6 +118,16 @@ export function isCompleteFreeOverview(content: string) {
     questionBulletCount >= 3 &&
     !hasOldActionChecklist &&
     requiredHeadings.every((heading) => content.includes(heading))
+  );
+}
+
+export function isCompleteFreeOverviewPreview(content: string) {
+  const wordCount = countWords(content);
+  const hasChartEvidence = /(cung|mệnh|thân|sao|đại vận|tuần|triệt)/i.test(content);
+  return (
+    wordCount >= FREE_OVERVIEW_PREVIEW_MIN_WORDS &&
+    wordCount <= FREE_OVERVIEW_PREVIEW_MAX_WORDS &&
+    hasChartEvidence
   );
 }
 
@@ -768,6 +781,26 @@ Markdown đúng thứ tự:
 ## Câu hỏi mở trước khi đi sâu`;
 }
 
+function freeOverviewPreviewPrompt(chart: TuViChart) {
+  const evidence = formatChartEvidence(buildChartEvidenceProfile(chart));
+  const audience = freeOverviewAudienceContext(chart);
+  const address = viewerAddress(chart);
+
+  return `Bạn là chuyên gia Tử Vi viết lời mở đầu riêng cho ${chart.input.fullName}.
+
+Hãy viết đúng ${FREE_OVERVIEW_PREVIEW_MIN_WORDS}-${FREE_OVERVIEW_PREVIEW_MAX_WORDS} từ tiếng Việt, không tiêu đề, không danh sách.
+- Mở đầu bằng một quan sát tâm lý hoặc hoàn cảnh đủ cụ thể để người đọc thấy mình trong đó.
+- Bám vào ít nhất hai dữ kiện lá số được cung cấp, nhưng chỉ nhắc tối đa hai thuật ngữ Tử Vi và giải thích ngay bằng lời đời thường.
+- Xưng hô với người đọc là "${address}". Văn phong ấm, rõ, câu ngắn, dễ hiểu với người lớn tuổi.
+- Điều chỉnh ví dụ theo giai đoạn: ${audience.lifeStage}. Ưu tiên ngôn ngữ về ${audience.workFocus}.
+- Chỉ nói điều gì đang nổi bật và vì sao cần đọc sâu hơn. Không đưa checklist hoặc giải pháp đầy đủ.
+- Không dùng điểm số, không hù dọa, không khẳng định số phận, không nhắc LLM/AI, không mời mua hàng.
+- Kết bằng một câu tự nhiên cho biết bản đầy đủ đang tiếp tục làm rõ công việc, tài chính, tình cảm và vận năm.
+
+Dữ liệu lá số:
+${evidence}`;
+}
+
 export function buildInstantFreeOverview(chart: TuViChart) {
   const profile = buildChartEvidenceProfile(chart);
   const decade = compactDecadeContext(chart);
@@ -961,6 +994,19 @@ export function paidReadingChapters(chart: TuViChart, type: ReadingKey): PaidRea
       targetWords: "450-700 từ",
     },
   ];
+}
+
+export async function generateFreeOverviewPreview(chart: TuViChart) {
+  const prompt = freeOverviewPreviewPrompt(chart);
+  if (isLlmDisabledForSmoke()) return { content: "", model: "llm-disabled", prompt };
+  const routed = await generateWithLlmRouter({
+    prompt,
+    maxTokens: FREE_OVERVIEW_PREVIEW_MAX_TOKENS,
+    temperature: 0.55,
+    providerOrder: [...READING_PROVIDER_ORDER],
+  });
+  if (routed) return { content: routed.text.trim(), model: routed.model, prompt };
+  return { content: "", model: "llm-unavailable", prompt };
 }
 
 function paidReadingQualityRules() {

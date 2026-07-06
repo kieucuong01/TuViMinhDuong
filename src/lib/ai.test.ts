@@ -8,6 +8,8 @@ import {
   FREE_OVERVIEW_MAX_WORDS,
   FREE_OVERVIEW_MAX_TOKENS,
   FREE_OVERVIEW_MIN_WORDS,
+  FREE_OVERVIEW_PREVIEW_MAX_WORDS,
+  FREE_OVERVIEW_PREVIEW_MIN_WORDS,
   PAID_FULL_WORD_TARGET,
   PAID_READING_CHAPTER_MAX_TOKENS,
   type PaidReadingChapter,
@@ -16,10 +18,12 @@ import {
   buildInstantFreeOverview,
   countWords,
   generateFreeOverview,
+  generateFreeOverviewPreview,
   generateReading,
   generateReadingWithProgress,
   getDeepReadingSummary,
   isCompleteFreeOverview,
+  isCompleteFreeOverviewPreview,
   isCompletePaidChapter,
   paidReadingChapterPrompt,
   paidReadingChapters,
@@ -321,6 +325,36 @@ describe("AI reading format", () => {
     expect(llmRouterMocks.generateWithLlmRouter).toHaveBeenCalledWith(
       expect.objectContaining({
         maxTokens: FREE_OVERVIEW_MAX_TOKENS,
+        providerOrder: ["deepseek", "groq"],
+      }),
+    );
+  });
+
+  it("generates a short evidence-based LLM preview before the full overview", async () => {
+    clearProviderEnv();
+    llmRouterMocks.hasExternalLlmProvider.mockReturnValue(true);
+    const preview = Array.from(
+      { length: 165 },
+      (_, index) => index === 0 ? "Cung Mệnh" : `tín-hiệu-${index}`,
+    ).join(" ");
+    llmRouterMocks.generateWithLlmRouter.mockResolvedValue({
+      text: preview,
+      model: "deepseek/deepseek-chat",
+      provider: "deepseek",
+    });
+
+    const result = await generateFreeOverviewPreview(sampleChart());
+
+    expect(FREE_OVERVIEW_PREVIEW_MIN_WORDS).toBe(150);
+    expect(FREE_OVERVIEW_PREVIEW_MAX_WORDS).toBe(200);
+    expect(result.content).toBe(preview);
+    expect(result.model).toBe("deepseek/deepseek-chat");
+    expect(result.prompt).toContain("150-200 từ");
+    expect(isCompleteFreeOverviewPreview(result.content)).toBe(true);
+    expect(isCompleteFreeOverviewPreview("Một đoạn quá ngắn không có dữ liệu lá số.")).toBe(false);
+    expect(llmRouterMocks.generateWithLlmRouter).toHaveBeenCalledWith(
+      expect.objectContaining({
+        maxTokens: expect.any(Number),
         providerOrder: ["deepseek", "groq"],
       }),
     );

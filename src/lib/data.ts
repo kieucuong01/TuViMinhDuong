@@ -6,7 +6,12 @@ import { articleWithScore, seedArticles, type ArticleCategoryView, type ArticleV
 import { getDb } from "@/lib/db";
 import { FEATURE_PRICE_KEYS, FEATURE_PRICES, COIN_PACKAGES, type FeaturePriceMap, type ReadingKey } from "@/lib/pricing";
 import { isReadingBundleKey, readingBundleScopeKey } from "@/lib/reading-bundles";
-import { FREE_OVERVIEW_VERSION, buildInstantFreeOverview, countWords, isCompleteFreeOverview } from "@/lib/ai";
+import {
+  FREE_OVERVIEW_VERSION,
+  countWords,
+  isCompleteFreeOverview,
+  isCompleteFreeOverviewPreview,
+} from "@/lib/ai";
 import { scoreArticleSeo } from "@/lib/seo";
 import { slugify } from "@/lib/format";
 import type { SessionUser } from "@/lib/auth";
@@ -138,6 +143,12 @@ export type AdminChartSubmission = {
 };
 
 type ChartWithFreeOverview = TuViChart & {
+  freeOverviewPreview?: {
+    content: string;
+    model: string;
+    generatedAt: string;
+    version?: string;
+  };
   freeOverview?: {
     content: string;
     model: string;
@@ -164,9 +175,19 @@ export type FreeOverviewStatus =
       jobStatus: "completed";
     }
   | {
+      status: "preview";
+      content: string;
+      source: "ai-preview";
+      model: string;
+      generatedAt: string;
+      wordCount: number;
+      jobStatus: "idle" | "processing" | "stale" | "failed";
+      error?: string;
+    }
+  | {
       status: "fallback";
       content: string;
-      source: "instant-template";
+      source: "pending";
       wordCount: number;
       jobStatus: "idle" | "processing" | "stale" | "failed";
       error?: string;
@@ -174,7 +195,7 @@ export type FreeOverviewStatus =
 
 export type FreeOverviewGenerationClaim =
   | { status: "ready"; overview: Extract<FreeOverviewStatus, { status: "ready" }> }
-  | { status: "processing"; overview: Extract<FreeOverviewStatus, { status: "fallback" }> }
+  | { status: "processing"; overview: Extract<FreeOverviewStatus, { status: "fallback" | "preview" }> }
   | { status: "claimed" };
 
 type ArticleRecord = Omit<ArticleView, "faqs"> & {
@@ -799,7 +820,6 @@ export function getFreeOverviewStatus(chart: TuViChart): FreeOverviewStatus {
   }
 
   const job = chartWithOverview.freeOverviewJob;
-  const fallback = buildInstantFreeOverview(chart);
   const hasCurrentJobVersion = job?.version === FREE_OVERVIEW_VERSION;
   const jobStatus =
     hasCurrentJobVersion && job?.status === "PENDING" && isFreshFreeOverviewJob(job)
@@ -810,11 +830,28 @@ export function getFreeOverviewStatus(chart: TuViChart): FreeOverviewStatus {
           ? "failed"
           : "idle";
 
+  if (
+    chartWithOverview.freeOverviewPreview?.content &&
+    chartWithOverview.freeOverviewPreview.version === FREE_OVERVIEW_VERSION &&
+    isCompleteFreeOverviewPreview(chartWithOverview.freeOverviewPreview.content)
+  ) {
+    return {
+      status: "preview",
+      content: chartWithOverview.freeOverviewPreview.content,
+      source: "ai-preview",
+      model: chartWithOverview.freeOverviewPreview.model,
+      generatedAt: chartWithOverview.freeOverviewPreview.generatedAt,
+      wordCount: countWords(chartWithOverview.freeOverviewPreview.content),
+      jobStatus,
+      ...(jobStatus === "failed" && job?.error ? { error: job.error } : {}),
+    };
+  }
+
   return {
     status: "fallback",
-    content: fallback,
-    source: "instant-template",
-    wordCount: countWords(fallback),
+    content: "",
+    source: "pending",
+    wordCount: 0,
     jobStatus,
     ...(jobStatus === "failed" && job?.error ? { error: job.error } : {}),
   };
@@ -866,8 +903,39 @@ export async function generateAndStoreFreeOverview(chartId: string) {
   const current = getFreeOverviewStatus(record.chart);
   if (current.status === "ready") return current;
 
-  const { generateFreeOverview } = await import("@/lib/ai");
-  const result = await generateFreeOverview(record.chart);
+  const { generateFreeOverview, generateFreeOverviewPreview } = await import("@/lib/ai");
+  const fullOverviewPromise = generateFreeOverview(record.chart);
+  if (current.status !== "preview") {
+    try {
+      const previewResult = await generateFreeOverviewPreview(record.chart);
+      if (isCompleteFreeOverviewPreview(previewResult.content)) {
+        const latestRecord = await getChart(chartId);
+        if (!latestRecord) throw new Error("Khong tim thay la so khi luu ban mo dau.");
+        const generatedAt = new Date().toISOString();
+        const chartWithLatestJob = latestRecord.chart as ChartWithFreeOverview;
+        const chartWithPreview: ChartWithFreeOverview = {
+          ...latestRecord.chart,
+          freeOverviewPreview: {
+            content: previewResult.content,
+            model: previewResult.model,
+            generatedAt,
+            version: FREE_OVERVIEW_VERSION,
+          },
+          freeOverviewJob: {
+            status: "PENDING",
+            startedAt: chartWithLatestJob.freeOverviewJob?.startedAt || generatedAt,
+            updatedAt: generatedAt,
+            version: FREE_OVERVIEW_VERSION,
+          },
+        };
+        await updateStoredChartPayload(chartId, chartWithPreview);
+      }
+    } catch {
+      // Preview is an early reading aid; full overview generation must still continue.
+    }
+  }
+
+  const result = await fullOverviewPromise;
   if (result.model.includes("template-fallback")) {
     const message = "LLM tong quan chua san sang, khong hien thi ban template.";
     await failFreeOverviewGeneration(chartId, message);
@@ -879,9 +947,11 @@ export async function generateAndStoreFreeOverview(chartId: string) {
     throw new Error(message);
   }
 
+  const latestRecord = await getChart(chartId);
+  if (!latestRecord) throw new Error("Khong tim thay la so khi luu ban tong quan AI.");
   const now = new Date().toISOString();
   const updatedChart: ChartWithFreeOverview = {
-    ...record.chart,
+    ...latestRecord.chart,
     freeOverview: {
       content: result.content,
       model: result.model,
@@ -890,7 +960,7 @@ export async function generateAndStoreFreeOverview(chartId: string) {
     },
     freeOverviewJob: {
       status: "COMPLETED",
-      startedAt: (record.chart as ChartWithFreeOverview).freeOverviewJob?.startedAt || now,
+      startedAt: (latestRecord.chart as ChartWithFreeOverview).freeOverviewJob?.startedAt || now,
       updatedAt: now,
       version: FREE_OVERVIEW_VERSION,
     },

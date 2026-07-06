@@ -10,6 +10,7 @@ import { premiumReadingModalId } from "@/components/premium-reading-target";
 type FreeOverviewState =
   | { status: "loading"; content?: string; error?: undefined }
   | { status: "ready"; content: string; detailContent: string; error?: undefined }
+  | { status: "preview"; content: string; jobStatus: "idle" | "processing" | "stale" | "failed"; error?: string }
   | { status: "fallback"; content: string; jobStatus: "idle" | "processing" | "stale" | "failed"; error?: string }
   | { status: "error"; content?: string; error: string };
 
@@ -17,6 +18,12 @@ type FreeOverviewPayload =
   | {
       status: "ready";
       content: string;
+    }
+  | {
+      status: "preview";
+      content: string;
+      jobStatus?: "idle" | "processing" | "stale" | "failed";
+      error?: string;
     }
   | {
       status: "fallback";
@@ -53,12 +60,81 @@ function initialOverviewState(
       detailContent: initialOverview.content,
     };
   }
+  if (initialOverview.status === "preview") {
+    return {
+      status: "preview",
+      content: initialOverview.content,
+      jobStatus: initialOverview.jobStatus || "processing",
+      error: initialOverview.error,
+    };
+  }
   return {
     status: "fallback",
     content: "",
     jobStatus: initialOverview.jobStatus || "idle",
     error: initialOverview.error,
   };
+}
+
+function GuestOverviewLoginCta({ chartId, compact = false }: { chartId: string; compact?: boolean }) {
+  const chartPath = `/la-so/${chartId}`;
+  const nextPath = `${chartPath}#luan-giai`;
+
+  return (
+    <aside className={compact ? "free-overview-waiting-cta is-compact" : "free-overview-waiting-cta"}>
+      <div>
+        <strong>Phần luận giải chi tiết sẽ được giữ lại cho bạn.</strong>
+        <span>Đăng nhập để lưu lá số và quay lại đúng vị trí đang đọc.</span>
+      </div>
+      <Link
+        className="btn btn-primary"
+        href={loginModalHref(chartPath, undefined, nextPath)}
+        scroll={false}
+      >
+        Đăng nhập miễn phí để xem chi tiết
+      </Link>
+    </aside>
+  );
+}
+
+function ProgressivePreviewCopy({ content }: { content: string }) {
+  const words = content.split(/\s+/).filter(Boolean);
+  const wordCount = words.length;
+  const [visiblePreviewWords, setVisiblePreviewWords] = useState(Math.min(10, words.length));
+  const [reduceMotion, setReduceMotion] = useState(false);
+
+  useEffect(() => {
+    const media = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const updatePreference = () => setReduceMotion(media.matches);
+    const initialTimer = window.setTimeout(updatePreference, 0);
+    media.addEventListener("change", updatePreference);
+    return () => {
+      window.clearTimeout(initialTimer);
+      media.removeEventListener("change", updatePreference);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (reduceMotion) return;
+    const timer = window.setInterval(() => {
+      setVisiblePreviewWords((current) => {
+        const next = Math.min(wordCount, current + 3);
+        if (next >= wordCount) window.clearInterval(timer);
+        return next;
+      });
+    }, 55);
+    return () => window.clearInterval(timer);
+  }, [reduceMotion, wordCount]);
+
+  const visibleContent = reduceMotion ? content : words.slice(0, visiblePreviewWords).join(" ");
+  const isWriting = !reduceMotion && visiblePreviewWords < wordCount;
+
+  return (
+    <p className="free-overview-preview-copy">
+      {visibleContent}
+      {isWriting ? <span className="free-overview-writing-cursor" aria-hidden="true" /> : null}
+    </p>
+  );
 }
 
 export function FreeOverviewLoader({
@@ -80,7 +156,7 @@ export function FreeOverviewLoader({
 
   function retryOverview() {
     setState((current) =>
-      current.status === "fallback"
+      current.status === "fallback" || current.status === "preview"
         ? { ...current, jobStatus: "processing" as const, error: undefined }
         : { status: "loading" },
     );
@@ -118,9 +194,8 @@ export function FreeOverviewLoader({
           headers: { accept: "application/json" },
         });
         if (response.status === 404) return;
-        schedulePoll();
       } catch {
-        if (!controller.signal.aborted) schedulePoll();
+        // The GET polling loop below remains responsible for the next attempt.
       }
     }
 
@@ -146,13 +221,23 @@ export function FreeOverviewLoader({
           return;
         }
 
-        setState({
-          status: "fallback",
-          content: "",
-          jobStatus: payload.jobStatus || "idle",
-          error: payload.error,
-        });
-        startProcess();
+        if (payload.status === "preview") {
+          setState({
+            status: "preview",
+            content: String(payload.content || ""),
+            jobStatus: payload.jobStatus || "processing",
+            error: payload.error,
+          });
+        } else {
+          setState({
+            status: "fallback",
+            content: "",
+            jobStatus: payload.jobStatus || "idle",
+            error: payload.error,
+          });
+        }
+        void startProcess();
+        schedulePoll();
       } catch (error) {
         if (controller.signal.aborted) return;
         setState({
@@ -179,12 +264,12 @@ export function FreeOverviewLoader({
               ? "Chưa viết xong mini-report bằng LLM."
               : state.jobStatus === "stale"
                 ? "Tiến trình viết mini-report trước đó quá lâu chưa xong."
-                : "Đang viết mini-report cá nhân hóa bằng LLM."}
+                : "Đang đọc những tín hiệu nổi bật trong lá số…"}
           </strong>
           <span>
             {state.jobStatus === "failed"
               ? "Bản dự phòng không còn được hiển thị. Bạn có thể thử viết lại để nhận đúng bản cá nhân hóa."
-              : "Hệ thống đang dùng dữ liệu lá số để viết bản luận giải miễn phí. Bạn có thể xem bàn lá số phía trên trong lúc chờ."}
+              : "Phần mở đầu cá nhân hóa sẽ xuất hiện trước. Bản mini-report đầy đủ tiếp tục được viết ở phía sau."}
           </span>
           {canRetry ? (
             <button type="button" className="btn btn-small btn-ghost" onClick={retryOverview}>
@@ -199,7 +284,38 @@ export function FreeOverviewLoader({
             </span>
           ) : null}
         </div>
+        {!isSignedIn ? <GuestOverviewLoginCta chartId={chartId} compact /> : null}
       </div>
+    );
+  }
+
+  if (state.status === "preview") {
+    const canRetry = state.jobStatus === "stale" || state.jobStatus === "failed";
+
+    return (
+      <article ref={setRootNode} className="free-reading-summary free-overview-preview" aria-live="polite">
+        <div className="free-overview-inline-status">
+          <div className="free-overview-detail-status-copy">
+            <strong>Đang viết phần luận giải dành riêng cho bạn…</strong>
+            <span>Phần mở đầu đã sẵn sàng; các nội dung chi tiết vẫn đang được hoàn thiện.</span>
+          </div>
+          {state.jobStatus === "processing" || state.jobStatus === "idle" ? (
+            <span className="free-overview-detail-loader" aria-hidden="true">
+              <i />
+              <i />
+              <i />
+            </span>
+          ) : null}
+        </div>
+        <ProgressivePreviewCopy key={state.content} content={state.content} />
+        {state.error ? <p className="free-overview-preview-note">{state.error}</p> : null}
+        {canRetry ? (
+          <button type="button" className="btn btn-small btn-ghost" onClick={retryOverview}>
+            Thử viết tiếp
+          </button>
+        ) : null}
+        {!isSignedIn ? <GuestOverviewLoginCta chartId={chartId} /> : null}
+      </article>
     );
   }
 
@@ -277,6 +393,7 @@ export function FreeOverviewLoader({
         <button type="button" className="btn btn-small btn-ghost" onClick={retryOverview}>
           Thử viết lại
         </button>
+        {!isSignedIn ? <GuestOverviewLoginCta chartId={chartId} compact /> : null}
       </div>
     );
   }
@@ -284,13 +401,14 @@ export function FreeOverviewLoader({
   return (
     <div ref={setRootNode} className="free-overview-loading" role="status" aria-live="polite">
       <div>
-        <strong>Đang chuẩn bị mini-report cá nhân...</strong>
-        <span>Lá số đã hiển thị trước để bạn xem ngay. Hồ sơ miễn phí đang được viết từ dữ liệu lá số.</span>
+        <strong>Đang đọc những tín hiệu nổi bật trong lá số…</strong>
+        <span>Chỉ ít phút nữa, phần mở đầu cá nhân hóa sẽ xuất hiện ngay tại đây.</span>
       </div>
       <i />
       <i />
       <i />
       <i />
+      {!isSignedIn ? <GuestOverviewLoginCta chartId={chartId} compact /> : null}
     </div>
   );
 }
