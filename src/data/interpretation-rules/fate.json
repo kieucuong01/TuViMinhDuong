@@ -1,0 +1,306 @@
+[
+  {
+    "version": "interpretation-rules-v1",
+    "status": "active",
+    "key": "fate:dai-van:menh",
+    "scope": "YEAR",
+    "pattern": {
+      "kind": "fate",
+      "fate": "dai-van",
+      "palace": "Mệnh"
+    },
+    "priority": 69,
+    "title": "Đại vận kích hoạt Mệnh",
+    "summary": "Đại vận chạm vào Mệnh khiến chủ đề khí chất gốc, cách tự nhìn mình và phản ứng khi gặp việc lớn cần được nhìn kỹ hơn trong giai đoạn đang xét.",
+    "strengthText": "Điểm nên phát huy là chọn một ưu tiên rõ, không ôm mọi việc cùng lúc.",
+    "cautionText": "Điểm cần lưu ý là vận không phải lời phán cố định; nó cho biết vùng nào cần quan sát và điều chỉnh nhịp.",
+    "lifeAdviceText": "Khi vận kích hoạt Mệnh, người đọc nên hỏi việc nào đang lặp lại, việc nào cần sửa cách làm và việc nào nên chậm lại để chắc hơn.",
+    "teaserQuestion": "Đại vận tại Mệnh đang nhắc bài học nào cần đọc sâu hơn?",
+    "evidenceLabel": "Căn cứ: đại vận hiện tại kích hoạt cung Mệnh."
+  },
+  {
+    "version": "interpretation-rules-v1",
+    "status": "active",
+    "key": "fate:dai-van:than",
+    "scope": "YEAR",
+    "pattern": {
+      "kind": "fate",
+      "fate": "dai-van",
+      "palace": "Thân"
+    },
+    "priority": 67,
+    "title": "Đại vận kích hoạt Thân",
+    "summary": "Đại vận chạm vào Thân khiến chủ đề vùng trọng yếu cần được nhìn kỹ hơn trong giai đoạn đang xét.",
+    "strengthText": "Điểm nên phát huy là chọn một ưu tiên rõ, không ôm mọi việc cùng lúc.",
+    "cautionText": "Điểm cần lưu ý là vận không phải lời phán cố định; nó cho biết vùng nào cần quan sát và điều chỉnh nhịp.",
+    "lifeAdviceText": "Khi vận kích hoạt Thân, người đọc nên hỏi việc nào đang lặp lại, việc nào cần sửa cách làm và việc nào nên chậm lại để chắc hơn.",
+    "teaserQuestion": "Đại vận tại Thân đang nhắc bài học nào cần đọc sâu hơn?",
+    "evidenceLabel": "Căn cứ: đại vận hiện tại kích hoạt cung Thân."
+  },
+  {
+    "version": "interpretation-rules-v1",
+    "status": "active",
+    "key": "fate:dai-van:quan-loc",
+    "scope": "YEAR",
+    "pattern": {
+      "kind": "fate",
+      "fate": "dai-van",
+      "palace": "Quan Lộc"
+    },
+    "priority": 69,
+    "title": "Đại vận kích hoạt Quan Lộc",
+    "summary": "Đại vận chạm vào Quan Lộc khiến chủ đề nghề nghiệp, vai trò xã hội và cách gây dựng vị trí cần được nhìn kỹ hơn trong giai đoạn đang xét.",
+    "strengthText": "Điểm nên phát huy là chọn một ưu tiên rõ, không ôm mọi việc cùng lúc.",
+    "cautionText": "Điểm cần lưu ý là vận không phải lời phán cố định; nó cho biết vùng nào cần quan sát và điều chỉnh nhịp.",
+    "lifeAdviceText": "Khi vận kích hoạt Quan Lộc, người đọc nên hỏi việc nào đang lặp lại, việc nào cần sửa cách làm và việc nào nên chậm lại để chắc hơn.",
+    "teaserQuestion": "Đại vận tại Quan Lộc đang nhắc bài học nào cần đọc sâu hơn?",
+    "evidenceLabel": "Căn cứ: đại vận hiện tại kích hoạt cung Quan Lộc."
+  },
+  {
+    "version": "interpretation-rules-v1",
+    "status": "active",
+    "key": "fate:dai-van:tai-bach",
+    "scope": "YEAR",
+    "pattern": {
+      "kind": "fate",
+      "fate": "dai-van",
+      "palace": "Tài Bạch"
+    },
+    "priority": 69,
+    "title": "Đại vận kích hoạt Tài Bạch",
+    "summary": "Đại vận chạm vào Tài Bạch khiến chủ đề cách kiếm tiền, giữ tiền và dùng nguồn lực cần được nhìn kỹ hơn trong giai đoạn đang xét.",
+    "strengthText": "Điểm nên phát huy là chọn một ưu tiên rõ, không ôm mọi việc cùng lúc.",
+    "cautionText": "Điểm cần lưu ý là vận không phải lời phán cố định; nó cho biết vùng nào cần quan sát và điều chỉnh nhịp.",
+    "lifeAdviceText": "Khi vận kích hoạt Tài Bạch, người đọc nên hỏi việc nào đang lặp lại, việc nào cần sửa cách làm và việc nào nên chậm lại để chắc hơn.",
+    "teaserQuestion": "Đại vận tại Tài Bạch đang nhắc bài học nào cần đọc sâu hơn?",
+    "evidenceLabel": "Căn cứ: đại vận hiện tại kích hoạt cung Tài Bạch."
+  },
+  {
+    "version": "interpretation-rules-v1",
+    "status": "active",
+    "key": "fate:dai-van:phu-the",
+    "scope": "YEAR",
+    "pattern": {
+      "kind": "fate",
+      "fate": "dai-van",
+      "palace": "Phu Thê"
+    },
+    "priority": 68,
+    "title": "Đại vận kích hoạt Phu Thê",
+    "summary": "Đại vận chạm vào Phu Thê khiến chủ đề tình cảm, hôn nhân, cách gắn bó và ranh giới thân mật cần được nhìn kỹ hơn trong giai đoạn đang xét.",
+    "strengthText": "Điểm nên phát huy là chọn một ưu tiên rõ, không ôm mọi việc cùng lúc.",
+    "cautionText": "Điểm cần lưu ý là vận không phải lời phán cố định; nó cho biết vùng nào cần quan sát và điều chỉnh nhịp.",
+    "lifeAdviceText": "Khi vận kích hoạt Phu Thê, người đọc nên hỏi việc nào đang lặp lại, việc nào cần sửa cách làm và việc nào nên chậm lại để chắc hơn.",
+    "teaserQuestion": "Đại vận tại Phu Thê đang nhắc bài học nào cần đọc sâu hơn?",
+    "evidenceLabel": "Căn cứ: đại vận hiện tại kích hoạt cung Phu Thê."
+  },
+  {
+    "version": "interpretation-rules-v1",
+    "status": "active",
+    "key": "fate:dai-van:tat-ach",
+    "scope": "YEAR",
+    "pattern": {
+      "kind": "fate",
+      "fate": "dai-van",
+      "palace": "Tật Ách"
+    },
+    "priority": 68,
+    "title": "Đại vận kích hoạt Tật Ách",
+    "summary": "Đại vận chạm vào Tật Ách khiến chủ đề nhịp sức khỏe, tinh thần và tín hiệu quá tải cần được nhìn kỹ hơn trong giai đoạn đang xét.",
+    "strengthText": "Điểm nên phát huy là chọn một ưu tiên rõ, không ôm mọi việc cùng lúc.",
+    "cautionText": "Điểm cần lưu ý là vận không phải lời phán cố định; nó cho biết vùng nào cần quan sát và điều chỉnh nhịp.",
+    "lifeAdviceText": "Khi vận kích hoạt Tật Ách, người đọc nên hỏi việc nào đang lặp lại, việc nào cần sửa cách làm và việc nào nên chậm lại để chắc hơn.",
+    "teaserQuestion": "Đại vận tại Tật Ách đang nhắc bài học nào cần đọc sâu hơn?",
+    "evidenceLabel": "Căn cứ: đại vận hiện tại kích hoạt cung Tật Ách."
+  },
+  {
+    "version": "interpretation-rules-v1",
+    "status": "active",
+    "key": "fate:dai-van:thien-di",
+    "scope": "YEAR",
+    "pattern": {
+      "kind": "fate",
+      "fate": "dai-van",
+      "palace": "Thiên Di"
+    },
+    "priority": 68,
+    "title": "Đại vận kích hoạt Thiên Di",
+    "summary": "Đại vận chạm vào Thiên Di khiến chủ đề cơ hội bên ngoài, môi trường xã hội và cách bước ra khỏi vùng quen cần được nhìn kỹ hơn trong giai đoạn đang xét.",
+    "strengthText": "Điểm nên phát huy là chọn một ưu tiên rõ, không ôm mọi việc cùng lúc.",
+    "cautionText": "Điểm cần lưu ý là vận không phải lời phán cố định; nó cho biết vùng nào cần quan sát và điều chỉnh nhịp.",
+    "lifeAdviceText": "Khi vận kích hoạt Thiên Di, người đọc nên hỏi việc nào đang lặp lại, việc nào cần sửa cách làm và việc nào nên chậm lại để chắc hơn.",
+    "teaserQuestion": "Đại vận tại Thiên Di đang nhắc bài học nào cần đọc sâu hơn?",
+    "evidenceLabel": "Căn cứ: đại vận hiện tại kích hoạt cung Thiên Di."
+  },
+  {
+    "version": "interpretation-rules-v1",
+    "status": "active",
+    "key": "fate:dai-van:phuc-duc",
+    "scope": "YEAR",
+    "pattern": {
+      "kind": "fate",
+      "fate": "dai-van",
+      "palace": "Phúc Đức"
+    },
+    "priority": 67,
+    "title": "Đại vận kích hoạt Phúc Đức",
+    "summary": "Đại vận chạm vào Phúc Đức khiến chủ đề gốc phúc, nếp nhà và sức nâng đỡ tinh thần cần được nhìn kỹ hơn trong giai đoạn đang xét.",
+    "strengthText": "Điểm nên phát huy là chọn một ưu tiên rõ, không ôm mọi việc cùng lúc.",
+    "cautionText": "Điểm cần lưu ý là vận không phải lời phán cố định; nó cho biết vùng nào cần quan sát và điều chỉnh nhịp.",
+    "lifeAdviceText": "Khi vận kích hoạt Phúc Đức, người đọc nên hỏi việc nào đang lặp lại, việc nào cần sửa cách làm và việc nào nên chậm lại để chắc hơn.",
+    "teaserQuestion": "Đại vận tại Phúc Đức đang nhắc bài học nào cần đọc sâu hơn?",
+    "evidenceLabel": "Căn cứ: đại vận hiện tại kích hoạt cung Phúc Đức."
+  },
+  {
+    "version": "interpretation-rules-v1",
+    "status": "active",
+    "key": "fate:yearly:menh",
+    "scope": "IDENTITY",
+    "pattern": {
+      "kind": "fate",
+      "fate": "yearly",
+      "palace": "Mệnh"
+    },
+    "priority": 63,
+    "title": "Vận năm kích hoạt Mệnh",
+    "summary": "Vận năm chạm vào Mệnh khiến chủ đề khí chất gốc, cách tự nhìn mình và phản ứng khi gặp việc lớn cần được nhìn kỹ hơn trong giai đoạn đang xét.",
+    "strengthText": "Điểm nên phát huy là chọn một ưu tiên rõ, không ôm mọi việc cùng lúc.",
+    "cautionText": "Điểm cần lưu ý là vận không phải lời phán cố định; nó cho biết vùng nào cần quan sát và điều chỉnh nhịp.",
+    "lifeAdviceText": "Khi vận kích hoạt Mệnh, người đọc nên hỏi việc nào đang lặp lại, việc nào cần sửa cách làm và việc nào nên chậm lại để chắc hơn.",
+    "teaserQuestion": "Vận năm tại Mệnh đang nhắc bài học nào cần đọc sâu hơn?",
+    "evidenceLabel": "Căn cứ: sao lưu năm kích hoạt cung Mệnh."
+  },
+  {
+    "version": "interpretation-rules-v1",
+    "status": "active",
+    "key": "fate:yearly:than",
+    "scope": "AXIS",
+    "pattern": {
+      "kind": "fate",
+      "fate": "yearly",
+      "palace": "Thân"
+    },
+    "priority": 61,
+    "title": "Vận năm kích hoạt Thân",
+    "summary": "Vận năm chạm vào Thân khiến chủ đề vùng trọng yếu cần được nhìn kỹ hơn trong giai đoạn đang xét.",
+    "strengthText": "Điểm nên phát huy là chọn một ưu tiên rõ, không ôm mọi việc cùng lúc.",
+    "cautionText": "Điểm cần lưu ý là vận không phải lời phán cố định; nó cho biết vùng nào cần quan sát và điều chỉnh nhịp.",
+    "lifeAdviceText": "Khi vận kích hoạt Thân, người đọc nên hỏi việc nào đang lặp lại, việc nào cần sửa cách làm và việc nào nên chậm lại để chắc hơn.",
+    "teaserQuestion": "Vận năm tại Thân đang nhắc bài học nào cần đọc sâu hơn?",
+    "evidenceLabel": "Căn cứ: sao lưu năm kích hoạt cung Thân."
+  },
+  {
+    "version": "interpretation-rules-v1",
+    "status": "active",
+    "key": "fate:yearly:quan-loc",
+    "scope": "CAREER",
+    "pattern": {
+      "kind": "fate",
+      "fate": "yearly",
+      "palace": "Quan Lộc"
+    },
+    "priority": 63,
+    "title": "Vận năm kích hoạt Quan Lộc",
+    "summary": "Vận năm chạm vào Quan Lộc khiến chủ đề nghề nghiệp, vai trò xã hội và cách gây dựng vị trí cần được nhìn kỹ hơn trong giai đoạn đang xét.",
+    "strengthText": "Điểm nên phát huy là chọn một ưu tiên rõ, không ôm mọi việc cùng lúc.",
+    "cautionText": "Điểm cần lưu ý là vận không phải lời phán cố định; nó cho biết vùng nào cần quan sát và điều chỉnh nhịp.",
+    "lifeAdviceText": "Khi vận kích hoạt Quan Lộc, người đọc nên hỏi việc nào đang lặp lại, việc nào cần sửa cách làm và việc nào nên chậm lại để chắc hơn.",
+    "teaserQuestion": "Vận năm tại Quan Lộc đang nhắc bài học nào cần đọc sâu hơn?",
+    "evidenceLabel": "Căn cứ: sao lưu năm kích hoạt cung Quan Lộc."
+  },
+  {
+    "version": "interpretation-rules-v1",
+    "status": "active",
+    "key": "fate:yearly:tai-bach",
+    "scope": "MONEY",
+    "pattern": {
+      "kind": "fate",
+      "fate": "yearly",
+      "palace": "Tài Bạch"
+    },
+    "priority": 63,
+    "title": "Vận năm kích hoạt Tài Bạch",
+    "summary": "Vận năm chạm vào Tài Bạch khiến chủ đề cách kiếm tiền, giữ tiền và dùng nguồn lực cần được nhìn kỹ hơn trong giai đoạn đang xét.",
+    "strengthText": "Điểm nên phát huy là chọn một ưu tiên rõ, không ôm mọi việc cùng lúc.",
+    "cautionText": "Điểm cần lưu ý là vận không phải lời phán cố định; nó cho biết vùng nào cần quan sát và điều chỉnh nhịp.",
+    "lifeAdviceText": "Khi vận kích hoạt Tài Bạch, người đọc nên hỏi việc nào đang lặp lại, việc nào cần sửa cách làm và việc nào nên chậm lại để chắc hơn.",
+    "teaserQuestion": "Vận năm tại Tài Bạch đang nhắc bài học nào cần đọc sâu hơn?",
+    "evidenceLabel": "Căn cứ: sao lưu năm kích hoạt cung Tài Bạch."
+  },
+  {
+    "version": "interpretation-rules-v1",
+    "status": "active",
+    "key": "fate:yearly:phu-the",
+    "scope": "RELATIONSHIP",
+    "pattern": {
+      "kind": "fate",
+      "fate": "yearly",
+      "palace": "Phu Thê"
+    },
+    "priority": 62,
+    "title": "Vận năm kích hoạt Phu Thê",
+    "summary": "Vận năm chạm vào Phu Thê khiến chủ đề tình cảm, hôn nhân, cách gắn bó và ranh giới thân mật cần được nhìn kỹ hơn trong giai đoạn đang xét.",
+    "strengthText": "Điểm nên phát huy là chọn một ưu tiên rõ, không ôm mọi việc cùng lúc.",
+    "cautionText": "Điểm cần lưu ý là vận không phải lời phán cố định; nó cho biết vùng nào cần quan sát và điều chỉnh nhịp.",
+    "lifeAdviceText": "Khi vận kích hoạt Phu Thê, người đọc nên hỏi việc nào đang lặp lại, việc nào cần sửa cách làm và việc nào nên chậm lại để chắc hơn.",
+    "teaserQuestion": "Vận năm tại Phu Thê đang nhắc bài học nào cần đọc sâu hơn?",
+    "evidenceLabel": "Căn cứ: sao lưu năm kích hoạt cung Phu Thê."
+  },
+  {
+    "version": "interpretation-rules-v1",
+    "status": "active",
+    "key": "fate:yearly:tat-ach",
+    "scope": "HEALTH",
+    "pattern": {
+      "kind": "fate",
+      "fate": "yearly",
+      "palace": "Tật Ách"
+    },
+    "priority": 62,
+    "title": "Vận năm kích hoạt Tật Ách",
+    "summary": "Vận năm chạm vào Tật Ách khiến chủ đề nhịp sức khỏe, tinh thần và tín hiệu quá tải cần được nhìn kỹ hơn trong giai đoạn đang xét.",
+    "strengthText": "Điểm nên phát huy là chọn một ưu tiên rõ, không ôm mọi việc cùng lúc.",
+    "cautionText": "Điểm cần lưu ý là vận không phải lời phán cố định; nó cho biết vùng nào cần quan sát và điều chỉnh nhịp.",
+    "lifeAdviceText": "Khi vận kích hoạt Tật Ách, người đọc nên hỏi việc nào đang lặp lại, việc nào cần sửa cách làm và việc nào nên chậm lại để chắc hơn.",
+    "teaserQuestion": "Vận năm tại Tật Ách đang nhắc bài học nào cần đọc sâu hơn?",
+    "evidenceLabel": "Căn cứ: sao lưu năm kích hoạt cung Tật Ách."
+  },
+  {
+    "version": "interpretation-rules-v1",
+    "status": "active",
+    "key": "fate:yearly:thien-di",
+    "scope": "CAREER",
+    "pattern": {
+      "kind": "fate",
+      "fate": "yearly",
+      "palace": "Thiên Di"
+    },
+    "priority": 62,
+    "title": "Vận năm kích hoạt Thiên Di",
+    "summary": "Vận năm chạm vào Thiên Di khiến chủ đề cơ hội bên ngoài, môi trường xã hội và cách bước ra khỏi vùng quen cần được nhìn kỹ hơn trong giai đoạn đang xét.",
+    "strengthText": "Điểm nên phát huy là chọn một ưu tiên rõ, không ôm mọi việc cùng lúc.",
+    "cautionText": "Điểm cần lưu ý là vận không phải lời phán cố định; nó cho biết vùng nào cần quan sát và điều chỉnh nhịp.",
+    "lifeAdviceText": "Khi vận kích hoạt Thiên Di, người đọc nên hỏi việc nào đang lặp lại, việc nào cần sửa cách làm và việc nào nên chậm lại để chắc hơn.",
+    "teaserQuestion": "Vận năm tại Thiên Di đang nhắc bài học nào cần đọc sâu hơn?",
+    "evidenceLabel": "Căn cứ: sao lưu năm kích hoạt cung Thiên Di."
+  },
+  {
+    "version": "interpretation-rules-v1",
+    "status": "active",
+    "key": "fate:yearly:phuc-duc",
+    "scope": "RELATIONSHIP",
+    "pattern": {
+      "kind": "fate",
+      "fate": "yearly",
+      "palace": "Phúc Đức"
+    },
+    "priority": 61,
+    "title": "Vận năm kích hoạt Phúc Đức",
+    "summary": "Vận năm chạm vào Phúc Đức khiến chủ đề gốc phúc, nếp nhà và sức nâng đỡ tinh thần cần được nhìn kỹ hơn trong giai đoạn đang xét.",
+    "strengthText": "Điểm nên phát huy là chọn một ưu tiên rõ, không ôm mọi việc cùng lúc.",
+    "cautionText": "Điểm cần lưu ý là vận không phải lời phán cố định; nó cho biết vùng nào cần quan sát và điều chỉnh nhịp.",
+    "lifeAdviceText": "Khi vận kích hoạt Phúc Đức, người đọc nên hỏi việc nào đang lặp lại, việc nào cần sửa cách làm và việc nào nên chậm lại để chắc hơn.",
+    "teaserQuestion": "Vận năm tại Phúc Đức đang nhắc bài học nào cần đọc sâu hơn?",
+    "evidenceLabel": "Căn cứ: sao lưu năm kích hoạt cung Phúc Đức."
+  }
+]

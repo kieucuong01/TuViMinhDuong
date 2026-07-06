@@ -40,6 +40,14 @@ describe("production release command", () => {
     );
   });
 
+  it("seeds interpretation rules before building the VPS release", () => {
+    expect(packageJson.scripts?.["seed:interpretations"]).toContain("seed-interpretations.ts");
+    expect(releaseScript).toContain("npm run seed:interpretations");
+    expect(releaseScript.indexOf("npm run seed:interpretations")).toBeLessThan(
+      releaseScript.lastIndexOf("npm run build"),
+    );
+  });
+
   it("documents the normal command and migration variant", () => {
     expect(releaseGuide).toContain('npm run release:production -- "feat: mô tả thay đổi"');
     expect(releaseGuide).toContain("-Migrate");

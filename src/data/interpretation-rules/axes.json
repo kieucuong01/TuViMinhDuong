@@ -1,0 +1,134 @@
+[
+  {
+    "version": "interpretation-rules-v1",
+    "status": "active",
+    "key": "axis:menh-than",
+    "scope": "IDENTITY",
+    "pattern": {
+      "kind": "axis",
+      "axis": "menh-than",
+      "palaces": [
+        "Mệnh",
+        "Thân"
+      ]
+    },
+    "priority": 58,
+    "title": "Trục Mệnh - Thân",
+    "summary": "Trục Mệnh - Thân nối khí chất gốc và cách con người vận hành khi bước vào đời thật. Khi trục này nổi bật, không nên đọc từng cung rời rạc vì quyết định ở một bên thường kéo phản ứng ở bên còn lại.",
+    "strengthText": "Điểm nên phát huy là đối chiếu hai cung cùng lúc để thấy nguyên nhân và hệ quả.",
+    "cautionText": "Điểm cần lưu ý là một cung thuận nhưng cung còn lại căng thì kết quả vẫn cần đi từng bước.",
+    "lifeAdviceText": "Trong đời sống, trục này giúp trả lời vì sao một lựa chọn không chỉ ảnh hưởng một việc mà kéo theo nhiều mặt khác.",
+    "teaserQuestion": "Trục Mệnh - Thân đang cho thấy mảng nào cần ưu tiên trước để bớt rối?",
+    "evidenceLabel": "Căn cứ: đối chiếu Mệnh và Thân trong cùng lá số."
+  },
+  {
+    "version": "interpretation-rules-v1",
+    "status": "active",
+    "key": "axis:quan-tai",
+    "scope": "CAREER",
+    "pattern": {
+      "kind": "axis",
+      "axis": "quan-tai",
+      "palaces": [
+        "Quan Lộc",
+        "Tài Bạch"
+      ]
+    },
+    "priority": 58,
+    "title": "Trục Quan - Tài",
+    "summary": "Trục Quan - Tài nối cách tạo giá trị, đổi công sức thành thu nhập và giữ nguồn lực. Khi trục này nổi bật, không nên đọc từng cung rời rạc vì quyết định ở một bên thường kéo phản ứng ở bên còn lại.",
+    "strengthText": "Điểm nên phát huy là đối chiếu hai cung cùng lúc để thấy nguyên nhân và hệ quả.",
+    "cautionText": "Điểm cần lưu ý là một cung thuận nhưng cung còn lại căng thì kết quả vẫn cần đi từng bước.",
+    "lifeAdviceText": "Trong đời sống, trục này giúp trả lời vì sao một lựa chọn không chỉ ảnh hưởng một việc mà kéo theo nhiều mặt khác.",
+    "teaserQuestion": "Trục Quan - Tài đang cho thấy mảng nào cần ưu tiên trước để bớt rối?",
+    "evidenceLabel": "Căn cứ: đối chiếu Quan Lộc và Tài Bạch trong cùng lá số."
+  },
+  {
+    "version": "interpretation-rules-v1",
+    "status": "active",
+    "key": "axis:phu-phuc",
+    "scope": "RELATIONSHIP",
+    "pattern": {
+      "kind": "axis",
+      "axis": "phu-phuc",
+      "palaces": [
+        "Phu Thê",
+        "Phúc Đức"
+      ]
+    },
+    "priority": 58,
+    "title": "Trục Phu - Phúc",
+    "summary": "Trục Phu - Phúc nối quan hệ thân thiết, nền gia đình và khả năng giữ hòa khí dài lâu. Khi trục này nổi bật, không nên đọc từng cung rời rạc vì quyết định ở một bên thường kéo phản ứng ở bên còn lại.",
+    "strengthText": "Điểm nên phát huy là đối chiếu hai cung cùng lúc để thấy nguyên nhân và hệ quả.",
+    "cautionText": "Điểm cần lưu ý là một cung thuận nhưng cung còn lại căng thì kết quả vẫn cần đi từng bước.",
+    "lifeAdviceText": "Trong đời sống, trục này giúp trả lời vì sao một lựa chọn không chỉ ảnh hưởng một việc mà kéo theo nhiều mặt khác.",
+    "teaserQuestion": "Trục Phu - Phúc đang cho thấy mảng nào cần ưu tiên trước để bớt rối?",
+    "evidenceLabel": "Căn cứ: đối chiếu Phu Thê và Phúc Đức trong cùng lá số."
+  },
+  {
+    "version": "interpretation-rules-v1",
+    "status": "active",
+    "key": "axis:tat-menh",
+    "scope": "HEALTH",
+    "pattern": {
+      "kind": "axis",
+      "axis": "tat-menh",
+      "palaces": [
+        "Tật Ách",
+        "Mệnh"
+      ]
+    },
+    "priority": 58,
+    "title": "Trục Tật - Mệnh",
+    "summary": "Trục Tật - Mệnh nối nhịp sức khỏe, tinh thần và cách cơ thể phản ứng với áp lực. Khi trục này nổi bật, không nên đọc từng cung rời rạc vì quyết định ở một bên thường kéo phản ứng ở bên còn lại.",
+    "strengthText": "Điểm nên phát huy là đối chiếu hai cung cùng lúc để thấy nguyên nhân và hệ quả.",
+    "cautionText": "Điểm cần lưu ý là một cung thuận nhưng cung còn lại căng thì kết quả vẫn cần đi từng bước.",
+    "lifeAdviceText": "Trong đời sống, trục này giúp trả lời vì sao một lựa chọn không chỉ ảnh hưởng một việc mà kéo theo nhiều mặt khác.",
+    "teaserQuestion": "Trục Tật - Mệnh đang cho thấy mảng nào cần ưu tiên trước để bớt rối?",
+    "evidenceLabel": "Căn cứ: đối chiếu Tật Ách và Mệnh trong cùng lá số."
+  },
+  {
+    "version": "interpretation-rules-v1",
+    "status": "active",
+    "key": "axis:di-quan",
+    "scope": "CAREER",
+    "pattern": {
+      "kind": "axis",
+      "axis": "di-quan",
+      "palaces": [
+        "Thiên Di",
+        "Quan Lộc"
+      ]
+    },
+    "priority": 58,
+    "title": "Trục Di - Quan",
+    "summary": "Trục Di - Quan nối cơ hội bên ngoài, môi trường xã hội và đường nghề nghiệp. Khi trục này nổi bật, không nên đọc từng cung rời rạc vì quyết định ở một bên thường kéo phản ứng ở bên còn lại.",
+    "strengthText": "Điểm nên phát huy là đối chiếu hai cung cùng lúc để thấy nguyên nhân và hệ quả.",
+    "cautionText": "Điểm cần lưu ý là một cung thuận nhưng cung còn lại căng thì kết quả vẫn cần đi từng bước.",
+    "lifeAdviceText": "Trong đời sống, trục này giúp trả lời vì sao một lựa chọn không chỉ ảnh hưởng một việc mà kéo theo nhiều mặt khác.",
+    "teaserQuestion": "Trục Di - Quan đang cho thấy mảng nào cần ưu tiên trước để bớt rối?",
+    "evidenceLabel": "Căn cứ: đối chiếu Thiên Di và Quan Lộc trong cùng lá số."
+  },
+  {
+    "version": "interpretation-rules-v1",
+    "status": "active",
+    "key": "axis:tai-phuc",
+    "scope": "MONEY",
+    "pattern": {
+      "kind": "axis",
+      "axis": "tai-phuc",
+      "palaces": [
+        "Tài Bạch",
+        "Phúc Đức"
+      ]
+    },
+    "priority": 58,
+    "title": "Trục Tài - Phúc",
+    "summary": "Trục Tài - Phúc nối tiền bạc, nền tích lũy và sự nâng đỡ từ phúc phần/gia đình. Khi trục này nổi bật, không nên đọc từng cung rời rạc vì quyết định ở một bên thường kéo phản ứng ở bên còn lại.",
+    "strengthText": "Điểm nên phát huy là đối chiếu hai cung cùng lúc để thấy nguyên nhân và hệ quả.",
+    "cautionText": "Điểm cần lưu ý là một cung thuận nhưng cung còn lại căng thì kết quả vẫn cần đi từng bước.",
+    "lifeAdviceText": "Trong đời sống, trục này giúp trả lời vì sao một lựa chọn không chỉ ảnh hưởng một việc mà kéo theo nhiều mặt khác.",
+    "teaserQuestion": "Trục Tài - Phúc đang cho thấy mảng nào cần ưu tiên trước để bớt rối?",
+    "evidenceLabel": "Căn cứ: đối chiếu Tài Bạch và Phúc Đức trong cùng lá số."
+  }
+]

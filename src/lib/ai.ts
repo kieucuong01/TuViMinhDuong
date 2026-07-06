@@ -1,5 +1,6 @@
 import { type TuViChart } from "@/lib/chart";
 import { buildChartEvidenceProfile, formatChartEvidence } from "@/lib/chart-evidence";
+import { buildFreeOverviewFromInterpretationRules } from "@/lib/free-overview-engine";
 import { generateWithLlmRouter, hasExternalLlmProvider } from "@/lib/llm-router";
 import { FEATURE_PRICES, type ReadingKey } from "@/lib/pricing";
 
@@ -191,12 +192,6 @@ function freeOverviewAudienceContext(chart: TuViChart) {
     paidTeaser:
       "hồ sơ chuyên sâu sẽ nối từng cung, đại vận và vận năm thành một lộ trình ưu tiên rõ hơn",
   };
-}
-
-function freeOverviewStatusLabel(score: number, strong: string, steady: string, careful: string) {
-  if (score >= 72) return strong;
-  if (score >= 55) return steady;
-  return careful;
 }
 
 function palaceByName(chart: TuViChart, name: string) {
@@ -875,63 +870,7 @@ ${evidence}`;
 }
 
 export function buildInstantFreeOverview(chart: TuViChart) {
-  const profile = buildChartEvidenceProfile(chart);
-  const decade = compactDecadeContext(chart);
-  const summary = getDeepReadingSummary(chart);
-  const menh = profile.palaces.find((palace) => palace.name === "Mệnh");
-  const thanPalace = chart.palaces.find((palace) => palace.isThan);
-  const than = profile.palaces.find((palace) => palace.name === thanPalace?.name);
-  const career = profile.palaces.find((palace) => palace.name === "Quan Lộc");
-  const money = profile.palaces.find((palace) => palace.name === "Tài Bạch");
-  const relationship = profile.palaces.find((palace) => palace.name === "Phu Thê");
-  const caution = profile.signals.find((signal) => signal.kind === "caution");
-  const scores = Object.fromEntries(summary.scores.map((score) => [score.key, score.value])) as Record<DeepScoreKey, number>;
-  const innerScore = clampScore(Math.round((scores.career + scores.health + scores.love) / 3));
-  const workMoneyScore = clampScore(Math.round((scores.career + scores.money) / 2));
-  const audience = freeOverviewAudienceContext(chart);
-  const innerStatus = freeOverviewStatusLabel(innerScore, "nền ổn định", "cần giữ nhịp", "dễ quá tải nếu vội");
-  const workMoneyStatus = freeOverviewStatusLabel(workMoneyScore, "có cửa mở rộng", "chọn lọc trước khi nhận", "đi chậm để chắc nền");
-  const yearStatus = freeOverviewStatusLabel(scores.year, "thuận để mở thêm cơ hội", "tiến từng bước có kiểm chứng", "ưu tiên quan sát và giữ sức");
-  const menhStars = menh?.stars.slice(0, 3).join(", ") || "dữ liệu đang cập nhật";
-  const thanStars = than?.stars.slice(0, 3).join(", ") || "dữ liệu đang cập nhật";
-  const careerStars = career?.stars.slice(0, 3).join(", ") || "chưa có sao nổi bật";
-  const moneyStars = money?.stars.slice(0, 3).join(", ") || "chưa có sao nổi bật";
-  const relationshipStars = relationship?.stars.slice(0, 3).join(", ") || "dữ liệu đang cập nhật";
-
-  return `## Tín hiệu nổi bật của lá số
-${chart.input.fullName}, lá số này cho thấy bạn không dễ quyết theo cảm hứng nhất thời. Bạn thường nhìn kỹ, nghĩ nhiều bước rồi mới nói hoặc mới chọn. Đây là điểm mạnh, nhưng cũng khiến bạn dễ tự ôm áp lực, sợ chọn sai hoặc thấy mình chậm hơn người khác. Trục Mệnh ${chart.menh} và ${chart.than} cho thấy nền tính cách cần sự chắc chắn; đại vận ${decade.current} lại đang đẩy bạn tới lựa chọn rõ hơn. Bản đọc nhanh này không phán tốt xấu. Nó chỉ mở ra điểm cần đọc sâu: nên tin vào năng lực nào, nên chậm lại ở đâu.
-
-Điểm dễ “chạm” nhất ở lá số này là cảm giác bên trong luôn muốn làm cho đúng, nhưng bên ngoài lại có nhiều việc buộc phải quyết nhanh hơn mong muốn. Khi chưa có đủ thông tin, bạn có xu hướng nghĩ thêm, quan sát thêm, hoặc tự giữ mọi thứ trong lòng. Điều này giúp bạn tránh sai lầm lớn, nhưng nếu kéo dài quá lâu sẽ khiến cơ hội đi qua hoặc khiến người khác không hiểu bạn đang cần gì.
-
-## Mỏ neo
-- **Nội lực: ${innerStatus}** — càng rõ nhịp, càng bền.
-- **${audience.anchorWorkLabel}: ${workMoneyStatus}** — chọn đúng vai trò trước khi nhận.
-- **Năm ${chart.input.viewYear}: ${yearStatus}** — đi chắc, không chạy theo điểm số.
-
-## Điểm đáng chú ý nhất
-Mệnh tại ${menh?.branch || chart.menh} có ${menhStars}; Thân ở ${than?.name || "cung đang cập nhật"} có ${thanStars}. Bạn nhìn được chi tiết nhỏ, nhưng càng gặp việc lớn càng cần khung rõ ràng. Nếu còn đi học hoặc mới tự lập, khung đó là lịch học, bài tập nhóm, tiền tiêu vặt hoặc việc part-time. Khi vai trò mơ hồ, bạn dễ gánh nhiều hơn phần mình nên nhận.
-
-Vì vậy, điểm mạnh không chỉ là chăm hay chịu khó. Điểm mạnh thật nằm ở khả năng nhìn ra điều người khác bỏ sót, rồi biến nó thành lựa chọn an toàn hơn. Mặt trái là bạn dễ tự kiểm tra mình quá nhiều: đã đủ tốt chưa, người khác nghĩ sao, nếu nói ra có bị hiểu lầm không. Lá số này nên đọc để tháo nút thắt đó, không phải để làm bạn lo thêm.
-
-## Công việc và tài chính
-Cung Quan Lộc có ${careerStars}, nghiêng về việc chọn hướng có cấu trúc. Trọng tâm nên đặt vào ${audience.workFocus}. Cơ hội nghe hay nhưng không rõ vai trò hoặc người chịu trách nhiệm thì chưa nên vội nhận. Cung Tài Bạch có ${moneyStars}; tiền bạc cần đi cùng kế hoạch giữ sức.
-
-Điều nên nhớ là lá số không khuyên bạn đứng yên. Nó khuyên bạn mở rộng có điều kiện. Trước một lời mời, một dự án, một việc làm thêm, hoặc một hướng học mới, câu hỏi quan trọng không phải “có nên thử không”, mà là “mình có hiểu rõ mình phải làm gì, được gì, mất gì không”. Khi câu trả lời còn mờ, hãy hỏi lại hoặc thử trong phạm vi nhỏ trước.
-
-## Tình cảm và quan hệ
-Cung Phu Thê có ${relationshipStars}. Điều làm hao sức thường không phải thiếu tình cảm, mà là thiếu lời nói rõ: ai chịu trách nhiệm việc gì, giới hạn nằm ở đâu.
-
-Trong quan hệ gần, bạn cần sự rõ ràng hơn là lời hứa đẹp. Nếu phải đoán quá nhiều hoặc luôn nhường để giữ hòa khí, năng lượng sẽ hao nhanh. Bản chuyên sâu sẽ làm rõ kiểu quan hệ nào nên giữ gần, kiểu nào nên đặt ranh giới sớm.
-
-## Vận năm ${chart.input.viewYear}
-Năm ${chart.input.viewYear} nghiêng về trạng thái ${yearStatus}. Tín hiệu cần chú ý là ${caution?.evidence.join("; ") || "áp lực dễ tăng khi quyết định thiếu kiểm chứng"}. Bản miễn phí bên dưới là bản đọc nhanh; bản chi tiết đang được viết tiếp dưới nền để làm rõ công việc, tiền bạc, tình cảm và vận năm.
-
-Nói dễ hiểu, năm này hợp với cách đi từng bước có kiểm tra. Việc càng quan trọng càng không nên quyết lúc mệt, vội hoặc muốn làm vừa lòng người khác. Điều gì giúp mình rõ hơn, khỏe hơn, bớt rối hơn thì làm trước; điều gì chỉ làm mình thêm chứng minh, thêm lo thì chậm lại.
-
-## Câu hỏi mở trước khi đi sâu
-- Lựa chọn nào trong năm ${chart.input.viewYear} khiến bạn vừa muốn tiến lên, vừa sợ mình chọn sai?
-- Với ${audience.workFocus}, đâu là cơ hội thật và đâu chỉ là áp lực?
-- Đại vận ${decade.current} đang nhấn vào bài học nào cần đọc sâu hơn?`;
+  return buildFreeOverviewFromInterpretationRules(chart);
 }
 
 export async function generateFreeOverview(chart: TuViChart) {

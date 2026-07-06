@@ -148,6 +148,7 @@ if ($DryRun) {
   Write-Host "git push origin master"
   Write-Host "VPS release build, symlink switch, PM2 restart, and production smoke"
   Write-Host "npm run pseo:seed on the new VPS release before build"
+  Write-Host "npm run seed:interpretations on the new VPS release before build"
   if ($Migrate) {
     Write-Host "npm run db:deploy on the new VPS release"
   }
@@ -300,6 +301,7 @@ if [ "$RUN_MIGRATIONS" = "1" ]; then
   npm run db:deploy
 fi
 npm run pseo:seed
+npm run seed:interpretations
 npm run build
 
 ln -sfn "$RELEASE_DIR" "$CURRENT_DIR"

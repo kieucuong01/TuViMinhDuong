@@ -1,0 +1,1346 @@
+[
+  {
+    "version": "interpretation-rules-v1",
+    "status": "active",
+    "key": "group:cat-tinh:menh",
+    "scope": "IDENTITY",
+    "pattern": {
+      "kind": "support-group",
+      "group": "cát tinh",
+      "palace": "Mệnh",
+      "stars": [
+        "Tả Phù",
+        "Hữu Bật",
+        "Văn Xương",
+        "Văn Khúc",
+        "Khôi",
+        "Việt",
+        "Long Trì",
+        "Phượng"
+      ]
+    },
+    "priority": 62,
+    "title": "cát tinh tại Mệnh",
+    "summary": "Nhóm cát tinh tại Mệnh làm nổi rõ nguồn trợ lực, quý nhân, học hỏi và sự nâng đỡ đúng lúc. Tác động này nên được hiểu như một lớp bối cảnh, không phải kết luận tốt xấu riêng lẻ.",
+    "strengthText": "Điểm nên phát huy là biết nhận hỗ trợ và dùng đúng người đúng việc trong phần việc thuộc Mệnh.",
+    "cautionText": "Điểm cần lưu ý là đừng ỷ lại vào may mắn hoặc chờ người khác mở đường; càng nhiều sao cùng nhóm càng cần đọc cùng cung chính và vận hiện tại.",
+    "lifeAdviceText": "Trong đời sống, nhóm sao này trả lời câu hỏi: nên mở thêm, giữ lại hay đặt ranh giới. Cách dùng đúng là biến tín hiệu thành lựa chọn nhỏ, rõ và kiểm chứng được.",
+    "teaserQuestion": "Nhóm cát tinh tại Mệnh đang mở ra trợ lực hay đang nhắc cần giữ giới hạn ở đâu?",
+    "evidenceLabel": "Căn cứ: nhóm cát tinh xuất hiện tại cung Mệnh."
+  },
+  {
+    "version": "interpretation-rules-v1",
+    "status": "active",
+    "key": "group:cat-tinh:than",
+    "scope": "IDENTITY",
+    "pattern": {
+      "kind": "support-group",
+      "group": "cát tinh",
+      "palace": "Thân",
+      "stars": [
+        "Tả Phù",
+        "Hữu Bật",
+        "Văn Xương",
+        "Văn Khúc",
+        "Khôi",
+        "Việt",
+        "Long Trì",
+        "Phượng"
+      ]
+    },
+    "priority": 58,
+    "title": "cát tinh tại Thân",
+    "summary": "Nhóm cát tinh tại Thân làm nổi rõ nguồn trợ lực, quý nhân, học hỏi và sự nâng đỡ đúng lúc. Tác động này nên được hiểu như một lớp bối cảnh, không phải kết luận tốt xấu riêng lẻ.",
+    "strengthText": "Điểm nên phát huy là biết nhận hỗ trợ và dùng đúng người đúng việc trong phần việc thuộc Thân.",
+    "cautionText": "Điểm cần lưu ý là đừng ỷ lại vào may mắn hoặc chờ người khác mở đường; càng nhiều sao cùng nhóm càng cần đọc cùng cung chính và vận hiện tại.",
+    "lifeAdviceText": "Trong đời sống, nhóm sao này trả lời câu hỏi: nên mở thêm, giữ lại hay đặt ranh giới. Cách dùng đúng là biến tín hiệu thành lựa chọn nhỏ, rõ và kiểm chứng được.",
+    "teaserQuestion": "Nhóm cát tinh tại Thân đang mở ra trợ lực hay đang nhắc cần giữ giới hạn ở đâu?",
+    "evidenceLabel": "Căn cứ: nhóm cát tinh xuất hiện tại cung Thân."
+  },
+  {
+    "version": "interpretation-rules-v1",
+    "status": "active",
+    "key": "group:cat-tinh:quan-loc",
+    "scope": "CAREER",
+    "pattern": {
+      "kind": "support-group",
+      "group": "cát tinh",
+      "palace": "Quan Lộc",
+      "stars": [
+        "Tả Phù",
+        "Hữu Bật",
+        "Văn Xương",
+        "Văn Khúc",
+        "Khôi",
+        "Việt",
+        "Long Trì",
+        "Phượng"
+      ]
+    },
+    "priority": 61,
+    "title": "cát tinh tại Quan Lộc",
+    "summary": "Nhóm cát tinh tại Quan Lộc làm nổi rõ nguồn trợ lực, quý nhân, học hỏi và sự nâng đỡ đúng lúc. Tác động này nên được hiểu như một lớp bối cảnh, không phải kết luận tốt xấu riêng lẻ.",
+    "strengthText": "Điểm nên phát huy là biết nhận hỗ trợ và dùng đúng người đúng việc trong phần việc thuộc Quan Lộc.",
+    "cautionText": "Điểm cần lưu ý là đừng ỷ lại vào may mắn hoặc chờ người khác mở đường; càng nhiều sao cùng nhóm càng cần đọc cùng cung chính và vận hiện tại.",
+    "lifeAdviceText": "Trong đời sống, nhóm sao này trả lời câu hỏi: nên mở thêm, giữ lại hay đặt ranh giới. Cách dùng đúng là biến tín hiệu thành lựa chọn nhỏ, rõ và kiểm chứng được.",
+    "teaserQuestion": "Nhóm cát tinh tại Quan Lộc đang mở ra trợ lực hay đang nhắc cần giữ giới hạn ở đâu?",
+    "evidenceLabel": "Căn cứ: nhóm cát tinh xuất hiện tại cung Quan Lộc."
+  },
+  {
+    "version": "interpretation-rules-v1",
+    "status": "active",
+    "key": "group:cat-tinh:tai-bach",
+    "scope": "MONEY",
+    "pattern": {
+      "kind": "support-group",
+      "group": "cát tinh",
+      "palace": "Tài Bạch",
+      "stars": [
+        "Tả Phù",
+        "Hữu Bật",
+        "Văn Xương",
+        "Văn Khúc",
+        "Khôi",
+        "Việt",
+        "Long Trì",
+        "Phượng"
+      ]
+    },
+    "priority": 61,
+    "title": "cát tinh tại Tài Bạch",
+    "summary": "Nhóm cát tinh tại Tài Bạch làm nổi rõ nguồn trợ lực, quý nhân, học hỏi và sự nâng đỡ đúng lúc. Tác động này nên được hiểu như một lớp bối cảnh, không phải kết luận tốt xấu riêng lẻ.",
+    "strengthText": "Điểm nên phát huy là biết nhận hỗ trợ và dùng đúng người đúng việc trong phần việc thuộc Tài Bạch.",
+    "cautionText": "Điểm cần lưu ý là đừng ỷ lại vào may mắn hoặc chờ người khác mở đường; càng nhiều sao cùng nhóm càng cần đọc cùng cung chính và vận hiện tại.",
+    "lifeAdviceText": "Trong đời sống, nhóm sao này trả lời câu hỏi: nên mở thêm, giữ lại hay đặt ranh giới. Cách dùng đúng là biến tín hiệu thành lựa chọn nhỏ, rõ và kiểm chứng được.",
+    "teaserQuestion": "Nhóm cát tinh tại Tài Bạch đang mở ra trợ lực hay đang nhắc cần giữ giới hạn ở đâu?",
+    "evidenceLabel": "Căn cứ: nhóm cát tinh xuất hiện tại cung Tài Bạch."
+  },
+  {
+    "version": "interpretation-rules-v1",
+    "status": "active",
+    "key": "group:cat-tinh:phu-the",
+    "scope": "RELATIONSHIP",
+    "pattern": {
+      "kind": "support-group",
+      "group": "cát tinh",
+      "palace": "Phu Thê",
+      "stars": [
+        "Tả Phù",
+        "Hữu Bật",
+        "Văn Xương",
+        "Văn Khúc",
+        "Khôi",
+        "Việt",
+        "Long Trì",
+        "Phượng"
+      ]
+    },
+    "priority": 60,
+    "title": "cát tinh tại Phu Thê",
+    "summary": "Nhóm cát tinh tại Phu Thê làm nổi rõ nguồn trợ lực, quý nhân, học hỏi và sự nâng đỡ đúng lúc. Tác động này nên được hiểu như một lớp bối cảnh, không phải kết luận tốt xấu riêng lẻ.",
+    "strengthText": "Điểm nên phát huy là biết nhận hỗ trợ và dùng đúng người đúng việc trong phần việc thuộc Phu Thê.",
+    "cautionText": "Điểm cần lưu ý là đừng ỷ lại vào may mắn hoặc chờ người khác mở đường; càng nhiều sao cùng nhóm càng cần đọc cùng cung chính và vận hiện tại.",
+    "lifeAdviceText": "Trong đời sống, nhóm sao này trả lời câu hỏi: nên mở thêm, giữ lại hay đặt ranh giới. Cách dùng đúng là biến tín hiệu thành lựa chọn nhỏ, rõ và kiểm chứng được.",
+    "teaserQuestion": "Nhóm cát tinh tại Phu Thê đang mở ra trợ lực hay đang nhắc cần giữ giới hạn ở đâu?",
+    "evidenceLabel": "Căn cứ: nhóm cát tinh xuất hiện tại cung Phu Thê."
+  },
+  {
+    "version": "interpretation-rules-v1",
+    "status": "active",
+    "key": "group:cat-tinh:tat-ach",
+    "scope": "HEALTH",
+    "pattern": {
+      "kind": "support-group",
+      "group": "cát tinh",
+      "palace": "Tật Ách",
+      "stars": [
+        "Tả Phù",
+        "Hữu Bật",
+        "Văn Xương",
+        "Văn Khúc",
+        "Khôi",
+        "Việt",
+        "Long Trì",
+        "Phượng"
+      ]
+    },
+    "priority": 59,
+    "title": "cát tinh tại Tật Ách",
+    "summary": "Nhóm cát tinh tại Tật Ách làm nổi rõ nguồn trợ lực, quý nhân, học hỏi và sự nâng đỡ đúng lúc. Tác động này nên được hiểu như một lớp bối cảnh, không phải kết luận tốt xấu riêng lẻ.",
+    "strengthText": "Điểm nên phát huy là biết nhận hỗ trợ và dùng đúng người đúng việc trong phần việc thuộc Tật Ách.",
+    "cautionText": "Điểm cần lưu ý là đừng ỷ lại vào may mắn hoặc chờ người khác mở đường; càng nhiều sao cùng nhóm càng cần đọc cùng cung chính và vận hiện tại.",
+    "lifeAdviceText": "Trong đời sống, nhóm sao này trả lời câu hỏi: nên mở thêm, giữ lại hay đặt ranh giới. Cách dùng đúng là biến tín hiệu thành lựa chọn nhỏ, rõ và kiểm chứng được.",
+    "teaserQuestion": "Nhóm cát tinh tại Tật Ách đang mở ra trợ lực hay đang nhắc cần giữ giới hạn ở đâu?",
+    "evidenceLabel": "Căn cứ: nhóm cát tinh xuất hiện tại cung Tật Ách."
+  },
+  {
+    "version": "interpretation-rules-v1",
+    "status": "active",
+    "key": "group:cat-tinh:thien-di",
+    "scope": "CAREER",
+    "pattern": {
+      "kind": "support-group",
+      "group": "cát tinh",
+      "palace": "Thiên Di",
+      "stars": [
+        "Tả Phù",
+        "Hữu Bật",
+        "Văn Xương",
+        "Văn Khúc",
+        "Khôi",
+        "Việt",
+        "Long Trì",
+        "Phượng"
+      ]
+    },
+    "priority": 59,
+    "title": "cát tinh tại Thiên Di",
+    "summary": "Nhóm cát tinh tại Thiên Di làm nổi rõ nguồn trợ lực, quý nhân, học hỏi và sự nâng đỡ đúng lúc. Tác động này nên được hiểu như một lớp bối cảnh, không phải kết luận tốt xấu riêng lẻ.",
+    "strengthText": "Điểm nên phát huy là biết nhận hỗ trợ và dùng đúng người đúng việc trong phần việc thuộc Thiên Di.",
+    "cautionText": "Điểm cần lưu ý là đừng ỷ lại vào may mắn hoặc chờ người khác mở đường; càng nhiều sao cùng nhóm càng cần đọc cùng cung chính và vận hiện tại.",
+    "lifeAdviceText": "Trong đời sống, nhóm sao này trả lời câu hỏi: nên mở thêm, giữ lại hay đặt ranh giới. Cách dùng đúng là biến tín hiệu thành lựa chọn nhỏ, rõ và kiểm chứng được.",
+    "teaserQuestion": "Nhóm cát tinh tại Thiên Di đang mở ra trợ lực hay đang nhắc cần giữ giới hạn ở đâu?",
+    "evidenceLabel": "Căn cứ: nhóm cát tinh xuất hiện tại cung Thiên Di."
+  },
+  {
+    "version": "interpretation-rules-v1",
+    "status": "active",
+    "key": "group:cat-tinh:phuc-duc",
+    "scope": "RELATIONSHIP",
+    "pattern": {
+      "kind": "support-group",
+      "group": "cát tinh",
+      "palace": "Phúc Đức",
+      "stars": [
+        "Tả Phù",
+        "Hữu Bật",
+        "Văn Xương",
+        "Văn Khúc",
+        "Khôi",
+        "Việt",
+        "Long Trì",
+        "Phượng"
+      ]
+    },
+    "priority": 58,
+    "title": "cát tinh tại Phúc Đức",
+    "summary": "Nhóm cát tinh tại Phúc Đức làm nổi rõ nguồn trợ lực, quý nhân, học hỏi và sự nâng đỡ đúng lúc. Tác động này nên được hiểu như một lớp bối cảnh, không phải kết luận tốt xấu riêng lẻ.",
+    "strengthText": "Điểm nên phát huy là biết nhận hỗ trợ và dùng đúng người đúng việc trong phần việc thuộc Phúc Đức.",
+    "cautionText": "Điểm cần lưu ý là đừng ỷ lại vào may mắn hoặc chờ người khác mở đường; càng nhiều sao cùng nhóm càng cần đọc cùng cung chính và vận hiện tại.",
+    "lifeAdviceText": "Trong đời sống, nhóm sao này trả lời câu hỏi: nên mở thêm, giữ lại hay đặt ranh giới. Cách dùng đúng là biến tín hiệu thành lựa chọn nhỏ, rõ và kiểm chứng được.",
+    "teaserQuestion": "Nhóm cát tinh tại Phúc Đức đang mở ra trợ lực hay đang nhắc cần giữ giới hạn ở đâu?",
+    "evidenceLabel": "Căn cứ: nhóm cát tinh xuất hiện tại cung Phúc Đức."
+  },
+  {
+    "version": "interpretation-rules-v1",
+    "status": "active",
+    "key": "group:sat-tinh:menh",
+    "scope": "IDENTITY",
+    "pattern": {
+      "kind": "support-group",
+      "group": "sát tinh",
+      "palace": "Mệnh",
+      "stars": [
+        "Kình",
+        "Đà",
+        "Hỏa",
+        "Linh",
+        "Không",
+        "Kiếp"
+      ]
+    },
+    "priority": 62,
+    "title": "sát tinh tại Mệnh",
+    "summary": "Nhóm sát tinh tại Mệnh làm nổi rõ áp lực, cạnh tranh, biến động và bài học phải tỉnh táo. Tác động này nên được hiểu như một lớp bối cảnh, không phải kết luận tốt xấu riêng lẻ.",
+    "strengthText": "Điểm nên phát huy là có sức chịu va chạm và năng lực xử lý việc khó trong phần việc thuộc Mệnh.",
+    "cautionText": "Điểm cần lưu ý là tránh nóng vội, cực đoan hoặc quyết khi đang bị kích động; càng nhiều sao cùng nhóm càng cần đọc cùng cung chính và vận hiện tại.",
+    "lifeAdviceText": "Trong đời sống, nhóm sao này trả lời câu hỏi: nên mở thêm, giữ lại hay đặt ranh giới. Cách dùng đúng là biến tín hiệu thành lựa chọn nhỏ, rõ và kiểm chứng được.",
+    "teaserQuestion": "Nhóm sát tinh tại Mệnh đang mở ra trợ lực hay đang nhắc cần giữ giới hạn ở đâu?",
+    "evidenceLabel": "Căn cứ: nhóm sát tinh xuất hiện tại cung Mệnh."
+  },
+  {
+    "version": "interpretation-rules-v1",
+    "status": "active",
+    "key": "group:sat-tinh:than",
+    "scope": "IDENTITY",
+    "pattern": {
+      "kind": "support-group",
+      "group": "sát tinh",
+      "palace": "Thân",
+      "stars": [
+        "Kình",
+        "Đà",
+        "Hỏa",
+        "Linh",
+        "Không",
+        "Kiếp"
+      ]
+    },
+    "priority": 58,
+    "title": "sát tinh tại Thân",
+    "summary": "Nhóm sát tinh tại Thân làm nổi rõ áp lực, cạnh tranh, biến động và bài học phải tỉnh táo. Tác động này nên được hiểu như một lớp bối cảnh, không phải kết luận tốt xấu riêng lẻ.",
+    "strengthText": "Điểm nên phát huy là có sức chịu va chạm và năng lực xử lý việc khó trong phần việc thuộc Thân.",
+    "cautionText": "Điểm cần lưu ý là tránh nóng vội, cực đoan hoặc quyết khi đang bị kích động; càng nhiều sao cùng nhóm càng cần đọc cùng cung chính và vận hiện tại.",
+    "lifeAdviceText": "Trong đời sống, nhóm sao này trả lời câu hỏi: nên mở thêm, giữ lại hay đặt ranh giới. Cách dùng đúng là biến tín hiệu thành lựa chọn nhỏ, rõ và kiểm chứng được.",
+    "teaserQuestion": "Nhóm sát tinh tại Thân đang mở ra trợ lực hay đang nhắc cần giữ giới hạn ở đâu?",
+    "evidenceLabel": "Căn cứ: nhóm sát tinh xuất hiện tại cung Thân."
+  },
+  {
+    "version": "interpretation-rules-v1",
+    "status": "active",
+    "key": "group:sat-tinh:quan-loc",
+    "scope": "CAREER",
+    "pattern": {
+      "kind": "support-group",
+      "group": "sát tinh",
+      "palace": "Quan Lộc",
+      "stars": [
+        "Kình",
+        "Đà",
+        "Hỏa",
+        "Linh",
+        "Không",
+        "Kiếp"
+      ]
+    },
+    "priority": 61,
+    "title": "sát tinh tại Quan Lộc",
+    "summary": "Nhóm sát tinh tại Quan Lộc làm nổi rõ áp lực, cạnh tranh, biến động và bài học phải tỉnh táo. Tác động này nên được hiểu như một lớp bối cảnh, không phải kết luận tốt xấu riêng lẻ.",
+    "strengthText": "Điểm nên phát huy là có sức chịu va chạm và năng lực xử lý việc khó trong phần việc thuộc Quan Lộc.",
+    "cautionText": "Điểm cần lưu ý là tránh nóng vội, cực đoan hoặc quyết khi đang bị kích động; càng nhiều sao cùng nhóm càng cần đọc cùng cung chính và vận hiện tại.",
+    "lifeAdviceText": "Trong đời sống, nhóm sao này trả lời câu hỏi: nên mở thêm, giữ lại hay đặt ranh giới. Cách dùng đúng là biến tín hiệu thành lựa chọn nhỏ, rõ và kiểm chứng được.",
+    "teaserQuestion": "Nhóm sát tinh tại Quan Lộc đang mở ra trợ lực hay đang nhắc cần giữ giới hạn ở đâu?",
+    "evidenceLabel": "Căn cứ: nhóm sát tinh xuất hiện tại cung Quan Lộc."
+  },
+  {
+    "version": "interpretation-rules-v1",
+    "status": "active",
+    "key": "group:sat-tinh:tai-bach",
+    "scope": "MONEY",
+    "pattern": {
+      "kind": "support-group",
+      "group": "sát tinh",
+      "palace": "Tài Bạch",
+      "stars": [
+        "Kình",
+        "Đà",
+        "Hỏa",
+        "Linh",
+        "Không",
+        "Kiếp"
+      ]
+    },
+    "priority": 61,
+    "title": "sát tinh tại Tài Bạch",
+    "summary": "Nhóm sát tinh tại Tài Bạch làm nổi rõ áp lực, cạnh tranh, biến động và bài học phải tỉnh táo. Tác động này nên được hiểu như một lớp bối cảnh, không phải kết luận tốt xấu riêng lẻ.",
+    "strengthText": "Điểm nên phát huy là có sức chịu va chạm và năng lực xử lý việc khó trong phần việc thuộc Tài Bạch.",
+    "cautionText": "Điểm cần lưu ý là tránh nóng vội, cực đoan hoặc quyết khi đang bị kích động; càng nhiều sao cùng nhóm càng cần đọc cùng cung chính và vận hiện tại.",
+    "lifeAdviceText": "Trong đời sống, nhóm sao này trả lời câu hỏi: nên mở thêm, giữ lại hay đặt ranh giới. Cách dùng đúng là biến tín hiệu thành lựa chọn nhỏ, rõ và kiểm chứng được.",
+    "teaserQuestion": "Nhóm sát tinh tại Tài Bạch đang mở ra trợ lực hay đang nhắc cần giữ giới hạn ở đâu?",
+    "evidenceLabel": "Căn cứ: nhóm sát tinh xuất hiện tại cung Tài Bạch."
+  },
+  {
+    "version": "interpretation-rules-v1",
+    "status": "active",
+    "key": "group:sat-tinh:phu-the",
+    "scope": "RELATIONSHIP",
+    "pattern": {
+      "kind": "support-group",
+      "group": "sát tinh",
+      "palace": "Phu Thê",
+      "stars": [
+        "Kình",
+        "Đà",
+        "Hỏa",
+        "Linh",
+        "Không",
+        "Kiếp"
+      ]
+    },
+    "priority": 60,
+    "title": "sát tinh tại Phu Thê",
+    "summary": "Nhóm sát tinh tại Phu Thê làm nổi rõ áp lực, cạnh tranh, biến động và bài học phải tỉnh táo. Tác động này nên được hiểu như một lớp bối cảnh, không phải kết luận tốt xấu riêng lẻ.",
+    "strengthText": "Điểm nên phát huy là có sức chịu va chạm và năng lực xử lý việc khó trong phần việc thuộc Phu Thê.",
+    "cautionText": "Điểm cần lưu ý là tránh nóng vội, cực đoan hoặc quyết khi đang bị kích động; càng nhiều sao cùng nhóm càng cần đọc cùng cung chính và vận hiện tại.",
+    "lifeAdviceText": "Trong đời sống, nhóm sao này trả lời câu hỏi: nên mở thêm, giữ lại hay đặt ranh giới. Cách dùng đúng là biến tín hiệu thành lựa chọn nhỏ, rõ và kiểm chứng được.",
+    "teaserQuestion": "Nhóm sát tinh tại Phu Thê đang mở ra trợ lực hay đang nhắc cần giữ giới hạn ở đâu?",
+    "evidenceLabel": "Căn cứ: nhóm sát tinh xuất hiện tại cung Phu Thê."
+  },
+  {
+    "version": "interpretation-rules-v1",
+    "status": "active",
+    "key": "group:sat-tinh:tat-ach",
+    "scope": "HEALTH",
+    "pattern": {
+      "kind": "support-group",
+      "group": "sát tinh",
+      "palace": "Tật Ách",
+      "stars": [
+        "Kình",
+        "Đà",
+        "Hỏa",
+        "Linh",
+        "Không",
+        "Kiếp"
+      ]
+    },
+    "priority": 59,
+    "title": "sát tinh tại Tật Ách",
+    "summary": "Nhóm sát tinh tại Tật Ách làm nổi rõ áp lực, cạnh tranh, biến động và bài học phải tỉnh táo. Tác động này nên được hiểu như một lớp bối cảnh, không phải kết luận tốt xấu riêng lẻ.",
+    "strengthText": "Điểm nên phát huy là có sức chịu va chạm và năng lực xử lý việc khó trong phần việc thuộc Tật Ách.",
+    "cautionText": "Điểm cần lưu ý là tránh nóng vội, cực đoan hoặc quyết khi đang bị kích động; càng nhiều sao cùng nhóm càng cần đọc cùng cung chính và vận hiện tại.",
+    "lifeAdviceText": "Trong đời sống, nhóm sao này trả lời câu hỏi: nên mở thêm, giữ lại hay đặt ranh giới. Cách dùng đúng là biến tín hiệu thành lựa chọn nhỏ, rõ và kiểm chứng được.",
+    "teaserQuestion": "Nhóm sát tinh tại Tật Ách đang mở ra trợ lực hay đang nhắc cần giữ giới hạn ở đâu?",
+    "evidenceLabel": "Căn cứ: nhóm sát tinh xuất hiện tại cung Tật Ách."
+  },
+  {
+    "version": "interpretation-rules-v1",
+    "status": "active",
+    "key": "group:sat-tinh:thien-di",
+    "scope": "CAREER",
+    "pattern": {
+      "kind": "support-group",
+      "group": "sát tinh",
+      "palace": "Thiên Di",
+      "stars": [
+        "Kình",
+        "Đà",
+        "Hỏa",
+        "Linh",
+        "Không",
+        "Kiếp"
+      ]
+    },
+    "priority": 59,
+    "title": "sát tinh tại Thiên Di",
+    "summary": "Nhóm sát tinh tại Thiên Di làm nổi rõ áp lực, cạnh tranh, biến động và bài học phải tỉnh táo. Tác động này nên được hiểu như một lớp bối cảnh, không phải kết luận tốt xấu riêng lẻ.",
+    "strengthText": "Điểm nên phát huy là có sức chịu va chạm và năng lực xử lý việc khó trong phần việc thuộc Thiên Di.",
+    "cautionText": "Điểm cần lưu ý là tránh nóng vội, cực đoan hoặc quyết khi đang bị kích động; càng nhiều sao cùng nhóm càng cần đọc cùng cung chính và vận hiện tại.",
+    "lifeAdviceText": "Trong đời sống, nhóm sao này trả lời câu hỏi: nên mở thêm, giữ lại hay đặt ranh giới. Cách dùng đúng là biến tín hiệu thành lựa chọn nhỏ, rõ và kiểm chứng được.",
+    "teaserQuestion": "Nhóm sát tinh tại Thiên Di đang mở ra trợ lực hay đang nhắc cần giữ giới hạn ở đâu?",
+    "evidenceLabel": "Căn cứ: nhóm sát tinh xuất hiện tại cung Thiên Di."
+  },
+  {
+    "version": "interpretation-rules-v1",
+    "status": "active",
+    "key": "group:sat-tinh:phuc-duc",
+    "scope": "RELATIONSHIP",
+    "pattern": {
+      "kind": "support-group",
+      "group": "sát tinh",
+      "palace": "Phúc Đức",
+      "stars": [
+        "Kình",
+        "Đà",
+        "Hỏa",
+        "Linh",
+        "Không",
+        "Kiếp"
+      ]
+    },
+    "priority": 58,
+    "title": "sát tinh tại Phúc Đức",
+    "summary": "Nhóm sát tinh tại Phúc Đức làm nổi rõ áp lực, cạnh tranh, biến động và bài học phải tỉnh táo. Tác động này nên được hiểu như một lớp bối cảnh, không phải kết luận tốt xấu riêng lẻ.",
+    "strengthText": "Điểm nên phát huy là có sức chịu va chạm và năng lực xử lý việc khó trong phần việc thuộc Phúc Đức.",
+    "cautionText": "Điểm cần lưu ý là tránh nóng vội, cực đoan hoặc quyết khi đang bị kích động; càng nhiều sao cùng nhóm càng cần đọc cùng cung chính và vận hiện tại.",
+    "lifeAdviceText": "Trong đời sống, nhóm sao này trả lời câu hỏi: nên mở thêm, giữ lại hay đặt ranh giới. Cách dùng đúng là biến tín hiệu thành lựa chọn nhỏ, rõ và kiểm chứng được.",
+    "teaserQuestion": "Nhóm sát tinh tại Phúc Đức đang mở ra trợ lực hay đang nhắc cần giữ giới hạn ở đâu?",
+    "evidenceLabel": "Căn cứ: nhóm sát tinh xuất hiện tại cung Phúc Đức."
+  },
+  {
+    "version": "interpretation-rules-v1",
+    "status": "active",
+    "key": "group:hao-tinh:menh",
+    "scope": "IDENTITY",
+    "pattern": {
+      "kind": "support-group",
+      "group": "hao tinh",
+      "palace": "Mệnh",
+      "stars": [
+        "Đại Hao",
+        "Tiểu Hao",
+        "Hao"
+      ]
+    },
+    "priority": 62,
+    "title": "hao tinh tại Mệnh",
+    "summary": "Nhóm hao tinh tại Mệnh làm nổi rõ tiền bạc, sức lực hoặc thời gian dễ bị rò rỉ nếu thiếu giới hạn. Tác động này nên được hiểu như một lớp bối cảnh, không phải kết luận tốt xấu riêng lẻ.",
+    "strengthText": "Điểm nên phát huy là nhìn ra nơi cần tiết chế và đặt giới hạn trong phần việc thuộc Mệnh.",
+    "cautionText": "Điểm cần lưu ý là cần kiểm soát chi phí, cam kết và những việc làm hao năng lượng; càng nhiều sao cùng nhóm càng cần đọc cùng cung chính và vận hiện tại.",
+    "lifeAdviceText": "Trong đời sống, nhóm sao này trả lời câu hỏi: nên mở thêm, giữ lại hay đặt ranh giới. Cách dùng đúng là biến tín hiệu thành lựa chọn nhỏ, rõ và kiểm chứng được.",
+    "teaserQuestion": "Nhóm hao tinh tại Mệnh đang mở ra trợ lực hay đang nhắc cần giữ giới hạn ở đâu?",
+    "evidenceLabel": "Căn cứ: nhóm hao tinh xuất hiện tại cung Mệnh."
+  },
+  {
+    "version": "interpretation-rules-v1",
+    "status": "active",
+    "key": "group:hao-tinh:than",
+    "scope": "IDENTITY",
+    "pattern": {
+      "kind": "support-group",
+      "group": "hao tinh",
+      "palace": "Thân",
+      "stars": [
+        "Đại Hao",
+        "Tiểu Hao",
+        "Hao"
+      ]
+    },
+    "priority": 58,
+    "title": "hao tinh tại Thân",
+    "summary": "Nhóm hao tinh tại Thân làm nổi rõ tiền bạc, sức lực hoặc thời gian dễ bị rò rỉ nếu thiếu giới hạn. Tác động này nên được hiểu như một lớp bối cảnh, không phải kết luận tốt xấu riêng lẻ.",
+    "strengthText": "Điểm nên phát huy là nhìn ra nơi cần tiết chế và đặt giới hạn trong phần việc thuộc Thân.",
+    "cautionText": "Điểm cần lưu ý là cần kiểm soát chi phí, cam kết và những việc làm hao năng lượng; càng nhiều sao cùng nhóm càng cần đọc cùng cung chính và vận hiện tại.",
+    "lifeAdviceText": "Trong đời sống, nhóm sao này trả lời câu hỏi: nên mở thêm, giữ lại hay đặt ranh giới. Cách dùng đúng là biến tín hiệu thành lựa chọn nhỏ, rõ và kiểm chứng được.",
+    "teaserQuestion": "Nhóm hao tinh tại Thân đang mở ra trợ lực hay đang nhắc cần giữ giới hạn ở đâu?",
+    "evidenceLabel": "Căn cứ: nhóm hao tinh xuất hiện tại cung Thân."
+  },
+  {
+    "version": "interpretation-rules-v1",
+    "status": "active",
+    "key": "group:hao-tinh:quan-loc",
+    "scope": "CAREER",
+    "pattern": {
+      "kind": "support-group",
+      "group": "hao tinh",
+      "palace": "Quan Lộc",
+      "stars": [
+        "Đại Hao",
+        "Tiểu Hao",
+        "Hao"
+      ]
+    },
+    "priority": 61,
+    "title": "hao tinh tại Quan Lộc",
+    "summary": "Nhóm hao tinh tại Quan Lộc làm nổi rõ tiền bạc, sức lực hoặc thời gian dễ bị rò rỉ nếu thiếu giới hạn. Tác động này nên được hiểu như một lớp bối cảnh, không phải kết luận tốt xấu riêng lẻ.",
+    "strengthText": "Điểm nên phát huy là nhìn ra nơi cần tiết chế và đặt giới hạn trong phần việc thuộc Quan Lộc.",
+    "cautionText": "Điểm cần lưu ý là cần kiểm soát chi phí, cam kết và những việc làm hao năng lượng; càng nhiều sao cùng nhóm càng cần đọc cùng cung chính và vận hiện tại.",
+    "lifeAdviceText": "Trong đời sống, nhóm sao này trả lời câu hỏi: nên mở thêm, giữ lại hay đặt ranh giới. Cách dùng đúng là biến tín hiệu thành lựa chọn nhỏ, rõ và kiểm chứng được.",
+    "teaserQuestion": "Nhóm hao tinh tại Quan Lộc đang mở ra trợ lực hay đang nhắc cần giữ giới hạn ở đâu?",
+    "evidenceLabel": "Căn cứ: nhóm hao tinh xuất hiện tại cung Quan Lộc."
+  },
+  {
+    "version": "interpretation-rules-v1",
+    "status": "active",
+    "key": "group:hao-tinh:tai-bach",
+    "scope": "MONEY",
+    "pattern": {
+      "kind": "support-group",
+      "group": "hao tinh",
+      "palace": "Tài Bạch",
+      "stars": [
+        "Đại Hao",
+        "Tiểu Hao",
+        "Hao"
+      ]
+    },
+    "priority": 61,
+    "title": "hao tinh tại Tài Bạch",
+    "summary": "Nhóm hao tinh tại Tài Bạch làm nổi rõ tiền bạc, sức lực hoặc thời gian dễ bị rò rỉ nếu thiếu giới hạn. Tác động này nên được hiểu như một lớp bối cảnh, không phải kết luận tốt xấu riêng lẻ.",
+    "strengthText": "Điểm nên phát huy là nhìn ra nơi cần tiết chế và đặt giới hạn trong phần việc thuộc Tài Bạch.",
+    "cautionText": "Điểm cần lưu ý là cần kiểm soát chi phí, cam kết và những việc làm hao năng lượng; càng nhiều sao cùng nhóm càng cần đọc cùng cung chính và vận hiện tại.",
+    "lifeAdviceText": "Trong đời sống, nhóm sao này trả lời câu hỏi: nên mở thêm, giữ lại hay đặt ranh giới. Cách dùng đúng là biến tín hiệu thành lựa chọn nhỏ, rõ và kiểm chứng được.",
+    "teaserQuestion": "Nhóm hao tinh tại Tài Bạch đang mở ra trợ lực hay đang nhắc cần giữ giới hạn ở đâu?",
+    "evidenceLabel": "Căn cứ: nhóm hao tinh xuất hiện tại cung Tài Bạch."
+  },
+  {
+    "version": "interpretation-rules-v1",
+    "status": "active",
+    "key": "group:hao-tinh:phu-the",
+    "scope": "RELATIONSHIP",
+    "pattern": {
+      "kind": "support-group",
+      "group": "hao tinh",
+      "palace": "Phu Thê",
+      "stars": [
+        "Đại Hao",
+        "Tiểu Hao",
+        "Hao"
+      ]
+    },
+    "priority": 60,
+    "title": "hao tinh tại Phu Thê",
+    "summary": "Nhóm hao tinh tại Phu Thê làm nổi rõ tiền bạc, sức lực hoặc thời gian dễ bị rò rỉ nếu thiếu giới hạn. Tác động này nên được hiểu như một lớp bối cảnh, không phải kết luận tốt xấu riêng lẻ.",
+    "strengthText": "Điểm nên phát huy là nhìn ra nơi cần tiết chế và đặt giới hạn trong phần việc thuộc Phu Thê.",
+    "cautionText": "Điểm cần lưu ý là cần kiểm soát chi phí, cam kết và những việc làm hao năng lượng; càng nhiều sao cùng nhóm càng cần đọc cùng cung chính và vận hiện tại.",
+    "lifeAdviceText": "Trong đời sống, nhóm sao này trả lời câu hỏi: nên mở thêm, giữ lại hay đặt ranh giới. Cách dùng đúng là biến tín hiệu thành lựa chọn nhỏ, rõ và kiểm chứng được.",
+    "teaserQuestion": "Nhóm hao tinh tại Phu Thê đang mở ra trợ lực hay đang nhắc cần giữ giới hạn ở đâu?",
+    "evidenceLabel": "Căn cứ: nhóm hao tinh xuất hiện tại cung Phu Thê."
+  },
+  {
+    "version": "interpretation-rules-v1",
+    "status": "active",
+    "key": "group:hao-tinh:tat-ach",
+    "scope": "HEALTH",
+    "pattern": {
+      "kind": "support-group",
+      "group": "hao tinh",
+      "palace": "Tật Ách",
+      "stars": [
+        "Đại Hao",
+        "Tiểu Hao",
+        "Hao"
+      ]
+    },
+    "priority": 59,
+    "title": "hao tinh tại Tật Ách",
+    "summary": "Nhóm hao tinh tại Tật Ách làm nổi rõ tiền bạc, sức lực hoặc thời gian dễ bị rò rỉ nếu thiếu giới hạn. Tác động này nên được hiểu như một lớp bối cảnh, không phải kết luận tốt xấu riêng lẻ.",
+    "strengthText": "Điểm nên phát huy là nhìn ra nơi cần tiết chế và đặt giới hạn trong phần việc thuộc Tật Ách.",
+    "cautionText": "Điểm cần lưu ý là cần kiểm soát chi phí, cam kết và những việc làm hao năng lượng; càng nhiều sao cùng nhóm càng cần đọc cùng cung chính và vận hiện tại.",
+    "lifeAdviceText": "Trong đời sống, nhóm sao này trả lời câu hỏi: nên mở thêm, giữ lại hay đặt ranh giới. Cách dùng đúng là biến tín hiệu thành lựa chọn nhỏ, rõ và kiểm chứng được.",
+    "teaserQuestion": "Nhóm hao tinh tại Tật Ách đang mở ra trợ lực hay đang nhắc cần giữ giới hạn ở đâu?",
+    "evidenceLabel": "Căn cứ: nhóm hao tinh xuất hiện tại cung Tật Ách."
+  },
+  {
+    "version": "interpretation-rules-v1",
+    "status": "active",
+    "key": "group:hao-tinh:thien-di",
+    "scope": "CAREER",
+    "pattern": {
+      "kind": "support-group",
+      "group": "hao tinh",
+      "palace": "Thiên Di",
+      "stars": [
+        "Đại Hao",
+        "Tiểu Hao",
+        "Hao"
+      ]
+    },
+    "priority": 59,
+    "title": "hao tinh tại Thiên Di",
+    "summary": "Nhóm hao tinh tại Thiên Di làm nổi rõ tiền bạc, sức lực hoặc thời gian dễ bị rò rỉ nếu thiếu giới hạn. Tác động này nên được hiểu như một lớp bối cảnh, không phải kết luận tốt xấu riêng lẻ.",
+    "strengthText": "Điểm nên phát huy là nhìn ra nơi cần tiết chế và đặt giới hạn trong phần việc thuộc Thiên Di.",
+    "cautionText": "Điểm cần lưu ý là cần kiểm soát chi phí, cam kết và những việc làm hao năng lượng; càng nhiều sao cùng nhóm càng cần đọc cùng cung chính và vận hiện tại.",
+    "lifeAdviceText": "Trong đời sống, nhóm sao này trả lời câu hỏi: nên mở thêm, giữ lại hay đặt ranh giới. Cách dùng đúng là biến tín hiệu thành lựa chọn nhỏ, rõ và kiểm chứng được.",
+    "teaserQuestion": "Nhóm hao tinh tại Thiên Di đang mở ra trợ lực hay đang nhắc cần giữ giới hạn ở đâu?",
+    "evidenceLabel": "Căn cứ: nhóm hao tinh xuất hiện tại cung Thiên Di."
+  },
+  {
+    "version": "interpretation-rules-v1",
+    "status": "active",
+    "key": "group:hao-tinh:phuc-duc",
+    "scope": "RELATIONSHIP",
+    "pattern": {
+      "kind": "support-group",
+      "group": "hao tinh",
+      "palace": "Phúc Đức",
+      "stars": [
+        "Đại Hao",
+        "Tiểu Hao",
+        "Hao"
+      ]
+    },
+    "priority": 58,
+    "title": "hao tinh tại Phúc Đức",
+    "summary": "Nhóm hao tinh tại Phúc Đức làm nổi rõ tiền bạc, sức lực hoặc thời gian dễ bị rò rỉ nếu thiếu giới hạn. Tác động này nên được hiểu như một lớp bối cảnh, không phải kết luận tốt xấu riêng lẻ.",
+    "strengthText": "Điểm nên phát huy là nhìn ra nơi cần tiết chế và đặt giới hạn trong phần việc thuộc Phúc Đức.",
+    "cautionText": "Điểm cần lưu ý là cần kiểm soát chi phí, cam kết và những việc làm hao năng lượng; càng nhiều sao cùng nhóm càng cần đọc cùng cung chính và vận hiện tại.",
+    "lifeAdviceText": "Trong đời sống, nhóm sao này trả lời câu hỏi: nên mở thêm, giữ lại hay đặt ranh giới. Cách dùng đúng là biến tín hiệu thành lựa chọn nhỏ, rõ và kiểm chứng được.",
+    "teaserQuestion": "Nhóm hao tinh tại Phúc Đức đang mở ra trợ lực hay đang nhắc cần giữ giới hạn ở đâu?",
+    "evidenceLabel": "Căn cứ: nhóm hao tinh xuất hiện tại cung Phúc Đức."
+  },
+  {
+    "version": "interpretation-rules-v1",
+    "status": "active",
+    "key": "group:dao-hoa:menh",
+    "scope": "IDENTITY",
+    "pattern": {
+      "kind": "support-group",
+      "group": "đào hoa",
+      "palace": "Mệnh",
+      "stars": [
+        "Đào Hoa",
+        "Hồng Loan",
+        "Thiên Hỷ",
+        "Hỷ Thần"
+      ]
+    },
+    "priority": 62,
+    "title": "đào hoa tại Mệnh",
+    "summary": "Nhóm đào hoa tại Mệnh làm nổi rõ sức hút, cảm xúc, niềm vui và quan hệ mềm. Tác động này nên được hiểu như một lớp bối cảnh, không phải kết luận tốt xấu riêng lẻ.",
+    "strengthText": "Điểm nên phát huy là có duyên kết nối và làm dịu không khí trong phần việc thuộc Mệnh.",
+    "cautionText": "Điểm cần lưu ý là đừng để cảm xúc đẹp che mất điều kiện thực tế; càng nhiều sao cùng nhóm càng cần đọc cùng cung chính và vận hiện tại.",
+    "lifeAdviceText": "Trong đời sống, nhóm sao này trả lời câu hỏi: nên mở thêm, giữ lại hay đặt ranh giới. Cách dùng đúng là biến tín hiệu thành lựa chọn nhỏ, rõ và kiểm chứng được.",
+    "teaserQuestion": "Nhóm đào hoa tại Mệnh đang mở ra trợ lực hay đang nhắc cần giữ giới hạn ở đâu?",
+    "evidenceLabel": "Căn cứ: nhóm đào hoa xuất hiện tại cung Mệnh."
+  },
+  {
+    "version": "interpretation-rules-v1",
+    "status": "active",
+    "key": "group:dao-hoa:than",
+    "scope": "IDENTITY",
+    "pattern": {
+      "kind": "support-group",
+      "group": "đào hoa",
+      "palace": "Thân",
+      "stars": [
+        "Đào Hoa",
+        "Hồng Loan",
+        "Thiên Hỷ",
+        "Hỷ Thần"
+      ]
+    },
+    "priority": 58,
+    "title": "đào hoa tại Thân",
+    "summary": "Nhóm đào hoa tại Thân làm nổi rõ sức hút, cảm xúc, niềm vui và quan hệ mềm. Tác động này nên được hiểu như một lớp bối cảnh, không phải kết luận tốt xấu riêng lẻ.",
+    "strengthText": "Điểm nên phát huy là có duyên kết nối và làm dịu không khí trong phần việc thuộc Thân.",
+    "cautionText": "Điểm cần lưu ý là đừng để cảm xúc đẹp che mất điều kiện thực tế; càng nhiều sao cùng nhóm càng cần đọc cùng cung chính và vận hiện tại.",
+    "lifeAdviceText": "Trong đời sống, nhóm sao này trả lời câu hỏi: nên mở thêm, giữ lại hay đặt ranh giới. Cách dùng đúng là biến tín hiệu thành lựa chọn nhỏ, rõ và kiểm chứng được.",
+    "teaserQuestion": "Nhóm đào hoa tại Thân đang mở ra trợ lực hay đang nhắc cần giữ giới hạn ở đâu?",
+    "evidenceLabel": "Căn cứ: nhóm đào hoa xuất hiện tại cung Thân."
+  },
+  {
+    "version": "interpretation-rules-v1",
+    "status": "active",
+    "key": "group:dao-hoa:quan-loc",
+    "scope": "CAREER",
+    "pattern": {
+      "kind": "support-group",
+      "group": "đào hoa",
+      "palace": "Quan Lộc",
+      "stars": [
+        "Đào Hoa",
+        "Hồng Loan",
+        "Thiên Hỷ",
+        "Hỷ Thần"
+      ]
+    },
+    "priority": 61,
+    "title": "đào hoa tại Quan Lộc",
+    "summary": "Nhóm đào hoa tại Quan Lộc làm nổi rõ sức hút, cảm xúc, niềm vui và quan hệ mềm. Tác động này nên được hiểu như một lớp bối cảnh, không phải kết luận tốt xấu riêng lẻ.",
+    "strengthText": "Điểm nên phát huy là có duyên kết nối và làm dịu không khí trong phần việc thuộc Quan Lộc.",
+    "cautionText": "Điểm cần lưu ý là đừng để cảm xúc đẹp che mất điều kiện thực tế; càng nhiều sao cùng nhóm càng cần đọc cùng cung chính và vận hiện tại.",
+    "lifeAdviceText": "Trong đời sống, nhóm sao này trả lời câu hỏi: nên mở thêm, giữ lại hay đặt ranh giới. Cách dùng đúng là biến tín hiệu thành lựa chọn nhỏ, rõ và kiểm chứng được.",
+    "teaserQuestion": "Nhóm đào hoa tại Quan Lộc đang mở ra trợ lực hay đang nhắc cần giữ giới hạn ở đâu?",
+    "evidenceLabel": "Căn cứ: nhóm đào hoa xuất hiện tại cung Quan Lộc."
+  },
+  {
+    "version": "interpretation-rules-v1",
+    "status": "active",
+    "key": "group:dao-hoa:tai-bach",
+    "scope": "MONEY",
+    "pattern": {
+      "kind": "support-group",
+      "group": "đào hoa",
+      "palace": "Tài Bạch",
+      "stars": [
+        "Đào Hoa",
+        "Hồng Loan",
+        "Thiên Hỷ",
+        "Hỷ Thần"
+      ]
+    },
+    "priority": 61,
+    "title": "đào hoa tại Tài Bạch",
+    "summary": "Nhóm đào hoa tại Tài Bạch làm nổi rõ sức hút, cảm xúc, niềm vui và quan hệ mềm. Tác động này nên được hiểu như một lớp bối cảnh, không phải kết luận tốt xấu riêng lẻ.",
+    "strengthText": "Điểm nên phát huy là có duyên kết nối và làm dịu không khí trong phần việc thuộc Tài Bạch.",
+    "cautionText": "Điểm cần lưu ý là đừng để cảm xúc đẹp che mất điều kiện thực tế; càng nhiều sao cùng nhóm càng cần đọc cùng cung chính và vận hiện tại.",
+    "lifeAdviceText": "Trong đời sống, nhóm sao này trả lời câu hỏi: nên mở thêm, giữ lại hay đặt ranh giới. Cách dùng đúng là biến tín hiệu thành lựa chọn nhỏ, rõ và kiểm chứng được.",
+    "teaserQuestion": "Nhóm đào hoa tại Tài Bạch đang mở ra trợ lực hay đang nhắc cần giữ giới hạn ở đâu?",
+    "evidenceLabel": "Căn cứ: nhóm đào hoa xuất hiện tại cung Tài Bạch."
+  },
+  {
+    "version": "interpretation-rules-v1",
+    "status": "active",
+    "key": "group:dao-hoa:phu-the",
+    "scope": "RELATIONSHIP",
+    "pattern": {
+      "kind": "support-group",
+      "group": "đào hoa",
+      "palace": "Phu Thê",
+      "stars": [
+        "Đào Hoa",
+        "Hồng Loan",
+        "Thiên Hỷ",
+        "Hỷ Thần"
+      ]
+    },
+    "priority": 60,
+    "title": "đào hoa tại Phu Thê",
+    "summary": "Nhóm đào hoa tại Phu Thê làm nổi rõ sức hút, cảm xúc, niềm vui và quan hệ mềm. Tác động này nên được hiểu như một lớp bối cảnh, không phải kết luận tốt xấu riêng lẻ.",
+    "strengthText": "Điểm nên phát huy là có duyên kết nối và làm dịu không khí trong phần việc thuộc Phu Thê.",
+    "cautionText": "Điểm cần lưu ý là đừng để cảm xúc đẹp che mất điều kiện thực tế; càng nhiều sao cùng nhóm càng cần đọc cùng cung chính và vận hiện tại.",
+    "lifeAdviceText": "Trong đời sống, nhóm sao này trả lời câu hỏi: nên mở thêm, giữ lại hay đặt ranh giới. Cách dùng đúng là biến tín hiệu thành lựa chọn nhỏ, rõ và kiểm chứng được.",
+    "teaserQuestion": "Nhóm đào hoa tại Phu Thê đang mở ra trợ lực hay đang nhắc cần giữ giới hạn ở đâu?",
+    "evidenceLabel": "Căn cứ: nhóm đào hoa xuất hiện tại cung Phu Thê."
+  },
+  {
+    "version": "interpretation-rules-v1",
+    "status": "active",
+    "key": "group:dao-hoa:tat-ach",
+    "scope": "HEALTH",
+    "pattern": {
+      "kind": "support-group",
+      "group": "đào hoa",
+      "palace": "Tật Ách",
+      "stars": [
+        "Đào Hoa",
+        "Hồng Loan",
+        "Thiên Hỷ",
+        "Hỷ Thần"
+      ]
+    },
+    "priority": 59,
+    "title": "đào hoa tại Tật Ách",
+    "summary": "Nhóm đào hoa tại Tật Ách làm nổi rõ sức hút, cảm xúc, niềm vui và quan hệ mềm. Tác động này nên được hiểu như một lớp bối cảnh, không phải kết luận tốt xấu riêng lẻ.",
+    "strengthText": "Điểm nên phát huy là có duyên kết nối và làm dịu không khí trong phần việc thuộc Tật Ách.",
+    "cautionText": "Điểm cần lưu ý là đừng để cảm xúc đẹp che mất điều kiện thực tế; càng nhiều sao cùng nhóm càng cần đọc cùng cung chính và vận hiện tại.",
+    "lifeAdviceText": "Trong đời sống, nhóm sao này trả lời câu hỏi: nên mở thêm, giữ lại hay đặt ranh giới. Cách dùng đúng là biến tín hiệu thành lựa chọn nhỏ, rõ và kiểm chứng được.",
+    "teaserQuestion": "Nhóm đào hoa tại Tật Ách đang mở ra trợ lực hay đang nhắc cần giữ giới hạn ở đâu?",
+    "evidenceLabel": "Căn cứ: nhóm đào hoa xuất hiện tại cung Tật Ách."
+  },
+  {
+    "version": "interpretation-rules-v1",
+    "status": "active",
+    "key": "group:dao-hoa:thien-di",
+    "scope": "CAREER",
+    "pattern": {
+      "kind": "support-group",
+      "group": "đào hoa",
+      "palace": "Thiên Di",
+      "stars": [
+        "Đào Hoa",
+        "Hồng Loan",
+        "Thiên Hỷ",
+        "Hỷ Thần"
+      ]
+    },
+    "priority": 59,
+    "title": "đào hoa tại Thiên Di",
+    "summary": "Nhóm đào hoa tại Thiên Di làm nổi rõ sức hút, cảm xúc, niềm vui và quan hệ mềm. Tác động này nên được hiểu như một lớp bối cảnh, không phải kết luận tốt xấu riêng lẻ.",
+    "strengthText": "Điểm nên phát huy là có duyên kết nối và làm dịu không khí trong phần việc thuộc Thiên Di.",
+    "cautionText": "Điểm cần lưu ý là đừng để cảm xúc đẹp che mất điều kiện thực tế; càng nhiều sao cùng nhóm càng cần đọc cùng cung chính và vận hiện tại.",
+    "lifeAdviceText": "Trong đời sống, nhóm sao này trả lời câu hỏi: nên mở thêm, giữ lại hay đặt ranh giới. Cách dùng đúng là biến tín hiệu thành lựa chọn nhỏ, rõ và kiểm chứng được.",
+    "teaserQuestion": "Nhóm đào hoa tại Thiên Di đang mở ra trợ lực hay đang nhắc cần giữ giới hạn ở đâu?",
+    "evidenceLabel": "Căn cứ: nhóm đào hoa xuất hiện tại cung Thiên Di."
+  },
+  {
+    "version": "interpretation-rules-v1",
+    "status": "active",
+    "key": "group:dao-hoa:phuc-duc",
+    "scope": "RELATIONSHIP",
+    "pattern": {
+      "kind": "support-group",
+      "group": "đào hoa",
+      "palace": "Phúc Đức",
+      "stars": [
+        "Đào Hoa",
+        "Hồng Loan",
+        "Thiên Hỷ",
+        "Hỷ Thần"
+      ]
+    },
+    "priority": 58,
+    "title": "đào hoa tại Phúc Đức",
+    "summary": "Nhóm đào hoa tại Phúc Đức làm nổi rõ sức hút, cảm xúc, niềm vui và quan hệ mềm. Tác động này nên được hiểu như một lớp bối cảnh, không phải kết luận tốt xấu riêng lẻ.",
+    "strengthText": "Điểm nên phát huy là có duyên kết nối và làm dịu không khí trong phần việc thuộc Phúc Đức.",
+    "cautionText": "Điểm cần lưu ý là đừng để cảm xúc đẹp che mất điều kiện thực tế; càng nhiều sao cùng nhóm càng cần đọc cùng cung chính và vận hiện tại.",
+    "lifeAdviceText": "Trong đời sống, nhóm sao này trả lời câu hỏi: nên mở thêm, giữ lại hay đặt ranh giới. Cách dùng đúng là biến tín hiệu thành lựa chọn nhỏ, rõ và kiểm chứng được.",
+    "teaserQuestion": "Nhóm đào hoa tại Phúc Đức đang mở ra trợ lực hay đang nhắc cần giữ giới hạn ở đâu?",
+    "evidenceLabel": "Căn cứ: nhóm đào hoa xuất hiện tại cung Phúc Đức."
+  },
+  {
+    "version": "interpretation-rules-v1",
+    "status": "active",
+    "key": "group:khoa-quyen-loc-ky:menh",
+    "scope": "IDENTITY",
+    "pattern": {
+      "kind": "support-group",
+      "group": "khoa quyền lộc kỵ",
+      "palace": "Mệnh",
+      "stars": [
+        "Hóa Khoa",
+        "Hóa Quyền",
+        "Hóa Lộc",
+        "Hóa Kỵ"
+      ]
+    },
+    "priority": 62,
+    "title": "khoa quyền lộc kỵ tại Mệnh",
+    "summary": "Nhóm khoa quyền lộc kỵ tại Mệnh làm nổi rõ điểm chuyển hóa mạnh về danh dự, quyền hạn, lợi ích và điều cần hóa giải. Tác động này nên được hiểu như một lớp bối cảnh, không phải kết luận tốt xấu riêng lẻ.",
+    "strengthText": "Điểm nên phát huy là dùng đúng năng lực nổi bật để tạo giá trị trong phần việc thuộc Mệnh.",
+    "cautionText": "Điểm cần lưu ý là phải đọc kỹ mặt trái của lợi ích, danh tiếng hoặc trách nhiệm đi kèm; càng nhiều sao cùng nhóm càng cần đọc cùng cung chính và vận hiện tại.",
+    "lifeAdviceText": "Trong đời sống, nhóm sao này trả lời câu hỏi: nên mở thêm, giữ lại hay đặt ranh giới. Cách dùng đúng là biến tín hiệu thành lựa chọn nhỏ, rõ và kiểm chứng được.",
+    "teaserQuestion": "Nhóm khoa quyền lộc kỵ tại Mệnh đang mở ra trợ lực hay đang nhắc cần giữ giới hạn ở đâu?",
+    "evidenceLabel": "Căn cứ: nhóm khoa quyền lộc kỵ xuất hiện tại cung Mệnh."
+  },
+  {
+    "version": "interpretation-rules-v1",
+    "status": "active",
+    "key": "group:khoa-quyen-loc-ky:than",
+    "scope": "IDENTITY",
+    "pattern": {
+      "kind": "support-group",
+      "group": "khoa quyền lộc kỵ",
+      "palace": "Thân",
+      "stars": [
+        "Hóa Khoa",
+        "Hóa Quyền",
+        "Hóa Lộc",
+        "Hóa Kỵ"
+      ]
+    },
+    "priority": 58,
+    "title": "khoa quyền lộc kỵ tại Thân",
+    "summary": "Nhóm khoa quyền lộc kỵ tại Thân làm nổi rõ điểm chuyển hóa mạnh về danh dự, quyền hạn, lợi ích và điều cần hóa giải. Tác động này nên được hiểu như một lớp bối cảnh, không phải kết luận tốt xấu riêng lẻ.",
+    "strengthText": "Điểm nên phát huy là dùng đúng năng lực nổi bật để tạo giá trị trong phần việc thuộc Thân.",
+    "cautionText": "Điểm cần lưu ý là phải đọc kỹ mặt trái của lợi ích, danh tiếng hoặc trách nhiệm đi kèm; càng nhiều sao cùng nhóm càng cần đọc cùng cung chính và vận hiện tại.",
+    "lifeAdviceText": "Trong đời sống, nhóm sao này trả lời câu hỏi: nên mở thêm, giữ lại hay đặt ranh giới. Cách dùng đúng là biến tín hiệu thành lựa chọn nhỏ, rõ và kiểm chứng được.",
+    "teaserQuestion": "Nhóm khoa quyền lộc kỵ tại Thân đang mở ra trợ lực hay đang nhắc cần giữ giới hạn ở đâu?",
+    "evidenceLabel": "Căn cứ: nhóm khoa quyền lộc kỵ xuất hiện tại cung Thân."
+  },
+  {
+    "version": "interpretation-rules-v1",
+    "status": "active",
+    "key": "group:khoa-quyen-loc-ky:quan-loc",
+    "scope": "CAREER",
+    "pattern": {
+      "kind": "support-group",
+      "group": "khoa quyền lộc kỵ",
+      "palace": "Quan Lộc",
+      "stars": [
+        "Hóa Khoa",
+        "Hóa Quyền",
+        "Hóa Lộc",
+        "Hóa Kỵ"
+      ]
+    },
+    "priority": 61,
+    "title": "khoa quyền lộc kỵ tại Quan Lộc",
+    "summary": "Nhóm khoa quyền lộc kỵ tại Quan Lộc làm nổi rõ điểm chuyển hóa mạnh về danh dự, quyền hạn, lợi ích và điều cần hóa giải. Tác động này nên được hiểu như một lớp bối cảnh, không phải kết luận tốt xấu riêng lẻ.",
+    "strengthText": "Điểm nên phát huy là dùng đúng năng lực nổi bật để tạo giá trị trong phần việc thuộc Quan Lộc.",
+    "cautionText": "Điểm cần lưu ý là phải đọc kỹ mặt trái của lợi ích, danh tiếng hoặc trách nhiệm đi kèm; càng nhiều sao cùng nhóm càng cần đọc cùng cung chính và vận hiện tại.",
+    "lifeAdviceText": "Trong đời sống, nhóm sao này trả lời câu hỏi: nên mở thêm, giữ lại hay đặt ranh giới. Cách dùng đúng là biến tín hiệu thành lựa chọn nhỏ, rõ và kiểm chứng được.",
+    "teaserQuestion": "Nhóm khoa quyền lộc kỵ tại Quan Lộc đang mở ra trợ lực hay đang nhắc cần giữ giới hạn ở đâu?",
+    "evidenceLabel": "Căn cứ: nhóm khoa quyền lộc kỵ xuất hiện tại cung Quan Lộc."
+  },
+  {
+    "version": "interpretation-rules-v1",
+    "status": "active",
+    "key": "group:khoa-quyen-loc-ky:tai-bach",
+    "scope": "MONEY",
+    "pattern": {
+      "kind": "support-group",
+      "group": "khoa quyền lộc kỵ",
+      "palace": "Tài Bạch",
+      "stars": [
+        "Hóa Khoa",
+        "Hóa Quyền",
+        "Hóa Lộc",
+        "Hóa Kỵ"
+      ]
+    },
+    "priority": 61,
+    "title": "khoa quyền lộc kỵ tại Tài Bạch",
+    "summary": "Nhóm khoa quyền lộc kỵ tại Tài Bạch làm nổi rõ điểm chuyển hóa mạnh về danh dự, quyền hạn, lợi ích và điều cần hóa giải. Tác động này nên được hiểu như một lớp bối cảnh, không phải kết luận tốt xấu riêng lẻ.",
+    "strengthText": "Điểm nên phát huy là dùng đúng năng lực nổi bật để tạo giá trị trong phần việc thuộc Tài Bạch.",
+    "cautionText": "Điểm cần lưu ý là phải đọc kỹ mặt trái của lợi ích, danh tiếng hoặc trách nhiệm đi kèm; càng nhiều sao cùng nhóm càng cần đọc cùng cung chính và vận hiện tại.",
+    "lifeAdviceText": "Trong đời sống, nhóm sao này trả lời câu hỏi: nên mở thêm, giữ lại hay đặt ranh giới. Cách dùng đúng là biến tín hiệu thành lựa chọn nhỏ, rõ và kiểm chứng được.",
+    "teaserQuestion": "Nhóm khoa quyền lộc kỵ tại Tài Bạch đang mở ra trợ lực hay đang nhắc cần giữ giới hạn ở đâu?",
+    "evidenceLabel": "Căn cứ: nhóm khoa quyền lộc kỵ xuất hiện tại cung Tài Bạch."
+  },
+  {
+    "version": "interpretation-rules-v1",
+    "status": "active",
+    "key": "group:khoa-quyen-loc-ky:phu-the",
+    "scope": "RELATIONSHIP",
+    "pattern": {
+      "kind": "support-group",
+      "group": "khoa quyền lộc kỵ",
+      "palace": "Phu Thê",
+      "stars": [
+        "Hóa Khoa",
+        "Hóa Quyền",
+        "Hóa Lộc",
+        "Hóa Kỵ"
+      ]
+    },
+    "priority": 60,
+    "title": "khoa quyền lộc kỵ tại Phu Thê",
+    "summary": "Nhóm khoa quyền lộc kỵ tại Phu Thê làm nổi rõ điểm chuyển hóa mạnh về danh dự, quyền hạn, lợi ích và điều cần hóa giải. Tác động này nên được hiểu như một lớp bối cảnh, không phải kết luận tốt xấu riêng lẻ.",
+    "strengthText": "Điểm nên phát huy là dùng đúng năng lực nổi bật để tạo giá trị trong phần việc thuộc Phu Thê.",
+    "cautionText": "Điểm cần lưu ý là phải đọc kỹ mặt trái của lợi ích, danh tiếng hoặc trách nhiệm đi kèm; càng nhiều sao cùng nhóm càng cần đọc cùng cung chính và vận hiện tại.",
+    "lifeAdviceText": "Trong đời sống, nhóm sao này trả lời câu hỏi: nên mở thêm, giữ lại hay đặt ranh giới. Cách dùng đúng là biến tín hiệu thành lựa chọn nhỏ, rõ và kiểm chứng được.",
+    "teaserQuestion": "Nhóm khoa quyền lộc kỵ tại Phu Thê đang mở ra trợ lực hay đang nhắc cần giữ giới hạn ở đâu?",
+    "evidenceLabel": "Căn cứ: nhóm khoa quyền lộc kỵ xuất hiện tại cung Phu Thê."
+  },
+  {
+    "version": "interpretation-rules-v1",
+    "status": "active",
+    "key": "group:khoa-quyen-loc-ky:tat-ach",
+    "scope": "HEALTH",
+    "pattern": {
+      "kind": "support-group",
+      "group": "khoa quyền lộc kỵ",
+      "palace": "Tật Ách",
+      "stars": [
+        "Hóa Khoa",
+        "Hóa Quyền",
+        "Hóa Lộc",
+        "Hóa Kỵ"
+      ]
+    },
+    "priority": 59,
+    "title": "khoa quyền lộc kỵ tại Tật Ách",
+    "summary": "Nhóm khoa quyền lộc kỵ tại Tật Ách làm nổi rõ điểm chuyển hóa mạnh về danh dự, quyền hạn, lợi ích và điều cần hóa giải. Tác động này nên được hiểu như một lớp bối cảnh, không phải kết luận tốt xấu riêng lẻ.",
+    "strengthText": "Điểm nên phát huy là dùng đúng năng lực nổi bật để tạo giá trị trong phần việc thuộc Tật Ách.",
+    "cautionText": "Điểm cần lưu ý là phải đọc kỹ mặt trái của lợi ích, danh tiếng hoặc trách nhiệm đi kèm; càng nhiều sao cùng nhóm càng cần đọc cùng cung chính và vận hiện tại.",
+    "lifeAdviceText": "Trong đời sống, nhóm sao này trả lời câu hỏi: nên mở thêm, giữ lại hay đặt ranh giới. Cách dùng đúng là biến tín hiệu thành lựa chọn nhỏ, rõ và kiểm chứng được.",
+    "teaserQuestion": "Nhóm khoa quyền lộc kỵ tại Tật Ách đang mở ra trợ lực hay đang nhắc cần giữ giới hạn ở đâu?",
+    "evidenceLabel": "Căn cứ: nhóm khoa quyền lộc kỵ xuất hiện tại cung Tật Ách."
+  },
+  {
+    "version": "interpretation-rules-v1",
+    "status": "active",
+    "key": "group:khoa-quyen-loc-ky:thien-di",
+    "scope": "CAREER",
+    "pattern": {
+      "kind": "support-group",
+      "group": "khoa quyền lộc kỵ",
+      "palace": "Thiên Di",
+      "stars": [
+        "Hóa Khoa",
+        "Hóa Quyền",
+        "Hóa Lộc",
+        "Hóa Kỵ"
+      ]
+    },
+    "priority": 59,
+    "title": "khoa quyền lộc kỵ tại Thiên Di",
+    "summary": "Nhóm khoa quyền lộc kỵ tại Thiên Di làm nổi rõ điểm chuyển hóa mạnh về danh dự, quyền hạn, lợi ích và điều cần hóa giải. Tác động này nên được hiểu như một lớp bối cảnh, không phải kết luận tốt xấu riêng lẻ.",
+    "strengthText": "Điểm nên phát huy là dùng đúng năng lực nổi bật để tạo giá trị trong phần việc thuộc Thiên Di.",
+    "cautionText": "Điểm cần lưu ý là phải đọc kỹ mặt trái của lợi ích, danh tiếng hoặc trách nhiệm đi kèm; càng nhiều sao cùng nhóm càng cần đọc cùng cung chính và vận hiện tại.",
+    "lifeAdviceText": "Trong đời sống, nhóm sao này trả lời câu hỏi: nên mở thêm, giữ lại hay đặt ranh giới. Cách dùng đúng là biến tín hiệu thành lựa chọn nhỏ, rõ và kiểm chứng được.",
+    "teaserQuestion": "Nhóm khoa quyền lộc kỵ tại Thiên Di đang mở ra trợ lực hay đang nhắc cần giữ giới hạn ở đâu?",
+    "evidenceLabel": "Căn cứ: nhóm khoa quyền lộc kỵ xuất hiện tại cung Thiên Di."
+  },
+  {
+    "version": "interpretation-rules-v1",
+    "status": "active",
+    "key": "group:khoa-quyen-loc-ky:phuc-duc",
+    "scope": "RELATIONSHIP",
+    "pattern": {
+      "kind": "support-group",
+      "group": "khoa quyền lộc kỵ",
+      "palace": "Phúc Đức",
+      "stars": [
+        "Hóa Khoa",
+        "Hóa Quyền",
+        "Hóa Lộc",
+        "Hóa Kỵ"
+      ]
+    },
+    "priority": 58,
+    "title": "khoa quyền lộc kỵ tại Phúc Đức",
+    "summary": "Nhóm khoa quyền lộc kỵ tại Phúc Đức làm nổi rõ điểm chuyển hóa mạnh về danh dự, quyền hạn, lợi ích và điều cần hóa giải. Tác động này nên được hiểu như một lớp bối cảnh, không phải kết luận tốt xấu riêng lẻ.",
+    "strengthText": "Điểm nên phát huy là dùng đúng năng lực nổi bật để tạo giá trị trong phần việc thuộc Phúc Đức.",
+    "cautionText": "Điểm cần lưu ý là phải đọc kỹ mặt trái của lợi ích, danh tiếng hoặc trách nhiệm đi kèm; càng nhiều sao cùng nhóm càng cần đọc cùng cung chính và vận hiện tại.",
+    "lifeAdviceText": "Trong đời sống, nhóm sao này trả lời câu hỏi: nên mở thêm, giữ lại hay đặt ranh giới. Cách dùng đúng là biến tín hiệu thành lựa chọn nhỏ, rõ và kiểm chứng được.",
+    "teaserQuestion": "Nhóm khoa quyền lộc kỵ tại Phúc Đức đang mở ra trợ lực hay đang nhắc cần giữ giới hạn ở đâu?",
+    "evidenceLabel": "Căn cứ: nhóm khoa quyền lộc kỵ xuất hiện tại cung Phúc Đức."
+  },
+  {
+    "version": "interpretation-rules-v1",
+    "status": "active",
+    "key": "gate:tuan:menh",
+    "scope": "IDENTITY",
+    "pattern": {
+      "kind": "gate",
+      "gate": "Tuần",
+      "palace": "Mệnh"
+    },
+    "priority": 84,
+    "title": "Tuần tại Mệnh",
+    "summary": "Tuần tại Mệnh cho thấy chủ đề này thường không đi thẳng ngay từ đầu. Việc liên quan đến cung này cần thêm bước kiểm chứng, thêm thời gian hoặc thêm điều kiện rõ ràng.",
+    "strengthText": "Điểm nên phát huy là sự thận trọng, biết thử nhỏ trước và không vội kết luận khi dữ kiện còn thiếu.",
+    "cautionText": "Điểm cần lưu ý là dễ nản sớm hoặc tưởng mình bị chặn, trong khi thực tế chỉ cần đổi cách đi và chọn thời điểm khôn hơn.",
+    "lifeAdviceText": "Nói đời thường, Tuần giống một lớp kiểm tra. Việc thuộc Mệnh nên có người chịu trách nhiệm rõ, mốc thời gian rõ và phương án dự phòng rõ.",
+    "teaserQuestion": "Tuần tại Mệnh đang yêu cầu đi chậm ở khâu nào để tránh hụt sức?",
+    "evidenceLabel": "Căn cứ: Tuần án ngữ cung Mệnh."
+  },
+  {
+    "version": "interpretation-rules-v1",
+    "status": "active",
+    "key": "gate:tuan:than",
+    "scope": "IDENTITY",
+    "pattern": {
+      "kind": "gate",
+      "gate": "Tuần",
+      "palace": "Thân"
+    },
+    "priority": 80,
+    "title": "Tuần tại Thân",
+    "summary": "Tuần tại Thân cho thấy chủ đề này thường không đi thẳng ngay từ đầu. Việc liên quan đến cung này cần thêm bước kiểm chứng, thêm thời gian hoặc thêm điều kiện rõ ràng.",
+    "strengthText": "Điểm nên phát huy là sự thận trọng, biết thử nhỏ trước và không vội kết luận khi dữ kiện còn thiếu.",
+    "cautionText": "Điểm cần lưu ý là dễ nản sớm hoặc tưởng mình bị chặn, trong khi thực tế chỉ cần đổi cách đi và chọn thời điểm khôn hơn.",
+    "lifeAdviceText": "Nói đời thường, Tuần giống một lớp kiểm tra. Việc thuộc Thân nên có người chịu trách nhiệm rõ, mốc thời gian rõ và phương án dự phòng rõ.",
+    "teaserQuestion": "Tuần tại Thân đang yêu cầu đi chậm ở khâu nào để tránh hụt sức?",
+    "evidenceLabel": "Căn cứ: Tuần án ngữ cung Thân."
+  },
+  {
+    "version": "interpretation-rules-v1",
+    "status": "active",
+    "key": "gate:tuan:quan-loc",
+    "scope": "CAREER",
+    "pattern": {
+      "kind": "gate",
+      "gate": "Tuần",
+      "palace": "Quan Lộc"
+    },
+    "priority": 83,
+    "title": "Tuần tại Quan Lộc",
+    "summary": "Tuần tại Quan Lộc cho thấy chủ đề này thường không đi thẳng ngay từ đầu. Việc liên quan đến cung này cần thêm bước kiểm chứng, thêm thời gian hoặc thêm điều kiện rõ ràng.",
+    "strengthText": "Điểm nên phát huy là sự thận trọng, biết thử nhỏ trước và không vội kết luận khi dữ kiện còn thiếu.",
+    "cautionText": "Điểm cần lưu ý là dễ nản sớm hoặc tưởng mình bị chặn, trong khi thực tế chỉ cần đổi cách đi và chọn thời điểm khôn hơn.",
+    "lifeAdviceText": "Nói đời thường, Tuần giống một lớp kiểm tra. Việc thuộc Quan Lộc nên có người chịu trách nhiệm rõ, mốc thời gian rõ và phương án dự phòng rõ.",
+    "teaserQuestion": "Tuần tại Quan Lộc đang yêu cầu đi chậm ở khâu nào để tránh hụt sức?",
+    "evidenceLabel": "Căn cứ: Tuần án ngữ cung Quan Lộc."
+  },
+  {
+    "version": "interpretation-rules-v1",
+    "status": "active",
+    "key": "gate:tuan:tai-bach",
+    "scope": "MONEY",
+    "pattern": {
+      "kind": "gate",
+      "gate": "Tuần",
+      "palace": "Tài Bạch"
+    },
+    "priority": 83,
+    "title": "Tuần tại Tài Bạch",
+    "summary": "Tuần tại Tài Bạch cho thấy chủ đề này thường không đi thẳng ngay từ đầu. Việc liên quan đến cung này cần thêm bước kiểm chứng, thêm thời gian hoặc thêm điều kiện rõ ràng.",
+    "strengthText": "Điểm nên phát huy là sự thận trọng, biết thử nhỏ trước và không vội kết luận khi dữ kiện còn thiếu.",
+    "cautionText": "Điểm cần lưu ý là dễ nản sớm hoặc tưởng mình bị chặn, trong khi thực tế chỉ cần đổi cách đi và chọn thời điểm khôn hơn.",
+    "lifeAdviceText": "Nói đời thường, Tuần giống một lớp kiểm tra. Việc thuộc Tài Bạch nên có người chịu trách nhiệm rõ, mốc thời gian rõ và phương án dự phòng rõ.",
+    "teaserQuestion": "Tuần tại Tài Bạch đang yêu cầu đi chậm ở khâu nào để tránh hụt sức?",
+    "evidenceLabel": "Căn cứ: Tuần án ngữ cung Tài Bạch."
+  },
+  {
+    "version": "interpretation-rules-v1",
+    "status": "active",
+    "key": "gate:tuan:phu-the",
+    "scope": "RELATIONSHIP",
+    "pattern": {
+      "kind": "gate",
+      "gate": "Tuần",
+      "palace": "Phu Thê"
+    },
+    "priority": 82,
+    "title": "Tuần tại Phu Thê",
+    "summary": "Tuần tại Phu Thê cho thấy chủ đề này thường không đi thẳng ngay từ đầu. Việc liên quan đến cung này cần thêm bước kiểm chứng, thêm thời gian hoặc thêm điều kiện rõ ràng.",
+    "strengthText": "Điểm nên phát huy là sự thận trọng, biết thử nhỏ trước và không vội kết luận khi dữ kiện còn thiếu.",
+    "cautionText": "Điểm cần lưu ý là dễ nản sớm hoặc tưởng mình bị chặn, trong khi thực tế chỉ cần đổi cách đi và chọn thời điểm khôn hơn.",
+    "lifeAdviceText": "Nói đời thường, Tuần giống một lớp kiểm tra. Việc thuộc Phu Thê nên có người chịu trách nhiệm rõ, mốc thời gian rõ và phương án dự phòng rõ.",
+    "teaserQuestion": "Tuần tại Phu Thê đang yêu cầu đi chậm ở khâu nào để tránh hụt sức?",
+    "evidenceLabel": "Căn cứ: Tuần án ngữ cung Phu Thê."
+  },
+  {
+    "version": "interpretation-rules-v1",
+    "status": "active",
+    "key": "gate:tuan:tat-ach",
+    "scope": "HEALTH",
+    "pattern": {
+      "kind": "gate",
+      "gate": "Tuần",
+      "palace": "Tật Ách"
+    },
+    "priority": 81,
+    "title": "Tuần tại Tật Ách",
+    "summary": "Tuần tại Tật Ách cho thấy chủ đề này thường không đi thẳng ngay từ đầu. Việc liên quan đến cung này cần thêm bước kiểm chứng, thêm thời gian hoặc thêm điều kiện rõ ràng.",
+    "strengthText": "Điểm nên phát huy là sự thận trọng, biết thử nhỏ trước và không vội kết luận khi dữ kiện còn thiếu.",
+    "cautionText": "Điểm cần lưu ý là dễ nản sớm hoặc tưởng mình bị chặn, trong khi thực tế chỉ cần đổi cách đi và chọn thời điểm khôn hơn.",
+    "lifeAdviceText": "Nói đời thường, Tuần giống một lớp kiểm tra. Việc thuộc Tật Ách nên có người chịu trách nhiệm rõ, mốc thời gian rõ và phương án dự phòng rõ.",
+    "teaserQuestion": "Tuần tại Tật Ách đang yêu cầu đi chậm ở khâu nào để tránh hụt sức?",
+    "evidenceLabel": "Căn cứ: Tuần án ngữ cung Tật Ách."
+  },
+  {
+    "version": "interpretation-rules-v1",
+    "status": "active",
+    "key": "gate:tuan:thien-di",
+    "scope": "CAREER",
+    "pattern": {
+      "kind": "gate",
+      "gate": "Tuần",
+      "palace": "Thiên Di"
+    },
+    "priority": 81,
+    "title": "Tuần tại Thiên Di",
+    "summary": "Tuần tại Thiên Di cho thấy chủ đề này thường không đi thẳng ngay từ đầu. Việc liên quan đến cung này cần thêm bước kiểm chứng, thêm thời gian hoặc thêm điều kiện rõ ràng.",
+    "strengthText": "Điểm nên phát huy là sự thận trọng, biết thử nhỏ trước và không vội kết luận khi dữ kiện còn thiếu.",
+    "cautionText": "Điểm cần lưu ý là dễ nản sớm hoặc tưởng mình bị chặn, trong khi thực tế chỉ cần đổi cách đi và chọn thời điểm khôn hơn.",
+    "lifeAdviceText": "Nói đời thường, Tuần giống một lớp kiểm tra. Việc thuộc Thiên Di nên có người chịu trách nhiệm rõ, mốc thời gian rõ và phương án dự phòng rõ.",
+    "teaserQuestion": "Tuần tại Thiên Di đang yêu cầu đi chậm ở khâu nào để tránh hụt sức?",
+    "evidenceLabel": "Căn cứ: Tuần án ngữ cung Thiên Di."
+  },
+  {
+    "version": "interpretation-rules-v1",
+    "status": "active",
+    "key": "gate:tuan:phuc-duc",
+    "scope": "RELATIONSHIP",
+    "pattern": {
+      "kind": "gate",
+      "gate": "Tuần",
+      "palace": "Phúc Đức"
+    },
+    "priority": 80,
+    "title": "Tuần tại Phúc Đức",
+    "summary": "Tuần tại Phúc Đức cho thấy chủ đề này thường không đi thẳng ngay từ đầu. Việc liên quan đến cung này cần thêm bước kiểm chứng, thêm thời gian hoặc thêm điều kiện rõ ràng.",
+    "strengthText": "Điểm nên phát huy là sự thận trọng, biết thử nhỏ trước và không vội kết luận khi dữ kiện còn thiếu.",
+    "cautionText": "Điểm cần lưu ý là dễ nản sớm hoặc tưởng mình bị chặn, trong khi thực tế chỉ cần đổi cách đi và chọn thời điểm khôn hơn.",
+    "lifeAdviceText": "Nói đời thường, Tuần giống một lớp kiểm tra. Việc thuộc Phúc Đức nên có người chịu trách nhiệm rõ, mốc thời gian rõ và phương án dự phòng rõ.",
+    "teaserQuestion": "Tuần tại Phúc Đức đang yêu cầu đi chậm ở khâu nào để tránh hụt sức?",
+    "evidenceLabel": "Căn cứ: Tuần án ngữ cung Phúc Đức."
+  },
+  {
+    "version": "interpretation-rules-v1",
+    "status": "active",
+    "key": "gate:triet:menh",
+    "scope": "IDENTITY",
+    "pattern": {
+      "kind": "gate",
+      "gate": "Triệt",
+      "palace": "Mệnh"
+    },
+    "priority": 84,
+    "title": "Triệt tại Mệnh",
+    "summary": "Triệt tại Mệnh cho thấy chủ đề này thường không đi thẳng ngay từ đầu. Việc liên quan đến cung này cần thêm bước kiểm chứng, thêm thời gian hoặc thêm điều kiện rõ ràng.",
+    "strengthText": "Điểm nên phát huy là sự thận trọng, biết thử nhỏ trước và không vội kết luận khi dữ kiện còn thiếu.",
+    "cautionText": "Điểm cần lưu ý là dễ nản sớm hoặc tưởng mình bị chặn, trong khi thực tế chỉ cần đổi cách đi và chọn thời điểm khôn hơn.",
+    "lifeAdviceText": "Nói đời thường, Triệt giống một lớp kiểm tra. Việc thuộc Mệnh nên có người chịu trách nhiệm rõ, mốc thời gian rõ và phương án dự phòng rõ.",
+    "teaserQuestion": "Triệt tại Mệnh đang yêu cầu đi chậm ở khâu nào để tránh hụt sức?",
+    "evidenceLabel": "Căn cứ: Triệt án ngữ cung Mệnh."
+  },
+  {
+    "version": "interpretation-rules-v1",
+    "status": "active",
+    "key": "gate:triet:than",
+    "scope": "IDENTITY",
+    "pattern": {
+      "kind": "gate",
+      "gate": "Triệt",
+      "palace": "Thân"
+    },
+    "priority": 80,
+    "title": "Triệt tại Thân",
+    "summary": "Triệt tại Thân cho thấy chủ đề này thường không đi thẳng ngay từ đầu. Việc liên quan đến cung này cần thêm bước kiểm chứng, thêm thời gian hoặc thêm điều kiện rõ ràng.",
+    "strengthText": "Điểm nên phát huy là sự thận trọng, biết thử nhỏ trước và không vội kết luận khi dữ kiện còn thiếu.",
+    "cautionText": "Điểm cần lưu ý là dễ nản sớm hoặc tưởng mình bị chặn, trong khi thực tế chỉ cần đổi cách đi và chọn thời điểm khôn hơn.",
+    "lifeAdviceText": "Nói đời thường, Triệt giống một lớp kiểm tra. Việc thuộc Thân nên có người chịu trách nhiệm rõ, mốc thời gian rõ và phương án dự phòng rõ.",
+    "teaserQuestion": "Triệt tại Thân đang yêu cầu đi chậm ở khâu nào để tránh hụt sức?",
+    "evidenceLabel": "Căn cứ: Triệt án ngữ cung Thân."
+  },
+  {
+    "version": "interpretation-rules-v1",
+    "status": "active",
+    "key": "gate:triet:quan-loc",
+    "scope": "CAREER",
+    "pattern": {
+      "kind": "gate",
+      "gate": "Triệt",
+      "palace": "Quan Lộc"
+    },
+    "priority": 83,
+    "title": "Triệt tại Quan Lộc",
+    "summary": "Triệt tại Quan Lộc cho thấy chủ đề này thường không đi thẳng ngay từ đầu. Việc liên quan đến cung này cần thêm bước kiểm chứng, thêm thời gian hoặc thêm điều kiện rõ ràng.",
+    "strengthText": "Điểm nên phát huy là sự thận trọng, biết thử nhỏ trước và không vội kết luận khi dữ kiện còn thiếu.",
+    "cautionText": "Điểm cần lưu ý là dễ nản sớm hoặc tưởng mình bị chặn, trong khi thực tế chỉ cần đổi cách đi và chọn thời điểm khôn hơn.",
+    "lifeAdviceText": "Nói đời thường, Triệt giống một lớp kiểm tra. Việc thuộc Quan Lộc nên có người chịu trách nhiệm rõ, mốc thời gian rõ và phương án dự phòng rõ.",
+    "teaserQuestion": "Triệt tại Quan Lộc đang yêu cầu đi chậm ở khâu nào để tránh hụt sức?",
+    "evidenceLabel": "Căn cứ: Triệt án ngữ cung Quan Lộc."
+  },
+  {
+    "version": "interpretation-rules-v1",
+    "status": "active",
+    "key": "gate:triet:tai-bach",
+    "scope": "MONEY",
+    "pattern": {
+      "kind": "gate",
+      "gate": "Triệt",
+      "palace": "Tài Bạch"
+    },
+    "priority": 83,
+    "title": "Triệt tại Tài Bạch",
+    "summary": "Triệt tại Tài Bạch cho thấy chủ đề này thường không đi thẳng ngay từ đầu. Việc liên quan đến cung này cần thêm bước kiểm chứng, thêm thời gian hoặc thêm điều kiện rõ ràng.",
+    "strengthText": "Điểm nên phát huy là sự thận trọng, biết thử nhỏ trước và không vội kết luận khi dữ kiện còn thiếu.",
+    "cautionText": "Điểm cần lưu ý là dễ nản sớm hoặc tưởng mình bị chặn, trong khi thực tế chỉ cần đổi cách đi và chọn thời điểm khôn hơn.",
+    "lifeAdviceText": "Nói đời thường, Triệt giống một lớp kiểm tra. Việc thuộc Tài Bạch nên có người chịu trách nhiệm rõ, mốc thời gian rõ và phương án dự phòng rõ.",
+    "teaserQuestion": "Triệt tại Tài Bạch đang yêu cầu đi chậm ở khâu nào để tránh hụt sức?",
+    "evidenceLabel": "Căn cứ: Triệt án ngữ cung Tài Bạch."
+  },
+  {
+    "version": "interpretation-rules-v1",
+    "status": "active",
+    "key": "gate:triet:phu-the",
+    "scope": "RELATIONSHIP",
+    "pattern": {
+      "kind": "gate",
+      "gate": "Triệt",
+      "palace": "Phu Thê"
+    },
+    "priority": 82,
+    "title": "Triệt tại Phu Thê",
+    "summary": "Triệt tại Phu Thê cho thấy chủ đề này thường không đi thẳng ngay từ đầu. Việc liên quan đến cung này cần thêm bước kiểm chứng, thêm thời gian hoặc thêm điều kiện rõ ràng.",
+    "strengthText": "Điểm nên phát huy là sự thận trọng, biết thử nhỏ trước và không vội kết luận khi dữ kiện còn thiếu.",
+    "cautionText": "Điểm cần lưu ý là dễ nản sớm hoặc tưởng mình bị chặn, trong khi thực tế chỉ cần đổi cách đi và chọn thời điểm khôn hơn.",
+    "lifeAdviceText": "Nói đời thường, Triệt giống một lớp kiểm tra. Việc thuộc Phu Thê nên có người chịu trách nhiệm rõ, mốc thời gian rõ và phương án dự phòng rõ.",
+    "teaserQuestion": "Triệt tại Phu Thê đang yêu cầu đi chậm ở khâu nào để tránh hụt sức?",
+    "evidenceLabel": "Căn cứ: Triệt án ngữ cung Phu Thê."
+  },
+  {
+    "version": "interpretation-rules-v1",
+    "status": "active",
+    "key": "gate:triet:tat-ach",
+    "scope": "HEALTH",
+    "pattern": {
+      "kind": "gate",
+      "gate": "Triệt",
+      "palace": "Tật Ách"
+    },
+    "priority": 81,
+    "title": "Triệt tại Tật Ách",
+    "summary": "Triệt tại Tật Ách cho thấy chủ đề này thường không đi thẳng ngay từ đầu. Việc liên quan đến cung này cần thêm bước kiểm chứng, thêm thời gian hoặc thêm điều kiện rõ ràng.",
+    "strengthText": "Điểm nên phát huy là sự thận trọng, biết thử nhỏ trước và không vội kết luận khi dữ kiện còn thiếu.",
+    "cautionText": "Điểm cần lưu ý là dễ nản sớm hoặc tưởng mình bị chặn, trong khi thực tế chỉ cần đổi cách đi và chọn thời điểm khôn hơn.",
+    "lifeAdviceText": "Nói đời thường, Triệt giống một lớp kiểm tra. Việc thuộc Tật Ách nên có người chịu trách nhiệm rõ, mốc thời gian rõ và phương án dự phòng rõ.",
+    "teaserQuestion": "Triệt tại Tật Ách đang yêu cầu đi chậm ở khâu nào để tránh hụt sức?",
+    "evidenceLabel": "Căn cứ: Triệt án ngữ cung Tật Ách."
+  },
+  {
+    "version": "interpretation-rules-v1",
+    "status": "active",
+    "key": "gate:triet:thien-di",
+    "scope": "CAREER",
+    "pattern": {
+      "kind": "gate",
+      "gate": "Triệt",
+      "palace": "Thiên Di"
+    },
+    "priority": 81,
+    "title": "Triệt tại Thiên Di",
+    "summary": "Triệt tại Thiên Di cho thấy chủ đề này thường không đi thẳng ngay từ đầu. Việc liên quan đến cung này cần thêm bước kiểm chứng, thêm thời gian hoặc thêm điều kiện rõ ràng.",
+    "strengthText": "Điểm nên phát huy là sự thận trọng, biết thử nhỏ trước và không vội kết luận khi dữ kiện còn thiếu.",
+    "cautionText": "Điểm cần lưu ý là dễ nản sớm hoặc tưởng mình bị chặn, trong khi thực tế chỉ cần đổi cách đi và chọn thời điểm khôn hơn.",
+    "lifeAdviceText": "Nói đời thường, Triệt giống một lớp kiểm tra. Việc thuộc Thiên Di nên có người chịu trách nhiệm rõ, mốc thời gian rõ và phương án dự phòng rõ.",
+    "teaserQuestion": "Triệt tại Thiên Di đang yêu cầu đi chậm ở khâu nào để tránh hụt sức?",
+    "evidenceLabel": "Căn cứ: Triệt án ngữ cung Thiên Di."
+  },
+  {
+    "version": "interpretation-rules-v1",
+    "status": "active",
+    "key": "gate:triet:phuc-duc",
+    "scope": "RELATIONSHIP",
+    "pattern": {
+      "kind": "gate",
+      "gate": "Triệt",
+      "palace": "Phúc Đức"
+    },
+    "priority": 80,
+    "title": "Triệt tại Phúc Đức",
+    "summary": "Triệt tại Phúc Đức cho thấy chủ đề này thường không đi thẳng ngay từ đầu. Việc liên quan đến cung này cần thêm bước kiểm chứng, thêm thời gian hoặc thêm điều kiện rõ ràng.",
+    "strengthText": "Điểm nên phát huy là sự thận trọng, biết thử nhỏ trước và không vội kết luận khi dữ kiện còn thiếu.",
+    "cautionText": "Điểm cần lưu ý là dễ nản sớm hoặc tưởng mình bị chặn, trong khi thực tế chỉ cần đổi cách đi và chọn thời điểm khôn hơn.",
+    "lifeAdviceText": "Nói đời thường, Triệt giống một lớp kiểm tra. Việc thuộc Phúc Đức nên có người chịu trách nhiệm rõ, mốc thời gian rõ và phương án dự phòng rõ.",
+    "teaserQuestion": "Triệt tại Phúc Đức đang yêu cầu đi chậm ở khâu nào để tránh hụt sức?",
+    "evidenceLabel": "Căn cứ: Triệt án ngữ cung Phúc Đức."
+  }
+]

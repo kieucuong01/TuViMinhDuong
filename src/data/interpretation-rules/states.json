@@ -1,0 +1,92 @@
+[
+  {
+    "version": "interpretation-rules-v1",
+    "status": "active",
+    "key": "state:mieu",
+    "scope": "AXIS",
+    "pattern": {
+      "kind": "state",
+      "state": "M"
+    },
+    "priority": 52,
+    "title": "Trạng thái Miếu",
+    "summary": "Trạng thái Miếu cho biết sao có nền mạnh, dễ phát huy đúng bản chất. Đây là lớp hiệu chỉnh để cùng một sao không bị đọc giống nhau trong mọi lá số.",
+    "strengthText": "Điểm nên phát huy là tận dụng năng lực sẵn có.",
+    "cautionText": "Điểm cần lưu ý là tránh chủ quan vì thuận thế.",
+    "lifeAdviceText": "Khi đọc sao, trạng thái giúp phân biệt mức biểu hiện. Người đọc nên nhìn cả vị trí cung, sao đi cùng và việc đang xét trước khi kết luận.",
+    "teaserQuestion": "Trạng thái Miếu đang làm điểm mạnh rõ hơn hay làm bài học cần đọc kỹ hơn?",
+    "evidenceLabel": "Căn cứ: sao trong lá số có trạng thái Miếu."
+  },
+  {
+    "version": "interpretation-rules-v1",
+    "status": "active",
+    "key": "state:vuong",
+    "scope": "AXIS",
+    "pattern": {
+      "kind": "state",
+      "state": "V"
+    },
+    "priority": 52,
+    "title": "Trạng thái Vượng",
+    "summary": "Trạng thái Vượng cho biết sao có sức bật tốt, dễ tạo kết quả khi có môi trường phù hợp. Đây là lớp hiệu chỉnh để cùng một sao không bị đọc giống nhau trong mọi lá số.",
+    "strengthText": "Điểm nên phát huy là đẩy việc đúng thời điểm.",
+    "cautionText": "Điểm cần lưu ý là tránh quá đà hoặc ôm quá nhiều.",
+    "lifeAdviceText": "Khi đọc sao, trạng thái giúp phân biệt mức biểu hiện. Người đọc nên nhìn cả vị trí cung, sao đi cùng và việc đang xét trước khi kết luận.",
+    "teaserQuestion": "Trạng thái Vượng đang làm điểm mạnh rõ hơn hay làm bài học cần đọc kỹ hơn?",
+    "evidenceLabel": "Căn cứ: sao trong lá số có trạng thái Vượng."
+  },
+  {
+    "version": "interpretation-rules-v1",
+    "status": "active",
+    "key": "state:dac",
+    "scope": "AXIS",
+    "pattern": {
+      "kind": "state",
+      "state": "Đ"
+    },
+    "priority": 52,
+    "title": "Trạng thái Đắc",
+    "summary": "Trạng thái Đắc cho biết sao có chỗ dùng được, cần bối cảnh đúng để phát huy. Đây là lớp hiệu chỉnh để cùng một sao không bị đọc giống nhau trong mọi lá số.",
+    "strengthText": "Điểm nên phát huy là chọn đúng sân chơi.",
+    "cautionText": "Điểm cần lưu ý là đừng dùng sức phân tán.",
+    "lifeAdviceText": "Khi đọc sao, trạng thái giúp phân biệt mức biểu hiện. Người đọc nên nhìn cả vị trí cung, sao đi cùng và việc đang xét trước khi kết luận.",
+    "teaserQuestion": "Trạng thái Đắc đang làm điểm mạnh rõ hơn hay làm bài học cần đọc kỹ hơn?",
+    "evidenceLabel": "Căn cứ: sao trong lá số có trạng thái Đắc."
+  },
+  {
+    "version": "interpretation-rules-v1",
+    "status": "active",
+    "key": "state:binh",
+    "scope": "AXIS",
+    "pattern": {
+      "kind": "state",
+      "state": "B"
+    },
+    "priority": 52,
+    "title": "Trạng thái Bình",
+    "summary": "Trạng thái Bình cho biết sao ở mức trung tính, kết quả phụ thuộc cách quản trị. Đây là lớp hiệu chỉnh để cùng một sao không bị đọc giống nhau trong mọi lá số.",
+    "strengthText": "Điểm nên phát huy là đi đều và tạo thói quen tốt.",
+    "cautionText": "Điểm cần lưu ý là tránh kỳ vọng thay đổi quá nhanh.",
+    "lifeAdviceText": "Khi đọc sao, trạng thái giúp phân biệt mức biểu hiện. Người đọc nên nhìn cả vị trí cung, sao đi cùng và việc đang xét trước khi kết luận.",
+    "teaserQuestion": "Trạng thái Bình đang làm điểm mạnh rõ hơn hay làm bài học cần đọc kỹ hơn?",
+    "evidenceLabel": "Căn cứ: sao trong lá số có trạng thái Bình."
+  },
+  {
+    "version": "interpretation-rules-v1",
+    "status": "active",
+    "key": "state:ham",
+    "scope": "AXIS",
+    "pattern": {
+      "kind": "state",
+      "state": "H"
+    },
+    "priority": 66,
+    "title": "Trạng thái Hãm",
+    "summary": "Trạng thái Hãm cho biết sao dễ biểu hiện mặt khó trước mặt thuận. Đây là lớp hiệu chỉnh để cùng một sao không bị đọc giống nhau trong mọi lá số.",
+    "strengthText": "Điểm nên phát huy là nhận diện sớm điểm lệch để sửa.",
+    "cautionText": "Điểm cần lưu ý là không nên quyết trong lúc cảm xúc hoặc áp lực lên cao.",
+    "lifeAdviceText": "Khi đọc sao, trạng thái giúp phân biệt mức biểu hiện. Người đọc nên nhìn cả vị trí cung, sao đi cùng và việc đang xét trước khi kết luận.",
+    "teaserQuestion": "Trạng thái Hãm đang làm điểm mạnh rõ hơn hay làm bài học cần đọc kỹ hơn?",
+    "evidenceLabel": "Căn cứ: sao trong lá số có trạng thái Hãm."
+  }
+]

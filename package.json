@@ -33,6 +33,7 @@
     "smoke:google-ads": "node scripts/smoke-google-ads.mjs",
     "smoke:payos": "node scripts/smoke-payos-checkout.mjs",
     "pseo:seed": "node --experimental-strip-types scripts/seed-pseo.ts",
+    "seed:interpretations": "node --experimental-strip-types scripts/seed-interpretations.ts",
     "pseo:generate": "node --experimental-strip-types scripts/generate-pseo.ts",
     "env:check:production": "node scripts/check-production-env.mjs",
     "release:production": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/release-production.ps1",

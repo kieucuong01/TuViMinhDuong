@@ -164,6 +164,27 @@ model ReadingProgress {
   @@index([readingId])
 }
 
+model InterpretationRule {
+  key            String   @id
+  scope          String
+  pattern        Json
+  priority       Int
+  title          String
+  summary        String
+  strengthText   String
+  cautionText    String
+  lifeAdviceText String
+  teaserQuestion String
+  evidenceLabel  String
+  version        String
+  status         String   @default("active")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([scope, status, priority])
+  @@index([version, status])
+}
+
 model AssistantQuestion {
   id        String   @id @default(cuid())
   userId    String
