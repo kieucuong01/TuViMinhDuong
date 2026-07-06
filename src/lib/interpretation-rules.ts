@@ -1,8 +1,8 @@
-import mainStarRules from "@/data/interpretation-rules/main-stars.json";
-import supportStarRules from "@/data/interpretation-rules/support-stars.json";
-import stateRules from "@/data/interpretation-rules/states.json";
-import axisRules from "@/data/interpretation-rules/axes.json";
-import fateRules from "@/data/interpretation-rules/fate.json";
+import mainStarRules from "../data/interpretation-rules/main-stars.json";
+import supportStarRules from "../data/interpretation-rules/support-stars.json";
+import stateRules from "../data/interpretation-rules/states.json";
+import axisRules from "../data/interpretation-rules/axes.json";
+import fateRules from "../data/interpretation-rules/fate.json";
 
 export const INTERPRETATION_RULE_VERSION = "interpretation-rules-v1";
 
