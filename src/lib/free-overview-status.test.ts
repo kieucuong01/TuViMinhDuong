@@ -59,60 +59,30 @@ Tuần tại Thiên Di là tín hiệu nên kiểm chứng.
 }
 
 describe("free overview status", () => {
-  it("starts the full LLM generation while the fast preview is being prepared", () => {
+  it("starts only the full LLM generation because the instant template covers the waiting state", () => {
     const source = readFileSync(fileURLToPath(new URL("./data.ts", import.meta.url)), "utf8");
     const fullStart = source.indexOf("const fullOverviewPromise = generateFreeOverview(record.chart)");
-    const previewStart = source.indexOf("await generateFreeOverviewPreview(record.chart)");
 
     expect(fullStart).toBeGreaterThan(-1);
-    expect(previewStart).toBeGreaterThan(fullStart);
     expect(source).toContain("const result = await fullOverviewPromise");
+    expect(source).not.toContain("generateFreeOverviewPreview");
+    expect(source).not.toContain("freeOverviewPreview:");
   });
 
-  it("returns an empty pending state when no LLM content is cached yet", async () => {
+  it("returns an 800-900 word template while no LLM content is cached yet", async () => {
+    const {
+      FREE_OVERVIEW_TEMPLATE_MAX_WORDS,
+      FREE_OVERVIEW_TEMPLATE_MIN_WORDS,
+    } = await import("@/lib/ai");
     const { getFreeOverviewStatus } = await import("@/lib/data");
     const status = getFreeOverviewStatus(chartFixture());
 
     expect(status.status).toBe("fallback");
-    expect(status.source).toBe("pending");
-    expect(status.content).toBe("");
-    expect(status.wordCount).toBe(0);
-  });
-
-  it("returns a persisted LLM preview while the full overview is processing", async () => {
-    const {
-      FREE_OVERVIEW_VERSION,
-      FREE_OVERVIEW_PREVIEW_MIN_WORDS,
-    } = await import("@/lib/ai");
-    const { getFreeOverviewStatus } = await import("@/lib/data");
-    const content = Array.from(
-      { length: FREE_OVERVIEW_PREVIEW_MIN_WORDS + 5 },
-      (_, index) => index === 0 ? "Cung Mệnh" : `tín-hiệu-${index}`,
-    ).join(" ");
-    const now = new Date().toISOString();
-    const chart = {
-      ...chartFixture(),
-      freeOverviewPreview: {
-        content,
-        model: "deepseek/deepseek-chat",
-        generatedAt: now,
-        version: FREE_OVERVIEW_VERSION,
-      },
-      freeOverviewJob: {
-        status: "PENDING",
-        startedAt: now,
-        updatedAt: now,
-        version: FREE_OVERVIEW_VERSION,
-      },
-    } as TuViChart;
-
-    const status = getFreeOverviewStatus(chart);
-
-    expect(status.status).toBe("preview");
-    expect(status.source).toBe("ai-preview");
-    expect(status.content).toBe(content);
-    expect(status.model).toBe("deepseek/deepseek-chat");
-    expect(status.jobStatus).toBe("processing");
+    expect(status.source).toBe("template-fallback");
+    expect(status.content).toContain("## Tín hiệu nổi bật của lá số");
+    expect(status.content).toContain("bản chi tiết đang được viết tiếp");
+    expect(status.wordCount).toBeGreaterThanOrEqual(FREE_OVERVIEW_TEMPLATE_MIN_WORDS);
+    expect(status.wordCount).toBeLessThanOrEqual(FREE_OVERVIEW_TEMPLATE_MAX_WORDS);
   });
 
   it("treats complete matching-version AI content as ready", async () => {

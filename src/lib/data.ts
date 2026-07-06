@@ -8,9 +8,9 @@ import { FEATURE_PRICE_KEYS, FEATURE_PRICES, COIN_PACKAGES, type FeaturePriceMap
 import { isReadingBundleKey, readingBundleScopeKey } from "@/lib/reading-bundles";
 import {
   FREE_OVERVIEW_VERSION,
+  buildInstantFreeOverview,
   countWords,
   isCompleteFreeOverview,
-  isCompleteFreeOverviewPreview,
 } from "@/lib/ai";
 import { scoreArticleSeo } from "@/lib/seo";
 import { slugify } from "@/lib/format";
@@ -143,12 +143,6 @@ export type AdminChartSubmission = {
 };
 
 type ChartWithFreeOverview = TuViChart & {
-  freeOverviewPreview?: {
-    content: string;
-    model: string;
-    generatedAt: string;
-    version?: string;
-  };
   freeOverview?: {
     content: string;
     model: string;
@@ -175,19 +169,9 @@ export type FreeOverviewStatus =
       jobStatus: "completed";
     }
   | {
-      status: "preview";
-      content: string;
-      source: "ai-preview";
-      model: string;
-      generatedAt: string;
-      wordCount: number;
-      jobStatus: "idle" | "processing" | "stale" | "failed";
-      error?: string;
-    }
-  | {
       status: "fallback";
       content: string;
-      source: "pending";
+      source: "template-fallback";
       wordCount: number;
       jobStatus: "idle" | "processing" | "stale" | "failed";
       error?: string;
@@ -195,7 +179,7 @@ export type FreeOverviewStatus =
 
 export type FreeOverviewGenerationClaim =
   | { status: "ready"; overview: Extract<FreeOverviewStatus, { status: "ready" }> }
-  | { status: "processing"; overview: Extract<FreeOverviewStatus, { status: "fallback" | "preview" }> }
+  | { status: "processing"; overview: Extract<FreeOverviewStatus, { status: "fallback" }> }
   | { status: "claimed" };
 
 type ArticleRecord = Omit<ArticleView, "faqs"> & {
@@ -830,28 +814,13 @@ export function getFreeOverviewStatus(chart: TuViChart): FreeOverviewStatus {
           ? "failed"
           : "idle";
 
-  if (
-    chartWithOverview.freeOverviewPreview?.content &&
-    chartWithOverview.freeOverviewPreview.version === FREE_OVERVIEW_VERSION &&
-    isCompleteFreeOverviewPreview(chartWithOverview.freeOverviewPreview.content)
-  ) {
-    return {
-      status: "preview",
-      content: chartWithOverview.freeOverviewPreview.content,
-      source: "ai-preview",
-      model: chartWithOverview.freeOverviewPreview.model,
-      generatedAt: chartWithOverview.freeOverviewPreview.generatedAt,
-      wordCount: countWords(chartWithOverview.freeOverviewPreview.content),
-      jobStatus,
-      ...(jobStatus === "failed" && job?.error ? { error: job.error } : {}),
-    };
-  }
+  const fallbackContent = buildInstantFreeOverview(chart);
 
   return {
     status: "fallback",
-    content: "",
-    source: "pending",
-    wordCount: 0,
+    content: fallbackContent,
+    source: "template-fallback",
+    wordCount: countWords(fallbackContent),
     jobStatus,
     ...(jobStatus === "failed" && job?.error ? { error: job.error } : {}),
   };
@@ -903,41 +872,12 @@ export async function generateAndStoreFreeOverview(chartId: string) {
   const current = getFreeOverviewStatus(record.chart);
   if (current.status === "ready") return current;
 
-  const { generateFreeOverview, generateFreeOverviewPreview } = await import("@/lib/ai");
+  const { generateFreeOverview } = await import("@/lib/ai");
   const fullOverviewPromise = generateFreeOverview(record.chart);
-  if (current.status !== "preview") {
-    try {
-      const previewResult = await generateFreeOverviewPreview(record.chart);
-      if (isCompleteFreeOverviewPreview(previewResult.content)) {
-        const latestRecord = await getChart(chartId);
-        if (!latestRecord) throw new Error("Khong tim thay la so khi luu ban mo dau.");
-        const generatedAt = new Date().toISOString();
-        const chartWithLatestJob = latestRecord.chart as ChartWithFreeOverview;
-        const chartWithPreview: ChartWithFreeOverview = {
-          ...latestRecord.chart,
-          freeOverviewPreview: {
-            content: previewResult.content,
-            model: previewResult.model,
-            generatedAt,
-            version: FREE_OVERVIEW_VERSION,
-          },
-          freeOverviewJob: {
-            status: "PENDING",
-            startedAt: chartWithLatestJob.freeOverviewJob?.startedAt || generatedAt,
-            updatedAt: generatedAt,
-            version: FREE_OVERVIEW_VERSION,
-          },
-        };
-        await updateStoredChartPayload(chartId, chartWithPreview);
-      }
-    } catch {
-      // Preview is an early reading aid; full overview generation must still continue.
-    }
-  }
 
   const result = await fullOverviewPromise;
   if (result.model.includes("template-fallback")) {
-    const message = "LLM tong quan chua san sang, khong hien thi ban template.";
+    const message = "LLM tong quan chua san sang, dang tiep tuc dung ban template.";
     await failFreeOverviewGeneration(chartId, message);
     throw new Error(message);
   }

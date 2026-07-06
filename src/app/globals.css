@@ -6140,6 +6140,15 @@ button.is-loading:not(.icon-button)::before {
   animation-delay: 240ms;
 }
 
+.free-overview-template-shell {
+  display: grid;
+  gap: 1rem;
+}
+
+.free-overview-template-shell .free-overview-inline-status {
+  margin-top: 0;
+}
+
 .free-overview-preview {
   display: grid;
   gap: 1rem;

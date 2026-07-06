@@ -10,7 +10,6 @@ import { premiumReadingModalId } from "@/components/premium-reading-target";
 type FreeOverviewState =
   | { status: "loading"; content?: string; error?: undefined }
   | { status: "ready"; content: string; detailContent: string; error?: undefined }
-  | { status: "preview"; content: string; jobStatus: "idle" | "processing" | "stale" | "failed"; error?: string }
   | { status: "fallback"; content: string; jobStatus: "idle" | "processing" | "stale" | "failed"; error?: string }
   | { status: "error"; content?: string; error: string };
 
@@ -18,12 +17,6 @@ type FreeOverviewPayload =
   | {
       status: "ready";
       content: string;
-    }
-  | {
-      status: "preview";
-      content: string;
-      jobStatus?: "idle" | "processing" | "stale" | "failed";
-      error?: string;
     }
   | {
       status: "fallback";
@@ -60,17 +53,9 @@ function initialOverviewState(
       detailContent: initialOverview.content,
     };
   }
-  if (initialOverview.status === "preview") {
-    return {
-      status: "preview",
-      content: initialOverview.content,
-      jobStatus: initialOverview.jobStatus || "processing",
-      error: initialOverview.error,
-    };
-  }
   return {
     status: "fallback",
-    content: "",
+    content: initialOverview.content,
     jobStatus: initialOverview.jobStatus || "idle",
     error: initialOverview.error,
   };
@@ -97,46 +82,6 @@ function GuestOverviewLoginCta({ chartId, compact = false }: { chartId: string; 
   );
 }
 
-function ProgressivePreviewCopy({ content }: { content: string }) {
-  const words = content.split(/\s+/).filter(Boolean);
-  const wordCount = words.length;
-  const [visiblePreviewWords, setVisiblePreviewWords] = useState(Math.min(10, words.length));
-  const [reduceMotion, setReduceMotion] = useState(false);
-
-  useEffect(() => {
-    const media = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const updatePreference = () => setReduceMotion(media.matches);
-    const initialTimer = window.setTimeout(updatePreference, 0);
-    media.addEventListener("change", updatePreference);
-    return () => {
-      window.clearTimeout(initialTimer);
-      media.removeEventListener("change", updatePreference);
-    };
-  }, []);
-
-  useEffect(() => {
-    if (reduceMotion) return;
-    const timer = window.setInterval(() => {
-      setVisiblePreviewWords((current) => {
-        const next = Math.min(wordCount, current + 3);
-        if (next >= wordCount) window.clearInterval(timer);
-        return next;
-      });
-    }, 55);
-    return () => window.clearInterval(timer);
-  }, [reduceMotion, wordCount]);
-
-  const visibleContent = reduceMotion ? content : words.slice(0, visiblePreviewWords).join(" ");
-  const isWriting = !reduceMotion && visiblePreviewWords < wordCount;
-
-  return (
-    <p className="free-overview-preview-copy">
-      {visibleContent}
-      {isWriting ? <span className="free-overview-writing-cursor" aria-hidden="true" /> : null}
-    </p>
-  );
-}
-
 export function FreeOverviewLoader({
   chartId,
   initialOverview,
@@ -156,7 +101,7 @@ export function FreeOverviewLoader({
 
   function retryOverview() {
     setState((current) =>
-      current.status === "fallback" || current.status === "preview"
+      current.status === "fallback"
         ? { ...current, jobStatus: "processing" as const, error: undefined }
         : { status: "loading" },
     );
@@ -221,21 +166,12 @@ export function FreeOverviewLoader({
           return;
         }
 
-        if (payload.status === "preview") {
-          setState({
-            status: "preview",
-            content: String(payload.content || ""),
-            jobStatus: payload.jobStatus || "processing",
-            error: payload.error,
-          });
-        } else {
-          setState({
-            status: "fallback",
-            content: "",
-            jobStatus: payload.jobStatus || "idle",
-            error: payload.error,
-          });
-        }
+        setState({
+          status: "fallback",
+          content: String(payload.content || ""),
+          jobStatus: payload.jobStatus || "idle",
+          error: payload.error,
+        });
         void startProcess();
         schedulePoll();
       } catch (error) {
@@ -257,20 +193,14 @@ export function FreeOverviewLoader({
   if (state.status === "fallback") {
     const canRetry = state.jobStatus === "stale" || state.jobStatus === "failed";
     return (
-      <div ref={setRootNode} className="free-overview-loading" role="status" aria-live="polite">
+      <article ref={setRootNode} className="free-reading-summary free-overview-template-shell" aria-live="polite">
         <div className="free-overview-inline-status">
-          <strong>
-            {state.jobStatus === "failed"
-              ? "Chưa viết xong mini-report bằng LLM."
-              : state.jobStatus === "stale"
-                ? "Tiến trình viết mini-report trước đó quá lâu chưa xong."
-                : "Đang đọc những tín hiệu nổi bật trong lá số…"}
-          </strong>
-          <span>
-            {state.jobStatus === "failed"
-              ? "Bản dự phòng không còn được hiển thị. Bạn có thể thử viết lại để nhận đúng bản cá nhân hóa."
-              : "Phần mở đầu cá nhân hóa sẽ xuất hiện trước. Bản mini-report đầy đủ tiếp tục được viết ở phía sau."}
-          </span>
+          <div className="free-overview-detail-status-copy">
+            <strong>Đang viết bản chi tiết dưới nền…</strong>
+            <span>
+              Bản miễn phí bên dưới là bản đọc nhanh khoảng 800-900 từ. Khi phần LLM đầy đủ sẵn sàng, hệ thống sẽ tự cập nhật ngay tại đây.
+            </span>
+          </div>
           {canRetry ? (
             <button type="button" className="btn btn-small btn-ghost" onClick={retryOverview}>
               Thử viết lại
@@ -284,36 +214,8 @@ export function FreeOverviewLoader({
             </span>
           ) : null}
         </div>
-        {!isSignedIn ? <GuestOverviewLoginCta chartId={chartId} compact /> : null}
-      </div>
-    );
-  }
-
-  if (state.status === "preview") {
-    const canRetry = state.jobStatus === "stale" || state.jobStatus === "failed";
-
-    return (
-      <article ref={setRootNode} className="free-reading-summary free-overview-preview" aria-live="polite">
-        <div className="free-overview-inline-status">
-          <div className="free-overview-detail-status-copy">
-            <strong>Đang viết phần luận giải dành riêng cho bạn…</strong>
-            <span>Phần mở đầu đã sẵn sàng; các nội dung chi tiết vẫn đang được hoàn thiện.</span>
-          </div>
-          {state.jobStatus === "processing" || state.jobStatus === "idle" ? (
-            <span className="free-overview-detail-loader" aria-hidden="true">
-              <i />
-              <i />
-              <i />
-            </span>
-          ) : null}
-        </div>
-        <ProgressivePreviewCopy key={state.content} content={state.content} />
+        <MarkdownContent content={state.content} />
         {state.error ? <p className="free-overview-preview-note">{state.error}</p> : null}
-        {canRetry ? (
-          <button type="button" className="btn btn-small btn-ghost" onClick={retryOverview}>
-            Thử viết tiếp
-          </button>
-        ) : null}
         {!isSignedIn ? <GuestOverviewLoginCta chartId={chartId} /> : null}
       </article>
     );

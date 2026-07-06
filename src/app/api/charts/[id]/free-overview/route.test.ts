@@ -36,9 +36,9 @@ describe("free overview GET route", () => {
     mocks.getChart.mockResolvedValue({ id: "chart-1", chart: { input: { fullName: "Test" } } });
     mocks.getFreeOverviewStatus.mockReturnValue({
       status: "fallback",
-      content: "",
-      source: "pending",
-      wordCount: 0,
+      content: "## Tín hiệu nổi bật của lá số\nBản template 500 từ đang hiển thị ngay.",
+      source: "template-fallback",
+      wordCount: 10,
       jobStatus: "idle",
     });
   });
@@ -50,9 +50,9 @@ describe("free overview GET route", () => {
     expect(response.status).toBe(200);
     expect(body).toEqual({
       status: "fallback",
-      content: "",
-      source: "pending",
-      wordCount: 0,
+      content: "## Tín hiệu nổi bật của lá số\nBản template 500 từ đang hiển thị ngay.",
+      source: "template-fallback",
+      wordCount: 10,
       jobStatus: "idle",
     });
     expect(mocks.getFreeOverviewStatus).toHaveBeenCalledTimes(1);
@@ -68,32 +68,6 @@ describe("free overview GET route", () => {
 
     expect(response.status).toBe(404);
     expect(body.error).toContain("Không tìm thấy");
-  });
-
-  it("returns the persisted LLM preview to a guest without trimming or hiding it", async () => {
-    const preview = "Cung Mệnh cho thấy đây là đoạn mở đầu LLM đang được viết dần cho riêng lá số này.";
-    mocks.getFreeOverviewStatus.mockReturnValue({
-      status: "preview",
-      content: preview,
-      source: "ai-preview",
-      model: "deepseek/deepseek-chat",
-      generatedAt: "2026-07-06T00:00:00.000Z",
-      wordCount: 18,
-      jobStatus: "processing",
-    });
-
-    const response = await getOverview();
-    const body = await response.json();
-
-    expect(body).toEqual({
-      status: "preview",
-      content: preview,
-      source: "ai-preview",
-      model: "deepseek/deepseek-chat",
-      generatedAt: "2026-07-06T00:00:00.000Z",
-      wordCount: 18,
-      jobStatus: "processing",
-    });
   });
 
   it("returns the expanded projected teaser to a guest", async () => {

@@ -89,9 +89,7 @@ export default async function ChartPage({
     : null;
   const visibleFreeOverviewStatus = guestOverviewContent && freeOverviewStatus
     ? { ...freeOverviewStatus, content: guestOverviewContent, wordCount: countWords(guestOverviewContent) }
-    : freeOverviewStatus?.status === "fallback"
-      ? { ...freeOverviewStatus, content: "", wordCount: 0 }
-      : freeOverviewStatus;
+    : freeOverviewStatus;
 
   return (
     <main className="chart-page" data-testid="chart-page">

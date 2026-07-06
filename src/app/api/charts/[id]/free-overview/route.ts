@@ -23,8 +23,6 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
   const guestContent = !user && overview.status === "ready" ? buildFreeOverviewTeaser(overview.content) : null;
   const visibleOverview = guestContent
     ? { ...overview, content: guestContent, wordCount: countWords(guestContent) }
-    : overview.status === "fallback"
-      ? { ...overview, content: "", wordCount: 0 }
     : overview;
   logPerfEvent("free_overview_get_timing", timer.total(), {
     chartId: id,

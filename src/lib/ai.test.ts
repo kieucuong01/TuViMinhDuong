@@ -1,15 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
-  FREE_OVERVIEW_GUEST_TEASER_MAX_CHARS,
-  FREE_OVERVIEW_GUEST_TEASER_MIN_CHARS,
-  buildFreeOverviewTeaser,
-} from "@/lib/free-overview-presentation";
-import {
   FREE_OVERVIEW_MAX_WORDS,
   FREE_OVERVIEW_MAX_TOKENS,
   FREE_OVERVIEW_MIN_WORDS,
-  FREE_OVERVIEW_PREVIEW_MAX_WORDS,
-  FREE_OVERVIEW_PREVIEW_MIN_WORDS,
+  FREE_OVERVIEW_TEMPLATE_MAX_WORDS,
+  FREE_OVERVIEW_TEMPLATE_MIN_WORDS,
   PAID_FULL_WORD_TARGET,
   PAID_READING_CHAPTER_MAX_TOKENS,
   type PaidReadingChapter,
@@ -18,12 +13,10 @@ import {
   buildInstantFreeOverview,
   countWords,
   generateFreeOverview,
-  generateFreeOverviewPreview,
   generateReading,
   generateReadingWithProgress,
   getDeepReadingSummary,
   isCompleteFreeOverview,
-  isCompleteFreeOverviewPreview,
   isCompletePaidChapter,
   paidReadingChapterPrompt,
   paidReadingChapters,
@@ -279,20 +272,15 @@ describe("AI reading format", () => {
     const chart = youngSampleChart();
     const content = buildInstantFreeOverview(chart);
 
-    expect(countWords(content)).toBeGreaterThanOrEqual(FREE_OVERVIEW_MIN_WORDS);
-    expect(countWords(content)).toBeLessThanOrEqual(FREE_OVERVIEW_MAX_WORDS);
+    expect(FREE_OVERVIEW_TEMPLATE_MIN_WORDS).toBe(800);
+    expect(FREE_OVERVIEW_TEMPLATE_MAX_WORDS).toBe(900);
+    expect(countWords(content)).toBeGreaterThanOrEqual(FREE_OVERVIEW_TEMPLATE_MIN_WORDS);
+    expect(countWords(content)).toBeLessThanOrEqual(FREE_OVERVIEW_TEMPLATE_MAX_WORDS);
     expect(content).toContain("## Mỏ neo");
     expect(content).toContain("## Tín hiệu nổi bật của lá số");
-    const guestTeaser = buildFreeOverviewTeaser(content);
-    expect(guestTeaser.length).toBeGreaterThanOrEqual(FREE_OVERVIEW_GUEST_TEASER_MIN_CHARS);
-    expect(guestTeaser.length).toBeLessThanOrEqual(FREE_OVERVIEW_GUEST_TEASER_MAX_CHARS);
-    expect(guestTeaser).toContain(chart.input.fullName);
-    expect(guestTeaser).not.toContain("## Mỏ neo");
     expect(content).toContain("## Điểm đáng chú ý nhất");
-    expect(content).toContain("## Khí chất và nội lực");
     expect(content).toContain("## Công việc và tài chính");
     expect(content).toContain("## Tình cảm và quan hệ");
-    expect(content).toContain("## Sức khỏe và nhịp sống");
     expect(content).toContain(`## Vận năm ${chart.input.viewYear}`);
     expect(content).toContain("## Câu hỏi mở trước khi đi sâu");
     expect(content).not.toContain("## Cẩm nang hành động");
@@ -303,6 +291,8 @@ describe("AI reading format", () => {
     expect(content).not.toContain("vốn thử nghiệm");
     expect(content).not.toContain("văn bản phạm vi công việc");
     expect(content).not.toContain("dòng tiền");
+    expect(content).toContain("bản chi tiết đang được viết tiếp");
+    expect(content).toContain("điểm cần đọc sâu");
     expect(content).toContain(chart.input.fullName);
     expect(content).toContain(chart.menh);
     expect(content).toContain(chart.than);
@@ -325,36 +315,6 @@ describe("AI reading format", () => {
     expect(llmRouterMocks.generateWithLlmRouter).toHaveBeenCalledWith(
       expect.objectContaining({
         maxTokens: FREE_OVERVIEW_MAX_TOKENS,
-        providerOrder: ["deepseek", "groq"],
-      }),
-    );
-  });
-
-  it("generates a short evidence-based LLM preview before the full overview", async () => {
-    clearProviderEnv();
-    llmRouterMocks.hasExternalLlmProvider.mockReturnValue(true);
-    const preview = Array.from(
-      { length: 165 },
-      (_, index) => index === 0 ? "Cung Mệnh" : `tín-hiệu-${index}`,
-    ).join(" ");
-    llmRouterMocks.generateWithLlmRouter.mockResolvedValue({
-      text: preview,
-      model: "deepseek/deepseek-chat",
-      provider: "deepseek",
-    });
-
-    const result = await generateFreeOverviewPreview(sampleChart());
-
-    expect(FREE_OVERVIEW_PREVIEW_MIN_WORDS).toBe(150);
-    expect(FREE_OVERVIEW_PREVIEW_MAX_WORDS).toBe(200);
-    expect(result.content).toBe(preview);
-    expect(result.model).toBe("deepseek/deepseek-chat");
-    expect(result.prompt).toContain("150-200 từ");
-    expect(isCompleteFreeOverviewPreview(result.content)).toBe(true);
-    expect(isCompleteFreeOverviewPreview("Một đoạn quá ngắn không có dữ liệu lá số.")).toBe(false);
-    expect(llmRouterMocks.generateWithLlmRouter).toHaveBeenCalledWith(
-      expect.objectContaining({
-        maxTokens: expect.any(Number),
         providerOrder: ["deepseek", "groq"],
       }),
     );

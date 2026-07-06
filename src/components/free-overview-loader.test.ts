@@ -6,34 +6,28 @@ const loaderSource = readFileSync(fileURLToPath(new URL("./free-overview-loader.
 const globalsCss = readFileSync(fileURLToPath(new URL("../app/globals.css", import.meta.url)), "utf8");
 const chartPageSource = readFileSync(fileURLToPath(new URL("../app/la-so/[id]/page.tsx", import.meta.url)), "utf8");
 
-describe("FreeOverviewLoader LLM-only flow", () => {
-  it("shows generation status while starting the background overview process without rendering fallback copy", () => {
+describe("FreeOverviewLoader template-first flow", () => {
+  it("renders the 800-900 word template while starting the background overview process", () => {
     expect(loaderSource).toContain('status: "fallback"');
     expect(loaderSource).toContain("/free-overview/process");
     expect(loaderSource).toContain("schedulePoll()");
     expect(loaderSource).toContain("free-overview-inline-status");
     expect(loaderSource).toContain('state.status === "fallback"');
-    expect(loaderSource).not.toContain("instantOverviewContent");
+    expect(loaderSource).toContain("<MarkdownContent content={state.content} />");
+    expect(loaderSource).toContain("Bản miễn phí bên dưới là bản đọc nhanh khoảng 800-900 từ");
+    expect(loaderSource).not.toContain('status: "preview"');
   });
 
-  it("reveals an LLM preview progressively and keeps polling for the full report", () => {
-    expect(loaderSource).toContain('status: "preview"');
-    expect(loaderSource).toContain("free-overview-writing-cursor");
-    expect(loaderSource).toContain("setVisiblePreviewWords");
-    expect(loaderSource).toContain("schedulePoll()");
-    expect(globalsCss).toContain("@keyframes free-overview-cursor");
-    expect(globalsCss).toContain("prefers-reduced-motion: reduce");
-  });
-
-  it("keeps the login CTA visible for guests while waiting, previewing, or handling an error", () => {
+  it("keeps the login CTA visible for guests while the detailed LLM report is being written", () => {
     expect(loaderSource).toContain("function GuestOverviewLoginCta");
     expect(loaderSource).toContain("Đăng nhập miễn phí để xem chi tiết");
-    expect(loaderSource).toContain("Đang đọc những tín hiệu nổi bật trong lá số");
+    expect(loaderSource).toContain("Đang viết bản chi tiết dưới nền");
+    expect(loaderSource).toContain("free-overview-detail-loader");
     expect(loaderSource.match(/<GuestOverviewLoginCta/g)?.length).toBeGreaterThanOrEqual(3);
     expect(loaderSource).toContain("#luan-giai");
   });
 
-  it("does not pass server-generated template copy into the free overview UI", () => {
+  it("passes server-generated template copy into the free overview UI immediately", () => {
     expect(loaderSource).toContain("initialOverview");
     expect(loaderSource).toContain("useState<FreeOverviewState>(() =>");
     expect(chartPageSource).toContain("getFreeOverviewStatus(record.chart)");
@@ -41,9 +35,10 @@ describe("FreeOverviewLoader LLM-only flow", () => {
     expect(chartPageSource).not.toContain("buildInstantFreeOverview");
     expect(chartPageSource).not.toContain("instantOverviewContent=");
     expect(chartPageSource).not.toContain("deferUntilVisible");
+    expect(chartPageSource).not.toContain('freeOverviewStatus?.status === "fallback"');
   });
 
-  it("projects only ready LLM guest content before it reaches the page HTML", () => {
+  it("projects only ready LLM guest content while keeping fallback template visible", () => {
     expect(chartPageSource).toContain('import { buildFreeOverviewTeaser } from "@/lib/free-overview-presentation"');
     expect(chartPageSource).toContain('freeOverviewStatus?.status === "ready"');
     expect(chartPageSource).toContain("buildFreeOverviewTeaser(freeOverviewStatus.content)");
@@ -74,6 +69,7 @@ describe("FreeOverviewLoader LLM-only flow", () => {
 
   it("has inline status styling for the fast overview state", () => {
     expect(globalsCss).toContain(".free-overview-inline-status");
+    expect(globalsCss).toContain(".free-overview-template-shell");
   });
 
   it("shows guests a locked preview and preserves the chart through login", () => {
