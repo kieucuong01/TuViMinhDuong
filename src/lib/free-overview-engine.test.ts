@@ -75,21 +75,26 @@ describe("free overview interpretation engine", () => {
     expect(second.selectedRules.map((rule) => rule.key)).not.toEqual(third.selectedRules.map((rule) => rule.key));
   });
 
-  it("composes an 800-900 word free overview with real evidence and no repeated generic opening", () => {
+  it("composes a 1,400-1,650 word free overview with highlights, direct address, and no anchor section", () => {
     const overviewA = buildFreeOverviewFromInterpretationRules(chartA());
     const overviewB = buildFreeOverviewFromInterpretationRules(chartB());
     const overviewC = buildFreeOverviewFromInterpretationRules(chartC());
 
     for (const overview of [overviewA, overviewB, overviewC]) {
-      expect(countWords(overview)).toBeGreaterThanOrEqual(800);
-      expect(countWords(overview)).toBeLessThanOrEqual(900);
+      expect(countWords(overview)).toBeGreaterThanOrEqual(1400);
+      expect(countWords(overview)).toBeLessThanOrEqual(1650);
       expect(overview).toContain("## Tín hiệu nổi bật của lá số");
-      expect(overview).toContain("## Mỏ neo");
+      expect(overview).not.toContain("## Mỏ neo");
       expect(overview).toContain("## Điểm đáng chú ý nhất");
       expect(overview).toContain("## Công việc và tài chính");
       expect(overview).toContain("## Tình cảm và quan hệ");
       expect(overview).toContain("## Vận năm 2026");
       expect(overview).toContain("## Câu hỏi mở trước khi đi sâu");
+      expect(overview).toContain("**Điểm chính:**");
+      expect(overview).toContain("**Cần chú ý:**");
+      expect(overview).toContain("**Nên đọc tiếp:**");
+      expect(overview).toMatch(/\bbạn\b/);
+      expect(overview).not.toContain("người đọc");
       expect(overview).not.toMatch(/\d+\/100/);
       expect(overview).toMatch(/Căn cứ:/);
       expect((overview.match(/Căn cứ:/g) || []).length).toBeGreaterThanOrEqual(3);

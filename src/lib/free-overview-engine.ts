@@ -49,13 +49,6 @@ function chartAge(chart: TuViChart) {
   return chart.input.viewYear - chart.solar.year;
 }
 
-function viewerAddress(chart: TuViChart) {
-  const age = chartAge(chart);
-  if (age >= 55) return chart.input.gender === "female" ? "cô" : "chú";
-  if (age >= 35) return chart.input.gender === "female" ? "chị" : "anh";
-  return "bạn";
-}
-
 function lifeContext(chart: TuViChart) {
   const age = chartAge(chart);
   if (age <= 21) return "Ở tuổi này, ví dụ gần nhất là lịch học, bài tập nhóm, chọn ngành, bạn bè, tiền tiêu vặt và việc part-time.";
@@ -145,7 +138,7 @@ export function extractFreeOverviewFacts(chart: TuViChart): FreeOverviewFacts {
 
   return {
     age: chartAge(chart),
-    address: viewerAddress(chart),
+    address: "bạn",
     lifeContext: lifeContext(chart),
     menhThanLabel: `Mệnh ${chart.menh} / Thân ${chart.than}; ${chart.menhCucRelation}; ${chart.cuc}`,
     currentDecade: decade,
@@ -273,6 +266,23 @@ function compactText(value: string, maxLength = 135) {
   return `${sliced.slice(0, Math.max(0, sliced.lastIndexOf(" ")))}.`;
 }
 
+function readerText(value: string) {
+  return value
+    .replaceAll("người đọc", "bạn")
+    .replaceAll("Người đọc", "Bạn")
+    .replaceAll("người này", "bạn")
+    .replaceAll("Người này", "Bạn")
+    .replaceAll("mình", "bạn");
+}
+
+function ruleParagraph(rule: ScoredInterpretationRule) {
+  return `${compactText(readerText(rule.summary), 180)} ${rule.evidence} ${compactText(readerText(rule.strengthText), 120)} ${compactText(readerText(rule.cautionText), 120)}`;
+}
+
+function highlightRule(label: string, rule: ScoredInterpretationRule, maxLength = 260) {
+  return `**${label}:** ${rule.title}. ${compactText(readerText(rule.summary), maxLength)} ${rule.evidence}`;
+}
+
 function compose(plan: FreeOverviewNarrativePlan, chart: TuViChart) {
   const [primary, secondary, tertiary] = plan.selectedRules;
   const career = ruleForScope(plan.selectedRules, "CAREER", 1);
@@ -282,52 +292,72 @@ function compose(plan: FreeOverviewNarrativePlan, chart: TuViChart) {
   const year = ruleForScope(plan.selectedRules, "YEAR", 0);
   const facts = plan.facts;
   const isYoung = facts.age <= 21;
+  const contextLine = isYoung
+    ? "Ở tuổi này, hãy hiểu các chữ như tiền bạc, hợp tác, trách nhiệm theo nghĩa rất gần: tiền tiêu vặt, học phí, việc part-time, bài tập nhóm, câu lạc bộ và chọn ngành."
+    : "Ở giai đoạn trưởng thành, hãy hiểu các chữ như tiền bạc, hợp tác, trách nhiệm theo nghĩa rất thực: vai trò công việc, ngân sách, gia đình, ranh giới cam kết và nhịp nghỉ.";
 
   return `## Tín hiệu nổi bật của lá số
-${chart.input.fullName}, điểm cần đọc sâu đầu tiên không nằm ở một lời phán chung, mà ở ${primary.title}. ${compactText(primary.summary)} ${primary.evidence} Khi ghép với ${facts.menhThanLabel}, lá số cho thấy một nhịp sống cần hiểu đúng trọng tâm trước khi vội kết luận tốt xấu.
+${chart.input.fullName}, bản đọc nhanh này không mở đầu bằng điểm số hay lời phán chung. Nó đi thẳng vào **điểm cần đọc sâu** đầu tiên: ${primary.title}. ${readerText(primary.summary)} ${primary.evidence}
 
-${compactText(primary.lifeAdviceText)} ${facts.lifeContext} Bản đọc nhanh này chỉ mở đúng điểm cần đọc sâu: đâu là năng lực nên tin, đâu là vùng nên đi chậm.
+**Điểm chính:** ${readerText(primary.strengthText)} Khi ghép với ${facts.menhThanLabel}, bạn nên đọc lá số này như một bản đồ về nhịp sống: điểm nào nên tin vào năng lực của bạn, điểm nào nên đi chậm, và điểm nào cần kiểm chứng trước khi quyết.
 
-## Mỏ neo
-- **Trọng tâm chính: ${primary.title}** — ${compactText(primary.strengthText, 120)}
-- **Điểm cần giữ nhịp: ${secondary.title}** — ${compactText(secondary.cautionText, 120)}
-- **Năm ${chart.input.viewYear}: đọc cùng vận hiện tại** — ${year.evidence}
+${compactText(readerText(primary.lifeAdviceText), 180)} ${facts.lifeContext} ${contextLine}
 
 ## Điểm đáng chú ý nhất
-${tertiary.title} là tín hiệu không nên bỏ qua. ${compactText(tertiary.summary)} ${tertiary.evidence}
+${highlightRule("Cần chú ý", secondary)}
 
-${compactText(tertiary.cautionText)} Nếu cùng một vấn đề lặp lại nhiều lần, lá số đang nhắc nên đọc nguyên nhân chứ không chỉ sửa phần ngọn.
+${ruleParagraph(secondary)}
+
+${highlightRule("Điểm chính", tertiary)}
+
+${readerText(tertiary.cautionText)} Nếu cùng một vấn đề lặp lại nhiều lần, lá số đang nhắc bạn đọc nguyên nhân. Đừng chỉ sửa phần ngọn.
 
 ## Công việc và tài chính
-Về công việc, ${compactText(career.summary)} ${career.evidence} Với tiền bạc và nguồn lực, ${compactText(money.summary)} ${money.evidence} ${isYoung ? "Ở tuổi này, tiền bạc là tiền tiêu vặt, học phí, part-time; cộng tác là bài tập nhóm cần rõ phần việc." : "Ở giai đoạn trưởng thành, tiền bạc đi cùng vai trò, trách nhiệm, ngân sách và cam kết dài hạn."}
+${highlightRule("Điểm chính", career)}
 
-Điểm nên phát huy là chọn việc có điều kiện rõ: mình làm gì, được gì, mất gì. Khi điều kiện còn mờ, nên thử nhỏ trước rồi mới mở rộng.
+Về công việc, ${ruleParagraph(career)} Với tiền bạc và nguồn lực, ${ruleParagraph(money)}
+
+**Cần chú ý:** tiền không chỉ là số dư. Nó còn là sức lực, thời gian, khả năng tập trung và các cam kết bạn đã nhận.
+
+${isYoung ? "Với bạn trẻ, hãy đọc phần này qua tiền tiêu vặt, học phí, part-time, bài tập nhóm và chọn ngành." : "Với người đã đi làm, hãy đọc phần này qua vai trò, thu nhập, trách nhiệm, ngân sách, hợp tác và gia đình."}
 
 ## Tình cảm và quan hệ
-Trong quan hệ, ${compactText(relationship.summary)} ${relationship.evidence} ${compactText(relationship.lifeAdviceText)} Điều cần tránh là giữ hòa khí bằng cách im lặng quá lâu.
+${highlightRule("Điểm chính", relationship)}
+
+Trong quan hệ, ${ruleParagraph(relationship)} Điều cần tránh là giữ hòa khí bằng cách im lặng quá lâu. Bạn cần biết mối quan hệ nào làm bạn vững hơn, mối quan hệ nào làm bạn phải gồng.
+
+**Cần chú ý:** tình cảm còn là cách hai bên chia trách nhiệm, giữ lời hứa và xử lý lúc có áp lực.
 
 ## Sức khỏe và nhịp sống
-Về sức khỏe, chỉ nên đọc như nhịp sống và tinh thần, không thay thế tư vấn y khoa. ${compactText(health.summary)} ${health.evidence} ${compactText(health.cautionText)}
+Về sức khỏe, chỉ nên đọc phần này như nhịp sống và tinh thần, không thay thế tư vấn y khoa. ${highlightRule("Cần chú ý", health)}
+
+${ruleParagraph(health)}
+
+Bạn nên quan sát tín hiệu nhỏ: ngủ không sâu, nghỉ mà vẫn mệt, dễ cáu, khó tập trung. Khi quá tải, hãy giảm một việc, nói rõ một ranh giới và giữ lại thời gian hồi sức.
 
 ## Vận năm ${chart.input.viewYear}
-Năm ${chart.input.viewYear} cần đọc cùng đại vận ${facts.currentDecade.range} tại ${facts.currentDecade.palace}. ${compactText(year.summary)} ${year.evidence} bản chi tiết đang được viết tiếp dưới nền để làm rõ công việc, tiền bạc, tình cảm và vận năm.
+Năm ${chart.input.viewYear} cần đọc cùng đại vận ${facts.currentDecade.range} tại ${facts.currentDecade.palace}. ${highlightRule("Điểm chính", year)}
 
-Việc quan trọng không nên quyết lúc vội, mệt hoặc muốn làm vừa lòng người khác. Điều gì giúp rõ hơn, khỏe hơn, bớt rối hơn thì làm trước.
+${ruleParagraph(year)}
+
+**Nên đọc tiếp:** bản chi tiết đang được viết tiếp dưới nền để làm rõ công việc, tiền bạc, tình cảm và vận năm. Bản miễn phí này chỉ chỉ ra vấn đề là gì và vì sao nó đáng chú ý. Phần chuyên sâu mới nối các cung, sao, trạng thái sao và vận hạn thành lộ trình cụ thể hơn.
+
+Việc quan trọng không nên quyết lúc vội hoặc mệt. Điều gì giúp rõ hơn, khỏe hơn, bớt rối hơn thì làm trước; điều gì chỉ tăng áp lực thì chậm lại.
 
 ## Câu hỏi mở trước khi đi sâu
-- ${primary.teaserQuestion}
-- ${secondary.teaserQuestion}
-- ${tertiary.teaserQuestion}
-- Trong năm ${chart.input.viewYear}, lựa chọn nào cần đọc kỹ trước khi ${facts.address} bước tiếp?`;
+- ${readerText(primary.teaserQuestion)}
+- ${readerText(secondary.teaserQuestion)}
+- ${readerText(tertiary.teaserQuestion)}
+- Trong năm ${chart.input.viewYear}, lựa chọn nào cần đọc kỹ trước khi bạn bước tiếp?`;
 }
 
 function normalizeWordCount(content: string, plan: FreeOverviewNarrativePlan) {
   let output = content.trim();
-  const additions = plan.selectedRules.map(
-    (rule) => `\n\nĐiểm bổ sung cần nhớ: ${rule.strengthText} ${rule.cautionText} ${rule.evidence}`,
+  const additions = plan.allMatches.slice(0, 8).map(
+    (rule) => `\n\n**Điểm bổ sung:** ${rule.title}. ${compactText(readerText(rule.strengthText), 110)} ${compactText(readerText(rule.cautionText), 110)} ${rule.evidence}`,
   );
   let index = 0;
-  while (countWords(output) < 800 && index < additions.length) {
+  while (countWords(output) < 1400 && index < additions.length) {
     output += additions[index];
     index += 1;
   }

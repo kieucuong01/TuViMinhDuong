@@ -279,17 +279,22 @@ describe("AI reading format", () => {
     const chart = youngSampleChart();
     const content = buildInstantFreeOverview(chart);
 
-    expect(FREE_OVERVIEW_TEMPLATE_MIN_WORDS).toBe(800);
-    expect(FREE_OVERVIEW_TEMPLATE_MAX_WORDS).toBe(900);
+    expect(FREE_OVERVIEW_TEMPLATE_MIN_WORDS).toBe(1400);
+    expect(FREE_OVERVIEW_TEMPLATE_MAX_WORDS).toBe(1650);
     expect(countWords(content)).toBeGreaterThanOrEqual(FREE_OVERVIEW_TEMPLATE_MIN_WORDS);
     expect(countWords(content)).toBeLessThanOrEqual(FREE_OVERVIEW_TEMPLATE_MAX_WORDS);
-    expect(content).toContain("## Mỏ neo");
+    expect(content).not.toContain("## Mỏ neo");
     expect(content).toContain("## Tín hiệu nổi bật của lá số");
     expect(content).toContain("## Điểm đáng chú ý nhất");
     expect(content).toContain("## Công việc và tài chính");
     expect(content).toContain("## Tình cảm và quan hệ");
     expect(content).toContain(`## Vận năm ${chart.input.viewYear}`);
     expect(content).toContain("## Câu hỏi mở trước khi đi sâu");
+    expect(content).toContain("**Điểm chính:**");
+    expect(content).toContain("**Cần chú ý:**");
+    expect(content).toContain("**Nên đọc tiếp:**");
+    expect(content).toMatch(/\bbạn\b/);
+    expect(content).not.toContain("người đọc");
     expect(content).not.toContain("## Cẩm nang hành động");
     expect(content).not.toMatch(/\d+\/100/);
     expect(content).toContain("tiền tiêu vặt");

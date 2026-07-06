@@ -69,7 +69,7 @@ describe("free overview status", () => {
     expect(source).not.toContain("freeOverviewPreview:");
   });
 
-  it("returns an 800-900 word template while no LLM content is cached yet", async () => {
+  it("returns a 1,400-1,650 word template while no LLM content is cached yet", async () => {
     const {
       FREE_OVERVIEW_TEMPLATE_MAX_WORDS,
       FREE_OVERVIEW_TEMPLATE_MIN_WORDS,
@@ -80,6 +80,8 @@ describe("free overview status", () => {
     expect(status.status).toBe("fallback");
     expect(status.source).toBe("template-fallback");
     expect(status.content).toContain("## Tín hiệu nổi bật của lá số");
+    expect(status.content).not.toContain("## Mỏ neo");
+    expect(status.content).toContain("**Điểm chính:**");
     expect(status.content).toContain("bản chi tiết đang được viết tiếp");
     expect(status.wordCount).toBeGreaterThanOrEqual(FREE_OVERVIEW_TEMPLATE_MIN_WORDS);
     expect(status.wordCount).toBeLessThanOrEqual(FREE_OVERVIEW_TEMPLATE_MAX_WORDS);
