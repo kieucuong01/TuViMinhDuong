@@ -4,16 +4,16 @@ import { generateWithLlmRouter, hasExternalLlmProvider } from "@/lib/llm-router"
 import { FEATURE_PRICES, type ReadingKey } from "@/lib/pricing";
 
 export const FREE_OVERVIEW_MIN_WORDS = 1000;
-export const FREE_OVERVIEW_MAX_WORDS = 1400;
-export const FREE_OVERVIEW_MAX_TOKENS = 5000;
-export const FREE_OVERVIEW_REPAIR_MAX_TOKENS = 4200;
+export const FREE_OVERVIEW_MAX_WORDS = 1200;
+export const FREE_OVERVIEW_MAX_TOKENS = 3800;
+export const FREE_OVERVIEW_REPAIR_MAX_TOKENS = 3200;
 export const FREE_OVERVIEW_TEMPLATE_MIN_WORDS = 800;
 export const FREE_OVERVIEW_TEMPLATE_MAX_WORDS = 900;
 export const FREE_OVERVIEW_PREVIEW_MIN_WORDS = 150;
 export const FREE_OVERVIEW_PREVIEW_MAX_WORDS = 200;
 export const FREE_OVERVIEW_PREVIEW_MAX_TOKENS = 900;
 export const PAID_READING_CHAPTER_MAX_TOKENS = 7000;
-export const FREE_OVERVIEW_VERSION = "free-mini-report-v7";
+export const FREE_OVERVIEW_VERSION = "free-mini-report-v8";
 export const PAID_READING_VERSION = "paid-personal-dossier-v5";
 export const PAID_FULL_WORD_TARGET = "5.000-7.000 từ";
 export const READING_PROVIDER_ORDER = ["deepseek", "groq"] as const;
@@ -794,7 +794,7 @@ ${compactFreeOverviewEvidence(chart)}
 
 Yêu cầu bắt buộc:
 - Chỉ dùng bằng chứng đã cấp; không tự an sao, không tự thêm sự kiện.
-- Mục tiêu 1.150-1.250 từ tiếng Việt. Hệ thống chấp nhận trong khoảng ${FREE_OVERVIEW_MIN_WORDS}-${FREE_OVERVIEW_MAX_WORDS} từ.
+- Mục tiêu 1.000-1.200 từ tiếng Việt. Hệ thống chấp nhận trong khoảng ${FREE_OVERVIEW_MIN_WORDS}-${FREE_OVERVIEW_MAX_WORDS} từ.
 - Mở đầu bằng mục "Tín hiệu nổi bật của lá số" dài 650-900 ký tự, viết như một đoạn luận giải cô đọng cho người chưa đăng nhập: đánh trúng một cảm giác tâm lý thật trước, sau đó mới lồng 1-2 thuật ngữ tử vi trong ngoặc nếu cần. Không mở đầu bằng danh sách sao. Làm người đọc thấy đúng, tò mò và muốn mở hồ sơ chuyên sâu. Không dùng bullet trong mục này.
 - Mỗi nhận định quan trọng phải gắn với một cung, sao, trạng thái sao, Tuần/Triệt hoặc đại vận trong hồ sơ.
 - Không dùng lời khen chung chung, không dọa nạt, không khẳng định chắc chắn tương lai.

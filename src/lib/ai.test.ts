@@ -3,8 +3,10 @@ import {
   FREE_OVERVIEW_MAX_WORDS,
   FREE_OVERVIEW_MAX_TOKENS,
   FREE_OVERVIEW_MIN_WORDS,
+  FREE_OVERVIEW_REPAIR_MAX_TOKENS,
   FREE_OVERVIEW_TEMPLATE_MAX_WORDS,
   FREE_OVERVIEW_TEMPLATE_MIN_WORDS,
+  FREE_OVERVIEW_VERSION,
   PAID_FULL_WORD_TARGET,
   PAID_READING_CHAPTER_MAX_TOKENS,
   type PaidReadingChapter,
@@ -240,12 +242,14 @@ describe("AI reading format", () => {
     expect(prompt).toContain(String(FREE_OVERVIEW_MIN_WORDS));
     expect(prompt).toContain(String(FREE_OVERVIEW_MAX_WORDS));
     expect(FREE_OVERVIEW_MIN_WORDS).toBe(1000);
-    expect(FREE_OVERVIEW_MAX_WORDS).toBe(1400);
-    expect(FREE_OVERVIEW_MAX_TOKENS).toBeLessThanOrEqual(5000);
+    expect(FREE_OVERVIEW_MAX_WORDS).toBe(1200);
+    expect(FREE_OVERVIEW_MAX_TOKENS).toBeLessThanOrEqual(3800);
+    expect(FREE_OVERVIEW_REPAIR_MAX_TOKENS).toBeLessThanOrEqual(3300);
+    expect(FREE_OVERVIEW_VERSION).toBe("free-mini-report-v8");
     expect(prompt.length).toBeLessThan(7500);
     expect(prompt).toContain("Hồ sơ bằng chứng rút gọn");
     expect(prompt).not.toContain("Dữ liệu cung:");
-    expect(prompt).toContain("1.150-1.250");
+    expect(prompt).toContain("1.000-1.200");
     expect(prompt).toContain("## Tín hiệu nổi bật của lá số");
     expect(prompt).toContain("650-900 ký tự");
     expect(prompt).toContain("người đọc thấy đúng");
@@ -388,13 +392,13 @@ Tuần tại Thiên Di là tín hiệu nên kiểm chứng.
 - Vì sao cùng một mối quan hệ có lúc hỗ trợ, có lúc làm hao sức?
 - Điểm nghẽn nào cần đối chiếu với đại vận trước khi hành động?`;
     };
-    const content = buildContent(1020);
+    const content = buildContent(750);
 
     expect(isCompleteFreeOverview(content)).toBe(true);
     expect(isCompleteFreeOverview(content.replace("## Tín hiệu nổi bật của lá số", "## Gợi mở"))).toBe(false);
     expect(isCompleteFreeOverview(content.replace("## Tình cảm và quan hệ", "## Ghi chú"))).toBe(false);
     expect(isCompleteFreeOverview(buildContent(500))).toBe(false);
-    expect(isCompleteFreeOverview(buildContent(1450))).toBe(false);
+    expect(isCompleteFreeOverview(buildContent(1300))).toBe(false);
   });
 
   it("defines eight interpretive chapters and one consolidated action chapter", () => {
