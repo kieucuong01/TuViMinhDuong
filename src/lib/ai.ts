@@ -5,7 +5,8 @@ import { FEATURE_PRICES, type ReadingKey } from "@/lib/pricing";
 
 export const FREE_OVERVIEW_MIN_WORDS = 1000;
 export const FREE_OVERVIEW_MAX_WORDS = 1400;
-export const FREE_OVERVIEW_MAX_TOKENS = 6500;
+export const FREE_OVERVIEW_MAX_TOKENS = 5000;
+export const FREE_OVERVIEW_REPAIR_MAX_TOKENS = 4200;
 export const FREE_OVERVIEW_TEMPLATE_MIN_WORDS = 800;
 export const FREE_OVERVIEW_TEMPLATE_MAX_WORDS = 900;
 export const FREE_OVERVIEW_PREVIEW_MIN_WORDS = 150;
@@ -500,6 +501,45 @@ function compactDecadeContext(chart: TuViChart) {
   };
 }
 
+function compactFreeOverviewEvidence(
+  chart: TuViChart,
+  options: { starLimit?: number; signalLimit?: number } = {},
+) {
+  const profile = buildChartEvidenceProfile(chart);
+  const starLimit = options.starLimit ?? 3;
+  const signalLimit = options.signalLimit ?? 3;
+  const thanPalaceName = chart.palaces.find((palace) => palace.isThan)?.name;
+  const palaceNames = Array.from(
+    new Set(
+      ["Mệnh", thanPalaceName, "Quan Lộc", "Tài Bạch", "Phu Thê", "Tật Ách", "Thiên Di"].filter(
+        (name): name is string => Boolean(name),
+      ),
+    ),
+  );
+  const palaceLines = palaceNames.map((name) => {
+    const palace = profile.palaces.find((item) => item.name === name);
+    if (!palace) return `- ${name}: chưa có dữ liệu nổi bật`;
+    const stars = palace.stars.slice(0, starLimit).join(", ") || "không có sao nổi bật";
+    const gates = [palace.hasTuan ? "Tuần" : "", palace.hasTriet ? "Triệt" : ""].filter(Boolean).join(", ");
+    return `- ${name} tại ${palace.branch}: ${stars}${gates ? `; án ngữ ${gates}` : ""}`;
+  });
+  const signalLines = profile.signals.slice(0, signalLimit).map((signal) => {
+    const evidence = signal.evidence.slice(0, 2).join(" | ");
+    return `- ${signal.area}: ${signal.summary}${evidence ? ` (${evidence})` : ""}`;
+  });
+
+  return [
+    "Hồ sơ bằng chứng rút gọn:",
+    `- Họ tên: ${profile.fullName}`,
+    `- Năm xem: ${profile.viewYear}`,
+    `- Mệnh/Thân/Cục: ${profile.menh} / ${profile.than} / ${profile.cuc}`,
+    "- Cung trọng tâm rút gọn:",
+    ...palaceLines,
+    "- Tín hiệu ưu tiên:",
+    ...signalLines,
+  ].join("\n");
+}
+
 function focusedPalaceNames(chart: TuViChart, type: ReadingKey, scopeKey: string) {
   const names = new Set<string>(["Mệnh"]);
   const thanName = chart.than?.replace("Thân cư ", "");
@@ -741,14 +781,13 @@ function getFocusData(chart: TuViChart, type: ReadingKey, scopeKey: string) {
 }
 
 function freeOverviewPrompt(chart: TuViChart) {
-  const profile = buildChartEvidenceProfile(chart);
   const decade = compactDecadeContext(chart);
   const audience = freeOverviewAudienceContext(chart);
 
   return `Bạn là chuyên gia tử vi Việt Nam có 30 năm kinh nghiệm tư vấn đời sống. Hãy đọc dữ liệu lá số đã được hệ thống tính sẵn và viết một mini-report cá nhân có chiều sâu. Không viết như bài blog.
 
 Hồ sơ bằng chứng:
-${formatChartEvidence(profile)}
+${compactFreeOverviewEvidence(chart)}
 - Đại vận hiện tại: ${decade.current}
 - Tuổi trong năm xem: ${decade.currentAge}
 - Bối cảnh ngôn ngữ cần dùng: ${audience.lifeStage}. Khi luận công việc/tài chính, hãy dịch sang các tình huống gần với người đọc: ${audience.workMoneyLanguage}.
@@ -770,6 +809,38 @@ Yêu cầu bắt buộc:
 - Không chào hỏi dài, không giải thích tử vi như kiến thức phổ thông, không quảng cáo quá mức.
 - Dùng đúng năm xem ${chart.input.viewYear}.
 - Kết thúc bằng mục "Câu hỏi mở trước khi đi sâu": 4-6 câu hỏi gợi mở có dấu hỏi, chỉ nêu What/Why và nhá hàng ${audience.paidTeaser}; không đưa checklist How-to chi tiết trong bản miễn phí.
+
+Markdown đúng thứ tự:
+## Tín hiệu nổi bật của lá số
+## Mỏ neo
+## Điểm đáng chú ý nhất
+## Khí chất và nội lực
+## Công việc và tài chính
+## Tình cảm và quan hệ
+## Sức khỏe và nhịp sống
+## Vận năm ${chart.input.viewYear}
+## Câu hỏi mở trước khi đi sâu`;
+}
+
+function freeOverviewRepairPrompt(chart: TuViChart) {
+  const decade = compactDecadeContext(chart);
+  const audience = freeOverviewAudienceContext(chart);
+
+  return `PROMPT REPAIR COMPACT
+Viết lại mini-report miễn phí bằng tiếng Việt vì lần gọi trước trả về rỗng. Dùng ít dữ liệu, không tự an sao, không nhắc AI/LLM.
+
+${compactFreeOverviewEvidence(chart, { starLimit: 2, signalLimit: 2 })}
+- Đại vận hiện tại: ${decade.current}
+- Tuổi trong năm xem: ${decade.currentAge}
+- Bối cảnh người đọc: ${audience.lifeStage}. Nếu 12-21 tuổi, dùng ví dụ tiền tiêu vặt, part-time, bài tập nhóm, chọn ngành/hướng học.
+
+Yêu cầu:
+- Mục tiêu 1.050-1.200 từ, hệ thống chấp nhận ${FREE_OVERVIEW_MIN_WORDS}-${FREE_OVERVIEW_MAX_WORDS} từ.
+- Viết dễ hiểu cho người lớn tuổi: câu ngắn, ý rõ, thuật ngữ tử vi phải giải thích ngay bằng lời đời thường.
+- Mở đầu đánh đúng cảm giác tâm lý thật, không mở đầu bằng danh sách sao.
+- Mỗi phần chỉ thêm một góc nhìn mới, không lặp ý, không đưa checklist How-to chi tiết.
+- "Mỏ neo" dùng nhãn trạng thái trung lập, không dùng điểm số kiểu 35/100.
+- Kết thúc bằng 4-6 câu hỏi What/Why để người đọc muốn mở hồ sơ chuyên sâu.
 
 Markdown đúng thứ tự:
 ## Tín hiệu nổi bật của lá số
@@ -866,13 +937,27 @@ Nói dễ hiểu, năm này hợp với cách đi từng bước có kiểm tra.
 export async function generateFreeOverview(chart: TuViChart) {
   const prompt = freeOverviewPrompt(chart);
   if (isLlmDisabledForSmoke()) return { content: buildInstantFreeOverview(chart), model: "template-fallback", prompt };
+  if (!hasExternalLlmProvider()) return { content: buildInstantFreeOverview(chart), model: "template-fallback", prompt };
+
   const routed = await generateWithLlmRouter({
     prompt,
     maxTokens: FREE_OVERVIEW_MAX_TOKENS,
     temperature: 0.55,
     providerOrder: [...READING_PROVIDER_ORDER],
   });
-  if (routed) return { content: routed.text, model: routed.model, prompt };
+
+  if (routed?.text?.trim()) return { content: routed.text.trim(), model: routed.model, prompt };
+
+  const repairPrompt = freeOverviewRepairPrompt(chart);
+  const repaired = await generateWithLlmRouter({
+    prompt: repairPrompt,
+    maxTokens: FREE_OVERVIEW_REPAIR_MAX_TOKENS,
+    temperature: 0.5,
+    providerOrder: ["deepseek"],
+  });
+
+  if (repaired?.text?.trim()) return { content: repaired.text.trim(), model: repaired.model, prompt: repairPrompt };
+
   return { content: buildInstantFreeOverview(chart), model: "template-fallback", prompt };
 }
 

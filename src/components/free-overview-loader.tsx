@@ -192,18 +192,21 @@ export function FreeOverviewLoader({
 
   if (state.status === "fallback") {
     const canRetry = state.jobStatus === "stale" || state.jobStatus === "failed";
+    const isSignedInFailedFallback = isSignedIn && state.jobStatus === "failed";
     return (
       <article ref={setRootNode} className="free-reading-summary free-overview-template-shell" aria-live="polite">
         <div className="free-overview-inline-status">
           <div className="free-overview-detail-status-copy">
-            <strong>Đang viết bản chi tiết dưới nền…</strong>
+            <strong>{isSignedInFailedFallback ? "Bản chi tiết đang lỗi, chưa phải bản cuối" : "Đang viết bản chi tiết dưới nền…"}</strong>
             <span>
-              Bản miễn phí bên dưới là bản đọc nhanh khoảng 800-900 từ. Khi phần LLM đầy đủ sẵn sàng, hệ thống sẽ tự cập nhật ngay tại đây.
+              {isSignedInFailedFallback
+                ? "Bạn vẫn có thể đọc bản nhanh bên dưới. Hãy thử viết lại để hệ thống tạo lại bản LLM chi tiết."
+                : "Bản miễn phí bên dưới là bản đọc nhanh khoảng 800-900 từ. Khi phần LLM đầy đủ sẵn sàng, hệ thống sẽ tự cập nhật ngay tại đây."}
             </span>
           </div>
           {canRetry ? (
             <button type="button" className="btn btn-small btn-ghost" onClick={retryOverview}>
-              Thử viết lại
+              {isSignedInFailedFallback ? "Thử viết lại bản chi tiết" : "Thử viết lại"}
             </button>
           ) : null}
           {state.jobStatus === "processing" || state.jobStatus === "idle" ? (
@@ -214,6 +217,12 @@ export function FreeOverviewLoader({
             </span>
           ) : null}
         </div>
+        {isSignedInFailedFallback ? (
+          <div className="free-overview-failed-detail" role="alert">
+            <strong>Bản chi tiết đang lỗi, chưa phải bản cuối.</strong>
+            <span>Phần bên dưới chỉ là bản đọc nhanh để bạn không phải chờ trắng màn hình. Bấm thử viết lại để hệ thống tạo lại bản luận giải LLM.</span>
+          </div>
+        ) : null}
         <MarkdownContent content={state.content} />
         {state.error ? <p className="free-overview-preview-note">{state.error}</p> : null}
         {!isSignedIn ? <GuestOverviewLoginCta chartId={chartId} /> : null}

@@ -241,7 +241,10 @@ describe("AI reading format", () => {
     expect(prompt).toContain(String(FREE_OVERVIEW_MAX_WORDS));
     expect(FREE_OVERVIEW_MIN_WORDS).toBe(1000);
     expect(FREE_OVERVIEW_MAX_WORDS).toBe(1400);
-    expect(FREE_OVERVIEW_MAX_TOKENS).toBeLessThanOrEqual(7000);
+    expect(FREE_OVERVIEW_MAX_TOKENS).toBeLessThanOrEqual(5000);
+    expect(prompt.length).toBeLessThan(7500);
+    expect(prompt).toContain("Hồ sơ bằng chứng rút gọn");
+    expect(prompt).not.toContain("Dữ liệu cung:");
     expect(prompt).toContain("1.150-1.250");
     expect(prompt).toContain("## Tín hiệu nổi bật của lá số");
     expect(prompt).toContain("650-900 ký tự");
@@ -318,6 +321,36 @@ describe("AI reading format", () => {
         providerOrder: ["deepseek", "groq"],
       }),
     );
+  });
+
+  it("repairs an empty DeepSeek free overview with a compact retry prompt", async () => {
+    clearProviderEnv();
+    llmRouterMocks.hasExternalLlmProvider.mockReturnValue(true);
+    llmRouterMocks.generateWithLlmRouter
+      .mockResolvedValueOnce({
+        text: "   ",
+        model: "deepseek/deepseek-chat",
+        provider: "deepseek",
+      })
+      .mockResolvedValueOnce({
+        text: "Compact repaired free overview",
+        model: "deepseek/deepseek-chat",
+        provider: "deepseek",
+      });
+
+    const result = await generateFreeOverview(sampleChart());
+
+    expect(result.content).toBe("Compact repaired free overview");
+    expect(result.model).toBe("deepseek/deepseek-chat");
+    expect(llmRouterMocks.generateWithLlmRouter).toHaveBeenCalledTimes(2);
+
+    const firstCall = llmRouterMocks.generateWithLlmRouter.mock.calls[0][0] as { prompt: string; maxTokens: number; providerOrder?: string[] };
+    const repairCall = llmRouterMocks.generateWithLlmRouter.mock.calls[1][0] as { prompt: string; maxTokens: number; providerOrder?: string[] };
+
+    expect(repairCall.prompt).toContain("PROMPT REPAIR COMPACT");
+    expect(repairCall.prompt.length).toBeLessThan(firstCall.prompt.length);
+    expect(repairCall.maxTokens).toBeLessThanOrEqual(firstCall.maxTokens);
+    expect(repairCall.providerOrder).toEqual(["deepseek"]);
   });
 
   it("accepts only evidence-based mini-reports within the guard range", () => {

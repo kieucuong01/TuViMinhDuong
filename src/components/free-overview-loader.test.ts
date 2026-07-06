@@ -67,6 +67,15 @@ describe("FreeOverviewLoader template-first flow", () => {
     expect(loaderSource).toContain('state.jobStatus === "failed"');
   });
 
+  it("tells signed-in readers when the detailed LLM overview failed instead of presenting the template as final", () => {
+    expect(loaderSource).toContain("isSignedInFailedFallback");
+    expect(loaderSource).toContain('isSignedIn && state.jobStatus === "failed"');
+    expect(loaderSource).toContain("Bản chi tiết đang lỗi, chưa phải bản cuối");
+    expect(loaderSource).toContain("Bạn vẫn có thể đọc bản nhanh bên dưới");
+    expect(loaderSource).toContain("Thử viết lại bản chi tiết");
+    expect(globalsCss).toContain(".free-overview-failed-detail");
+  });
+
   it("has inline status styling for the fast overview state", () => {
     expect(globalsCss).toContain(".free-overview-inline-status");
     expect(globalsCss).toContain(".free-overview-template-shell");

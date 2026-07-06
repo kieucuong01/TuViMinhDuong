@@ -6179,6 +6179,25 @@ button.is-loading:not(.icon-button)::before {
   font-size: 0.92rem;
 }
 
+.free-overview-failed-detail {
+  display: grid;
+  gap: 0.25rem;
+  border: 1px solid #fecaca;
+  border-radius: 1rem;
+  background: #fff1f2;
+  color: #991b1b;
+  padding: 0.9rem 1rem;
+}
+
+.free-overview-failed-detail strong {
+  font-weight: 800;
+}
+
+.free-overview-failed-detail span {
+  color: #7f1d1d;
+  line-height: 1.6;
+}
+
 .free-overview-waiting-cta {
   display: flex;
   align-items: center;
