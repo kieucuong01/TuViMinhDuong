@@ -33,6 +33,13 @@ describe("production release command", () => {
     expect(releaseScript).toContain("https://lasotinhhoa.vn/kien-thuc-tu-vi");
   });
 
+  it("seeds the curated pSEO inventory before building the VPS release", () => {
+    expect(releaseScript).toContain("npm run pseo:seed");
+    expect(releaseScript.indexOf("npm run pseo:seed")).toBeLessThan(
+      releaseScript.lastIndexOf("npm run build"),
+    );
+  });
+
   it("documents the normal command and migration variant", () => {
     expect(releaseGuide).toContain('npm run release:production -- "feat: mô tả thay đổi"');
     expect(releaseGuide).toContain("-Migrate");
