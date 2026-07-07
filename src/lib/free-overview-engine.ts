@@ -660,6 +660,19 @@ function normalizeWordCountSmooth(content: string, plan: FreeOverviewNarrativePl
     output = candidate;
     index += 1;
   }
+
+  const strategicBridges = [
+    "\n\nĐiểm cần giữ lại sau bản đọc thử này là cách bạn ra quyết định khi dữ kiện chưa hoàn toàn rõ. Một lá số có thể chỉ ra áp lực, nhưng giá trị thực tế nằm ở việc biến áp lực đó thành hệ thống: việc nào đo được thì đo, việc nào cần người cùng chịu trách nhiệm thì nói rõ, việc nào chỉ làm bạn mất sức mà không tạo giá trị thì nên đặt lại giới hạn.",
+    "\n\nNếu chỉ đọc một đoạn rồi kết luận ngay, bạn sẽ dễ bỏ qua phần quan trọng nhất: mỗi tín hiệu cần được nối với hoàn cảnh hiện tại của bạn. Vì vậy, hãy xem bản miễn phí như lớp bản đồ đầu tiên; nó giúp nhận diện khu vực cần soi kỹ, còn bản chuyên sâu mới trả lời nên đi nhanh, đi chậm hay dừng lại ở điểm nào.",
+  ];
+  let bridgeIndex = 0;
+  while (countWords(output) < 1400 && bridgeIndex < strategicBridges.length) {
+    const candidate = removeRepeatedSentences(`${output}${strategicBridges[bridgeIndex]}`);
+    if (countWords(candidate) > 1650) break;
+    output = candidate;
+    bridgeIndex += 1;
+  }
+
   return output;
 }
 

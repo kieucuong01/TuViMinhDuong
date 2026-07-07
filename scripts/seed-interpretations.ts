@@ -17,6 +17,8 @@ if (!validation.ok) {
 const prisma = new PrismaClient({ adapter: new PrismaPg({ connectionString: databaseUrl }) });
 
 try {
+  const activeRuleKeys = rules.map((rule) => rule.key);
+
   for (const rule of rules) {
     const data = {
       scope: rule.scope,
@@ -43,7 +45,15 @@ try {
     });
   }
 
-  console.log(`Seeded ${rules.length} interpretation rules.`);
+  const deleted = await prisma.interpretationRule.deleteMany({
+    where: {
+      key: {
+        notIn: activeRuleKeys,
+      },
+    },
+  });
+
+  console.log(`Seeded ${rules.length} interpretation rules. Removed ${deleted.count} stale rules.`);
 } finally {
   await prisma.$disconnect();
 }
