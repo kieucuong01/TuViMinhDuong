@@ -101,13 +101,13 @@ describe("free overview interpretation engine", () => {
     for (const overview of [overviewA, overviewB, overviewC]) {
       expect(countWords(overview)).toBeGreaterThanOrEqual(1400);
       expect(countWords(overview)).toBeLessThanOrEqual(1650);
-      expect(overview).toContain("## Tín hiệu nổi bật của lá số");
+      expect(overview).toContain("# Bản đọc thử lá số tử vi");
       expect(overview).not.toContain("## Mỏ neo");
-      expect(overview).toContain("## Điểm đáng chú ý nhất");
-      expect(overview).toContain("## Công việc và tài chính");
-      expect(overview).toContain("## Tình cảm và quan hệ");
-      expect(overview).toContain("## Vận năm 2026");
-      expect(overview).toContain("## Câu hỏi mở trước khi đi sâu");
+      expect(overview).toContain("## 1. Khí chất cốt lõi");
+      expect(overview).toContain("## 2. Công việc và hướng đi");
+      expect(overview).toContain("## 3. Tài chính và nguồn lực");
+      expect(overview).toContain("## 4. Gia đình, quan hệ và nhịp sống");
+      expect(overview).toContain("## Mở khóa bản luận giải chuyên sâu");
       expect(overview).toMatch(/\bbạn\b/);
       expect(overview).not.toContain("người đọc");
       expect(overview).not.toMatch(/\d+\/100/);
@@ -117,14 +117,21 @@ describe("free overview interpretation engine", () => {
       expect(overview).not.toContain("**Điểm bổ sung:**");
       expect(overview).not.toMatch(/Căn cứ:/);
       expect(overview).toMatch(/lá số cho thấy|trong lá số|dấu hiệu tử vi/i);
+      expect(overview).toContain("tấm bản đồ");
+      expect(overview).toContain("Những gì bạn vừa đọc chỉ là bề nổi");
+      expect(overview).toContain("Bản Luận Giải Chuyên Sâu");
+      expect(overview).toContain("lộ trình");
+      expect(overview).toContain("mở khóa");
+      expect(overview).not.toContain("tháng tử huyệt");
+      expect(overview).not.toContain("thời điểm vàng");
       expect(overview).not.toMatch(/\b(vì|và|hoặc|nhưng|là|rằng|khi|nếu|mà)\./i);
       expect(overview).not.toMatch(/nhận việc hoặc\.|tưởng là an toàn nhưng lại\./i);
       expect(repeatedSentences(overview).size).toBe(0);
     }
 
-    const openingA = overviewA.split("\n\n")[1];
-    const openingB = overviewB.split("\n\n")[1];
-    const openingC = overviewC.split("\n\n")[1];
+    const openingA = overviewA.match(/## 1\. Khí chất cốt lõi: .+/)?.[0];
+    const openingB = overviewB.match(/## 1\. Khí chất cốt lõi: .+/)?.[0];
+    const openingC = overviewC.match(/## 1\. Khí chất cốt lõi: .+/)?.[0];
     expect(new Set([openingA, openingB, openingC]).size).toBe(3);
     expect(overviewA).not.toContain("không dễ quyết theo cảm hứng nhất thời");
   });

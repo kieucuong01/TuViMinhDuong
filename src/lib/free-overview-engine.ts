@@ -520,7 +520,69 @@ function normalizeWordCount(content: string, plan: FreeOverviewNarrativePlan) {
   return output;
 }
 
+function composeLeadMagnet(plan: FreeOverviewNarrativePlan, chart: TuViChart) {
+  const { primary, secondary, career, money, relationship, health, year } = buildInsightSet(plan);
+  const facts = plan.facts;
+  const isYoung = facts.age <= 21;
+  const lifeFrame = isYoung
+    ? "Với độ tuổi này, hãy hiểu các chữ như công việc, tiền bạc và trách nhiệm theo nghĩa rất gần: chọn ngành, lịch học, bài tập nhóm, câu lạc bộ, tiền tiêu vặt, học phí và việc part-time."
+    : "Ở giai đoạn trưởng thành, các tín hiệu này nên được đọc qua vai trò công việc, tiền bạc, gia đình, trách nhiệm thân thiết, nhịp nghỉ và những quyết định dài hạn.";
+  const paidFocus = isYoung
+    ? "lộ trình học tập, lựa chọn môi trường, cách giữ năng lượng và các mốc nên đi chậm trong năm"
+    : "lộ trình công việc, tiền bạc, quan hệ thân thiết và các mốc cần kiểm chứng trước khi quyết";
+
+  return removeRepeatedSentences(`# Bản đọc thử lá số tử vi: Bức tranh tổng quan & những chỉ báo cốt lõi
+${chart.input.fullName} (${facts.menhThanLabel})
+
+Bản đọc thử này không bắt đầu bằng những lời tiên đoán định mệnh. Nó là **một tấm bản đồ** giải mã cách bạn tư duy, xử lý áp lực và lý do có lúc bạn phải đi một đường khác số đông.
+
+Điểm quan trọng nhất của bản miễn phí là nói trúng **chuyện gì đang diễn ra** và **vì sao nó lặp lại**. Phần cách xử lý cụ thể, mốc nào nên đi nhanh, mốc nào nên giữ lại và việc nào nên ưu tiên sẽ được giữ cho Bản Luận Giải Chuyên Sâu.
+
+## 1. Khí chất cốt lõi: ${primary.title}
+${primary.summary} ${primary.evidence} ${primary.strength}
+
+Nhìn ở tầng đời sống, dấu hiệu này cho thấy bạn không chỉ phản ứng bằng cảm xúc nhất thời. Bạn thường âm thầm dựng trong đầu một hệ thống kiểm tra riêng: điều gì đáng tin, điều gì còn thiếu dữ kiện, ai thật sự có trách nhiệm và việc nào đang lấy đi quá nhiều sức lực. ${primary.caution}
+
+${primary.advice} ${lifeFrame} **Đây là phần thường tạo cảm giác “đúng quá”**: lá số không chỉ nói bạn mạnh hay yếu, mà chỉ ra kiểu áp lực bạn hay tự gánh và lý do bạn khó yên tâm khi mọi thứ còn mơ hồ.
+
+## 2. Công việc và hướng đi: ${career.title}
+${career.summary} ${career.evidence} ${career.strength}
+
+Ở mảng công việc, lá số cho thấy bạn không hợp với cách đi mù mờ hoặc giao hết quyền kiểm soát cho người khác. Bạn cần hiểu rõ luật chơi, phạm vi trách nhiệm và giá trị thật của việc mình đang làm. Khi thiếu các điều kiện này, bạn dễ vừa làm vừa nghi ngờ, hoặc tự kéo thêm việc về phía mình để mọi thứ “chắc” hơn.
+
+Lớp nghĩa thứ hai là **${secondary.title}**. ${insightParagraph(secondary)} Điều này không phải lời phán tốt xấu. Nó là tín hiệu cho thấy có một điểm nghẽn cần đọc kỹ: bạn đang thiếu môi trường phù hợp, thiếu người chia trách nhiệm, hay thiếu một nhịp đi đủ chắc để biến năng lực thành kết quả.
+
+## 3. Tài chính và nguồn lực: ${money.title}
+${money.summary} ${money.evidence} ${money.strength} ${money.caution}
+
+Tài chính trong lá số này không nên hiểu hẹp là số tiền đang có. Nó còn là thời gian, sức lực, sự tập trung và mức độ tự do của bạn. Có người hao vì tiêu xài bốc đồng; nhưng với cấu trúc này, sự hao hụt thường tinh vi hơn: nhận việc không đúng giá trị, ôm trách nhiệm thay người khác, hoặc giữ một lựa chọn quá lâu vì sợ đổi hướng sẽ mất an toàn.
+
+Nếu đọc sâu hơn, phần tài chính sẽ không dừng ở nhận xét chung. Nó cần nối cung Tài Bạch, cung Quan Lộc, đại vận và vận năm để trả lời câu hỏi thực tế hơn: lúc nào nên giữ, lúc nào nên mở, việc nào chỉ làm bạn bận hơn nhưng không làm bạn tự do hơn.
+
+## 4. Gia đình, quan hệ và nhịp sống: ${relationship.title}
+${relationship.summary} ${relationship.evidence} ${relationship.strength} ${relationship.caution}
+
+Một lớp áp lực khác đến từ quan hệ và trách nhiệm thân thiết. Bạn có xu hướng để ý cảm giác của người khác, tính trước rủi ro cho người khác, hoặc tự đứng vào vai người giữ nhịp để mọi chuyện không rối. Điều này có thể tạo uy tín, nhưng cũng dễ làm “cột pin” tinh thần bị rút dần mà chính bạn không nhận ra.
+
+Về sức khỏe và nhịp sống, dấu hiệu cần quan sát là **${health.title}**. ${insightParagraph(health)} Phần này không thay thế tư vấn y khoa. Nó chỉ nhắc rằng khi áp lực kéo dài, cơ thể thường báo trước bằng những tín hiệu nhỏ: ngủ không sâu, nghỉ mà vẫn mệt, dễ cáu, khó tập trung hoặc không còn muốn bắt đầu việc mới.
+
+Năm ${chart.input.viewYear} cần đọc cùng đại vận ${facts.currentDecade.range} tại ${facts.currentDecade.palace}. Vùng vận đang mở ra là **${year.title}**. ${insightParagraph(year)} Vận hạn không phải bản án; nó giống bản đồ thời tiết, cho biết khu vực nào cần mang áo mưa và khu vực nào có thể đi xa hơn nếu chuẩn bị đủ.
+
+## Mở khóa bản luận giải chuyên sâu
+Những gì bạn vừa đọc chỉ là bề nổi của tảng băng chìm; bản chi tiết đang được viết tiếp dưới nền để làm rõ ${paidFocus}. Bản miễn phí này chỉ giữ vai trò chỉ ra **vấn đề là gì** và **vì sao nó đáng chú ý**; Bản Luận Giải Chuyên Sâu mới đi vào phần bạn thật sự cần để ra quyết định.
+
+Trong Bản Luận Giải Chuyên Sâu, bạn sẽ được mở khóa:
+
+- **Lộ trình trọng tâm năm ${chart.input.viewYear}**: vùng nào nên ưu tiên, vùng nào nên đi chậm, vùng nào cần kiểm chứng trước khi quyết.
+- **Chiến lược đọc công việc và nguồn lực**: vì sao bạn dễ ôm việc, dễ chậm quyết hoặc dễ mất sức ở những cam kết tưởng như nhỏ.
+- **Giải mã quan hệ và trách nhiệm thân thiết**: đâu là điểm nâng đỡ, đâu là nơi bạn đang gánh thay quá nhiều.
+- **Bản đồ hành động cá nhân hóa**: nối cung, sao, trạng thái và vận thành một hướng đi rõ hơn.
+
+Lá số đã vạch sẵn các đường nét chính; việc đi nhanh, đi chắc hay dừng lại đúng lúc cần một bản đồ đầy đủ hơn. Hãy mở khóa toàn bộ bản luận giải để đọc tiếp phần còn đang được giữ lại.`);
+}
+
 function composeSmooth(plan: FreeOverviewNarrativePlan, chart: TuViChart) {
+  return composeLeadMagnet(plan, chart);
   const { primary, secondary, tertiary, career, money, relationship, health, year } = buildInsightSet(plan);
   const facts = plan.facts;
   const isYoung = facts.age <= 21;

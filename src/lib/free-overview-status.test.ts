@@ -79,7 +79,7 @@ describe("free overview status", () => {
 
     expect(status.status).toBe("fallback");
     expect(status.source).toBe("template-fallback");
-    expect(status.content).toContain("## Tín hiệu nổi bật của lá số");
+    expect(status.content).toContain("# Bản đọc thử lá số tử vi");
     expect(status.content).not.toContain("## Mỏ neo");
     expect(status.content).not.toContain("**Điểm chính:**");
     expect(status.content).not.toMatch(/Căn cứ:/);
