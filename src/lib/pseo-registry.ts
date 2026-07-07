@@ -4,6 +4,7 @@ import {
   MANUAL_PSEO_BATCH_4_SLUGS,
   MANUAL_PSEO_BATCH_5_SLUGS,
   MANUAL_PSEO_BATCH_6_SLUGS,
+  MANUAL_PSEO_BATCH_7_SLUGS,
   getCuratedPseoContent,
 } from "./pseo-curated.ts";
 
@@ -259,7 +260,7 @@ export function buildPseoCombinations() {
   return MAIN_STARS.flatMap((star) => PALACES.map((palace) => buildPseoDraft(star.slug, palace.slug)));
 }
 
-export { CURATED_PSEO_SLUGS, MANUAL_PSEO_BATCH_3_SLUGS, MANUAL_PSEO_BATCH_4_SLUGS, MANUAL_PSEO_BATCH_5_SLUGS, MANUAL_PSEO_BATCH_6_SLUGS };
+export { CURATED_PSEO_SLUGS, MANUAL_PSEO_BATCH_3_SLUGS, MANUAL_PSEO_BATCH_4_SLUGS, MANUAL_PSEO_BATCH_5_SLUGS, MANUAL_PSEO_BATCH_6_SLUGS, MANUAL_PSEO_BATCH_7_SLUGS };
 
 export function buildPseoInventory() {
   const curated = new Set<string>(CURATED_PSEO_SLUGS);
