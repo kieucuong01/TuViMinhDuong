@@ -120,4 +120,76 @@ describe("admin business dashboard", () => {
       sourceLabel: "Luận giải nhanh",
     });
   });
+
+  it("summarizes report overview metrics and daily trends", async () => {
+    const recentDate = daysAgo(1);
+    const oldDate = daysAgo(30);
+    const users = [{ createdAt: oldDate }, { createdAt: recentDate }];
+    const charts = [
+      { userId: "user-1", createdAt: oldDate },
+      { userId: null, createdAt: recentDate },
+      { userId: "user-2", createdAt: recentDate },
+    ];
+    const readings = [{ status: "COMPLETED" }, { status: "PENDING" }];
+    const articles = [
+      { slug: "published", status: "published", robots: "index,follow", canonicalUrl: "/kien-thuc-tu-vi/published" },
+      { slug: "hidden", status: "published", robots: "noindex,follow", canonicalUrl: "/kien-thuc-tu-vi/hidden" },
+    ];
+
+    function countByCreatedAt(rows: Array<{ createdAt: Date }>, args?: { where?: { createdAt?: { lt?: Date; gte?: Date } } }) {
+      const range = args?.where?.createdAt;
+      if (!range) return rows.length;
+      return rows.filter((row) => {
+        if (range.lt && !(row.createdAt < range.lt)) return false;
+        if (range.gte && !(row.createdAt >= range.gte)) return false;
+        return true;
+      }).length;
+    }
+
+    const db = {
+      $queryRaw: vi.fn(async () => []),
+      featurePrice: { findMany: vi.fn(async () => []) },
+      user: { count: vi.fn(async (args) => countByCreatedAt(users, args)) },
+      chart: {
+        count: vi.fn(async (args) => {
+          if (args?.where?.userId === null) return charts.filter((chart) => chart.userId === null).length;
+          return countByCreatedAt(charts, args);
+        }),
+      },
+      reading: {
+        count: vi.fn(async (args) => args?.where?.status === "COMPLETED"
+          ? readings.filter((reading) => reading.status === "COMPLETED").length
+          : readings.length),
+      },
+      article: {
+        count: vi.fn(async () => articles.length),
+        findMany: vi.fn(async () => articles),
+      },
+      pseoPage: { count: vi.fn(async () => 5) },
+      paymentOrder: { count: vi.fn(async () => 4) },
+      coinPackage: { findMany: vi.fn(async () => []) },
+    };
+    mocks.getDb.mockReturnValue(db);
+
+    const { getAdminOverview } = await import("@/lib/data");
+    const overview = await getAdminOverview("day");
+    const trendTotals = overview.trends.reduce((sum, point) => ({
+      newUsers: sum.newUsers + point.newUsers,
+      charts: sum.charts + point.charts,
+    }), { newUsers: 0, charts: 0 });
+
+    expect(overview.users).toBe(2);
+    expect(overview.charts).toBe(3);
+    expect(overview.unlockedReadings).toBe(1);
+    expect(overview.seoArticles).toBe(2);
+    expect(overview.pseoArticles).toBe(37);
+    expect(overview.guestCharts).toBe(1);
+    expect(overview.guestChartRate).toBe(33.3);
+    expect(overview.sitemapFiles).toBe(16);
+    expect(overview.sitemapMainUrls).toBe(18);
+    expect(overview.trendPeriod).toBe("day");
+    expect(overview.trends).toHaveLength(14);
+    expect(trendTotals.newUsers).toBe(1);
+    expect(trendTotals.charts).toBe(2);
+  });
 });

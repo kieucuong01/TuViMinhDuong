@@ -3,7 +3,7 @@ import { Banknote, ClipboardList, Coins, Eye, FilePenLine, Plus, ReceiptText, Se
 import { redirect } from "next/navigation";
 import { adjustUserCoinsAction, deleteUserAction, saveArticleAction, saveArticleCategoryAction, saveFeaturePricesAction, saveOperationSettingsAction } from "@/app/actions";
 import { getCurrentUser } from "@/lib/auth";
-import { getAdminArticleBySlug, getAdminBusinessDashboard, getAdminOverview, listAdminArticles, listAdminChartSubmissions, listArticleCategories } from "@/lib/data";
+import { getAdminArticleBySlug, getAdminBusinessDashboard, getAdminOverview, listAdminArticles, listAdminChartSubmissions, listArticleCategories, normalizeAdminTrendPeriod, type AdminTrendPeriod, type AdminTrendPoint } from "@/lib/data";
 import type { ArticleView } from "@/lib/content";
 import { LoadingSubmitButton } from "@/components/loading-submit-button";
 import { AdminArticleDeleteForm } from "@/components/admin-article-delete-form";
@@ -16,17 +16,17 @@ export const metadata = {
 type AdminTab = "overview" | "users" | "charts" | "revenue" | "content" | "settings" | "pricing";
 const ARTICLES_PER_ADMIN_PAGE = 8;
 
-const adminTabs: Array<{ id: AdminTab; label: string; helper: string }> = [
-  { id: "overview", label: "Tổng quan", helper: "Chỉ số chính" },
-  { id: "users", label: "User", helper: "Tài khoản đăng ký" },
-  { id: "charts", label: "Lá số", helper: "Form đã submit" },
-  { id: "revenue", label: "Doanh thu", helper: "Đơn hàng và dòng tiền" },
-  { id: "content", label: "Bài viết", helper: "CMS và SEO" },
-  { id: "settings", label: "Cấu hình", helper: "Bật/tắt vận hành" },
-  { id: "pricing", label: "Giá", helper: "Xu từng tính năng" },
+const adminTabs: Array<{ id: AdminTab; label: string; helper: string; href: string }> = [
+  { id: "overview", label: "Tổng quan", helper: "Chỉ số chính", href: "/admin?tab=overview" },
+  { id: "users", label: "User", helper: "Tài khoản đăng ký", href: "/admin?tab=users" },
+  { id: "charts", label: "Lá số", helper: "Form đã submit", href: "/admin?tab=charts" },
+  { id: "revenue", label: "Doanh thu", helper: "Đơn hàng và dòng tiền", href: "/admin?tab=revenue" },
+  { id: "content", label: "Bài viết", helper: "CMS và SEO", href: "/admin?tab=content" },
+  { id: "settings", label: "Cấu hình", helper: "Bật/tắt vận hành", href: "/admin?tab=settings" },
+  { id: "pricing", label: "Giá", helper: "Xu từng tính năng", href: "/admin?tab=pricing" },
 ];
 
-function normalizeAdminTab(params: { tab?: string; edit?: string; saved?: string; categorySaved?: string; deleted?: string; settingsSaved?: string; userAdjusted?: string; userDeleted?: string; userError?: string; pricingSaved?: string; pricingError?: string; articleModal?: string; articlePage?: string }): AdminTab {
+function normalizeAdminTab(params: { tab?: string; edit?: string; saved?: string; categorySaved?: string; deleted?: string; settingsSaved?: string; userAdjusted?: string; userDeleted?: string; userError?: string; pricingSaved?: string; pricingError?: string; articleModal?: string; articlePage?: string; trend?: string }): AdminTab {
   if (params.edit || params.saved || params.categorySaved || params.deleted) return "content";
   if (params.settingsSaved) return "settings";
   if (params.userAdjusted || params.userDeleted || params.userError) return "users";
@@ -98,6 +98,45 @@ function formatVnd(value = 0) {
   }).format(value);
 }
 
+function formatInteger(value = 0) {
+  return new Intl.NumberFormat("vi-VN").format(value);
+}
+
+function formatPercent(value = 0) {
+  return `${new Intl.NumberFormat("vi-VN", { maximumFractionDigits: 1 }).format(value)}%`;
+}
+
+const trendPeriodOptions: Array<{ id: AdminTrendPeriod; label: string }> = [
+  { id: "day", label: "Ngày" },
+  { id: "week", label: "Tuần" },
+  { id: "month", label: "Tháng" },
+];
+
+function trendHref(period: AdminTrendPeriod) {
+  return `/admin?tab=overview&trend=${period}`;
+}
+
+function maxTrendValue(points: AdminTrendPoint[], keys: Array<keyof Pick<AdminTrendPoint, "newUsers" | "charts" | "cumulativeUsers" | "cumulativeCharts">>) {
+  return Math.max(1, ...points.flatMap((point) => keys.map((key) => Number(point[key] || 0))));
+}
+
+function trendPolyline(points: AdminTrendPoint[], key: "cumulativeUsers" | "cumulativeCharts", maxValue: number) {
+  const width = 640;
+  const height = 210;
+  const gutter = 24;
+  const step = points.length > 1 ? (width - gutter * 2) / (points.length - 1) : 0;
+  return points.map((point, index) => {
+    const x = gutter + step * index;
+    const y = height - gutter - (Number(point[key] || 0) / maxValue) * (height - gutter * 2);
+    return `${x.toFixed(1)},${y.toFixed(1)}`;
+  }).join(" ");
+}
+
+function barHeight(value: number, maxValue: number) {
+  if (value <= 0) return "2px";
+  return `${Math.max(10, Math.round((value / maxValue) * 100))}%`;
+}
+
 function seoTone(score = 0) {
   if (score >= 80) return "good";
   if (score >= 60) return "ok";
@@ -164,14 +203,15 @@ function seoChecks(article: ArticleView) {
     .filter(Boolean) as Array<{ label: string; passed: boolean; hint: string }>;
 }
 
-export default async function AdminPage({ searchParams }: { searchParams: Promise<{ tab?: string; saved?: string; edit?: string; categorySaved?: string; deleted?: string; settingsSaved?: string; userAdjusted?: string; userDeleted?: string; userError?: string; pricingSaved?: string; pricingError?: string; articleModal?: string; articlePage?: string }> }) {
+export default async function AdminPage({ searchParams }: { searchParams: Promise<{ tab?: string; saved?: string; edit?: string; categorySaved?: string; deleted?: string; settingsSaved?: string; userAdjusted?: string; userDeleted?: string; userError?: string; pricingSaved?: string; pricingError?: string; articleModal?: string; articlePage?: string; trend?: string }> }) {
   const user = await getCurrentUser();
   if (user?.role !== "ADMIN") redirect("/dang-nhap?next=/admin");
 
   const params = await searchParams;
   const activeTab = normalizeAdminTab(params);
+  const requestedTrendPeriod = normalizeAdminTrendPeriod(params.trend);
   const [overview, business, chartSubmissions, articles, categories, editingArticle] = await Promise.all([
-    getAdminOverview(),
+    getAdminOverview(requestedTrendPeriod),
     getAdminBusinessDashboard(),
     activeTab === "charts" ? listAdminChartSubmissions() : Promise.resolve([]),
     listAdminArticles(),
@@ -187,6 +227,18 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
   const paginatedArticles = articles.slice((articlePage - 1) * ARTICLES_PER_ADMIN_PAGE, articlePage * ARTICLES_PER_ADMIN_PAGE);
   const isArticleModalOpen = activeTab === "content" && (params.articleModal === "new" || Boolean(params.edit));
   const closeArticleModalHref = adminContentHref({ articlePage });
+  const trendPeriod = normalizeAdminTrendPeriod(overview.trendPeriod);
+  const trendMaxPeriodValue = maxTrendValue(overview.trends, ["newUsers", "charts"]);
+  const trendMaxCumulativeValue = maxTrendValue(overview.trends, ["cumulativeUsers", "cumulativeCharts"]);
+  const reportMetrics = [
+    { label: "Tổng Tài khoản", value: formatInteger(overview.users), note: "Tài khoản đã đăng ký" },
+    { label: "Lá số được lập", value: formatInteger(overview.charts), note: "Tổng form lập lá số đã lưu" },
+    { label: "Luận giải đã mở khóa", value: formatInteger(overview.unlockedReadings), note: `${formatInteger(overview.readings)} lượt luận giải trong hệ thống` },
+    { label: "Tổng số Bài viết SEO", value: formatInteger(overview.seoArticles), note: "CMS bài viết không bị xóa" },
+    { label: "Tổng số Bài viết pSEO", value: formatInteger(overview.pseoArticles), note: "Trang tra cứu published và entity pSEO" },
+    { label: "Tỷ lệ Lá số vãng lai", value: formatPercent(overview.guestChartRate), note: `${formatInteger(overview.guestCharts)} / ${formatInteger(overview.charts)} lá số không gắn tài khoản` },
+    { label: "Số Sitemap", value: formatInteger(overview.sitemapFiles), note: `${formatInteger(overview.sitemapMainUrls)} URL trong sitemap chính` },
+  ];
 
   return (
     <main className="section" data-testid="admin-page">
@@ -215,7 +267,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
 
         <nav className="admin-tabs" aria-label="Mục quản trị">
           {adminTabs.map((tab) => (
-            <Link key={tab.id} href={`/admin?tab=${tab.id}`} className={tab.id === activeTab ? "admin-tab-link active" : "admin-tab-link"} aria-current={tab.id === activeTab ? "page" : undefined} prefetch={false}>
+            <Link key={tab.id} href={tab.href} className={tab.id === activeTab ? "admin-tab-link active" : "admin-tab-link"} aria-current={tab.id === activeTab ? "page" : undefined} prefetch={false}>
               <strong>{tab.label}</strong>
               <span>{tab.helper}</span>
             </Link>
@@ -225,49 +277,113 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
         {activeTab === "overview" ? <section className="admin-tab-section">
           <div className="admin-panel-head">
             <div>
-              <p className="eyebrow">Tổng quan</p>
-              <h2>Chỉ số nhanh</h2>
+              <p className="eyebrow">Báo cáo</p>
+              <h2>Tổng quan dự án</h2>
             </div>
           </div>
-          <div className="mt-4 grid gap-4 md:grid-cols-5">
-          {[
-            ["Users", overview.users],
-            ["Lá số", overview.charts],
-            ["Readings", overview.readings],
-            ["Bài viết", overview.articles],
-            ["Thanh toán", overview.payments],
-          ].map(([label, value]) => (
-            <div key={String(label)} className="metric-card bg-white">
-              <strong>{String(value)}</strong>
-              <span>{String(label)}</span>
-            </div>
-          ))}
+          <div className="admin-report-metrics">
+            {reportMetrics.map((metric) => (
+              <article key={metric.label} className="admin-report-metric">
+                <span>{metric.label}</span>
+                <strong>{metric.value}</strong>
+                <small>{metric.note}</small>
+              </article>
+            ))}
           </div>
-          <div className="admin-overview-grid">
-            <article className="panel">
-              <p className="eyebrow">Doanh thu</p>
-              <h2 className="admin-overview-value">{formatVnd(business.revenue.totalPaidVnd)}</h2>
-              <p className="admin-overview-note">{business.revenue.paidOrders} đơn đã thanh toán, {formatVnd(business.revenue.last30DaysPaidVnd)} trong 30 ngày gần nhất.</p>
-              <Link href="/admin?tab=revenue" className="btn btn-ghost btn-small mt-4" prefetch={false}>Xem doanh thu</Link>
+
+          <div className="admin-trend-head">
+            <div>
+              <p className="eyebrow">Xu hướng</p>
+              <h2>Tài khoản mới và lá số theo {trendPeriod === "day" ? "ngày" : trendPeriod === "week" ? "tuần" : "tháng"}</h2>
+            </div>
+            <div className="admin-trend-tabs" aria-label="Chọn kỳ báo cáo">
+              {trendPeriodOptions.map((option) => (
+                <Link key={option.id} href={trendHref(option.id)} className={option.id === trendPeriod ? "active" : ""} prefetch={false}>
+                  {option.label}
+                </Link>
+              ))}
+            </div>
+          </div>
+
+          <div className="admin-trend-grid">
+            <article className="panel admin-trend-panel">
+              <div className="admin-panel-head">
+                <div>
+                  <p className="eyebrow">Chart 1</p>
+                  <h3>Cộng dồn số liệu</h3>
+                </div>
+                <div className="admin-chart-legend">
+                  <span className="users">Tài khoản</span>
+                  <span className="charts">Lá số</span>
+                </div>
+              </div>
+              <svg className="admin-line-chart" viewBox="0 0 640 210" role="img" aria-label="Biểu đồ cộng dồn tài khoản và lá số">
+                <line x1="24" y1="186" x2="616" y2="186" />
+                <polyline className="users" points={trendPolyline(overview.trends, "cumulativeUsers", trendMaxCumulativeValue)} />
+                <polyline className="charts" points={trendPolyline(overview.trends, "cumulativeCharts", trendMaxCumulativeValue)} />
+              </svg>
+              <div className="admin-chart-axis" aria-hidden="true">
+                {overview.trends.map((point) => <span key={`cumulative-${point.label}`}>{point.label}</span>)}
+              </div>
             </article>
-            <article className="panel">
-              <p className="eyebrow">User mới</p>
-              <h2 className="admin-overview-value">{business.recentUsers.length}</h2>
-              <p className="admin-overview-note">Danh sách gần nhất đang lấy tối đa 12 tài khoản để admin theo dõi nhanh.</p>
-              <Link href="/admin?tab=users" className="btn btn-ghost btn-small mt-4" prefetch={false}>Xem user</Link>
+
+            <article className="panel admin-trend-panel">
+              <div className="admin-panel-head">
+                <div>
+                  <p className="eyebrow">Chart 2</p>
+                  <h3>Số liệu theo kỳ</h3>
+                </div>
+                <div className="admin-chart-legend">
+                  <span className="users">Tài khoản mới</span>
+                  <span className="charts">Lá số</span>
+                </div>
+              </div>
+              <div className="admin-bar-chart" aria-label="Biểu đồ tài khoản mới và lá số theo kỳ">
+                {overview.trends.map((point) => (
+                  <div key={`period-${point.label}`} className="admin-bar-column">
+                    <div className="admin-bar-pair">
+                      <span className="users" style={{ height: barHeight(point.newUsers, trendMaxPeriodValue) }} title={`${point.label}: ${point.newUsers} tài khoản mới`} />
+                      <span className="charts" style={{ height: barHeight(point.charts, trendMaxPeriodValue) }} title={`${point.label}: ${point.charts} lá số`} />
+                    </div>
+                    <small>{point.label}</small>
+                  </div>
+                ))}
+              </div>
             </article>
-            <article className="panel">
-              <p className="eyebrow">Form lập lá số</p>
-              <h2 className="admin-overview-value">{overview.charts}</h2>
-              <p className="admin-overview-note">Theo dõi khách vãng lai và user đã đăng nhập đã submit form lập lá số.</p>
-              <Link href="/admin?tab=charts" className="btn btn-ghost btn-small mt-4" prefetch={false}>Xem lá số</Link>
-            </article>
-            <article className="panel">
-              <p className="eyebrow">Bài viết</p>
-              <h2 className="admin-overview-value">{articles.length}</h2>
-              <p className="admin-overview-note">Quản lý nháp, xuất bản, preview và checklist SEO trong mục Bài viết.</p>
-              <Link href="/admin?tab=content" className="btn btn-ghost btn-small mt-4" prefetch={false}>Mở CMS</Link>
-            </article>
+          </div>
+
+          <div className="panel admin-trend-table-panel">
+            <div className="admin-panel-head">
+              <div>
+                <p className="eyebrow">Dữ liệu chart</p>
+                <h3>Ngày, tài khoản mới, lá số</h3>
+              </div>
+              <span className="admin-overview-note">Đang xem theo {trendPeriod === "day" ? "ngày" : trendPeriod === "week" ? "tuần" : "tháng"}</span>
+            </div>
+            <div className="admin-table-wrap">
+              <table className="admin-data-table">
+                <thead>
+                  <tr>
+                    <th>Ngày</th>
+                    <th>Tài khoản mới</th>
+                    <th>Lá số</th>
+                    <th>Tài khoản cộng dồn</th>
+                    <th>Lá số cộng dồn</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {overview.trends.map((point) => (
+                    <tr key={`trend-row-${point.label}`}>
+                      <td><strong>{point.label}</strong></td>
+                      <td>{formatInteger(point.newUsers)}</td>
+                      <td>{formatInteger(point.charts)}</td>
+                      <td>{formatInteger(point.cumulativeUsers)}</td>
+                      <td>{formatInteger(point.cumulativeCharts)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </section> : null}
 

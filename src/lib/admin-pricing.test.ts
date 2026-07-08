@@ -12,7 +12,11 @@ function createDb() {
     user: { count: vi.fn(async () => 1) },
     chart: { count: vi.fn(async () => 2) },
     reading: { count: vi.fn(async () => 3) },
-    article: { count: vi.fn(async () => 4) },
+    article: {
+      count: vi.fn(async () => 4),
+      findMany: vi.fn(async () => []),
+    },
+    pseoPage: { count: vi.fn(async () => 0) },
     paymentOrder: { count: vi.fn(async () => 5) },
     coinPackage: { findMany: vi.fn(async () => []) },
     featurePrice: {

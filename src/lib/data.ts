@@ -14,6 +14,7 @@ import {
 } from "@/lib/ai";
 import { scoreArticleSeo } from "@/lib/seo";
 import { slugify } from "@/lib/format";
+import { MAIN_STARS, PALACES, SUPPORT_STARS, buildPseoInventory } from "@/lib/pseo-registry";
 import type { SessionUser } from "@/lib/auth";
 import { createPerfTimer, logPerfEvent } from "@/lib/perf";
 import type { ReadingProgressInput } from "@/lib/reading-progress";
@@ -111,6 +112,133 @@ export type AdminBusinessDashboard = {
   recentUsers: AdminRecentUser[];
   recentPayments: AdminRecentPayment[];
 };
+
+export type AdminTrendPeriod = "day" | "week" | "month";
+
+export type AdminTrendPoint = {
+  label: string;
+  start: Date;
+  end: Date;
+  newUsers: number;
+  charts: number;
+  cumulativeUsers: number;
+  cumulativeCharts: number;
+};
+
+const ADMIN_TREND_PERIODS = new Set<AdminTrendPeriod>(["day", "week", "month"]);
+const CORE_SITEMAP_URLS = 7;
+const TRUST_SITEMAP_URLS = 4;
+
+export function normalizeAdminTrendPeriod(value?: string | null): AdminTrendPeriod {
+  return ADMIN_TREND_PERIODS.has(value as AdminTrendPeriod) ? (value as AdminTrendPeriod) : "day";
+}
+
+function startOfDay(date: Date) {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+}
+
+function startOfWeek(date: Date) {
+  const start = startOfDay(date);
+  const day = start.getDay();
+  start.setDate(start.getDate() - ((day + 6) % 7));
+  return start;
+}
+
+function startOfMonth(date: Date) {
+  return new Date(date.getFullYear(), date.getMonth(), 1);
+}
+
+function addTrendPeriod(date: Date, period: AdminTrendPeriod, amount = 1) {
+  const next = new Date(date);
+  if (period === "day") next.setDate(next.getDate() + amount);
+  if (period === "week") next.setDate(next.getDate() + amount * 7);
+  if (period === "month") next.setMonth(next.getMonth() + amount);
+  return next;
+}
+
+function trendLabel(date: Date, period: AdminTrendPeriod) {
+  if (period === "month") {
+    return date.toLocaleDateString("vi-VN", { month: "2-digit", year: "2-digit" });
+  }
+  return date.toLocaleDateString("vi-VN", { day: "2-digit", month: "2-digit" });
+}
+
+function buildTrendBuckets(period: AdminTrendPeriod, now = new Date()) {
+  const count = period === "day" ? 14 : 12;
+  const currentStart = period === "day" ? startOfDay(now) : period === "week" ? startOfWeek(now) : startOfMonth(now);
+  const firstStart = addTrendPeriod(currentStart, period, -(count - 1));
+  return Array.from({ length: count }, (_, index) => {
+    const start = addTrendPeriod(firstStart, period, index);
+    const end = addTrendPeriod(start, period);
+    return { label: trendLabel(start, period), start, end };
+  });
+}
+
+function countDatesInRange(dates: Date[], start: Date, end: Date) {
+  return dates.filter((date) => date >= start && date < end).length;
+}
+
+function isIndexableSitemapArticle(article: { slug: string; status?: string; robots?: string | null; canonicalUrl?: string | null }) {
+  if (article.status && article.status !== "published") return false;
+  if (String(article.robots || "").toLowerCase().includes("noindex")) return false;
+  const canonical = String(article.canonicalUrl || "").trim();
+  return !canonical || canonical === `/kien-thuc-tu-vi/${article.slug}` || canonical.endsWith(`/kien-thuc-tu-vi/${article.slug}`);
+}
+
+async function buildDbAdminTrends(db: NonNullable<ReturnType<typeof getDb>>, period: AdminTrendPeriod): Promise<AdminTrendPoint[]> {
+  const buckets = buildTrendBuckets(period);
+  const firstStart = buckets[0]?.start || startOfDay(new Date());
+  const [baseUsers, baseCharts, newUsers, charts] = await Promise.all([
+    db.user.count({ where: { createdAt: { lt: firstStart } } }),
+    db.chart.count({ where: { createdAt: { lt: firstStart } } }),
+    Promise.all(buckets.map((bucket) => db.user.count({ where: { createdAt: { gte: bucket.start, lt: bucket.end } } }))),
+    Promise.all(buckets.map((bucket) => db.chart.count({ where: { createdAt: { gte: bucket.start, lt: bucket.end } } }))),
+  ]);
+
+  let cumulativeUsers = baseUsers;
+  let cumulativeCharts = baseCharts;
+  return buckets.map((bucket, index) => {
+    cumulativeUsers += newUsers[index] || 0;
+    cumulativeCharts += charts[index] || 0;
+    return {
+      ...bucket,
+      newUsers: newUsers[index] || 0,
+      charts: charts[index] || 0,
+      cumulativeUsers,
+      cumulativeCharts,
+    };
+  });
+}
+
+function buildDemoAdminTrends(period: AdminTrendPeriod): AdminTrendPoint[] {
+  const buckets = buildTrendBuckets(period);
+  const userDates = new Map<string, Date>();
+  const chartDates: Date[] = [];
+  for (const chart of charts().values()) {
+    chartDates.push(chart.createdAt);
+    if (chart.userId) {
+      const existing = userDates.get(chart.userId);
+      if (!existing || chart.createdAt < existing) userDates.set(chart.userId, chart.createdAt);
+    }
+  }
+  const userDateList = Array.from(userDates.values());
+  const firstStart = buckets[0]?.start || startOfDay(new Date());
+  let cumulativeUsers = countDatesInRange(userDateList, new Date(0), firstStart);
+  let cumulativeCharts = countDatesInRange(chartDates, new Date(0), firstStart);
+  return buckets.map((bucket) => {
+    const newUsers = countDatesInRange(userDateList, bucket.start, bucket.end);
+    const chartCount = countDatesInRange(chartDates, bucket.start, bucket.end);
+    cumulativeUsers += newUsers;
+    cumulativeCharts += chartCount;
+    return {
+      ...bucket,
+      newUsers,
+      charts: chartCount,
+      cumulativeUsers,
+      cumulativeCharts,
+    };
+  });
+}
 
 export type StoredReadingProgress = ReadingProgressInput & {
   id: string;
@@ -2018,35 +2146,83 @@ export async function listAdminChartSubmissions(limit = 80): Promise<AdminChartS
   return rows.map((row) => normalizeAdminChartSubmission(row));
 }
 
-export async function getAdminOverview() {
+export async function getAdminOverview(periodInput?: string | null) {
+  const period = normalizeAdminTrendPeriod(periodInput);
   const db = getDb();
   const [operationSettings, featurePrices] = await Promise.all([getOperationSettings(), getFeaturePrices()]);
+  const pseoEntityCount = MAIN_STARS.length + PALACES.length + SUPPORT_STARS.length;
+  const sitemapFiles = 2 + MAIN_STARS.length;
   if (!db) {
+    const demoCharts = Array.from(charts().values());
+    const guestCharts = demoCharts.filter((chart) => !chart.userId).length;
+    const pseoArticles = buildPseoInventory().filter((page) => page.status === "PUBLISHED").length + pseoEntityCount;
+    const sitemapMainUrls = CORE_SITEMAP_URLS + SUPPORT_STARS.length + TRUST_SITEMAP_URLS
+      + Array.from(demoArticles().values()).filter(isIndexableSitemapArticle).length;
     return {
       users: 1,
-      charts: charts().size,
+      charts: demoCharts.length,
       readings: readings().size,
+      unlockedReadings: readings().size,
       articles: demoArticles().size,
+      seoArticles: demoArticles().size,
+      pseoArticles,
       payments: 0,
+      guestCharts,
+      guestChartRate: demoCharts.length ? Math.round((guestCharts / demoCharts.length) * 1000) / 10 : 0,
+      sitemapFiles,
+      sitemapMainUrls,
+      trendPeriod: period,
+      trends: buildDemoAdminTrends(period),
       coinPackages: COIN_PACKAGES,
       featurePrices,
       operationSettings,
     };
   }
-  const [users, chartCount, readingCount, articleCount, paymentCount, packages] = await Promise.all([
+  const [
+    users,
+    chartCount,
+    guestChartCount,
+    readingCount,
+    unlockedReadingCount,
+    articleCount,
+    sitemapArticles,
+    pseoPageCount,
+    paymentCount,
+    packages,
+    trends,
+  ] = await Promise.all([
     db.user.count(),
     db.chart.count(),
+    db.chart.count({ where: { userId: null } }),
     db.reading.count(),
+    db.reading.count({ where: { status: "COMPLETED" } }),
     db.article.count({ where: { status: { not: DELETED_ARTICLE_STATUS } } }),
+    db.article.findMany({
+      where: { status: "published" },
+      select: { slug: true, status: true, robots: true, canonicalUrl: true },
+    }),
+    db.pseoPage.count({ where: { status: "PUBLISHED" } }),
     db.paymentOrder.count(),
     db.coinPackage.findMany({ orderBy: { priceVnd: "asc" } }),
+    buildDbAdminTrends(db, period),
   ]);
+  const sitemapMainUrls = CORE_SITEMAP_URLS + SUPPORT_STARS.length + TRUST_SITEMAP_URLS
+    + sitemapArticles.filter(isIndexableSitemapArticle).length;
   return {
     users,
     charts: chartCount,
     readings: readingCount,
+    unlockedReadings: unlockedReadingCount,
     articles: articleCount,
+    seoArticles: articleCount,
+    pseoArticles: pseoPageCount + pseoEntityCount,
     payments: paymentCount,
+    guestCharts: guestChartCount,
+    guestChartRate: chartCount ? Math.round((guestChartCount / chartCount) * 1000) / 10 : 0,
+    sitemapFiles,
+    sitemapMainUrls,
+    trendPeriod: period,
+    trends,
     coinPackages: packages.length ? packages : COIN_PACKAGES,
     featurePrices,
     operationSettings,
