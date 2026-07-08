@@ -3,10 +3,11 @@ import { Banknote, ClipboardList, Coins, Eye, FilePenLine, Plus, ReceiptText, Se
 import { redirect } from "next/navigation";
 import { adjustUserCoinsAction, deleteUserAction, saveArticleAction, saveArticleCategoryAction, saveFeaturePricesAction, saveOperationSettingsAction } from "@/app/actions";
 import { getCurrentUser } from "@/lib/auth";
-import { getAdminArticleBySlug, getAdminBusinessDashboard, getAdminOverview, listAdminArticles, listAdminChartSubmissions, listArticleCategories, normalizeAdminTrendPeriod, type AdminTrendPeriod, type AdminTrendPoint } from "@/lib/data";
+import { getAdminArticleBySlug, getAdminBusinessDashboard, getAdminOverview, listAdminArticles, listAdminChartSubmissions, listArticleCategories, normalizeAdminTrendPeriod } from "@/lib/data";
 import type { ArticleView } from "@/lib/content";
 import { LoadingSubmitButton } from "@/components/loading-submit-button";
 import { AdminArticleDeleteForm } from "@/components/admin-article-delete-form";
+import { AdminTrendCharts } from "@/components/admin-trend-charts";
 
 export const metadata = {
   title: "Admin",
@@ -106,37 +107,6 @@ function formatPercent(value = 0) {
   return `${new Intl.NumberFormat("vi-VN", { maximumFractionDigits: 1 }).format(value)}%`;
 }
 
-const trendPeriodOptions: Array<{ id: AdminTrendPeriod; label: string }> = [
-  { id: "day", label: "Ngày" },
-  { id: "week", label: "Tuần" },
-  { id: "month", label: "Tháng" },
-];
-
-function trendHref(period: AdminTrendPeriod) {
-  return `/admin?tab=overview&trend=${period}`;
-}
-
-function maxTrendValue(points: AdminTrendPoint[], keys: Array<keyof Pick<AdminTrendPoint, "newUsers" | "charts" | "cumulativeUsers" | "cumulativeCharts">>) {
-  return Math.max(1, ...points.flatMap((point) => keys.map((key) => Number(point[key] || 0))));
-}
-
-function trendPolyline(points: AdminTrendPoint[], key: "cumulativeUsers" | "cumulativeCharts", maxValue: number) {
-  const width = 640;
-  const height = 210;
-  const gutter = 24;
-  const step = points.length > 1 ? (width - gutter * 2) / (points.length - 1) : 0;
-  return points.map((point, index) => {
-    const x = gutter + step * index;
-    const y = height - gutter - (Number(point[key] || 0) / maxValue) * (height - gutter * 2);
-    return `${x.toFixed(1)},${y.toFixed(1)}`;
-  }).join(" ");
-}
-
-function barHeight(value: number, maxValue: number) {
-  if (value <= 0) return "2px";
-  return `${Math.max(10, Math.round((value / maxValue) * 100))}%`;
-}
-
 function seoTone(score = 0) {
   if (score >= 80) return "good";
   if (score >= 60) return "ok";
@@ -228,8 +198,6 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
   const isArticleModalOpen = activeTab === "content" && (params.articleModal === "new" || Boolean(params.edit));
   const closeArticleModalHref = adminContentHref({ articlePage });
   const trendPeriod = normalizeAdminTrendPeriod(overview.trendPeriod);
-  const trendMaxPeriodValue = maxTrendValue(overview.trends, ["newUsers", "charts"]);
-  const trendMaxCumulativeValue = maxTrendValue(overview.trends, ["cumulativeUsers", "cumulativeCharts"]);
   const reportMetrics = [
     { label: "Tổng Tài khoản", value: formatInteger(overview.users), note: "Tài khoản đã đăng ký" },
     { label: "Lá số được lập", value: formatInteger(overview.charts), note: "Tổng form lập lá số đã lưu" },
@@ -291,100 +259,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
             ))}
           </div>
 
-          <div className="admin-trend-head">
-            <div>
-              <p className="eyebrow">Xu hướng</p>
-              <h2>Tài khoản mới và lá số theo {trendPeriod === "day" ? "ngày" : trendPeriod === "week" ? "tuần" : "tháng"}</h2>
-            </div>
-            <div className="admin-trend-tabs" aria-label="Chọn kỳ báo cáo">
-              {trendPeriodOptions.map((option) => (
-                <Link key={option.id} href={trendHref(option.id)} className={option.id === trendPeriod ? "active" : ""} prefetch={false}>
-                  {option.label}
-                </Link>
-              ))}
-            </div>
-          </div>
-
-          <div className="admin-trend-grid">
-            <article className="panel admin-trend-panel">
-              <div className="admin-panel-head">
-                <div>
-                  <p className="eyebrow">Chart 1</p>
-                  <h3>Cộng dồn số liệu</h3>
-                </div>
-                <div className="admin-chart-legend">
-                  <span className="users">Tài khoản</span>
-                  <span className="charts">Lá số</span>
-                </div>
-              </div>
-              <svg className="admin-line-chart" viewBox="0 0 640 210" role="img" aria-label="Biểu đồ cộng dồn tài khoản và lá số">
-                <line x1="24" y1="186" x2="616" y2="186" />
-                <polyline className="users" points={trendPolyline(overview.trends, "cumulativeUsers", trendMaxCumulativeValue)} />
-                <polyline className="charts" points={trendPolyline(overview.trends, "cumulativeCharts", trendMaxCumulativeValue)} />
-              </svg>
-              <div className="admin-chart-axis" aria-hidden="true">
-                {overview.trends.map((point) => <span key={`cumulative-${point.label}`}>{point.label}</span>)}
-              </div>
-            </article>
-
-            <article className="panel admin-trend-panel">
-              <div className="admin-panel-head">
-                <div>
-                  <p className="eyebrow">Chart 2</p>
-                  <h3>Số liệu theo kỳ</h3>
-                </div>
-                <div className="admin-chart-legend">
-                  <span className="users">Tài khoản mới</span>
-                  <span className="charts">Lá số</span>
-                </div>
-              </div>
-              <div className="admin-bar-chart" aria-label="Biểu đồ tài khoản mới và lá số theo kỳ">
-                {overview.trends.map((point) => (
-                  <div key={`period-${point.label}`} className="admin-bar-column">
-                    <div className="admin-bar-pair">
-                      <span className="users" style={{ height: barHeight(point.newUsers, trendMaxPeriodValue) }} title={`${point.label}: ${point.newUsers} tài khoản mới`} />
-                      <span className="charts" style={{ height: barHeight(point.charts, trendMaxPeriodValue) }} title={`${point.label}: ${point.charts} lá số`} />
-                    </div>
-                    <small>{point.label}</small>
-                  </div>
-                ))}
-              </div>
-            </article>
-          </div>
-
-          <div className="panel admin-trend-table-panel">
-            <div className="admin-panel-head">
-              <div>
-                <p className="eyebrow">Dữ liệu chart</p>
-                <h3>Ngày, tài khoản mới, lá số</h3>
-              </div>
-              <span className="admin-overview-note">Đang xem theo {trendPeriod === "day" ? "ngày" : trendPeriod === "week" ? "tuần" : "tháng"}</span>
-            </div>
-            <div className="admin-table-wrap">
-              <table className="admin-data-table">
-                <thead>
-                  <tr>
-                    <th>Ngày</th>
-                    <th>Tài khoản mới</th>
-                    <th>Lá số</th>
-                    <th>Tài khoản cộng dồn</th>
-                    <th>Lá số cộng dồn</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {overview.trends.map((point) => (
-                    <tr key={`trend-row-${point.label}`}>
-                      <td><strong>{point.label}</strong></td>
-                      <td>{formatInteger(point.newUsers)}</td>
-                      <td>{formatInteger(point.charts)}</td>
-                      <td>{formatInteger(point.cumulativeUsers)}</td>
-                      <td>{formatInteger(point.cumulativeCharts)}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
+          <AdminTrendCharts initialPeriod={trendPeriod} trendGroups={overview.trendGroups} />
         </section> : null}
 
         {activeTab === "revenue" ? <section className="admin-business-grid admin-tab-section">

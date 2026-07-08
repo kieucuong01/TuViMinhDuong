@@ -125,7 +125,10 @@ export type AdminTrendPoint = {
   cumulativeCharts: number;
 };
 
+export type AdminTrendGroups = Record<AdminTrendPeriod, AdminTrendPoint[]>;
+
 const ADMIN_TREND_PERIODS = new Set<AdminTrendPeriod>(["day", "week", "month"]);
+const ADMIN_TREND_PERIOD_LIST: AdminTrendPeriod[] = ["day", "week", "month"];
 const CORE_SITEMAP_URLS = 7;
 const TRUST_SITEMAP_URLS = 4;
 
@@ -157,10 +160,11 @@ function addTrendPeriod(date: Date, period: AdminTrendPeriod, amount = 1) {
 }
 
 function trendLabel(date: Date, period: AdminTrendPeriod) {
+  const twoDigits = (value: number) => String(value).padStart(2, "0");
   if (period === "month") {
-    return date.toLocaleDateString("vi-VN", { month: "2-digit", year: "2-digit" });
+    return `${twoDigits(date.getMonth() + 1)}/${String(date.getFullYear()).slice(-2)}`;
   }
-  return date.toLocaleDateString("vi-VN", { day: "2-digit", month: "2-digit" });
+  return `${twoDigits(date.getDate())}/${twoDigits(date.getMonth() + 1)}`;
 }
 
 function buildTrendBuckets(period: AdminTrendPeriod, now = new Date()) {
@@ -238,6 +242,19 @@ function buildDemoAdminTrends(period: AdminTrendPeriod): AdminTrendPoint[] {
       cumulativeCharts,
     };
   });
+}
+
+async function buildDbAdminTrendGroups(db: NonNullable<ReturnType<typeof getDb>>): Promise<AdminTrendGroups> {
+  const entries = await Promise.all(
+    ADMIN_TREND_PERIOD_LIST.map(async (period) => [period, await buildDbAdminTrends(db, period)] as const),
+  );
+  return Object.fromEntries(entries) as AdminTrendGroups;
+}
+
+function buildDemoAdminTrendGroups(): AdminTrendGroups {
+  return Object.fromEntries(
+    ADMIN_TREND_PERIOD_LIST.map((period) => [period, buildDemoAdminTrends(period)]),
+  ) as AdminTrendGroups;
 }
 
 export type StoredReadingProgress = ReadingProgressInput & {
@@ -2158,6 +2175,7 @@ export async function getAdminOverview(periodInput?: string | null) {
     const pseoArticles = buildPseoInventory().filter((page) => page.status === "PUBLISHED").length + pseoEntityCount;
     const sitemapMainUrls = CORE_SITEMAP_URLS + SUPPORT_STARS.length + TRUST_SITEMAP_URLS
       + Array.from(demoArticles().values()).filter(isIndexableSitemapArticle).length;
+    const trendGroups = buildDemoAdminTrendGroups();
     return {
       users: 1,
       charts: demoCharts.length,
@@ -2172,7 +2190,8 @@ export async function getAdminOverview(periodInput?: string | null) {
       sitemapFiles,
       sitemapMainUrls,
       trendPeriod: period,
-      trends: buildDemoAdminTrends(period),
+      trends: trendGroups[period],
+      trendGroups,
       coinPackages: COIN_PACKAGES,
       featurePrices,
       operationSettings,
@@ -2189,7 +2208,7 @@ export async function getAdminOverview(periodInput?: string | null) {
     pseoPageCount,
     paymentCount,
     packages,
-    trends,
+    trendGroups,
   ] = await Promise.all([
     db.user.count(),
     db.chart.count(),
@@ -2204,7 +2223,7 @@ export async function getAdminOverview(periodInput?: string | null) {
     db.pseoPage.count({ where: { status: "PUBLISHED" } }),
     db.paymentOrder.count(),
     db.coinPackage.findMany({ orderBy: { priceVnd: "asc" } }),
-    buildDbAdminTrends(db, period),
+    buildDbAdminTrendGroups(db),
   ]);
   const sitemapMainUrls = CORE_SITEMAP_URLS + SUPPORT_STARS.length + TRUST_SITEMAP_URLS
     + sitemapArticles.filter(isIndexableSitemapArticle).length;
@@ -2222,7 +2241,8 @@ export async function getAdminOverview(periodInput?: string | null) {
     sitemapFiles,
     sitemapMainUrls,
     trendPeriod: period,
-    trends,
+    trends: trendGroups[period],
+    trendGroups,
     coinPackages: packages.length ? packages : COIN_PACKAGES,
     featurePrices,
     operationSettings,

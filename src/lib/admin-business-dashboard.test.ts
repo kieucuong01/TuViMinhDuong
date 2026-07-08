@@ -189,6 +189,10 @@ describe("admin business dashboard", () => {
     expect(overview.sitemapMainUrls).toBe(18);
     expect(overview.trendPeriod).toBe("day");
     expect(overview.trends).toHaveLength(14);
+    expect(overview.trendGroups.day).toHaveLength(14);
+    expect(overview.trendGroups.week).toHaveLength(12);
+    expect(overview.trendGroups.month).toHaveLength(12);
+    expect(overview.trends).toBe(overview.trendGroups.day);
     expect(trendTotals.newUsers).toBe(1);
     expect(trendTotals.charts).toBe(2);
   });
