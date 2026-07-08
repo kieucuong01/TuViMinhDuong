@@ -36,6 +36,7 @@ describe("SEO content cluster", () => {
     expect(slugs).toContain("cung-phu-mau-trong-tu-vi");
     expect(slugs).toContain("lap-la-so-tu-vi-can-gi");
     expect(slugs).toContain("la-so-tu-vi-tron-doi");
+    expect(slugs).toContain("la-so-tu-vi-co-thay-doi-khong");
     expect(slugs).toContain("sao-thien-co");
     expect(slugs).toContain("sao-thai-duong");
     expect(slugs).toContain("sao-tham-lang-trong-tu-vi");
@@ -59,11 +60,11 @@ describe("SEO content cluster", () => {
     const cungPhuMauGuide = seedArticles.find((article) => article.slug === "cung-phu-mau-trong-tu-vi");
     const setupChecklistGuide = seedArticles.find((article) => article.slug === "lap-la-so-tu-vi-can-gi");
     const tronDoiGuide = seedArticles.find((article) => article.slug === "la-so-tu-vi-tron-doi");
+    const changingChartGuide = seedArticles.find((article) => article.slug === "la-so-tu-vi-co-thay-doi-khong");
     const mainStarsPillar = seedArticles.find((article) => article.slug === "sao-chinh-tinh-tu-vi");
     const saoThienCoGuide = seedArticles.find((article) => article.slug === "sao-thien-co");
     const saoThaiDuongGuide = seedArticles.find((article) => article.slug === "sao-thai-duong");
     const saoThamLangGuide = seedArticles.find((article) => article.slug === "sao-tham-lang-trong-tu-vi");
-    const allStarsGuide = seedArticles.find((article) => article.slug === "cac-sao-trong-la-so-tu-vi");
 
     expect(hub?.content).toContain("/#lap-la-so");
     expect(hub?.content).toContain("/kien-thuc-tu-vi/cung-menh-cung-than");
@@ -113,6 +114,13 @@ describe("SEO content cluster", () => {
     expect(tronDoiGuide?.content).toContain("/#lap-la-so");
     expect(tronDoiGuide?.content).toContain("/kien-thuc-tu-vi/lap-la-so-tu-vi-chuan");
     expect(tronDoiGuide?.content).toContain("/kien-thuc-tu-vi/dai-van-la-gi");
+    expect(changingChartGuide?.content).toContain("/#lap-la-so");
+    expect(changingChartGuide?.content).toContain("/kien-thuc-tu-vi/lap-la-so-tu-vi-chuan");
+    expect(changingChartGuide?.content).toContain("/kien-thuc-tu-vi/tieu-van-la-gi");
+    expect(changingChartGuide?.content).toContain("| Tình huống | Có làm lá số gốc thay đổi không? | Vì sao kết quả khác đi |");
+    expect(changingChartGuide?.content).toContain(
+      "| Dấu hiệu đang gặp | Có thể giữ lá số hiện tại để đọc tiếp | Nên lập thêm lá số thứ hai để so |",
+    );
     expect(mainStarsPillar?.content).toContain("/kien-thuc-tu-vi/sao-tu-vi");
     expect(mainStarsPillar?.content).toContain("/kien-thuc-tu-vi/sao-thien-co");
     expect(mainStarsPillar?.content).toContain("/kien-thuc-tu-vi/sao-thai-duong");
@@ -141,6 +149,21 @@ describe("SEO content cluster", () => {
     expect(allStarsGuide?.content).toContain("/kien-thuc-tu-vi/an-sao-la-so-tu-vi");
     expect(allStarsGuide?.content).toContain("| Nhóm sao / dấu hiệu |");
     expect(allStarsGuide?.content).toContain("| Dữ liệu nền cần khóa |");
+  });
+
+  it("ships the changing-chart article as a distinct troubleshooting guide with clear data blocks", () => {
+    const changingChartGuide = seedArticles.find((article) => article.slug === "la-so-tu-vi-co-thay-doi-khong");
+
+    expect(changingChartGuide).toBeTruthy();
+    expect(changingChartGuide?.coverImage).toBe("/articles/la-so-tu-vi-co-thay-doi-khong.webp");
+    expect(changingChartGuide?.ogImage).toBe("/articles/la-so-tu-vi-co-thay-doi-khong.webp");
+    expect(changingChartGuide?.coverAlt).toContain("hai phiên bản lá số tử vi");
+    expect(changingChartGuide?.coverAlt).toContain("giờ sinh");
+    expect(changingChartGuide?.content).toContain("/kien-thuc-tu-vi/gio-sinh-trong-tu-vi");
+    expect(changingChartGuide?.content).toContain("/kien-thuc-tu-vi/la-so-tu-vi-tron-doi");
+    expect(changingChartGuide?.content).toContain("/kien-thuc-tu-vi/nguyet-van-nhat-van");
+    expect(changingChartGuide?.content).toContain("## Khung causal analysis để kiểm tra “đổi” hay “không đổi”");
+    expect(changingChartGuide?.faqs?.length).toBeGreaterThanOrEqual(3);
   });
 
   it("uses dedicated SEO images for every public knowledge article", () => {
@@ -266,6 +289,7 @@ describe("SEO content cluster", () => {
           "cung-phu-mau-trong-tu-vi",
           "lap-la-so-tu-vi-can-gi",
           "la-so-tu-vi-tron-doi",
+          "la-so-tu-vi-co-thay-doi-khong",
           "sao-tham-lang-trong-tu-vi",
           "cac-sao-trong-la-so-tu-vi",
         ].includes(article.slug),
