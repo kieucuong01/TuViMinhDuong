@@ -150,6 +150,49 @@ export function pseoScores(starSlug: string, palaceSlug: string): PseoScores {
   };
 }
 
+const STAR_SERP_ANGLES: Record<string, { title: string; snippet: string }> = {
+  "tu-vi": { title: "vai trò trung tâm", snippet: "nhu cầu tổ chức, giữ vai trò và điều phối đại cục" },
+  "thien-co": { title: "mưu lược xoay chuyển", snippet: "tư duy linh hoạt, khả năng đổi phương án và xử lý dữ kiện" },
+  "thai-duong": { title: "trách nhiệm soi sáng", snippet: "sự rõ ràng, trách nhiệm và nhu cầu đứng ra gánh việc" },
+  "vu-khuc": { title: "kỷ luật nguồn lực", snippet: "tính thực tế, kỷ luật và cách quản trị nguồn lực" },
+  "thien-dong": { title: "thích nghi mềm dẻo", snippet: "khả năng hòa nhịp, làm dịu căng thẳng và thích nghi" },
+  "liem-trinh": { title: "ranh giới đúng sai", snippet: "nguyên tắc, sức hút và cách giữ ranh giới cá nhân" },
+  "thien-phu": { title: "bảo toàn nền tảng", snippet: "khả năng chứa đựng, bảo toàn và điều phối bền bỉ" },
+  "thai-am": { title: "cảm nhận và tích lũy", snippet: "độ sâu nội tâm, nhu cầu an toàn và năng lực quan sát tinh tế" },
+  "tham-lang": { title: "ham muốn mở rộng", snippet: "sức hút xã hội, nhu cầu trải nghiệm và khả năng học qua va chạm" },
+  "cu-mon": { title: "phản biện và lời nói", snippet: "ngôn ngữ, tranh biện và khả năng nhìn ra điểm chưa rõ" },
+  "thien-tuong": { title: "bảo vệ tiêu chuẩn", snippet: "khả năng hỗ trợ, giữ công bằng và bảo vệ chuẩn mực" },
+  "thien-luong": { title: "kinh nghiệm bảo hộ", snippet: "đạo lý, kinh nghiệm và cách nâng đỡ người khác" },
+  "that-sat": { title: "quyết đoán áp lực", snippet: "sự dứt khoát, sức chịu áp lực và năng lực cắt bế tắc" },
+  "pha-quan": { title: "phá cũ lập mới", snippet: "năng lực tái cấu trúc, kết thúc chu kỳ cũ và mở hướng mới" },
+};
+
+const PALACE_SERP_ANGLES: Record<string, { title: string; snippet: string }> = {
+  "menh": { title: "bản thân", snippet: "khí chất, phản ứng đầu tiên và cách tự định vị" },
+  "phu-mau": { title: "cha mẹ", snippet: "nếp gia đình, người lớn và nguồn nâng đỡ ban đầu" },
+  "phuc-duc": { title: "phúc phần", snippet: "đời sống tinh thần, nền gia tộc và sức bền nội tâm" },
+  "dien-trach": { title: "nhà cửa", snippet: "nhà cửa, tài sản, không gian sống và nền ổn định" },
+  "quan-loc": { title: "sự nghiệp", snippet: "công việc, trách nhiệm và cách tạo giá trị xã hội" },
+  "no-boc": { title: "bạn bè", snippet: "bạn bè, cộng sự, đội nhóm và cách hợp tác" },
+  "thien-di": { title: "ra ngoài", snippet: "môi trường xã hội, dịch chuyển và phản ứng khi bước ra ngoài" },
+  "tat-ach": { title: "áp lực", snippet: "thói quen, sức bền và tín hiệu cần chăm sóc bản thân" },
+  "tai-bach": { title: "tiền bạc", snippet: "tiền bạc, tài sản và cách tạo-dùng-giữ nguồn lực" },
+  "tu-tuc": { title: "con cái", snippet: "con cái, dự án dài hạn và điều được nuôi dưỡng" },
+  "phu-the": { title: "hôn nhân", snippet: "quan hệ đôi lứa, kỳ vọng và cách cùng nhau quyết định" },
+  "huynh-de": { title: "anh em", snippet: "anh chị em, người ngang hàng và mạng lưới gần" },
+};
+
+function pseoSerpCopy(star: PseoEntityDefinition, palace: PseoEntityDefinition) {
+  const starAngle = STAR_SERP_ANGLES[star.slug] || { title: star.summary, snippet: star.summary };
+  const palaceAngle = PALACE_SERP_ANGLES[palace.slug] || { title: palace.summary, snippet: palace.summary };
+  return {
+    title: `${star.name} cung ${palace.name}: ${starAngle.title} trong ${palaceAngle.title}`,
+    excerpt: `Khi ${star.name} gặp cung ${palace.name}, trọng tâm là ${starAngle.snippet} đặt vào chủ đề ${palaceAngle.snippet}.`,
+    metaTitle: `${star.name} cung ${palace.name}: ${starAngle.title} ở ${palaceAngle.title}`,
+    metaDescription: `Đọc ${star.name} tại ${palace.name} qua ${starAngle.snippet}; đối chiếu với ${palaceAngle.snippet}, điểm dễ lệch và câu hỏi tự kiểm trong lá số.`,
+  };
+}
+
 function bodyFor(star: PseoEntityDefinition, palace: PseoEntityDefinition, scores: PseoScores) {
   const sameStarLinks = PALACES.filter((item) => item.slug !== palace.slug).slice(0, 3)
     .map((item) => `[${star.name} cung ${item.name}](/tra-cuu/sao-${star.slug}-cung-${item.slug})`).join(", ");
@@ -222,7 +265,8 @@ export function buildPseoDraft(starSlug: string, palaceSlug: string): PseoPageDr
   const palace = PALACES.find((item) => item.slug === palaceSlug);
   if (!star || !palace) throw new Error(`Unknown pSEO combination: ${starSlug}/${palaceSlug}`);
   const scores = pseoScores(starSlug, palaceSlug);
-  const title = `Sao ${star.name} cung ${palace.name}: ý nghĩa và cách luận giải`;
+  const serp = pseoSerpCopy(star, palace);
+  const title = serp.title;
   const slug = `sao-${star.slug}-cung-${palace.slug}`;
   const now = new Date("2026-06-25T00:00:00+07:00");
   return {
@@ -230,7 +274,7 @@ export function buildPseoDraft(starSlug: string, palaceSlug: string): PseoPageDr
     status: "PUBLISHED",
     slug,
     title,
-    excerpt: `Giải thích ${star.name} tại cung ${palace.name}, gồm điểm thuận lợi, điều cần lưu ý, chỉ số tham khảo và cách đối chiếu với lá số cá nhân.`,
+    excerpt: serp.excerpt,
     body: bodyFor(star, palace, scores),
     starSlug,
     palaceSlug,
@@ -249,8 +293,8 @@ export function buildPseoDraft(starSlug: string, palaceSlug: string): PseoPageDr
       },
     ],
     focusKeyword: `sao ${star.name.toLowerCase()} cung ${palace.name.toLowerCase()}`,
-    metaTitle: `${star.name} cung ${palace.name}: ý nghĩa và cách đọc`,
-    metaDescription: `Tra cứu ${star.name} tại cung ${palace.name}: điểm thuận lợi, điều cần thận trọng, chỉ số tham khảo và cách đối chiếu đúng với lá số cá nhân.`,
+    metaTitle: serp.metaTitle,
+    metaDescription: serp.metaDescription,
     canonicalUrl: `/tra-cuu/${slug}`,
     robots: "index,follow",
     publishedAt: now,

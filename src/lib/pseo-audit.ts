@@ -44,6 +44,20 @@ function shingles(value: string, size = 7) {
   return result;
 }
 
+function normalizeSerpFormula(value: string) {
+  return value
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/đ/g, "d")
+    .replace(/[“”"'`]/g, "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .replace(/tra cuu\s+[\p{L}\s]{2,48}\s+(?:tai|o)\s+cung\s+[\p{L}\s]{2,48}(?=\s*[:.,])/gu, "tra cuu STAR tai cung PALACE")
+    .replace(/(?:sao\s+)?[\p{L}\s]{2,48}\s+cung\s+[\p{L}\s]{2,48}(?=\s*[:|–-])/gu, "STAR cung PALACE")
+    .replace(/\b[\p{L}\s]{2,48}\s+(?:tai|o)\s+cung\s+[\p{L}\s]{2,48}(?=\s*[:.,])/gu, "STAR tai cung PALACE");
+}
+
 export function contentSimilarityScore(first: string, second: string) {
   const firstSet = shingles(first);
   const secondSet = shingles(second);
@@ -112,6 +126,23 @@ export function auditPseoInventory(pages: PseoPageDraft[]) {
           message: `Nội dung quá giống ${first.slug}; không publish trang tra cứu dạng template.`,
         });
       }
+    }
+  }
+  const serpPatterns = new Map<string, PseoPageDraft[]>();
+  for (const page of publishedPages) {
+    const pattern = `${normalizeSerpFormula(page.metaTitle)} || ${normalizeSerpFormula(page.metaDescription)}`;
+    serpPatterns.set(pattern, [...(serpPatterns.get(pattern) || []), page]);
+  }
+  for (const matches of serpPatterns.values()) {
+    if (matches.length < 2) continue;
+    const [first, ...duplicates] = matches;
+    for (const page of duplicates) {
+      findings.push({
+        severity: "error",
+        code: "repeated-serp-pattern",
+        slug: page.slug,
+        message: `Title/meta qua giong ${first.slug}; can viet theo intent rieng de tranh Google gom ket qua.`,
+      });
     }
   }
   return findings;

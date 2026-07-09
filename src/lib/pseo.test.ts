@@ -121,6 +121,23 @@ describe("pSEO audit", () => {
     expect(findings.map((finding) => finding.code)).toContain("duplicate-template");
   });
 
+  it("flags repeated SERP metadata formulas across lookup pages", () => {
+    const [first, second] = buildPseoInventory().filter((page) => page.status === "PUBLISHED");
+    const findings = auditPseoInventory([
+      {
+        ...first,
+        metaTitle: "Tử Vi cung Mệnh: ý nghĩa và cách đọc",
+        metaDescription: "Tra cứu Tử Vi tại cung Mệnh: điểm thuận lợi, điều cần thận trọng và cách đối chiếu đúng với lá số cá nhân.",
+      },
+      {
+        ...second,
+        metaTitle: "Thiên Cơ cung Quan Lộc: ý nghĩa và cách đọc",
+        metaDescription: "Tra cứu Thiên Cơ tại cung Quan Lộc: điểm thuận lợi, điều cần thận trọng và cách đối chiếu đúng với lá số cá nhân.",
+      },
+    ]);
+    expect(findings.map((finding) => finding.code)).toContain("repeated-serp-pattern");
+  });
+
   it("rejects proper Vietnamese absolute claims and article-shape artifacts", () => {
     const source = buildPseoInventory().find((page) => page.status === "PUBLISHED")!;
     const findings = auditPseoPage({

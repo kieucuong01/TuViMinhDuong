@@ -591,7 +591,7 @@ function parseBatch2Slug(slug: string) {
 }
 
 function titleForBatch2(star: typeof BATCH2_STARS[Batch2StarKey], palace: typeof BATCH2_PALACES[Batch2PalaceKey]) {
-  return `Sao ${star.name} cung ${palace.name}: ý nghĩa và cách tự đối chiếu`;
+  return `${star.name} cung ${palace.name}: ${star.gift.split(",")[0]} trong ${palace.name}`;
 }
 
 function buildBatch2Content(slug: string): CuratedPage | undefined {
@@ -611,9 +611,9 @@ function buildBatch2Content(slug: string): CuratedPage | undefined {
 
   return {
     title: titleForBatch2(star, palace),
-    excerpt: `Tra cứu ${star.name} tại cung ${palace.name}: cách hiểu ${palace.lens}, điểm mạnh, rủi ro và checklist tự đối chiếu trước khi luận sâu lá số.`,
-    metaTitle: `${star.name} cung ${palace.name}: ý nghĩa và cách đọc`,
-    metaDescription: `Hướng dẫn đọc ${star.name} ở cung ${palace.name}: trọng tâm luận giải, điểm thuận lợi, rủi ro, checklist đời sống và cách đối chiếu với lá số cá nhân.`,
+    excerpt: `Tra cứu ${star.name} tại cung ${palace.name} qua trọng tâm ${star.gift} khi xét ${palace.lens}; có checklist tự đối chiếu trước khi luận sâu lá số.`,
+    metaTitle: `${star.name} cung ${palace.name}: ${star.gift.split(",")[0]} ở ${palace.name}`,
+    metaDescription: `Đọc ${star.name} ở cung ${palace.name} qua ${star.gift}; đối chiếu với ${palace.decision}, rủi ro dễ lệch và dữ kiện cần kiểm trong lá số.`,
     body: `## ${star.name} ở cung ${palace.name} nên được đọc từ câu hỏi nào?
 
 Khi ${star.name} nằm tại cung ${palace.name}, câu hỏi đầu tiên không phải là tốt hay xấu, mà là: ${palace.question}. ${star.name} mang sắc thái ${star.temperament}; cung ${palace.name} lại mở ra lớp ${palace.lens}. Ghép hai phần này với nhau, người đọc có một bản đồ để tự quan sát thay vì vội dán nhãn vận mệnh.
