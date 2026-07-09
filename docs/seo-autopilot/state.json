@@ -1,13 +1,13 @@
 {
-  "lastRunAt": "2026-07-06T06:28:33.058Z",
-  "lastStatus": "success",
+  "lastRunAt": "2026-07-09T04:00:38.327Z",
+  "lastStatus": "warning",
   "lastAction": {
     "type": "single_article_publish",
-    "slug": "cac-sao-trong-la-so-tu-vi",
+    "slug": "la-so-tu-vi-theo-ngay-thang-nam-sinh",
     "slugs": [
-      "cac-sao-trong-la-so-tu-vi"
+      "la-so-tu-vi-theo-ngay-thang-nam-sinh"
     ],
-    "reason": "Rejected duplicate-intent candidate xem-la-so-tu-vi-mien-phi because la-so-tu-vi-mien-phi already covers that reader need, then selected the next distinct SEMrush-backed topic cac-sao-trong-la-so-tu-vi.",
+    "reason": "Publish 1 people-first articles from SEMrush intent clusters; first topic: Người đọc muốn biết chỉ với ngày tháng năm sinh thì lập lá số tử vi được đến đâu, thiếu giờ sinh sẽ lệch phần nào và nên kiểm tra gì trước khi tin vào kết quả.",
     "approvalRequired": false,
     "allowedToCommitDeployAfterVerification": true
   },
@@ -20,9 +20,9 @@
     "status": "skipped"
   },
   "lastDraftPaths": [
-    "docs/seo-autopilot/drafts/cac-sao-trong-la-so-tu-vi.md"
+    "docs/seo-autopilot/drafts/la-so-tu-vi-theo-ngay-thang-nam-sinh.md"
   ],
-  "lastReportPath": "docs/seo-autopilot/reports/2026-07-06-weekly-content-batch.md",
+  "lastReportPath": "docs/seo-autopilot/reports/2026-07-09-weekly-content-batch.md",
   "nextVerificationCommands": [
     "npm run seo:autopilot",
     "npm test -- src/lib/content.test.ts src/lib/article-cover-assets.test.ts src/lib/seo-autopilot-core.test.ts",

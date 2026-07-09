@@ -463,6 +463,22 @@ describe("SEO content cluster", () => {
     expect(setupChecklistGuide?.faqs?.length).toBeGreaterThanOrEqual(3);
   });
 
+  it("keeps the birth-date-only guide scoped, data-rich, and clear about confidence limits", () => {
+    const birthDateGuide = seedArticles.find((article) => article.slug === "la-so-tu-vi-theo-ngay-thang-nam-sinh");
+
+    expect(birthDateGuide).toBeTruthy();
+    expect(birthDateGuide?.coverImage).toBe("/articles/la-so-tu-vi-theo-ngay-thang-nam-sinh.webp");
+    expect(birthDateGuide?.ogImage).toBe("/articles/la-so-tu-vi-theo-ngay-thang-nam-sinh.webp");
+    expect(birthDateGuide?.content).toContain("| Dữ liệu hiện có |");
+    expect(birthDateGuide?.content).toContain("| Phần của lá số |");
+    expect(birthDateGuide?.content).toContain("| Lớp dữ liệu trên app |");
+    expect(birthDateGuide?.content).toContain("/kien-thuc-tu-vi/gio-sinh-trong-tu-vi");
+    expect(birthDateGuide?.content).toContain("/kien-thuc-tu-vi/lap-la-so-tu-vi-chuan");
+    expect(birthDateGuide?.content).toContain("## Khung causal analysis");
+    expect(birthDateGuide?.content).toContain("đừng chờ đủ hoàn hảo mới bắt đầu");
+    expect(birthDateGuide?.faqs?.length).toBeGreaterThanOrEqual(3);
+  });
+
   it("keeps the trọn đời guide long-horizon, data-rich, and bounded by real-life checks", () => {
     const tronDoiGuide = seedArticles.find((article) => article.slug === "la-so-tu-vi-tron-doi");
 

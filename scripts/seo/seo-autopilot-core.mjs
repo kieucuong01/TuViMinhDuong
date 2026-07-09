@@ -102,6 +102,22 @@ const KEYWORD_CLUSTER_RULES = [
     },
   },
   {
+    id: "theo-ngay-thang-nam-sinh",
+    label: "Theo ngay thang nam sinh",
+    pattern: /\bla so tu vi\b.*\btheo ngay thang nam sinh\b|\btheo ngay thang nam sinh\b.*\bla so tu vi\b/,
+    stage: "conversion-support",
+    pillarSlug: "lap-la-so-tu-vi-can-gi",
+    opportunity: {
+      slug: "la-so-tu-vi-theo-ngay-thang-nam-sinh",
+      cluster: "Chuyển đổi",
+      focusKeyword: "lá số tử vi theo ngày tháng năm sinh",
+      intent:
+        "Người đọc muốn biết chỉ với ngày tháng năm sinh thì lập lá số tử vi được đến đâu, thiếu giờ sinh sẽ lệch phần nào và nên kiểm tra gì trước khi tin vào kết quả.",
+      funnelStage: "conversion-support",
+      priority: 83,
+    },
+  },
+  {
     id: "xem-giai-luan-doc",
     label: "Xem giai luan doc la so",
     pattern: /\b(xem|giai|luan|doc|phan tich|cach xem|cach doc)\b.*\bla so\b|\bla so\b.*\b(xem|giai|luan|doc|phan tich)\b/,
@@ -264,6 +280,11 @@ const KEYWORD_EXCLUSION_RULES = [
   },
 ];
 
+const OVERLAPPING_INTENT_SLUG_GROUPS = [
+  ["la-so-tu-vi-online", "xem-la-so-tu-vi-online"],
+  ["la-so-tu-vi-mien-phi", "xem-la-so-tu-vi-mien-phi"],
+];
+
 const PROGRAMMATIC_SEO_GUARDRAILS = [
   "Doorway Pages: do not create near-duplicate pages by swapping star, palace, birth-year, or keyword variables into the same frame.",
   "Helpful Content: reject thin generic AI advice; every publishable article must add structured data, expert causal logic, and a next useful action.",
@@ -377,7 +398,7 @@ export function buildKeywordDrivenOpportunities({ keywordRows, existingSlugs = [
 
   for (const cluster of intelligence.clusters) {
     for (const item of cluster.opportunities || [cluster.opportunity]) {
-      if (!item?.slug || existing.has(item.slug)) continue;
+      if (!item?.slug || existing.has(item.slug) || overlapsExistingIntent(item.slug, existing)) continue;
       const current = dedupedOpportunities.get(item.slug);
       if (!current || item.priority > current.priority) {
         dedupedOpportunities.set(item.slug, item);
@@ -607,6 +628,7 @@ export function planSeoAutopilotRun({
     ? buildKeywordDrivenOpportunities({ keywordRows: inputKeywordRows, existingSlugs: [...currentSlugs] })
     : null;
   const keywordOpportunities = keywordPlan?.opportunities || [];
+  const keywordIntelligence = keywordPlan?.intelligence || null;
   const refreshOpportunities = rankRefreshTopicOpportunities([...currentSlugs], keywordPlan);
   const opportunities = keywordOpportunities.length
     ? keywordOpportunities
@@ -623,13 +645,46 @@ export function planSeoAutopilotRun({
     articlesPerWeek,
   });
   if (isSinglePublisherRun && normalizedOpportunities.length === 0) {
-    throw new Error("No new SEO article opportunities remain for the daily publisher run.");
+    return {
+      mode: "auto-safe",
+      status: "blocked",
+      summary: [
+        `Sitemap URLs: ${snapshot?.sitemapUrlCount ?? "unknown"}`,
+        ...(snapshot?.warnings || []),
+      ],
+      nextAction: {
+        type: "blocked",
+        slug: "",
+        slugs: [],
+        reason:
+          "No safe new SEO article opportunities remain for the daily publisher run after excluding existing slugs and overlapping reader intents.",
+        approvalRequired: false,
+        allowedToCommitDeployAfterVerification: false,
+      },
+      brief: null,
+      weeklyContentPlan: {
+        strategy: keywordPlan?.opportunities?.length ? "semrush-keyword-intent-funnel" : "topic-cluster-funnel",
+        articlesPerWeek,
+        measurementCadence: "weekly",
+        strategyNotes: [
+          "Daily publisher must stop with Blocked when no distinct SEMrush-backed topic remains after intent deduplication.",
+        ],
+        articles: [],
+      },
+      keywordIntelligence,
+      searchConsole,
+      verificationCommands: ["npm run seo:autopilot"],
+      hardStops: [
+        "Do not change payment, auth, database schema, chart engine, or date engine.",
+        "Do not delete indexed URLs or change URL structure without user approval.",
+        "Do not deploy if tests or build fail.",
+      ],
+    };
   }
   const weeklyContentPlan = buildWeeklyContentPlan({ opportunities: normalizedOpportunities, articlesPerWeek });
   const selected = weeklyContentPlan.articles[0]?.brief || buildContentBrief(rankTopicOpportunities([...currentSlugs])[0]);
   const brief = buildContentBrief(selected);
   const slugs = weeklyContentPlan.articles.map((item) => item.slug);
-  const keywordIntelligence = keywordPlan?.intelligence || null;
   if (clusterMode) assertDistinctClusterArticles(weeklyContentPlan.articles);
 
   return {
@@ -738,6 +793,11 @@ function avoidImmediateRepeat({ opportunities, previousState, articlesPerWeek })
   const nextTopics = opportunities.filter((item) => item.slug !== lastSlug);
   const repeatedTopics = opportunities.filter((item) => item.slug === lastSlug);
   return nextTopics.length ? [...nextTopics, ...repeatedTopics] : opportunities;
+}
+
+function overlapsExistingIntent(slug, existingSlugs) {
+  if (!slug || !existingSlugs?.size) return false;
+  return OVERLAPPING_INTENT_SLUG_GROUPS.some((group) => group.includes(slug) && group.some((item) => existingSlugs.has(item)));
 }
 
 export function renderContentDraft(brief, { generatedAt } = {}) {
@@ -885,7 +945,9 @@ export function renderRunReport(result) {
     "",
     "## Next Action",
     "",
-    `Next action: ${plan.nextAction.type} \`${plan.nextAction.slug}\``,
+    plan.nextAction.slug
+      ? `Next action: ${plan.nextAction.type} \`${plan.nextAction.slug}\``
+      : `Next action: ${plan.nextAction.type}`,
     plan.nextAction.slugs?.length ? `Weekly batch: ${plan.nextAction.slugs.map((slug) => `\`${slug}\``).join(", ")}` : null,
     `Approval required: ${plan.nextAction.approvalRequired ? "yes" : "no"}`,
     `Reason: ${plan.nextAction.reason}`,
