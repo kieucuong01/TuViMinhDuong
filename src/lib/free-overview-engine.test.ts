@@ -105,10 +105,10 @@ describe("free overview interpretation engine", () => {
       expect(countWords(overview)).toBeLessThanOrEqual(1650);
       expect(overview).toContain("# Bản đọc thử lá số tử vi");
       expect(overview).not.toContain("## Mỏ neo");
-      expect(overview).toContain("## 1. Khí chất cốt lõi");
-      expect(overview).toContain("## 2. Công việc và hướng đi");
-      expect(overview).toContain("## 3. Tài chính và nguồn lực");
-      expect(overview).toContain("## 4. Gia đình, quan hệ và nhịp sống");
+      expect(overview).toContain("## 1. Vì sao bạn hay tự kiểm tra trước khi tin");
+      expect(overview).toContain("## 2. Công việc: cần rõ vai, rõ luật chơi");
+      expect(overview).toContain("## 3. Tiền bạc: giữ an toàn nhưng đừng tự khóa mình");
+      expect(overview).toContain("## 4. Quan hệ và nhịp sống: đừng để mình thành người gánh hết");
       expect(overview).toContain("## Mở khóa bản luận giải chuyên sâu");
       expect(overview).toMatch(/\bbạn\b/);
       expect(overview).not.toContain("người đọc");
@@ -117,10 +117,17 @@ describe("free overview interpretation engine", () => {
       expect(overview).not.toContain("**Cần chú ý:**");
       expect(overview).not.toContain("**Nên đọc tiếp:**");
       expect(overview).not.toContain("**Điểm bổ sung:**");
+      expect(overview).not.toContain("Lợi thế là");
+      expect(overview).not.toContain("Điểm mù là");
+      expect(overview).not.toContain("Cạm bẫy là");
+      expect(overview).not.toContain("Điểm có thể nâng bạn lên");
+      expect((overview.match(/\sgiống\s/g) || []).length).toBeLessThanOrEqual(1);
       expect(overview).not.toMatch(/Căn cứ:/);
       expect(overview).toMatch(/lá số cho thấy|trong lá số|dấu hiệu tử vi/i);
       expect(overview).toContain("tấm bản đồ");
-      expect(overview).toContain("Những gì bạn vừa đọc chỉ là bề nổi");
+      expect(overview).toContain("Nếu phần đọc thử này làm bạn thấy có vài điều đúng với mình");
+      expect(overview).not.toContain("bề nổi của tảng băng chìm");
+      expect(overview).not.toContain("phần còn đang được giữ lại");
       expect(overview).toContain("Bản Luận Giải Chuyên Sâu");
       expect(overview).toContain("lộ trình");
       expect(overview).toContain("mở khóa");
@@ -131,9 +138,9 @@ describe("free overview interpretation engine", () => {
       expect(repeatedSentences(overview).size).toBe(0);
     }
 
-    const openingA = overviewA.match(/## 1\. Khí chất cốt lõi: .+/)?.[0];
-    const openingB = overviewB.match(/## 1\. Khí chất cốt lõi: .+/)?.[0];
-    const openingC = overviewC.match(/## 1\. Khí chất cốt lõi: .+/)?.[0];
+    const openingA = overviewA.match(/## 1\. Vì sao bạn hay tự kiểm tra trước khi tin: .+/)?.[0];
+    const openingB = overviewB.match(/## 1\. Vì sao bạn hay tự kiểm tra trước khi tin: .+/)?.[0];
+    const openingC = overviewC.match(/## 1\. Vì sao bạn hay tự kiểm tra trước khi tin: .+/)?.[0];
     expect(new Set([openingA, openingB, openingC]).size).toBeGreaterThanOrEqual(1);
     expect(overviewA).not.toContain("không dễ quyết theo cảm hứng nhất thời");
   });

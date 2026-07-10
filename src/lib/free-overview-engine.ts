@@ -283,6 +283,12 @@ export function buildFreeOverviewNarrativePlan(chart: TuViChart): FreeOverviewNa
 
 function readerText(value: string) {
   return value
+    .replaceAll("Lợi thế là", "Bạn có điểm mạnh ở")
+    .replaceAll("lợi thế là", "bạn có điểm mạnh ở")
+    .replaceAll("Điểm mù là", "Điều dễ làm bạn vướng là")
+    .replaceAll("điểm mù là", "điều dễ làm bạn vướng là")
+    .replaceAll("Cạm bẫy là", "Bạn cần tránh việc")
+    .replaceAll("cạm bẫy là", "bạn cần tránh việc")
     .replaceAll("người đọc", "bạn")
     .replaceAll("Người đọc", "Bạn")
     .replaceAll("người này", "bạn")
@@ -311,6 +317,61 @@ function splitSentences(value: string) {
 function completeSentences(value: string, maxSentences = 1, fallback = "Ý này cần được đọc cùng bối cảnh lá số để tránh kết luận vội.") {
   const sentences = splitSentences(value).slice(0, maxSentences);
   return sentences.length > 0 ? sentences.join(" ") : fallback;
+}
+
+function capitalizeSentence(value: string) {
+  return value ? `${value.charAt(0).toUpperCase()}${value.slice(1)}` : value;
+}
+
+function practicalSummary(value: string) {
+  const sentences = splitSentences(value);
+  const practical =
+    sentences.find((sentence) => /^Trong (đời sống|thực tế),/i.test(sentence)) ||
+    sentences.find((sentence) => !/\sgiống\s/i.test(sentence)) ||
+    sentences[0];
+  if (!practical) return "Dấu hiệu này cần được đọc qua đời sống thực tế, không nên hiểu như một lời phán cố định.";
+  return capitalizeSentence(practical.replace(/^Trong (đời sống|thực tế),\s*/i, ""));
+}
+
+function trimSentenceEnding(value: string) {
+  return value.trim().replace(/[.!?]+$/g, "");
+}
+
+function lowerFirst(value: string) {
+  return value ? `${value.charAt(0).toLowerCase()}${value.slice(1)}` : value;
+}
+
+function stripRuleLead(value: string) {
+  return trimSentenceEnding(
+    completeSentences(value, 1)
+      .replace(/^(Bạn có điểm mạnh ở|bạn có điểm mạnh ở)\s+/i, "")
+      .replace(/^(Điều dễ làm bạn vướng là|điều dễ làm bạn vướng là)\s+/i, "")
+      .replace(/^(Bạn cần tránh việc|bạn cần tránh việc)\s+/i, ""),
+  );
+}
+
+function naturalStrength(value: string) {
+  const raw = stripRuleLead(value);
+  if (!raw) return "Bạn có thể dùng điểm này để chọn việc quan trọng và giữ nhịp ổn định.";
+  if (/^khả năng\s/i.test(raw)) return `Bạn có ${lowerFirst(raw)}.`;
+  if (/^năng lực\s/i.test(raw)) return `Bạn có ${lowerFirst(raw)}.`;
+  if (/^tránh\s/i.test(raw)) return `Bạn biết ${lowerFirst(raw)}.`;
+  if (/^biến\s/i.test(raw)) return `Bạn biết ${lowerFirst(raw)}.`;
+  if (/^tạo\s/i.test(raw)) return `Bạn có thể ${lowerFirst(raw)}.`;
+  if (/^(biết|dám|tránh|nhìn|đọc|phát hiện|xây|tạo|mở|giữ|chỉnh|sửa|học)\s/i.test(raw)) {
+    return `Bạn ${lowerFirst(raw)}.`;
+  }
+  return `Điểm sáng của bạn là ${lowerFirst(raw)}.`;
+}
+
+function naturalCaution(value: string) {
+  const raw = stripRuleLead(value);
+  if (!raw) return "Điều cần để ý là đừng quyết khi còn thiếu dữ kiện hoặc khi đang quá mệt.";
+  if (/^quá\s/i.test(raw)) return `Nếu ${lowerFirst(raw)}, bạn dễ tự làm mình chậm lại.`;
+  if (/^(dùng|xem|phá|giữ|nhận|chạy|tin|im lặng|để|tiếp tục|phản ứng|khép|phủ nhận)\s/i.test(raw)) {
+    return `Điều cần để ý là bạn có thể ${lowerFirst(raw)}.`;
+  }
+  return `Điều cần để ý là ${lowerFirst(raw)}.`;
 }
 
 function normalizedFingerprint(value: string) {
@@ -344,9 +405,9 @@ function toInsight(rule: ScoredInterpretationRule, topic: string): FreeOverviewI
     key: rule.key,
     topic,
     title: normalizeText(rule.title),
-    summary: completeSentences(rule.summary, 1),
-    strength: completeSentences(rule.strengthText, 1, "Điểm nên phát huy là biết chọn việc quan trọng và giữ nhịp ổn định."),
-    caution: completeSentences(rule.cautionText, 1, "Điểm cần giữ là không quyết khi còn thiếu dữ kiện hoặc khi đang quá mệt."),
+    summary: practicalSummary(rule.summary),
+    strength: naturalStrength(rule.strengthText),
+    caution: naturalCaution(rule.cautionText),
     advice: completeSentences(rule.lifeAdviceText, 1, "Nói đời thường, phần này nhắc bạn nhìn kỹ trách nhiệm, thời gian và sức lực trước khi nhận thêm việc."),
     evidence: completeSentences(rule.evidence, 1, "Lá số cho thấy đây là một vùng cần đọc kỹ hơn."),
     teaserQuestion: completeSentences(rule.teaserQuestion, 1, "Nếu đọc sâu hơn, bạn cần biết lựa chọn nào nên đi tiếp và lựa chọn nào nên chậm lại?"),
@@ -534,42 +595,42 @@ function composeLeadMagnet(plan: FreeOverviewNarrativePlan, chart: TuViChart) {
   return removeRepeatedSentences(`# Bản đọc thử lá số tử vi: Bức tranh tổng quan & những chỉ báo cốt lõi
 ${chart.input.fullName} (${facts.menhThanLabel})
 
-Bản đọc thử này không bắt đầu bằng những lời tiên đoán định mệnh. Nó là **một tấm bản đồ** giải mã cách bạn tư duy, xử lý áp lực và lý do có lúc bạn phải đi một đường khác số đông.
+Bản đọc thử này không bắt đầu bằng lời phán định mệnh. Nó là **một tấm bản đồ** giúp bạn nhìn lại cách mình suy nghĩ, giữ an toàn và xử lý áp lực.
 
-Điểm quan trọng nhất của bản miễn phí là nói trúng **chuyện gì đang diễn ra** và **vì sao nó lặp lại**. Phần cách xử lý cụ thể, mốc nào nên đi nhanh, mốc nào nên giữ lại và việc nào nên ưu tiên sẽ được giữ cho Bản Luận Giải Chuyên Sâu.
+Điểm quan trọng nhất của bản miễn phí là giúp bạn nhận ra **chuyện gì đang lặp lại trong đời sống**. Bản Luận Giải Chuyên Sâu sẽ đi tiếp vào phần thực tế hơn: nên ưu tiên điều gì, việc nào đang làm bạn hao sức và năm ${chart.input.viewYear} nên đi nhanh hay chậm ở đâu.
 
-## 1. Khí chất cốt lõi: ${primary.title}
+## 1. Vì sao bạn hay tự kiểm tra trước khi tin: ${primary.title}
 ${primary.summary} ${primary.evidence} ${primary.strength}
 
-Nhìn ở tầng đời sống, dấu hiệu này cho thấy bạn không chỉ phản ứng bằng cảm xúc nhất thời. Bạn thường âm thầm dựng trong đầu một hệ thống kiểm tra riêng: điều gì đáng tin, điều gì còn thiếu dữ kiện, ai thật sự có trách nhiệm và việc nào đang lấy đi quá nhiều sức lực. ${primary.caution}
+Bạn không phải kiểu dễ tin ngay chỉ vì người khác nói hay. Trước khi quyết, bạn thường âm thầm hỏi: điều này có đáng tin không, ai thật sự chịu trách nhiệm, mình có đang gánh quá nhiều không. ${primary.caution}
 
-${primary.advice} ${lifeFrame} **Đây là phần thường tạo cảm giác “đúng quá”**: lá số không chỉ nói bạn mạnh hay yếu, mà chỉ ra kiểu áp lực bạn hay tự gánh và lý do bạn khó yên tâm khi mọi thứ còn mơ hồ.
+${primary.advice} ${lifeFrame} **Đây là đoạn dễ tạo cảm giác “đúng với mình”**: không phải vì lá số nói bạn tốt hay xấu, mà vì nó gọi đúng kiểu áp lực bạn hay tự giữ trong lòng.
 
-## 2. Công việc và hướng đi: ${career.title}
+## 2. Công việc: cần rõ vai, rõ luật chơi: ${career.title}
 ${career.summary} ${career.evidence} ${career.strength}
 
-Ở mảng công việc, lá số cho thấy bạn không hợp với cách đi mù mờ hoặc giao hết quyền kiểm soát cho người khác. Bạn cần hiểu rõ luật chơi, phạm vi trách nhiệm và giá trị thật của việc mình đang làm. Khi thiếu các điều kiện này, bạn dễ vừa làm vừa nghi ngờ, hoặc tự kéo thêm việc về phía mình để mọi thứ “chắc” hơn.
+Bạn không hợp với kiểu làm việc mù mờ hoặc giao hết quyền kiểm soát cho người khác. Khi vai trò, trách nhiệm và giá trị thật chưa rõ, bạn dễ vừa làm vừa nghi ngờ, rồi tự kéo thêm việc về phía mình để mọi thứ “chắc” hơn.
 
-Lớp nghĩa thứ hai là **${secondary.title}**. ${insightParagraph(secondary)} Điều này không phải lời phán tốt xấu. Nó là tín hiệu cho thấy có một điểm nghẽn cần đọc kỹ: bạn đang thiếu môi trường phù hợp, thiếu người chia trách nhiệm, hay thiếu một nhịp đi đủ chắc để biến năng lực thành kết quả.
+Trong tử vi, lớp nghĩa này còn liên quan đến **${secondary.title}**. ${insightParagraph(secondary)} Điều này không phải lời phán tốt xấu. Nó chỉ gợi ý rằng bạn nên nhìn kỹ: mình đang thiếu môi trường phù hợp, thiếu người chia trách nhiệm, hay thiếu một nhịp đi đủ chắc để biến năng lực thành kết quả.
 
-## 3. Tài chính và nguồn lực: ${money.title}
+## 3. Tiền bạc: giữ an toàn nhưng đừng tự khóa mình: ${money.title}
 ${money.summary} ${money.evidence} ${money.strength} ${money.caution}
 
-Tài chính trong lá số này không nên hiểu hẹp là số tiền đang có. Nó còn là thời gian, sức lực, sự tập trung và mức độ tự do của bạn. Có người hao vì tiêu xài bốc đồng; nhưng với cấu trúc này, sự hao hụt thường tinh vi hơn: nhận việc không đúng giá trị, ôm trách nhiệm thay người khác, hoặc giữ một lựa chọn quá lâu vì sợ đổi hướng sẽ mất an toàn.
+Tài chính trong lá số này không chỉ là số tiền đang có. Nó còn là thời gian, sức lực, sự tập trung và mức độ tự do. Có người hao vì tiêu xài bốc đồng; còn bạn có thể hao kín hơn: nhận việc không đúng giá trị, ôm trách nhiệm thay người khác, hoặc giữ một lựa chọn quá lâu vì sợ đổi hướng sẽ mất an toàn.
 
-Nếu đọc sâu hơn, phần tài chính sẽ không dừng ở nhận xét chung. Nó cần nối cung Tài Bạch, cung Quan Lộc, đại vận và vận năm để trả lời câu hỏi thực tế hơn: lúc nào nên giữ, lúc nào nên mở, việc nào chỉ làm bạn bận hơn nhưng không làm bạn tự do hơn.
+Nếu đọc sâu hơn, phần tiền bạc sẽ không dừng ở nhận xét chung. Nó cần nối cung Tài Bạch, cung Quan Lộc, đại vận và vận năm để trả lời câu hỏi thực tế hơn: lúc nào nên giữ, lúc nào nên mở, việc nào chỉ làm bạn bận hơn nhưng không làm bạn tự do hơn.
 
-## 4. Gia đình, quan hệ và nhịp sống: ${relationship.title}
+## 4. Quan hệ và nhịp sống: đừng để mình thành người gánh hết: ${relationship.title}
 ${relationship.summary} ${relationship.evidence} ${relationship.strength} ${relationship.caution}
 
-Một lớp áp lực khác đến từ quan hệ và trách nhiệm thân thiết. Bạn có xu hướng để ý cảm giác của người khác, tính trước rủi ro cho người khác, hoặc tự đứng vào vai người giữ nhịp để mọi chuyện không rối. Điều này có thể tạo uy tín, nhưng cũng dễ làm “cột pin” tinh thần bị rút dần mà chính bạn không nhận ra.
+Một lớp áp lực khác đến từ gia đình, tình cảm và trách nhiệm thân thiết. Bạn có thể rất để ý cảm giác của người khác, tính trước rủi ro cho người khác, hoặc tự đứng vào vai người giữ nhịp. Điều này tạo uy tín, nhưng cũng dễ làm năng lượng tinh thần bị rút dần.
 
 Về sức khỏe và nhịp sống, dấu hiệu cần quan sát là **${health.title}**. ${insightParagraph(health)} Phần này không thay thế tư vấn y khoa. Nó chỉ nhắc rằng khi áp lực kéo dài, cơ thể thường báo trước bằng những tín hiệu nhỏ: ngủ không sâu, nghỉ mà vẫn mệt, dễ cáu, khó tập trung hoặc không còn muốn bắt đầu việc mới.
 
-Năm ${chart.input.viewYear} cần đọc cùng đại vận ${facts.currentDecade.range} tại ${facts.currentDecade.palace}. Vùng vận đang mở ra là **${year.title}**. ${insightParagraph(year)} Vận hạn không phải bản án; nó giống bản đồ thời tiết, cho biết khu vực nào cần mang áo mưa và khu vực nào có thể đi xa hơn nếu chuẩn bị đủ.
+Năm ${chart.input.viewYear} cần đọc cùng đại vận ${facts.currentDecade.range} tại ${facts.currentDecade.palace}. Vùng vận đang mở ra là **${year.title}**. ${insightParagraph(year)} Vận hạn không phải bản án; nó chỉ cho biết vùng nào nên chuẩn bị kỹ, vùng nào có thể đi xa hơn nếu bạn đủ dữ kiện và sức lực.
 
 ## Mở khóa bản luận giải chuyên sâu
-Những gì bạn vừa đọc chỉ là bề nổi của tảng băng chìm; bản chi tiết đang được viết tiếp dưới nền để làm rõ ${paidFocus}. Bản miễn phí này chỉ giữ vai trò chỉ ra **vấn đề là gì** và **vì sao nó đáng chú ý**; Bản Luận Giải Chuyên Sâu mới đi vào phần bạn thật sự cần để ra quyết định.
+Nếu phần đọc thử này làm bạn thấy có vài điều đúng với mình, Bản Luận Giải Chuyên Sâu sẽ đi tiếp từ những điểm đã chạm ở trên. Bản chuyên sâu sẽ đi tiếp vào ${paidFocus}, để bạn nhìn rõ hơn nên ưu tiên điều gì và điều gì đang âm thầm làm mình hao sức.
 
 Trong Bản Luận Giải Chuyên Sâu, bạn sẽ được mở khóa:
 
@@ -578,7 +639,7 @@ Trong Bản Luận Giải Chuyên Sâu, bạn sẽ được mở khóa:
 - **Giải mã quan hệ và trách nhiệm thân thiết**: đâu là điểm nâng đỡ, đâu là nơi bạn đang gánh thay quá nhiều.
 - **Bản đồ hành động cá nhân hóa**: nối cung, sao, trạng thái và vận thành một hướng đi rõ hơn.
 
-Lá số đã vạch sẵn các đường nét chính; việc đi nhanh, đi chắc hay dừng lại đúng lúc cần một bản đồ đầy đủ hơn. Hãy mở khóa toàn bộ bản luận giải để đọc tiếp phần còn đang được giữ lại.`);
+Lá số đã vạch ra những đường nét chính. Việc đi nhanh, đi chắc hay dừng lại đúng lúc cần một bản đồ đầy đủ hơn để bạn không quyết chỉ bằng cảm giác nhất thời.`);
 }
 
 function composeSmooth(plan: FreeOverviewNarrativePlan, chart: TuViChart) {

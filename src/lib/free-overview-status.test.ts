@@ -84,7 +84,9 @@ describe("free overview status", () => {
     expect(status.content).not.toContain("**Điểm chính:**");
     expect(status.content).not.toMatch(/Căn cứ:/);
     expect(status.content).not.toMatch(/\b(vì|và|hoặc|nhưng|là|rằng|khi|nếu|mà)\./i);
-    expect(status.content).toContain("bản chi tiết đang được viết tiếp");
+    expect(status.content).toContain("Nếu phần đọc thử này làm bạn thấy có vài điều đúng với mình");
+    expect(status.content).toContain("Bản chuyên sâu sẽ đi tiếp");
+    expect(status.content).not.toContain("bản chi tiết đang được viết tiếp");
     expect(status.wordCount).toBeGreaterThanOrEqual(FREE_OVERVIEW_TEMPLATE_MIN_WORDS);
     expect(status.wordCount).toBeLessThanOrEqual(FREE_OVERVIEW_TEMPLATE_MAX_WORDS);
   });
