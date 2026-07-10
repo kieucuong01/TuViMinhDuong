@@ -29,6 +29,7 @@ describe("SEO content cluster", () => {
     expect(slugs).toContain("chiem-tinh-la-so-va-tu-vi");
     expect(slugs).toContain("la-so-tu-vi-mien-phi");
     expect(slugs).toContain("giai-ma-la-so-tu-vi");
+    expect(slugs).toContain("binh-giai-la-so-tu-vi");
     expect(slugs).toContain("an-sao-la-so-tu-vi");
     expect(slugs).toContain("sao-tu-vi");
     expect(slugs).toContain("menh-vo-chinh-dieu");
@@ -53,6 +54,7 @@ describe("SEO content cluster", () => {
     const astrologyGuide = seedArticles.find((article) => article.slug === "chiem-tinh-la-so-va-tu-vi");
     const freeGuide = seedArticles.find((article) => article.slug === "la-so-tu-vi-mien-phi");
     const decodingGuide = seedArticles.find((article) => article.slug === "giai-ma-la-so-tu-vi");
+    const interpretationGuide = seedArticles.find((article) => article.slug === "binh-giai-la-so-tu-vi");
     const starPlacementGuide = seedArticles.find((article) => article.slug === "an-sao-la-so-tu-vi");
     const saoTuViGuide = seedArticles.find((article) => article.slug === "sao-tu-vi");
     const menhVoChinhDieuGuide = seedArticles.find((article) => article.slug === "menh-vo-chinh-dieu");
@@ -93,6 +95,9 @@ describe("SEO content cluster", () => {
     expect(decodingGuide?.content).toContain("/#lap-la-so");
     expect(decodingGuide?.content).toContain("/kien-thuc-tu-vi/cung-menh-cung-than");
     expect(decodingGuide?.content).toContain("/kien-thuc-tu-vi/sao-chinh-tinh-tu-vi");
+    expect(interpretationGuide?.content).toContain("/#lap-la-so");
+    expect(interpretationGuide?.content).toContain("/kien-thuc-tu-vi/giai-ma-la-so-tu-vi");
+    expect(interpretationGuide?.content).toContain("/kien-thuc-tu-vi/phan-tich-la-so-tu-vi");
     expect(starPlacementGuide?.content).toContain("/#lap-la-so");
     expect(starPlacementGuide?.content).toContain("/kien-thuc-tu-vi/cung-menh-cung-than");
     expect(starPlacementGuide?.content).toContain("/kien-thuc-tu-vi/gio-sinh-trong-tu-vi");
@@ -164,6 +169,23 @@ describe("SEO content cluster", () => {
     expect(changingChartGuide?.content).toContain("/kien-thuc-tu-vi/nguyet-van-nhat-van");
     expect(changingChartGuide?.content).toContain("## Khung causal analysis để kiểm tra “đổi” hay “không đổi”");
     expect(changingChartGuide?.faqs?.length).toBeGreaterThanOrEqual(3);
+  });
+
+  it("ships the interpretation guide as a distinct middle-funnel article with chart-confidence checks", () => {
+    const interpretationGuide = seedArticles.find((article) => article.slug === "binh-giai-la-so-tu-vi");
+
+    expect(interpretationGuide).toBeTruthy();
+    expect(interpretationGuide?.coverImage).toBe("/articles/binh-giai-la-so-tu-vi.webp");
+    expect(interpretationGuide?.ogImage).toBe("/articles/binh-giai-la-so-tu-vi.webp");
+    expect(interpretationGuide?.coverAlt).toContain("đối chiếu lá số tử vi");
+    expect(interpretationGuide?.coverAlt).toContain("ghi chú giờ sinh");
+    expect(interpretationGuide?.content).toContain("/kien-thuc-tu-vi/giai-ma-la-so-tu-vi");
+    expect(interpretationGuide?.content).toContain("/kien-thuc-tu-vi/phan-tich-la-so-tu-vi");
+    expect(interpretationGuide?.content).toContain("/kien-thuc-tu-vi/gio-sinh-trong-tu-vi");
+    expect(interpretationGuide?.content).toContain("| Lớp thông tin trong phần bình giải |");
+    expect(interpretationGuide?.content).toContain("| Tình huống người đọc đang gặp |");
+    expect(interpretationGuide?.content).toContain("## Khung causal analysis để dùng bình giải đúng cách");
+    expect(interpretationGuide?.faqs?.length).toBeGreaterThanOrEqual(3);
   });
 
   it("uses dedicated SEO images for every public knowledge article", () => {

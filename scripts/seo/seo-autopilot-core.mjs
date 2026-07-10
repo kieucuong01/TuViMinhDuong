@@ -145,6 +145,23 @@ const KEYWORD_CLUSTER_RULES = [
     ],
   },
   {
+    id: "binh-giai-luan-giai",
+    label: "Binh giai luan giai la so",
+    pattern:
+      /\b(binh giai|luan giai|giai la so|dich la so)\b.*\bla so\b|\bla so\b.*\b(binh giai|luan giai|giai la so|dich la so)\b/,
+    stage: "middle",
+    pillarSlug: "giai-ma-la-so-tu-vi",
+    opportunity: {
+      slug: "binh-giai-la-so-tu-vi",
+      cluster: "Doc va luan la so",
+      focusKeyword: "bình giải lá số tử vi",
+      intent:
+        "Người đọc đã có lá số và muốn hiểu phần bình giải nên dùng như thế nào, câu hỏi nào có thể đọc sâu hơn và khi nào cần quay lại kiểm tra dữ liệu nền trước khi tin kết luận.",
+      funnelStage: "middle",
+      priority: 91,
+    },
+  },
+  {
     id: "bat-tu-tu-tru",
     label: "Bat tu tu tru",
     pattern: /\bbat tu\b|\btu tru\b|\btu try\b|\btu tru\b/,

@@ -184,6 +184,42 @@ describe("SEO Autopilot core", () => {
     expect(plan.brief.focusKeyword).toBe("lá số tử vi theo ngày tháng năm sinh");
   });
 
+  it("selects the interpretation-support topic when setup and decoding intents already exist", () => {
+    const rows = parseSemrushKeywordCsv(
+      [
+        "keyword,intent,volume,kd_percent,cpc_usd",
+        "la so tu vi luan giai,C,1300,51,0.01",
+        "binh giai la so tu vi,I,210,47,0.01",
+        "la so tu vi binh giai,I,210,49,0.01",
+        "dich la so tu vi,I,260,49,0.01",
+      ].join("\n"),
+    );
+
+    const plan = planSeoAutopilotRun({
+      snapshot: {
+        status: "ok",
+        sitemapUrlCount: 69,
+        warnings: [],
+      },
+      existingSlugs: [
+        "la-so-tu-vi-la-gi",
+        "tao-la-so-tu-vi",
+        "lap-la-so-tu-vi-chuan",
+        "la-so-tu-vi-online",
+        "la-so-tu-vi-mien-phi",
+        "phan-tich-la-so-tu-vi",
+        "giai-ma-la-so-tu-vi",
+      ],
+      keywordRows: rows,
+      articlesPerWeek: 1,
+    });
+
+    expect(plan.nextAction.type).toBe("single_article_publish");
+    expect(plan.nextAction.slug).toBe("binh-giai-la-so-tu-vi");
+    expect(plan.brief.slug).toBe("binh-giai-la-so-tu-vi");
+    expect(plan.brief.focusKeyword).toBe("bình giải lá số tử vi");
+  });
+
   it("extracts page SEO signals from rendered HTML", () => {
     const html = `
       <html>
