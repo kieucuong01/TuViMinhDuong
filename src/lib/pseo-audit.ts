@@ -118,7 +118,7 @@ export function auditPseoInventory(pages: PseoPageDraft[]) {
       const first = publishedPages[firstIndex];
       const second = publishedPages[secondIndex];
       const score = contentSimilarityScore(first.body, second.body);
-      if (score >= 0.68) {
+      if (score >= 0.64) {
         findings.push({
           severity: "error",
           code: "duplicate-template",

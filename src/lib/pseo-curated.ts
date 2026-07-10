@@ -579,6 +579,36 @@ const BATCH2_PALACES: Record<Batch2PalaceKey, {
   },
 };
 
+const BATCH2_PALACE_DEEPENING: Record<Batch2PalaceKey, {
+  sectionTitle: string;
+  diagnostic: string;
+  misread: string;
+  evidence: string;
+  checkpoint: string;
+}> = {
+  "menh": {
+    sectionTitle: "Lớp riêng của cung Mệnh: phản ứng nền và cảm giác về bản thân",
+    diagnostic: "Với cung Mệnh, câu hỏi trọng tâm không nằm ở thành tựu bên ngoài mà nằm ở phản ứng đầu tiên của một người khi bị đặt vào tình huống mới. Hãy quan sát cách bạn bước vào phòng, cách bạn nhận trách nhiệm, cách bạn tự vệ khi bị hiểu sai và kiểu vai trò bạn vô thức chọn trong nhóm. Nếu chính tinh ở Mệnh mạnh, người đọc thường thấy mẫu này xuất hiện từ rất sớm: khi đi học, khi vào môi trường làm việc đầu tiên, khi phải tự quyết hoặc khi bị người khác gán một hình ảnh nào đó. Đây là dữ kiện khác hẳn với cung Quan Lộc hay Tài Bạch, vì nó nói về căn tính vận hành trước khi có chức danh, tiền bạc hoặc kết quả đo được.",
+    misread: "Lỗi dễ gặp là biến Mệnh thành nhãn tính cách cố định. Một người có sao mạnh ở Mệnh không phải lúc nào cũng sống đúng mặt mạnh của sao đó. Khi áp lực tăng, họ có thể trượt sang mặt phòng thủ: giữ sĩ diện, nghi ngờ, trì hoãn, kiểm soát, né trách nhiệm hoặc gồng quá mức tùy tính chất chính tinh. Vì vậy phần luận Mệnh cần được đọc như bản đồ tự quan sát: điều gì làm mình sáng lên, điều gì làm mình co lại, và tình huống nào khiến mình phản ứng theo thói quen cũ.",
+    evidence: "Dữ kiện nên lấy từ các cảnh rất cụ thể: cách bạn xử lý một lời phê bình, cách bạn nhận vai trò trong gia đình, cách bạn quyết định khi không ai chỉ dẫn, cách bạn hồi phục sau thất bại, và kiểu lời khen hoặc lời chê khiến bạn nhớ lâu. Nếu các dữ kiện này lặp lại qua nhiều giai đoạn, cung Mệnh đang là lớp đọc đáng ưu tiên. Nếu không lặp lại, cần kiểm tra cung Thân, tam hợp và các vận đang kích hoạt thay vì ép mọi thứ vào Mệnh.",
+    checkpoint: "Trước khi tin vào phần luận, hãy viết ba câu: tôi thường tự giới thiệu mình bằng vai trò nào; tôi sợ bị nhìn nhận sai ở điểm nào; và khi không ai ép buộc, tôi vẫn tự chọn trách nhiệm gì. Ba câu này giúp phần tra cứu đi vào đời sống thật thay vì chỉ là mô tả chung.",
+  },
+  "quan-loc": {
+    sectionTitle: "Lớp riêng của cung Quan Lộc: vai trò xã hội và cách tạo giá trị",
+    diagnostic: "Với cung Quan Lộc, trọng tâm là cách một người tạo giá trị trong mắt xã hội. Đây không chỉ là nghề nghiệp trên danh thiếp. Nó bao gồm cách bạn chịu trách nhiệm, kiểu môi trường làm việc làm bạn phát huy, tiêu chuẩn bạn muốn được ghi nhận, và dạng áp lực khiến bạn trưởng thành hoặc kiệt sức. Khi chính tinh nằm ở Quan Lộc, hãy đọc nó qua các câu chuyện nghề thật: bạn được giao việc gì, việc nào người khác tin bạn làm tốt, việc nào khiến bạn mất năng lượng, và bạn đang xây uy tín bằng kết quả, chuyên môn, quan hệ hay khả năng xử lý tình huống.",
+    misread: "Lỗi dễ gặp là dùng Quan Lộc để chốt một nghề duy nhất. Tử vi không nên được đọc như danh sách ngành nghề cứng. Cùng một chính tinh có thể đi vào quản lý, tư vấn, vận hành, giáo dục, sản phẩm, kinh doanh hoặc sáng tạo tùy kỹ năng, thời vận và lựa chọn của người đó. Điều cần giữ lại là cơ chế tạo giá trị: bạn tỏa sáng khi điều phối, phân tích, bảo vệ chuẩn mực, mở đường, tích lũy hay giải thích vấn đề. Nghề cụ thể chỉ là một vỏ biểu hiện.",
+    evidence: "Dữ kiện nên lấy từ lịch sử công việc: dự án nào bạn làm tốt nhất, mâu thuẫn nào lặp lại với cấp trên hoặc cộng sự, kiểu deadline nào khiến bạn sắc bén hơn, và tiêu chuẩn nào bạn không muốn hạ thấp. Nếu đang đổi nghề, hãy đối chiếu với kỹ năng thật, thu nhập thật, sức khỏe thật và trách nhiệm gia đình thay vì chỉ đọc một đoạn luận rồi quyết định. Quan Lộc tốt khi nó giúp bạn hỏi đúng câu hỏi về vai trò, không phải khi nó hứa trước một chức danh.",
+    checkpoint: "Trước khi tin vào phần luận, hãy ghi một dự án thành công, một dự án thất bại và một kiểu việc bạn không muốn lặp lại. Sau đó hỏi: chính tinh trong Quan Lộc đang mô tả năng lực thật, điểm mù thật hay chỉ là kỳ vọng mình muốn có?",
+  },
+  "tai-bach": {
+    sectionTitle: "Lớp riêng của cung Tài Bạch: dòng tiền, tài sản và cảm giác an toàn",
+    diagnostic: "Với cung Tài Bạch, trọng tâm không phải là giàu hay nghèo mà là cơ chế tạo, giữ, dùng và đánh giá nguồn lực. Hãy quan sát cách bạn kiếm tiền, cách bạn phân bổ tiền, cách bạn phản ứng khi thu nhập biến động và kiểu tài sản làm bạn thấy yên tâm. Chính tinh ở Tài Bạch có thể cho biết bạn thiên về tích lũy, hành động nhanh, quản trị chặt, mở rộng cơ hội, chăm nguồn thu bền hay đặt câu hỏi về rủi ro. Nhưng nó luôn cần được đối chiếu với kỹ năng nghề, thị trường, kỷ luật chi tiêu và hoàn cảnh gia đình.",
+    misread: "Lỗi dễ gặp là đọc Tài Bạch như lời tiên đoán tài chính. Một chỉ số trong trang tra cứu không phải xác suất giàu có, không phải khuyến nghị đầu tư và không thay thế tư vấn chuyên môn. Nếu đang có khoản vay, tranh chấp tài sản, kế hoạch góp vốn hoặc quyết định lớn, người đọc cần dữ liệu thật và chuyên gia phù hợp. Tử vi chỉ nên giúp nhận ra thói quen: mình kiếm tiền bằng cách nào, sợ mất tiền ra sao, dễ quá tay ở đâu và thường bỏ sót loại chi phí nào.",
+    evidence: "Dữ kiện nên lấy từ sổ thu chi, lịch sử quyết định tài chính và phản ứng cảm xúc khi tiền vào-ra. Hãy xem ba năm gần nhất: giai đoạn nào bạn tạo nguồn lực tốt nhất, giai đoạn nào mất kiểm soát, khoản chi nào lặp lại vì cảm xúc, và khi có cơ hội mới bạn kiểm tra bằng dữ liệu hay bằng sự hào hứng. Nếu phần luận Tài Bạch không khớp dữ kiện tiền thật, cần xem lại các sao hội chiếu, Quan Lộc, Điền Trạch và vận đang kích hoạt.",
+    checkpoint: "Trước khi tin vào phần luận, hãy ghi ba con số: nguồn thu chính, khoản chi gây áp lực nhất và số tháng dự phòng thật. Sau đó hỏi: chính tinh trong Tài Bạch đang hỗ trợ cách mình quản trị nguồn lực hay đang chỉ ra điểm mình hay tự lừa mình?",
+  },
+};
+
 const BATCH2_SLUGS = new Set<string>(CURATED_PSEO_SLUGS);
 
 function parseBatch2Slug(slug: string) {
@@ -594,11 +624,20 @@ function titleForBatch2(star: typeof BATCH2_STARS[Batch2StarKey], palace: typeof
   return `${star.name} cung ${palace.name}: ${star.gift.split(",")[0]} trong ${palace.name}`;
 }
 
+function starDepthSection(star: typeof BATCH2_STARS[Batch2StarKey]) {
+  return `## Lớp riêng của sao ${star.name}: cơ chế vận hành cần tách khỏi công thức chung
+
+${star.image}. Hình ảnh này là cách ghi nhớ nhanh bản chất của ${star.name}: ${star.temperament}. Khi đặt vào một cung cụ thể, đừng chỉ hỏi sao này tốt hay xấu. Hãy hỏi nó đang đưa kiểu lực nào vào đời sống, lực đó cần môi trường nào để phát huy và khi bị ép quá mức nó sẽ biến dạng ra sao. Với ${star.name}, phần đáng giữ là ${star.gift}. Đây là năng lực có thể rèn bằng tình huống thật, phản hồi thật và thời gian đủ dài, không phải nhãn cố định để tự khen hoặc tự dọa mình.
+
+Mặt cần kiểm soát của ${star.name} là ${star.shadow}. Nếu chỉ đọc phần sáng, người đọc dễ kỳ vọng quá mức; nếu chỉ đọc phần tối, người đọc lại bỏ qua một tài nguyên thật trong lá số. Cách dùng an toàn là lấy ${star.practice} làm bài tập kiểm chứng. Trong đời sống hiện đại, năng lượng này có thể xuất hiện ở các bối cảnh như ${star.nghề}, nhưng danh sách đó chỉ là ví dụ về môi trường phù hợp. Điều quan trọng hơn là nhận ra cơ chế: khi nào ${star.name} giúp bạn xử lý vấn đề rõ hơn, và khi nào cùng một cơ chế làm bạn cứng, vội, né tránh hoặc lệ thuộc vào phản ứng quen thuộc.`;
+}
+
 function buildBatch2Content(slug: string): CuratedPage | undefined {
   const parsed = parseBatch2Slug(slug);
   if (!parsed || !BATCH2_SLUGS.has(slug)) return undefined;
   const star = BATCH2_STARS[parsed.starSlug];
   const palace = BATCH2_PALACES[parsed.palaceSlug];
+  const palaceDepth = BATCH2_PALACE_DEEPENING[parsed.palaceSlug];
   const sameStarLinks = (["menh", "quan-loc", "tai-bach"] as Batch2PalaceKey[])
     .filter((item) => item !== parsed.palaceSlug)
     .map((item) => `[${star.name} cung ${BATCH2_PALACES[item].name}](/tra-cuu/sao-${parsed.starSlug}-cung-${item})`)
@@ -626,6 +665,18 @@ Hình ảnh gần nhất cho tổ hợp này là ${star.image}. Nó cho thấy m
 | Cung ${palace.name} | ${palace.lens} | Chủ đề này có lặp lại trong các quyết định lớn không? |
 | Điểm mạnh | ${star.gift} | Người khác từng nhờ bạn ở phần việc nào tương tự? |
 | Điểm lệch | ${star.shadow} | Khi mọi thứ không như ý, bạn lệch về hướng nào trước? |
+
+${starDepthSection(star)}
+
+## ${palaceDepth.sectionTitle}
+
+${palaceDepth.diagnostic}
+
+${palaceDepth.misread}
+
+${palaceDepth.evidence}
+
+${palaceDepth.checkpoint}
 
 ## Điểm thuận lợi: ${star.gift}
 

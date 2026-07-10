@@ -177,6 +177,48 @@ Every automatically drafted article must include:
 
 Stop or downgrade to draft/report-only when the topic would produce thin advice, doorway variants, or a page that cannot add data/tool value.
 
+### `/tra-cuu` pSEO operating procedure
+
+The `/tra-cuu` system is separate from `/kien-thuc-tu-vi`. Do not canonicalize lookup pages back to knowledge articles and do not create a second pSEO stack. The current source of truth is:
+
+- `src/lib/pseo-registry.ts`: entities, matrix drafts, deterministic scores, default metadata and fallback content.
+- `src/lib/pseo-curated.ts`: curated/manual publish list and legacy curated content.
+- `src/lib/pseo-manual-batch-*.ts|json`: hand-written published batches.
+- `src/lib/pseo-audit.ts`: publish/audit gate for thin content, unsafe claims, duplicated body, repeated title/meta patterns, internal links and CTA.
+- `src/lib/pseo-data.ts`: published-only data access used by routes and sitemaps.
+- `scripts/seed-pseo.ts`: production DB seed; must run before production `next build`.
+
+Publication rules:
+
+- Publish fewer pages with stronger content. Do not expand the matrix just to increase URL count.
+- Every published leaf must have star-specific, palace-specific and combination-specific value. A page that only swaps star/palace names is a blocker.
+- Body similarity across published lookup pages must stay below the audit guard (`duplicate-template`, currently `>= 0.64` by 7-shingle Jaccard). If the guard fails, rewrite or enrich the pages; do not loosen the threshold without measuring the new maximum similarity and documenting why.
+- Title/meta formulas are also audited (`repeated-serp-pattern`). Avoid repeated SERP snippets such as `X cung Y: ý nghĩa và cách đọc` across many URLs. Metadata must express the distinct intent of both the star and the palace.
+- Keep safety language for health, finance, marriage, career and fate claims. Lookup pages may suggest questions and patterns, not guaranteed outcomes.
+- Every published leaf needs at least 5 internal links, a visible `/#lap-la-so` conversion path, structured blocks, FAQ when FAQ schema is present, and no links to draft-only leaf pages.
+
+Sitemap and indexing:
+
+- Submit `https://lasotinhhoa.vn/sitemap-index.xml` in Google Search Console. The per-star sitemaps under `/tra-cuu/sitemap/[star]` are for crawling/debugging and are referenced by the sitemap index; normally do not submit each child sitemap manually.
+- `site:lasotinhhoa.vn` is only a rough SERP sampling tool, not an index-count source of truth. Use Search Console Pages/Sitemaps/URL Inspection for index status and duplicate/canonical diagnostics.
+- Draft pages must return 404 publicly and must not appear in pSEO sitemaps.
+- Existing indexed URLs should not be removed, redirected, or canonicalized away without Search Console evidence and a separate review.
+
+Verification for `/tra-cuu` changes:
+
+```powershell
+$env:PATH="C:\Users\ASUS\.cache\codex-runtimes\codex-primary-runtime\dependencies\node\bin;$env:PATH"
+node .\node_modules\vitest\vitest.mjs run src\lib\pseo.test.ts src\lib\pseo-sitemap.test.ts src\app\tra-cuu\pseo-routes.test.ts src\components\pseo-pages-ui.test.tsx
+```
+
+Before production release, run the normal guarded release path:
+
+```powershell
+npm run release:production -- "<message>"
+```
+
+That path is expected to run lint, full tests, build, `npm run pseo:seed`, production build, PM2 restart and public smoke. If the worktree contains unrelated dirty files, stash them before release and restore them after deployment because the release script stages with `git add --all`.
+
 ## Token And Work Budget
 
 Automation should avoid repeated heavy work. Use the smallest useful loop:

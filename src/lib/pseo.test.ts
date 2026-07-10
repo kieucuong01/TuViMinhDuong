@@ -114,6 +114,17 @@ describe("pSEO audit", () => {
     expect(findings.filter((finding) => finding.severity === "error")).toEqual([]);
   }, 120_000);
 
+  it("keeps published lookup body similarity below the dedupe risk guard", () => {
+    const pages = buildPseoInventory().filter((page) => page.status === "PUBLISHED");
+    let maxSimilarity = 0;
+    for (let firstIndex = 0; firstIndex < pages.length; firstIndex += 1) {
+      for (let secondIndex = firstIndex + 1; secondIndex < pages.length; secondIndex += 1) {
+        maxSimilarity = Math.max(maxSimilarity, contentSimilarityScore(pages[firstIndex].body, pages[secondIndex].body));
+      }
+    }
+    expect(maxSimilarity).toBeLessThan(0.64);
+  }, 120_000);
+
   it("flags pages that are too similar to another published lookup page", () => {
     const [first, second] = buildPseoInventory().filter((page) => page.status === "PUBLISHED");
     const findings = auditPseoInventory([{ ...first }, { ...second, body: first.body }]);
