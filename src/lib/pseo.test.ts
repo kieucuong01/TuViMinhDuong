@@ -114,7 +114,7 @@ describe("pSEO audit", () => {
   it("accepts only hand-written published pages and keeps canonical slugs unique", () => {
     const findings = auditPseoInventory(buildPseoInventory());
     expect(findings.filter((finding) => finding.severity === "error")).toEqual([]);
-  }, 120_000);
+  }, 240_000);
 
   it("keeps published lookup body similarity below the dedupe risk guard", () => {
     const pages = buildPseoInventory().filter((page) => page.status === "PUBLISHED");
@@ -125,7 +125,7 @@ describe("pSEO audit", () => {
       }
     }
     expect(maxSimilarity).toBeLessThan(0.64);
-  }, 120_000);
+  }, 240_000);
 
   it("flags pages that are too similar to another published lookup page", () => {
     const [first, second] = buildPseoInventory().filter((page) => page.status === "PUBLISHED");

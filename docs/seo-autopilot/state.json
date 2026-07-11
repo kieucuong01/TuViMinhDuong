@@ -1,13 +1,15 @@
 {
-  "lastRunAt": "2026-07-10T21:54:38.189Z",
-  "lastStatus": "blocked",
+  "lastRunAt": "2026-07-11T04:29:06.312Z",
+  "lastStatus": "warning",
   "lastAction": {
-    "type": "blocked",
-    "slug": "",
-    "slugs": [],
-    "reason": "No safe new SEO article opportunities remain for the daily publisher run after excluding existing slugs and overlapping reader intents.",
+    "type": "single_article_publish",
+    "slug": "menh-tham-lang-la-gi",
+    "slugs": [
+      "menh-tham-lang-la-gi"
+    ],
+    "reason": "Publish 1 people-first articles from expanded SEMrush keyword research; first topic: Nguoi doc dang tim \"lá số menh tham lang\" va can mot bai giai thich rieng, co boi canh la so ca nhan, gioi han dien giai va buoc tiep theo de doi chieu tren /#lap-la-so.",
     "approvalRequired": false,
-    "allowedToCommitDeployAfterVerification": false
+    "allowedToCommitDeployAfterVerification": true
   },
   "lastKeywordSource": {
     "sourcePath": "D:\\DU AN CA NHAN WEBSITE\\tsh\\semrush_la_so_keywords.csv",
@@ -17,9 +19,13 @@
   "lastSearchConsole": {
     "status": "skipped"
   },
-  "lastDraftPaths": [],
-  "lastReportPath": "docs/seo-autopilot/reports/2026-07-10-weekly-content-batch.md",
+  "lastDraftPaths": [
+    "docs/seo-autopilot/drafts/menh-tham-lang-la-gi.md"
+  ],
+  "lastReportPath": "docs/seo-autopilot/reports/2026-07-11-weekly-content-batch.md",
   "nextVerificationCommands": [
-    "npm run seo:autopilot"
+    "npm run seo:autopilot",
+    "npm test -- src/lib/content.test.ts src/lib/article-cover-assets.test.ts src/lib/seo-autopilot-core.test.ts",
+    "npm run build"
   ]
 }

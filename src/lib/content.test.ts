@@ -38,6 +38,7 @@ describe("SEO content cluster", () => {
     expect(slugs).toContain("lap-la-so-tu-vi-can-gi");
     expect(slugs).toContain("la-so-tu-vi-tron-doi");
     expect(slugs).toContain("la-so-tu-vi-co-thay-doi-khong");
+    expect(slugs).toContain("menh-tham-lang-la-gi");
     expect(slugs).toContain("sao-thien-co");
     expect(slugs).toContain("sao-thai-duong");
     expect(slugs).toContain("sao-tham-lang-trong-tu-vi");
@@ -67,6 +68,7 @@ describe("SEO content cluster", () => {
     const saoThienCoGuide = seedArticles.find((article) => article.slug === "sao-thien-co");
     const saoThaiDuongGuide = seedArticles.find((article) => article.slug === "sao-thai-duong");
     const saoThamLangGuide = seedArticles.find((article) => article.slug === "sao-tham-lang-trong-tu-vi");
+    const menhThamLangGuide = seedArticles.find((article) => article.slug === "menh-tham-lang-la-gi");
 
     expect(hub?.content).toContain("/#lap-la-so");
     expect(hub?.content).toContain("/kien-thuc-tu-vi/cung-menh-cung-than");
@@ -139,6 +141,11 @@ describe("SEO content cluster", () => {
     expect(saoThamLangGuide?.content).toContain("/kien-thuc-tu-vi/an-sao-la-so-tu-vi");
     expect(saoThamLangGuide?.content).toContain("| Tình huống cần đọc |");
     expect(saoThamLangGuide?.content).toContain("| Điều kiện làm Tham Lang đổi sắc thái |");
+    expect(menhThamLangGuide?.content).toContain("/#lap-la-so");
+    expect(menhThamLangGuide?.content).toContain("/kien-thuc-tu-vi/sao-tham-lang-trong-tu-vi");
+    expect(menhThamLangGuide?.content).toContain("/kien-thuc-tu-vi/cung-menh-cung-than");
+    expect(menhThamLangGuide?.content).toContain("| Dữ liệu nền cần khóa |");
+    expect(menhThamLangGuide?.content).toContain("| Tình huống người đọc đang gặp |");
   });
 
   it("keeps the all-stars guide practical, grouped, and tied to reading order", () => {
@@ -169,6 +176,21 @@ describe("SEO content cluster", () => {
     expect(changingChartGuide?.content).toContain("/kien-thuc-tu-vi/nguyet-van-nhat-van");
     expect(changingChartGuide?.content).toContain("## Khung causal analysis để kiểm tra “đổi” hay “không đổi”");
     expect(changingChartGuide?.faqs?.length).toBeGreaterThanOrEqual(3);
+  });
+
+  it("ships the menh Tham Lang article as a distinct intent page with chart-check workflow", () => {
+    const menhThamLangGuide = seedArticles.find((article) => article.slug === "menh-tham-lang-la-gi");
+
+    expect(menhThamLangGuide).toBeTruthy();
+    expect(menhThamLangGuide?.coverImage).toBe("/articles/menh-tham-lang-la-gi.webp");
+    expect(menhThamLangGuide?.ogImage).toBe("/articles/menh-tham-lang-la-gi.webp");
+    expect(menhThamLangGuide?.coverAlt).toContain("cung Mệnh");
+    expect(menhThamLangGuide?.coverAlt).toContain("đối chiếu Mệnh Tham Lang");
+    expect(menhThamLangGuide?.content).toContain("/kien-thuc-tu-vi/sao-tham-lang-trong-tu-vi");
+    expect(menhThamLangGuide?.content).toContain("/kien-thuc-tu-vi/cung-quan-loc-trong-tu-vi");
+    expect(menhThamLangGuide?.content).toContain("/kien-thuc-tu-vi/cung-tai-bach-trong-tu-vi");
+    expect(menhThamLangGuide?.content).toContain("## Khung causal analysis để đọc Mệnh Tham Lang không bị cuốn theo nhãn");
+    expect(menhThamLangGuide?.faqs?.length).toBeGreaterThanOrEqual(3);
   });
 
   it("ships the interpretation guide as a distinct middle-funnel article with chart-confidence checks", () => {
@@ -312,6 +334,7 @@ describe("SEO content cluster", () => {
           "lap-la-so-tu-vi-can-gi",
           "la-so-tu-vi-tron-doi",
           "la-so-tu-vi-co-thay-doi-khong",
+          "menh-tham-lang-la-gi",
           "sao-tham-lang-trong-tu-vi",
           "cac-sao-trong-la-so-tu-vi",
         ].includes(article.slug),
