@@ -67,7 +67,7 @@ try {
     searchConsole,
     plan,
     artifacts: {
-      draftPath: toRepoPath(draftPaths[0]),
+      draftPath: draftPaths[0] ? toRepoPath(draftPaths[0]) : null,
       draftPaths: draftPaths.map(toRepoPath),
       reportPath: toRepoPath(reportPath),
       statePath: toRepoPath(statePath),

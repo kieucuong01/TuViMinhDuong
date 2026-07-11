@@ -473,13 +473,15 @@ export const seedArticles = [
     expect(plan.nextAction.reason).toContain("Publish 1 people-first");
   });
 
-  it("reports blocked when the daily publisher has no distinct SEMrush-backed topic left", () => {
+  it("researches a new CSV-backed topic when the mapped daily publisher topics are exhausted", () => {
     const rows = parseSemrushKeywordCsv(
       [
         "keyword,intent,volume,kd_percent,cpc_usd",
         "lÃ¡ sá»‘ tá»­ vi,I,368.0K,61,0.01",
         "táº¡o lÃ¡ sá»‘ tá»­ vi,I,8.1K,44,0.01",
         "phÃ¢n tÃ­ch lÃ¡ sá»‘ tá»­ vi,I,590,33,0.02",
+        "menh than la gi,I,720,31,0.01",
+        "cach xem menh than trong la so tu vi,I,260,34,0.01",
       ].join("\n"),
     );
 
@@ -507,10 +509,53 @@ export const seedArticles = [
       articlesPerWeek: 1,
     });
 
-    expect(plan.status).toBe("blocked");
-    expect(plan.nextAction.type).toBe("blocked");
-    expect(plan.nextAction.reason).toContain("No safe new SEO article opportunities remain");
-    expect(plan.weeklyContentPlan.articles).toEqual([]);
+    expect(plan.nextAction.type).toBe("single_article_publish");
+    expect(plan.nextAction.slug).toBe("menh-than-la-gi");
+    expect(plan.nextAction.reason).toContain("expanded SEMrush keyword research");
+    expect(plan.brief.slug).toBe("menh-than-la-gi");
+    expect(plan.brief.focusKeyword).toBe("menh than la gi");
+    expect(plan.brief.keywordEvidence.clusterId).toBe("researched-menh-than-la-gi");
+    expect(plan.weeklyContentPlan.articles).toHaveLength(1);
+  });
+
+  it("rejects noisy expanded CSV topics before using the self-researched backstop queue", () => {
+    const rows = parseSemrushKeywordCsv(
+      [
+        "keyword,intent,volume,kd_percent,cpc_usd",
+        "lÃ¡ sá»‘ tá»­ vi,I,368.0K,61,0.01",
+        "lá số tl-'f tru,I,720,31,0.01",
+        "Otử vi việt nam lá số,I,660,43,0.01",
+      ].join("\n"),
+    );
+
+    const plan = planSeoAutopilotRun({
+      snapshot: {
+        status: "ok",
+        sitemapUrlCount: 30,
+        warnings: [],
+      },
+      existingSlugs: [
+        "la-so-tu-vi-la-gi",
+        "tao-la-so-tu-vi",
+        "phan-tich-la-so-tu-vi",
+        "la-so-tu-vi-online",
+        "la-so-tu-vi-mien-phi",
+        "sao-tu-vi",
+        "sao-thien-co",
+        "sao-thai-duong",
+        "menh-vo-chinh-dieu",
+        "cung-phu-mau-trong-tu-vi",
+        "tieu-van-la-gi",
+        "lap-la-so-tu-vi-can-gi",
+      ],
+      keywordRows: rows,
+      articlesPerWeek: 1,
+    });
+
+    expect(plan.nextAction.type).toBe("single_article_publish");
+    expect(plan.nextAction.slug).toBe("sao-vu-khuc");
+    expect(plan.nextAction.slug).not.toContain("tl");
+    expect(plan.brief.keywordEvidence).toBeNull();
   });
 
   it("requires an explicit bounded cluster mode for multi-article publishing", () => {

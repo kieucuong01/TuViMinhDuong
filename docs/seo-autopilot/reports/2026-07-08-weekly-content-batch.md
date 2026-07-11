@@ -1,10 +1,10 @@
 # SEO Autopilot Report
-Generated: 2026-07-10T21:54:38.189Z
+Generated: 2026-07-08T01:10:49.869Z
 Base URL: https://lasotinhhoa.vn
 Status: blocked
 Mode: auto-safe
-Sitemap URLs: 71
-Seed articles: 45
+Sitemap URLs: 65
+Seed articles: 42
 ## Keyword Intelligence
 Source: D:\DU AN CA NHAN WEBSITE\tsh\semrush_la_so_keywords.csv (396 rows)
 Included keyword volume: 666780

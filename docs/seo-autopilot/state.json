@@ -1,15 +1,13 @@
 {
-  "lastRunAt": "2026-07-10T02:37:34.196Z",
-  "lastStatus": "warning",
+  "lastRunAt": "2026-07-10T21:54:38.189Z",
+  "lastStatus": "blocked",
   "lastAction": {
-    "type": "single_article_publish",
-    "slug": "binh-giai-la-so-tu-vi",
-    "slugs": [
-      "binh-giai-la-so-tu-vi"
-    ],
-    "reason": "Publish 1 people-first articles from SEMrush intent clusters; first topic: Người đọc đã có lá số và muốn hiểu phần bình giải nên dùng như thế nào, câu hỏi nào có thể đọc sâu hơn và khi nào cần quay lại kiểm tra dữ liệu nền trước khi tin kết luận.",
+    "type": "blocked",
+    "slug": "",
+    "slugs": [],
+    "reason": "No safe new SEO article opportunities remain for the daily publisher run after excluding existing slugs and overlapping reader intents.",
     "approvalRequired": false,
-    "allowedToCommitDeployAfterVerification": true
+    "allowedToCommitDeployAfterVerification": false
   },
   "lastKeywordSource": {
     "sourcePath": "D:\\DU AN CA NHAN WEBSITE\\tsh\\semrush_la_so_keywords.csv",
@@ -19,13 +17,9 @@
   "lastSearchConsole": {
     "status": "skipped"
   },
-  "lastDraftPaths": [
-    "docs/seo-autopilot/drafts/binh-giai-la-so-tu-vi.md"
-  ],
+  "lastDraftPaths": [],
   "lastReportPath": "docs/seo-autopilot/reports/2026-07-10-weekly-content-batch.md",
   "nextVerificationCommands": [
-    "npm run seo:autopilot",
-    "npm test -- src/lib/content.test.ts src/lib/article-cover-assets.test.ts src/lib/seo-autopilot-core.test.ts",
-    "npm run build"
+    "npm run seo:autopilot"
   ]
 }

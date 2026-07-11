@@ -57,6 +57,65 @@ const DEFAULT_TOPIC_OPPORTUNITIES = [
   },
 ];
 
+const BACKSTOP_TOPIC_OPPORTUNITIES = [
+  {
+    slug: "sao-vu-khuc",
+    cluster: "14 chinh tinh",
+    priority: 74,
+    focusKeyword: "sao Vu Khuc",
+    intent: "Nguoi doc muon hieu sao Vu Khuc lien quan den tai chinh, ky luat va cach doc cung Menh, Tai Bach, Quan Loc.",
+  },
+  {
+    slug: "sao-thai-am",
+    cluster: "14 chinh tinh",
+    priority: 72,
+    focusKeyword: "sao Thai Am",
+    intent: "Nguoi doc muon hieu sao Thai Am trong la so, cach doc ve noi tam, tai san, gia dinh va moi truong ho tro.",
+  },
+  {
+    slug: "sao-thien-dong",
+    cluster: "14 chinh tinh",
+    priority: 70,
+    focusKeyword: "sao Thien Dong",
+    intent: "Nguoi doc muon hieu sao Thien Dong ve kha nang thich nghi, phuc khi, thay doi moi truong va gioi han khi doc mot sao rieng le.",
+  },
+  {
+    slug: "sao-liem-trinh",
+    cluster: "14 chinh tinh",
+    priority: 68,
+    focusKeyword: "sao Liem Trinh",
+    intent: "Nguoi doc muon hieu sao Liem Trinh ve ky luat, ranh gioi, danh du va cach doc cung bo sao di kem.",
+  },
+  {
+    slug: "sao-thien-phu",
+    cluster: "14 chinh tinh",
+    priority: 66,
+    focusKeyword: "sao Thien Phu",
+    intent: "Nguoi doc muon hieu sao Thien Phu ve nang luc giu gin, quan tri tai nguyen va cach doc cung Tai Bach, Dien Trach, Phuc Duc.",
+  },
+  {
+    slug: "sao-cu-mon",
+    cluster: "14 chinh tinh",
+    priority: 64,
+    focusKeyword: "sao Cu Mon",
+    intent: "Nguoi doc muon hieu sao Cu Mon ve ngon ngu, tranh luan, thi phi va cach giam doc doan khi chi nhin mot chinh tinh.",
+  },
+  {
+    slug: "sao-thien-tuong",
+    cluster: "14 chinh tinh",
+    priority: 62,
+    focusKeyword: "sao Thien Tuong",
+    intent: "Nguoi doc muon hieu sao Thien Tuong ve vai tro phu ta, bao ve, quan he xa hoi va cach doc trong tung cung.",
+  },
+  {
+    slug: "sao-thien-luong",
+    cluster: "14 chinh tinh",
+    priority: 60,
+    focusKeyword: "sao Thien Luong",
+    intent: "Nguoi doc muon hieu sao Thien Luong ve phuc thien, nguyen tac, su che cho va nhung dieu can doi chieu tren la so rieng.",
+  },
+];
+
 const KEYWORD_CLUSTER_RULES = [
   {
     id: "core-la-so-tu-vi",
@@ -423,8 +482,119 @@ export function buildKeywordDrivenOpportunities({ keywordRows, existingSlugs = [
     }
   }
 
+  for (const item of buildExpandedKeywordResearchOpportunities({ keywordRows, existing })) {
+    if (!item?.slug || existing.has(item.slug) || overlapsExistingIntent(item.slug, existing)) continue;
+    const current = dedupedOpportunities.get(item.slug);
+    if (!current || item.priority > current.priority) {
+      dedupedOpportunities.set(item.slug, item);
+    }
+  }
+
   const opportunities = [...dedupedOpportunities.values()].sort((left, right) => right.priority - left.priority);
   return { opportunities, intelligence };
+}
+
+function buildExpandedKeywordResearchOpportunities({ keywordRows, existing }) {
+  const rows = (keywordRows || [])
+    .map(normalizeKeywordRow)
+    .filter((row) => row.keyword && row.volume >= 20)
+    .filter((row) => !looksMojibakeKeyword(row.keyword))
+    .filter((row) => !KEYWORD_EXCLUSION_RULES.some((rule) => rule.pattern.test(row.normalizedKeyword)))
+    .filter((row) => !KEYWORD_CLUSTER_RULES.some((rule) => rule.pattern.test(row.normalizedKeyword)));
+  const grouped = new Map();
+
+  for (const row of rows) {
+    const topicKey = deriveResearchTopicKey(row.normalizedKeyword);
+    if (!topicKey) continue;
+    const current = grouped.get(topicKey) || {
+      topicKey,
+      rows: [],
+      totalVolume: 0,
+    };
+    current.rows.push(row);
+    current.totalVolume += row.volume;
+    grouped.set(topicKey, current);
+  }
+
+  return [...grouped.values()]
+    .map((group) => buildExpandedKeywordOpportunity(group))
+    .filter(Boolean)
+    .filter((item) => !existing.has(item.slug) && !overlapsExistingIntent(item.slug, existing))
+    .sort((left, right) => right.priority - left.priority)
+    .slice(0, 12);
+}
+
+function buildExpandedKeywordOpportunity(group) {
+  const rows = group.rows.slice().sort((left, right) => right.volume - left.volume);
+  const top = rows[0];
+  if (!top) return null;
+  const slug = slugForResearchTopic(top, group.topicKey);
+  if (!slug || slug.length < 8) return null;
+  const totalVolume = sum(rows.map((row) => row.volume));
+  const averageKd = weightedAverage(rows.map((row) => [row.kd, row.volume]));
+
+  return {
+    slug,
+    cluster: "Expanded SEMrush keyword research",
+    focusKeyword: top.keyword,
+    intent: `Nguoi doc dang tim "${top.keyword}" va can mot bai giai thich rieng, co boi canh la so ca nhan, gioi han dien giai va buoc tiep theo de doi chieu tren /#lap-la-so.`,
+    funnelStage: inferResearchFunnelStage(top.normalizedKeyword),
+    priority: Math.max(30, Math.round(totalVolume / Math.max(8, averageKd || 35))),
+    keywordEvidence: {
+      clusterId: `researched-${slug}`,
+      totalVolume,
+      keywordCount: rows.length,
+      averageKd,
+      topKeywords: rows.slice(0, 8).map((row) => ({
+        keyword: row.keyword,
+        volume: row.volume,
+        kd: row.kd,
+        intent: row.intent,
+      })),
+    },
+  };
+}
+
+function deriveResearchTopicKey(value) {
+  const topic = normalizeWhitespace(
+    String(value || "")
+      .replace(/\b(la so tu vi|la so|tu vi)\b/g, " ")
+      .replace(/^(cach|huong dan|xem|doc|giai|luan|tim hieu)\s+/, "")
+      .replace(/\b(la gi|co y nghia gi|y nghia|trong|tren|cua)\b/g, " ")
+      .replace(/\s+/g, " "),
+  );
+  const tokens = topic.split(" ").filter(Boolean);
+  if (tokens.length < 2 || tokens.length > 6) return null;
+  if (tokens.some((token) => token.length < 2)) return null;
+  if (!isSupportedResearchTopic(topic)) return null;
+  if (isGenericResearchTopic(topic)) return null;
+  return tokens.join(" ");
+}
+
+function slugForResearchTopic(top, topicKey) {
+  const source = /\bla gi\b/.test(top.normalizedKeyword) ? top.normalizedKeyword : `${topicKey} la gi`;
+  return normalizeSearchText(source).replace(/\s+/g, "-").replace(/^-+|-+$/g, "");
+}
+
+function inferResearchFunnelStage(value) {
+  if (/\b(lap|tao|lay|mien phi|online|can gi)\b/.test(value)) return "conversion-support";
+  if (/\b(cach|xem|doc|giai|luan|phan tich|y nghia)\b/.test(value)) return "middle";
+  return "top";
+}
+
+function isGenericResearchTopic(value) {
+  return /^(la so|tu vi|xem|doc|giai|luan|phan tich|lap|tao|lay|mien phi|online|chuan|tron doi)$/.test(value);
+}
+
+function isSupportedResearchTopic(value) {
+  if (/\bviet nam\b/.test(value)) return false;
+  return /\b(menh|than|cung|sao|van|dai van|tieu van|nguyet van|nhat van|tai bach|quan loc|phu the|phuc duc|dien trach|thien di|tat ach|tu tuc|no boc|phu mau)\b/.test(
+    value,
+  );
+}
+
+function looksMojibakeKeyword(value) {
+  return /[ÃÂ�]/.test(String(value || ""));
 }
 
 function rankRefreshTopicOpportunities(existingSlugs, keywordPlan) {
@@ -512,7 +682,7 @@ export function rankTopicOpportunities(existingUrls) {
       .filter(Boolean),
   );
 
-  return DEFAULT_TOPIC_OPPORTUNITIES.filter((item) => !existingSlugs.has(item.slug)).sort(
+  return [...DEFAULT_TOPIC_OPPORTUNITIES, ...BACKSTOP_TOPIC_OPPORTUNITIES].filter((item) => !existingSlugs.has(item.slug)).sort(
     (left, right) => right.priority - left.priority,
   );
 }
@@ -719,9 +889,7 @@ export function planSeoAutopilotRun({
           : "weekly_content_batch",
       slug: brief.slug,
       slugs,
-      reason: keywordIntelligence
-        ? `Publish ${slugs.length} people-first articles from SEMrush intent clusters; first topic: ${brief.intent}`
-        : `Publish ${slugs.length} people-first articles this week across the keyword funnel; first topic: ${brief.intent}`,
+      reason: buildPublishReason({ slugs, brief, keywordIntelligence }),
       approvalRequired: false,
       allowedToCommitDeployAfterVerification: true,
       ...(clusterMode
@@ -810,6 +978,16 @@ function avoidImmediateRepeat({ opportunities, previousState, articlesPerWeek })
   const nextTopics = opportunities.filter((item) => item.slug !== lastSlug);
   const repeatedTopics = opportunities.filter((item) => item.slug === lastSlug);
   return nextTopics.length ? [...nextTopics, ...repeatedTopics] : opportunities;
+}
+
+function buildPublishReason({ slugs, brief, keywordIntelligence }) {
+  if (brief?.keywordEvidence?.clusterId?.startsWith("researched-")) {
+    return `Publish ${slugs.length} people-first articles from expanded SEMrush keyword research; first topic: ${brief.intent}`;
+  }
+  if (keywordIntelligence) {
+    return `Publish ${slugs.length} people-first articles from SEMrush intent clusters; first topic: ${brief.intent}`;
+  }
+  return `Publish ${slugs.length} people-first articles this week across the keyword funnel; first topic: ${brief.intent}`;
 }
 
 function overlapsExistingIntent(slug, existingSlugs) {
