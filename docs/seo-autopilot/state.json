@@ -1,15 +1,13 @@
 {
-  "lastRunAt": "2026-07-11T04:29:06.312Z",
-  "lastStatus": "warning",
+  "lastRunAt": "2026-07-11T14:22:47.762Z",
+  "lastStatus": "blocked",
   "lastAction": {
-    "type": "single_article_publish",
-    "slug": "menh-tham-lang-la-gi",
-    "slugs": [
-      "menh-tham-lang-la-gi"
-    ],
-    "reason": "Publish 1 people-first articles from expanded SEMrush keyword research; first topic: Nguoi doc dang tim \"lá số menh tham lang\" va can mot bai giai thich rieng, co boi canh la so ca nhan, gioi han dien giai va buoc tiep theo de doi chieu tren /#lap-la-so.",
+    "type": "blocked",
+    "slug": "",
+    "slugs": [],
+    "reason": "Blocked: after excluding published slugs and overlapping intents, the remaining SEMrush-backed candidates are malformed or low-confidence queries such as \"lá số cung hoång deo\", so no safe new article can be published today without filler or doorway risk.",
     "approvalRequired": false,
-    "allowedToCommitDeployAfterVerification": true
+    "allowedToCommitDeployAfterVerification": false
   },
   "lastKeywordSource": {
     "sourcePath": "D:\\DU AN CA NHAN WEBSITE\\tsh\\semrush_la_so_keywords.csv",
@@ -19,13 +17,10 @@
   "lastSearchConsole": {
     "status": "skipped"
   },
-  "lastDraftPaths": [
-    "docs/seo-autopilot/drafts/menh-tham-lang-la-gi.md"
-  ],
+  "lastDraftPaths": [],
   "lastReportPath": "docs/seo-autopilot/reports/2026-07-11-weekly-content-batch.md",
   "nextVerificationCommands": [
-    "npm run seo:autopilot",
-    "npm test -- src/lib/content.test.ts src/lib/article-cover-assets.test.ts src/lib/seo-autopilot-core.test.ts",
-    "npm run build"
+    "npm run seo:autopilot:publisher",
+    "Review malformed SEMrush rows before the next daily publish run."
   ]
 }

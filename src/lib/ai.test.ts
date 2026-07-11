@@ -577,6 +577,10 @@ Tuần tại Thiên Di là tín hiệu nên kiểm chứng.
     expect(prompt).toContain("Bảng ngữ cảnh 12 tháng");
     expect(prompt.match(/Tháng \d+:/g)).toHaveLength(12);
     expect(prompt).toContain("mỗi tháng phải có trọng tâm riêng");
+    expect(prompt).toContain("ANTI-LOOP MONTH CONTRACT");
+    expect(prompt).toContain("mỗi tháng phải đổi cả cung tham chiếu, nhịp cảm xúc và hành động ưu tiên");
+    expect(prompt).toContain("không được dùng cùng một câu mở, cùng một cặp lời khuyên hoặc cùng một nhịp cảnh báo cho 2 tháng liền nhau");
+    expect(prompt).toContain("viết như lịch tư vấn cá nhân năm 2026, không như 12 đoạn copy được thay số tháng");
   });
 
   it("guides paid readings toward simple older-reader language and concrete value", () => {
@@ -759,7 +763,7 @@ ${filler}
     expect(new Set(monthBodies).size).toBe(12);
     expect(content.match(/🔻 Điểm cần chậm lại/g)).toHaveLength(12);
     expect(content.match(/🔹 Việc nên tận dụng/g)).toHaveLength(12);
-    expect(prompt).toContain("paid-personal-dossier-v5");
+    expect(prompt).toContain("paid-personal-dossier-v6");
   });
 
   it("computes 5 directional score groups for the advanced report header", () => {

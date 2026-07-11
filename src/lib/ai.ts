@@ -15,7 +15,7 @@ export const FREE_OVERVIEW_PREVIEW_MAX_WORDS = 200;
 export const FREE_OVERVIEW_PREVIEW_MAX_TOKENS = 900;
 export const PAID_READING_CHAPTER_MAX_TOKENS = 7000;
 export const FREE_OVERVIEW_VERSION = "free-mini-report-v9";
-export const PAID_READING_VERSION = "paid-personal-dossier-v5";
+export const PAID_READING_VERSION = "paid-personal-dossier-v6";
 export const PAID_FULL_WORD_TARGET = "5.000-7.000 từ";
 export const READING_PROVIDER_ORDER = ["deepseek", "groq"] as const;
 
@@ -619,6 +619,51 @@ const MONTH_READING_THEMES = [
   "tổng kết năm, thu gọn việc dở và chuẩn bị chu kỳ mới",
 ];
 
+const MONTH_READING_TONES = [
+  "khởi động chậm mà chắc",
+  "giữ ví tiền tỉnh táo",
+  "nói rõ trước khi nhận lời",
+  "sắp xếp lại phần nền",
+  "giữ sức khi áp lực tăng",
+  "đi ra ngoài có chọn lọc",
+  "nghỉ đúng lúc để không hụt hơi",
+  "tích lũy nhỏ, tránh ham nhanh",
+  "học và nói cho rõ nghĩa",
+  "làm yên phần hậu trường",
+  "đo kết quả trước khi tăng tốc",
+  "khép việc cũ, mở chu kỳ mới",
+];
+
+const MONTH_READING_SLOWDOWNS = [
+  "đừng mở quá nhiều đầu việc trong tháng đầu năm; hãy kiểm tra lại mục tiêu, lịch làm việc và người chịu trách nhiệm trước",
+  "chậm lại với khoản chi lớn, khoản vay, lời hứa góp vốn hoặc quyết định mua sắm theo cảm xúc",
+  "tránh trả lời vội trong hợp tác và gia đình; điều cần chậm là lời nói dễ làm người khác hiểu sai",
+  "đừng xử lý chuyện nhà cửa, hồ sơ, giấy tờ hoặc việc nền tảng bằng tâm thế đối phó; thiếu một giấy nhỏ cũng dễ kéo dài",
+  "giảm nhận thêm việc nếu sức bền chưa theo kịp; áp lực vai trò dễ làm tháng này bị quá tải",
+  "đi lại, gặp gỡ, ký hẹn hoặc mở rộng quan hệ cần có lịch rõ; tránh cả nể rồi nhận quá tay",
+  "hãy chậm với tranh luận, thức khuya và quyết định khi cơ thể đã mệt; tháng này cần giữ nhịp thần kinh",
+  "đừng để ý muốn sinh lời nhanh làm lỏng kỷ luật tiền; khoản nhỏ vẫn cần nguyên tắc rõ",
+  "tránh phát ngôn khi chưa kiểm chứng; hiểu nhầm nhỏ có thể làm mất thời gian sửa lại",
+  "chậm lại với trách nhiệm gia đình hoặc việc hậu trường không thuộc phần mình; cần ranh giới rõ",
+  "đừng tăng tốc chỉ vì đã có vài tín hiệu tốt; hãy đo thành quả, phản hồi và nguồn lực còn lại trước",
+  "tránh ôm việc dở sang chu kỳ mới; điều cần chậm là ham mở thêm trong khi việc cũ chưa khép",
+];
+
+const MONTH_READING_LEVERAGES = [
+  "chọn một việc nền tảng để bắt đầu ngay, đặt mốc kiểm tra sau 7 ngày và bỏ bớt việc phụ",
+  "rà lại dòng tiền, tách khoản bắt buộc với khoản linh hoạt, rồi đặt một giới hạn chi rõ cho tháng",
+  "dùng tháng này để nói rõ kỳ vọng, phân vai và điều kiện hợp tác; việc càng rõ càng đỡ hao sức",
+  "dọn một hồ sơ, một góc nhà hoặc một quy trình cũ để tạo cảm giác đứng vững hơn",
+  "ưu tiên việc có tác động lớn nhất tới vị trí công việc, nhưng chia nhỏ để không tiêu hao sức khỏe",
+  "gặp đúng người, đi đúng việc, ghi lại kết quả sau mỗi cuộc hẹn để biết quan hệ nào đáng đầu tư tiếp",
+  "thiết lập lại giờ ngủ, nhịp nghỉ và một thói quen phục hồi; sức bền là lợi thế chính của tháng",
+  "tận dụng cơ hội tích lũy đều, học thêm về tiền hoặc thử khoản đầu tư nhỏ trong giới hạn đã đặt",
+  "viết lại thông điệp, học một kỹ năng giao tiếp hoặc làm rõ điều từng bị hiểu sai",
+  "giải quyết một việc gia đình/hậu trường còn treo, nhưng đặt giới hạn thời gian và trách nhiệm",
+  "tổng kết điều đã làm được, xin phản hồi từ người quan trọng và chọn một điểm tăng tốc có kiểm chứng",
+  "chốt việc cũ, thanh lọc cam kết, chuẩn bị lịch và nguồn lực cho ba tháng đầu chu kỳ sau",
+];
+
 function compactPalaceSignalsForMonth(chart: TuViChart, palaceName: string) {
   const palace = palaceByName(chart, palaceName);
   if (!palace) return "dữ kiện cung đang cập nhật";
@@ -638,15 +683,25 @@ function yearlyMonthGuidanceLines(chart: TuViChart) {
     const palace = chart.palaces[(anchor + monthIndex) % chart.palaces.length];
     const nextPalace = chart.palaces[(anchor + monthIndex + 1) % chart.palaces.length];
     const theme = MONTH_READING_THEMES[monthIndex];
+    const tone = MONTH_READING_TONES[monthIndex];
+    const slowDown = MONTH_READING_SLOWDOWNS[monthIndex];
+    const leverage = MONTH_READING_LEVERAGES[monthIndex];
     const signals = compactPalaceSignalsForMonth(chart, palace.name);
     const caution = nextPalace ? `${nextPalace.name.toLowerCase()} và các cam kết kéo theo` : "việc phát sinh ngoài kế hoạch";
-    return `- Tháng ${month}: Cung tham chiếu ${palace.name} (${palace.branch}), tín hiệu ${signals}; trọng tâm là ${theme}; nên ưu tiên một việc có mốc kiểm tra rõ, tránh mở rộng sang ${caution} khi thông tin chưa đủ chắc.`;
+    return `- Tháng ${month}: Cung tham chiếu ${palace.name} (${palace.branch}), tín hiệu ${signals}; nhịp cảm xúc là ${tone}; trọng tâm là ${theme}; điểm cần chậm: ${slowDown}; việc nên tận dụng: ${leverage}; ranh giới phụ: tránh mở rộng sang ${caution} khi thông tin chưa đủ chắc.`;
   });
 }
 
 function yearlyMonthContextBlock(chart: TuViChart) {
   return `Bảng ngữ cảnh 12 tháng (mỗi tháng phải có trọng tâm riêng, không lặp mẫu 1/4/7/10):
-${yearlyMonthGuidanceLines(chart).join("\n")}`;
+${yearlyMonthGuidanceLines(chart).join("\n")}
+
+ANTI-LOOP MONTH CONTRACT:
+- mỗi tháng phải đổi cả cung tham chiếu, nhịp cảm xúc và hành động ưu tiên; không chỉ thay số tháng.
+- không được dùng cùng một câu mở, cùng một cặp lời khuyên hoặc cùng một nhịp cảnh báo cho 2 tháng liền nhau.
+- viết như lịch tư vấn cá nhân năm ${chart.input.viewYear}, không như 12 đoạn copy được thay số tháng.
+- nếu hai tháng cùng nói về tiền, sức khỏe hoặc quan hệ, phải đổi góc nhìn: tháng trước là kiểm tra/chậm lại, tháng sau là tận dụng/chốt việc/đặt ranh giới.
+- từng tháng phải có một chi tiết khiến người đọc nhận ra tháng đó khác tháng bên cạnh: cung tham chiếu, sao nổi bật, nhịp cảm xúc, việc nên làm hoặc việc nên tránh.`;
 }
 
 function fallbackEvidenceForChapter(chart: TuViChart, chapter: PaidReadingChapter, fallbackEvidence: string) {
@@ -1003,7 +1058,7 @@ export function paidReadingChapters(chart: TuViChart, type: ReadingKey): PaidRea
       key: "yearly-months",
       title: `Chương 8: Vận hạn năm ${year} và gợi ý theo từng tháng`,
       requiredSections: ["Mỏ neo", "Luận giải chi tiết"],
-      instruction: `Tổng hợp vận hạn năm ${year}, đại vận hiện tại, sao lưu niên và lời khuyên hành động. BẮT BUỘC biến 12 tháng thành bản đồ nhịp từng tháng. Mỗi tháng bắt đầu bằng dòng "### Tháng X: [trạng thái ngắn]"; bên dưới tách rõ "🔻 Điểm cần chậm lại" và "🔹 Việc nên tận dụng". Mỗi tháng nêu trọng tâm, việc nên ưu tiên, việc nên tránh, lưu ý cảm xúc/sức khỏe/tài chính nếu cần.`,
+      instruction: `Tổng hợp vận hạn năm ${year}, đại vận hiện tại, sao lưu niên và lời khuyên hành động. BẮT BUỘC biến 12 tháng thành bản đồ nhịp từng tháng. Mỗi tháng bắt đầu bằng dòng "### Tháng X: [trạng thái ngắn riêng của tháng]"; bên dưới tách rõ "🔻 Điểm cần chậm lại" và "🔹 Việc nên tận dụng". Mỗi tháng phải dùng đúng cung tham chiếu, tín hiệu sao, nhịp cảm xúc và hành động ưu tiên trong Bảng ngữ cảnh 12 tháng. Không viết 12 tháng giống nhau, không dùng cùng công thức cảnh báo/khuyên làm cho các tháng liền nhau. Người đọc phải thấy tháng 2 khác tháng 3, tháng 6 khác tháng 7, tháng 11 khác tháng 12 bằng một chi tiết cụ thể về tiền, việc, quan hệ, sức khỏe, giấy tờ hoặc nhịp nghỉ.`,
       targetWords: "900-1300 từ",
     },
     {
@@ -1127,7 +1182,8 @@ export function paidReadingChapterPrompt(
   const formatRules = isFullReport
     ? `${fullFormatRules}
 - Nếu là chương 12 cung, bắt buộc dùng tiêu đề cấp 3 cho ba trụ cột chiến lược đã nêu trong trọng tâm nội dung.
-- Nếu chương là vận năm, bắt buộc có đủ 12 tháng trong năm ${chart.input.viewYear}; mỗi tháng là một timeline card dạng "### Tháng X: [nhịp từng tháng]" và tách rõ "🔻 Điểm cần chậm lại" / "🔹 Việc nên tận dụng".`
+- Nếu chương là vận năm, bắt buộc có đủ 12 tháng trong năm ${chart.input.viewYear}; mỗi tháng là một timeline card dạng "### Tháng X: [nhịp từng tháng]" và tách rõ "🔻 Điểm cần chậm lại" / "🔹 Việc nên tận dụng".
+- Với chương vận năm, tuyệt đối không viết các tháng theo cùng một khuôn. Mỗi tháng phải có một cung tham chiếu riêng, một tín hiệu sao/cung riêng, một nhịp cảm xúc riêng, một việc nên chậm lại riêng và một việc nên tận dụng riêng.`
     : `- Ở phần dữ kiện: chỉ ghi 3-5 bằng chứng tử vi mạnh nhất, có thể nêu trạng thái sao (M/V/Đ/B/H), nhưng không liệt kê giàn giáo dữ liệu dài. Mỗi bằng chứng phải có một câu diễn giải đời sống đi kèm.
 - Ở phần luận giải: giải thích sâu bằng các tình huống cụ thể, nhưng mỗi đoạn tối đa 3-4 dòng khi đọc trên điện thoại.
 - Ở phần lưu ý: mọi sao hãm, sát tinh, lưu sát tinh phải chuyển thành lời khuyên đi chậm, kiểm tra kỹ và giữ an toàn; không dọa, không kết luận tuyệt đối.
@@ -1288,9 +1344,12 @@ ${yearlyMonthGuidanceLines(chart)
   .map((line, index) => {
     const month = index + 1;
     const theme = MONTH_READING_THEMES[index];
+    const tone = MONTH_READING_TONES[index];
+    const slowDown = MONTH_READING_SLOWDOWNS[index];
+    const leverage = MONTH_READING_LEVERAGES[index];
     return `### Tháng ${month}: Nhịp tháng - ${theme}
-🔻 Điểm cần chậm lại: tránh mở rộng cam kết khi thông tin chưa đủ rõ; đọc kỹ đoạn tham chiếu: ${line.replace(/^- Tháng \d+:\s*/, "")}
-🔹 Việc nên tận dụng: chọn một việc ưu tiên có mốc kiểm tra rõ, giữ nhịp tiền bạc/sức khỏe/quan hệ ở mức có thể kiểm soát.`;
+🔻 Điểm cần chậm lại: ${slowDown}. Đọc kỹ đoạn tham chiếu: ${line.replace(/^- Tháng \d+:\s*/, "")}
+🔹 Việc nên tận dụng: ${leverage}. Nhịp cảm xúc của tháng là ${tone}, vì vậy lời khuyên cần đi vào một việc cụ thể thay vì dàn trải.`;
   })
   .join("\n\n")}`
         : `${lead}

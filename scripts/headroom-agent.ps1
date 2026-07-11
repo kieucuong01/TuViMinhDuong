@@ -19,6 +19,20 @@ $env:HEADROOM_MEMORY_DB_PATH = Join-Path $env:USERPROFILE ".headroom\memory.db"
 $env:HEADROOM_MEMORY_PROJECT_ROOT = $repoRoot
 $env:HEADROOM_SAVINGS_PATH = Join-Path $env:USERPROFILE ".headroom\proxy_savings.json"
 
+function Get-HeadroomStartupTimeoutSeconds {
+  $rawValue = $env:HEADROOM_PROXY_STARTUP_TIMEOUT_SECONDS
+  if ([string]::IsNullOrWhiteSpace($rawValue)) {
+    return 120
+  }
+
+  $timeoutSeconds = 0
+  if ([int]::TryParse($rawValue, [ref]$timeoutSeconds) -and $timeoutSeconds -gt 0) {
+    return $timeoutSeconds
+  }
+
+  return 120
+}
+
 function Find-Headroom {
   $command = Get-Command headroom.exe -ErrorAction SilentlyContinue
   if (-not $command) {
@@ -57,12 +71,18 @@ function Find-HeadroomPython {
 }
 
 function Test-HeadroomProxy {
-  try {
-    $health = Invoke-RestMethod -Uri "$proxyUrl/health" -TimeoutSec 2
-    return $health.status -eq "healthy"
-  } catch {
-    return $false
+  foreach ($path in @("readyz", "health")) {
+    try {
+      $health = Invoke-RestMethod -Uri "$proxyUrl/$path" -TimeoutSec 2
+      if (($health.ready -eq $true) -or ($health.status -eq "healthy")) {
+        return $true
+      }
+    } catch {
+      continue
+    }
   }
+
+  return $false
 }
 
 function Ensure-HeadroomProxy {
@@ -80,16 +100,53 @@ function Ensure-HeadroomProxy {
     "--memory",
     "--memory-storage", "project"
   )
-  Start-Process -FilePath $HeadroomPath -ArgumentList $arguments -WorkingDirectory $env:USERPROFILE -WindowStyle Hidden
+  $proxyProcess = Start-Process -FilePath $HeadroomPath -ArgumentList $arguments -WorkingDirectory $env:USERPROFILE -WindowStyle Hidden -PassThru
+  $timeoutSeconds = Get-HeadroomStartupTimeoutSeconds
+  $stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
 
-  for ($attempt = 1; $attempt -le 40; $attempt += 1) {
+  while ($stopwatch.Elapsed.TotalSeconds -lt $timeoutSeconds) {
     if (Test-HeadroomProxy) {
       return
     }
+
+    if ($proxyProcess.HasExited) {
+      throw "Headroom proxy dừng trước khi sẵn sàng trên $proxyUrl. Exit code: $($proxyProcess.ExitCode). Chạy thủ công '$HeadroomPath proxy --host 127.0.0.1 --port 8787 --no-telemetry --memory --memory-storage project' để xem log."
+    }
+
     Start-Sleep -Milliseconds 500
   }
 
-  throw "Headroom proxy không khởi động trên $proxyUrl. Chạy thủ công '$HeadroomPath proxy --no-telemetry' để xem log."
+  throw "Headroom proxy không khởi động trên $proxyUrl sau $timeoutSeconds giây. Chạy thủ công '$HeadroomPath proxy --host 127.0.0.1 --port 8787 --no-telemetry --memory --memory-storage project' để xem log."
+}
+
+function Get-HeadroomStats {
+  try {
+    return [ordered]@{
+      source = "stats"
+      stats = Invoke-RestMethod -Uri "$proxyUrl/stats" -TimeoutSec 5
+    }
+  } catch {
+    $statsError = $_.Exception.Message
+  }
+
+  $health = Invoke-RestMethod -Uri "$proxyUrl/health" -TimeoutSec 10
+  $history = $null
+  $historyError = $null
+
+  try {
+    $history = Invoke-RestMethod -Uri "$proxyUrl/stats-history" -TimeoutSec 10
+  } catch {
+    $historyError = $_.Exception.Message
+  }
+
+  return [ordered]@{
+    source = "stats-fallback"
+    note = "/stats timed out or failed; using /health and /stats-history."
+    stats_error = $statsError
+    health = $health
+    stats_history = $history
+    stats_history_error = $historyError
+  }
 }
 
 $headroom = Find-Headroom
@@ -112,7 +169,7 @@ switch ($Action) {
 
   "stats" {
     Ensure-HeadroomProxy -HeadroomPath $headroom
-    Invoke-RestMethod -Uri "$proxyUrl/stats" -TimeoutSec 10 | ConvertTo-Json -Depth 8
+    Get-HeadroomStats | ConvertTo-Json -Depth 12
     break
   }
 

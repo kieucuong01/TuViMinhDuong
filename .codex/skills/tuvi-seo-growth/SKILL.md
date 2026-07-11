@@ -103,3 +103,4 @@ Content quality rules:
 - For programmatic SEO topics, require unique value beyond prose: at least two structured data/tool blocks, an expert causal-analysis frame, and an interactive chart-form CTA. If the topic cannot support that, publish fewer articles or create a draft/report only.
 - Do not return a short duplicate-run skip just because GSC, SEMrush, sitemap, and content inventory look unchanged. Continue through the topic queue until one distinct new article is publishable or a real blocker prevents safe release.
 - Treat character ranges as anti-thin-content safeguards, not as Google ranking requirements.
+- When a quality gate fails, repair every reported content, metadata, link, data-block, CTA, and cover issue and rerun the gate for up to 3 substantive passes before rejecting the candidate. Never lower the gate or publish a placeholder to satisfy cadence.
