@@ -530,6 +530,7 @@ function buildExpandedKeywordOpportunity(group) {
   if (!top) return null;
   const slug = slugForResearchTopic(top, group.topicKey);
   if (!slug || slug.length < 8) return null;
+  if (isUnsafeExpandedResearchTopic({ slug, topicKey: group.topicKey, topKeyword: top.keyword })) return null;
   const totalVolume = sum(rows.map((row) => row.volume));
   const averageKd = weightedAverage(rows.map((row) => [row.kd, row.volume]));
 
@@ -553,6 +554,15 @@ function buildExpandedKeywordOpportunity(group) {
       })),
     },
   };
+}
+
+function isUnsafeExpandedResearchTopic({ slug, topicKey, topKeyword }) {
+  const text = normalizeSearchText([slug, topicKey, topKeyword].filter(Boolean).join(" "));
+  if (!text) return true;
+  if (/\b(xau|dep)\b/.test(text) && /\bcung phu the\b/.test(text)) return true;
+  if (/\byeu menh\b/.test(text)) return true;
+  if (/\bhoang deo\b/.test(text)) return true;
+  return false;
 }
 
 function deriveResearchTopicKey(value) {

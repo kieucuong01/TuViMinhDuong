@@ -1,13 +1,15 @@
 {
-  "lastRunAt": "2026-07-11T14:22:47.762Z",
-  "lastStatus": "blocked",
+  "lastRunAt": "2026-07-12T03:17:38.198Z",
+  "lastStatus": "warning",
   "lastAction": {
-    "type": "blocked",
-    "slug": "",
-    "slugs": [],
-    "reason": "Blocked: after excluding published slugs and overlapping intents, the remaining SEMrush-backed candidates are malformed or low-confidence queries such as \"lá số cung hoång deo\", so no safe new article can be published today without filler or doorway risk.",
+    "type": "single_article_publish",
+    "slug": "sao-vu-khuc",
+    "slugs": [
+      "sao-vu-khuc"
+    ],
+    "reason": "Publish 1 people-first articles from SEMrush intent clusters; first topic: Nguoi doc muon hieu sao Vu Khuc lien quan den tai chinh, ky luat va cach doc cung Menh, Tai Bach, Quan Loc.",
     "approvalRequired": false,
-    "allowedToCommitDeployAfterVerification": false
+    "allowedToCommitDeployAfterVerification": true
   },
   "lastKeywordSource": {
     "sourcePath": "D:\\DU AN CA NHAN WEBSITE\\tsh\\semrush_la_so_keywords.csv",
@@ -17,10 +19,13 @@
   "lastSearchConsole": {
     "status": "skipped"
   },
-  "lastDraftPaths": [],
-  "lastReportPath": "docs/seo-autopilot/reports/2026-07-11-weekly-content-batch.md",
+  "lastDraftPaths": [
+    "docs/seo-autopilot/drafts/sao-vu-khuc.md"
+  ],
+  "lastReportPath": "docs/seo-autopilot/reports/2026-07-12-weekly-content-batch.md",
   "nextVerificationCommands": [
-    "npm run seo:autopilot:publisher",
-    "Review malformed SEMrush rows before the next daily publish run."
+    "npm run seo:autopilot",
+    "npm test -- src/lib/content.test.ts src/lib/article-cover-assets.test.ts src/lib/seo-autopilot-core.test.ts",
+    "npm run build"
   ]
 }
