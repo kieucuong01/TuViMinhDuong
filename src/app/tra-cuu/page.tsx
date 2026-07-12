@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowRight, BookOpenText, Orbit, Sparkles } from "lucide-react";
 import { routeMetadata } from "@/lib/metadata";
+import { itemListJsonLd, webPageJsonLd } from "@/lib/seo";
 
 export const metadata = routeMetadata({
   title: "Tra cứu ý nghĩa sao và 12 cung tử vi",
@@ -30,8 +31,21 @@ const hubs = [
 ];
 
 export default function LookupHubPage() {
+  const pageLd = webPageJsonLd({
+    name: "Tra cứu ý nghĩa sao và 12 cung tử vi",
+    description: "Tra cứu 14 chính tinh, 12 cung, phụ tinh và các tổ hợp sao tại từng cung trong lá số tử vi.",
+    url: "/tra-cuu",
+    breadcrumb: [
+      { name: "Trang chủ", url: "/" },
+      { name: "Tra cứu tử vi", url: "/tra-cuu" },
+    ],
+  });
+  const listLd = itemListJsonLd(hubs.map((hub) => ({ name: hub.title, url: hub.href })));
+
   return (
     <main className="pseo-hub pseo-root-hub section">
+      <script id="lookup-root-page-jsonld" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(pageLd) }} />
+      <script id="lookup-root-list-jsonld" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(listLd) }} />
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <header>
           <h1>Tra cứu tử vi theo sao và cung</h1>

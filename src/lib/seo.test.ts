@@ -8,6 +8,7 @@ import {
   robotsAllowsIndex,
   scoreArticleSeo,
   websiteJsonLd,
+  webApplicationJsonLd,
 } from "@/lib/seo";
 
 describe("SEO scoring", () => {
@@ -118,6 +119,24 @@ describe("Structured data", () => {
           priceCurrency: "VND",
         },
       ],
+    });
+  });
+
+  it("describes an ungated interactive tool as a WebApplication", () => {
+    const tool = webApplicationJsonLd({
+      name: "Tìm ngày khai trương",
+      description: "So sánh ngày theo khoảng và mục đích.",
+      url: "/xem-ngay/khai-truong",
+    });
+
+    expect(tool).toMatchObject({
+      "@type": "WebApplication",
+      name: "Tìm ngày khai trương",
+      applicationCategory: "LifestyleApplication",
+      operatingSystem: "Any",
+      isAccessibleForFree: true,
+      offers: { "@type": "Offer", price: 0, priceCurrency: "VND" },
+      url: expect.stringMatching(/\/xem-ngay\/khai-truong$/),
     });
   });
 });

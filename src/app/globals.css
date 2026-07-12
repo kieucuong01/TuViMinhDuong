@@ -6525,10 +6525,634 @@ button.is-loading:not(.icon-button)::before {
   }
 }
 
+.date-purpose-intro h1,
+.birth-hour-intro h1 {
+  margin-top: 0.35rem;
+  max-width: 780px;
+  font-size: clamp(2rem, 4vw, 3.6rem);
+  line-height: 1.02;
+  font-weight: 950;
+  letter-spacing: 0;
+  color: #1c1917;
+}
+
+.date-purpose-intro p:not(.eyebrow),
+.birth-hour-intro p {
+  margin-top: 1rem;
+  max-width: 860px;
+  font-size: 1.08rem;
+  line-height: 1.8;
+  color: #57534e;
+}
+
+.date-purpose-guide h2,
+.birth-hour-summary h2,
+.birth-hour-section-head h2,
+.birth-hour-confirm h2 {
+  font-size: clamp(1.4rem, 2.4vw, 2rem);
+  line-height: 1.16;
+  font-weight: 950;
+  color: #1c1917;
+}
+
+.date-purpose-grid,
+.birth-hour-summary-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.date-purpose-grid article,
+.date-purpose-table article,
+.birth-hour-summary article,
+.birth-hour-selected-grid article,
+.birth-hour-card {
+  border: 1px solid rgba(234, 88, 12, 0.14);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow: 0 16px 35px rgba(120, 53, 15, 0.06);
+}
+
+.date-purpose-grid article,
+.date-purpose-table article,
+.birth-hour-summary article,
+.birth-hour-selected-grid article,
+.birth-hour-card {
+  padding: 1rem;
+}
+
+.date-purpose-grid ul,
+.date-purpose-table div,
+.date-purpose-faq div,
+.birth-hour-summary ul,
+.birth-hour-card ul,
+.birth-hour-selected-grid ul {
+  margin-top: 1rem;
+}
+
+.date-purpose-grid li,
+.birth-hour-summary li,
+.birth-hour-card li,
+.birth-hour-selected-grid li {
+  color: #57534e;
+  line-height: 1.75;
+}
+
+.date-purpose-grid li + li,
+.birth-hour-summary li + li,
+.birth-hour-card li + li,
+.birth-hour-selected-grid li + li {
+  margin-top: 0.55rem;
+}
+
+.date-purpose-range,
+.date-purpose-table,
+.date-purpose-faq {
+  margin-top: 1.3rem;
+}
+
+.date-purpose-range ol,
+.date-purpose-table > div {
+  margin-top: 1rem;
+  display: grid;
+  gap: 0.8rem;
+}
+
+.date-purpose-range li {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.8rem;
+  align-items: start;
+  color: #57534e;
+}
+
+.date-purpose-range li span {
+  display: grid;
+  width: 2rem;
+  height: 2rem;
+  place-items: center;
+  border-radius: 999px;
+  background: #0f766e;
+  color: #fff;
+  font-weight: 900;
+}
+
+.date-purpose-table > div,
+.birth-hour-grid,
+.birth-hour-selected-grid,
+.birth-hour-form-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.date-purpose-table p,
+.date-purpose-faq p {
+  margin-top: 0.4rem;
+  color: #57534e;
+  line-height: 1.7;
+}
+
+.date-purpose-faq details {
+  border: 1px solid rgba(15, 118, 110, 0.16);
+  border-radius: 8px;
+  background: rgba(240, 253, 250, 0.72);
+  padding: 1rem;
+}
+
+.date-purpose-faq details + details {
+  margin-top: 0.65rem;
+}
+
+.date-purpose-faq summary {
+  cursor: pointer;
+  font-weight: 900;
+  color: #1c1917;
+}
+
+.birth-hour-page {
+  min-height: 100vh;
+}
+
+.birth-hour-tool,
+.birth-hour-confirm-form {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.birth-hour-form-grid,
+.birth-hour-grid,
+.birth-hour-selected-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.birth-hour-form label,
+.birth-hour-confirm-form label {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.birth-hour-form span,
+.birth-hour-confirm-form span {
+  font-weight: 900;
+  color: #44403c;
+}
+
+.birth-hour-form select,
+.birth-hour-confirm-form input {
+  min-height: 48px;
+  width: 100%;
+  border-radius: 8px;
+  border: 1px solid rgba(120, 113, 108, 0.26);
+  background: #fff;
+  padding: 0.78rem 0.9rem;
+  color: #1c1917;
+  outline: none;
+}
+
+.birth-hour-form select:focus-visible,
+.birth-hour-confirm-form input:focus-visible {
+  border-color: #0f766e;
+  box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.18);
+}
+
+.birth-hour-form .btn {
+  margin-top: 1rem;
+}
+
+.birth-hour-error {
+  margin-top: 0.85rem;
+  color: #be123c;
+  font-weight: 800;
+}
+
+.birth-hour-summary h3 {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  font-size: 1.05rem;
+  font-weight: 950;
+  color: #1c1917;
+}
+
+.birth-hour-summary li,
+.birth-hour-selected-grid dl div {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.birth-hour-section-head,
+.birth-hour-card-head,
+.birth-hour-card-actions {
+  display: flex;
+  gap: 0.8rem;
+  justify-content: space-between;
+}
+
+.birth-hour-section-head {
+  align-items: end;
+}
+
+.birth-hour-section-head > span {
+  border-radius: 999px;
+  background: #ecfeff;
+  padding: 0.45rem 0.8rem;
+  color: #155e75;
+  font-weight: 950;
+}
+
+.birth-hour-card[data-selected="true"] {
+  border-color: rgba(15, 118, 110, 0.36);
+  background: #f0fdfa;
+}
+
+.birth-hour-card[data-chosen="true"] {
+  box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.18), 0 16px 35px rgba(15, 118, 110, 0.08);
+}
+
+.birth-hour-card-head span {
+  color: #ea580c;
+  font-weight: 950;
+}
+
+.birth-hour-card-head h3 {
+  margin-top: 0.2rem;
+  font-size: 1.3rem;
+  font-weight: 950;
+  color: #1c1917;
+}
+
+.birth-hour-card-head strong {
+  white-space: nowrap;
+  color: #0f766e;
+}
+
+.birth-hour-card p,
+.birth-hour-confirm p {
+  margin-top: 0.8rem;
+  color: #57534e;
+  line-height: 1.65;
+}
+
+.birth-hour-card-actions {
+  margin-top: 1rem;
+  align-items: stretch;
+}
+
+.birth-hour-card-actions .btn {
+  min-height: 44px;
+  flex: 1;
+}
+
+.birth-hour-selected-grid h3 {
+  font-size: 1.2rem;
+  font-weight: 950;
+  color: #1c1917;
+}
+
+.birth-hour-selected-grid h3 span {
+  display: block;
+  margin-top: 0.15rem;
+  font-size: 0.9rem;
+  color: #78716c;
+}
+
+.birth-hour-selected-grid dl {
+  margin-top: 1rem;
+  display: grid;
+  gap: 0.45rem;
+}
+
+.birth-hour-selected-grid dt {
+  color: #78716c;
+  font-weight: 800;
+}
+
+.birth-hour-selected-grid dd {
+  color: #1c1917;
+  font-weight: 950;
+}
+
+.birth-hour-confirm {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 420px);
+  align-items: start;
+}
+
+.birth-hour-empty {
+  display: flex;
+  gap: 0.85rem;
+  align-items: center;
+  color: #57534e;
+  font-weight: 800;
+}
+
+@media (max-width: 980px) {
+  .date-purpose-grid,
+  .date-purpose-table > div,
+  .birth-hour-form-grid,
+  .birth-hour-summary-grid,
+  .birth-hour-grid,
+  .birth-hour-selected-grid,
+  .birth-hour-confirm {
+    grid-template-columns: 1fr;
+  }
+
+  .birth-hour-section-head {
+    align-items: start;
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 640px) {
+  .date-purpose-intro h1,
+  .birth-hour-intro h1 {
+    font-size: 2rem;
+  }
+
+  .birth-hour-card-actions,
+  .birth-hour-summary li,
+  .birth-hour-selected-grid dl div {
+    align-items: stretch;
+    flex-direction: column;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .free-overview-writing-cursor,
   .free-overview-detail-loader i {
     animation: none;
+  }
+}
+
+.date-finder-panel {
+  --finder-ink: #292524;
+  --finder-accent: #c2410c;
+  --finder-line: #fed7aa;
+  position: relative;
+  overflow: hidden;
+  margin-top: 1.5rem;
+  border: 1px solid var(--finder-line);
+  border-radius: 1.6rem;
+  background: linear-gradient(145deg, #fff 0%, #fff7ed 64%, #ecfdf5 100%);
+  padding: clamp(1rem, 3vw, 1.75rem);
+  box-shadow: 0 22px 58px rgb(124 45 18 / 0.09);
+}
+
+.date-finder-heading,
+.date-finder-results-head,
+.date-finder-chart-cta {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.date-finder-heading h2 {
+  color: var(--finder-ink);
+  font-size: clamp(1.65rem, 4vw, 2.45rem);
+  font-weight: 950;
+  letter-spacing: -0.04em;
+  line-height: 1.08;
+}
+
+.date-finder-heading p:not(.eyebrow) {
+  max-width: 48rem;
+  margin-top: 0.5rem;
+  color: #57534e;
+}
+
+.date-finder-heading > svg {
+  flex: 0 0 auto;
+  color: var(--finder-accent);
+}
+
+.date-finder-form {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.9rem;
+  align-items: end;
+  margin-top: 1.35rem;
+  border-top: 1px solid rgb(254 215 170 / 0.8);
+  padding-top: 1.25rem;
+}
+
+.date-finder-form label span {
+  display: flex;
+  gap: 0.35rem;
+  align-items: baseline;
+}
+
+.date-finder-form label small {
+  color: #78716c;
+  font-size: 0.78rem;
+  font-weight: 650;
+}
+
+.date-finder-form input:focus-visible,
+.date-finder-form select:focus-visible {
+  outline: 3px solid rgb(249 115 22 / 0.22);
+  outline-offset: 2px;
+}
+
+.date-finder-submit {
+  grid-column: span 2;
+  min-height: 3.2rem;
+}
+
+.date-finder-limit {
+  grid-column: span 2;
+  align-self: center;
+  color: #78716c;
+  font-size: 0.9rem;
+}
+
+.date-finder-error {
+  display: flex;
+  gap: 0.55rem;
+  align-items: center;
+  margin-top: 1rem;
+  border: 1px solid #fecdd3;
+  border-radius: 0.9rem;
+  background: #fff1f2;
+  padding: 0.8rem 0.9rem;
+  color: #9f1239;
+  font-weight: 800;
+}
+
+.date-finder-results {
+  margin-top: 1.5rem;
+}
+
+.date-finder-results-head h3 {
+  color: var(--finder-ink);
+  font-size: 1.35rem;
+  font-weight: 950;
+}
+
+.date-finder-results-head span {
+  border-radius: 999px;
+  background: #ffedd5;
+  padding: 0.35rem 0.7rem;
+  color: #9a3412;
+  font-size: 0.82rem;
+  font-weight: 850;
+}
+
+.date-finder-result-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.date-finder-result-card {
+  position: relative;
+  display: grid;
+  gap: 0.8rem;
+  min-width: 0;
+  border: 1px solid #e7e5e4;
+  border-radius: 1.1rem;
+  background: rgb(255 255 255 / 0.94);
+  padding: 1rem;
+  box-shadow: 0 14px 34px rgb(41 37 36 / 0.07);
+}
+
+.date-finder-result-card[data-tone="good"] {
+  border-color: #a7f3d0;
+}
+
+.date-finder-rank {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  color: rgb(120 53 15 / 0.42);
+  font-size: 0.82rem;
+  font-weight: 950;
+}
+
+.date-finder-result-date {
+  display: grid;
+  padding-right: 2rem;
+}
+
+.date-finder-result-date span,
+.date-finder-result-date small {
+  color: #78716c;
+  font-size: 0.8rem;
+  font-weight: 750;
+}
+
+.date-finder-result-date strong {
+  color: var(--finder-ink);
+  font-size: 1.25rem;
+  font-weight: 950;
+  font-variant-numeric: tabular-nums;
+}
+
+.date-finder-result-score {
+  display: flex;
+  align-items: baseline;
+  color: #047857;
+}
+
+.date-finder-result-score strong {
+  font-size: 2.25rem;
+  font-weight: 950;
+  line-height: 1;
+}
+
+.date-finder-result-card > p {
+  color: #57534e;
+  font-size: 0.92rem;
+  line-height: 1.55;
+}
+
+.date-finder-signals {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.date-finder-signals span,
+.date-finder-hours {
+  display: flex;
+  gap: 0.4rem;
+  align-items: flex-start;
+  color: #047857;
+  font-size: 0.82rem;
+  font-weight: 750;
+  line-height: 1.4;
+}
+
+.date-finder-signals svg,
+.date-finder-hours svg {
+  flex: 0 0 auto;
+  margin-top: 0.08rem;
+}
+
+.date-finder-signals .warning {
+  color: #be123c;
+}
+
+.date-finder-hours {
+  color: #7c2d12;
+}
+
+.date-finder-result-card .btn {
+  width: 100%;
+  min-height: 2.8rem;
+  margin-top: auto;
+}
+
+.date-finder-chart-cta {
+  margin-top: 1rem;
+  border-radius: 1.1rem;
+  background: #292524;
+  padding: 1rem 1.1rem;
+  color: #fff7ed;
+}
+
+.date-finder-chart-cta p {
+  margin-top: 0.2rem;
+  color: #d6d3d1;
+  font-size: 0.9rem;
+}
+
+@media (max-width: 1100px) {
+  .date-finder-result-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  .date-finder-form,
+  .date-finder-result-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .date-finder-submit,
+  .date-finder-limit {
+    grid-column: auto;
+  }
+
+  .date-finder-heading,
+  .date-finder-results-head,
+  .date-finder-chart-cta {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .date-finder-heading > svg {
+    display: none;
+  }
+
+  .date-finder-results-head span {
+    width: fit-content;
+  }
+
+  .date-finder-chart-cta .btn {
+    width: 100%;
   }
 }
 

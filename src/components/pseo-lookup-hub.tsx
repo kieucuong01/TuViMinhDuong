@@ -2,6 +2,7 @@ import Form from "next/form";
 import Link from "next/link";
 import { AlertTriangle, ArrowRight, CheckCircle2, Search } from "lucide-react";
 import type { PseoEntityDefinition } from "@/lib/pseo-registry";
+import { faqJsonLd, itemListJsonLd, webPageJsonLd } from "@/lib/seo";
 
 type LookupSection = {
   title: string;
@@ -52,8 +53,28 @@ export function PseoLookupHub({
 
   if (!selected) return null;
 
+  const pageLd = webPageJsonLd({
+    name: title,
+    description,
+    url: actionPath,
+    breadcrumb: [
+      { name: "Trang chủ", url: "/" },
+      { name: "Tra cứu tử vi", url: "/tra-cuu" },
+      { name: title, url: actionPath },
+    ],
+  });
+  const listLd = itemListJsonLd(
+    entities
+      .filter((entity) => entity.canonicalPath)
+      .map((entity) => ({ name: entity.name, url: entity.canonicalPath as string })),
+  );
+  const faqLd = faqJsonLd(faqs);
+
   return (
     <main className="pseo-hub pseo-lookup-hub section">
+      <script id="pseo-hub-page-jsonld" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(pageLd) }} />
+      <script id="pseo-hub-list-jsonld" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(listLd) }} />
+      <script id="pseo-hub-faq-jsonld" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }} />
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <header className="pseo-lookup-hero">
           <h1>{title}</h1>

@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { APP_URL } from "@/lib/env";
 import { listArticles } from "@/lib/data";
+import { DATE_PURPOSE_PAGES } from "@/lib/date-purpose-pages";
 import { SUPPORT_STARS } from "@/lib/pseo-registry";
 import { isSelfCanonicalArticle, robotsAllowsIndex } from "@/lib/seo";
 
@@ -22,6 +23,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: APP_URL, lastModified: STATIC_LAST_MODIFIED, changeFrequency: "daily", priority: 1 },
     { url: `${APP_URL}/kien-thuc-tu-vi`, lastModified: STATIC_LAST_MODIFIED, changeFrequency: "daily", priority: 0.8 },
     { url: `${APP_URL}/xem-ngay`, lastModified: STATIC_LAST_MODIFIED, changeFrequency: "daily", priority: 0.8 },
+    ...DATE_PURPOSE_PAGES.map((page) => ({
+      url: `${APP_URL}/xem-ngay/${page.slug}`,
+      lastModified: STATIC_LAST_MODIFIED,
+      changeFrequency: "weekly" as const,
+      priority: 0.72,
+    })),
     { url: `${APP_URL}/tra-cuu`, lastModified: STATIC_LAST_MODIFIED, changeFrequency: "weekly", priority: 0.85 },
     { url: `${APP_URL}/tra-cuu/y-nghia-14-chinh-tinh`, lastModified: STATIC_LAST_MODIFIED, changeFrequency: "weekly", priority: 0.8 },
     { url: `${APP_URL}/tra-cuu/y-nghia-12-cung`, lastModified: STATIC_LAST_MODIFIED, changeFrequency: "weekly", priority: 0.8 },

@@ -21,6 +21,7 @@ export const metadata = routeMetadata({
 
 type HomeSearchParams = {
   chartError?: string;
+  source?: string;
 };
 
 function chartFormErrorMessage(chartError?: string) {
@@ -39,12 +40,17 @@ function chartFormErrorMessage(chartError?: string) {
   return "";
 }
 
+function safeHomeAdSource(params: HomeSearchParams) {
+  return params.source === "date_finder" ? "date_finder" : "chart_form";
+}
+
 export default async function Home({ searchParams }: { searchParams?: Promise<HomeSearchParams> }) {
   const paramsPromise: Promise<HomeSearchParams> = searchParams ?? Promise.resolve({});
   const [params, articleList, operationSettings] = await Promise.all([paramsPromise, listArticles(), getOperationSettings()]);
   const articles = articleList.slice(0, 3);
   const showQuickReading = operationSettings.paymentsEnabled && operationSettings.paidReadingsEnabled;
   const chartErrorMessage = chartFormErrorMessage(params.chartError);
+  const chartAdSource = safeHomeAdSource(params);
   const homeFaqs = [
     {
       question: "Lá số tinh hoa khác gì một trang xem bói nhanh?",
@@ -143,7 +149,7 @@ export default async function Home({ searchParams }: { searchParams?: Promise<Ho
                   {chartErrorMessage}
                 </p>
               ) : null}
-              <ChartForm />
+              <ChartForm adSource={chartAdSource} />
               <div className="form-assurance">
                 <span><ShieldCheck size={17} /> Không cần trả phí để lập lá số</span>
                 <span><Eye size={17} /> Có bản đọc rõ trên điện thoại</span>

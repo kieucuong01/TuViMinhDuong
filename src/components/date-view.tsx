@@ -20,6 +20,7 @@ import {
   XCircle,
 } from "lucide-react";
 import { analyzeDate, monthDays, parseInputDate, toInputDate, type DateTaskKey, type FortuneTone } from "@/lib/date-fortune";
+import { DateRangeFinder } from "@/components/date-range-finder";
 
 const toneClass: Record<FortuneTone, string> = {
   good: "bg-emerald-50 text-emerald-700 ring-emerald-200",
@@ -68,7 +69,21 @@ function TaskIcon({ type }: { type: DateTaskKey }) {
   return <Icon size={19} className="date-task-icon" />;
 }
 
-export function DateView({ initialDate, initialBirthYear }: { initialDate?: string | string[]; initialBirthYear?: string | string[] }) {
+export function DateView({
+  initialDate,
+  initialBirthYear,
+  initialMode,
+  initialFinderTask,
+  initialFinderFrom,
+  initialFinderTo,
+}: {
+  initialDate?: string | string[];
+  initialBirthYear?: string | string[];
+  initialMode?: string | string[];
+  initialFinderTask?: string | string[];
+  initialFinderFrom?: string | string[];
+  initialFinderTo?: string | string[];
+}) {
   const [selectedDate, setSelectedDate] = useState(() => safeInputDate(initialDate));
   const [birthYear, setBirthYear] = useState(() => safeBirthYear(initialBirthYear));
   const [selectedTask, setSelectedTask] = useState<DateTaskKey>("general");
@@ -182,6 +197,19 @@ export function DateView({ initialDate, initialBirthYear }: { initialDate?: stri
           </div>
         </aside>
       </section>
+
+      <DateRangeFinder
+        initialMode={initialMode}
+        initialTask={initialFinderTask}
+        initialFrom={initialFinderFrom}
+        initialTo={initialFinderTo}
+        initialBirthYear={initialBirthYear}
+        onViewDate={(dateKey, finderBirthYear) => {
+          setSelectedDate(dateKey);
+          if (finderBirthYear) setBirthYear(finderBirthYear);
+          window.requestAnimationFrame(() => document.querySelector("[data-testid='date-view']")?.scrollIntoView({ behavior: "smooth", block: "start" }));
+        }}
+      />
 
       <section className="date-month-overview">
         <div className="date-month-calendar-card">

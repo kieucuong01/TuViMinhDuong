@@ -1,8 +1,6 @@
-#!/usr/bin/env node
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
-import { extractSeedArticleSlugs } from "../seo/seo-autopilot-core.mjs";
 
 const REPO_ROOT = fileURLToPath(new URL("../..", import.meta.url));
 const CONTENT_PATH = resolve(REPO_ROOT, "src/lib/content.ts");
@@ -287,6 +285,12 @@ function buildTrackedUrl({ target, source, content }) {
 export function readExistingArticleSlugs(contentPath = CONTENT_PATH) {
   if (!existsSync(contentPath)) return [];
   return extractSeedArticleSlugs(readFileSync(contentPath, "utf8"));
+}
+
+function extractSeedArticleSlugs(source) {
+  return [...String(source || "").matchAll(/\bslug:\s*["']([^"']+)["']/g)]
+    .map((match) => match[1])
+    .filter(Boolean);
 }
 
 export function readSeoState(statePath = SEO_STATE_PATH) {

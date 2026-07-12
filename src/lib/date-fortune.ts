@@ -6,6 +6,31 @@ export const weekdays = ["Chủ Nhật", "Thứ Hai", "Thứ Ba", "Thứ Tư", "
 
 export type FortuneTone = "good" | "neutral" | "bad";
 export type DateTaskKey = "general" | "wedding" | "opening" | "contract" | "travel" | "groundbreaking";
+export type SpecificDateTaskKey = Exclude<DateTaskKey, "general">;
+
+export type RankDateRangeInput = {
+  from: string;
+  to: string;
+  task: DateTaskKey;
+  birthYear?: number;
+};
+
+export type RankedDateResult = {
+  date: Date;
+  dateKey: string;
+  task: SpecificDateTaskKey;
+  taskLabel: string;
+  taskScore: number;
+  overallScore: number;
+  tone: FortuneTone;
+  verdict: string;
+  goodSignals: string[];
+  badSignals: string[];
+  goodHours: { branch: string; range: string }[];
+  weekday: string;
+  lunar: { day: number; month: number; year: number; leap: boolean };
+  canChiDay: string;
+};
 
 export type VietnameseDateHighlight = {
   label: string;
@@ -577,4 +602,52 @@ export function analyzeDate(date: Date, birthYear?: number) {
 export function monthDays(year: number, month: number) {
   const total = new Date(year, month, 0).getDate();
   return Array.from({ length: total }, (_, index) => analyzeDate(new Date(`${year}-${pad(month)}-${pad(index + 1)}T12:00:00+07:00`)));
+}
+
+function parseStrictDateKey(value: string, label: string) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) throw new Error(`${label} không hợp lệ`);
+  const date = parseInputDate(value);
+  if (Number.isNaN(date.getTime()) || toInputDate(date) !== value) throw new Error(`${label} không hợp lệ`);
+  return date;
+}
+
+export function rankDateRange({ from, to, task, birthYear }: RankDateRangeInput): RankedDateResult[] {
+  const start = parseStrictDateKey(from, "Ngày bắt đầu");
+  const end = parseStrictDateKey(to, "Ngày kết thúc");
+  if (end.getTime() < start.getTime()) throw new Error("Ngày kết thúc phải từ ngày bắt đầu");
+
+  const inclusiveDays = Math.floor((Date.UTC(end.getFullYear(), end.getMonth(), end.getDate()) - Date.UTC(start.getFullYear(), start.getMonth(), start.getDate())) / 86_400_000) + 1;
+  if (inclusiveDays > 60) throw new Error("Khoảng tìm kiếm tối đa 60 ngày");
+  if (task === "general" || !taskRules.some((rule) => rule.key === task)) throw new Error("Hãy chọn một việc cụ thể");
+  if (birthYear !== undefined && (!Number.isInteger(birthYear) || birthYear < 1900 || birthYear > 2100)) {
+    throw new Error("Năm sinh không hợp lệ");
+  }
+
+  const ranked = Array.from({ length: inclusiveDays }, (_, index) => {
+    const date = new Date(start);
+    date.setDate(start.getDate() + index);
+    const fortune = analyzeDate(date, birthYear);
+    const selectedTask = fortune.taskScores.find((item) => item.key === task);
+    if (!selectedTask) throw new Error("Không thể chấm điểm việc đã chọn");
+    return {
+      date,
+      dateKey: toInputDate(date),
+      task: task as SpecificDateTaskKey,
+      taskLabel: selectedTask.label,
+      taskScore: selectedTask.score,
+      overallScore: fortune.score,
+      tone: selectedTask.tone,
+      verdict: selectedTask.verdict,
+      goodSignals: selectedTask.goodSignals.slice(0, 3),
+      badSignals: selectedTask.badSignals.slice(0, 2),
+      goodHours: fortune.goodHours,
+      weekday: fortune.weekday,
+      lunar: fortune.lunar,
+      canChiDay: fortune.canChi.day,
+    } satisfies RankedDateResult;
+  });
+
+  return ranked
+    .sort((left, right) => right.taskScore - left.taskScore || right.overallScore - left.overallScore || left.dateKey.localeCompare(right.dateKey))
+    .slice(0, 5);
 }

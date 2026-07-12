@@ -247,6 +247,30 @@ export function offerCatalogJsonLd(catalog: {
   };
 }
 
+export function webApplicationJsonLd(app: { name: string; description: string; url: string }) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    name: app.name,
+    description: app.description,
+    url: absoluteUrl(app.url),
+    applicationCategory: "LifestyleApplication",
+    operatingSystem: "Any",
+    inLanguage: "vi-VN",
+    isAccessibleForFree: true,
+    offers: {
+      "@type": "Offer",
+      price: 0,
+      priceCurrency: "VND",
+    },
+    provider: {
+      "@type": "Organization",
+      name: APP_NAME,
+      url: APP_URL,
+    },
+  };
+}
+
 export function websiteJsonLd() {
   return {
     "@context": "https://schema.org",
