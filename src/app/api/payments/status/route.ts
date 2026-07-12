@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 
 import { getCurrentUser } from "@/lib/auth";
 import { getDb } from "@/lib/db";
+import { creditPaidTopupOrder, getPayOSPaymentRequest, isPayOSRequestPaid } from "@/lib/payos";
 
 function invalidOrderCode() {
   return NextResponse.json({ error: "Invalid orderCode" }, { status: 400 });
@@ -29,14 +30,17 @@ export async function GET(request: Request) {
     });
   }
 
-  const order = await db.paymentOrder.findUnique({
+  let order = await db.paymentOrder.findUnique({
     where: { orderCode: BigInt(orderCode) },
     select: {
+      id: true,
       userId: true,
+      orderCode: true,
       status: true,
       amountVnd: true,
       coins: true,
       paidAt: true,
+      rawPayload: true,
       package: {
         select: {
           key: true,
@@ -47,6 +51,14 @@ export async function GET(request: Request) {
 
   if (!order || order.userId !== user.id) {
     return NextResponse.json({ error: "Order not found" }, { status: 404 });
+  }
+
+  if (order.status !== "PAID" || !order.paidAt) {
+    const payosStatus = await getPayOSPaymentRequest(orderCode).catch(() => null);
+    if (isPayOSRequestPaid(payosStatus, order.amountVnd)) {
+      const reconciled = await creditPaidTopupOrder(db, order, { raw: order.rawPayload, reconciliation: payosStatus?.raw });
+      if (reconciled) order = { ...order, ...reconciled };
+    }
   }
 
   if (order.status !== "PAID" || !order.paidAt) {

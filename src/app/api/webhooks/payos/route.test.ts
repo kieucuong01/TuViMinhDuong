@@ -3,11 +3,15 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const mocks = vi.hoisted(() => ({
   getDb: vi.fn(),
   verifyPayOSWebhook: vi.fn(),
+  creditPaidTopupOrder: vi.fn(),
   generateReading: vi.fn(),
 }));
 
 vi.mock("@/lib/db", () => ({ getDb: mocks.getDb }));
-vi.mock("@/lib/payos", () => ({ verifyPayOSWebhook: mocks.verifyPayOSWebhook }));
+vi.mock("@/lib/payos", () => ({
+  creditPaidTopupOrder: mocks.creditPaidTopupOrder,
+  verifyPayOSWebhook: mocks.verifyPayOSWebhook,
+}));
 vi.mock("@/lib/ai", () => ({ generateReading: mocks.generateReading }));
 
 type FakePaymentOrder = {
@@ -76,6 +80,10 @@ describe("PayOS webhook", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mocks.verifyPayOSWebhook.mockReturnValue(true);
+    mocks.creditPaidTopupOrder.mockImplementation(async (_db, order: FakePaymentOrder) => {
+      order.status = "PAID";
+      return order;
+    });
     mocks.generateReading.mockResolvedValue({
       content: "paid quick reading",
       model: "test-model",
@@ -98,7 +106,7 @@ describe("PayOS webhook", () => {
     expect(db.coinLedger.create).not.toHaveBeenCalled();
   });
 
-  it("credits coins for a paid topup and ignores duplicate paid webhooks", async () => {
+  it("delegates paid topup crediting to the idempotent PayOS helper", async () => {
     const { db } = createDb();
     mocks.getDb.mockReturnValue(db);
 
@@ -108,28 +116,12 @@ describe("PayOS webhook", () => {
     });
 
     expect(response.status).toBe(200);
-    expect(db.paymentOrder.update).toHaveBeenCalledWith(
-      expect.objectContaining({
-        where: { id: "order-1" },
-        data: expect.objectContaining({ status: "PAID" }),
-      }),
+    expect(mocks.creditPaidTopupOrder).toHaveBeenCalledWith(
+      db,
+      expect.objectContaining({ id: "order-1" }),
+      expect.objectContaining({ data: { orderCode: 123456, status: "PAID" } }),
     );
-    expect(db.user.update).toHaveBeenCalledWith({
-      where: { id: "user-1" },
-      data: { coinBalance: 209 },
-    });
-    expect(db.coinLedger.create).toHaveBeenCalledTimes(1);
-    expect(db.coinLedger.create).toHaveBeenCalledWith(
-      expect.objectContaining({
-        data: expect.objectContaining({
-          userId: "user-1",
-          type: "CREDIT",
-          amount: 199,
-          balance: 209,
-          referenceId: "order-1",
-        }),
-      }),
-    );
+    expect(db.coinLedger.create).not.toHaveBeenCalled();
 
     const duplicateResponse = await postWebhook({
       data: { orderCode: 123456, status: "PAID" },
@@ -137,8 +129,7 @@ describe("PayOS webhook", () => {
     });
 
     expect(duplicateResponse.status).toBe(200);
-    expect(db.coinLedger.create).toHaveBeenCalledTimes(1);
-    expect(db.user.update).toHaveBeenCalledTimes(1);
+    expect(mocks.creditPaidTopupOrder).toHaveBeenCalledTimes(2);
   });
 
   it.each([

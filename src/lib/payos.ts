@@ -4,6 +4,7 @@ import { createHmac } from "node:crypto";
 import { APP_URL, isPayOSEnabled } from "@/lib/env";
 import { COIN_PACKAGES } from "@/lib/pricing";
 import type { SessionUser } from "@/lib/auth";
+import type { Prisma, PrismaClient } from "@/generated/prisma/client";
 
 function checksumKey() {
   return process.env.PAYOS_CHECKSUM_KEY || "demo";
@@ -23,6 +24,109 @@ export function signPayOSData(data: Record<string, unknown>) {
 export function verifyPayOSWebhook(data: Record<string, unknown>, signature?: string) {
   if (!signature) return false;
   return signPayOSData(data) === signature;
+}
+
+type PayOSPaymentRequestStatus = {
+  status?: string;
+  amount?: number;
+  amountPaid?: number;
+  raw: unknown;
+};
+
+type TopupPaymentOrder = {
+  id: string;
+  userId: string;
+  orderCode: bigint;
+  amountVnd: number;
+  coins: number;
+  status: string;
+  rawPayload?: unknown;
+};
+
+export async function getPayOSPaymentRequest(orderCode: string | number | bigint): Promise<PayOSPaymentRequestStatus | null> {
+  if (!isPayOSEnabled()) return null;
+  const response = await fetch(`https://api-merchant.payos.vn/v2/payment-requests/${orderCode}`, {
+    headers: {
+      "x-client-id": process.env.PAYOS_CLIENT_ID || "",
+      "x-api-key": process.env.PAYOS_API_KEY || "",
+    },
+    cache: "no-store",
+  });
+  if (!response.ok) return null;
+  const json = await response.json().catch(() => null);
+  if (!json || typeof json !== "object") return null;
+  const data = (json as { data?: { status?: unknown; amount?: unknown; amountPaid?: unknown } }).data;
+  return {
+    status: typeof data?.status === "string" ? data.status : undefined,
+    amount: Number(data?.amount || 0),
+    amountPaid: Number(data?.amountPaid || 0),
+    raw: json,
+  };
+}
+
+export function isPayOSRequestPaid(payment: PayOSPaymentRequestStatus | null, expectedAmountVnd: number) {
+  if (!payment) return false;
+  return payment.status === "PAID" && Number(payment.amountPaid || 0) >= expectedAmountVnd;
+}
+
+export async function creditPaidTopupOrder(db: PrismaClient, order: TopupPaymentOrder, rawPayload: unknown, paidAt = new Date()) {
+  return db.$transaction(async (tx) => {
+    const fresh = await tx.paymentOrder.findUnique({
+      where: { id: order.id },
+      select: {
+        id: true,
+        userId: true,
+        orderCode: true,
+        amountVnd: true,
+        coins: true,
+        status: true,
+        paidAt: true,
+        package: { select: { key: true } },
+      },
+    });
+    if (!fresh) return null;
+
+    if (fresh.status !== "PAID" || !fresh.paidAt) {
+      await tx.paymentOrder.update({
+        where: { id: fresh.id },
+        data: { status: "PAID", paidAt, rawPayload: rawPayload as Prisma.InputJsonValue },
+      });
+    }
+
+    if (fresh.coins > 0) {
+      const existingCredits = await tx.coinLedger.findMany({
+        where: { referenceId: fresh.id, type: "CREDIT" },
+        select: { amount: true },
+      });
+      if (existingCredits.length === 0) {
+        const user = await tx.user.findUniqueOrThrow({ where: { id: fresh.userId }, select: { coinBalance: true } });
+        const balance = user.coinBalance + fresh.coins;
+        await tx.user.update({ where: { id: fresh.userId }, data: { coinBalance: balance } });
+        await tx.coinLedger.create({
+          data: {
+            userId: fresh.userId,
+            type: "CREDIT",
+            amount: fresh.coins,
+            balance,
+            reason: "Nạp xu PayOS",
+            referenceId: fresh.id,
+          },
+        });
+      }
+    }
+
+    return tx.paymentOrder.findUnique({
+      where: { id: fresh.id },
+      select: {
+        userId: true,
+        status: true,
+        amountVnd: true,
+        coins: true,
+        paidAt: true,
+        package: { select: { key: true } },
+      },
+    });
+  });
 }
 
 function normalizeReturnPath(returnPath?: string) {

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
-import { verifyPayOSWebhook } from "@/lib/payos";
+import { creditPaidTopupOrder, verifyPayOSWebhook } from "@/lib/payos";
 import { generateReading } from "@/lib/ai";
 import type { TuViChart } from "@/lib/chart";
 
@@ -85,7 +85,9 @@ export async function POST(request: Request) {
   const order = await db.paymentOrder.findUnique({ where: { orderCode } });
   if (!order) return NextResponse.json({ ok: true, ignored: "unknown-order" });
   if (order.status === "PAID") {
-    await completeQuickReading(order.id);
+    const quick = quickReadingPayload(order.rawPayload);
+    if (quick) await completeQuickReading(order.id);
+    else await creditPaidTopupOrder(db, order, payload);
     return NextResponse.json({ ok: true, idempotent: true });
   }
 
@@ -99,6 +101,10 @@ export async function POST(request: Request) {
   }
 
   const quick = quickReadingPayload(order.rawPayload);
+  if (!quick) {
+    await creditPaidTopupOrder(db, order, payload);
+    return NextResponse.json({ ok: true });
+  }
   await db.$transaction(async (tx) => {
     await tx.paymentOrder.update({
       where: { id: order.id },
