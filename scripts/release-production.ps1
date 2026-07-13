@@ -208,6 +208,7 @@ APP_ROOT="/opt/lasotinhhoa"
 SOURCE_DIR="$APP_ROOT/source"
 RELEASE_DIR="$APP_ROOT/releases/$RELEASE_NAME"
 CURRENT_DIR="$APP_ROOT/current"
+UPLOAD_DIR="$APP_ROOT/uploads/articles"
 REPO_URL="https://github.com/kieucuong01/TuViMinhDuong.git"
 PREVIOUS_RELEASE="$(readlink -f "$CURRENT_DIR" 2>/dev/null || true)"
 RELEASES_TO_KEEP=3
@@ -311,6 +312,9 @@ mkdir -p "$RELEASE_DIR"
 git archive --format=tar "$EXPECTED_SHA" | tar -x -C "$RELEASE_DIR"
 cd "$RELEASE_DIR"
 printf '%s\n' "$EXPECTED_SHA" > .release-commit
+mkdir -p "$UPLOAD_DIR" "$RELEASE_DIR/public/uploads"
+rm -rf -- "$RELEASE_DIR/public/uploads/articles"
+ln -sfn "$UPLOAD_DIR" "$RELEASE_DIR/public/uploads/articles"
 
 if [ -d "$CURRENT_DIR" ]; then
   for env_file in "$CURRENT_DIR"/.env "$CURRENT_DIR"/.env.*; do

@@ -334,8 +334,8 @@ type ArticleRecord = Omit<ArticleView, "faqs"> & {
   faqs?: unknown;
 };
 
-const ARTICLE_UPLOAD_DIR = path.join(process.cwd(), "public", "articles");
-const ARTICLE_UPLOAD_PUBLIC_PATH = "/articles";
+const ARTICLE_UPLOAD_PUBLIC_PATH = "/uploads/articles";
+const ARTICLE_UPLOAD_DIR = path.join(process.cwd(), "public", "uploads", "articles");
 const ARTICLE_UPLOAD_MAX_BYTES = 5 * 1024 * 1024;
 const ARTICLE_UPLOAD_TYPES: Record<string, { extension: string; signatures: number[][] }> = {
   "image/jpeg": { extension: "jpg", signatures: [[0xff, 0xd8, 0xff]] },

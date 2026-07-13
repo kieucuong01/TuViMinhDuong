@@ -35,6 +35,12 @@ describe("production release command", () => {
     expect(releaseScript).toContain("https://lasotinhhoa.vn/kien-thuc-tu-vi");
   });
 
+  it("keeps CMS-uploaded article images in a persistent VPS upload directory", () => {
+    expect(releaseScript).toContain('UPLOAD_DIR="$APP_ROOT/uploads/articles"');
+    expect(releaseScript).toContain('mkdir -p "$UPLOAD_DIR" "$RELEASE_DIR/public/uploads"');
+    expect(releaseScript).toContain('ln -sfn "$UPLOAD_DIR" "$RELEASE_DIR/public/uploads/articles"');
+  });
+
   it("seeds the curated pSEO inventory before building the VPS release", () => {
     expect(releaseScript).toContain("npm run pseo:seed");
     expect(releaseScript.indexOf("npm run pseo:seed")).toBeLessThan(

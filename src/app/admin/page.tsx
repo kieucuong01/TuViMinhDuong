@@ -740,7 +740,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
                     <div className="admin-cover-upload-grid">
                       <label>
                         <span>Ảnh đại diện</span>
-                        <input name="coverImage" defaultValue={article.coverImage || ""} placeholder="/articles/ten-bai.webp" data-testid="admin-article-cover-image" />
+                        <input name="coverImage" defaultValue={article.coverImage || ""} placeholder="/uploads/articles/ten-bai.webp" data-testid="admin-article-cover-image" />
                         <small>Giữ URL hiện tại hoặc chọn file mới bên cạnh.</small>
                       </label>
                       <label>

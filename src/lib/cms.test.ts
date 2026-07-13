@@ -67,7 +67,7 @@ describe("admin article CMS", () => {
     expect(edited.publishedAt?.toISOString()).toBe(firstSave.publishedAt?.toISOString());
   });
 
-  it("stores uploaded article cover images under the public articles folder", async () => {
+  it("stores uploaded article cover images under the public uploads folder", async () => {
     const { saveArticleFromForm } = await import("@/lib/data");
     const slug = `cms-upload-${Date.now()}`;
     const form = articleForm(slug, "published");
@@ -77,7 +77,7 @@ describe("admin article CMS", () => {
     const uploadedPath = path.join(process.cwd(), "public", saved.coverImage?.replace(/^\/+/, "") || "");
 
     try {
-      expect(saved.coverImage).toMatch(new RegExp(`^/articles/${slug}-[a-f0-9-]+\\.webp$`));
+      expect(saved.coverImage).toMatch(new RegExp(`^/uploads/articles/${slug}-[a-f0-9-]+\\.webp$`));
       expect(saved.ogImage).toBe(saved.coverImage);
     } finally {
       await rm(uploadedPath, { force: true });
