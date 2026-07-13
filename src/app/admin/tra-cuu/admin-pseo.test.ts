@@ -11,9 +11,10 @@ describe("pSEO admin CMS", () => {
     expect(source).not.toContain("bulk");
   });
 
-  it("links the pSEO CMS from the existing admin navigation", () => {
+  it("links the pSEO CMS from the content tab", () => {
     const source = readFileSync("src/app/admin/page.tsx", "utf8");
     expect(source).toContain("/admin/tra-cuu");
     expect(source).toContain("Tra cứu pSEO");
+    expect(source).toContain("CMS, SEO và pSEO");
   });
 });

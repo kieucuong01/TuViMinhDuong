@@ -177,16 +177,16 @@ export function AdminTrendCharts({ initialPeriod, trendGroups }: { initialPeriod
         </article>
       </div>
 
-      <div className="panel admin-trend-table-panel">
+      <div className="panel admin-trend-table-panel compact">
         <div className="admin-panel-head">
           <div>
-            <p className="eyebrow">Dữ liệu chart</p>
-            <h3>Ngày, tài khoản mới, lá số</h3>
+            <p className="eyebrow">Bảng</p>
+            <h3>Dữ liệu chart</h3>
           </div>
           <span className="admin-overview-note">Đang xem theo {currentNoun}</span>
         </div>
-        <div className="admin-table-wrap">
-          <table className="admin-data-table">
+        <div className="admin-table-wrap admin-compact-chart-data">
+          <table className="admin-data-table admin-data-table-compact">
             <thead>
               <tr>
                 <th>Ngày</th>

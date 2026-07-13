@@ -15,7 +15,17 @@ describe("date fortune engine", () => {
     expect(fortune.zodiac).toMatchObject({ name: "Thanh Long", type: "Hoàng đạo" });
     expect(fortune.mansion).toMatchObject({ name: "Sâm", fullName: "Sâm Thủy Viên" });
     expect(fortune.goodStars.map((star) => star.name)).toContain("Thiên Xá");
-    expect(fortune.taskScores).toHaveLength(6);
+    expect(fortune.taskScores.map((task) => task.key)).toEqual([
+      "general",
+      "wedding",
+      "opening",
+      "contract",
+      "travel",
+      "groundbreaking",
+      "houseMoving",
+      "vehiclePurchase",
+      "funeral",
+    ]);
   });
 
   it("applies age relation when birth year is provided", () => {

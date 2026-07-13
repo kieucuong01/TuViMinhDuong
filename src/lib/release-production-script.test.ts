@@ -16,7 +16,9 @@ const releaseGuide = readFileSync(
 
 describe("production release command", () => {
   it("exposes one npm command for verify, commit, push, and deploy", () => {
-    expect(packageJson.scripts?.["release:production"]).toContain("release-production.ps1");
+    expect(packageJson.scripts?.ship).toContain("release-production.ps1");
+    expect(packageJson.scripts).not.toHaveProperty("release:production");
+    expect(packageJson.scripts).not.toHaveProperty("ship:production");
     expect(releaseScript).toContain("npm run lint");
     expect(releaseScript).toContain("npm test");
     expect(releaseScript).toContain("npm run build");
@@ -49,7 +51,8 @@ describe("production release command", () => {
   });
 
   it("documents the normal command and migration variant", () => {
-    expect(releaseGuide).toContain('npm run release:production -- "feat: mô tả thay đổi"');
+    expect(releaseGuide).toContain('npm run ship -- "feat: mô tả thay đổi"');
+    expect(releaseGuide).toContain('npm run ship -- "feat: cập nhật schema" -Migrate');
     expect(releaseGuide).toContain("-Migrate");
     expect(releaseGuide).toContain("git status --short");
   });

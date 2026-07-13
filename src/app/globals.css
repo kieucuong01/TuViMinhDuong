@@ -4953,7 +4953,7 @@ button.is-loading:not(.icon-button)::before {
 
 .admin-hero {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr) auto;
   gap: 1rem;
   align-items: center;
 }
@@ -5140,7 +5140,7 @@ button.is-loading:not(.icon-button)::before {
 
 .admin-trend-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1fr);
   gap: 1rem;
   margin-top: 1rem;
 }
@@ -5204,6 +5204,45 @@ button.is-loading:not(.icon-button)::before {
   margin-top: 1rem;
 }
 
+.admin-trend-table-panel.compact {
+  padding: 0.9rem;
+}
+
+.admin-trend-table-panel.compact .admin-panel-head {
+  align-items: center;
+}
+
+.admin-trend-table-panel.compact h3 {
+  font-size: 1rem;
+}
+
+.admin-compact-chart-data {
+  max-height: 18rem;
+  border: 1px solid #ffedd5;
+  border-radius: 0.85rem;
+  overflow: auto;
+}
+
+.admin-data-table-compact {
+  min-width: 48rem;
+  font-size: 0.82rem;
+}
+
+.admin-data-table-compact th,
+.admin-data-table-compact td {
+  padding: 0.48rem 0.62rem;
+}
+
+.admin-overview-revenue {
+  margin-top: 1rem;
+}
+
+.admin-settings-stack {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1.25rem;
+}
+
 .admin-cms-grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
@@ -5231,8 +5270,12 @@ button.is-loading:not(.icon-button)::before {
 .admin-content-support-grid {
   display: grid;
   grid-column: 1 / -1;
-  grid-template-columns: minmax(0, 28rem);
+  grid-template-columns: repeat(2, minmax(0, 28rem));
   gap: 1rem;
+}
+
+.admin-pseo-panel {
+  border-color: #fed7aa;
 }
 
 .admin-editor-panel {

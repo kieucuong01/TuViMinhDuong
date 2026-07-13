@@ -578,14 +578,14 @@ export async function saveFeaturePricesAction(formData: FormData) {
   try {
     await updateFeaturePrices(updates);
   } catch (error) {
-    redirect(`/admin?tab=pricing&pricingError=${encodeURIComponent(adminPricingErrorMessage(error))}`);
+    redirect(`/admin?tab=settings&pricingError=${encodeURIComponent(adminPricingErrorMessage(error))}`);
   }
 
   revalidateTag(FEATURE_PRICES_CACHE_TAG, "max");
   revalidatePath("/");
   revalidatePath("/admin");
   revalidatePath("/pricing");
-  redirect("/admin?tab=pricing&pricingSaved=1");
+  redirect("/admin?tab=settings&pricingSaved=1");
 }
 
 export async function createCheckoutAction(formData: FormData) {

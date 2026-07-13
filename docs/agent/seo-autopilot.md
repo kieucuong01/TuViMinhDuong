@@ -214,7 +214,7 @@ node .\node_modules\vitest\vitest.mjs run src\lib\pseo.test.ts src\lib\pseo-site
 Before production release, run the normal guarded release path:
 
 ```powershell
-npm run release:production -- "<message>"
+npm run ship -- "<message>"
 ```
 
 That path is expected to run lint, full tests, build, `npm run pseo:seed`, production build, PM2 restart and public smoke. If the worktree contains unrelated dirty files, stash them before release and restore them after deployment because the release script stages with `git add --all`.

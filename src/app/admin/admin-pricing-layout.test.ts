@@ -6,16 +6,19 @@ const adminPageSource = readFileSync(fileURLToPath(new URL("./page.tsx", import.
 const actionsSource = readFileSync(fileURLToPath(new URL("../actions.ts", import.meta.url)), "utf8");
 
 describe("admin pricing editor layout", () => {
-  it("renders the pricing tab as an editable admin form", () => {
+  it("renders pricing as an editable settings form", () => {
     expect(adminPageSource).toContain("saveFeaturePricesAction");
+    expect(adminPageSource).toContain("Vận hành và giá");
     expect(adminPageSource).toContain("data-testid=\"admin-pricing-form\"");
     expect(adminPageSource).toContain("priceCoins:${key}");
     expect(adminPageSource).toContain("admin-pricing-input");
+    expect(adminPageSource).not.toContain("href: \"/admin?tab=pricing\"");
+    expect(adminPageSource).not.toContain("activeTab === \"pricing\"");
   });
 
   it("has a server action dedicated to saving feature prices", () => {
     expect(actionsSource).toContain("export async function saveFeaturePricesAction");
     expect(actionsSource).toContain("updateFeaturePrices");
-    expect(actionsSource).toContain("pricingSaved=1");
+    expect(actionsSource).toContain("/admin?tab=settings&pricingSaved=1");
   });
 });

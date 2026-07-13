@@ -29,7 +29,7 @@ Lệnh thứ hai tự thực hiện:
 Nếu release có migration Prisma đã được review và commit:
 
 ```powershell
-npm run release:production -- "feat: cập nhật schema" -Migrate
+npm run ship -- "feat: cập nhật schema" -Migrate
 ```
 
 Xem trước các bước mà không commit, push hoặc deploy:

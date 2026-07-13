@@ -126,7 +126,7 @@ Target deploy là VPS self-hosted + Postgres. App production chạy tại `/opt/
 Quy trình commit, push và deploy production một lệnh:
 
 ```powershell
-npm run release:production -- "feat: mô tả thay đổi"
+npm run ship -- "feat: mô tả thay đổi"
 ```
 
 Xem hướng dẫn và tùy chọn migration tại `docs/agent/manual-release.md`.

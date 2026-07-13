@@ -14,24 +14,23 @@ export const metadata = {
   robots: { index: false, follow: false },
 };
 
-type AdminTab = "overview" | "users" | "charts" | "revenue" | "content" | "settings" | "pricing";
+type AdminTab = "overview" | "users" | "charts" | "content" | "settings";
 const ARTICLES_PER_ADMIN_PAGE = 8;
 
 const adminTabs: Array<{ id: AdminTab; label: string; helper: string; href: string }> = [
   { id: "overview", label: "Tổng quan", helper: "Chỉ số chính", href: "/admin?tab=overview" },
   { id: "users", label: "User", helper: "Tài khoản đăng ký", href: "/admin?tab=users" },
   { id: "charts", label: "Lá số", helper: "Form đã submit", href: "/admin?tab=charts" },
-  { id: "revenue", label: "Doanh thu", helper: "Đơn hàng và dòng tiền", href: "/admin?tab=revenue" },
-  { id: "content", label: "Bài viết", helper: "CMS và SEO", href: "/admin?tab=content" },
-  { id: "settings", label: "Cấu hình", helper: "Bật/tắt vận hành", href: "/admin?tab=settings" },
-  { id: "pricing", label: "Giá", helper: "Xu từng tính năng", href: "/admin?tab=pricing" },
+  { id: "content", label: "Nội dung", helper: "CMS, SEO và pSEO", href: "/admin?tab=content" },
+  { id: "settings", label: "Cấu hình", helper: "Vận hành và giá", href: "/admin?tab=settings" },
 ];
 
 function normalizeAdminTab(params: { tab?: string; edit?: string; saved?: string; categorySaved?: string; deleted?: string; settingsSaved?: string; userAdjusted?: string; userDeleted?: string; userError?: string; pricingSaved?: string; pricingError?: string; articleModal?: string; articlePage?: string; trend?: string }): AdminTab {
   if (params.edit || params.saved || params.categorySaved || params.deleted) return "content";
-  if (params.settingsSaved) return "settings";
+  if (params.settingsSaved || params.pricingSaved || params.pricingError) return "settings";
   if (params.userAdjusted || params.userDeleted || params.userError) return "users";
-  if (params.pricingSaved || params.pricingError) return "pricing";
+  if (params.tab === "revenue") return "overview";
+  if (params.tab === "pricing") return "settings";
   return adminTabs.some((tab) => tab.id === params.tab) ? (params.tab as AdminTab) : "overview";
 }
 
@@ -199,6 +198,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
   const closeArticleModalHref = adminContentHref({ articlePage });
   const trendPeriod = normalizeAdminTrendPeriod(overview.trendPeriod);
   const reportMetrics = [
+    { label: "Doanh thu", value: formatVnd(business.revenue.totalPaidVnd), note: `${formatInteger(business.revenue.paidOrders)} đơn đã thanh toán` },
     { label: "Tổng Tài khoản", value: formatInteger(overview.users), note: "Tài khoản đã đăng ký" },
     { label: "Lá số được lập", value: formatInteger(overview.charts), note: "Tổng form lập lá số đã lưu" },
     { label: "Luận giải đã mở khóa", value: formatInteger(overview.unlockedReadings), note: `${formatInteger(overview.readings)} lượt luận giải trong hệ thống` },
@@ -212,7 +212,6 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
     <main className="section" data-testid="admin-page">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="admin-hero">
-          <Link href="/admin/tra-cuu" className="btn btn-ghost">Tra cứu pSEO</Link>
           <div>
             <p className="eyebrow">Admin</p>
             <h1 className="section-title">Quản trị hệ thống Lá số tinh hoa</h1>
@@ -260,14 +259,13 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
           </div>
 
           <AdminTrendCharts initialPeriod={trendPeriod} trendGroups={overview.trendGroups} />
-        </section> : null}
 
-        {activeTab === "revenue" ? <section className="admin-business-grid admin-tab-section">
+          <section className="admin-business-grid admin-overview-revenue" aria-labelledby="admin-revenue-overview-title">
           <div className="panel admin-revenue-panel">
             <div className="admin-panel-head">
               <div>
                 <p className="eyebrow">Doanh thu</p>
-                <h2>Tổng quan đơn hàng và dòng tiền</h2>
+                <h2 id="admin-revenue-overview-title">Tổng quan đơn hàng và dòng tiền</h2>
               </div>
               <span className="admin-operation-status">
                 <Banknote size={17} /> {business.revenue.paidOrders} đơn đã thanh toán
@@ -335,6 +333,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
               )}
             </div>
           </aside>
+          </section>
         </section> : null}
 
         {activeTab === "users" ? <section className="panel admin-users-panel admin-tab-section">
@@ -487,7 +486,8 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
           </div>
         </section> : null}
 
-        {activeTab === "settings" ? <section className="panel admin-operations-panel admin-tab-section">
+        {activeTab === "settings" ? <div className="admin-settings-stack admin-tab-section">
+        <section className="panel admin-operations-panel">
           <div className="admin-panel-head">
             <div>
               <p className="eyebrow">Cấu hình vận hành</p>
@@ -531,7 +531,44 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
               </LoadingSubmitButton>
             </div>
           </form>
-        </section> : null}
+        </section>
+
+        <section className="panel admin-pricing-panel">
+          <div className="admin-panel-head">
+            <div>
+              <p className="eyebrow">Giá tính năng</p>
+              <h2>Xu cần dùng cho từng loại luận giải</h2>
+            </div>
+          </div>
+          <form action={saveFeaturePricesAction} className="admin-pricing-form" data-testid="admin-pricing-form" data-loading-message="Đang lưu bảng giá..." data-loading-label="Đang lưu...">
+            <div className="admin-pricing-grid">
+            {Object.entries(overview.featurePrices).map(([key, value]) => (
+              <label key={key} className="admin-pricing-row">
+                <span>{value.label}</span>
+                <input
+                  className="admin-pricing-input"
+                  name={`priceCoins:${key}`}
+                  type="number"
+                  inputMode="numeric"
+                  min="0"
+                  max="999999"
+                  step="1"
+                  defaultValue={value.priceCoins}
+                  aria-label={`Giá xu cho ${value.label}`}
+                  required
+                />
+              </label>
+            ))}
+            </div>
+            <div className="admin-pricing-actions">
+              <p>Giá này dùng chung cho nút mở luận giải, paywall và số xu bị trừ khi người dùng xác nhận.</p>
+              <LoadingSubmitButton className="btn btn-primary" loadingText="Đang lưu...">
+                Lưu bảng giá
+              </LoadingSubmitButton>
+            </div>
+          </form>
+        </section>
+        </div> : null}
 
         {activeTab === "content" ? <div className="admin-cms-grid admin-tab-section">
           <section className="panel admin-article-board">
@@ -614,6 +651,21 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
                   </div>
                 ))}
               </div>
+            </section>
+
+            <section className="panel admin-pseo-panel">
+              <div className="admin-panel-head">
+                <div>
+                  <p className="eyebrow">pSEO</p>
+                  <h2>Tra cứu pSEO</h2>
+                </div>
+              </div>
+              <p className="admin-board-note">
+                Quản lý trang tra cứu, trạng thái xuất bản và nội dung entity pSEO trong cùng nhóm nội dung.
+              </p>
+              <Link href="/admin/tra-cuu" className="btn btn-ghost w-full justify-center" prefetch={false}>
+                <SearchCheck size={17} /> Mở Tra cứu pSEO
+              </Link>
             </section>
           </section>
 
@@ -755,42 +807,6 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
             </div>
           ) : null}
         </div> : null}
-
-        {activeTab === "pricing" ? <section className="panel admin-pricing-panel admin-tab-section">
-          <div className="admin-panel-head">
-            <div>
-              <p className="eyebrow">Giá tính năng</p>
-              <h2>Xu cần dùng cho từng loại luận giải</h2>
-            </div>
-          </div>
-          <form action={saveFeaturePricesAction} className="admin-pricing-form" data-testid="admin-pricing-form" data-loading-message="Đang lưu bảng giá..." data-loading-label="Đang lưu...">
-            <div className="admin-pricing-grid">
-            {Object.entries(overview.featurePrices).map(([key, value]) => (
-              <label key={key} className="admin-pricing-row">
-                <span>{value.label}</span>
-                <input
-                  className="admin-pricing-input"
-                  name={`priceCoins:${key}`}
-                  type="number"
-                  inputMode="numeric"
-                  min="0"
-                  max="999999"
-                  step="1"
-                  defaultValue={value.priceCoins}
-                  aria-label={`Giá xu cho ${value.label}`}
-                  required
-                />
-              </label>
-            ))}
-            </div>
-            <div className="admin-pricing-actions">
-              <p>Giá này dùng chung cho nút mở luận giải, paywall và số xu bị trừ khi người dùng xác nhận.</p>
-              <LoadingSubmitButton className="btn btn-primary" loadingText="Đang lưu...">
-                Lưu bảng giá
-              </LoadingSubmitButton>
-            </div>
-          </form>
-        </section> : null}
       </div>
     </main>
   );
