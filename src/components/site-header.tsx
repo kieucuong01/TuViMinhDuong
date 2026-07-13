@@ -1,9 +1,27 @@
 import Link from "next/link";
 import Image from "next/image";
+import type { ComponentType } from "react";
 import { Suspense } from "react";
-import { BookOpenText, CalendarDays, ChevronDown, Search } from "lucide-react";
+import {
+  BookOpenText,
+  CalendarCheck2,
+  CalendarDays,
+  Car,
+  ChevronDown,
+  Flower2,
+  Ghost,
+  Gift,
+  Hammer,
+  HeartHandshake,
+  Home,
+  Map,
+  MoonStar,
+  Search,
+  TreePine,
+} from "lucide-react";
 import { UserHeaderBadge } from "@/components/user-header-badge";
 import { MobileSiteMenu } from "@/components/mobile-site-menu";
+import { dateCountdownMenuLinks, dateTaskMenuLinks, type DateMenuIcon } from "@/lib/date-menu";
 import { APP_NAME } from "@/lib/env";
 
 const baseNav = [
@@ -17,6 +35,20 @@ const lookupLinks = [
   { href: "/tra-cuu/y-nghia-12-cung", label: "Tra cứu Ý nghĩa 12 Cung" },
   { href: "/tra-cuu/phu-tinh", label: "Tra cứu Phụ Tinh" },
 ];
+
+const dateMenuIcons: Record<DateMenuIcon, ComponentType<{ size?: number; strokeWidth?: number; "aria-hidden"?: boolean }>> = {
+  calendar: CalendarCheck2,
+  heart: HeartHandshake,
+  hammer: Hammer,
+  map: Map,
+  home: Home,
+  car: Car,
+  flower: Flower2,
+  gift: Gift,
+  ghost: Ghost,
+  tree: TreePine,
+  moon: MoonStar,
+};
 
 export async function SiteHeader() {
   const nav = baseNav;
@@ -42,6 +74,46 @@ export async function SiteHeader() {
           {nav.map((item, index) => {
             const Icon = item.tone === "date" ? CalendarDays : item.tone === "knowledge" ? BookOpenText : null;
             const linkClass = `site-nav-link rounded-full px-3.5 py-2 transition hover:bg-orange-50 hover:text-orange-700 ${index === 0 ? "site-nav-primary" : ""} ${item.tone === "date" ? "site-nav-date" : ""} ${item.tone === "knowledge" ? "site-nav-knowledge" : ""}`;
+
+            if (item.tone === "date") {
+              return (
+                <details key={item.href} className="site-date-menu">
+                  <summary className={`${linkClass} site-date-menu-trigger`}>
+                    <CalendarDays aria-hidden="true" size={16} strokeWidth={2.4} />
+                    <span>{item.label}</span>
+                    <ChevronDown aria-hidden="true" size={14} />
+                  </summary>
+                  <div className="site-date-panel" aria-label="Chọn công cụ xem ngày">
+                    <div className="site-date-panel-grid">
+                      {dateTaskMenuLinks.map((link) => {
+                        const MenuIcon = dateMenuIcons[link.icon];
+                        return (
+                          <Link key={link.href} href={link.href} className="site-date-panel-link" prefetch={false}>
+                            <span className="site-date-panel-icon"><MenuIcon aria-hidden={true} size={17} strokeWidth={2.35} /></span>
+                            <span>
+                              <strong>{link.label}</strong>
+                              {link.description ? <small>{link.description}</small> : null}
+                            </span>
+                          </Link>
+                        );
+                      })}
+                    </div>
+                    <div className="site-date-panel-more"><span /> Xem thêm <span /></div>
+                    <div className="site-date-panel-grid site-date-panel-countdowns">
+                      {dateCountdownMenuLinks.map((link) => {
+                        const MenuIcon = dateMenuIcons[link.icon];
+                        return (
+                          <Link key={link.href} href={link.href} className="site-date-panel-link compact" prefetch={false}>
+                            <span className="site-date-panel-icon"><MenuIcon aria-hidden={true} size={17} strokeWidth={2.35} /></span>
+                            <strong>{link.label}</strong>
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </details>
+              );
+            }
 
             return (
               <Link key={item.href} href={item.href} className={linkClass} prefetch={false}>

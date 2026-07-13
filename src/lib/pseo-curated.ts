@@ -8,6 +8,7 @@ import { MANUAL_PSEO_BATCH_8 } from "./pseo-manual-batch-8.ts";
 import { MANUAL_PSEO_BATCH_9 } from "./pseo-manual-batch-9.ts";
 import { MANUAL_PSEO_BATCH_10 } from "./pseo-manual-batch-10.ts";
 import { MANUAL_PSEO_BATCH_11 } from "./pseo-manual-batch-11.ts";
+import { MANUAL_PSEO_BATCH_12 } from "./pseo-manual-batch-12.ts";
 
 type ManualPseoBatchItem = {
   body: string;
@@ -26,6 +27,7 @@ const MANUAL_BATCH_8 = MANUAL_PSEO_BATCH_8 as Record<string, ManualPseoBatchItem
 const MANUAL_BATCH_9 = MANUAL_PSEO_BATCH_9 as Record<string, ManualPseoBatchItem>;
 const MANUAL_BATCH_10 = MANUAL_PSEO_BATCH_10 as Record<string, ManualPseoBatchItem>;
 const MANUAL_BATCH_11 = MANUAL_PSEO_BATCH_11 as Record<string, ManualPseoBatchItem>;
+const MANUAL_BATCH_12 = MANUAL_PSEO_BATCH_12 as Record<string, ManualPseoBatchItem>;
 export const MANUAL_PSEO_BATCH_3_SLUGS = Object.keys(MANUAL_BATCH_3);
 export const MANUAL_PSEO_BATCH_4_SLUGS = Object.keys(MANUAL_BATCH_4);
 export const MANUAL_PSEO_BATCH_5_SLUGS = Object.keys(MANUAL_BATCH_5);
@@ -35,6 +37,7 @@ export const MANUAL_PSEO_BATCH_8_SLUGS = Object.keys(MANUAL_BATCH_8);
 export const MANUAL_PSEO_BATCH_9_SLUGS = Object.keys(MANUAL_BATCH_9);
 export const MANUAL_PSEO_BATCH_10_SLUGS = Object.keys(MANUAL_BATCH_10);
 export const MANUAL_PSEO_BATCH_11_SLUGS = Object.keys(MANUAL_BATCH_11);
+export const MANUAL_PSEO_BATCH_12_SLUGS = Object.keys(MANUAL_BATCH_12);
 
 export const CURATED_PSEO_SLUGS = [
   "sao-thai-am-cung-tai-bach",
@@ -88,6 +91,7 @@ export const CURATED_PSEO_SLUGS = [
   ...MANUAL_PSEO_BATCH_9_SLUGS,
   ...MANUAL_PSEO_BATCH_10_SLUGS,
   ...MANUAL_PSEO_BATCH_11_SLUGS,
+  ...MANUAL_PSEO_BATCH_12_SLUGS,
 ] as const;
 
 type CuratedSlug = string;
@@ -738,14 +742,17 @@ export function getCuratedPseoContent(slug: string) {
     || (MANUAL_BATCH_9[slug] ? { body: MANUAL_BATCH_9[slug].body } : undefined)
     || (MANUAL_BATCH_10[slug] ? { body: MANUAL_BATCH_10[slug].body } : undefined)
     || (MANUAL_BATCH_11[slug] ? { body: MANUAL_BATCH_11[slug].body } : undefined)
+    || (MANUAL_BATCH_12[slug] ? { body: MANUAL_BATCH_12[slug].body } : undefined)
     || buildBatch2Content(slug);
 }
 
 export function getCuratedPseoGenerationMeta(slug: string) {
-  const item = MANUAL_BATCH_3[slug] || MANUAL_BATCH_4[slug] || MANUAL_BATCH_5[slug] || MANUAL_BATCH_6[slug] || MANUAL_BATCH_7[slug] || MANUAL_BATCH_8[slug] || MANUAL_BATCH_9[slug] || MANUAL_BATCH_10[slug] || MANUAL_BATCH_11[slug];
+  const item = MANUAL_BATCH_3[slug] || MANUAL_BATCH_4[slug] || MANUAL_BATCH_5[slug] || MANUAL_BATCH_6[slug] || MANUAL_BATCH_7[slug] || MANUAL_BATCH_8[slug] || MANUAL_BATCH_9[slug] || MANUAL_BATCH_10[slug] || MANUAL_BATCH_11[slug] || MANUAL_BATCH_12[slug];
   return item
     ? {
-      source: MANUAL_BATCH_11[slug]
+      source: MANUAL_BATCH_12[slug]
+        ? "manual-editorial-batch-12"
+        : MANUAL_BATCH_11[slug]
         ? "manual-editorial-batch-11"
         : MANUAL_BATCH_10[slug]
         ? "manual-editorial-batch-10"

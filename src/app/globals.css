@@ -870,6 +870,137 @@ button.is-loading:not(.icon-button)::before {
   box-shadow: 0 8px 20px rgb(234 88 12 / 0.08);
 }
 
+.site-date-menu {
+  position: relative;
+}
+
+.site-date-menu summary {
+  list-style: none;
+  cursor: pointer;
+}
+
+.site-date-menu summary::-webkit-details-marker {
+  display: none;
+}
+
+.site-date-menu[open] .site-date-menu-trigger,
+.site-date-menu:hover .site-date-menu-trigger,
+.site-date-menu:focus-within .site-date-menu-trigger {
+  background: linear-gradient(135deg, #ecfdf5, #fff7ed);
+  color: #047857;
+}
+
+.site-date-panel {
+  position: absolute;
+  top: calc(100% + 0.7rem);
+  left: 50%;
+  z-index: 70;
+  display: grid;
+  width: min(26rem, calc(100vw - 2rem));
+  transform: translateX(-50%);
+  gap: 0.5rem;
+  border: 1px solid #fed7aa;
+  border-radius: 1.25rem;
+  background: rgb(255 255 255 / 0.98);
+  padding: 0.65rem;
+  box-shadow: 0 26px 70px rgb(120 53 15 / 0.18);
+  backdrop-filter: blur(18px);
+}
+
+.site-date-panel::before {
+  content: "";
+  position: absolute;
+  inset: -0.8rem 0 auto;
+  height: 0.8rem;
+}
+
+.site-date-panel-grid {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.site-date-panel-link {
+  display: grid;
+  grid-template-columns: 2.1rem minmax(0, 1fr);
+  gap: 0.65rem;
+  align-items: center;
+  min-height: 3.05rem;
+  border-radius: 0.9rem;
+  padding: 0.55rem 0.7rem;
+  color: #44403c;
+  transition: background 160ms ease, color 160ms ease, transform 160ms ease;
+}
+
+.site-date-panel-link:hover,
+.site-date-panel-link:focus-visible {
+  background: #fff7ed;
+  color: #c2410c;
+  transform: translateX(2px);
+}
+
+.site-date-panel-link strong {
+  display: block;
+  font-size: 0.92rem;
+  font-weight: 900;
+  line-height: 1.25;
+}
+
+.site-date-panel-link small {
+  display: block;
+  margin-top: 0.1rem;
+  color: #78716c;
+  font-size: 0.74rem;
+  font-weight: 750;
+  line-height: 1.25;
+}
+
+.site-date-panel-link.compact {
+  min-height: 2.75rem;
+}
+
+.site-date-panel-icon {
+  display: grid;
+  width: 2.1rem;
+  height: 2.1rem;
+  place-items: center;
+  border-radius: 0.8rem;
+  background: linear-gradient(135deg, #ecfdf5, #fff7ed);
+  color: #047857;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.9);
+}
+
+.site-date-panel-more {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 0.65rem;
+  align-items: center;
+  padding: 0.2rem 0.2rem 0;
+  color: #a8a29e;
+  font-size: 0.76rem;
+  font-weight: 850;
+}
+
+.site-date-panel-more span {
+  height: 1px;
+  background: #ffedd5;
+}
+
+.site-date-panel-countdowns .site-date-panel-icon {
+  background: linear-gradient(135deg, #fff7ed, #fef3c7);
+  color: #9a3412;
+}
+
+@media (hover: hover) {
+  .site-date-menu:not([open]) .site-date-panel {
+    display: none;
+  }
+
+  .site-date-menu:hover .site-date-panel,
+  .site-date-menu:focus-within .site-date-panel {
+    display: grid;
+  }
+}
+
 .mobile-menu-link {
   display: inline-flex;
   min-height: 2.75rem;
@@ -889,6 +1020,66 @@ button.is-loading:not(.icon-button)::before {
 .mobile-menu-knowledge {
   background: linear-gradient(135deg, rgb(255 247 237 / 0.96), rgb(254 243 199 / 0.76));
   color: #9a3412;
+}
+
+.mobile-date-group {
+  border-radius: 0.85rem;
+}
+
+.mobile-date-group summary {
+  cursor: pointer;
+  list-style: none;
+}
+
+.mobile-date-group summary span {
+  flex: 1;
+}
+
+.mobile-date-group > div {
+  display: grid;
+  gap: 0.2rem;
+  padding: 0.25rem 0.35rem 0.4rem 1.1rem;
+}
+
+.mobile-date-group > div a {
+  display: grid;
+  grid-template-columns: 1.35rem minmax(0, 1fr);
+  gap: 0.45rem;
+  align-items: center;
+  min-height: 2.75rem;
+  border-radius: 0.7rem;
+  padding: 0.6rem 0.7rem;
+  color: #57534e;
+  font-size: 0.86rem;
+  font-weight: 820;
+}
+
+.mobile-date-group > div a:hover,
+.mobile-date-group > div a:focus-visible {
+  background: #fff7ed;
+  color: #c2410c;
+}
+
+.mobile-date-group > div a svg {
+  color: #047857;
+}
+
+.mobile-date-group > div p {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 0.5rem;
+  align-items: center;
+  margin: 0.25rem 0.4rem;
+  color: #a8a29e;
+  font-size: 0.74rem;
+  font-weight: 850;
+}
+
+.mobile-date-group > div p::before,
+.mobile-date-group > div p::after {
+  content: "";
+  height: 1px;
+  background: #ffedd5;
 }
 
 .site-header-menu-slot {
@@ -9361,6 +9552,128 @@ button.is-loading:not(.icon-button)::before {
 .date-list-item.bad {
   background: #fff1f2;
   color: #be123c;
+}
+
+.date-countdown-page {
+  position: relative;
+}
+
+.date-countdown-hero {
+  text-align: center;
+}
+
+.date-countdown-hero h1 {
+  color: #1c1917;
+  font-size: clamp(2rem, 6vw, 3.35rem);
+  font-weight: 950;
+  line-height: 1.04;
+}
+
+.date-countdown-hero p:not(.eyebrow) {
+  margin: 0.85rem auto 0;
+  max-width: 42rem;
+  color: #57534e;
+  font-size: 1.02rem;
+  font-weight: 650;
+  line-height: 1.7;
+}
+
+.date-countdown-card {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: clamp(1rem, 3vw, 1.6rem);
+  align-items: center;
+  overflow: hidden;
+  border-color: rgb(187 247 208 / 0.95);
+  background:
+    radial-gradient(circle at 86% 12%, rgb(16 185 129 / 0.16), transparent 17rem),
+    radial-gradient(circle at 10% 0%, rgb(251 146 60 / 0.18), transparent 18rem),
+    rgb(255 255 255 / 0.94);
+}
+
+.date-countdown-icon {
+  display: grid;
+  width: clamp(4rem, 12vw, 5.5rem);
+  height: clamp(4rem, 12vw, 5.5rem);
+  place-items: center;
+  border-radius: 1.4rem;
+  background: linear-gradient(135deg, #ecfdf5, #fff7ed);
+  color: #047857;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.9), 0 18px 42px rgb(16 185 129 / 0.14);
+}
+
+.date-countdown-card span {
+  display: block;
+  color: #78716c;
+  font-size: 0.9rem;
+  font-weight: 850;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.date-countdown-card strong {
+  display: block;
+  color: #047857;
+  font-size: clamp(4rem, 16vw, 7rem);
+  font-weight: 950;
+  letter-spacing: -0.08em;
+  line-height: 0.92;
+}
+
+.date-countdown-card em {
+  display: block;
+  color: #1c1917;
+  font-size: clamp(1.05rem, 3vw, 1.45rem);
+  font-style: normal;
+  font-weight: 900;
+}
+
+.date-countdown-detail {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.date-countdown-detail article {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.75rem;
+  align-items: center;
+  border: 1px solid #ffedd5;
+  border-radius: 1.05rem;
+  background: rgb(255 255 255 / 0.82);
+  padding: 0.95rem 1rem;
+  color: #9a3412;
+  box-shadow: 0 12px 28px rgb(120 53 15 / 0.05);
+}
+
+.date-countdown-detail strong,
+.date-countdown-detail span {
+  display: block;
+}
+
+.date-countdown-detail strong {
+  color: #1c1917;
+  font-size: 0.9rem;
+  font-weight: 950;
+}
+
+.date-countdown-detail span {
+  margin-top: 0.12rem;
+  color: #57534e;
+  font-weight: 760;
+}
+
+.date-countdown-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: center;
+}
+
+@media (min-width: 720px) {
+  .date-countdown-detail {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 .date-task-grid {

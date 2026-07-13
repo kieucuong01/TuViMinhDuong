@@ -53,6 +53,17 @@ describe("date range ranking", () => {
     expect(results.every((item) => item.task === "wedding")).toBe(true);
   });
 
+  it.each(["houseMoving", "vehiclePurchase", "funeral"] as const)("supports the expanded date menu task %s", (task) => {
+    const results = rankDateRange({
+      from: "2026-07-01",
+      to: "2026-07-10",
+      task,
+    });
+
+    expect(results).toHaveLength(5);
+    expect(results.every((item) => item.task === task)).toBe(true);
+  });
+
   it.each([
     [{ from: "2026-02-30", to: "2026-03-01", task: "opening" as const }, "Ngày bắt đầu không hợp lệ"],
     [{ from: "2026-07-10", to: "2026-07-09", task: "opening" as const }, "Ngày kết thúc phải từ ngày bắt đầu"],

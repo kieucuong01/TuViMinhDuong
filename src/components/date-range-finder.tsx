@@ -18,6 +18,9 @@ const FINDER_TASKS: { key: SpecificDateTaskKey; label: string }[] = [
   { key: "contract", label: "Ký hợp đồng" },
   { key: "travel", label: "Xuất hành" },
   { key: "groundbreaking", label: "Động thổ" },
+  { key: "houseMoving", label: "Nhập trạch" },
+  { key: "vehiclePurchase", label: "Mua xe" },
+  { key: "funeral", label: "An táng" },
 ];
 
 function safeTask(value?: string | string[]): SpecificDateTaskKey {

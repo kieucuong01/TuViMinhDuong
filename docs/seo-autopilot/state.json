@@ -1,13 +1,13 @@
 {
-  "lastRunAt": "2026-07-12T03:17:38.198Z",
-  "lastStatus": "warning",
+  "lastRunAt": "2026-07-13T00:08:50.934Z",
+  "lastStatus": "ok",
   "lastAction": {
     "type": "single_article_publish",
-    "slug": "sao-vu-khuc",
+    "slug": "sao-thai-am",
     "slugs": [
-      "sao-vu-khuc"
+      "sao-thai-am"
     ],
-    "reason": "Publish 1 people-first articles from SEMrush intent clusters; first topic: Nguoi doc muon hieu sao Vu Khuc lien quan den tai chinh, ky luat va cach doc cung Menh, Tai Bach, Quan Loc.",
+    "reason": "Publish 1 people-first articles from SEMrush intent clusters; first topic: Nguoi doc muon hieu sao Thai Am trong la so, cach doc ve noi tam, tai san, gia dinh va moi truong ho tro.",
     "approvalRequired": false,
     "allowedToCommitDeployAfterVerification": true
   },
@@ -20,9 +20,9 @@
     "status": "skipped"
   },
   "lastDraftPaths": [
-    "docs/seo-autopilot/drafts/sao-vu-khuc.md"
+    "docs/seo-autopilot/drafts/sao-thai-am.md"
   ],
-  "lastReportPath": "docs/seo-autopilot/reports/2026-07-12-weekly-content-batch.md",
+  "lastReportPath": "docs/seo-autopilot/reports/2026-07-13-weekly-content-batch.md",
   "nextVerificationCommands": [
     "npm run seo:autopilot",
     "npm test -- src/lib/content.test.ts src/lib/article-cover-assets.test.ts src/lib/seo-autopilot-core.test.ts",

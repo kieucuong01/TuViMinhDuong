@@ -5,13 +5,16 @@ import type { ComponentType } from "react";
 import { useMemo, useState } from "react";
 import {
   CalendarDays,
+  Car,
   CheckCircle2,
   ChevronLeft,
   ChevronRight,
   Clock3,
   Compass,
   FileSignature,
+  Flower2,
   HeartHandshake,
+  Home,
   Map,
   ShieldCheck,
   Sparkles,
@@ -35,6 +38,9 @@ const taskIcons: Record<DateTaskKey, ComponentType<{ size?: number; className?: 
   contract: FileSignature,
   travel: Map,
   groundbreaking: ShieldCheck,
+  houseMoving: Home,
+  vehiclePurchase: Car,
+  funeral: Flower2,
 };
 
 function shiftDate(input: string, amount: number) {
