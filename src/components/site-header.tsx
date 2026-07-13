@@ -17,6 +17,7 @@ import {
   Map,
   MoonStar,
   Search,
+  Sparkles,
   TreePine,
 } from "lucide-react";
 import { UserHeaderBadge } from "@/components/user-header-badge";
@@ -31,9 +32,9 @@ const baseNav = [
 ];
 
 const lookupLinks = [
-  { href: "/tra-cuu/y-nghia-14-chinh-tinh", label: "Tra cứu Ý nghĩa 14 Chính Tinh" },
-  { href: "/tra-cuu/y-nghia-12-cung", label: "Tra cứu Ý nghĩa 12 Cung" },
-  { href: "/tra-cuu/phu-tinh", label: "Tra cứu Phụ Tinh" },
+  { href: "/tra-cuu/y-nghia-14-chinh-tinh", label: "Tra cứu Ý nghĩa 14 Chính Tinh", icon: "star" },
+  { href: "/tra-cuu/y-nghia-12-cung", label: "Tra cứu Ý nghĩa 12 Cung", icon: "book" },
+  { href: "/tra-cuu/phu-tinh", label: "Tra cứu Phụ Tinh", icon: "spark" },
 ];
 
 const dateMenuIcons: Record<DateMenuIcon, ComponentType<{ size?: number; strokeWidth?: number; "aria-hidden"?: boolean }>> = {
@@ -48,6 +49,12 @@ const dateMenuIcons: Record<DateMenuIcon, ComponentType<{ size?: number; strokeW
   ghost: Ghost,
   tree: TreePine,
   moon: MoonStar,
+};
+
+const lookupMenuIcons: Record<string, ComponentType<{ size?: number; strokeWidth?: number; "aria-hidden"?: boolean }>> = {
+  star: MoonStar,
+  book: BookOpenText,
+  spark: Sparkles,
 };
 
 export async function SiteHeader() {
@@ -77,12 +84,12 @@ export async function SiteHeader() {
 
             if (item.tone === "date") {
               return (
-                <details key={item.href} className="site-date-menu">
-                  <summary className={`${linkClass} site-date-menu-trigger`}>
+                <div key={item.href} className="site-nav-flyout site-date-menu">
+                  <Link href={item.href} className={`${linkClass} site-date-menu-trigger`} prefetch={false} aria-haspopup="true">
                     <CalendarDays aria-hidden="true" size={16} strokeWidth={2.4} />
                     <span>{item.label}</span>
                     <ChevronDown aria-hidden="true" size={14} />
-                  </summary>
+                  </Link>
                   <div className="site-date-panel" aria-label="Chọn công cụ xem ngày">
                     <div className="site-date-panel-grid">
                       {dateTaskMenuLinks.map((link) => {
@@ -111,7 +118,7 @@ export async function SiteHeader() {
                       })}
                     </div>
                   </div>
-                </details>
+                </div>
               );
             }
 
@@ -122,18 +129,24 @@ export async function SiteHeader() {
               </Link>
             );
           })}
-          <details className="site-lookup-menu">
-            <summary className="site-nav-link site-nav-lookup rounded-full px-3.5 py-2">
+          <div className="site-nav-flyout site-lookup-menu">
+            <Link href="/tra-cuu" className="site-nav-link site-nav-lookup rounded-full px-3.5 py-2" prefetch={false} aria-haspopup="true">
               <Search aria-hidden="true" size={16} strokeWidth={2.4} />
               <span>Tra cứu</span>
               <ChevronDown aria-hidden="true" size={14} />
-            </summary>
+            </Link>
             <div className="site-lookup-panel">
-              {lookupLinks.map((item) => (
-                <Link key={item.href} href={item.href} prefetch={false}>{item.label}</Link>
-              ))}
+              {lookupLinks.map((item) => {
+                const LookupIcon = lookupMenuIcons[item.icon];
+                return (
+                  <Link key={item.href} href={item.href} prefetch={false}>
+                    <span className="site-lookup-panel-icon"><LookupIcon aria-hidden={true} size={16} strokeWidth={2.35} /></span>
+                    <strong>{item.label}</strong>
+                  </Link>
+                );
+              })}
             </div>
-          </details>
+          </div>
         </nav>
 
         <div className="site-header-actions flex items-center gap-2">

@@ -1,5 +1,8 @@
 import "server-only";
 
+import { randomUUID } from "node:crypto";
+import { mkdir, writeFile } from "node:fs/promises";
+import path from "node:path";
 import { unstable_cache } from "next/cache";
 import { CHART_ENGINE_VERSION, generateTuViChart, type ChartInput, type TuViChart } from "@/lib/chart";
 import { articleWithScore, seedArticles, type ArticleCategoryView, type ArticleView } from "@/lib/content";
@@ -331,6 +334,15 @@ type ArticleRecord = Omit<ArticleView, "faqs"> & {
   faqs?: unknown;
 };
 
+const ARTICLE_UPLOAD_DIR = path.join(process.cwd(), "public", "articles");
+const ARTICLE_UPLOAD_PUBLIC_PATH = "/articles";
+const ARTICLE_UPLOAD_MAX_BYTES = 5 * 1024 * 1024;
+const ARTICLE_UPLOAD_TYPES: Record<string, { extension: string; signatures: number[][] }> = {
+  "image/jpeg": { extension: "jpg", signatures: [[0xff, 0xd8, 0xff]] },
+  "image/png": { extension: "png", signatures: [[0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]] },
+  "image/webp": { extension: "webp", signatures: [[0x52, 0x49, 0x46, 0x46]] },
+};
+
 const DELETED_ARTICLE_STATUS = "deleted";
 export const OPERATION_SETTINGS_CACHE_TAG = "operation-settings";
 export const FEATURE_PRICES_CACHE_TAG = "feature-prices";
@@ -640,6 +652,60 @@ function faqsFromForm(formData: FormData) {
     .map((question, index) => ({ question, answer: answers[index] || "" }))
     .filter((item) => item.question && item.answer)
     .slice(0, 8);
+}
+
+function hasByteSignature(bytes: Uint8Array, signatures: number[][]) {
+  return signatures.some((signature) => signature.every((byte, index) => bytes[index] === byte));
+}
+
+function isFileUpload(value: FormDataEntryValue | null): value is File {
+  return Boolean(
+    value &&
+      typeof value === "object" &&
+      "arrayBuffer" in value &&
+      typeof value.arrayBuffer === "function" &&
+      "size" in value &&
+      typeof value.size === "number" &&
+      "type" in value &&
+      typeof value.type === "string",
+  );
+}
+
+function uploadExtensionForFile(file: File, bytes: Uint8Array) {
+  const uploadType = ARTICLE_UPLOAD_TYPES[file.type];
+  if (!uploadType) {
+    throw new Error("Chi ho tro upload anh JPEG, PNG hoac WebP.");
+  }
+
+  if (!hasByteSignature(bytes, uploadType.signatures)) {
+    throw new Error("File anh khong dung dinh dang da chon.");
+  }
+
+  if (file.type === "image/webp") {
+    const riffType = new TextDecoder().decode(bytes.slice(8, 12));
+    if (riffType !== "WEBP") throw new Error("File anh khong dung dinh dang da chon.");
+  }
+
+  return uploadType.extension;
+}
+
+async function articleCoverImageFromForm(formData: FormData, slug: string) {
+  const fallbackImage = String(formData.get("coverImage") || "").trim() || "/og-default.svg";
+  const upload = formData.get("coverImageFile");
+  if (!isFileUpload(upload) || upload.size === 0) return fallbackImage;
+
+  if (upload.size > ARTICLE_UPLOAD_MAX_BYTES) {
+    throw new Error("Anh dai dien toi da 5MB.");
+  }
+
+  const bytes = new Uint8Array(await upload.arrayBuffer());
+  const extension = uploadExtensionForFile(upload, bytes);
+  const safeSlug = slug || `article-${Date.now()}`;
+  const fileName = `${safeSlug}-${randomUUID()}.${extension}`;
+
+  await mkdir(ARTICLE_UPLOAD_DIR, { recursive: true });
+  await writeFile(path.join(ARTICLE_UPLOAD_DIR, fileName), bytes);
+  return `${ARTICLE_UPLOAD_PUBLIC_PATH}/${fileName}`;
 }
 
 function articleWithNormalizedRelations(article: ArticleRecord): ArticleView {
@@ -1928,15 +1994,19 @@ export async function saveArticleFromForm(formData: FormData) {
   const slug = slugify(String(formData.get("slug") || title));
   const originalSlug = slugify(String(formData.get("originalSlug") || slug));
   const status = articleStatusFromForm(formData);
-  const publishedAt = status === "published" ? new Date() : null;
   const categoryId = String(formData.get("categoryId") || "") || null;
   const category = categoryId ? demoArticleCategories().get(categoryId) || null : null;
   const faqs = faqsFromForm(formData);
   const metaTitle = String(formData.get("metaTitle") || title);
   const metaDescription = String(formData.get("metaDescription") || excerpt);
   const canonicalUrl = String(formData.get("canonicalUrl") || `/kien-thuc-tu-vi/${slug}`);
-  const coverImage = String(formData.get("coverImage") || "/og-default.svg");
+  const coverImage = await articleCoverImageFromForm(formData, slug);
   const coverAlt = String(formData.get("coverAlt") || "");
+  const db = getDb();
+  const existingDemoArticle = !db ? demoArticles().get(originalSlug) || demoArticles().get(slug) || null : null;
+  const existing = db ? await db.article.findUnique({ where: { slug: originalSlug || slug } }) : null;
+  const existingPublishedAt = existing?.publishedAt || existingDemoArticle?.publishedAt || null;
+  const publishedAt = existingPublishedAt || (status === "published" ? new Date() : null);
   const seo = scoreArticleSeo({
     title,
     slug,
@@ -1966,6 +2036,7 @@ export async function saveArticleFromForm(formData: FormData) {
     metaDescription,
     canonicalUrl,
     robots: "index,follow",
+    ogImage: coverImage,
     schemaType: "Article",
     faqs,
     seoScore: seo.score,
@@ -1974,7 +2045,6 @@ export async function saveArticleFromForm(formData: FormData) {
     updatedAt: new Date(),
   };
 
-  const db = getDb();
   if (!db) {
     if (originalSlug !== slug) demoArticles().delete(originalSlug);
     demoArticles().set(slug, article);
@@ -1992,6 +2062,7 @@ export async function saveArticleFromForm(formData: FormData) {
     canonicalUrl,
     coverImage,
     coverAlt,
+    ogImage: coverImage,
     status,
     faqs,
     seoScore: seo.score,
@@ -1999,7 +2070,6 @@ export async function saveArticleFromForm(formData: FormData) {
     publishedAt,
   };
 
-  const existing = originalSlug ? await db.article.findUnique({ where: { slug: originalSlug } }) : null;
   const saved = existing
     ? await db.article.update({
         where: { id: existing.id },

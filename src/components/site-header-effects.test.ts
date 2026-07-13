@@ -31,8 +31,19 @@ describe("site header featured nav effects", () => {
     expect(headerSource).toContain("/tra-cuu/y-nghia-14-chinh-tinh");
     expect(headerSource).toContain("/tra-cuu/y-nghia-12-cung");
     expect(headerSource).toContain("/tra-cuu/phu-tinh");
+    expect(headerSource).toContain("site-lookup-panel-icon");
     expect(headerSource).not.toContain("sao-thai-am-cung-tai-bach");
     expect(mobileMenuSource).toContain("mobile-lookup-group");
+  });
+
+  it("opens desktop date and lookup dropdowns on hover/focus without sticky details state", () => {
+    expect(headerSource).toContain("site-nav-flyout site-date-menu");
+    expect(headerSource).toContain("site-nav-flyout site-lookup-menu");
+    expect(headerSource).not.toContain("<details key={item.href} className=\"site-date-menu\"");
+    expect(headerSource).not.toContain("<details className=\"site-lookup-menu\"");
+    expect(globalsCss).toMatch(/\.site-date-panel\s*{[\s\S]*opacity:\s*0;[\s\S]*pointer-events:\s*none;[\s\S]*visibility:\s*hidden;/);
+    expect(globalsCss).toMatch(/\.site-date-menu:hover \.site-date-panel,\s*\n\.site-date-menu:focus-within \.site-date-panel\s*{[\s\S]*opacity:\s*1;[\s\S]*pointer-events:\s*auto;/);
+    expect(globalsCss).toMatch(/\.site-lookup-menu:hover \.site-lookup-panel,\s*\n\.site-lookup-menu:focus-within \.site-lookup-panel\s*{[\s\S]*opacity:\s*1;[\s\S]*pointer-events:\s*auto;/);
   });
 
   it("removes the mobile bottom nav in favor of a three-zone mobile header", () => {

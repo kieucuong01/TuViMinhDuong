@@ -696,7 +696,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
                 </div>
 
                 <div className="admin-modal-body-grid">
-                  <form action={saveArticleAction} className="admin-article-form" data-testid="admin-article-form" data-loading-message="Đang lưu bài viết..." data-loading-label="Đang lưu...">
+                  <form action={saveArticleAction} encType="multipart/form-data" className="admin-article-form" data-testid="admin-article-form" data-loading-message="Đang lưu bài viết..." data-loading-label="Đang lưu...">
                     <input type="hidden" name="originalSlug" value={article.slug} />
 
                     <div className="admin-form-row">
@@ -737,9 +737,21 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
 
                     <label><span>Meta description</span><textarea name="metaDescription" rows={2} defaultValue={article.metaDescription || ""} data-testid="admin-article-meta-description" /></label>
 
-                    <div className="admin-form-row">
-                      <label><span>Ảnh đại diện</span><input name="coverImage" defaultValue={article.coverImage || ""} data-testid="admin-article-cover-image" /></label>
-                      <label><span>Alt ảnh đại diện</span><input name="coverAlt" defaultValue={article.coverAlt || ""} data-testid="admin-article-cover-alt" /></label>
+                    <div className="admin-cover-upload-grid">
+                      <label>
+                        <span>Ảnh đại diện</span>
+                        <input name="coverImage" defaultValue={article.coverImage || ""} placeholder="/articles/ten-bai.webp" data-testid="admin-article-cover-image" />
+                        <small>Giữ URL hiện tại hoặc chọn file mới bên cạnh.</small>
+                      </label>
+                      <label>
+                        <span>Upload ảnh mới</span>
+                        <input type="file" name="coverImageFile" accept="image/jpeg,image/png,image/webp" data-testid="admin-article-cover-image-file" />
+                        <small>JPEG, PNG hoặc WebP, tối đa 5MB.</small>
+                      </label>
+                      <label>
+                        <span>Alt ảnh đại diện</span>
+                        <input name="coverAlt" defaultValue={article.coverAlt || ""} data-testid="admin-article-cover-alt" />
+                      </label>
                     </div>
 
                     <label><span>Nội dung Markdown</span><textarea name="content" rows={16} defaultValue={article.content} data-testid="admin-article-content" /></label>

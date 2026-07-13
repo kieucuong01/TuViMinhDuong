@@ -1,3 +1,5 @@
+import { rm } from "node:fs/promises";
+import path from "node:path";
 import { describe, expect, it, vi } from "vitest";
 
 vi.mock("server-only", () => ({}));
@@ -47,6 +49,39 @@ describe("admin article CMS", () => {
 
     expect(saved.status).toBe("published");
     expect(publicArticles).toEqual(expect.arrayContaining([expect.objectContaining({ slug, status: "published" })]));
+  });
+
+  it("keeps the original publish date when editing a published article", async () => {
+    const { saveArticleFromForm } = await import("@/lib/data");
+    const slug = `cms-published-edit-${Date.now()}`;
+
+    const firstSave = await saveArticleFromForm(articleForm(slug, "published"));
+    const editForm = articleForm(slug, "published");
+    editForm.set("originalSlug", slug);
+    editForm.set("title", "Bai xuat ban CMS da sua");
+    editForm.set("excerpt", "Noi dung tom tat moi nhung ngay publish phai giu nguyen.");
+
+    const edited = await saveArticleFromForm(editForm);
+
+    expect(firstSave.publishedAt).toBeInstanceOf(Date);
+    expect(edited.publishedAt?.toISOString()).toBe(firstSave.publishedAt?.toISOString());
+  });
+
+  it("stores uploaded article cover images under the public articles folder", async () => {
+    const { saveArticleFromForm } = await import("@/lib/data");
+    const slug = `cms-upload-${Date.now()}`;
+    const form = articleForm(slug, "published");
+    form.set("coverImageFile", new File([new Uint8Array([0x52, 0x49, 0x46, 0x46, 0x10, 0x00, 0x00, 0x00, 0x57, 0x45, 0x42, 0x50])], "cover.webp", { type: "image/webp" }));
+
+    const saved = await saveArticleFromForm(form);
+    const uploadedPath = path.join(process.cwd(), "public", saved.coverImage?.replace(/^\/+/, "") || "");
+
+    try {
+      expect(saved.coverImage).toMatch(new RegExp(`^/articles/${slug}-[a-f0-9-]+\\.webp$`));
+      expect(saved.ogImage).toBe(saved.coverImage);
+    } finally {
+      await rm(uploadedPath, { force: true });
+    }
   });
 
   it("keeps archived articles available to admins and hidden from public article readers", async () => {
