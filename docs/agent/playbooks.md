@@ -212,7 +212,7 @@ Rules:
 - Required envs: `DATABASE_URL`, `NEXT_PUBLIC_APP_URL`, `AUTH_SECRET`, `ADMIN_EMAIL`, `ADMIN_PASSWORD`.
 - PayOS and Google OAuth only work when their envs exist.
 - Run migrations before trusting production data flows.
-- The safe release shape is: create `/opt/lasotinhhoa/releases/<timestamp>-<sha>`, clone or export the target commit there, copy the production `.env*` files from the current release, run `npm ci` and `npm run build`, then switch `/opt/lasotinhhoa/current` to the new release.
+- The safe release shape is: after `git push origin master`, SSH to the VPS, update `/opt/lasotinhhoa/source` with `git fetch` and `git reset --hard <sha>`, create `/opt/lasotinhhoa/releases/<timestamp>-<sha>` from that exact commit, copy the production `.env*` files from the current release, run `npm ci` and `npm run build`, then switch `/opt/lasotinhhoa/current` to the new release.
 - For post-deploy health, use `pm2 status`, `pm2 logs lasotinhhoa`, Nginx logs, live HTTP checks, and `npm run perf:smoke`.
 - Restart PM2 from the active release directory so the process cwd and `.next` build match the deployed release.
 - After restart, verify `pm2 describe lasotinhhoa` points `exec cwd` and script path at the new release. If PM2 still points at an older release, recreate the process from `/opt/lasotinhhoa/current` and `pm2 save` instead of trusting a plain restart.

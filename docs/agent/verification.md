@@ -134,6 +134,7 @@ Public trust policy:
 Deploy path:
 
 - After any production release, confirm `pm2 describe lasotinhhoa` shows `exec cwd` or script path under the latest `/opt/lasotinhhoa/releases/<timestamp>-<sha>`, not an older release.
+- Confirm `/opt/lasotinhhoa/current/.release-commit` matches the commit that was pushed to `origin/master`.
 - Smoke `https://lasotinhhoa.vn`, `https://lasotinhhoa.vn/kien-thuc-tu-vi`, and the changed public URL before claiming deploy success.
 
 ## Git Hygiene

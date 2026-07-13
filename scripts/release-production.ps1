@@ -129,13 +129,14 @@ if ($branch -ne "master") {
 }
 
 $statusLines = @(Get-RepositoryStatus)
-if ($statusLines.Count -eq 0) {
-  throw "No repository changes to commit."
-}
-Assert-ReleaseFilesAreSafe -StatusLines $statusLines
+if ($statusLines.Count -gt 0) {
+  Assert-ReleaseFilesAreSafe -StatusLines $statusLines
 
-Write-Host "Files included in this release:" -ForegroundColor Yellow
-$statusLines | ForEach-Object { Write-Host $_ }
+  Write-Host "Files included in this release:" -ForegroundColor Yellow
+  $statusLines | ForEach-Object { Write-Host $_ }
+} else {
+  Write-Host "Working tree is clean. The release will push and deploy current HEAD." -ForegroundColor Yellow
+}
 
 if ($DryRun) {
   Write-Host ""
@@ -143,9 +144,14 @@ if ($DryRun) {
   Write-Host "npm run lint"
   Write-Host "npm test"
   Write-Host "npm run build"
-  Write-Host "git add --all"
-  Write-Host "git commit -m `"$Message`""
+  if ($statusLines.Count -gt 0) {
+    Write-Host "git add --all"
+    Write-Host "git commit -m `"$Message`""
+  } else {
+    Write-Host "skip git commit because working tree is clean"
+  }
   Write-Host "git push origin master"
+  Write-Host "SSH to VPS, fetch/reset /opt/lasotinhhoa/source to pushed commit"
   Write-Host "VPS release build, symlink switch, PM2 restart, and production smoke"
   Write-Host "npm run pseo:seed on the new VPS release before build"
   Write-Host "npm run seed:interpretations on the new VPS release before build"
@@ -169,18 +175,22 @@ Invoke-NativeCommand -Label "npm test" -FilePath $npm -Arguments @("test")
 Invoke-NativeCommand -Label "npm run build" -FilePath $npm -Arguments @("run", "build")
 
 $statusLines = Get-RepositoryStatus
-Assert-ReleaseFilesAreSafe -StatusLines $statusLines
+if ($statusLines.Count -gt 0) {
+  Assert-ReleaseFilesAreSafe -StatusLines $statusLines
 
-Invoke-NativeCommand -Label "git add --all" -FilePath $git -Arguments @("add", "--all")
-& $git diff --cached --quiet
-if ($LASTEXITCODE -eq 0) {
-  throw "No staged changes remain after verification."
-}
-if ($LASTEXITCODE -ne 1) {
-  throw "Unable to inspect staged changes."
-}
+  Invoke-NativeCommand -Label "git add --all" -FilePath $git -Arguments @("add", "--all")
+  & $git diff --cached --quiet
+  if ($LASTEXITCODE -eq 0) {
+    throw "No staged changes remain after verification."
+  }
+  if ($LASTEXITCODE -ne 1) {
+    throw "Unable to inspect staged changes."
+  }
 
-Invoke-NativeCommand -Label "Commit release" -FilePath $git -Arguments @("commit", "-m", $Message)
+  Invoke-NativeCommand -Label "Commit release" -FilePath $git -Arguments @("commit", "-m", $Message)
+} else {
+  Write-Host "No local commit needed; deploying current HEAD." -ForegroundColor Yellow
+}
 Invoke-NativeCommand -Label "git push origin master" -FilePath $git -Arguments @("push", "origin", "master")
 
 $commitSha = (Get-NativeOutput -FilePath $git -Arguments @("rev-parse", "HEAD") | Select-Object -First 1).Trim()
@@ -195,6 +205,7 @@ EXPECTED_SHA="$1"
 RELEASE_NAME="$2"
 RUN_MIGRATIONS="$3"
 APP_ROOT="/opt/lasotinhhoa"
+SOURCE_DIR="$APP_ROOT/source"
 RELEASE_DIR="$APP_ROOT/releases/$RELEASE_NAME"
 CURRENT_DIR="$APP_ROOT/current"
 REPO_URL="https://github.com/kieucuong01/TuViMinhDuong.git"
@@ -278,14 +289,28 @@ if [ -e "$RELEASE_DIR" ]; then
   exit 1
 fi
 
-git clone --quiet --branch master --single-branch "$REPO_URL" "$RELEASE_DIR"
-cd "$RELEASE_DIR"
+if [ -d "$SOURCE_DIR/.git" ]; then
+  cd "$SOURCE_DIR"
+  git remote set-url origin "$REPO_URL"
+else
+  rm -rf -- "$SOURCE_DIR"
+  git clone --quiet "$REPO_URL" "$SOURCE_DIR"
+  cd "$SOURCE_DIR"
+fi
+
+git fetch --quiet origin master
+git checkout --quiet master
+git reset --hard "$EXPECTED_SHA"
 ACTUAL_SHA="$(git rev-parse HEAD)"
 if [ "$ACTUAL_SHA" != "$EXPECTED_SHA" ]; then
-  echo "Expected commit $EXPECTED_SHA but cloned $ACTUAL_SHA" >&2
+  echo "Expected commit $EXPECTED_SHA but VPS source is $ACTUAL_SHA" >&2
   exit 1
 fi
-rm -rf -- "$RELEASE_DIR/.git"
+
+mkdir -p "$RELEASE_DIR"
+git archive --format=tar "$EXPECTED_SHA" | tar -x -C "$RELEASE_DIR"
+cd "$RELEASE_DIR"
+printf '%s\n' "$EXPECTED_SHA" > .release-commit
 
 if [ -d "$CURRENT_DIR" ]; then
   for env_file in "$CURRENT_DIR"/.env "$CURRENT_DIR"/.env.*; do

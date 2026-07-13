@@ -39,7 +39,7 @@ Use this file as the map, not the encyclopedia. Load only the docs and files nee
 - Use `security-and-hardening` for auth, sessions, payments, webhooks, admin access, secrets, or untrusted input.
 - Use `performance-optimization` only for slow pages, large bundles, database/query hot paths, Core Web Vitals, or build/runtime bottlenecks.
 - Keep `/tra-cuu` and SEO publishing additive-safe: one bounded release slice, flat routes, no overlapping search intent, and no broad URL generation without approval.
-- Production requests require the real VPS/PM2 path: `npm run release:production`, then verify PM2/current release and the public URL. Local build alone is not production proof.
+- Production requests require the real GitHub -> VPS/PM2 path: `npm run release:production`, which commits if needed, pushes `origin/master`, SSHes to the VPS, fetches the pushed commit into `/opt/lasotinhhoa/source`, builds a clean release, then verifies PM2/current release and the public URL. Local build alone is not production proof.
 - Do not install new workflow packs, MCPs, or framework tools unless the user explicitly asks.
 
 ## Fast File Map
