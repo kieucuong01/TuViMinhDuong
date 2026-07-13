@@ -37,6 +37,8 @@
     "pseo:generate": "node --experimental-strip-types scripts/generate-pseo.ts",
     "env:check:production": "node scripts/check-production-env.mjs",
     "release:production": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/release-production.ps1",
+    "ship": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/release-production.ps1",
+    "ship:production": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/release-production.ps1",
     "agent:headroom:doctor": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/headroom-agent.ps1 doctor",
     "agent:headroom:smoke": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/headroom-agent.ps1 smoke",
     "agent:headroom:stats": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/headroom-agent.ps1 stats",

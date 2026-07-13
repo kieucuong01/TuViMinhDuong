@@ -119,7 +119,7 @@ npm run perf:smoke
 
 ## Deploy
 
-Canonical production flow: `npm run release:production -- "<message>"` commits local changes when present, pushes `origin/master`, SSHes to `tuvi-vps`, fetches the pushed commit into `/opt/lasotinhhoa/source`, builds a clean release under `/opt/lasotinhhoa/releases/<timestamp>-<sha>`, switches `/opt/lasotinhhoa/current`, restarts PM2, and smokes the public URLs.
+Canonical production flow: `npm run ship` commits local changes when present, pushes `origin/master`, SSHes to `tuvi-vps`, fetches the pushed commit into `/opt/lasotinhhoa/source`, builds a clean release under `/opt/lasotinhhoa/releases/<timestamp>-<sha>`, switches `/opt/lasotinhhoa/current`, restarts PM2, and smokes the public URLs. Use `npm run ship -- "<message>"` when you want a custom commit message.
 
 Target deploy là VPS self-hosted + Postgres. App production chạy tại `/opt/lasotinhhoa/current`, PM2 process `lasotinhhoa`, internal port `127.0.0.1:4100`; Nginx phục vụ public HTTPS tại `https://lasotinhhoa.vn`.
 

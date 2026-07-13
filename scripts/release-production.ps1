@@ -1,8 +1,8 @@
 [CmdletBinding()]
 param(
-  [Parameter(Mandatory = $true, Position = 0)]
+  [Parameter(Position = 0)]
   [ValidateNotNullOrEmpty()]
-  [string]$Message,
+  [string]$Message = "chore: production release",
 
   [switch]$Migrate,
   [switch]$DryRun

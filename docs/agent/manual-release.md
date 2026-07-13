@@ -4,7 +4,13 @@ Chạy tại thư mục gốc của repo:
 
 ```powershell
 git status --short
-npm run release:production -- "feat: mô tả thay đổi"
+npm run ship
+```
+
+Nếu muốn commit message rõ hơn cho release hiện tại:
+
+```powershell
+npm run ship -- "feat: mô tả thay đổi"
 ```
 
 Lệnh thứ hai tự thực hiện:
@@ -29,12 +35,13 @@ npm run release:production -- "feat: cập nhật schema" -Migrate
 Xem trước các bước mà không commit, push hoặc deploy:
 
 ```powershell
-npm run release:production -- "test: dry run" -DryRun
+npm run ship -- -DryRun
 ```
 
 Lưu ý:
 
 - Lệnh sẽ commit tất cả thay đổi đang hiển thị bởi `git status --short`. Hãy kiểm tra danh sách đó trước.
+- Nếu không truyền message, commit mới sẽ dùng message mặc định `chore: production release`.
 - Nếu working tree đã sạch, lệnh không tạo commit mới; nó vẫn push `origin/master` và deploy `HEAD` hiện tại.
 - Deploy production chuẩn là VPS pull/fetch từ GitHub sau khi push. Không deploy trực tiếp từ archive local trừ khi cần phương án khẩn cấp riêng.
 - Không dùng `-Migrate` nếu không có migration Prisma cần áp dụng.
