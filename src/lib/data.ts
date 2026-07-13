@@ -17,6 +17,7 @@ import {
 } from "@/lib/ai";
 import { scoreArticleSeo } from "@/lib/seo";
 import { slugify } from "@/lib/format";
+import { ARTICLE_UPLOAD_DIR, ARTICLE_UPLOAD_MAX_BYTES, ARTICLE_UPLOAD_PUBLIC_PATH, ARTICLE_UPLOAD_TYPES } from "@/lib/article-upload-storage";
 import { MAIN_STARS, PALACES, SUPPORT_STARS, buildPseoInventory } from "@/lib/pseo-registry";
 import type { SessionUser } from "@/lib/auth";
 import { createPerfTimer, logPerfEvent } from "@/lib/perf";
@@ -332,15 +333,6 @@ export type FreeOverviewGenerationClaim =
 
 type ArticleRecord = Omit<ArticleView, "faqs"> & {
   faqs?: unknown;
-};
-
-const ARTICLE_UPLOAD_PUBLIC_PATH = "/uploads/articles";
-const ARTICLE_UPLOAD_DIR = path.join(process.cwd(), "public", "uploads", "articles");
-const ARTICLE_UPLOAD_MAX_BYTES = 5 * 1024 * 1024;
-const ARTICLE_UPLOAD_TYPES: Record<string, { extension: string; signatures: number[][] }> = {
-  "image/jpeg": { extension: "jpg", signatures: [[0xff, 0xd8, 0xff]] },
-  "image/png": { extension: "png", signatures: [[0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]] },
-  "image/webp": { extension: "webp", signatures: [[0x52, 0x49, 0x46, 0x46]] },
 };
 
 const DELETED_ARTICLE_STATUS = "deleted";
