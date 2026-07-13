@@ -37,8 +37,8 @@ describe("production release command", () => {
 
   it("keeps CMS-uploaded article images in a persistent VPS upload directory", () => {
     expect(releaseScript).toContain('UPLOAD_DIR="$APP_ROOT/uploads/articles"');
-    expect(releaseScript).toContain('mkdir -p "$UPLOAD_DIR" "$RELEASE_DIR/public/uploads"');
-    expect(releaseScript).toContain('ln -sfn "$UPLOAD_DIR" "$RELEASE_DIR/public/uploads/articles"');
+    expect(releaseScript).toContain('mkdir -p "$UPLOAD_DIR"');
+    expect(releaseScript).not.toContain('ln -sfn "$UPLOAD_DIR" "$RELEASE_DIR/public/uploads/articles"');
   });
 
   it("seeds the curated pSEO inventory before building the VPS release", () => {

@@ -312,9 +312,7 @@ mkdir -p "$RELEASE_DIR"
 git archive --format=tar "$EXPECTED_SHA" | tar -x -C "$RELEASE_DIR"
 cd "$RELEASE_DIR"
 printf '%s\n' "$EXPECTED_SHA" > .release-commit
-mkdir -p "$UPLOAD_DIR" "$RELEASE_DIR/public/uploads"
-rm -rf -- "$RELEASE_DIR/public/uploads/articles"
-ln -sfn "$UPLOAD_DIR" "$RELEASE_DIR/public/uploads/articles"
+mkdir -p "$UPLOAD_DIR"
 
 if [ -d "$CURRENT_DIR" ]; then
   for env_file in "$CURRENT_DIR"/.env "$CURRENT_DIR"/.env.*; do

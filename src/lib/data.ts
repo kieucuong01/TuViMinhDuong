@@ -17,7 +17,6 @@ import {
 } from "@/lib/ai";
 import { scoreArticleSeo } from "@/lib/seo";
 import { slugify } from "@/lib/format";
-import { ARTICLE_UPLOAD_DIR, ARTICLE_UPLOAD_MAX_BYTES, ARTICLE_UPLOAD_PUBLIC_PATH, ARTICLE_UPLOAD_TYPES } from "@/lib/article-upload-storage";
 import { MAIN_STARS, PALACES, SUPPORT_STARS, buildPseoInventory } from "@/lib/pseo-registry";
 import type { SessionUser } from "@/lib/auth";
 import { createPerfTimer, logPerfEvent } from "@/lib/perf";
@@ -663,8 +662,8 @@ function isFileUpload(value: FormDataEntryValue | null): value is File {
   );
 }
 
-function uploadExtensionForFile(file: File, bytes: Uint8Array) {
-  const uploadType = ARTICLE_UPLOAD_TYPES[file.type];
+function uploadExtensionForFile(file: File, bytes: Uint8Array, uploadTypes: Record<string, { extension: string; signatures: number[][] }>) {
+  const uploadType = uploadTypes[file.type];
   if (!uploadType) {
     throw new Error("Chi ho tro upload anh JPEG, PNG hoac WebP.");
   }
@@ -686,12 +685,14 @@ async function articleCoverImageFromForm(formData: FormData, slug: string) {
   const upload = formData.get("coverImageFile");
   if (!isFileUpload(upload) || upload.size === 0) return fallbackImage;
 
+  const { ARTICLE_UPLOAD_DIR, ARTICLE_UPLOAD_MAX_BYTES, ARTICLE_UPLOAD_PUBLIC_PATH, ARTICLE_UPLOAD_TYPES } = await import("@/lib/article-upload-storage");
+
   if (upload.size > ARTICLE_UPLOAD_MAX_BYTES) {
     throw new Error("Anh dai dien toi da 5MB.");
   }
 
   const bytes = new Uint8Array(await upload.arrayBuffer());
-  const extension = uploadExtensionForFile(upload, bytes);
+  const extension = uploadExtensionForFile(upload, bytes, ARTICLE_UPLOAD_TYPES);
   const safeSlug = slug || `article-${Date.now()}`;
   const fileName = `${safeSlug}-${randomUUID()}.${extension}`;
 
