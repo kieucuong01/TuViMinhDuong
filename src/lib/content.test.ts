@@ -41,6 +41,7 @@ describe("SEO content cluster", () => {
     expect(slugs).toContain("menh-tham-lang-la-gi");
     expect(slugs).toContain("sao-vu-khuc");
     expect(slugs).toContain("sao-thai-am");
+    expect(slugs).toContain("sao-thien-dong");
     expect(slugs).toContain("sao-thien-co");
     expect(slugs).toContain("sao-thai-duong");
     expect(slugs).toContain("sao-tham-lang-trong-tu-vi");
@@ -226,6 +227,7 @@ describe("SEO content cluster", () => {
 
   it("ships the sao Thái Âm article as a distinct star-intent page with inner-life and stability context", () => {
     const saoThaiAmGuide = seedArticles.find((article) => article.slug === "sao-thai-am");
+    const saoThienDongGuide = seedArticles.find((article) => article.slug === "sao-thien-dong");
 
     expect(saoThaiAmGuide).toBeTruthy();
     expect(saoThaiAmGuide?.coverImage).toBe("/articles/sao-thai-am.webp");
@@ -235,10 +237,32 @@ describe("SEO content cluster", () => {
     expect(saoThaiAmGuide?.content).toContain("/kien-thuc-tu-vi/cung-dien-trach-trong-tu-vi");
     expect(saoThaiAmGuide?.content).toContain("/kien-thuc-tu-vi/cung-tai-bach-trong-tu-vi");
     expect(saoThaiAmGuide?.content).toContain("/kien-thuc-tu-vi/cung-phu-the-trong-tu-vi");
+    expect(saoThienDongGuide?.content).toContain("/#lap-la-so");
+    expect(saoThienDongGuide?.content).toContain("/kien-thuc-tu-vi/cung-quan-loc-trong-tu-vi");
+    expect(saoThienDongGuide?.content).toContain("/kien-thuc-tu-vi/cung-thien-di-trong-tu-vi");
+    expect(saoThienDongGuide?.content).toContain("| Dữ liệu nền cần khóa |");
+    expect(saoThienDongGuide?.content).toContain("| Điều kiện cần đối chiếu |");
     expect(saoThaiAmGuide?.content).toContain("| Vị trí hoặc câu hỏi đang hỏi |");
     expect(saoThaiAmGuide?.content).toContain("| Điều kiện cần đối chiếu |");
     expect(saoThaiAmGuide?.content).toContain("## Khung causal analysis để đọc sao Thái Âm không thành nhãn \"hiền hay yếu\"");
     expect(saoThaiAmGuide?.faqs?.length).toBeGreaterThanOrEqual(3);
+  });
+
+  it("ships the sao Thiên Đồng article as a distinct star-intent page with adaptability and environment context", () => {
+    const saoThienDongGuide = seedArticles.find((article) => article.slug === "sao-thien-dong");
+
+    expect(saoThienDongGuide).toBeTruthy();
+    expect(saoThienDongGuide?.coverImage).toBe("/articles/sao-thien-dong.webp");
+    expect(saoThienDongGuide?.ogImage).toBe("/articles/sao-thien-dong.webp");
+    expect(saoThienDongGuide?.coverAlt).toContain("sổ tay");
+    expect(saoThienDongGuide?.coverAlt).toContain("đọc sao Thiên Đồng");
+    expect(saoThienDongGuide?.content).toContain("/kien-thuc-tu-vi/cung-quan-loc-trong-tu-vi");
+    expect(saoThienDongGuide?.content).toContain("/kien-thuc-tu-vi/cung-thien-di-trong-tu-vi");
+    expect(saoThienDongGuide?.content).toContain("/kien-thuc-tu-vi/cung-tai-bach-trong-tu-vi");
+    expect(saoThienDongGuide?.content).toContain("| Vị trí hoặc câu hỏi đang hỏi |");
+    expect(saoThienDongGuide?.content).toContain("| Điều kiện cần đối chiếu |");
+    expect(saoThienDongGuide?.content).toContain("## Khung causal analysis để đọc sao Thiên Đồng không thành nhãn “dễ thay đổi”");
+    expect(saoThienDongGuide?.faqs?.length).toBeGreaterThanOrEqual(3);
   });
 
   it("ships the interpretation guide as a distinct middle-funnel article with chart-confidence checks", () => {

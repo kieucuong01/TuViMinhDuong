@@ -1,13 +1,13 @@
 {
-  "lastRunAt": "2026-07-13T00:08:50.934Z",
+  "lastRunAt": "2026-07-14T02:03:25.800Z",
   "lastStatus": "ok",
   "lastAction": {
     "type": "single_article_publish",
-    "slug": "sao-thai-am",
+    "slug": "sao-thien-dong",
     "slugs": [
-      "sao-thai-am"
+      "sao-thien-dong"
     ],
-    "reason": "Publish 1 people-first articles from SEMrush intent clusters; first topic: Nguoi doc muon hieu sao Thai Am trong la so, cach doc ve noi tam, tai san, gia dinh va moi truong ho tro.",
+    "reason": "Publish 1 people-first articles from SEMrush intent clusters; first topic: Nguoi doc muon hieu sao Thien Dong ve kha nang thich nghi, phuc khi, thay doi moi truong va gioi han khi doc mot sao rieng le.",
     "approvalRequired": false,
     "allowedToCommitDeployAfterVerification": true
   },
@@ -20,9 +20,9 @@
     "status": "skipped"
   },
   "lastDraftPaths": [
-    "docs/seo-autopilot/drafts/sao-thai-am.md"
+    "docs/seo-autopilot/drafts/sao-thien-dong.md"
   ],
-  "lastReportPath": "docs/seo-autopilot/reports/2026-07-13-weekly-content-batch.md",
+  "lastReportPath": "docs/seo-autopilot/reports/2026-07-14-weekly-content-batch.md",
   "nextVerificationCommands": [
     "npm run seo:autopilot",
     "npm test -- src/lib/content.test.ts src/lib/article-cover-assets.test.ts src/lib/seo-autopilot-core.test.ts",
