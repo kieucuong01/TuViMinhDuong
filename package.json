@@ -38,9 +38,11 @@
     "env:check:production": "node scripts/check-production-env.mjs",
     "ship": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/release-production.ps1",
     "agent:headroom:doctor": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/headroom-agent.ps1 doctor",
+    "agent:headroom:start": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/headroom-agent.ps1 start",
     "agent:headroom:smoke": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/headroom-agent.ps1 smoke",
     "agent:headroom:stats": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/headroom-agent.ps1 stats",
-    "agent:headroom:claude": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/headroom-agent.ps1 claude"
+    "agent:headroom:claude": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/headroom-agent.ps1 claude",
+    "agent:headroom:codex": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/headroom-agent.ps1 codex"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.8.0",

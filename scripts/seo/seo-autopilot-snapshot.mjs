@@ -31,14 +31,12 @@ export async function buildSnapshot({ baseUrl, sampleSize }) {
   ]);
   const sitemapUrls = extractSitemapUrls(sitemapXml);
   const sampleUrls = chooseSampleUrls(baseUrl, sitemapUrls, sampleSize);
-  const pages = [];
-
-  for (const url of sampleUrls) {
+  const pages = await Promise.all(sampleUrls.map(async (url) => {
     try {
       const html = await fetchText(url);
-      pages.push(extractPageSeo(url, html));
+      return extractPageSeo(url, html);
     } catch (error) {
-      pages.push({
+      return {
         url,
         title: "",
         metaDescription: "",
@@ -47,9 +45,9 @@ export async function buildSnapshot({ baseUrl, sampleSize }) {
         jsonLdCount: 0,
         htmlLength: 0,
         error: error.message,
-      });
+      };
     }
-  }
+  }));
 
   return {
     generatedAt: new Date().toISOString(),
@@ -70,7 +68,7 @@ function chooseSampleUrls(baseUrl, sitemapUrls, sampleSize) {
 
 async function fetchText(url) {
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 20_000);
+  const timeout = setTimeout(() => controller.abort(), 8_000);
   try {
     const response = await fetch(url, {
       headers: {

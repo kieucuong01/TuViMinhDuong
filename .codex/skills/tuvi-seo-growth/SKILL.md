@@ -86,6 +86,7 @@ Then choose the highest-impact safe SEO task, implement it, verify, and report:
 - for normal daily publisher runs, an existing or repeated slug is not publishable output; continue to the next distinct SEMrush-backed topic instead of refreshing or returning a no-op report
 - each article must follow `brief.targetCharacterRange`, `brief.internalLinkPolicy`, `brief.googleQualityPolicy`, and the funnel stage in `plan.weeklyContentPlan`
 - if live evidence contradicts the generated plan, choose the safer higher-impact SEO task and explain why
+- if another VPS-side agent has already published a `/kien-thuc-tu-vi/*` slug found in the live sitemap, treat that slug and its equivalent reader intent as already published even when it is missing from local repo inventory
 
 - what changed
 - why it was chosen
@@ -102,5 +103,6 @@ Content quality rules:
 - Do not stuff exact-match anchors, copy competitor content, create doorway pages, or mass-produce low-value articles.
 - For programmatic SEO topics, require unique value beyond prose: at least two structured data/tool blocks, an expert causal-analysis frame, and an interactive chart-form CTA. If the topic cannot support that, publish fewer articles or create a draft/report only.
 - Do not return a short duplicate-run skip just because GSC, SEMrush, sitemap, and content inventory look unchanged. Continue through the topic queue until one distinct new article is publishable or a real blocker prevents safe release.
+- Merge local content slugs with live sitemap `/kien-thuc-tu-vi/*` slugs before selecting topics so Codex cannot duplicate articles or equivalent intents produced by the VPS-side SEO agent.
 - Treat character ranges as anti-thin-content safeguards, not as Google ranking requirements.
 - When a quality gate fails, repair every reported content, metadata, link, data-block, CTA, and cover issue and rerun the gate for up to 3 substantive passes before rejecting the candidate. Never lower the gate or publish a placeholder to satisfy cadence.

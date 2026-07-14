@@ -35,6 +35,7 @@ describe("organic tool analytics", () => {
     expect(homeSource).toContain('params.source === "date_finder"');
     expect(homeSource).toContain("chartAdSource");
     expect(homeSource).toContain("<ChartForm adSource={chartAdSource} />");
+    expect(homeSource).toContain('params.source === "seo_article"');
   });
 });
 

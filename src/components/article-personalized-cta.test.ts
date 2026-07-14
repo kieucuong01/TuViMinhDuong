@@ -11,13 +11,16 @@ describe("ArticlePersonalizedCta", () => {
   it("invites article readers to personalize the topic early", () => {
     expect(ctaSource).toContain("article-personalized-cta");
     expect(ctaSource).toContain("theo lá số của bạn");
-    expect(ctaSource).toContain("/#lap-la-so");
+    expect(ctaSource).toContain("/?source=seo_article#lap-la-so");
+    expect(ctaSource).toContain('data-ad-click="article_chart_cta_click"');
+    expect(ctaSource).toContain("data-ad-placement={articleSlug}");
     expect(ctaSource).toContain("/xem-ngay");
   });
 
   it("renders the personalized CTA inside the long-form reading flow", () => {
     expect(articlePageSource).toContain("ArticlePersonalizedCta");
     expect(articlePageSource).toContain("const midArticleCta");
+    expect(articlePageSource).toContain("articleSlug={article.slug}");
     expect(articlePageSource).toContain("afterFirstSection={midArticleCta}");
   });
 

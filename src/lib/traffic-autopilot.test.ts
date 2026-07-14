@@ -52,6 +52,9 @@ describe("Traffic Autopilot", () => {
       "/kien-thuc-tu-vi/tao-la-so-tu-vi",
     );
     expect(plan.shortVideoPack.platformCaptions.tiktok).toContain("utm_source=tiktok");
+    const trackedUrl = new URL(plan.shortVideoPack.platformCaptions.tiktok.match(/https:\/\/\S+/)?.[0] || "");
+    expect(trackedUrl.searchParams.get("utm_source")).toBe("tiktok");
+    expect(trackedUrl.hash).toBe("#lap-la-so");
     expect(plan.commands).toEqual(["npm run traffic:autopilot"]);
   });
 
@@ -108,18 +111,25 @@ describe("Traffic Autopilot", () => {
     expect(combinedCopy).not.toMatch(/chac chan|bao dam|doi doi/i);
   });
 
-  it("uses the latest SEO publisher state action before static fallback articles", () => {
+  it("uses the latest confirmed published slug before static fallback articles", () => {
     const article = pickTrafficArticle({
       existingSlugs: [...existingSlugs, "phan-tich-la-so-tu-vi"],
       seoState: {
-        lastAction: {
-          slug: "phan-tich-la-so-tu-vi",
-        },
+        lastPublishedSlug: "phan-tich-la-so-tu-vi",
       },
     });
 
     expect(article.slug).toBe("phan-tich-la-so-tu-vi");
     expect(article.url).toBe("/kien-thuc-tu-vi/phan-tich-la-so-tu-vi");
+  });
+
+  it("does not distribute a planned article before it is confirmed live", () => {
+    const article = pickTrafficArticle({
+      existingSlugs: [...existingSlugs, "phan-tich-la-so-tu-vi"],
+      seoState: { lastAction: { slug: "phan-tich-la-so-tu-vi" } },
+    });
+
+    expect(article.slug).toBe("tao-la-so-tu-vi");
   });
 
   it("writes a durable short-video report with captions, UTM links, and website CTA", () => {

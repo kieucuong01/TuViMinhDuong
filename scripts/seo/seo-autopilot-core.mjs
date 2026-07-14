@@ -628,6 +628,32 @@ export function extractSitemapUrls(xml) {
   return [...xml.matchAll(/<loc>\s*([^<]+?)\s*<\/loc>/gi)].map((match) => decodeHtml(match[1].trim()));
 }
 
+export function extractKnowledgeArticleSlugsFromUrls(urls) {
+  return [
+    ...new Set(
+      (urls || [])
+        .map((url) => extractKnowledgeArticleSlugFromUrl(url))
+        .filter(Boolean),
+    ),
+  ];
+}
+
+function extractKnowledgeArticleSlugFromUrl(url) {
+  const pathname = safeUrlPathname(url);
+  const match = pathname.match(/^\/kien-thuc-tu-vi\/([^/]+)\/?$/);
+  return match?.[1] || "";
+}
+
+function safeUrlPathname(url) {
+  const raw = String(url || "").trim();
+  if (!raw) return "";
+  try {
+    return new URL(raw, "https://lasotinhhoa.vn").pathname;
+  } catch {
+    return raw.split("?")[0].split("#")[0];
+  }
+}
+
 export function extractPageSeo(url, html) {
   const source = html || "";
   return {
@@ -654,6 +680,7 @@ export function summarizeSeoSnapshot({ baseUrl, robotsText, sitemapUrls, pages }
   const warnings = [];
   const normalizedRobots = robotsText || "";
   const pageList = pages || [];
+  const knowledgeArticleSlugs = extractKnowledgeArticleSlugsFromUrls(sitemapUrls || []);
 
   if (!normalizedRobots.trim()) {
     warnings.push("robots.txt is empty or unavailable");
@@ -679,9 +706,11 @@ export function summarizeSeoSnapshot({ baseUrl, robotsText, sitemapUrls, pages }
     status: warnings.length ? "warning" : "ok",
     sitemapUrlCount: sitemapUrls?.length || 0,
     checkedPageCount: pageList.length,
+    knowledgeArticleCount: knowledgeArticleSlugs.length,
+    knowledgeArticleSlugs,
     checks,
     warnings,
-    opportunities: rankTopicOpportunities(sitemapUrls || []).slice(0, 5),
+    opportunities: rankTopicOpportunities(knowledgeArticleSlugs).slice(0, 5),
   };
 }
 
@@ -818,7 +847,7 @@ export function planSeoAutopilotRun({
   const publisherSelection = normalizePublisherSelection({ articles: articlesPerWeek, clusterMode });
   articlesPerWeek = publisherSelection.articles;
   const isSinglePublisherRun = articlesPerWeek === 1 && !clusterMode;
-  const currentSlugs = new Set(existingSlugs || []);
+  const currentSlugs = buildCurrentArticleSlugSet({ existingSlugs, snapshot });
   const snapshotOpportunities = Array.isArray(snapshot?.opportunities) ? snapshot.opportunities : [];
   const inputKeywordRows = Array.isArray(keywordRows) ? keywordRows : [];
   const keywordPlan = inputKeywordRows.length
@@ -830,7 +859,7 @@ export function planSeoAutopilotRun({
   const opportunities = keywordOpportunities.length
     ? keywordOpportunities
     : snapshotOpportunities.length
-      ? snapshotOpportunities.filter((item) => !currentSlugs.has(item.slug))
+      ? snapshotOpportunities.filter((item) => !currentSlugs.has(item.slug) && !overlapsExistingIntent(item.slug, currentSlugs))
       : rankTopicOpportunities([...currentSlugs]).length
         ? rankTopicOpportunities([...currentSlugs])
         : isSinglePublisherRun
@@ -847,6 +876,7 @@ export function planSeoAutopilotRun({
       status: "blocked",
       summary: [
         `Sitemap URLs: ${snapshot?.sitemapUrlCount ?? "unknown"}`,
+        `Production knowledge articles: ${snapshot?.knowledgeArticleCount ?? snapshot?.knowledgeArticleSlugs?.length ?? "unknown"}`,
         ...(snapshot?.warnings || []),
       ],
       nextAction: {
@@ -889,6 +919,7 @@ export function planSeoAutopilotRun({
     status: snapshot?.status || "unknown",
     summary: [
       `Sitemap URLs: ${snapshot?.sitemapUrlCount ?? "unknown"}`,
+      `Production knowledge articles: ${snapshot?.knowledgeArticleCount ?? snapshot?.knowledgeArticleSlugs?.length ?? "unknown"}`,
       ...(snapshot?.warnings || []),
     ],
     nextAction: {
@@ -925,6 +956,13 @@ export function planSeoAutopilotRun({
       "Do not deploy if tests or build fail.",
     ],
   };
+}
+
+function buildCurrentArticleSlugSet({ existingSlugs, snapshot }) {
+  return new Set([
+    ...(existingSlugs || []),
+    ...(snapshot?.knowledgeArticleSlugs || []),
+  ]);
 }
 
 function assertDistinctClusterArticles(articles) {

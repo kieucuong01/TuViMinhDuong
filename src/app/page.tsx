@@ -41,7 +41,8 @@ function chartFormErrorMessage(chartError?: string) {
 }
 
 function safeHomeAdSource(params: HomeSearchParams) {
-  return params.source === "date_finder" ? "date_finder" : "chart_form";
+  if (params.source === "date_finder" || params.source === "seo_article") return params.source;
+  return "chart_form";
 }
 
 export default async function Home({ searchParams }: { searchParams?: Promise<HomeSearchParams> }) {

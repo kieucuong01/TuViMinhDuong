@@ -54,7 +54,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
     (item) => item.slug !== article.slug && !relatedByCategory.some((related) => related.slug === item.slug),
   );
   const relatedArticles = [...relatedByCategory, ...fallbackArticles].slice(0, 3);
-  const midArticleCta = <ArticlePersonalizedCta articleTitle={article.title} categoryName={article.category?.name} />;
+  const midArticleCta = <ArticlePersonalizedCta articleSlug={article.slug} articleTitle={article.title} categoryName={article.category?.name} />;
   const articleLd = articleJsonLd(article);
   const breadcrumbLd = breadcrumbJsonLd([
     { name: "Trang chủ", url: APP_URL },
@@ -123,7 +123,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
           </section>
         ) : null}
         <div className="article-final-cta">
-          <ArticlePersonalizedCta articleTitle={article.title} categoryName={article.category?.name} variant="final" />
+          <ArticlePersonalizedCta articleSlug={article.slug} articleTitle={article.title} categoryName={article.category?.name} variant="final" />
         </div>
         {relatedArticles.length ? (
           <section className="article-related-section" aria-labelledby="article-related-heading">

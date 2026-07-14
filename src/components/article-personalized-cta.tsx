@@ -2,12 +2,13 @@ import Link from "next/link";
 import { CalendarDays, Sparkles } from "lucide-react";
 
 type ArticlePersonalizedCtaProps = {
+  articleSlug: string;
   articleTitle: string;
   categoryName?: string;
   variant?: "inline" | "final";
 };
 
-export function ArticlePersonalizedCta({ articleTitle, categoryName, variant = "inline" }: ArticlePersonalizedCtaProps) {
+export function ArticlePersonalizedCta({ articleSlug, articleTitle, categoryName, variant = "inline" }: ArticlePersonalizedCtaProps) {
   const topic = categoryName || articleTitle;
   const isFinal = variant === "final";
 
@@ -23,7 +24,12 @@ export function ArticlePersonalizedCta({ articleTitle, categoryName, variant = "
         </span>
       </div>
       <div className="article-personalized-actions">
-        <Link href="/#lap-la-so" className="btn btn-primary">
+        <Link
+          href="/?source=seo_article#lap-la-so"
+          className="btn btn-primary"
+          data-ad-click="article_chart_cta_click"
+          data-ad-placement={articleSlug}
+        >
           <Sparkles size={18} />
           Lập lá số miễn phí
         </Link>

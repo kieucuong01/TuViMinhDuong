@@ -1,5 +1,8 @@
+import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import {
+  extractKnowledgeArticleSlugsFromUrls,
   extractSitemapUrls,
   extractPageSeo,
   buildContentBrief,
@@ -16,7 +19,14 @@ import {
   summarizeSeoSnapshot,
 } from "../../scripts/seo/seo-autopilot-core.mjs";
 
+const executeSource = readFileSync(fileURLToPath(new URL("../../scripts/seo/seo-autopilot-execute.mjs", import.meta.url)), "utf8");
+
 describe("SEO Autopilot core", () => {
+  it("preserves confirmed published state across planning runs", () => {
+    expect(executeSource).toContain("lastPublishedSlug: previousState?.lastPublishedSlug");
+    expect(executeSource).toContain("lastPublishedAt: previousState?.lastPublishedAt");
+  });
+
   it("extracts URL locations from a sitemap", () => {
     const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
@@ -28,6 +38,17 @@ describe("SEO Autopilot core", () => {
       "https://lasotinhhoa.vn",
       "https://lasotinhhoa.vn/kien-thuc-tu-vi/la-so-tu-vi-la-gi",
     ]);
+  });
+
+  it("extracts live production knowledge slugs from sitemap URLs", () => {
+    expect(
+      extractKnowledgeArticleSlugsFromUrls([
+        "https://lasotinhhoa.vn",
+        "https://lasotinhhoa.vn/kien-thuc-tu-vi/sao-tu-vi",
+        "https://lasotinhhoa.vn/kien-thuc-tu-vi/sao-tu-vi/",
+        "https://lasotinhhoa.vn/tra-cuu/sao/tu-vi",
+      ]),
+    ).toEqual(["sao-tu-vi"]);
   });
 
   it("parses SEMrush keyword CSV and builds a Google-safe pillar funnel", () => {
@@ -261,6 +282,8 @@ describe("SEO Autopilot core", () => {
     });
 
     expect(summary.status).toBe("warning");
+    expect(summary.knowledgeArticleSlugs).toEqual(["bai-mong"]);
+    expect(summary.knowledgeArticleCount).toBe(1);
     expect(summary.checks).toContain("robots.txt references sitemap.xml");
     expect(summary.warnings).toEqual(
       expect.arrayContaining([
@@ -471,6 +494,53 @@ export const seedArticles = [
     expect(plan.nextAction.type).toBe("single_article_publish");
     expect(plan.weeklyContentPlan.articles).toHaveLength(1);
     expect(plan.nextAction.reason).toContain("Publish 1 people-first");
+  });
+
+  it("excludes production-only sitemap slugs from the daily publisher queue", () => {
+    const plan = planSeoAutopilotRun({
+      snapshot: {
+        status: "ok",
+        sitemapUrlCount: 31,
+        knowledgeArticleCount: 1,
+        knowledgeArticleSlugs: ["sao-tu-vi"],
+        warnings: [],
+      },
+      existingSlugs: ["la-so-tu-vi-la-gi", "sao-chinh-tinh-tu-vi"],
+      articlesPerWeek: 1,
+    });
+
+    expect(plan.summary).toContain("Production knowledge articles: 1");
+    expect(plan.nextAction.type).toBe("single_article_publish");
+    expect(plan.nextAction.slug).toBe("sao-thien-co");
+    expect(plan.nextAction.slugs).toEqual(["sao-thien-co"]);
+  });
+
+  it("excludes SEMrush variants that overlap production-only live intent", () => {
+    const rows = parseSemrushKeywordCsv(
+      [
+        "keyword,intent,volume,kd_percent,cpc_usd",
+        "xem la so tu vi,I,6600,54,0.01",
+        "cach xem la so tu vi,I,2900,51,0.01",
+        "xem la so tu vi mien phi,I,1300,50,0.01",
+      ].join("\n"),
+    );
+
+    const plan = planSeoAutopilotRun({
+      snapshot: {
+        status: "ok",
+        sitemapUrlCount: 33,
+        knowledgeArticleCount: 2,
+        knowledgeArticleSlugs: ["la-so-tu-vi-online", "la-so-tu-vi-mien-phi"],
+        warnings: [],
+      },
+      existingSlugs: ["la-so-tu-vi-la-gi", "tao-la-so-tu-vi", "phan-tich-la-so-tu-vi"],
+      keywordRows: rows,
+      articlesPerWeek: 1,
+    });
+
+    expect(plan.nextAction.slug).not.toBe("xem-la-so-tu-vi-online");
+    expect(plan.nextAction.slug).not.toBe("xem-la-so-tu-vi-mien-phi");
+    expect(plan.nextAction.slugs).toEqual([plan.nextAction.slug]);
   });
 
   it("researches a new CSV-backed topic when the mapped daily publisher topics are exhausted", () => {

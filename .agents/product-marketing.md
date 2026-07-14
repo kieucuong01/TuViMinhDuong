@@ -92,6 +92,7 @@ Last updated: 2026-07-01
 **Keyword selection:**
 
 - Start from `D:\DU AN CA NHAN WEBSITE\tsh\semrush_la_so_keywords.csv`, the latest Sunday handoff, the live sitemap, and the production content inventory.
+- Because another AI agent may publish SEO articles directly from the VPS, treat the live `/sitemap.xml` `/kien-thuc-tu-vi/*` inventory as an authoritative exclusion source. If a slug or equivalent reader intent is live but missing locally, reject it and continue to the next distinct topic instead of recreating the page in Codex.
 - Group keyword variants by reader intent. Publish one complete page for the intent instead of separate doorway pages for synonyms such as `lập`, `lấy`, `tạo`, `tra`, `vẽ`, or `kẻ lá số`.
 - Rotate the funnel across informational discovery, interpretation support, and conversion-support topics. Prefer topics that naturally lead to free chart creation at `/#lap-la-so`.
 - Exclude stale year pages, competitor-navigation queries, mass birth-year variants, and topics that cannot support article-specific analysis or useful data blocks.

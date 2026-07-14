@@ -15,12 +15,12 @@ import { shouldSkipSearchConsole } from "./search-console-policy.mjs";
 
 const args = parseArgs(process.argv.slice(2));
 const baseUrl = normalizeBaseUrl(args.baseUrl || "https://lasotinhhoa.vn");
-const sampleSize = Number.parseInt(args.sampleSize || "8", 10);
 const publisherSelection = normalizePublisherSelection({
   articles: args.articles || args.articlesPerWeek || (args.cluster ? "5" : "7"),
   clusterMode: args.cluster,
 });
 const articlesPerWeek = publisherSelection.articles;
+const sampleSize = Number.parseInt(args.sampleSize || (articlesPerWeek === 1 ? "3" : "8"), 10);
 const dryRun = Boolean(args.dryRun);
 const skipSearchConsole = shouldSkipSearchConsole({ explicitSkip: args.skipSearchConsole });
 
@@ -28,6 +28,7 @@ try {
   const generatedAt = new Date().toISOString();
   const snapshot = await buildSnapshot({ baseUrl, sampleSize });
   const existingSlugs = await readExistingSlugs();
+  const contentInventory = buildContentInventory({ existingSlugs, snapshot });
   const previousState = await readPreviousState();
   const keywordSource = readSemrushKeywordRows({ csvPath: args.keywordCsv });
   const searchConsole = skipSearchConsole
@@ -55,10 +56,7 @@ try {
     generatedAt,
     baseUrl,
     snapshot,
-    contentInventory: {
-      seedArticleCount: existingSlugs.length,
-      existingSlugs,
-    },
+    contentInventory,
     keywordSource: {
       sourcePath: keywordSource.sourcePath,
       rowCount: keywordSource.rows.length,
@@ -85,6 +83,8 @@ try {
         {
           lastRunAt: generatedAt,
           lastStatus: plan.status,
+          lastPublishedSlug: previousState?.lastPublishedSlug,
+          lastPublishedAt: previousState?.lastPublishedAt,
           lastAction: plan.nextAction,
           lastKeywordSource: {
             sourcePath: keywordSource.sourcePath,
@@ -180,6 +180,8 @@ function summarizeExecutionOutput(result) {
     status: plan.status,
     warnings: result.snapshot?.warnings || [],
     seedArticleCount: result.contentInventory?.seedArticleCount,
+    productionArticleCount: result.contentInventory?.productionArticleCount,
+    combinedArticleCount: result.contentInventory?.combinedArticleCount,
     keywordSource: result.keywordSource,
     searchConsoleStatus: result.searchConsole?.status || (result.searchConsole ? "unknown" : "skipped"),
     nextAction: plan.nextAction,
@@ -200,6 +202,19 @@ function summarizeExecutionOutput(result) {
     },
     artifacts: result.artifacts,
     verificationCommands: plan.verificationCommands,
+  };
+}
+
+function buildContentInventory({ existingSlugs, snapshot }) {
+  const productionSlugs = snapshot?.knowledgeArticleSlugs || [];
+  const combinedSlugs = [...new Set([...existingSlugs, ...productionSlugs])];
+  return {
+    seedArticleCount: existingSlugs.length,
+    existingSlugs,
+    productionArticleCount: productionSlugs.length,
+    productionSlugs,
+    combinedArticleCount: combinedSlugs.length,
+    combinedSlugs,
   };
 }
 

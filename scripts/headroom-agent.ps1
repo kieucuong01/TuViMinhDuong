@@ -1,7 +1,7 @@
 ﻿[CmdletBinding()]
 param(
   [Parameter(Position = 0)]
-  [ValidateSet("doctor", "mcp", "claude", "stats", "smoke")]
+  [ValidateSet("doctor", "mcp", "claude", "codex", "stats", "smoke", "start")]
   [string]$Action = "doctor",
 
   [Parameter(ValueFromRemainingArguments = $true)]
@@ -12,7 +12,9 @@ $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
 
 $repoRoot = Split-Path -Parent $PSScriptRoot
-$proxyUrl = "http://127.0.0.1:8787"
+$defaultProxyPort = 8787
+$proxyPort = if ($env:HEADROOM_PROXY_PORT) { [int]$env:HEADROOM_PROXY_PORT } else { $defaultProxyPort }
+$proxyUrl = "http://127.0.0.1:$proxyPort"
 
 $env:HEADROOM_TELEMETRY = "off"
 $env:HEADROOM_MEMORY_DB_PATH = Join-Path $env:USERPROFILE ".headroom\memory.db"
@@ -95,7 +97,7 @@ function Ensure-HeadroomProxy {
   $arguments = @(
     "proxy",
     "--host", "127.0.0.1",
-    "--port", "8787",
+    "--port", "$proxyPort",
     "--no-telemetry",
     "--memory",
     "--memory-storage", "project"
@@ -110,13 +112,13 @@ function Ensure-HeadroomProxy {
     }
 
     if ($proxyProcess.HasExited) {
-      throw "Headroom proxy dừng trước khi sẵn sàng trên $proxyUrl. Exit code: $($proxyProcess.ExitCode). Chạy thủ công '$HeadroomPath proxy --host 127.0.0.1 --port 8787 --no-telemetry --memory --memory-storage project' để xem log."
+      throw "Headroom proxy dừng trước khi sẵn sàng trên $proxyUrl. Exit code: $($proxyProcess.ExitCode). Chạy thủ công '$HeadroomPath proxy --host 127.0.0.1 --port $proxyPort --no-telemetry --memory --memory-storage project' để xem log."
     }
 
     Start-Sleep -Milliseconds 500
   }
 
-  throw "Headroom proxy không khởi động trên $proxyUrl sau $timeoutSeconds giây. Chạy thủ công '$HeadroomPath proxy --host 127.0.0.1 --port 8787 --no-telemetry --memory --memory-storage project' để xem log."
+  throw "Headroom proxy không khởi động trên $proxyUrl sau $timeoutSeconds giây. Chạy thủ công '$HeadroomPath proxy --host 127.0.0.1 --port $proxyPort --no-telemetry --memory --memory-storage project' để xem log."
 }
 
 function Get-HeadroomStats {
@@ -158,12 +160,27 @@ switch ($Action) {
     exit $LASTEXITCODE
   }
 
+  "start" {
+    Ensure-HeadroomProxy -HeadroomPath $headroom
+    Invoke-RestMethod -Uri "$proxyUrl/readyz" -TimeoutSec 10 | ConvertTo-Json -Depth 8
+    break
+  }
+
   "claude" {
     if (-not (Get-Command claude -ErrorAction SilentlyContinue)) {
       throw "Claude Code CLI chưa được cài hoặc chưa có trong PATH. Cài Claude Code rồi chạy lại npm run agent:headroom:claude."
     }
     Set-Location $repoRoot
-    & $headroom wrap claude --memory --tool-search true @PassThrough
+    & $headroom wrap claude --port $proxyPort --memory --tool-search true @PassThrough
+    exit $LASTEXITCODE
+  }
+
+  "codex" {
+    if (-not (Get-Command codex -ErrorAction SilentlyContinue)) {
+      throw "Codex CLI chưa được cài hoặc chưa có trong PATH. Với Codex Desktop, dùng MCP Headroom cho output lớn; không thể route phiên Desktop hiện tại qua wrapper repo."
+    }
+    Set-Location $repoRoot
+    & $headroom wrap codex --port $proxyPort --memory @PassThrough
     exit $LASTEXITCODE
   }
 

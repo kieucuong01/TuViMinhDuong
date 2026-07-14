@@ -37,12 +37,7 @@ export function getHoChiMinhWeekday(now = new Date()) {
 
 export function pickTrafficArticle({ existingSlugs = [], preferredSlug, seoState } = {}) {
   const uniqueSlugs = [...new Set(existingSlugs.filter(Boolean))];
-  const stateSlug =
-    seoState?.lastPublishedSlug ||
-    seoState?.lastAction?.slug ||
-    seoState?.lastAction?.slugs?.[0] ||
-    seoState?.selectedSlug ||
-    seoState?.slug;
+  const stateSlug = seoState?.lastPublishedSlug;
   const candidates = [preferredSlug, stateSlug, ...PREFERRED_TRAFFIC_SLUGS, ...uniqueSlugs].filter(Boolean);
   const slug = candidates.find((candidate) => uniqueSlugs.includes(candidate)) || candidates[0] || "la-so-tu-vi-la-gi";
 
@@ -278,8 +273,12 @@ export function buildMarketingFrameworks({ hasProductMarketingContext = false } 
 }
 
 function buildTrackedUrl({ target, source, content }) {
-  const separator = target.includes("?") ? "&" : "?";
-  return `${target}${separator}utm_source=${source}&utm_medium=organic_short_video&utm_campaign=shorts_phase_1&utm_content=${content}`;
+  const url = new URL(target);
+  url.searchParams.set("utm_source", source);
+  url.searchParams.set("utm_medium", "organic_short_video");
+  url.searchParams.set("utm_campaign", "shorts_phase_1");
+  url.searchParams.set("utm_content", content);
+  return url.toString();
 }
 
 export function readExistingArticleSlugs(contentPath = CONTENT_PATH) {

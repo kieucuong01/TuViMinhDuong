@@ -121,7 +121,7 @@ Goal: grow qualified traffic with organic short-form video first: TikTok, YouTub
 Start by reading AGENTS.md, docs/agent/quickstart.md, .agents/product-marketing.md, docs/agent/seo-autopilot.md, and docs/agent/traffic-autopilot.md.
 
 Then:
-1. Read `docs/seo-autopilot/state.json` and the latest publisher report so the traffic task follows the real published or refreshed URL.
+1. Read `docs/seo-autopilot/state.json` and use only `lastPublishedSlug` as the publisher handoff. Ignore planning-only `lastAction` fields, and skip distribution when no confirmed live slug is available.
 2. Run `npm run traffic:autopilot`.
 3. Execute only the one primary task in the JSON plan if it is safe and useful.
 4. Do not rerun `npm run seo:autopilot:publisher` or `npm run seo:autopilot:cluster` because the dedicated SEO release already handles publishing. Only rerun the single publisher if that automation failed or was disabled; never infer cluster authorization from a traffic task.

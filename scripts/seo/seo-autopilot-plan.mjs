@@ -19,6 +19,7 @@ const skipSearchConsole = shouldSkipSearchConsole({ explicitSkip: args.skipSearc
 try {
   const snapshot = await buildSnapshot({ baseUrl, sampleSize });
   const existingSlugs = await readExistingSlugs();
+  const contentInventory = buildContentInventory({ existingSlugs, snapshot });
   const previousState = await readPreviousState();
   const keywordSource = readSemrushKeywordRows({ csvPath: args.keywordCsv });
   const searchConsole = skipSearchConsole
@@ -36,10 +37,7 @@ try {
     generatedAt: new Date().toISOString(),
     baseUrl,
     snapshot,
-    contentInventory: {
-      seedArticleCount: existingSlugs.length,
-      existingSlugs,
-    },
+    contentInventory,
     keywordSource: {
       sourcePath: keywordSource.sourcePath,
       rowCount: keywordSource.rows.length,
@@ -85,6 +83,8 @@ function formatMarkdown(result) {
     `- Mode: ${plan.mode}`,
     `- Sitemap URLs: ${snapshot.sitemapUrlCount}`,
     `- Seed articles: ${result.contentInventory.seedArticleCount}`,
+    `- Production articles: ${result.contentInventory.productionArticleCount}`,
+    `- Combined exclusion slugs: ${result.contentInventory.combinedArticleCount}`,
     "",
     "## Next Action",
     `- Type: ${plan.nextAction.type}`,
@@ -128,6 +128,19 @@ function formatMarkdown(result) {
     "## Verification",
     ...plan.verificationCommands.map((item) => `- ${item}`),
   ].join("\n");
+}
+
+function buildContentInventory({ existingSlugs, snapshot }) {
+  const productionSlugs = snapshot?.knowledgeArticleSlugs || [];
+  const combinedSlugs = [...new Set([...existingSlugs, ...productionSlugs])];
+  return {
+    seedArticleCount: existingSlugs.length,
+    existingSlugs,
+    productionArticleCount: productionSlugs.length,
+    productionSlugs,
+    combinedArticleCount: combinedSlugs.length,
+    combinedSlugs,
+  };
 }
 
 function normalizeBaseUrl(value) {
