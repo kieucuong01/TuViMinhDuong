@@ -174,7 +174,7 @@ Invoke-NativeCommand -Label "npm run lint" -FilePath $npm -Arguments @("run", "l
 Invoke-NativeCommand -Label "npm test" -FilePath $npm -Arguments @("test")
 Invoke-NativeCommand -Label "npm run build" -FilePath $npm -Arguments @("run", "build")
 
-$statusLines = Get-RepositoryStatus
+$statusLines = @(Get-RepositoryStatus)
 if ($statusLines.Count -gt 0) {
   Assert-ReleaseFilesAreSafe -StatusLines $statusLines
 
