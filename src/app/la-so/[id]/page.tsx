@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { ChartBoard, MobileChartReader } from "@/components/chart-board";
-import { getAnyCompletedReading, getCachedReading, getChart, getFeaturePrices, getFreeOverviewStatus, getOperationSettings, getReadingById } from "@/lib/data";
+import { getAnyCompletedReading, getCachedReading, getChart, getFeaturePrices, getFreeOverviewStatus, getOperationSettings, getReadingById, getUserBalance } from "@/lib/data";
 import { getCurrentUser } from "@/lib/auth";
 import { FeedbackActions } from "@/components/feedback-actions";
 import { PromptChips } from "@/components/prompt-chips";
@@ -12,7 +12,6 @@ import { FateTabs, type FateView } from "@/components/fate-tabs";
 import { DailyFateView, MajorFateView, MinorFateView, MonthlyFateView } from "@/components/fate-views";
 import { PalaceFateView } from "@/components/palace-fate-view";
 import { PremiumReadingCta } from "@/components/premium-reading-cta";
-import { PREMIUM_READING_TARGET_ID } from "@/components/premium-reading-target";
 import { DeferredChartActionPanel } from "@/components/deferred-chart-action-panel";
 import { ChartRetentionPanel } from "@/components/chart-retention-panel";
 import { PaywallPopup } from "@/components/paywall-popup";
@@ -40,12 +39,20 @@ const readingLabels = {
   NHAT_VAN: "Nhật vận",
 } as const;
 
+function checkoutNotice(checkout?: string, status?: string) {
+  if (status === "cancelled") return "Thanh toán đã được hủy. Lá số của bạn vẫn được giữ nguyên và bạn có thể thử lại khi sẵn sàng.";
+  if (checkout === "pending") return "PayOS chưa xác nhận giao dịch. Hệ thống chưa mở bản FULL và không trừ xu của bạn.";
+  if (checkout === "disabled") return "Thanh toán bản FULL hiện đang tạm dừng. Bạn có thể quay lại lá số và thử lại sau.";
+  if (checkout) return "Chưa thể mở thanh toán cho lá số này. Không có khoản xu nào bị trừ; bạn có thể tải lại trang rồi thử lại.";
+  return "";
+}
+
 export default async function ChartPage({
   params,
   searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ reading?: string; view?: string }>;
+  searchParams: Promise<{ reading?: string; view?: string; checkout?: string; status?: string }>;
 }) {
   const { id } = await params;
   const query = await searchParams;
@@ -82,13 +89,15 @@ export default async function ChartPage({
           history: assistantHistory,
         };
   const reportOutline = buildPersonalizedReportOutline(record.chart);
+  const paymentNotice = checkoutNotice(query.checkout, query.status);
+  const coinBalance = user ? await getUserBalance(user) : 0;
   const activeLabel = activeReading ? readingLabels[activeReading.type] : "Luận giải tổng quan";
   const freeOverviewStatus = activeReading || isScopedReadingView ? null : getFreeOverviewStatus(record.chart);
   const guestOverviewContent = !user && freeOverviewStatus?.status === "ready"
     ? buildFreeOverviewTeaser(freeOverviewStatus.content)
     : null;
-  const visibleFreeOverviewStatus = guestOverviewContent && freeOverviewStatus
-    ? { ...freeOverviewStatus, content: guestOverviewContent, wordCount: countWords(guestOverviewContent) }
+  const visibleFreeOverviewStatus = !user && freeOverviewStatus
+    ? { ...freeOverviewStatus, content: guestOverviewContent || "", wordCount: countWords(guestOverviewContent || "") }
     : freeOverviewStatus;
 
   return (
@@ -107,6 +116,7 @@ export default async function ChartPage({
         <div className="chart-titlebar">
           <h1>Tổng quan lá số của {record.chart.input.fullName}</h1>
         </div>
+        {paymentNotice ? <p className="chart-checkout-notice" role="status">{paymentNotice}</p> : null}
 
         <ChartRetentionPanel chartId={id} chart={record.chart} isSignedIn={Boolean(user)} />
 
@@ -158,7 +168,7 @@ export default async function ChartPage({
           )}
         </section>
 
-        {paidFeaturesVisible ? (
+        {user && paidFeaturesVisible ? (
           <>
             <PersonalizedReportOutline
               chartId={id}
@@ -167,11 +177,7 @@ export default async function ChartPage({
               priceCoins={featurePrices?.FULL.priceCoins ?? 199}
             />
             {featurePrices ? <ReadingTabs chartId={id} chart={record.chart} featurePrices={featurePrices} /> : null}
-            {featurePrices ? (
-              <div id={PREMIUM_READING_TARGET_ID} style={{ scrollMarginTop: "7rem" }}>
-                <PremiumReadingCta chartId={id} fullName={record.chart.input.fullName} hasAdvancedReading={hasAdvancedReading} fullPriceCoins={featurePrices.FULL.priceCoins} />
-              </div>
-            ) : null}
+            {featurePrices ? <PremiumReadingCta chartId={id} fullName={record.chart.input.fullName} hasAdvancedReading={hasAdvancedReading} fullPriceCoins={featurePrices.FULL.priceCoins} coinBalance={coinBalance} /> : null}
           </>
         ) : null}
         </>

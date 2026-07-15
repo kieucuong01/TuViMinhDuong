@@ -24,17 +24,13 @@ function countBy<T>(items: T[], getKey: (item: T) => string) {
   return counts;
 }
 
-function sentenceCount(text: string) {
-  return text
-    .trim()
-    .split(/(?<=[.!?])\s+/u)
-    .filter(Boolean).length;
+function wordCount(text: string) {
+  return text.trim().split(/\s+/u).filter(Boolean).length;
 }
-
 describe("interpretation rule knowledge base", () => {
   const rules = loadInterpretationRules();
 
-  it("ships the complete v1 seed files with the expected rule counts", () => {
+  it("ships the complete v2 seed files with the expected rule counts", () => {
     expect(readdirSync(ruleDir).filter((file) => file.endsWith(".json")).sort()).toEqual([
       "axes.json",
       "fate.json",
@@ -88,9 +84,17 @@ describe("interpretation rule knowledge base", () => {
   it("keeps every rule valid and aligned with the freemium copy standard", () => {
     const validation = validateInterpretationRules(rules);
     const fullTexts = new Set<string>();
+    const limits = {
+      summary: [45, 80],
+      strengthText: [25, 50],
+      cautionText: [25, 50],
+      lifeAdviceText: [30, 60],
+      teaserQuestion: [12, 35],
+      evidenceLabel: [15, 40],
+    } as const;
 
-    expect(validation.ok).toBe(true);
     expect(validation.errors).toEqual([]);
+    expect(validation.ok).toBe(true);
     expect(new Set(rules.map((rule) => rule.key)).size).toBe(rules.length);
 
     for (const rule of rules) {
@@ -98,21 +102,37 @@ describe("interpretation rule knowledge base", () => {
       expect(rule.status).toBe("active");
       expect(rule.priority).toBeGreaterThan(0);
       expect(rule.title.trim()).not.toBe("");
-      expect(sentenceCount(rule.summary)).toBe(2);
-      expect(rule.strengthText).toMatch(/Lợi thế|Điểm mạnh/i);
-      expect(rule.cautionText).toMatch(/Điểm mù|Cạm bẫy/i);
-      expect(rule.lifeAdviceText).not.toMatch(/Người đọc nên nhìn cả vị trí cung/i);
+      expect(rule.summary).toMatch(/^(Bạn thường|Bạn dễ|Có những lúc bạn)(?:\s|$)/u);
+      expect(rule.strengthText).toMatch(/^Khi(?:\s|$).+\bbạn\b/iu);
+      expect(rule.cautionText).toMatch(/^(Nếu kéo dài,|Khi quá|Bạn có thể dễ)(?:\s|$)/iu);
+      expect(rule.lifeAdviceText).toMatch(/\bbạn\b/iu);
       expect(rule.teaserQuestion.trim()).toMatch(/\?$/);
       expect(rule.evidenceLabel).not.toMatch(/^Căn cứ:/i);
-      expect(JSON.stringify(rule)).not.toMatch(/TODO|TBD|placeholder|thầy bói|số phận an bài|chết chắc|chắc chắn thất bại/i);
+      expect(JSON.stringify(rule)).not.toMatch(/TODO|TBD|placeholder|thầy bói|số phận an bài|chết chắc|chắc chắn thất bại|người đọc|người này|đương số|\bmình\b|bạn mạnh mẽ nhưng đôi lúc yếu lòng/iu);
       expect(JSON.stringify(rule)).not.toMatch(/\b(vì|và|hoặc|nhưng|là|rằng|khi|nếu|mà)\./i);
       expect(JSON.stringify(rule)).not.toMatch(/nhận việc hoặc\.|tưởng là an toàn nhưng lại\./i);
 
-      for (const field of ["summary", "strengthText", "cautionText", "lifeAdviceText", "teaserQuestion"] as const) {
+      for (const field of ["summary", "strengthText", "cautionText", "lifeAdviceText", "teaserQuestion", "evidenceLabel"] as const) {
+        const [minimum, maximum] = limits[field];
+        expect(wordCount(rule[field]), `${rule.key}:${field}`).toBeGreaterThanOrEqual(minimum);
+        expect(wordCount(rule[field]), `${rule.key}:${field}`).toBeLessThanOrEqual(maximum);
+        if (field !== "evidenceLabel") expect(rule[field], `${rule.key}:${field}`).toMatch(/\bbạn\b/iu);
         const signature = `${field}:${rule[field].trim()}`;
         expect(fullTexts.has(signature)).toBe(false);
         fullTexts.add(signature);
       }
     }
+  });
+  it("rejects generic, distant, duplicate, and near-duplicate copy", () => {
+    const base = rules[0];
+    const invalid = [
+      { ...base, key: "quality:a", summary: "Bạn mạnh mẽ nhưng đôi lúc yếu lòng." },
+      { ...base, key: "quality:b", summary: "Bạn mạnh mẽ, nhưng đôi lúc cũng yếu lòng." },
+    ];
+
+    const validation = validateInterpretationRules(invalid);
+
+    expect(validation.ok).toBe(false);
+    expect(validation.errors.join("\n")).toMatch(/summary|generic|duplicate|near-duplicate/i);
   });
 });

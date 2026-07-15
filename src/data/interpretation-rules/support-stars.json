@@ -1,61 +1,1346 @@
 [
-  {"version":"interpretation-rules-v1","status":"active","key":"group:cat-tinh:menh","scope":"IDENTITY","pattern":{"kind":"support-group","group":"cát tinh","palace":"Mệnh","stars":["Tả Phù","Hữu Bật","Văn Xương","Văn Khúc","Khôi","Việt","Long Trì","Phượng"]},"priority":57,"title":"Cát tinh tại Mệnh","summary":"Cát tinh tại Mệnh giống một bộ dụng cụ tốt được đặt ngay trong balo cá nhân: bạn không cần khoe, nhưng khi cần thì có thứ để dùng. Trong đời sống, nhóm này cho thấy bạn dễ có người nâng, ý tưởng sáng hoặc khả năng học nhanh nếu biết chủ động mở lời.","strengthText":"Lợi thế là khả năng tạo thiện cảm và nhận hỗ trợ đúng lúc, rất hữu ích khi xin cơ hội, phỏng vấn, bán dịch vụ hoặc xây uy tín cá nhân.","cautionText":"Điểm mù là chờ người khác nhìn thấy giá trị của mình trước, trong khi cơ hội thường đến với người biết trình bày rõ điều mình cần.","lifeAdviceText":"Hãy chuẩn bị một câu giới thiệu ngắn về năng lực, nhu cầu và mục tiêu hiện tại; khi quý nhân xuất hiện, bạn phải đủ rõ để họ biết có thể giúp bạn ở đâu.","teaserQuestion":"Ai đang có thể mở cửa cho bạn, nhưng bạn chưa nói đủ rõ mình đang cần cánh cửa nào?","evidenceLabel":"Dấu hiệu này đến từ nhóm sao nâng đỡ đang nằm gần vùng khí chất và cách bạn tự thể hiện."},
-  {"version":"interpretation-rules-v1","status":"active","key":"group:cat-tinh:than","scope":"AXIS","pattern":{"kind":"support-group","group":"cát tinh","palace":"Thân","stars":["Tả Phù","Hữu Bật","Văn Xương","Văn Khúc","Khôi","Việt","Long Trì","Phượng"]},"priority":56,"title":"Cát tinh tại Thân","summary":"Cát tinh tại Thân giống đội hậu cần xuất hiện đúng lúc bạn bước ra sân thi đấu thật. Trong đời sống, bạn thường được mở đường qua người hướng dẫn, đồng đội tốt hoặc một môi trường biết công nhận nỗ lực thực tế.","strengthText":"Lợi thế là biến quan hệ hỗ trợ thành hiệu suất làm việc, đặc biệt khi bạn biết xin phản hồi, nhận mentoring hoặc tham gia nhóm có tiêu chuẩn cao.","cautionText":"Cạm bẫy là được giúp nhiều nên ngại tự quyết, hoặc để nhịp hành động phụ thuộc quá mạnh vào sự xác nhận bên ngoài.","lifeAdviceText":"Hãy dùng hỗ trợ như bàn đạp chứ không như nạng chống; sau mỗi lần được giúp, xác định một việc bạn phải tự làm để tăng năng lực thật.","teaserQuestion":"Sự hỗ trợ nào đang giúp bạn lớn lên, và sự hỗ trợ nào đang khiến bạn chậm tự chủ?","evidenceLabel":"Dấu hiệu này đến từ nhóm sao nâng đỡ chạm vào phần hành động và trải nghiệm ngoài đời."},
-  {"version":"interpretation-rules-v1","status":"active","key":"group:cat-tinh:quan-loc","scope":"CAREER","pattern":{"kind":"support-group","group":"cát tinh","palace":"Quan Lộc","stars":["Tả Phù","Hữu Bật","Văn Xương","Văn Khúc","Khôi","Việt","Long Trì","Phượng"]},"priority":58,"title":"Cát tinh tại Quan Lộc","summary":"Cát tinh tại Quan Lộc giống ánh đèn đặt đúng bàn làm việc: năng lực dễ được nhìn thấy hơn khi bạn làm đúng vai. Trong đời sống, đây là dấu hiệu thuận cho học nghề, được giới thiệu, có mentor hoặc gặp môi trường công nhận chất lượng.","strengthText":"Lợi thế là dùng kiến thức và uy tín để tăng vị trí nghề nghiệp, từ đó thương lượng tốt hơn về lương, phí hoặc quyền quyết.","cautionText":"Điểm mù là dựa vào tiếng tốt mà chậm nâng tiêu chuẩn giao hàng, khiến cơ hội tới nhưng năng lực vận hành chưa theo kịp.","lifeAdviceText":"Hãy biến mỗi sự hỗ trợ trong nghề thành một tài sản cụ thể: case study, chứng chỉ, quy trình, portfolio hoặc mối quan hệ có thể tái sử dụng.","teaserQuestion":"Cơ hội nghề nào đang cần bạn đóng gói năng lực rõ hơn để người khác dám đặt niềm tin lớn hơn?","evidenceLabel":"Dấu hiệu này đến từ nhóm sao nâng đỡ nằm tại vùng nghề nghiệp và vị trí xã hội."},
-  {"version":"interpretation-rules-v1","status":"active","key":"group:cat-tinh:tai-bach","scope":"MONEY","pattern":{"kind":"support-group","group":"cát tinh","palace":"Tài Bạch","stars":["Tả Phù","Hữu Bật","Văn Xương","Văn Khúc","Khôi","Việt","Long Trì","Phượng"]},"priority":58,"title":"Cát tinh tại Tài Bạch","summary":"Cát tinh tại Tài Bạch giống một dòng vốn mềm: không ồn ào, nhưng biết chảy về nơi có uy tín và giá trị rõ. Trong đời sống, tiền bạc dễ đến qua năng lực được công nhận, lời giới thiệu, tri thức hoặc các mối quan hệ đáng tin.","strengthText":"Lợi thế là kiếm tiền bằng sự tín nhiệm, tư vấn, chuyên môn hoặc dịch vụ cần chất lượng ổn định hơn là chạy theo may rủi.","cautionText":"Cạm bẫy là ngại nói giá, ngại đặt điều kiện, rồi để sự tử tế biến thành làm thêm không được trả xứng đáng.","lifeAdviceText":"Hãy chuẩn hóa bảng giá, phạm vi việc và điều kiện hỗ trợ; người quý bạn càng cần một khung rõ để việc tốt không thành hao hụt.","teaserQuestion":"Bạn đang nhận được thiện cảm, nhưng đã biết chuyển thiện cảm đó thành nguồn thu xứng đáng chưa?","evidenceLabel":"Dấu hiệu này đến từ nhóm sao nâng đỡ đi vào vùng tiền bạc và nguồn lực."},
-  {"version":"interpretation-rules-v1","status":"active","key":"group:cat-tinh:phu-the","scope":"RELATIONSHIP","pattern":{"kind":"support-group","group":"cát tinh","palace":"Phu Thê","stars":["Tả Phù","Hữu Bật","Văn Xương","Văn Khúc","Khôi","Việt","Long Trì","Phượng"]},"priority":55,"title":"Cát tinh tại Phu Thê","summary":"Cát tinh tại Phu Thê giống một chiếc bàn có người biết ngồi xuống nói chuyện tử tế. Trong đời sống, quan hệ thân mật dễ được nâng đỡ bởi sự tôn trọng, lời khuyên tốt hoặc khả năng cùng nhau tìm cách thay vì thắng thua.","strengthText":"Lợi thế là xây quan hệ dựa trên đối thoại, rất có ích khi bàn chuyện tiền chung, trách nhiệm gia đình hoặc kế hoạch dài hạn.","cautionText":"Điểm mù là vì muốn giữ hòa khí nên né những chủ đề thực tế, khiến sự dễ chịu ban đầu che đi vấn đề cần thỏa thuận.","lifeAdviceText":"Hãy đặt lịch nói chuyện định kỳ về ba việc: thời gian, tiền bạc và trách nhiệm; tình cảm càng tốt càng cần cơ chế rõ để đi xa.","teaserQuestion":"Mối quan hệ nào đang có nền đẹp, nhưng cần một cuộc nói chuyện rõ để thật sự bền?","evidenceLabel":"Dấu hiệu này đến từ nhóm sao nâng đỡ nằm ở vùng cam kết và quan hệ thân thiết."},
-  {"version":"interpretation-rules-v1","status":"active","key":"group:cat-tinh:tat-ach","scope":"HEALTH","pattern":{"kind":"support-group","group":"cát tinh","palace":"Tật Ách","stars":["Tả Phù","Hữu Bật","Văn Xương","Văn Khúc","Khôi","Việt","Long Trì","Phượng"]},"priority":54,"title":"Cát tinh tại Tật Ách","summary":"Cát tinh tại Tật Ách giống một phòng hồi sức có ánh sáng dịu: áp lực vẫn có, nhưng bạn không nhất thiết phải tự chịu một mình. Trong đời sống, đây là dấu hiệu bạn hồi phục tốt hơn khi có tri thức đúng, người lắng nghe hoặc phương pháp chăm sóc phù hợp.","strengthText":"Lợi thế là biết học cách quản trị stress, biến hiểu biết về thân tâm thành hiệu suất bền hơn trong công việc.","cautionText":"Cạm bẫy là dùng lý trí để giải thích cảm xúc quá lâu, thay vì thừa nhận mình cần nghỉ, cần hỗ trợ hoặc cần đổi nhịp.","lifeAdviceText":"Hãy xây một bộ công cụ hồi phục gồm giấc ngủ, vận động nhẹ, người có thể nói thật và lịch nghỉ cố định; đừng đợi quá tải mới dùng.","teaserQuestion":"Ai hoặc phương pháp nào có thể giúp bạn hồi phục nhanh hơn, nhưng bạn vẫn đang cố tự xoay một mình?","evidenceLabel":"Dấu hiệu này đến từ nhóm sao nâng đỡ chạm vào vùng thân tâm và khả năng phục hồi."},
-  {"version":"interpretation-rules-v1","status":"active","key":"group:cat-tinh:thien-di","scope":"CAREER","pattern":{"kind":"support-group","group":"cát tinh","palace":"Thiên Di","stars":["Tả Phù","Hữu Bật","Văn Xương","Văn Khúc","Khôi","Việt","Long Trì","Phượng"]},"priority":55,"title":"Cát tinh tại Thiên Di","summary":"Cát tinh tại Thiên Di giống một tấm danh thiếp được trao đúng phòng họp. Trong đời sống, bước ra ngoài thường có cơ hội gặp người tốt, môi trường tốt hoặc lời mời giúp bạn mở rộng tầm nhìn.","strengthText":"Lợi thế là phát triển qua networking, học hỏi bên ngoài, hợp tác khách hàng hoặc chuyển môi trường để tăng giá trị nghề nghiệp.","cautionText":"Điểm mù là quá tin vào thiện chí ban đầu mà chưa kiểm tra điều kiện, quyền lợi và trách nhiệm thực tế.","lifeAdviceText":"Mỗi lời mời bên ngoài nên có checklist: ai chịu trách nhiệm, kết quả đo bằng gì, lợi ích chia thế nào và bạn được quyền dừng ở đâu.","teaserQuestion":"Cơ hội bên ngoài nào đang thật sự có quý nhân, và cơ hội nào chỉ mới có lời nói đẹp?","evidenceLabel":"Dấu hiệu này đến từ nhóm sao nâng đỡ xuất hiện ở vùng môi trường xã hội và cơ hội bên ngoài."},
-  {"version":"interpretation-rules-v1","status":"active","key":"group:cat-tinh:phuc-duc","scope":"RELATIONSHIP","pattern":{"kind":"support-group","group":"cát tinh","palace":"Phúc Đức","stars":["Tả Phù","Hữu Bật","Văn Xương","Văn Khúc","Khôi","Việt","Long Trì","Phượng"]},"priority":54,"title":"Cát tinh tại Phúc Đức","summary":"Cát tinh tại Phúc Đức giống một căn phòng có nền gỗ chắc: bước vào đã thấy bớt lạnh. Trong đời sống, bạn có thể nhận được sức nâng từ gia đình, nếp sống tử tế, niềm tin tốt hoặc người đi trước để lại kinh nghiệm hữu ích.","strengthText":"Lợi thế là dùng nền giá trị và uy tín gia đình để xây niềm tin, quan hệ làm ăn hoặc sự ổn định tinh thần dài hạn.","cautionText":"Cạm bẫy là dựa vào nền tốt mà ngại tự xây hệ thống riêng, hoặc tiếp tục giữ những kỳ vọng không còn hợp với mình.","lifeAdviceText":"Hãy chọn một giá trị tốt từ gia đình để kế thừa thành hành động cụ thể, đồng thời đặt ranh giới với những kỳ vọng làm bạn hao sức.","teaserQuestion":"Điều gì trong nền gia đình đang nâng bạn lên, và điều gì cần được đặt lại để bạn sống nhẹ hơn?","evidenceLabel":"Dấu hiệu này đến từ nhóm sao nâng đỡ nằm ở vùng nền tinh thần và nếp nhà."}
-,
-  {"version":"interpretation-rules-v1","status":"active","key":"group:sat-tinh:menh","scope":"IDENTITY","pattern":{"kind":"support-group","group":"sát tinh","palace":"Mệnh","stars":["Kình","Đà","Hỏa","Linh","Không","Kiếp"]},"priority":66,"title":"Sát tinh tại Mệnh","summary":"Sát tinh tại Mệnh giống một động cơ mạnh đặt trong thân xe nhỏ: lực rất lớn, nhưng cần hệ thống phanh tốt. Trong đời sống, bạn dễ phản ứng nhanh, chịu va chạm tốt và có bản năng chiến đấu khi bị dồn vào góc.","strengthText":"Lợi thế là khả năng xử lý khủng hoảng, cạnh tranh và ra quyết định trong môi trường áp lực cao, nơi người mềm quá dễ bị cuốn đi.","cautionText":"Điểm mù là đồng nhất sự căng thẳng với sức mạnh, rồi quen sống trong chế độ phòng thủ ngay cả khi không còn nguy hiểm.","lifeAdviceText":"Hãy đặt quy tắc dừng trước khi phản ứng: khi bị kích hoạt, ghi ra dữ kiện, mục tiêu và cái giá của từng lựa chọn trước khi nói hoặc ký quyết định.","teaserQuestion":"Lực chiến đấu trong bạn đang bảo vệ tương lai, hay đang làm bạn mất những cơ hội cần sự mềm hơn?","evidenceLabel":"Dấu hiệu này đến từ nhóm sao va chạm nằm gần vùng khí chất và phản ứng bản năng."},
-  {"version":"interpretation-rules-v1","status":"active","key":"group:sat-tinh:than","scope":"AXIS","pattern":{"kind":"support-group","group":"sát tinh","palace":"Thân","stars":["Kình","Đà","Hỏa","Linh","Không","Kiếp"]},"priority":64,"title":"Sát tinh tại Thân","summary":"Sát tinh tại Thân giống đôi giày đã đi qua nhiều mặt đường xấu: không mới, nhưng rất lì. Trong đời sống, kinh nghiệm thực tế thường đến với bạn qua va chạm, đổi hướng và những việc buộc phải tự đứng ra xử lý.","strengthText":"Lợi thế là sức chịu tải cao trong việc thật, đặc biệt khi làm vận hành, bán hàng, quản lý rủi ro hoặc xử lý tình huống khó.","cautionText":"Cạm bẫy là quen tự gánh nên không biết khi nào cần chia việc, khiến năng lực bền bỉ biến thành kiệt sức kéo dài.","lifeAdviceText":"Hãy tạo ngưỡng nhận việc rõ ràng: việc nào thuộc trách nhiệm của bạn, việc nào cần người khác cùng chịu, việc nào phải từ chối dù bạn làm được.","teaserQuestion":"Bạn đang mạnh lên nhờ va chạm, hay đang để va chạm biến thành thói quen tự gánh mọi thứ?","evidenceLabel":"Dấu hiệu này đến từ nhóm sao va chạm tác động vào phần hành động và đời sống thực tế."},
-  {"version":"interpretation-rules-v1","status":"active","key":"group:sat-tinh:quan-loc","scope":"CAREER","pattern":{"kind":"support-group","group":"sát tinh","palace":"Quan Lộc","stars":["Kình","Đà","Hỏa","Linh","Không","Kiếp"]},"priority":66,"title":"Sát tinh tại Quan Lộc","summary":"Sát tinh tại Quan Lộc giống một thị trường cạnh tranh cao: ai không có bản lĩnh sẽ bị ép giá hoặc ép vai. Trong đời sống, đường nghề dễ có áp lực, deadline, xung đột quyền hạn hoặc những bước ngoặt buộc bạn nâng tiêu chuẩn làm việc.","strengthText":"Lợi thế là hợp với môi trường cần quyết đoán, cải tổ, xử lý vấn đề và chịu trách nhiệm khi hệ thống đang rối.","cautionText":"Điểm mù là lấy căng thẳng làm thước đo giá trị nghề nghiệp, rồi chỉ thấy mình có ích khi mọi thứ đang cháy.","lifeAdviceText":"Hãy chuyển năng lượng chiến đấu thành quy trình: định nghĩa vấn đề, người chịu trách nhiệm, thời hạn và tiêu chí xong việc trước khi lao vào cứu hỏa.","teaserQuestion":"Công việc đang cần bản lĩnh của bạn, hay đang nghiện việc đặt bạn vào trạng thái phải cứu nguy?","evidenceLabel":"Dấu hiệu này đến từ nhóm sao va chạm xuất hiện ở vùng nghề nghiệp và trách nhiệm xã hội."},
-  {"version":"interpretation-rules-v1","status":"active","key":"group:sat-tinh:tai-bach","scope":"MONEY","pattern":{"kind":"support-group","group":"sát tinh","palace":"Tài Bạch","stars":["Kình","Đà","Hỏa","Linh","Không","Kiếp"]},"priority":65,"title":"Sát tinh tại Tài Bạch","summary":"Sát tinh tại Tài Bạch giống một chiếc két đặt trong vùng nhiều va đập: muốn giữ được phải có khóa tốt và quy tắc rõ. Trong đời sống, tiền bạc dễ đi kèm rủi ro, áp lực chi trả, quyết định nhanh hoặc những khoản hao vì thiếu kiểm soát.","strengthText":"Lợi thế là nhạy với rủi ro tài chính và có thể kiếm tốt trong lĩnh vực cần xử lý vấn đề, đàm phán căng hoặc quản trị khủng hoảng.","cautionText":"Cạm bẫy là quyết tiền trong lúc bực, sợ hoặc muốn chứng minh bản lĩnh, khiến một quyết định nóng kéo theo hậu quả dài.","lifeAdviceText":"Hãy đặt luật 24 giờ cho khoản chi hoặc cam kết lớn; mọi quyết định tài chính dưới áp lực phải được kiểm lại bằng số liệu và phương án thoát.","teaserQuestion":"Khoản tiền nào đang thử bản lĩnh của bạn, và khoản nào đang kích hoạt nỗi sợ khiến bạn quyết quá nhanh?","evidenceLabel":"Dấu hiệu này đến từ nhóm sao va chạm nằm ở vùng tiền bạc và nguồn lực cá nhân."},
-  {"version":"interpretation-rules-v1","status":"active","key":"group:sat-tinh:phu-the","scope":"RELATIONSHIP","pattern":{"kind":"support-group","group":"sát tinh","palace":"Phu Thê","stars":["Kình","Đà","Hỏa","Linh","Không","Kiếp"]},"priority":63,"title":"Sát tinh tại Phu Thê","summary":"Sát tinh tại Phu Thê giống hai người cầm dao sắc trong cùng một căn bếp: dùng đúng thì nấu rất nhanh, dùng sai thì dễ làm nhau đau. Trong đời sống, quan hệ thân mật có thể nhiều lực hút nhưng cũng dễ phát sinh va chạm về quyền quyết, tự do và trách nhiệm.","strengthText":"Lợi thế là quan hệ có khả năng cùng vượt khó, cùng xử lý áp lực và xây bản lĩnh nếu hai bên biết nói thẳng mà không công kích.","cautionText":"Điểm mù là nhầm sự dữ dội với chiều sâu, rồi để mâu thuẫn trở thành cách duy nhất chứng minh tình cảm.","lifeAdviceText":"Hãy thống nhất quy tắc tranh luận: không quyết tiền khi đang giận, không lôi quá khứ làm vũ khí và phải quay lại vấn đề chính trong 24 giờ.","teaserQuestion":"Va chạm trong quan hệ đang giúp hai người trưởng thành, hay đang lặp lại một vòng tổn thương quen thuộc?","evidenceLabel":"Dấu hiệu này đến từ nhóm sao va chạm xuất hiện ở vùng cam kết và quan hệ thân thiết."},
-  {"version":"interpretation-rules-v1","status":"active","key":"group:sat-tinh:tat-ach","scope":"HEALTH","pattern":{"kind":"support-group","group":"sát tinh","palace":"Tật Ách","stars":["Kình","Đà","Hỏa","Linh","Không","Kiếp"]},"priority":64,"title":"Sát tinh tại Tật Ách","summary":"Sát tinh tại Tật Ách giống còi báo động trong nhà máy: ồn ào, khó chịu, nhưng được sinh ra để ngăn tai nạn lớn. Trong đời sống, cơ thể và tinh thần dễ phản ứng mạnh khi bạn sống quá lâu trong áp lực, xung đột hoặc nhịp làm việc thiếu hồi phục.","strengthText":"Lợi thế là khả năng nhận biết điểm gãy của hệ thống nếu bạn chịu quan sát tín hiệu sớm, từ đó bảo vệ hiệu suất dài hạn.","cautionText":"Cạm bẫy là xem căng thẳng như bình thường vì đã quen chịu, đến khi cơ thể buộc dừng thì chi phí hồi phục cao hơn nhiều.","lifeAdviceText":"Hãy có danh sách tín hiệu đỏ riêng: mất ngủ, tim đập nhanh, cáu gắt, đau lặp lại; khi hai tín hiệu cùng xuất hiện, giảm tải ngay thay vì cố thêm.","teaserQuestion":"Cơ thể bạn đang phát còi báo động ở đâu mà lịch sống của bạn vẫn chưa chịu điều chỉnh?","evidenceLabel":"Dấu hiệu này đến từ nhóm sao va chạm tác động vào vùng thân tâm và khả năng chịu áp lực."},
-  {"version":"interpretation-rules-v1","status":"active","key":"group:sat-tinh:thien-di","scope":"CAREER","pattern":{"kind":"support-group","group":"sát tinh","palace":"Thiên Di","stars":["Kình","Đà","Hỏa","Linh","Không","Kiếp"]},"priority":63,"title":"Sát tinh tại Thiên Di","summary":"Sát tinh tại Thiên Di giống ra biển đúng mùa gió lớn: có thể đi xa, nhưng không thể đi bằng sự ngây thơ. Trong đời sống, môi trường bên ngoài dễ có cạnh tranh, lời mời khó đọc hoặc những người buộc bạn phải sắc sảo hơn.","strengthText":"Lợi thế là bản lĩnh thương lượng và khả năng tồn tại trong thị trường khó, đặc biệt khi cần mở rộng khách hàng hoặc bước vào môi trường mới.","cautionText":"Điểm mù là phòng thủ quá mức, khiến bạn nhìn cơ hội nào cũng như mối đe dọa và bỏ lỡ người thật sự đáng hợp tác.","lifeAdviceText":"Hãy kiểm tra môi trường mới bằng dữ kiện: luật chơi, người ra quyết định, chi phí ẩn và quyền rút lui; tin người nhưng phải có cấu trúc bảo vệ.","teaserQuestion":"Môi trường bên ngoài đang rèn bạn sắc hơn, hay đang kéo bạn vào cuộc chiến không cần thiết?","evidenceLabel":"Dấu hiệu này đến từ nhóm sao va chạm nằm ở vùng giao tiếp xã hội và cơ hội bên ngoài."},
-  {"version":"interpretation-rules-v1","status":"active","key":"group:sat-tinh:phuc-duc","scope":"RELATIONSHIP","pattern":{"kind":"support-group","group":"sát tinh","palace":"Phúc Đức","stars":["Kình","Đà","Hỏa","Linh","Không","Kiếp"]},"priority":62,"title":"Sát tinh tại Phúc Đức","summary":"Sát tinh tại Phúc Đức giống một vết nứt trong nền nhà cũ: không phải để sợ, mà để biết chỗ nào cần gia cố. Trong đời sống, nền tinh thần hoặc chuyện gia đình có thể mang theo áp lực, kỳ vọng hoặc ký ức khiến bạn phản ứng mạnh hơn mức cần thiết.","strengthText":"Lợi thế là khả năng chuyển hóa trải nghiệm khó thành sự tỉnh táo, giúp bạn quản trị quan hệ và tiền bạc ít bị kéo bởi quá khứ.","cautionText":"Cạm bẫy là tiếp tục chiến đấu với những chuyện đã qua bằng các quyết định hiện tại, khiến người mới phải trả giá cho vết cũ.","lifeAdviceText":"Hãy tách quá khứ khỏi hiện tại bằng một câu hỏi trước mỗi phản ứng mạnh: việc này thật sự đang xảy ra bây giờ, hay chỉ giống điều từng làm mình đau?","teaserQuestion":"Vết nứt nào trong nền tinh thần đang âm thầm điều khiển cách bạn yêu, làm việc hoặc dùng tiền?","evidenceLabel":"Dấu hiệu này đến từ nhóm sao va chạm nằm ở vùng nền tinh thần và nếp gia đình."}
-,
-  {"version":"interpretation-rules-v1","status":"active","key":"group:hao-tinh:menh","scope":"IDENTITY","pattern":{"kind":"support-group","group":"hao tinh","palace":"Mệnh","stars":["Đại Hao","Tiểu Hao","Hao"]},"priority":55,"title":"Hao tinh tại Mệnh","summary":"Hao tinh tại Mệnh giống một chiếc điện thoại mở quá nhiều ứng dụng nền: nhìn vẫn chạy, nhưng pin tụt rất nhanh. Trong đời sống, bạn dễ tiêu hao vì ôm nhiều vai, nghĩ nhiều hoặc dùng năng lượng cá nhân để giải quyết việc không thật sự thuộc về mình.","strengthText":"Lợi thế là rất nhạy với dòng chảy nguồn lực, biết việc nào đang hút sức và có thể tối ưu cách làm để giảm hao phí.","cautionText":"Điểm mù là tưởng mình phải luôn cho đi, luôn phản hồi, luôn có mặt thì mới có giá trị.","lifeAdviceText":"Hãy đặt ngân sách năng lượng hằng tuần như ngân sách tiền: mỗi cam kết mới phải có thứ được bỏ ra hoặc giao lại.","teaserQuestion":"Việc gì đang rút pin của bạn mỗi ngày nhưng bạn vẫn gọi đó là trách nhiệm?","evidenceLabel":"Dấu hiệu này đến từ nhóm sao hao tán chạm vào vùng bản thân và cách dùng sức cá nhân."},
-  {"version":"interpretation-rules-v1","status":"active","key":"group:hao-tinh:than","scope":"AXIS","pattern":{"kind":"support-group","group":"hao tinh","palace":"Thân","stars":["Đại Hao","Tiểu Hao","Hao"]},"priority":54,"title":"Hao tinh tại Thân","summary":"Hao tinh tại Thân giống đôi giày mòn đế vì đi quá nhiều đoạn đường không tên. Trong đời sống, sự hao hụt thường đến từ lịch chạy việc, di chuyển, trách nhiệm thực tế hoặc những việc nhỏ tích lại thành mệt lớn.","strengthText":"Lợi thế là khả năng nhận ra điểm rò trong vận hành hằng ngày, từ đó tiết kiệm thời gian và tăng hiệu suất làm việc.","cautionText":"Cạm bẫy là chỉ kiểm soát tiền mà không kiểm soát lịch, trong khi thứ mất nhiều nhất có thể là sức và sự tập trung.","lifeAdviceText":"Hãy kiểm toán một tuần bằng màu: việc tạo tiền, việc tạo kỹ năng, việc chỉ giữ thể diện; nhóm thứ ba cần cắt giảm trước.","teaserQuestion":"Bạn đang hao vì thiếu tiền, hay hao vì một lịch sống không còn phục vụ mục tiêu thật?","evidenceLabel":"Dấu hiệu này đến từ nhóm sao hao tán nằm ở vùng hành động và đời sống thực tế."},
-  {"version":"interpretation-rules-v1","status":"active","key":"group:hao-tinh:quan-loc","scope":"CAREER","pattern":{"kind":"support-group","group":"hao tinh","palace":"Quan Lộc","stars":["Đại Hao","Tiểu Hao","Hao"]},"priority":55,"title":"Hao tinh tại Quan Lộc","summary":"Hao tinh tại Quan Lộc giống một văn phòng có quá nhiều cửa mở, việc nào cũng vào được nhưng khó giữ được trọng tâm. Trong đời sống, công việc dễ làm bạn hao vì nhận nhiều, đổi hướng nhiều hoặc thiếu ranh giới về phạm vi trách nhiệm.","strengthText":"Lợi thế là nếu biết tinh gọn, bạn có thể biến trải nghiệm đa dạng thành kỹ năng quản trị quy trình và tối ưu chi phí.","cautionText":"Điểm mù là bận rộn để chứng minh năng lực, rồi cuối cùng không còn thời gian cho việc thật sự nâng vị thế.","lifeAdviceText":"Hãy viết mô tả phạm vi cho từng dự án: việc gì làm, việc gì không làm, chi phí phát sinh tính thế nào; không có phạm vi thì không nhận thêm.","teaserQuestion":"Công việc nào đang làm bạn trông có vẻ quan trọng nhưng thật ra đang rút dần vị thế của bạn?","evidenceLabel":"Dấu hiệu này đến từ nhóm sao hao tán xuất hiện ở vùng nghề nghiệp và trách nhiệm xã hội."},
-  {"version":"interpretation-rules-v1","status":"active","key":"group:hao-tinh:tai-bach","scope":"MONEY","pattern":{"kind":"support-group","group":"hao tinh","palace":"Tài Bạch","stars":["Đại Hao","Tiểu Hao","Hao"]},"priority":58,"title":"Hao tinh tại Tài Bạch","summary":"Hao tinh tại Tài Bạch giống một ví tiền có lỗ nhỏ: không mất ầm ầm, nhưng mất đều nếu không soi kỹ. Trong đời sống, nguồn lực dễ rò qua chi phí nhỏ, việc nhận thiếu giá, hỗ trợ quá tay hoặc quyết định tài chính thiếu hệ thống.","strengthText":"Lợi thế là khả năng nhìn thấy chỗ thất thoát và thiết kế lại ngân sách, bảng giá hoặc cách thu tiền để giảm hao phí.","cautionText":"Cạm bẫy là nghĩ chỉ cần kiếm thêm là ổn, trong khi vấn đề thật nằm ở cách giữ và phân bổ nguồn lực.","lifeAdviceText":"Hãy rà ba nhóm: khoản chi lặp lại, việc làm không tính phí và cam kết hỗ trợ người khác; mỗi nhóm cần một giới hạn bằng số.","teaserQuestion":"Tiền của bạn đang mất ở khoản lớn dễ thấy, hay ở những lỗ nhỏ bạn đã quen bỏ qua?","evidenceLabel":"Dấu hiệu này đến từ nhóm sao hao tán đi thẳng vào vùng tiền bạc và tài nguyên cá nhân."},
-  {"version":"interpretation-rules-v1","status":"active","key":"group:hao-tinh:phu-the","scope":"RELATIONSHIP","pattern":{"kind":"support-group","group":"hao tinh","palace":"Phu Thê","stars":["Đại Hao","Tiểu Hao","Hao"]},"priority":53,"title":"Hao tinh tại Phu Thê","summary":"Hao tinh tại Phu Thê giống hai người dùng chung một bình nước nhưng không ai đánh dấu mực còn lại. Trong đời sống, quan hệ dễ hao vì cho nhiều hơn nói, nhường nhiều hơn thỏa thuận hoặc chi tiêu cảm xúc để giữ hòa khí.","strengthText":"Lợi thế là nếu biết minh bạch, bạn có thể xây quan hệ rất thực tế: rõ tiền, rõ thời gian, rõ trách nhiệm và ít ấm ức ngầm.","cautionText":"Điểm mù là tưởng hy sinh im lặng sẽ làm quan hệ bền, trong khi nó thường tạo khoản nợ cảm xúc không ai ghi sổ.","lifeAdviceText":"Hãy nói trước về nguồn lực chung: ai trả gì, ai làm gì, lúc mệt thì báo ra sao; thỏa thuận rõ là cách bảo vệ tình cảm.","teaserQuestion":"Bạn đang yêu bằng sự tự nguyện, hay đang âm thầm trả một khoản phí cảm xúc quá cao?","evidenceLabel":"Dấu hiệu này đến từ nhóm sao hao tán nằm ở vùng cam kết và quan hệ thân thiết."},
-  {"version":"interpretation-rules-v1","status":"active","key":"group:hao-tinh:tat-ach","scope":"HEALTH","pattern":{"kind":"support-group","group":"hao tinh","palace":"Tật Ách","stars":["Đại Hao","Tiểu Hao","Hao"]},"priority":54,"title":"Hao tinh tại Tật Ách","summary":"Hao tinh tại Tật Ách giống một bể nước rò dưới sàn: không thấy ngay, nhưng độ ẩm lan dần khắp nhà. Trong đời sống, sức khỏe tinh thần dễ bị rút bởi lo nghĩ kéo dài, ngủ kém, việc nhỏ không dứt hoặc cảm giác phải luôn sẵn sàng.","strengthText":"Lợi thế là khả năng phát hiện kiểu hao ngầm và sửa bằng thói quen nhỏ, giúp bạn giữ năng lượng ổn định hơn cho công việc.","cautionText":"Cạm bẫy là chỉ nghỉ khi đã cạn sạch, khiến việc hồi phục mất nhiều thời gian hơn việc phòng ngừa.","lifeAdviceText":"Hãy đặt ba mức cảnh báo năng lượng xanh, vàng, đỏ; khi vào mức vàng đã phải giảm việc, không đợi đến đỏ mới dừng.","teaserQuestion":"Nguồn hao nào đang âm thầm làm bạn mệt dù bên ngoài mọi thứ vẫn có vẻ ổn?","evidenceLabel":"Dấu hiệu này đến từ nhóm sao hao tán chạm vào vùng thân tâm và nhịp hồi phục."},
-  {"version":"interpretation-rules-v1","status":"active","key":"group:hao-tinh:thien-di","scope":"CAREER","pattern":{"kind":"support-group","group":"hao tinh","palace":"Thiên Di","stars":["Đại Hao","Tiểu Hao","Hao"]},"priority":53,"title":"Hao tinh tại Thiên Di","summary":"Hao tinh tại Thiên Di giống một chuyến đi nhiều điểm dừng: nhìn phong phú, nhưng tốn nhiên liệu nếu không có lộ trình. Trong đời sống, cơ hội bên ngoài có thể kéo theo chi phí di chuyển, giao tiếp, thời gian hoặc những cam kết xã hội làm bạn phân tán.","strengthText":"Lợi thế là biết tính chi phí cơ hội trước khi bước ra thị trường, nhờ vậy chọn được mối quan hệ và môi trường đáng đầu tư hơn.","cautionText":"Điểm mù là sợ bỏ lỡ nên có mặt ở quá nhiều nơi, cuối cùng nơi nào cũng chưa đủ sâu để sinh giá trị.","lifeAdviceText":"Hãy chọn tối đa hai sân chơi bên ngoài trong một giai đoạn; mọi lời mời khác phải chứng minh được lợi ích rõ trước khi bạn tham gia.","teaserQuestion":"Bạn đang mở rộng đúng hướng, hay đang tiêu hao vì quá nhiều lời mời nghe có vẻ hay?","evidenceLabel":"Dấu hiệu này đến từ nhóm sao hao tán nằm ở vùng môi trường bên ngoài và cơ hội xã hội."},
-  {"version":"interpretation-rules-v1","status":"active","key":"group:hao-tinh:phuc-duc","scope":"RELATIONSHIP","pattern":{"kind":"support-group","group":"hao tinh","palace":"Phúc Đức","stars":["Đại Hao","Tiểu Hao","Hao"]},"priority":52,"title":"Hao tinh tại Phúc Đức","summary":"Hao tinh tại Phúc Đức giống một căn nhà ấm nhưng có nhiều ổ cắm đang cắm thiết bị cũ. Trong đời sống, năng lượng tinh thần có thể hao vì trách nhiệm gia đình, niềm tin cũ hoặc cảm giác phải bù đắp cho người khác.","strengthText":"Lợi thế là nếu nhận ra gốc hao, bạn có thể dọn lại nền sống và giảm những khoản chi cảm xúc lặp đi lặp lại.","cautionText":"Cạm bẫy là xem mọi gánh nặng gia đình như bổn phận tự nhiên, không phân biệt đâu là yêu thương và đâu là tự làm cạn mình.","lifeAdviceText":"Hãy đặt ranh giới hỗ trợ theo khả năng thật: giúp bao nhiêu, trong bao lâu, bằng tiền hay bằng cách khác; đừng để lòng tốt không có giới hạn.","teaserQuestion":"Điều gì trong nếp nhà đang khiến bạn tiêu hao dù không ai trực tiếp yêu cầu?","evidenceLabel":"Dấu hiệu này đến từ nhóm sao hao tán nằm ở vùng nền tinh thần và trách nhiệm gia đình."},
-  {"version":"interpretation-rules-v1","status":"active","key":"group:dao-hoa:menh","scope":"IDENTITY","pattern":{"kind":"support-group","group":"đào hoa","palace":"Mệnh","stars":["Đào Hoa","Hồng Loan","Thiên Hỷ","Hỷ Thần"]},"priority":55,"title":"Đào hoa tại Mệnh","summary":"Đào hoa tại Mệnh giống một mùi hương riêng: không cần nói nhiều vẫn khiến người khác chú ý. Trong đời sống, bạn có sức hút tự nhiên qua cảm xúc, thẩm mỹ, cách nói chuyện hoặc khả năng làm người khác thấy dễ gần.","strengthText":"Lợi thế là dùng sức hút cá nhân để mở quan hệ, bán ý tưởng, xây thương hiệu cá nhân hoặc tạo thiện cảm trong công việc.","cautionText":"Điểm mù là nhầm được chú ý với được hiểu, rồi để sự công nhận bên ngoài kéo mình lệch khỏi giá trị thật.","lifeAdviceText":"Hãy định nghĩa rõ bạn muốn được nhớ vì điều gì: vẻ ngoài, cảm xúc hay năng lực; sức hút chỉ bền khi được neo vào giá trị cụ thể.","teaserQuestion":"Bạn đang dùng sức hút để mở đúng cánh cửa, hay đang để ánh nhìn của người khác điều khiển lựa chọn của mình?","evidenceLabel":"Dấu hiệu này đến từ nhóm sao cảm xúc và sức hút nằm gần vùng khí chất cá nhân."},
-  {"version":"interpretation-rules-v1","status":"active","key":"group:dao-hoa:than","scope":"AXIS","pattern":{"kind":"support-group","group":"đào hoa","palace":"Thân","stars":["Đào Hoa","Hồng Loan","Thiên Hỷ","Hỷ Thần"]},"priority":54,"title":"Đào hoa tại Thân","summary":"Đào hoa tại Thân giống ánh đèn mềm đi theo bạn vào đời sống thật. Trong thực tế, sức hút của bạn không chỉ nằm ở ngoại hình mà còn ở cách hành động, cách hiện diện và cách làm người khác muốn hợp tác.","strengthText":"Lợi thế là dễ tạo mạng lưới qua trải nghiệm trực tiếp, phù hợp với công việc cần gặp người, chăm khách hàng, truyền thông hoặc cộng đồng.","cautionText":"Cạm bẫy là vì muốn được quý nên nhận thêm việc, thêm lời hẹn hoặc thêm trách nhiệm cảm xúc vượt sức.","lifeAdviceText":"Hãy phân biệt thân thiện và cam kết: bạn có thể tử tế với nhiều người, nhưng chỉ nên nhận trách nhiệm với những việc thật sự có giá trị.","teaserQuestion":"Sức hút ngoài đời của bạn đang tạo cơ hội, hay đang kéo thêm những cam kết bạn không muốn nói không?","evidenceLabel":"Dấu hiệu này đến từ nhóm sao cảm xúc và sức hút tác động vào phần hành động thực tế."},
-  {"version":"interpretation-rules-v1","status":"active","key":"group:dao-hoa:quan-loc","scope":"CAREER","pattern":{"kind":"support-group","group":"đào hoa","palace":"Quan Lộc","stars":["Đào Hoa","Hồng Loan","Thiên Hỷ","Hỷ Thần"]},"priority":55,"title":"Đào hoa tại Quan Lộc","summary":"Đào hoa tại Quan Lộc giống một thương hiệu nghề nghiệp có màu sắc riêng. Trong đời sống, sự nghiệp dễ hưởng lợi từ hình ảnh, giao tiếp, thẩm mỹ, quan hệ công chúng hoặc khả năng khiến người khác muốn lắng nghe.","strengthText":"Lợi thế là biến phong cách cá nhân thành tài sản nghề nghiệp, đặc biệt trong tư vấn, bán hàng, giáo dục, sáng tạo hoặc dịch vụ.","cautionText":"Điểm mù là chăm hình ảnh nhiều hơn năng lực lõi, khiến sự chú ý đến trước nhưng niềm tin không ở lại lâu.","lifeAdviceText":"Hãy gắn mỗi hoạt động xây hình ảnh với một bằng chứng năng lực: sản phẩm, kết quả, phản hồi khách hàng hoặc quy trình làm việc.","teaserQuestion":"Hình ảnh nghề nghiệp của bạn đang phản ánh năng lực thật, hay chỉ mới tạo được sự tò mò ban đầu?","evidenceLabel":"Dấu hiệu này đến từ nhóm sao cảm xúc và sức hút nằm ở vùng nghề nghiệp."},
-  {"version":"interpretation-rules-v1","status":"active","key":"group:dao-hoa:tai-bach","scope":"MONEY","pattern":{"kind":"support-group","group":"đào hoa","palace":"Tài Bạch","stars":["Đào Hoa","Hồng Loan","Thiên Hỷ","Hỷ Thần"]},"priority":54,"title":"Đào hoa tại Tài Bạch","summary":"Đào hoa tại Tài Bạch giống một cửa hàng có mặt tiền đẹp: người ta dễ bước vào, nhưng doanh thu còn tùy cách bạn vận hành. Trong đời sống, tiền bạc có thể đến qua thẩm mỹ, cảm xúc, quan hệ, dịch vụ hoặc khả năng tạo trải nghiệm dễ chịu.","strengthText":"Lợi thế là kiếm tiền từ sự tinh tế: hiểu nhu cầu người khác, đóng gói sản phẩm đẹp hơn hoặc làm dịch vụ có cảm xúc hơn.","cautionText":"Cạm bẫy là chi tiêu để được yêu thích, hoặc giảm giá quá dễ vì ngại làm người khác mất vui.","lifeAdviceText":"Hãy đặt khung giá và khung ưu đãi trước khi tương tác; cảm xúc có thể giúp bán hàng, nhưng giá trị phải được bảo vệ bằng nguyên tắc.","teaserQuestion":"Bạn đang dùng sự tinh tế để tạo nguồn thu, hay đang dùng tiền để mua cảm giác được quý mến?","evidenceLabel":"Dấu hiệu này đến từ nhóm sao cảm xúc và sức hút đi vào vùng tiền bạc."},
-  {"version":"interpretation-rules-v1","status":"active","key":"group:dao-hoa:phu-the","scope":"RELATIONSHIP","pattern":{"kind":"support-group","group":"đào hoa","palace":"Phu Thê","stars":["Đào Hoa","Hồng Loan","Thiên Hỷ","Hỷ Thần"]},"priority":56,"title":"Đào hoa tại Phu Thê","summary":"Đào hoa tại Phu Thê giống một khúc nhạc dễ làm hai người lại gần. Trong đời sống, quan hệ thân mật thường có sức hút, cảm xúc và nhu cầu được yêu thương rõ, nhưng cũng cần thực tế để đi xa.","strengthText":"Lợi thế là biết tạo kết nối cảm xúc, giữ sự mềm mại và làm quan hệ có màu sắc riêng thay vì khô cứng.","cautionText":"Điểm mù là mê cảm giác được chọn mà quên kiểm tra sự phù hợp về trách nhiệm, tiền bạc và nhịp sống.","lifeAdviceText":"Hãy để cảm xúc mở cửa nhưng dùng thỏa thuận để giữ nhà: nói rõ kỳ vọng, ranh giới và cách hai bên xử lý lúc không còn lãng mạn.","teaserQuestion":"Bạn đang bị thu hút bởi người phù hợp, hay bởi cảm giác họ khiến bạn thấy mình đặc biệt?","evidenceLabel":"Dấu hiệu này đến từ nhóm sao cảm xúc và sức hút nằm ở vùng cam kết thân mật."},
-  {"version":"interpretation-rules-v1","status":"active","key":"group:dao-hoa:tat-ach","scope":"HEALTH","pattern":{"kind":"support-group","group":"đào hoa","palace":"Tật Ách","stars":["Đào Hoa","Hồng Loan","Thiên Hỷ","Hỷ Thần"]},"priority":52,"title":"Đào hoa tại Tật Ách","summary":"Đào hoa tại Tật Ách giống một trái tim nhạy với nhiệt độ phòng: môi trường cảm xúc đổi là cơ thể cũng đổi theo. Trong đời sống, tâm trạng, quan hệ và cảm giác được yêu thương có thể tác động mạnh đến nhịp nghỉ, sức tập trung và mức hồi phục.","strengthText":"Lợi thế là khả năng đọc cảm xúc tinh tế, giúp bạn làm tốt các việc cần chăm sóc, giao tiếp hoặc tạo trải nghiệm cho người khác.","cautionText":"Cạm bẫy là để cảm xúc của người khác đi thẳng vào cơ thể mình, khiến bạn mệt vì những chuyện không phải của mình.","lifeAdviceText":"Hãy có nghi thức xả cảm xúc sau tương tác nặng: đi bộ, viết ra, tắt thông báo hoặc nói chuyện với người an toàn trong thời lượng giới hạn.","teaserQuestion":"Cảm xúc của ai đang đi vào cơ thể bạn nhiều hơn mức bạn nhận ra?","evidenceLabel":"Dấu hiệu này đến từ nhóm sao cảm xúc và sức hút chạm vào vùng thân tâm."},
-  {"version":"interpretation-rules-v1","status":"active","key":"group:dao-hoa:thien-di","scope":"CAREER","pattern":{"kind":"support-group","group":"đào hoa","palace":"Thiên Di","stars":["Đào Hoa","Hồng Loan","Thiên Hỷ","Hỷ Thần"]},"priority":54,"title":"Đào hoa tại Thiên Di","summary":"Đào hoa tại Thiên Di giống một nụ cười đúng lúc ở nơi xa lạ: nó làm cửa mở nhanh hơn. Trong đời sống, ra ngoài dễ gặp thiện cảm, lời mời, kết nối xã hội hoặc môi trường giúp bạn được chú ý.","strengthText":"Lợi thế là xây mạng lưới nhanh, phù hợp với công việc cần quan hệ khách hàng, cộng đồng, truyền thông hoặc hợp tác đối ngoại.","cautionText":"Điểm mù là tin vào cảm giác hợp ngay từ đầu mà chưa kiểm tra động cơ và điều kiện thực tế của người đối diện.","lifeAdviceText":"Hãy dùng ba bước khi gặp cơ hội mới: cảm nhận thiện chí, kiểm tra dữ kiện, rồi mới cam kết; đừng đảo thứ tự này.","teaserQuestion":"Thiện cảm bên ngoài đang dẫn bạn đến cơ hội thật, hay chỉ khiến bạn hạ tiêu chuẩn kiểm chứng?","evidenceLabel":"Dấu hiệu này đến từ nhóm sao cảm xúc và sức hút xuất hiện ở vùng môi trường xã hội."},
-  {"version":"interpretation-rules-v1","status":"active","key":"group:dao-hoa:phuc-duc","scope":"RELATIONSHIP","pattern":{"kind":"support-group","group":"đào hoa","palace":"Phúc Đức","stars":["Đào Hoa","Hồng Loan","Thiên Hỷ","Hỷ Thần"]},"priority":52,"title":"Đào hoa tại Phúc Đức","summary":"Đào hoa tại Phúc Đức giống một mùi hương cũ trong căn nhà thân quen: dịu dàng, nhưng cũng dễ kéo ký ức trở lại. Trong đời sống, nền tinh thần của bạn nhạy với tình cảm, sự hòa thuận gia đình và cảm giác được yêu thương.","strengthText":"Lợi thế là biết tạo không khí ấm áp, kết nối người thân và xây những quan hệ có chiều sâu cảm xúc.","cautionText":"Cạm bẫy là vì sợ mất hòa khí nên giữ vai làm người dễ thương, ngay cả khi bên trong đã mệt hoặc không đồng ý.","lifeAdviceText":"Hãy tập nói nhu cầu thật bằng giọng mềm nhưng rõ: sự tử tế không cần đi kèm việc tự xóa mình khỏi cuộc trò chuyện.","teaserQuestion":"Bạn đang giữ hòa khí vì yêu thương, hay vì sợ khi mình nói thật thì tình cảm sẽ đổi khác?","evidenceLabel":"Dấu hiệu này đến từ nhóm sao cảm xúc và sức hút nằm ở vùng nền tinh thần và nếp nhà."}
-,
-  {"version":"interpretation-rules-v1","status":"active","key":"group:khoa-quyen-loc-ky:menh","scope":"IDENTITY","pattern":{"kind":"support-group","group":"khoa quyền lộc kỵ","palace":"Mệnh","stars":["Hóa Khoa","Hóa Quyền","Hóa Lộc","Hóa Kỵ"]},"priority":62,"title":"Khoa Quyền Lộc Kỵ tại Mệnh","summary":"Khoa Quyền Lộc Kỵ tại Mệnh giống một bảng điều khiển có cả đèn xanh lẫn đèn cảnh báo. Trong đời sống, bản thân bạn là nơi danh tiếng, quyền quyết, lợi ích và bài học cần hóa giải hiện ra rất rõ.","strengthText":"Lợi thế là biết biến năng lực cá nhân thành uy tín và cơ hội tạo nguồn thu nếu bạn chọn đúng cách xuất hiện.","cautionText":"Cạm bẫy là muốn được công nhận nhanh nên nhận cả phần trách nhiệm hoặc ràng buộc chưa đọc kỹ.","lifeAdviceText":"Hãy tách mọi cơ hội cá nhân thành bốn cột: học được gì, có quyền gì, có lợi gì và phải trả giá gì.","teaserQuestion":"Điều gì đang nâng tên tuổi của bạn, và điều gì đi kèm nó mà bạn chưa nhìn hết?","evidenceLabel":"Dấu hiệu này đến từ bộ sao chuyển hóa chạm vào vùng bản thân và cách bạn được nhìn nhận."},
-  {"version":"interpretation-rules-v1","status":"active","key":"group:khoa-quyen-loc-ky:than","scope":"AXIS","pattern":{"kind":"support-group","group":"khoa quyền lộc kỵ","palace":"Thân","stars":["Hóa Khoa","Hóa Quyền","Hóa Lộc","Hóa Kỵ"]},"priority":61,"title":"Khoa Quyền Lộc Kỵ tại Thân","summary":"Khoa Quyền Lộc Kỵ tại Thân giống một hợp đồng đời sống có nhiều điều khoản nhỏ. Trong thực tế, mỗi bước hành động của bạn dễ kéo theo cơ hội, trách nhiệm, lợi ích và bài học phải xử lý đến cùng.","strengthText":"Lợi thế là khả năng biến trải nghiệm thật thành vị thế, nhất là khi bạn biết ghi nhận kết quả và chuẩn hóa cách làm.","cautionText":"Điểm mù là chỉ nhìn phần lợi mà chưa tính phần vận hành, khiến việc tưởng nhỏ thành nghĩa vụ dài.","lifeAdviceText":"Trước mỗi cam kết, hãy hỏi: ai quyết, ai làm, ai hưởng lợi và ai chịu hậu quả nếu lệch kế hoạch.","teaserQuestion":"Bạn đang bước vào cơ hội thật, hay đang ký một trách nhiệm mà mình chưa đọc hết điều khoản?","evidenceLabel":"Dấu hiệu này đến từ bộ sao chuyển hóa tác động vào phần hành động và đời sống thực tế."},
-  {"version":"interpretation-rules-v1","status":"active","key":"group:khoa-quyen-loc-ky:quan-loc","scope":"CAREER","pattern":{"kind":"support-group","group":"khoa quyền lộc kỵ","palace":"Quan Lộc","stars":["Hóa Khoa","Hóa Quyền","Hóa Lộc","Hóa Kỵ"]},"priority":64,"title":"Khoa Quyền Lộc Kỵ tại Quan Lộc","summary":"Khoa Quyền Lộc Kỵ tại Quan Lộc giống một thang máy nghề nghiệp có cả nút lên tầng và nút báo quá tải. Trong đời sống, sự nghiệp là nơi bạn dễ gặp danh, quyền, tiền và áp lực trách nhiệm cùng lúc.","strengthText":"Lợi thế là có khả năng biến chuyên môn thành vị trí có ảnh hưởng, nếu bạn biết chọn vai trò đi kèm quyền hạn rõ.","cautionText":"Cạm bẫy là nhận danh mà thiếu quyền, nhận quyền mà thiếu nguồn lực, hoặc nhận lợi mà không thấy mặt trái trách nhiệm.","lifeAdviceText":"Hãy thương lượng nghề nghiệp theo gói: chức danh, quyền quyết, nguồn lực hỗ trợ, tiêu chí đo kết quả và phần thưởng phải đi cùng nhau.","teaserQuestion":"Vai trò nghề nghiệp nào đang thật sự nâng bạn lên, và vai nào chỉ khoác lên bạn thêm áp lực?","evidenceLabel":"Dấu hiệu này đến từ bộ sao chuyển hóa nằm ở vùng nghề nghiệp và vị trí xã hội."},
-  {"version":"interpretation-rules-v1","status":"active","key":"group:khoa-quyen-loc-ky:tai-bach","scope":"MONEY","pattern":{"kind":"support-group","group":"khoa quyền lộc kỵ","palace":"Tài Bạch","stars":["Hóa Khoa","Hóa Quyền","Hóa Lộc","Hóa Kỵ"]},"priority":64,"title":"Khoa Quyền Lộc Kỵ tại Tài Bạch","summary":"Khoa Quyền Lộc Kỵ tại Tài Bạch giống một bảng cân đối có cả doanh thu, quyền quyết và khoản nợ vô hình. Trong đời sống, tiền bạc không chỉ là số dư mà còn là cái giá, điều kiện và trách nhiệm đi kèm lợi ích.","strengthText":"Lợi thế là biết định giá công sức, biến tri thức hoặc uy tín thành nguồn thu chính đáng.","cautionText":"Điểm mù là thấy lợi trước mắt mà bỏ qua điều khoản khiến mình mất tự do hoặc phải gánh dài hạn.","lifeAdviceText":"Mọi khoản tiền lớn nên được đọc bằng ba lớp: vì sao có tiền, đổi lại điều gì và nếu dừng thì chi phí là bao nhiêu.","teaserQuestion":"Khoản lợi nào đang thật sự làm bạn mạnh hơn, và khoản lợi nào đang âm thầm khóa bạn vào trách nhiệm mới?","evidenceLabel":"Dấu hiệu này đến từ bộ sao chuyển hóa nằm ở vùng tiền bạc và nguồn lực."},
-  {"version":"interpretation-rules-v1","status":"active","key":"group:khoa-quyen-loc-ky:phu-the","scope":"RELATIONSHIP","pattern":{"kind":"support-group","group":"khoa quyền lộc kỵ","palace":"Phu Thê","stars":["Hóa Khoa","Hóa Quyền","Hóa Lộc","Hóa Kỵ"]},"priority":61,"title":"Khoa Quyền Lộc Kỵ tại Phu Thê","summary":"Khoa Quyền Lộc Kỵ tại Phu Thê giống một bản cam kết có cả tình cảm và quyền lợi chung. Trong đời sống, quan hệ thân mật dễ chạm tới danh dự, ảnh hưởng, tiền bạc và những điểm cần hóa giải bằng đối thoại thật.","strengthText":"Lợi thế là có thể xây quan hệ thành liên minh mạnh, nơi hai người cùng nâng vị thế và nguồn lực cho nhau.","cautionText":"Cạm bẫy là để quyền lực mềm trong tình cảm vận hành âm thầm, khiến một người nhường quá nhiều hoặc kiểm soát quá sâu.","lifeAdviceText":"Hãy làm rõ quyền quyết trong các việc chung: tiền, gia đình, thời gian và kế hoạch dài hạn; tình yêu không nên vận hành bằng giả định.","teaserQuestion":"Quan hệ này đang cùng bạn xây giá trị, hay đang tạo một khoản nợ cảm xúc khó gọi tên?","evidenceLabel":"Dấu hiệu này đến từ bộ sao chuyển hóa xuất hiện ở vùng cam kết thân mật."},
-  {"version":"interpretation-rules-v1","status":"active","key":"group:khoa-quyen-loc-ky:tat-ach","scope":"HEALTH","pattern":{"kind":"support-group","group":"khoa quyền lộc kỵ","palace":"Tật Ách","stars":["Hóa Khoa","Hóa Quyền","Hóa Lộc","Hóa Kỵ"]},"priority":60,"title":"Khoa Quyền Lộc Kỵ tại Tật Ách","summary":"Khoa Quyền Lộc Kỵ tại Tật Ách giống một phòng điều khiển nơi áp lực được chuyển thành tín hiệu cơ thể. Trong đời sống, danh dự, lợi ích, trách nhiệm hoặc kỳ vọng có thể đi thẳng vào sức khỏe tinh thần nếu bạn không đặt giới hạn.","strengthText":"Lợi thế là khả năng hiểu nguyên nhân sâu của stress và chuyển nó thành chiến lược hồi phục có kỷ luật.","cautionText":"Điểm mù là chịu áp lực để giữ hình ảnh mạnh mẽ, rồi để cơ thể trả thay cho những điều miệng chưa nói.","lifeAdviceText":"Hãy ghi lại áp lực theo nguồn: tiền, danh, trách nhiệm, quan hệ; nguồn nào lặp nhiều nhất phải có ranh giới cụ thể trong tuần tới.","teaserQuestion":"Áp lực nào đang được cơ thể bạn gánh thay vì được bạn gọi tên và xử lý?","evidenceLabel":"Dấu hiệu này đến từ bộ sao chuyển hóa chạm vào vùng thân tâm và khả năng chịu tải."},
-  {"version":"interpretation-rules-v1","status":"active","key":"group:khoa-quyen-loc-ky:thien-di","scope":"CAREER","pattern":{"kind":"support-group","group":"khoa quyền lộc kỵ","palace":"Thiên Di","stars":["Hóa Khoa","Hóa Quyền","Hóa Lộc","Hóa Kỵ"]},"priority":61,"title":"Khoa Quyền Lộc Kỵ tại Thiên Di","summary":"Khoa Quyền Lộc Kỵ tại Thiên Di giống một lời mời có dấu nổi và cả dòng chữ nhỏ phía dưới. Trong đời sống, bên ngoài dễ mang đến cơ hội, danh tiếng, lợi ích xã hội nhưng cũng kèm điều kiện, nghĩa vụ hoặc bài học về ranh giới.","strengthText":"Lợi thế là biết dùng môi trường, truyền thông hoặc mạng lưới để mở rộng vị thế và nguồn thu.","cautionText":"Cạm bẫy là bị hấp dẫn bởi sân khấu bên ngoài mà chưa kiểm tra ai đang hưởng lợi, ai chịu rủi ro và ai giữ quyền quyết.","lifeAdviceText":"Trước khi bước vào hợp tác mới, hãy yêu cầu rõ mục tiêu, quyền sử dụng hình ảnh, chia lợi ích và điều kiện rút lui.","teaserQuestion":"Lời mời nào đang mở ra sân chơi lớn, và lời mời nào đang giấu một điều kiện bạn cần đọc kỹ?","evidenceLabel":"Dấu hiệu này đến từ bộ sao chuyển hóa nằm ở vùng môi trường xã hội và cơ hội bên ngoài."},
-  {"version":"interpretation-rules-v1","status":"active","key":"group:khoa-quyen-loc-ky:phuc-duc","scope":"RELATIONSHIP","pattern":{"kind":"support-group","group":"khoa quyền lộc kỵ","palace":"Phúc Đức","stars":["Hóa Khoa","Hóa Quyền","Hóa Lộc","Hóa Kỵ"]},"priority":60,"title":"Khoa Quyền Lộc Kỵ tại Phúc Đức","summary":"Khoa Quyền Lộc Kỵ tại Phúc Đức giống một di sản có cả tài sản, danh dự và điều khoản thừa kế tinh thần. Trong đời sống, nền gia đình có thể trao cho bạn giá trị tốt, nhưng cũng đặt lên bạn những trách nhiệm cần được đọc lại.","strengthText":"Lợi thế là biết dùng nền tảng gia đình, học vấn hoặc uy tín dòng nhà để xây niềm tin và sự ổn định dài hạn.","cautionText":"Điểm mù là tiếp tục sống theo danh dự hoặc kỳ vọng cũ, dù nó khiến bạn mất tự do lựa chọn.","lifeAdviceText":"Hãy chọn điều nên kế thừa bằng hành động cụ thể, đồng thời nói rõ điều bạn không còn muốn gánh thay cho thế hệ trước.","teaserQuestion":"Bạn đang nhận phúc khí nào từ gốc nhà, và đang gánh điều gì không còn thuộc về mình?","evidenceLabel":"Dấu hiệu này đến từ bộ sao chuyển hóa nằm ở vùng nền tinh thần và nếp gia đình."},
-  {"version":"interpretation-rules-v1","status":"active","key":"gate:tuan:menh","scope":"IDENTITY","pattern":{"kind":"gate","gate":"Tuần","palace":"Mệnh"},"priority":62,"title":"Tuần tại Mệnh","summary":"Tuần tại Mệnh giống một lớp sương mỏng trước gương: bạn vẫn ở đó, nhưng cần thời gian để nhìn rõ mình. Trong đời sống, bản sắc và hướng đi cá nhân thường mở chậm, qua thử nghiệm, vấp váp và những lần lọc bớt kỳ vọng bên ngoài.","strengthText":"Lợi thế là khả năng tự quan sát sâu, giúp bạn tránh chọn nghề hoặc hướng kiếm tiền chỉ vì người khác bảo ổn.","cautionText":"Điểm mù là hiểu nhầm sự chậm mở thành kém cỏi, rồi tự giảm tiêu chuẩn trước khi thật sự biết mình hợp gì.","lifeAdviceText":"Hãy thử mục tiêu bằng phiên bản nhỏ trong 30 ngày trước khi định nghĩa nó là con đường dài hạn.","teaserQuestion":"Bạn đang chậm vì thiếu năng lực, hay vì bản thân cần thêm dữ kiện để chọn đúng đường?","evidenceLabel":"Dấu hiệu này đến từ một lớp lọc đặt ở vùng khí chất và cách bạn tự nhận diện mình."},
-  {"version":"interpretation-rules-v1","status":"active","key":"gate:tuan:than","scope":"AXIS","pattern":{"kind":"gate","gate":"Tuần","palace":"Thân"},"priority":60,"title":"Tuần tại Thân","summary":"Tuần tại Thân giống một đoạn đường vòng trước khi vào cao tốc. Trong đời sống, hành động thực tế của bạn thường cần thử nhỏ, chỉnh nhịp và qua vài lần kiểm chứng trước khi đi nhanh.","strengthText":"Lợi thế là giảm rủi ro bằng cách kiểm tra thực địa, rất hữu ích khi đổi việc, nhận dự án hoặc đầu tư công sức lớn.","cautionText":"Cạm bẫy là thử mãi nhưng không đặt mốc quyết, khiến đường vòng thành nơi trú ẩn.","lifeAdviceText":"Hãy đặt ngày kết luận cho mọi thử nghiệm: sau mốc đó, chỉ chọn một trong ba hướng là tăng tốc, sửa cách làm hoặc dừng.","teaserQuestion":"Việc nào bạn cần thử nhỏ thêm, và việc nào đã đủ dữ kiện để thôi trì hoãn?","evidenceLabel":"Dấu hiệu này đến từ một lớp lọc đặt ở vùng hành động và trải nghiệm ngoài đời."},
-  {"version":"interpretation-rules-v1","status":"active","key":"gate:tuan:quan-loc","scope":"CAREER","pattern":{"kind":"gate","gate":"Tuần","palace":"Quan Lộc"},"priority":61,"title":"Tuần tại Quan Lộc","summary":"Tuần tại Quan Lộc giống một cánh cửa nghề nghiệp mở bằng hai ổ khóa thay vì một. Trong đời sống, đường nghề thường cần thêm điều kiện, thêm thời gian hoặc thêm bằng chứng trước khi vị trí thật sự rõ.","strengthText":"Lợi thế là biết xây nền nghề chắc, không vội nhận vai lớn khi tiêu chuẩn và quyền hạn chưa rõ.","cautionText":"Điểm mù là nản vì thấy công việc chậm thông, rồi đổi hướng trước khi hoàn thành vòng kiểm chứng cần thiết.","lifeAdviceText":"Hãy biến sự chậm thành kế hoạch: chọn kỹ năng lõi, chọn người phản hồi và chọn một sản phẩm nghề nghiệp để chứng minh năng lực.","teaserQuestion":"Sự nghiệp đang chặn bạn, hay đang bắt bạn chuẩn bị đủ chứng cứ trước khi bước lên tầng mới?","evidenceLabel":"Dấu hiệu này đến từ một lớp lọc đặt ở vùng nghề nghiệp và vị trí xã hội."},
-  {"version":"interpretation-rules-v1","status":"active","key":"gate:tuan:tai-bach","scope":"MONEY","pattern":{"kind":"gate","gate":"Tuần","palace":"Tài Bạch"},"priority":61,"title":"Tuần tại Tài Bạch","summary":"Tuần tại Tài Bạch giống một cửa kiểm soát trước kho tiền. Trong đời sống, nguồn lực nên đi qua bước kiểm chứng trước khi chi, nhận, đầu tư hoặc cam kết dài hạn.","strengthText":"Lợi thế là biết thử nhỏ và bảo toàn vốn, giúp bạn tránh mất tiền vì lời hứa đẹp hoặc cảm xúc nhất thời.","cautionText":"Cạm bẫy là giữ quá lâu ở trạng thái chờ, khiến tiền và năng lực không được đưa vào nơi sinh giá trị.","lifeAdviceText":"Hãy chia quyết định tài chính thành mức thử nghiệm và mức cam kết; chỉ nâng mức khi kết quả nhỏ đã chứng minh được logic.","teaserQuestion":"Khoản nào đang cần kiểm chứng thêm, và khoản nào đang bị bạn giữ quá lâu vì sợ sai?","evidenceLabel":"Dấu hiệu này đến từ một lớp lọc đặt ở vùng tiền bạc và nguồn lực."},
-  {"version":"interpretation-rules-v1","status":"active","key":"gate:tuan:phu-the","scope":"RELATIONSHIP","pattern":{"kind":"gate","gate":"Tuần","palace":"Phu Thê"},"priority":59,"title":"Tuần tại Phu Thê","summary":"Tuần tại Phu Thê giống một nhịp chậm trước khi hai người ký vào một bản cam kết sâu. Trong đời sống, tình cảm cần thời gian kiểm chứng qua trách nhiệm, cách nói chuyện và cách hai bên xử lý điều không như ý.","strengthText":"Lợi thế là tránh lao vào quan hệ chỉ vì cảm xúc ban đầu, từ đó bảo vệ cả trái tim lẫn tài sản chung.","cautionText":"Điểm mù là dùng chữ cần thời gian để né nói rõ nhu cầu, khiến sự chậm trở thành im lặng kéo dài.","lifeAdviceText":"Hãy đặt các mốc trò chuyện: sau mỗi giai đoạn, nói rõ kỳ vọng, giới hạn và điều hai bên đã học về nhau.","teaserQuestion":"Quan hệ này cần thêm thời gian để chín, hay cần một cuộc nói thẳng để khỏi mơ hồ?","evidenceLabel":"Dấu hiệu này đến từ một lớp lọc đặt ở vùng cam kết và quan hệ thân thiết."},
-  {"version":"interpretation-rules-v1","status":"active","key":"gate:tuan:tat-ach","scope":"HEALTH","pattern":{"kind":"gate","gate":"Tuần","palace":"Tật Ách"},"priority":59,"title":"Tuần tại Tật Ách","summary":"Tuần tại Tật Ách giống một tín hiệu mờ trên màn hình theo dõi sức khỏe. Trong đời sống, mệt mỏi và căng thẳng thường cần quan sát theo chu kỳ, vì nguyên nhân có thể tích lại từ nhiều việc nhỏ.","strengthText":"Lợi thế là có thể phát hiện mẫu lặp nếu bạn chịu ghi nhận dữ kiện thay vì chỉ phản ứng khi quá tải.","cautionText":"Cạm bẫy là bỏ qua tín hiệu nhỏ vì chưa đủ nghiêm trọng, trong khi chính tín hiệu nhỏ mới cho bạn cơ hội sửa sớm.","lifeAdviceText":"Hãy theo dõi ngủ, năng lượng và cảm xúc trong hai tuần; dữ kiện lặp lại ba lần là dấu hiệu cần điều chỉnh lịch sống.","teaserQuestion":"Tín hiệu nhỏ nào đang lặp lại đủ nhiều để bạn không nên xem nó là ngẫu nhiên nữa?","evidenceLabel":"Dấu hiệu này đến từ một lớp lọc đặt ở vùng thân tâm và nhịp hồi phục."},
-  {"version":"interpretation-rules-v1","status":"active","key":"gate:tuan:thien-di","scope":"CAREER","pattern":{"kind":"gate","gate":"Tuần","palace":"Thiên Di"},"priority":59,"title":"Tuần tại Thiên Di","summary":"Tuần tại Thiên Di giống một cửa xuất cảnh yêu cầu kiểm tra giấy tờ trước khi đi xa. Trong đời sống, cơ hội bên ngoài nên được thử từng bước, vì lời mời tốt vẫn cần điều kiện và người phù hợp.","strengthText":"Lợi thế là biết đánh giá môi trường mới trước khi đầu tư lớn, giúp giảm rủi ro khi đổi việc, hợp tác hoặc mở rộng thị trường.","cautionText":"Điểm mù là chần chừ vì muốn chắc tuyệt đối, rồi bỏ lỡ thời điểm thử nhỏ đáng giá.","lifeAdviceText":"Hãy tạo một bước thử ít rủi ro cho mỗi cơ hội bên ngoài: gặp một lần, làm một phần, ký ngắn hạn hoặc đặt điều kiện rõ.","teaserQuestion":"Lời mời nào cần bạn thử nhỏ ngay, trước khi nó nguội đi hoặc kéo bạn đi quá xa?","evidenceLabel":"Dấu hiệu này đến từ một lớp lọc đặt ở vùng môi trường xã hội và cơ hội bên ngoài."},
-  {"version":"interpretation-rules-v1","status":"active","key":"gate:tuan:phuc-duc","scope":"RELATIONSHIP","pattern":{"kind":"gate","gate":"Tuần","palace":"Phúc Đức"},"priority":58,"title":"Tuần tại Phúc Đức","summary":"Tuần tại Phúc Đức giống một cuốn album cũ cần mở chậm để không làm rách trang. Trong đời sống, chuyện gia đình, niềm tin và nền tinh thần cần được hiểu từng lớp thay vì phủ nhận hoặc ôm trọn một lần.","strengthText":"Lợi thế là khả năng quan sát gốc rễ, giúp bạn chọn điều nên kế thừa và điều cần thay đổi một cách ít cực đoan hơn.","cautionText":"Cạm bẫy là dùng sự chậm để trì hoãn việc đặt ranh giới với nếp cũ đang làm mình hao.","lifeAdviceText":"Hãy chọn một thói quen gia đình để xem lại trong tháng này, rồi quyết định giữ, sửa hay dừng bằng hành động cụ thể.","teaserQuestion":"Nếp cũ nào cần được nhìn chậm lại để bạn không tiếp tục sống theo nó một cách tự động?","evidenceLabel":"Dấu hiệu này đến từ một lớp lọc đặt ở vùng nền tinh thần và gia đình."},
-  {"version":"interpretation-rules-v1","status":"active","key":"gate:triet:menh","scope":"IDENTITY","pattern":{"kind":"gate","gate":"Triệt","palace":"Mệnh"},"priority":65,"title":"Triệt tại Mệnh","summary":"Triệt tại Mệnh giống một thanh chắn hạ xuống trước con đường quen. Trong đời sống, có giai đoạn bạn bị buộc dừng lại để bỏ bớt hình ảnh không còn đúng, dù cảm giác ban đầu là bị chặn.","strengthText":"Lợi thế là khả năng tự tái cấu trúc bản thân, không sống mãi bằng nhãn cũ hoặc kỳ vọng người khác đặt lên mình.","cautionText":"Điểm mù là biến cảm giác bị chặn thành tự nghi ngờ giá trị, thay vì đọc nó như lời nhắc đổi cách đi.","lifeAdviceText":"Hãy viết lại ba điều bạn không còn muốn chứng minh; năng lượng tiết kiệm được nên chuyển sang kỹ năng hoặc dự án có thể đo kết quả.","teaserQuestion":"Điều gì đang bị chặn để bảo vệ bạn khỏi một phiên bản không còn phù hợp?","evidenceLabel":"Dấu hiệu này đến từ một lớp chặn mạnh đặt ở vùng bản sắc và khí chất."},
-  {"version":"interpretation-rules-v1","status":"active","key":"gate:triet:than","scope":"AXIS","pattern":{"kind":"gate","gate":"Triệt","palace":"Thân"},"priority":63,"title":"Triệt tại Thân","summary":"Triệt tại Thân giống một phanh khẩn cấp trên đường dốc. Trong đời sống, cách hành động của bạn thường phải được lọc kỹ để tránh lao vào việc không có quyền quyết hoặc không đúng sức chịu.","strengthText":"Lợi thế là khả năng dừng đúng lúc, cắt lỗ công sức và không tiếp tục chỉ vì đã lỡ đi xa.","cautionText":"Cạm bẫy là phòng thủ quá mạnh, khiến bạn không dám bước vào trải nghiệm mới dù đã có đủ dữ kiện.","lifeAdviceText":"Hãy đặt tiêu chí mở lại hành động: cần thêm dữ kiện gì, cần ai cùng chịu trách nhiệm, cần giới hạn nào để bạn bước tiếp an toàn.","teaserQuestion":"Bạn đang dừng vì sáng suốt, hay vì một nỗi sợ cũ đang giữ tay lái?","evidenceLabel":"Dấu hiệu này đến từ một lớp chặn mạnh đặt ở vùng hành động và đời sống thực tế."},
-  {"version":"interpretation-rules-v1","status":"active","key":"gate:triet:quan-loc","scope":"CAREER","pattern":{"kind":"gate","gate":"Triệt","palace":"Quan Lộc"},"priority":64,"title":"Triệt tại Quan Lộc","summary":"Triệt tại Quan Lộc giống một biển báo công trường trên con đường sự nghiệp. Trong đời sống, nghề nghiệp thường không hợp lối đi quá sẵn mà cần tái thiết vai trò, quy trình hoặc quyền hạn trước khi tăng tốc.","strengthText":"Lợi thế là nhìn ra điểm hỏng trong hệ thống công việc và có khả năng cải tổ thay vì chỉ chạy theo guồng cũ.","cautionText":"Điểm mù là tự làm mọi thứ vì không tin hệ thống, rồi biến năng lực tự chủ thành kiệt sức.","lifeAdviceText":"Hãy xác định phần nào cần bạn kiểm soát trực tiếp và phần nào phải được phân quyền; tự chủ không có nghĩa là tự gánh hết.","teaserQuestion":"Sự nghiệp đang chặn bạn khỏi sai đường, hay đang yêu cầu bạn xây một hệ thống mới để đi xa hơn?","evidenceLabel":"Dấu hiệu này đến từ một lớp chặn mạnh đặt ở vùng nghề nghiệp và trách nhiệm xã hội."},
-  {"version":"interpretation-rules-v1","status":"active","key":"gate:triet:tai-bach","scope":"MONEY","pattern":{"kind":"gate","gate":"Triệt","palace":"Tài Bạch"},"priority":64,"title":"Triệt tại Tài Bạch","summary":"Triệt tại Tài Bạch giống một khóa an toàn trên két tiền. Trong đời sống, nguồn lực thường cần được bảo vệ khỏi quyết định nóng, lời mời mơ hồ hoặc cam kết thiếu đường lui.","strengthText":"Lợi thế là khả năng kiểm soát rủi ro tài chính, đặc biệt khi bạn biết hỏi khó trước khi xuất tiền hoặc nhận việc.","cautionText":"Cạm bẫy là khóa quá chặt, khiến tiền, kỹ năng và cơ hội không được đưa vào nơi có thể sinh giá trị.","lifeAdviceText":"Hãy đặt hai ngưỡng: ngưỡng bảo vệ không được đụng tới và ngưỡng thử nghiệm có thể chấp nhận mất; mọi cơ hội phải nằm rõ ở một trong hai ngưỡng.","teaserQuestion":"Bạn đang bảo toàn nguồn lực đúng lúc, hay đang giữ quá chặt vì chưa tin mình có thể chọn đúng?","evidenceLabel":"Dấu hiệu này đến từ một lớp chặn mạnh đặt ở vùng tiền bạc và tài nguyên cá nhân."},
-  {"version":"interpretation-rules-v1","status":"active","key":"gate:triet:phu-the","scope":"RELATIONSHIP","pattern":{"kind":"gate","gate":"Triệt","palace":"Phu Thê"},"priority":62,"title":"Triệt tại Phu Thê","summary":"Triệt tại Phu Thê giống một cánh cửa tình cảm có chốt khóa bên trong. Trong đời sống, quan hệ cần đi qua lớp kiểm chứng về niềm tin, trách nhiệm và ranh giới trước khi thật sự mở sâu.","strengthText":"Lợi thế là biết lọc quan hệ, tránh cam kết vì cô đơn, áp lực gia đình hoặc cảm xúc nhất thời.","cautionText":"Điểm mù là khép lòng quá mạnh, khiến người phù hợp cũng khó bước vào vì bạn chỉ nhìn thấy rủi ro.","lifeAdviceText":"Hãy cho quan hệ một lộ trình mở dần: chia sẻ nhỏ, trách nhiệm nhỏ, kế hoạch nhỏ; ai đi đều qua các mốc đó mới đáng đi xa.","teaserQuestion":"Bạn đang lọc để bảo vệ trái tim, hay đang khóa cửa vì một vết cũ chưa được gọi tên?","evidenceLabel":"Dấu hiệu này đến từ một lớp chặn mạnh đặt ở vùng cam kết và quan hệ thân thiết."},
-  {"version":"interpretation-rules-v1","status":"active","key":"gate:triet:tat-ach","scope":"HEALTH","pattern":{"kind":"gate","gate":"Triệt","palace":"Tật Ách"},"priority":62,"title":"Triệt tại Tật Ách","summary":"Triệt tại Tật Ách giống cầu dao tự ngắt khi hệ thống quá tải. Trong đời sống, thân tâm có thể buộc bạn dừng lại nếu bạn bỏ qua tín hiệu mệt, căng hoặc thiếu hồi phục quá lâu.","strengthText":"Lợi thế là học được cách dừng trước khi hỏng, từ đó xây sức bền và hiệu suất làm việc thực tế hơn.","cautionText":"Cạm bẫy là coi việc dừng lại như thất bại, trong khi đôi khi nó là cách duy nhất để bảo vệ hệ thống.","lifeAdviceText":"Hãy định nghĩa trước các trường hợp phải giảm tải: ngủ dưới mức tối thiểu, cáu gắt kéo dài, đau lặp lại hoặc mất hứng bắt đầu việc.","teaserQuestion":"Điểm dừng nào đang cứu bạn khỏi quá tải nhưng bạn vẫn cố xem nó như vật cản?","evidenceLabel":"Dấu hiệu này đến từ một lớp chặn mạnh đặt ở vùng thân tâm và sức bền."},
-  {"version":"interpretation-rules-v1","status":"active","key":"gate:triet:thien-di","scope":"CAREER","pattern":{"kind":"gate","gate":"Triệt","palace":"Thiên Di"},"priority":62,"title":"Triệt tại Thiên Di","summary":"Triệt tại Thiên Di giống cổng an ninh trước một thành phố lạ. Trong đời sống, cơ hội bên ngoài cần được lọc kỹ vì không phải môi trường sáng sủa nào cũng hợp với bạn.","strengthText":"Lợi thế là khả năng đọc điều kiện ẩn trong lời mời, hợp đồng, nhóm mới hoặc thị trường mới.","cautionText":"Điểm mù là quá nghi ngờ nên bỏ lỡ nơi thật sự giúp mình lớn lên và được công nhận đúng giá trị.","lifeAdviceText":"Hãy dùng tiêu chí ba điểm khi bước ra ngoài: người đáng tin, luật chơi rõ và quyền rút lui an toàn.","teaserQuestion":"Môi trường nào đang bị Triệt chặn để bạn khỏi bước nhầm, và môi trường nào đáng mở thử từng bước?","evidenceLabel":"Dấu hiệu này đến từ một lớp chặn mạnh đặt ở vùng môi trường xã hội và cơ hội bên ngoài."},
-  {"version":"interpretation-rules-v1","status":"active","key":"gate:triet:phuc-duc","scope":"RELATIONSHIP","pattern":{"kind":"gate","gate":"Triệt","palace":"Phúc Đức"},"priority":61,"title":"Triệt tại Phúc Đức","summary":"Triệt tại Phúc Đức giống một đường cắt qua tấm vải cũ, buộc bạn chọn phần nào giữ lại và phần nào bỏ đi. Trong đời sống, nền gia đình và niềm tin cũ có thể cần được lọc mạnh để bạn sống nhẹ hơn.","strengthText":"Lợi thế là khả năng tự chọn di sản tinh thần, không lặp lại mọi khuôn mẫu chỉ vì chúng quen thuộc.","cautionText":"Cạm bẫy là phủ nhận toàn bộ gốc rễ vì có phần làm đau, trong khi một số giá trị vẫn đáng giữ và dùng lại.","lifeAdviceText":"Hãy viết hai danh sách: điều từ gia đình giúp bạn vững và điều khiến bạn nhỏ lại; danh sách thứ hai cần ranh giới cụ thể.","teaserQuestion":"Bạn cần giữ phần phúc nào của nếp nhà, và cần trả lại điều gì cho quá khứ?","evidenceLabel":"Dấu hiệu này đến từ một lớp chặn mạnh đặt ở vùng nền tinh thần và nếp gia đình."}
+    {
+        "version":  "interpretation-rules-v2",
+        "status":  "active",
+        "key":  "group:cat-tinh:menh",
+        "scope":  "IDENTITY",
+        "pattern":  {
+                        "kind":  "support-group",
+                        "group":  "cát tinh",
+                        "palace":  "Mệnh",
+                        "stars":  [
+                                      "Tả Phù",
+                                      "Hữu Bật",
+                                      "Văn Xương",
+                                      "Văn Khúc",
+                                      "Khôi",
+                                      "Việt",
+                                      "Long Trì",
+                                      "Phượng"
+                                  ]
+                    },
+        "priority":  57,
+        "title":  "Cát tinh tại Mệnh",
+        "summary":  "Bạn dễ dễ có người nâng, ý tưởng sáng hoặc khả năng học nhanh nếu biết chủ động mở lời. Bạn muốn sống đúng với điều bạn tin là phù hợp, nhưng cũng cần để ý việc chờ người khác nhìn thấy giá trị của bạn trước, nhất là trong cách bạn tự quyết và nhận trách nhiệm.",
+        "strengthText":  "Khi mục tiêu và vai trò của bạn đã rõ, bạn có thể phát huy khả năng tạo thiện cảm và nhận hỗ trợ đúng lúc, rất hữu ích khi xin cơ hội, phỏng vấn, bán dịch vụ hoặc xây uy tín cá nhân.",
+        "cautionText":  "Nếu kéo dài, bạn có thể dễ chờ người khác nhìn thấy giá trị của bạn trước, trong khi cơ hội thường đến với người biết trình bày rõ điều bạn cần.",
+        "lifeAdviceText":  "Bạn hãy chuẩn bị một câu giới thiệu ngắn về năng lực, nhu cầu và mục tiêu hiện tại; khi quý nhân xuất hiện, bạn phải đủ rõ để họ biết có thể giúp bạn ở đâu.",
+        "teaserQuestion":  "Ai đang có thể mở cửa cho bạn, nhưng bạn chưa nói đủ rõ bạn đang cần cánh cửa nào?",
+        "evidenceLabel":  "Dấu hiệu này đến từ nhóm sao nâng đỡ đang nằm gần vùng khí chất và cách bạn tự thể hiện."
+    },
+    {
+        "version":  "interpretation-rules-v2",
+        "status":  "active",
+        "key":  "group:cat-tinh:than",
+        "scope":  "AXIS",
+        "pattern":  {
+                        "kind":  "support-group",
+                        "group":  "cát tinh",
+                        "palace":  "Thân",
+                        "stars":  [
+                                      "Tả Phù",
+                                      "Hữu Bật",
+                                      "Văn Xương",
+                                      "Văn Khúc",
+                                      "Khôi",
+                                      "Việt",
+                                      "Long Trì",
+                                      "Phượng"
+                                  ]
+                    },
+        "priority":  56,
+        "title":  "Cát tinh tại Thân",
+        "summary":  "Bạn thường được mở đường qua người hướng dẫn, đồng đội tốt hoặc một môi trường biết công nhận nỗ lực thực tế. Bạn muốn đưa những lựa chọn khác nhau về cùng một hướng, nhưng cũng cần để ý việc được giúp nhiều nên ngại tự quyết, hoặc để nhịp hành động phụ thuộc quá mạnh vào sự xác nhận bên ngoài, nhất là trong vai trò thực tế và lịch sống mỗi ngày.",
+        "strengthText":  "Khi thứ tự ưu tiên đã rõ, bạn có thể biến quan hệ hỗ trợ thành hiệu suất làm việc, đặc biệt khi bạn biết xin phản hồi, nhận mentoring hoặc tham gia nhóm có tiêu chuẩn cao.",
+        "cautionText":  "Khi quá tin vào mặt thuận của Cát tinh tại Thân, bạn có thể dễ được giúp nhiều nên ngại tự quyết, hoặc để nhịp hành động phụ thuộc quá mạnh vào sự xác nhận bên ngoài.",
+        "lifeAdviceText":  "Bạn hãy dùng hỗ trợ như bàn đạp chứ không như nạng chống; sau mỗi lần được giúp, xác định một việc bạn phải tự làm để tăng năng lực thật.",
+        "teaserQuestion":  "Sự hỗ trợ nào đang giúp bạn lớn lên, và sự hỗ trợ nào đang khiến bạn chậm tự chủ?",
+        "evidenceLabel":  "Dấu hiệu này đến từ nhóm sao nâng đỡ chạm vào phần hành động và trải nghiệm ngoài đời."
+    },
+    {
+        "version":  "interpretation-rules-v2",
+        "status":  "active",
+        "key":  "group:cat-tinh:quan-loc",
+        "scope":  "CAREER",
+        "pattern":  {
+                        "kind":  "support-group",
+                        "group":  "cát tinh",
+                        "palace":  "Quan Lộc",
+                        "stars":  [
+                                      "Tả Phù",
+                                      "Hữu Bật",
+                                      "Văn Xương",
+                                      "Văn Khúc",
+                                      "Khôi",
+                                      "Việt",
+                                      "Long Trì",
+                                      "Phượng"
+                                  ]
+                    },
+        "priority":  58,
+        "title":  "Cát tinh tại Quan Lộc",
+        "summary":  "Bạn dễ nhận ra rằng đây là dấu hiệu thuận cho học nghề, được giới thiệu, có mentor hoặc gặp môi trường công nhận chất lượng. Bạn muốn tạo kết quả mà không phải ôm hết việc, nhưng cũng cần để ý việc dựa vào tiếng tốt mà chậm nâng tiêu chuẩn giao hàng, khiến cơ hội tới nhưng năng lực vận hành chưa theo kịp, nhất là trong công việc và trách nhiệm nghề nghiệp.",
+        "strengthText":  "Khi trách nhiệm công việc đã rõ, bạn có thể dùng kiến thức và uy tín để tăng vị trí nghề nghiệp, từ đó thương lượng tốt hơn về lương, phí hoặc quyền quyết.",
+        "cautionText":  "Bạn có thể dễ dựa vào tiếng tốt mà chậm nâng tiêu chuẩn giao hàng, khiến cơ hội tới nhưng năng lực vận hành chưa theo kịp nếu chưa đặt giới hạn rõ.",
+        "lifeAdviceText":  "Bạn hãy biến mỗi sự hỗ trợ trong nghề thành một tài sản cụ thể: case study, chứng chỉ, quy trình, portfolio hoặc mối quan hệ có thể tái sử dụng.",
+        "teaserQuestion":  "Cơ hội nghề nào đang cần bạn đóng gói năng lực rõ hơn để người khác dám đặt niềm tin lớn hơn?",
+        "evidenceLabel":  "Dấu hiệu này đến từ nhóm sao nâng đỡ nằm tại vùng nghề nghiệp và vị trí xã hội."
+    },
+    {
+        "version":  "interpretation-rules-v2",
+        "status":  "active",
+        "key":  "group:cat-tinh:tai-bach",
+        "scope":  "MONEY",
+        "pattern":  {
+                        "kind":  "support-group",
+                        "group":  "cát tinh",
+                        "palace":  "Tài Bạch",
+                        "stars":  [
+                                      "Tả Phù",
+                                      "Hữu Bật",
+                                      "Văn Xương",
+                                      "Văn Khúc",
+                                      "Khôi",
+                                      "Việt",
+                                      "Long Trì",
+                                      "Phượng"
+                                  ]
+                    },
+        "priority":  58,
+        "title":  "Cát tinh tại Tài Bạch",
+        "summary":  "Bạn dễ nhận ra rằng tiền bạc dễ đến qua năng lực được công nhận, lời giới thiệu, tri thức hoặc các mối quan hệ đáng tin. Bạn muốn giữ an toàn mà không tự bỏ lỡ cơ hội, nhưng cũng cần để ý việc ngại nói giá, ngại đặt điều kiện, rồi để sự tử tế biến thành làm thêm không được trả xứng đáng, nhất là trong tiền bạc, công sức và quyền lựa chọn.",
+        "strengthText":  "Khi giới hạn tiền bạc đã rõ, bạn có thể kiếm tiền bằng sự tín nhiệm, tư vấn, chuyên môn hoặc dịch vụ cần chất lượng ổn định hơn là chạy theo may rủi.",
+        "cautionText":  "Nếu kéo dài, bạn có thể dễ ngại nói giá, ngại đặt điều kiện, rồi để sự tử tế biến thành làm thêm không được trả xứng đáng.",
+        "lifeAdviceText":  "Bạn hãy chuẩn hóa bảng giá, phạm vi việc và điều kiện hỗ trợ; người quý bạn càng cần một khung rõ để việc tốt không thành hao hụt; trong ba ngày tới, bạn áp dụng ngay vào một tình huống thật thuộc tiền bạc, công sức và quyền lựa chọn.",
+        "teaserQuestion":  "Bạn đang nhận được thiện cảm, nhưng đã biết chuyển thiện cảm đó thành nguồn thu xứng đáng chưa?",
+        "evidenceLabel":  "Dấu hiệu này đến từ nhóm sao nâng đỡ đi vào vùng tiền bạc và nguồn lực."
+    },
+    {
+        "version":  "interpretation-rules-v2",
+        "status":  "active",
+        "key":  "group:cat-tinh:phu-the",
+        "scope":  "RELATIONSHIP",
+        "pattern":  {
+                        "kind":  "support-group",
+                        "group":  "cát tinh",
+                        "palace":  "Phu Thê",
+                        "stars":  [
+                                      "Tả Phù",
+                                      "Hữu Bật",
+                                      "Văn Xương",
+                                      "Văn Khúc",
+                                      "Khôi",
+                                      "Việt",
+                                      "Long Trì",
+                                      "Phượng"
+                                  ]
+                    },
+        "priority":  55,
+        "title":  "Cát tinh tại Phu Thê",
+        "summary":  "Bạn dễ nhận ra rằng quan hệ thân mật dễ được nâng đỡ bởi sự tôn trọng, lời khuyên tốt hoặc khả năng cùng nhau tìm cách thay vì thắng thua. Bạn muốn giữ hòa khí mà vẫn nói rõ nhu cầu, nhưng cũng cần để ý việc vì muốn giữ hòa khí nên né những chủ đề thực tế, khiến sự dễ chịu ban đầu che đi vấn đề cần thỏa thuận.",
+        "strengthText":  "Khi kỳ vọng giữa các bên đã rõ, bạn có thể xây quan hệ dựa trên đối thoại, rất có ích khi bàn chuyện tiền chung, trách nhiệm gia đình hoặc kế hoạch dài hạn.",
+        "cautionText":  "Khi quá tin vào mặt thuận của Cát tinh tại Phu Thê, bạn có thể dễ vì muốn giữ hòa khí nên né những chủ đề thực tế, khiến sự dễ chịu ban đầu che đi vấn đề cần thỏa thuận.",
+        "lifeAdviceText":  "Bạn hãy đặt lịch nói chuyện định kỳ về ba việc: thời gian, tiền bạc và trách nhiệm; tình cảm càng tốt càng cần cơ chế rõ để đi xa.",
+        "teaserQuestion":  "Bạn đang cần tự hỏi: mối quan hệ nào đang có nền đẹp, nhưng cần một cuộc nói chuyện rõ để thật sự bền?",
+        "evidenceLabel":  "Dấu hiệu này đến từ nhóm sao nâng đỡ nằm ở vùng cam kết và quan hệ thân thiết."
+    },
+    {
+        "version":  "interpretation-rules-v2",
+        "status":  "active",
+        "key":  "group:cat-tinh:tat-ach",
+        "scope":  "HEALTH",
+        "pattern":  {
+                        "kind":  "support-group",
+                        "group":  "cát tinh",
+                        "palace":  "Tật Ách",
+                        "stars":  [
+                                      "Tả Phù",
+                                      "Hữu Bật",
+                                      "Văn Xương",
+                                      "Văn Khúc",
+                                      "Khôi",
+                                      "Việt",
+                                      "Long Trì",
+                                      "Phượng"
+                                  ]
+                    },
+        "priority":  54,
+        "title":  "Cát tinh tại Tật Ách",
+        "summary":  "Bạn dễ nhận ra rằng đây là dấu hiệu bạn hồi phục tốt hơn khi có tri thức đúng, người lắng nghe hoặc phương pháp chăm sóc phù hợp. Bạn muốn làm tròn trách nhiệm mà không kiệt sức, nhưng cũng cần để ý việc dùng lý trí để giải thích cảm xúc quá lâu, thay vì thừa nhận bạn cần nghỉ, cần hỗ trợ hoặc cần đổi nhịp, nhất là trong nhịp nghỉ và phản ứng khi quá tải.",
+        "strengthText":  "Khi lịch làm và lịch nghỉ đã rõ, bạn có thể học cách quản trị stress, biến hiểu biết về thân tâm thành hiệu suất bền hơn trong công việc.",
+        "cautionText":  "Bạn có thể dễ dùng lý trí để giải thích cảm xúc quá lâu, thay vì thừa nhận bạn cần nghỉ, cần hỗ trợ hoặc cần đổi nhịp nếu chưa đặt giới hạn rõ.",
+        "lifeAdviceText":  "Bạn hãy xây một bộ công cụ hồi phục gồm giấc ngủ, vận động nhẹ, người có thể nói thật và lịch nghỉ cố định; đừng đợi quá tải mới dùng.",
+        "teaserQuestion":  "Ai hoặc phương pháp nào có thể giúp bạn hồi phục nhanh hơn, nhưng bạn vẫn đang cố tự xoay xở?",
+        "evidenceLabel":  "Dấu hiệu này đến từ nhóm sao nâng đỡ chạm vào vùng thân tâm và khả năng phục hồi."
+    },
+    {
+        "version":  "interpretation-rules-v2",
+        "status":  "active",
+        "key":  "group:cat-tinh:thien-di",
+        "scope":  "CAREER",
+        "pattern":  {
+                        "kind":  "support-group",
+                        "group":  "cát tinh",
+                        "palace":  "Thiên Di",
+                        "stars":  [
+                                      "Tả Phù",
+                                      "Hữu Bật",
+                                      "Văn Xương",
+                                      "Văn Khúc",
+                                      "Khôi",
+                                      "Việt",
+                                      "Long Trì",
+                                      "Phượng"
+                                  ]
+                    },
+        "priority":  55,
+        "title":  "Cát tinh tại Thiên Di",
+        "summary":  "Bạn dễ nhận ra rằng bước ra ngoài thường có cơ hội gặp người tốt, môi trường tốt hoặc lời mời giúp bạn mở rộng tầm nhìn. Bạn muốn tạo kết quả mà không phải ôm hết việc, nhưng cũng cần để ý việc quá tin vào thiện chí ban đầu mà chưa kiểm tra điều kiện, quyền lợi và trách nhiệm thực tế, nhất là trong môi trường bên ngoài và cơ hội mới.",
+        "strengthText":  "Khi trách nhiệm công việc đã rõ, bạn có thể phát triển qua networking, học hỏi bên ngoài, hợp tác khách hàng hoặc chuyển môi trường để tăng giá trị nghề nghiệp.",
+        "cautionText":  "Nếu kéo dài, bạn có thể dễ quá tin vào thiện chí ban đầu mà chưa kiểm tra điều kiện, quyền lợi và trách nhiệm thực tế.",
+        "lifeAdviceText":  "Bạn hãy mỗi lời mời bên ngoài nên có checklist: ai chịu trách nhiệm, kết quả đo bằng gì, lợi ích chia thế nào và bạn được quyền dừng ở đâu.",
+        "teaserQuestion":  "Bạn đang cần tự hỏi: cơ hội bên ngoài nào đang thật sự có quý nhân, và cơ hội nào chỉ mới có lời nói đẹp?",
+        "evidenceLabel":  "Dấu hiệu này đến từ nhóm sao nâng đỡ xuất hiện ở vùng môi trường xã hội và cơ hội bên ngoài."
+    },
+    {
+        "version":  "interpretation-rules-v2",
+        "status":  "active",
+        "key":  "group:cat-tinh:phuc-duc",
+        "scope":  "RELATIONSHIP",
+        "pattern":  {
+                        "kind":  "support-group",
+                        "group":  "cát tinh",
+                        "palace":  "Phúc Đức",
+                        "stars":  [
+                                      "Tả Phù",
+                                      "Hữu Bật",
+                                      "Văn Xương",
+                                      "Văn Khúc",
+                                      "Khôi",
+                                      "Việt",
+                                      "Long Trì",
+                                      "Phượng"
+                                  ]
+                    },
+        "priority":  54,
+        "title":  "Cát tinh tại Phúc Đức",
+        "summary":  "Bạn thường có thể nhận được sức nâng từ gia đình, nếp sống tử tế, niềm tin tốt hoặc người đi trước để lại kinh nghiệm hữu ích. Bạn muốn giữ hòa khí mà vẫn nói rõ nhu cầu, nhưng cũng cần để ý việc dựa vào nền tốt mà ngại tự xây hệ thống riêng, hoặc tiếp tục giữ những kỳ vọng không còn hợp với bạn, nhất là trong nếp nhà và chỗ nghỉ tinh thần.",
+        "strengthText":  "Khi kỳ vọng giữa các bên đã rõ, bạn có thể dùng nền giá trị và uy tín gia đình để xây niềm tin, quan hệ làm ăn hoặc sự ổn định tinh thần dài hạn.",
+        "cautionText":  "Khi quá tin vào mặt thuận của Cát tinh tại Phúc Đức, bạn có thể dễ dựa vào nền tốt mà ngại tự xây hệ thống riêng, hoặc tiếp tục giữ những kỳ vọng không còn hợp với bạn.",
+        "lifeAdviceText":  "Bạn hãy chọn một giá trị tốt từ gia đình để kế thừa thành hành động cụ thể, đồng thời đặt ranh giới với những kỳ vọng làm bạn hao sức.",
+        "teaserQuestion":  "Điều gì trong nền gia đình đang nâng bạn lên, và điều gì cần được đặt lại để bạn sống nhẹ hơn?",
+        "evidenceLabel":  "Dấu hiệu này đến từ nhóm sao nâng đỡ nằm ở vùng nền tinh thần và nếp nhà."
+    },
+    {
+        "version":  "interpretation-rules-v2",
+        "status":  "active",
+        "key":  "group:sat-tinh:menh",
+        "scope":  "IDENTITY",
+        "pattern":  {
+                        "kind":  "support-group",
+                        "group":  "sát tinh",
+                        "palace":  "Mệnh",
+                        "stars":  [
+                                      "Kình",
+                                      "Đà",
+                                      "Hỏa",
+                                      "Linh",
+                                      "Không",
+                                      "Kiếp"
+                                  ]
+                    },
+        "priority":  66,
+        "title":  "Sát tinh tại Mệnh",
+        "summary":  "Bạn dễ phản ứng nhanh, chịu va chạm tốt và có bản năng chiến đấu khi bị dồn vào góc. Bạn muốn sống đúng với điều bạn tin là phù hợp, nhưng cũng cần để ý việc đồng nhất sự căng thẳng với sức mạnh, rồi quen sống trong chế độ phòng thủ ngay cả khi không còn nguy hiểm, nhất là trong cách bạn tự quyết và nhận trách nhiệm.",
+        "strengthText":  "Khi mục tiêu và vai trò của bạn đã rõ, bạn có thể phát huy khả năng xử lý khủng hoảng, cạnh tranh và ra quyết định trong môi trường áp lực cao, nơi người mềm quá dễ bị cuốn đi.",
+        "cautionText":  "Bạn có thể dễ đồng nhất sự căng thẳng với sức mạnh, rồi quen sống trong chế độ phòng thủ ngay cả khi không còn nguy hiểm nếu chưa đặt giới hạn rõ.",
+        "lifeAdviceText":  "Bạn hãy đặt quy tắc dừng trước khi phản ứng: khi bị kích hoạt, ghi ra dữ kiện, mục tiêu và cái giá của từng lựa chọn trước khi nói hoặc ký quyết định.",
+        "teaserQuestion":  "Lực chiến đấu trong bạn đang bảo vệ tương lai, hay đang làm bạn mất những cơ hội cần sự mềm hơn?",
+        "evidenceLabel":  "Dấu hiệu này đến từ nhóm sao va chạm nằm gần vùng khí chất và phản ứng bản năng."
+    },
+    {
+        "version":  "interpretation-rules-v2",
+        "status":  "active",
+        "key":  "group:sat-tinh:than",
+        "scope":  "AXIS",
+        "pattern":  {
+                        "kind":  "support-group",
+                        "group":  "sát tinh",
+                        "palace":  "Thân",
+                        "stars":  [
+                                      "Kình",
+                                      "Đà",
+                                      "Hỏa",
+                                      "Linh",
+                                      "Không",
+                                      "Kiếp"
+                                  ]
+                    },
+        "priority":  64,
+        "title":  "Sát tinh tại Thân",
+        "summary":  "Bạn dễ nhận ra rằng kinh nghiệm thực tế thường đến với bạn qua va chạm, đổi hướng và những việc buộc phải tự đứng ra xử lý. Bạn muốn đưa những lựa chọn khác nhau về cùng một hướng, nhưng cũng cần để ý việc quen tự gánh nên không biết khi nào cần chia việc, khiến năng lực bền bỉ biến thành kiệt sức kéo dài, nhất là trong vai trò thực tế và lịch sống mỗi ngày.",
+        "strengthText":  "Khi thứ tự ưu tiên đã rõ, bạn có thể phát huy sức chịu tải cao trong việc thật, đặc biệt khi làm vận hành, bán hàng, quản lý rủi ro hoặc xử lý tình huống khó.",
+        "cautionText":  "Nếu kéo dài, bạn có thể dễ quen tự gánh nên không biết khi nào cần chia việc, khiến năng lực bền bỉ biến thành kiệt sức kéo dài.",
+        "lifeAdviceText":  "Bạn hãy tạo ngưỡng nhận việc rõ ràng: việc nào thuộc trách nhiệm của bạn, việc nào cần người khác cùng chịu, việc nào phải từ chối dù bạn làm được.",
+        "teaserQuestion":  "Bạn đang mạnh lên nhờ va chạm, hay đang để va chạm biến thành thói quen tự gánh mọi thứ?",
+        "evidenceLabel":  "Dấu hiệu này đến từ nhóm sao va chạm tác động vào phần hành động và đời sống thực tế."
+    },
+    {
+        "version":  "interpretation-rules-v2",
+        "status":  "active",
+        "key":  "group:sat-tinh:quan-loc",
+        "scope":  "CAREER",
+        "pattern":  {
+                        "kind":  "support-group",
+                        "group":  "sát tinh",
+                        "palace":  "Quan Lộc",
+                        "stars":  [
+                                      "Kình",
+                                      "Đà",
+                                      "Hỏa",
+                                      "Linh",
+                                      "Không",
+                                      "Kiếp"
+                                  ]
+                    },
+        "priority":  66,
+        "title":  "Sát tinh tại Quan Lộc",
+        "summary":  "Có những lúc bạn nâng tiêu chuẩn làm việc. Bạn muốn tạo kết quả mà không phải ôm hết việc, nhưng cũng cần để ý việc lấy căng thẳng làm thước đo giá trị nghề nghiệp, rồi chỉ thấy bản thân có ích khi mọi thứ đang cháy, nhất là trong công việc và trách nhiệm nghề nghiệp.",
+        "strengthText":  "Khi trách nhiệm công việc đã rõ, bạn có thể hợp với môi trường cần quyết đoán, cải tổ, xử lý vấn đề và chịu trách nhiệm khi hệ thống đang rối.",
+        "cautionText":  "Khi quá tin vào mặt thuận của Sát tinh tại Quan Lộc, bạn có thể dễ lấy căng thẳng làm thước đo giá trị nghề nghiệp, rồi chỉ thấy bản thân có ích khi mọi thứ đang cháy.",
+        "lifeAdviceText":  "Bạn hãy chuyển năng lượng chiến đấu thành quy trình: định nghĩa vấn đề, người chịu trách nhiệm, thời hạn và tiêu chí xong việc trước khi lao vào cứu hỏa.",
+        "teaserQuestion":  "Công việc đang cần bản lĩnh của bạn, hay đang nghiện việc đặt bạn vào trạng thái phải cứu nguy?",
+        "evidenceLabel":  "Dấu hiệu này đến từ nhóm sao va chạm xuất hiện ở vùng nghề nghiệp và trách nhiệm xã hội."
+    },
+    {
+        "version":  "interpretation-rules-v2",
+        "status":  "active",
+        "key":  "group:sat-tinh:tai-bach",
+        "scope":  "MONEY",
+        "pattern":  {
+                        "kind":  "support-group",
+                        "group":  "sát tinh",
+                        "palace":  "Tài Bạch",
+                        "stars":  [
+                                      "Kình",
+                                      "Đà",
+                                      "Hỏa",
+                                      "Linh",
+                                      "Không",
+                                      "Kiếp"
+                                  ]
+                    },
+        "priority":  65,
+        "title":  "Sát tinh tại Tài Bạch",
+        "summary":  "Bạn dễ nhận ra rằng tiền bạc dễ đi kèm rủi ro, áp lực chi trả, quyết định nhanh hoặc những khoản hao vì thiếu kiểm soát. Bạn muốn giữ an toàn mà không tự bỏ lỡ cơ hội, nhưng cũng cần để ý việc quyết tiền trong lúc bực, sợ hoặc muốn chứng minh bản lĩnh, khiến một quyết định nóng kéo theo hậu quả dài, nhất là trong tiền bạc, công sức và quyền lựa chọn.",
+        "strengthText":  "Khi giới hạn tiền bạc đã rõ, bạn có thể nhạy với rủi ro tài chính và có thể kiếm tốt trong lĩnh vực cần xử lý vấn đề, đàm phán căng hoặc quản trị khủng hoảng.",
+        "cautionText":  "Bạn có thể dễ quyết tiền trong lúc bực, sợ hoặc muốn chứng minh bản lĩnh, khiến một quyết định nóng kéo theo hậu quả dài nếu chưa đặt giới hạn rõ.",
+        "lifeAdviceText":  "Bạn hãy đặt luật 24 giờ cho khoản chi hoặc cam kết lớn; mọi quyết định tài chính dưới áp lực phải được kiểm lại bằng số liệu và phương án thoát.",
+        "teaserQuestion":  "Khoản tiền nào đang thử bản lĩnh của bạn, và khoản nào đang kích hoạt nỗi sợ khiến bạn quyết quá nhanh?",
+        "evidenceLabel":  "Dấu hiệu này đến từ nhóm sao va chạm nằm ở vùng tiền bạc và nguồn lực cá nhân."
+    },
+    {
+        "version":  "interpretation-rules-v2",
+        "status":  "active",
+        "key":  "group:sat-tinh:phu-the",
+        "scope":  "RELATIONSHIP",
+        "pattern":  {
+                        "kind":  "support-group",
+                        "group":  "sát tinh",
+                        "palace":  "Phu Thê",
+                        "stars":  [
+                                      "Kình",
+                                      "Đà",
+                                      "Hỏa",
+                                      "Linh",
+                                      "Không",
+                                      "Kiếp"
+                                  ]
+                    },
+        "priority":  63,
+        "title":  "Sát tinh tại Phu Thê",
+        "summary":  "Bạn dễ nhận ra rằng quan hệ thân mật có thể nhiều lực hút nhưng cũng dễ phát sinh va chạm về quyền quyết, tự do và trách nhiệm. Bạn muốn giữ hòa khí mà vẫn nói rõ nhu cầu, nhưng cũng cần để ý việc nhầm sự dữ dội với chiều sâu, rồi để mâu thuẫn trở thành cách duy nhất chứng minh tình cảm, nhất là trong tình cảm, cam kết và trách nhiệm chung.",
+        "strengthText":  "Khi kỳ vọng giữa các bên đã rõ, bạn có thể quan hệ có khả năng cùng vượt khó, cùng xử lý áp lực và xây bản lĩnh nếu hai bên biết nói thẳng mà không công kích.",
+        "cautionText":  "Nếu kéo dài, bạn có thể dễ nhầm sự dữ dội với chiều sâu, rồi để mâu thuẫn trở thành cách duy nhất chứng minh tình cảm.",
+        "lifeAdviceText":  "Bạn hãy thống nhất quy tắc tranh luận: không quyết tiền khi đang giận, không lôi quá khứ làm vũ khí và phải quay lại vấn đề chính trong 24 giờ.",
+        "teaserQuestion":  "Bạn đang cần tự hỏi: va chạm trong quan hệ đang giúp hai người trưởng thành, hay đang lặp lại một vòng tổn thương quen thuộc?",
+        "evidenceLabel":  "Dấu hiệu này đến từ nhóm sao va chạm xuất hiện ở vùng cam kết và quan hệ thân thiết."
+    },
+    {
+        "version":  "interpretation-rules-v2",
+        "status":  "active",
+        "key":  "group:sat-tinh:tat-ach",
+        "scope":  "HEALTH",
+        "pattern":  {
+                        "kind":  "support-group",
+                        "group":  "sát tinh",
+                        "palace":  "Tật Ách",
+                        "stars":  [
+                                      "Kình",
+                                      "Đà",
+                                      "Hỏa",
+                                      "Linh",
+                                      "Không",
+                                      "Kiếp"
+                                  ]
+                    },
+        "priority":  64,
+        "title":  "Sát tinh tại Tật Ách",
+        "summary":  "Bạn dễ nhận ra rằng cơ thể và tinh thần dễ phản ứng mạnh khi bạn sống quá lâu trong áp lực, xung đột hoặc nhịp làm việc thiếu hồi phục. Bạn muốn làm tròn trách nhiệm mà không kiệt sức, nhưng cũng cần để ý việc xem căng thẳng như bình thường vì đã quen chịu, đến khi cơ thể buộc dừng thì chi phí hồi phục cao hơn nhiều.",
+        "strengthText":  "Khi lịch làm và lịch nghỉ đã rõ, bạn có thể phát huy khả năng nhận biết điểm gãy của hệ thống nếu bạn chịu quan sát tín hiệu sớm, từ đó bảo vệ hiệu suất dài hạn.",
+        "cautionText":  "Khi quá tin vào mặt thuận của Sát tinh tại Tật Ách, bạn có thể dễ xem căng thẳng như bình thường vì đã quen chịu, đến khi cơ thể buộc dừng thì chi phí hồi phục cao hơn nhiều.",
+        "lifeAdviceText":  "Bạn hãy có danh sách tín hiệu đỏ riêng: mất ngủ, tim đập nhanh, cáu gắt, đau lặp lại; khi hai tín hiệu cùng xuất hiện, giảm tải ngay thay vì cố thêm.",
+        "teaserQuestion":  "Cơ thể bạn đang phát còi báo động ở đâu mà lịch sống của bạn vẫn chưa chịu điều chỉnh?",
+        "evidenceLabel":  "Dấu hiệu này đến từ nhóm sao va chạm tác động vào vùng thân tâm và khả năng chịu áp lực."
+    },
+    {
+        "version":  "interpretation-rules-v2",
+        "status":  "active",
+        "key":  "group:sat-tinh:thien-di",
+        "scope":  "CAREER",
+        "pattern":  {
+                        "kind":  "support-group",
+                        "group":  "sát tinh",
+                        "palace":  "Thiên Di",
+                        "stars":  [
+                                      "Kình",
+                                      "Đà",
+                                      "Hỏa",
+                                      "Linh",
+                                      "Không",
+                                      "Kiếp"
+                                  ]
+                    },
+        "priority":  63,
+        "title":  "Sát tinh tại Thiên Di",
+        "summary":  "Có những lúc bạn phải sắc sảo hơn. Bạn muốn tạo kết quả mà không phải ôm hết việc, nhưng cũng cần để ý việc phòng thủ quá mức, khiến bạn nhìn cơ hội nào cũng như mối đe dọa và bỏ lỡ người thật sự đáng hợp tác, nhất là trong môi trường bên ngoài và cơ hội mới.",
+        "strengthText":  "Khi trách nhiệm công việc đã rõ, bạn có thể bản lĩnh thương lượng và khả năng tồn tại trong thị trường khó, đặc biệt khi cần mở rộng khách hàng hoặc bước vào môi trường mới.",
+        "cautionText":  "Bạn có thể dễ phòng thủ quá mức, khiến bạn nhìn cơ hội nào cũng như mối đe dọa và bỏ lỡ người thật sự đáng hợp tác nếu chưa đặt giới hạn rõ.",
+        "lifeAdviceText":  "Bạn hãy kiểm tra môi trường mới bằng dữ kiện: luật chơi, người ra quyết định, chi phí ẩn và quyền rút lui; tin người nhưng phải có cấu trúc bảo vệ.",
+        "teaserQuestion":  "Môi trường bên ngoài đang rèn bạn sắc hơn, hay đang kéo bạn vào cuộc chiến không cần thiết?",
+        "evidenceLabel":  "Dấu hiệu này đến từ nhóm sao va chạm nằm ở vùng giao tiếp xã hội và cơ hội bên ngoài."
+    },
+    {
+        "version":  "interpretation-rules-v2",
+        "status":  "active",
+        "key":  "group:sat-tinh:phuc-duc",
+        "scope":  "RELATIONSHIP",
+        "pattern":  {
+                        "kind":  "support-group",
+                        "group":  "sát tinh",
+                        "palace":  "Phúc Đức",
+                        "stars":  [
+                                      "Kình",
+                                      "Đà",
+                                      "Hỏa",
+                                      "Linh",
+                                      "Không",
+                                      "Kiếp"
+                                  ]
+                    },
+        "priority":  62,
+        "title":  "Sát tinh tại Phúc Đức",
+        "summary":  "Có những lúc bạn phản ứng mạnh hơn mức cần thiết. Bạn muốn giữ hòa khí mà vẫn nói rõ nhu cầu, nhưng cũng cần để ý việc tiếp tục chiến đấu với những chuyện đã qua bằng các quyết định hiện tại, khiến người mới phải trả giá cho vết cũ, nhất là trong nếp nhà và chỗ nghỉ tinh thần.",
+        "strengthText":  "Khi kỳ vọng giữa các bên đã rõ, bạn có thể phát huy khả năng chuyển hóa trải nghiệm khó thành sự tỉnh táo, giúp bạn quản trị quan hệ và tiền bạc ít bị kéo bởi quá khứ.",
+        "cautionText":  "Nếu kéo dài, bạn có thể dễ tiếp tục chiến đấu với những chuyện đã qua bằng các quyết định hiện tại, khiến người mới phải trả giá cho vết cũ.",
+        "lifeAdviceText":  "Bạn hãy tách quá khứ khỏi hiện tại bằng một câu hỏi trước mỗi phản ứng mạnh: việc này thật sự đang xảy ra bây giờ, hay chỉ giống điều từng làm bạn đau.",
+        "teaserQuestion":  "Vết nứt nào trong nền tinh thần đang âm thầm điều khiển cách bạn yêu, làm việc hoặc dùng tiền?",
+        "evidenceLabel":  "Dấu hiệu này đến từ nhóm sao va chạm nằm ở vùng nền tinh thần và nếp gia đình."
+    },
+    {
+        "version":  "interpretation-rules-v2",
+        "status":  "active",
+        "key":  "group:hao-tinh:menh",
+        "scope":  "IDENTITY",
+        "pattern":  {
+                        "kind":  "support-group",
+                        "group":  "hao tinh",
+                        "palace":  "Mệnh",
+                        "stars":  [
+                                      "Đại Hao",
+                                      "Tiểu Hao",
+                                      "Hao"
+                                  ]
+                    },
+        "priority":  55,
+        "title":  "Hao tinh tại Mệnh",
+        "summary":  "Bạn dễ tiêu hao vì ôm nhiều vai, nghĩ nhiều hoặc dùng năng lượng cá nhân để giải quyết việc không thật sự thuộc về bạn. Bạn muốn sống đúng với điều bạn tin là phù hợp, nhưng cũng cần để ý việc tưởng bạn phải luôn cho đi, luôn phản hồi, luôn có mặt thì mới có giá trị, nhất là trong cách bạn tự quyết và nhận trách nhiệm.",
+        "strengthText":  "Khi mục tiêu và vai trò của bạn đã rõ, bạn có thể rất nhạy với dòng chảy nguồn lực, biết việc nào đang hút sức và có thể tối ưu cách làm để giảm hao phí.",
+        "cautionText":  "Khi quá tin vào mặt thuận của Hao tinh tại Mệnh, bạn có thể dễ tưởng bạn phải luôn cho đi, luôn phản hồi, luôn có mặt thì mới có giá trị.",
+        "lifeAdviceText":  "Bạn hãy đặt ngân sách năng lượng hằng tuần như ngân sách tiền: mỗi cam kết mới phải có thứ được bỏ ra hoặc giao lại; trong bảy ngày tới, bạn áp dụng ngay vào một tình huống thật thuộc cách bạn tự quyết và nhận trách nhiệm.",
+        "teaserQuestion":  "Việc gì đang rút pin của bạn mỗi ngày nhưng bạn vẫn gọi đó là trách nhiệm?",
+        "evidenceLabel":  "Dấu hiệu này đến từ nhóm sao hao tán chạm vào vùng bản thân và cách dùng sức cá nhân."
+    },
+    {
+        "version":  "interpretation-rules-v2",
+        "status":  "active",
+        "key":  "group:hao-tinh:than",
+        "scope":  "AXIS",
+        "pattern":  {
+                        "kind":  "support-group",
+                        "group":  "hao tinh",
+                        "palace":  "Thân",
+                        "stars":  [
+                                      "Đại Hao",
+                                      "Tiểu Hao",
+                                      "Hao"
+                                  ]
+                    },
+        "priority":  54,
+        "title":  "Hao tinh tại Thân",
+        "summary":  "Bạn dễ nhận ra rằng sự hao hụt thường đến từ lịch chạy việc, di chuyển, trách nhiệm thực tế hoặc những việc nhỏ tích lại thành mệt lớn. Bạn muốn đưa những lựa chọn khác nhau về cùng một hướng, nhưng cũng cần để ý việc chỉ kiểm soát tiền mà không kiểm soát lịch, nhất là trong vai trò thực tế và lịch sống mỗi ngày.",
+        "strengthText":  "Khi thứ tự ưu tiên đã rõ, bạn có thể phát huy khả năng nhận ra điểm rò trong vận hành hằng ngày, từ đó tiết kiệm thời gian và tăng hiệu suất làm việc.",
+        "cautionText":  "Bạn có thể dễ chỉ kiểm soát tiền mà không kiểm soát lịch, trong khi thứ mất nhiều nhất có thể là sức và sự tập trung nếu chưa đặt giới hạn rõ.",
+        "lifeAdviceText":  "Bạn hãy kiểm toán một tuần bằng màu: việc tạo tiền, việc tạo kỹ năng, việc chỉ giữ thể diện; nhóm thứ ba cần cắt giảm trước; trong mười bốn ngày tới, bạn áp dụng ngay vào một tình huống thật thuộc vai trò thực tế và lịch sống mỗi ngày.",
+        "teaserQuestion":  "Bạn đang hao vì thiếu tiền, hay hao vì một lịch sống không còn phục vụ mục tiêu thật?",
+        "evidenceLabel":  "Dấu hiệu này đến từ nhóm sao hao tán nằm ở vùng hành động và đời sống thực tế."
+    },
+    {
+        "version":  "interpretation-rules-v2",
+        "status":  "active",
+        "key":  "group:hao-tinh:quan-loc",
+        "scope":  "CAREER",
+        "pattern":  {
+                        "kind":  "support-group",
+                        "group":  "hao tinh",
+                        "palace":  "Quan Lộc",
+                        "stars":  [
+                                      "Đại Hao",
+                                      "Tiểu Hao",
+                                      "Hao"
+                                  ]
+                    },
+        "priority":  55,
+        "title":  "Hao tinh tại Quan Lộc",
+        "summary":  "Bạn dễ nhận ra rằng công việc dễ làm bạn hao vì nhận nhiều, đổi hướng nhiều hoặc thiếu ranh giới về phạm vi trách nhiệm. Bạn muốn tạo kết quả mà không phải ôm hết việc, nhưng cũng cần để ý việc bận rộn để chứng minh năng lực, rồi cuối cùng không còn thời gian cho việc thật sự nâng vị thế, nhất là trong công việc và trách nhiệm nghề nghiệp.",
+        "strengthText":  "Khi trách nhiệm công việc đã rõ, bạn có thể nếu biết tinh gọn, bạn có thể biến trải nghiệm đa dạng thành kỹ năng quản trị quy trình và tối ưu chi phí.",
+        "cautionText":  "Nếu kéo dài, bạn có thể dễ bận rộn để chứng minh năng lực, rồi cuối cùng không còn thời gian cho việc thật sự nâng vị thế.",
+        "lifeAdviceText":  "Bạn hãy viết mô tả phạm vi cho từng dự án: việc gì làm, việc gì không làm, chi phí phát sinh tính thế nào; không có phạm vi thì không nhận thêm.",
+        "teaserQuestion":  "Công việc nào đang làm bạn trông có vẻ quan trọng nhưng thật ra đang rút dần vị thế của bạn?",
+        "evidenceLabel":  "Dấu hiệu này đến từ nhóm sao hao tán xuất hiện ở vùng nghề nghiệp và trách nhiệm xã hội."
+    },
+    {
+        "version":  "interpretation-rules-v2",
+        "status":  "active",
+        "key":  "group:hao-tinh:tai-bach",
+        "scope":  "MONEY",
+        "pattern":  {
+                        "kind":  "support-group",
+                        "group":  "hao tinh",
+                        "palace":  "Tài Bạch",
+                        "stars":  [
+                                      "Đại Hao",
+                                      "Tiểu Hao",
+                                      "Hao"
+                                  ]
+                    },
+        "priority":  58,
+        "title":  "Hao tinh tại Tài Bạch",
+        "summary":  "Bạn dễ nhận ra rằng nguồn lực dễ rò qua chi phí nhỏ, việc nhận thiếu giá, hỗ trợ quá tay hoặc quyết định tài chính thiếu hệ thống. Bạn muốn giữ an toàn mà không tự bỏ lỡ cơ hội, nhưng cũng cần để ý việc nghĩ chỉ cần kiếm thêm là ổn, nhất là trong tiền bạc, công sức và quyền lựa chọn.",
+        "strengthText":  "Khi giới hạn tiền bạc đã rõ, bạn có thể phát huy khả năng nhìn thấy chỗ thất thoát và thiết kế lại ngân sách, bảng giá hoặc cách thu tiền để giảm hao phí.",
+        "cautionText":  "Khi quá tin vào mặt thuận của Hao tinh tại Tài Bạch, bạn có thể dễ nghĩ chỉ cần kiếm thêm là ổn, trong khi vấn đề thật nằm ở cách giữ và phân bổ nguồn lực.",
+        "lifeAdviceText":  "Bạn hãy rà ba nhóm: khoản chi lặp lại, việc làm không tính phí và cam kết hỗ trợ người khác; mỗi nhóm cần một giới hạn bằng số; trong bảy ngày tới, bạn áp dụng ngay vào một tình huống thật thuộc tiền bạc, công sức và quyền lựa chọn.",
+        "teaserQuestion":  "Tiền của bạn đang mất ở khoản lớn dễ thấy, hay ở những lỗ nhỏ bạn đã quen bỏ qua?",
+        "evidenceLabel":  "Dấu hiệu này đến từ nhóm sao hao tán đi thẳng vào vùng tiền bạc và tài nguyên cá nhân."
+    },
+    {
+        "version":  "interpretation-rules-v2",
+        "status":  "active",
+        "key":  "group:hao-tinh:phu-the",
+        "scope":  "RELATIONSHIP",
+        "pattern":  {
+                        "kind":  "support-group",
+                        "group":  "hao tinh",
+                        "palace":  "Phu Thê",
+                        "stars":  [
+                                      "Đại Hao",
+                                      "Tiểu Hao",
+                                      "Hao"
+                                  ]
+                    },
+        "priority":  53,
+        "title":  "Hao tinh tại Phu Thê",
+        "summary":  "Bạn dễ nhận ra rằng quan hệ dễ hao vì cho nhiều hơn nói, nhường nhiều hơn thỏa thuận hoặc chi tiêu cảm xúc để giữ hòa khí. Bạn muốn giữ hòa khí mà vẫn nói rõ nhu cầu, nhưng cũng cần để ý việc tưởng hy sinh im lặng sẽ làm quan hệ bền, nhất là trong tình cảm, cam kết và trách nhiệm chung.",
+        "strengthText":  "Khi kỳ vọng giữa các bên đã rõ, bạn có thể nếu biết minh bạch, bạn có thể xây quan hệ rất thực tế: rõ tiền, rõ thời gian, rõ trách nhiệm và ít ấm ức ngầm.",
+        "cautionText":  "Bạn có thể dễ tưởng hy sinh im lặng sẽ làm quan hệ bền, trong khi nó thường tạo khoản nợ cảm xúc không ai ghi sổ nếu chưa đặt giới hạn rõ.",
+        "lifeAdviceText":  "Bạn hãy nói trước về nguồn lực chung: ai trả gì, ai làm gì, lúc mệt thì báo ra sao; thỏa thuận rõ là cách bảo vệ tình cảm; trong mười bốn ngày tới, bạn áp dụng ngay vào một tình huống thật thuộc tình cảm, cam kết và trách nhiệm chung.",
+        "teaserQuestion":  "Bạn đang yêu bằng sự tự nguyện, hay đang âm thầm trả một khoản phí cảm xúc quá cao?",
+        "evidenceLabel":  "Dấu hiệu này đến từ nhóm sao hao tán nằm ở vùng cam kết và quan hệ thân thiết."
+    },
+    {
+        "version":  "interpretation-rules-v2",
+        "status":  "active",
+        "key":  "group:hao-tinh:tat-ach",
+        "scope":  "HEALTH",
+        "pattern":  {
+                        "kind":  "support-group",
+                        "group":  "hao tinh",
+                        "palace":  "Tật Ách",
+                        "stars":  [
+                                      "Đại Hao",
+                                      "Tiểu Hao",
+                                      "Hao"
+                                  ]
+                    },
+        "priority":  54,
+        "title":  "Hao tinh tại Tật Ách",
+        "summary":  "Bạn dễ nhận ra rằng sức khỏe tinh thần dễ bị rút bởi lo nghĩ kéo dài, ngủ kém, việc nhỏ không dứt hoặc cảm giác phải luôn sẵn sàng. Bạn muốn làm tròn trách nhiệm mà không kiệt sức, nhưng cũng cần để ý việc chỉ nghỉ khi đã cạn sạch, khiến việc hồi phục mất nhiều thời gian hơn việc phòng ngừa, nhất là trong nhịp nghỉ và phản ứng khi quá tải.",
+        "strengthText":  "Khi lịch làm và lịch nghỉ đã rõ, bạn có thể phát huy khả năng phát hiện kiểu hao ngầm và sửa bằng thói quen nhỏ, giúp bạn giữ năng lượng ổn định hơn cho công việc.",
+        "cautionText":  "Nếu kéo dài, bạn có thể dễ chỉ nghỉ khi đã cạn sạch, khiến việc hồi phục mất nhiều thời gian hơn việc phòng ngừa.",
+        "lifeAdviceText":  "Bạn hãy đặt ba mức cảnh báo năng lượng xanh, vàng, đỏ; khi vào mức vàng đã phải giảm việc, không đợi đến đỏ mới dừng; trong ba ngày tới, bạn áp dụng ngay vào một tình huống thật thuộc nhịp nghỉ và phản ứng khi quá tải.",
+        "teaserQuestion":  "Nguồn hao nào đang âm thầm làm bạn mệt dù bên ngoài mọi thứ vẫn có vẻ ổn?",
+        "evidenceLabel":  "Dấu hiệu này đến từ nhóm sao hao tán chạm vào vùng thân tâm và nhịp hồi phục."
+    },
+    {
+        "version":  "interpretation-rules-v2",
+        "status":  "active",
+        "key":  "group:hao-tinh:thien-di",
+        "scope":  "CAREER",
+        "pattern":  {
+                        "kind":  "support-group",
+                        "group":  "hao tinh",
+                        "palace":  "Thiên Di",
+                        "stars":  [
+                                      "Đại Hao",
+                                      "Tiểu Hao",
+                                      "Hao"
+                                  ]
+                    },
+        "priority":  53,
+        "title":  "Hao tinh tại Thiên Di",
+        "summary":  "Bạn dễ nhận ra rằng cơ hội bên ngoài có thể kéo theo chi phí di chuyển, giao tiếp, thời gian hoặc những cam kết xã hội làm bạn phân tán. Bạn muốn tạo kết quả mà không phải ôm hết việc, nhưng cũng cần để ý việc sợ bỏ lỡ nên có mặt ở quá nhiều nơi, cuối cùng nơi nào cũng chưa đủ sâu để sinh giá trị.",
+        "strengthText":  "Khi trách nhiệm công việc đã rõ, bạn có thể tính chi phí cơ hội trước khi bước ra thị trường, nhờ vậy chọn được mối quan hệ và môi trường đáng đầu tư hơn.",
+        "cautionText":  "Khi quá tin vào mặt thuận của Hao tinh tại Thiên Di, bạn có thể dễ sợ bỏ lỡ nên có mặt ở quá nhiều nơi, cuối cùng nơi nào cũng chưa đủ sâu để sinh giá trị.",
+        "lifeAdviceText":  "Bạn hãy chọn tối đa hai sân chơi bên ngoài trong một giai đoạn; mọi lời mời khác phải chứng minh được lợi ích rõ trước khi bạn tham gia.",
+        "teaserQuestion":  "Bạn đang mở rộng đúng hướng, hay đang tiêu hao vì quá nhiều lời mời nghe có vẻ hay?",
+        "evidenceLabel":  "Dấu hiệu này đến từ nhóm sao hao tán nằm ở vùng môi trường bên ngoài và cơ hội xã hội."
+    },
+    {
+        "version":  "interpretation-rules-v2",
+        "status":  "active",
+        "key":  "group:hao-tinh:phuc-duc",
+        "scope":  "RELATIONSHIP",
+        "pattern":  {
+                        "kind":  "support-group",
+                        "group":  "hao tinh",
+                        "palace":  "Phúc Đức",
+                        "stars":  [
+                                      "Đại Hao",
+                                      "Tiểu Hao",
+                                      "Hao"
+                                  ]
+                    },
+        "priority":  52,
+        "title":  "Hao tinh tại Phúc Đức",
+        "summary":  "Bạn dễ nhận ra rằng năng lượng tinh thần có thể hao vì trách nhiệm gia đình, niềm tin cũ hoặc cảm giác phải bù đắp cho người khác. Bạn muốn giữ hòa khí mà vẫn nói rõ nhu cầu, nhưng cũng cần để ý việc xem mọi gánh nặng gia đình như bổn phận tự nhiên, không phân biệt đâu là yêu thương và đâu là tự làm cạn bạn.",
+        "strengthText":  "Khi kỳ vọng giữa các bên đã rõ, bạn có thể nếu nhận ra gốc hao, bạn có thể dọn lại nền sống và giảm những khoản chi cảm xúc lặp đi lặp lại.",
+        "cautionText":  "Bạn có thể dễ xem mọi gánh nặng gia đình như bổn phận tự nhiên, không phân biệt đâu là yêu thương và đâu là tự làm cạn bạn nếu chưa đặt giới hạn rõ.",
+        "lifeAdviceText":  "Bạn hãy đặt ranh giới hỗ trợ theo khả năng thật: giúp bao nhiêu, trong bao lâu, bằng tiền hay bằng cách khác; đừng để lòng tốt không có giới hạn.",
+        "teaserQuestion":  "Điều gì trong nếp nhà đang khiến bạn tiêu hao dù không ai trực tiếp yêu cầu?",
+        "evidenceLabel":  "Dấu hiệu này đến từ nhóm sao hao tán nằm ở vùng nền tinh thần và trách nhiệm gia đình."
+    },
+    {
+        "version":  "interpretation-rules-v2",
+        "status":  "active",
+        "key":  "group:dao-hoa:menh",
+        "scope":  "IDENTITY",
+        "pattern":  {
+                        "kind":  "support-group",
+                        "group":  "đào hoa",
+                        "palace":  "Mệnh",
+                        "stars":  [
+                                      "Đào Hoa",
+                                      "Hồng Loan",
+                                      "Thiên Hỷ",
+                                      "Hỷ Thần"
+                                  ]
+                    },
+        "priority":  55,
+        "title":  "Đào hoa tại Mệnh",
+        "summary":  "Bạn thường có sức hút tự nhiên qua cảm xúc, thẩm mỹ, cách nói chuyện hoặc khả năng làm người khác thấy dễ gần. Bạn muốn sống đúng với điều bạn tin là phù hợp, nhưng cũng cần để ý việc nhầm được chú ý với được hiểu, rồi để sự công nhận bên ngoài kéo bạn lệch khỏi giá trị thật, nhất là trong cách bạn tự quyết và nhận trách nhiệm.",
+        "strengthText":  "Khi mục tiêu và vai trò của bạn đã rõ, bạn có thể dùng sức hút cá nhân để mở quan hệ, bán ý tưởng, xây thương hiệu cá nhân hoặc tạo thiện cảm trong công việc.",
+        "cautionText":  "Nếu kéo dài, bạn có thể dễ nhầm được chú ý với được hiểu, rồi để sự công nhận bên ngoài kéo bạn lệch khỏi giá trị thật.",
+        "lifeAdviceText":  "Bạn hãy định nghĩa rõ bạn muốn được nhớ vì điều gì: vẻ ngoài, cảm xúc hay năng lực; sức hút chỉ bền khi được neo vào giá trị cụ thể.",
+        "teaserQuestion":  "Bạn đang dùng sức hút để mở đúng cánh cửa, hay đang để ánh nhìn của người khác điều khiển lựa chọn của bạn?",
+        "evidenceLabel":  "Dấu hiệu này đến từ nhóm sao cảm xúc và sức hút nằm gần vùng khí chất cá nhân."
+    },
+    {
+        "version":  "interpretation-rules-v2",
+        "status":  "active",
+        "key":  "group:dao-hoa:than",
+        "scope":  "AXIS",
+        "pattern":  {
+                        "kind":  "support-group",
+                        "group":  "đào hoa",
+                        "palace":  "Thân",
+                        "stars":  [
+                                      "Đào Hoa",
+                                      "Hồng Loan",
+                                      "Thiên Hỷ",
+                                      "Hỷ Thần"
+                                  ]
+                    },
+        "priority":  54,
+        "title":  "Đào hoa tại Thân",
+        "summary":  "Bạn dễ nhận ra rằng sức hút của bạn không chỉ nằm ở ngoại hình mà còn ở cách hành động, cách hiện diện và cách làm người khác muốn hợp tác. Bạn muốn đưa những lựa chọn khác nhau về cùng một hướng, nhưng cũng cần để ý việc vì muốn được quý nên nhận thêm việc, thêm lời hẹn hoặc thêm trách nhiệm cảm xúc vượt sức.",
+        "strengthText":  "Khi thứ tự ưu tiên đã rõ, bạn có thể dễ tạo mạng lưới qua trải nghiệm trực tiếp, phù hợp với công việc cần gặp người, chăm khách hàng, truyền thông hoặc cộng đồng.",
+        "cautionText":  "Khi quá tin vào mặt thuận của Đào hoa tại Thân, bạn có thể dễ vì muốn được quý nên nhận thêm việc, thêm lời hẹn hoặc thêm trách nhiệm cảm xúc vượt sức.",
+        "lifeAdviceText":  "Bạn hãy phân biệt thân thiện và cam kết: bạn có thể tử tế với nhiều người, nhưng chỉ nên nhận trách nhiệm với những việc thật sự có giá trị.",
+        "teaserQuestion":  "Sức hút ngoài đời của bạn đang tạo cơ hội, hay đang kéo thêm những cam kết bạn không muốn nói không?",
+        "evidenceLabel":  "Dấu hiệu này đến từ nhóm sao cảm xúc và sức hút tác động vào phần hành động thực tế."
+    },
+    {
+        "version":  "interpretation-rules-v2",
+        "status":  "active",
+        "key":  "group:dao-hoa:quan-loc",
+        "scope":  "CAREER",
+        "pattern":  {
+                        "kind":  "support-group",
+                        "group":  "đào hoa",
+                        "palace":  "Quan Lộc",
+                        "stars":  [
+                                      "Đào Hoa",
+                                      "Hồng Loan",
+                                      "Thiên Hỷ",
+                                      "Hỷ Thần"
+                                  ]
+                    },
+        "priority":  55,
+        "title":  "Đào hoa tại Quan Lộc",
+        "summary":  "Bạn dễ nhận ra rằng sự nghiệp dễ hưởng lợi từ hình ảnh, giao tiếp, thẩm mỹ, quan hệ công chúng hoặc khả năng khiến người khác muốn lắng nghe. Bạn muốn tạo kết quả mà không phải ôm hết việc, nhưng cũng cần để ý việc chăm hình ảnh nhiều hơn năng lực lõi, khiến sự chú ý đến trước nhưng niềm tin không ở lại lâu, nhất là trong công việc và trách nhiệm nghề nghiệp.",
+        "strengthText":  "Khi trách nhiệm công việc đã rõ, bạn có thể biến phong cách cá nhân thành tài sản nghề nghiệp, đặc biệt trong tư vấn, bán hàng, giáo dục, sáng tạo hoặc dịch vụ.",
+        "cautionText":  "Bạn có thể dễ chăm hình ảnh nhiều hơn năng lực lõi, khiến sự chú ý đến trước nhưng niềm tin không ở lại lâu nếu chưa đặt giới hạn rõ.",
+        "lifeAdviceText":  "Bạn hãy gắn mỗi hoạt động xây hình ảnh với một bằng chứng năng lực: sản phẩm, kết quả, phản hồi khách hàng hoặc quy trình làm việc; trong mười bốn ngày tới, bạn áp dụng ngay vào một tình huống thật thuộc công việc và trách nhiệm nghề nghiệp.",
+        "teaserQuestion":  "Hình ảnh nghề nghiệp của bạn đang phản ánh năng lực thật, hay chỉ mới tạo được sự tò mò ban đầu?",
+        "evidenceLabel":  "Dấu hiệu này đến từ nhóm sao cảm xúc và sức hút nằm ở vùng nghề nghiệp."
+    },
+    {
+        "version":  "interpretation-rules-v2",
+        "status":  "active",
+        "key":  "group:dao-hoa:tai-bach",
+        "scope":  "MONEY",
+        "pattern":  {
+                        "kind":  "support-group",
+                        "group":  "đào hoa",
+                        "palace":  "Tài Bạch",
+                        "stars":  [
+                                      "Đào Hoa",
+                                      "Hồng Loan",
+                                      "Thiên Hỷ",
+                                      "Hỷ Thần"
+                                  ]
+                    },
+        "priority":  54,
+        "title":  "Đào hoa tại Tài Bạch",
+        "summary":  "Bạn dễ nhận ra rằng tiền bạc có thể đến qua thẩm mỹ, cảm xúc, quan hệ, dịch vụ hoặc khả năng tạo trải nghiệm dễ chịu. Bạn muốn giữ an toàn mà không tự bỏ lỡ cơ hội, nhưng cũng cần để ý việc chi tiêu để được yêu thích, hoặc giảm giá quá dễ vì ngại làm người khác mất vui, nhất là trong tiền bạc, công sức và quyền lựa chọn.",
+        "strengthText":  "Khi giới hạn tiền bạc đã rõ, bạn có thể kiếm tiền từ sự tinh tế: hiểu nhu cầu người khác, đóng gói sản phẩm đẹp hơn hoặc làm dịch vụ có cảm xúc hơn.",
+        "cautionText":  "Nếu kéo dài, bạn có thể dễ chi tiêu để được yêu thích, hoặc giảm giá quá dễ vì ngại làm người khác mất vui.",
+        "lifeAdviceText":  "Bạn hãy đặt khung giá và khung ưu đãi trước khi tương tác; cảm xúc có thể giúp bán hàng, nhưng giá trị phải được bảo vệ bằng nguyên tắc.",
+        "teaserQuestion":  "Bạn đang dùng sự tinh tế để tạo nguồn thu, hay đang dùng tiền để mua cảm giác được quý mến?",
+        "evidenceLabel":  "Dấu hiệu này đến từ nhóm sao cảm xúc và sức hút đi vào vùng tiền bạc."
+    },
+    {
+        "version":  "interpretation-rules-v2",
+        "status":  "active",
+        "key":  "group:dao-hoa:phu-the",
+        "scope":  "RELATIONSHIP",
+        "pattern":  {
+                        "kind":  "support-group",
+                        "group":  "đào hoa",
+                        "palace":  "Phu Thê",
+                        "stars":  [
+                                      "Đào Hoa",
+                                      "Hồng Loan",
+                                      "Thiên Hỷ",
+                                      "Hỷ Thần"
+                                  ]
+                    },
+        "priority":  56,
+        "title":  "Đào hoa tại Phu Thê",
+        "summary":  "Bạn dễ nhận ra rằng quan hệ thân mật thường có sức hút, cảm xúc và nhu cầu được yêu thương rõ, nhưng cũng cần thực tế để đi xa. Bạn muốn giữ hòa khí mà vẫn nói rõ nhu cầu, nhưng cũng cần để ý việc mê cảm giác được chọn mà quên kiểm tra sự phù hợp về trách nhiệm, tiền bạc và nhịp sống, nhất là trong tình cảm, cam kết và trách nhiệm chung.",
+        "strengthText":  "Khi kỳ vọng giữa các bên đã rõ, bạn có thể tạo kết nối cảm xúc, giữ sự mềm mại và làm quan hệ có màu sắc riêng thay vì khô cứng.",
+        "cautionText":  "Khi quá tin vào mặt thuận của Đào hoa tại Phu Thê, bạn có thể dễ mê cảm giác được chọn mà quên kiểm tra sự phù hợp về trách nhiệm, tiền bạc và nhịp sống.",
+        "lifeAdviceText":  "Bạn hãy để cảm xúc mở cửa nhưng dùng thỏa thuận để giữ nhà: nói rõ kỳ vọng, ranh giới và cách hai bên xử lý lúc không còn lãng mạn.",
+        "teaserQuestion":  "Bạn đang bị thu hút bởi người phù hợp, hay bởi cảm giác họ khiến bạn thấy bản thân đặc biệt?",
+        "evidenceLabel":  "Dấu hiệu này đến từ nhóm sao cảm xúc và sức hút nằm ở vùng cam kết thân mật."
+    },
+    {
+        "version":  "interpretation-rules-v2",
+        "status":  "active",
+        "key":  "group:dao-hoa:tat-ach",
+        "scope":  "HEALTH",
+        "pattern":  {
+                        "kind":  "support-group",
+                        "group":  "đào hoa",
+                        "palace":  "Tật Ách",
+                        "stars":  [
+                                      "Đào Hoa",
+                                      "Hồng Loan",
+                                      "Thiên Hỷ",
+                                      "Hỷ Thần"
+                                  ]
+                    },
+        "priority":  52,
+        "title":  "Đào hoa tại Tật Ách",
+        "summary":  "Bạn dễ nhận ra rằng tâm trạng, quan hệ và cảm giác được yêu thương có thể tác động mạnh đến nhịp nghỉ, sức tập trung và mức hồi phục. Bạn muốn làm tròn trách nhiệm mà không kiệt sức, nhưng cũng cần để ý việc để cảm xúc của người khác đi thẳng vào cơ thể bạn, khiến bạn mệt vì những chuyện không phải của bạn, nhất là trong nhịp nghỉ và phản ứng khi quá tải.",
+        "strengthText":  "Khi lịch làm và lịch nghỉ đã rõ, bạn có thể phát huy khả năng đọc cảm xúc tinh tế, giúp bạn làm tốt các việc cần chăm sóc, giao tiếp hoặc tạo trải nghiệm cho người khác.",
+        "cautionText":  "Bạn có thể dễ để cảm xúc của người khác đi thẳng vào cơ thể bạn, khiến bạn mệt vì những chuyện không phải của bạn nếu chưa đặt giới hạn rõ.",
+        "lifeAdviceText":  "Bạn hãy có nghi thức xả cảm xúc sau tương tác nặng: đi bộ, viết ra, tắt thông báo hoặc nói chuyện với người an toàn trong thời lượng giới hạn.",
+        "teaserQuestion":  "Cảm xúc của ai đang đi vào cơ thể bạn nhiều hơn mức bạn nhận ra?",
+        "evidenceLabel":  "Dấu hiệu này đến từ nhóm sao cảm xúc và sức hút chạm vào vùng thân tâm."
+    },
+    {
+        "version":  "interpretation-rules-v2",
+        "status":  "active",
+        "key":  "group:dao-hoa:thien-di",
+        "scope":  "CAREER",
+        "pattern":  {
+                        "kind":  "support-group",
+                        "group":  "đào hoa",
+                        "palace":  "Thiên Di",
+                        "stars":  [
+                                      "Đào Hoa",
+                                      "Hồng Loan",
+                                      "Thiên Hỷ",
+                                      "Hỷ Thần"
+                                  ]
+                    },
+        "priority":  54,
+        "title":  "Đào hoa tại Thiên Di",
+        "summary":  "Bạn dễ nhận ra rằng ra ngoài dễ gặp thiện cảm, lời mời, kết nối xã hội hoặc môi trường giúp bạn được chú ý. Bạn muốn tạo kết quả mà không phải ôm hết việc, nhưng cũng cần để ý việc tin vào cảm giác hợp ngay từ đầu mà chưa kiểm tra động cơ và điều kiện thực tế của người đối diện, nhất là trong môi trường bên ngoài và cơ hội mới.",
+        "strengthText":  "Khi trách nhiệm công việc đã rõ, bạn có thể xây mạng lưới nhanh, phù hợp với công việc cần quan hệ khách hàng, cộng đồng, truyền thông hoặc hợp tác đối ngoại.",
+        "cautionText":  "Nếu kéo dài, bạn có thể dễ tin vào cảm giác hợp ngay từ đầu mà chưa kiểm tra động cơ và điều kiện thực tế của người đối diện.",
+        "lifeAdviceText":  "Bạn hãy dùng ba bước khi gặp cơ hội mới: cảm nhận thiện chí, kiểm tra dữ kiện, rồi mới cam kết; đừng đảo thứ tự này; trong ba ngày tới, bạn áp dụng ngay vào một tình huống thật thuộc môi trường bên ngoài và cơ hội mới.",
+        "teaserQuestion":  "Thiện cảm bên ngoài đang dẫn bạn đến cơ hội thật, hay chỉ khiến bạn hạ tiêu chuẩn kiểm chứng?",
+        "evidenceLabel":  "Dấu hiệu này đến từ nhóm sao cảm xúc và sức hút xuất hiện ở vùng môi trường xã hội."
+    },
+    {
+        "version":  "interpretation-rules-v2",
+        "status":  "active",
+        "key":  "group:dao-hoa:phuc-duc",
+        "scope":  "RELATIONSHIP",
+        "pattern":  {
+                        "kind":  "support-group",
+                        "group":  "đào hoa",
+                        "palace":  "Phúc Đức",
+                        "stars":  [
+                                      "Đào Hoa",
+                                      "Hồng Loan",
+                                      "Thiên Hỷ",
+                                      "Hỷ Thần"
+                                  ]
+                    },
+        "priority":  52,
+        "title":  "Đào hoa tại Phúc Đức",
+        "summary":  "Bạn dễ nhận ra rằng nền tinh thần của bạn nhạy với tình cảm, sự hòa thuận gia đình và cảm giác được yêu thương. Bạn muốn giữ hòa khí mà vẫn nói rõ nhu cầu, nhưng cũng cần để ý việc vì sợ mất hòa khí nên giữ vai làm người dễ thương, ngay cả khi bên trong đã mệt hoặc không đồng ý, nhất là trong nếp nhà và chỗ nghỉ tinh thần.",
+        "strengthText":  "Khi kỳ vọng giữa các bên đã rõ, bạn có thể tạo không khí ấm áp, kết nối người thân và xây những quan hệ có chiều sâu cảm xúc.",
+        "cautionText":  "Khi quá tin vào mặt thuận của Đào hoa tại Phúc Đức, bạn có thể dễ vì sợ mất hòa khí nên giữ vai làm người dễ thương, ngay cả khi bên trong đã mệt hoặc không đồng ý.",
+        "lifeAdviceText":  "Bạn hãy tập nói nhu cầu thật bằng giọng mềm nhưng rõ: sự tử tế không cần đi kèm việc tự xóa bạn khỏi cuộc trò chuyện; trong bảy ngày tới, bạn áp dụng ngay vào một tình huống thật thuộc nếp nhà và chỗ nghỉ tinh thần.",
+        "teaserQuestion":  "Bạn đang giữ hòa khí vì yêu thương, hay vì sợ khi bạn nói thật thì tình cảm sẽ đổi khác?",
+        "evidenceLabel":  "Dấu hiệu này đến từ nhóm sao cảm xúc và sức hút nằm ở vùng nền tinh thần và nếp nhà."
+    },
+    {
+        "version":  "interpretation-rules-v2",
+        "status":  "active",
+        "key":  "group:khoa-quyen-loc-ky:menh",
+        "scope":  "IDENTITY",
+        "pattern":  {
+                        "kind":  "support-group",
+                        "group":  "khoa quyền lộc kỵ",
+                        "palace":  "Mệnh",
+                        "stars":  [
+                                      "Hóa Khoa",
+                                      "Hóa Quyền",
+                                      "Hóa Lộc",
+                                      "Hóa Kỵ"
+                                  ]
+                    },
+        "priority":  62,
+        "title":  "Khoa Quyền Lộc Kỵ tại Mệnh",
+        "summary":  "Bạn dễ nhận ra rằng bản thân bạn là nơi danh tiếng, quyền quyết, lợi ích và bài học cần hóa giải hiện ra rất rõ. Bạn muốn sống đúng với điều bạn tin là phù hợp, nhưng cũng cần để ý việc muốn được công nhận nhanh nên nhận cả phần trách nhiệm hoặc ràng buộc chưa đọc kỹ, nhất là trong cách bạn tự quyết và nhận trách nhiệm.",
+        "strengthText":  "Khi mục tiêu và vai trò của bạn đã rõ, bạn có thể biến năng lực cá nhân thành uy tín và cơ hội tạo nguồn thu nếu bạn chọn đúng cách xuất hiện.",
+        "cautionText":  "Bạn có thể dễ muốn được công nhận nhanh nên nhận cả phần trách nhiệm hoặc ràng buộc chưa đọc kỹ nếu chưa đặt giới hạn rõ.",
+        "lifeAdviceText":  "Bạn hãy tách mọi cơ hội cá nhân thành bốn cột: học được gì, có quyền gì, có lợi gì và phải trả giá gì; trong mười bốn ngày tới, bạn áp dụng ngay vào một tình huống thật thuộc cách bạn tự quyết và nhận trách nhiệm.",
+        "teaserQuestion":  "Điều gì đang nâng tên tuổi của bạn, và điều gì đi kèm nó mà bạn chưa nhìn hết?",
+        "evidenceLabel":  "Dấu hiệu này đến từ bộ sao chuyển hóa chạm vào vùng bản thân và cách bạn được nhìn nhận."
+    },
+    {
+        "version":  "interpretation-rules-v2",
+        "status":  "active",
+        "key":  "group:khoa-quyen-loc-ky:than",
+        "scope":  "AXIS",
+        "pattern":  {
+                        "kind":  "support-group",
+                        "group":  "khoa quyền lộc kỵ",
+                        "palace":  "Thân",
+                        "stars":  [
+                                      "Hóa Khoa",
+                                      "Hóa Quyền",
+                                      "Hóa Lộc",
+                                      "Hóa Kỵ"
+                                  ]
+                    },
+        "priority":  61,
+        "title":  "Khoa Quyền Lộc Kỵ tại Thân",
+        "summary":  "Bạn dễ nhận ra rằng mỗi bước hành động của bạn dễ kéo theo cơ hội, trách nhiệm, lợi ích và bài học phải xử lý đến cùng. Bạn muốn đưa những lựa chọn khác nhau về cùng một hướng, nhưng cũng cần để ý việc chỉ nhìn phần lợi mà chưa tính phần vận hành, khiến việc tưởng nhỏ thành nghĩa vụ dài, nhất là trong vai trò thực tế và lịch sống mỗi ngày.",
+        "strengthText":  "Khi thứ tự ưu tiên đã rõ, bạn có thể phát huy khả năng biến trải nghiệm thật thành vị thế, nhất là khi bạn biết ghi nhận kết quả và chuẩn hóa cách làm.",
+        "cautionText":  "Nếu kéo dài, bạn có thể dễ chỉ nhìn phần lợi mà chưa tính phần vận hành, khiến việc tưởng nhỏ thành nghĩa vụ dài.",
+        "lifeAdviceText":  "Bạn hãy trước mỗi cam kết, hãy hỏi: ai quyết, ai làm, ai hưởng lợi và ai chịu hậu quả nếu lệch kế hoạch; trong ba ngày tới, bạn áp dụng ngay vào một tình huống thật thuộc vai trò thực tế và lịch sống mỗi ngày.",
+        "teaserQuestion":  "Bạn đang bước vào cơ hội thật, hay đang ký một trách nhiệm mà bạn chưa đọc hết điều khoản?",
+        "evidenceLabel":  "Dấu hiệu này đến từ bộ sao chuyển hóa tác động vào phần hành động và đời sống thực tế."
+    },
+    {
+        "version":  "interpretation-rules-v2",
+        "status":  "active",
+        "key":  "group:khoa-quyen-loc-ky:quan-loc",
+        "scope":  "CAREER",
+        "pattern":  {
+                        "kind":  "support-group",
+                        "group":  "khoa quyền lộc kỵ",
+                        "palace":  "Quan Lộc",
+                        "stars":  [
+                                      "Hóa Khoa",
+                                      "Hóa Quyền",
+                                      "Hóa Lộc",
+                                      "Hóa Kỵ"
+                                  ]
+                    },
+        "priority":  64,
+        "title":  "Khoa Quyền Lộc Kỵ tại Quan Lộc",
+        "summary":  "Bạn dễ nhận ra rằng sự nghiệp là nơi bạn dễ gặp danh, quyền, tiền và áp lực trách nhiệm cùng lúc. Bạn muốn tạo kết quả mà không phải ôm hết việc, nhưng cũng cần để ý việc nhận danh mà thiếu quyền, nhận quyền mà thiếu nguồn lực, hoặc nhận lợi mà không thấy mặt trái trách nhiệm, nhất là trong công việc và trách nhiệm nghề nghiệp.",
+        "strengthText":  "Khi trách nhiệm công việc đã rõ, bạn có thể có khả năng biến chuyên môn thành vị trí có ảnh hưởng, nếu bạn biết chọn vai trò đi kèm quyền hạn rõ.",
+        "cautionText":  "Khi quá tin vào mặt thuận của Khoa Quyền Lộc Kỵ tại Quan Lộc, bạn có thể dễ nhận danh mà thiếu quyền, nhận quyền mà thiếu nguồn lực, hoặc nhận lợi mà không thấy mặt trái trách nhiệm.",
+        "lifeAdviceText":  "Bạn hãy thương lượng nghề nghiệp theo gói: chức danh, quyền quyết, nguồn lực hỗ trợ, tiêu chí đo kết quả và phần thưởng phải đi cùng nhau; trong bảy ngày tới, bạn áp dụng ngay vào một tình huống thật thuộc công việc và trách nhiệm nghề nghiệp.",
+        "teaserQuestion":  "Vai trò nghề nghiệp nào đang thật sự nâng bạn lên, và vai nào chỉ khoác lên bạn thêm áp lực?",
+        "evidenceLabel":  "Dấu hiệu này đến từ bộ sao chuyển hóa nằm ở vùng nghề nghiệp và vị trí xã hội."
+    },
+    {
+        "version":  "interpretation-rules-v2",
+        "status":  "active",
+        "key":  "group:khoa-quyen-loc-ky:tai-bach",
+        "scope":  "MONEY",
+        "pattern":  {
+                        "kind":  "support-group",
+                        "group":  "khoa quyền lộc kỵ",
+                        "palace":  "Tài Bạch",
+                        "stars":  [
+                                      "Hóa Khoa",
+                                      "Hóa Quyền",
+                                      "Hóa Lộc",
+                                      "Hóa Kỵ"
+                                  ]
+                    },
+        "priority":  64,
+        "title":  "Khoa Quyền Lộc Kỵ tại Tài Bạch",
+        "summary":  "Bạn dễ nhận ra rằng tiền bạc không chỉ là số dư mà còn là cái giá, điều kiện và trách nhiệm đi kèm lợi ích. Bạn muốn giữ an toàn mà không tự bỏ lỡ cơ hội, nhưng cũng cần để ý việc thấy lợi trước mắt mà bỏ qua điều khoản khiến bạn mất tự do hoặc phải gánh dài hạn, nhất là trong tiền bạc, công sức và quyền lựa chọn.",
+        "strengthText":  "Khi giới hạn tiền bạc đã rõ, bạn có thể định giá công sức, biến tri thức hoặc uy tín thành nguồn thu chính đáng.",
+        "cautionText":  "Bạn có thể dễ thấy lợi trước mắt mà bỏ qua điều khoản khiến bạn mất tự do hoặc phải gánh dài hạn nếu chưa đặt giới hạn rõ.",
+        "lifeAdviceText":  "Bạn hãy mọi khoản tiền lớn nên được đọc bằng ba lớp: vì sao có tiền, đổi lại điều gì và nếu dừng thì chi phí là bao nhiêu; trong mười bốn ngày tới, bạn áp dụng ngay vào một tình huống thật thuộc tiền bạc, công sức và quyền lựa chọn.",
+        "teaserQuestion":  "Khoản lợi nào đang thật sự làm bạn mạnh hơn, và khoản lợi nào đang âm thầm khóa bạn vào trách nhiệm mới?",
+        "evidenceLabel":  "Dấu hiệu này đến từ bộ sao chuyển hóa nằm ở vùng tiền bạc và nguồn lực."
+    },
+    {
+        "version":  "interpretation-rules-v2",
+        "status":  "active",
+        "key":  "group:khoa-quyen-loc-ky:phu-the",
+        "scope":  "RELATIONSHIP",
+        "pattern":  {
+                        "kind":  "support-group",
+                        "group":  "khoa quyền lộc kỵ",
+                        "palace":  "Phu Thê",
+                        "stars":  [
+                                      "Hóa Khoa",
+                                      "Hóa Quyền",
+                                      "Hóa Lộc",
+                                      "Hóa Kỵ"
+                                  ]
+                    },
+        "priority":  61,
+        "title":  "Khoa Quyền Lộc Kỵ tại Phu Thê",
+        "summary":  "Bạn dễ nhận ra rằng quan hệ thân mật dễ chạm tới danh dự, ảnh hưởng, tiền bạc và những điểm cần hóa giải bằng đối thoại thật. Bạn muốn giữ hòa khí mà vẫn nói rõ nhu cầu, nhưng cũng cần để ý việc để quyền lực mềm trong tình cảm vận hành âm thầm, khiến một người nhường quá nhiều hoặc kiểm soát quá sâu, nhất là trong tình cảm, cam kết và trách nhiệm chung.",
+        "strengthText":  "Khi kỳ vọng giữa các bên đã rõ, bạn có thể xây quan hệ thành liên minh mạnh, nơi hai người cùng nâng vị thế và nguồn lực cho nhau.",
+        "cautionText":  "Nếu kéo dài, bạn có thể dễ để quyền lực mềm trong tình cảm vận hành âm thầm, khiến một người nhường quá nhiều hoặc kiểm soát quá sâu.",
+        "lifeAdviceText":  "Bạn hãy làm rõ quyền quyết trong các việc chung: tiền, gia đình, thời gian và kế hoạch dài hạn; tình yêu không nên vận hành bằng giả định; trong ba ngày tới, bạn áp dụng ngay vào một tình huống thật thuộc tình cảm, cam kết và trách nhiệm chung.",
+        "teaserQuestion":  "Quan hệ này đang cùng bạn xây giá trị, hay đang tạo một khoản nợ cảm xúc khó gọi tên?",
+        "evidenceLabel":  "Dấu hiệu này đến từ bộ sao chuyển hóa xuất hiện ở vùng cam kết thân mật."
+    },
+    {
+        "version":  "interpretation-rules-v2",
+        "status":  "active",
+        "key":  "group:khoa-quyen-loc-ky:tat-ach",
+        "scope":  "HEALTH",
+        "pattern":  {
+                        "kind":  "support-group",
+                        "group":  "khoa quyền lộc kỵ",
+                        "palace":  "Tật Ách",
+                        "stars":  [
+                                      "Hóa Khoa",
+                                      "Hóa Quyền",
+                                      "Hóa Lộc",
+                                      "Hóa Kỵ"
+                                  ]
+                    },
+        "priority":  60,
+        "title":  "Khoa Quyền Lộc Kỵ tại Tật Ách",
+        "summary":  "Bạn dễ nhận ra rằng danh dự, lợi ích, trách nhiệm hoặc kỳ vọng có thể đi thẳng vào sức khỏe tinh thần nếu bạn không đặt giới hạn. Bạn muốn làm tròn trách nhiệm mà không kiệt sức, nhưng cũng cần để ý việc chịu áp lực để giữ hình ảnh mạnh mẽ, rồi để cơ thể trả thay cho những điều miệng chưa nói, nhất là trong nhịp nghỉ và phản ứng khi quá tải.",
+        "strengthText":  "Khi lịch làm và lịch nghỉ đã rõ, bạn có thể phát huy khả năng hiểu nguyên nhân sâu của stress và chuyển nó thành chiến lược hồi phục có kỷ luật.",
+        "cautionText":  "Khi quá tin vào mặt thuận của Khoa Quyền Lộc Kỵ tại Tật Ách, bạn có thể dễ chịu áp lực để giữ hình ảnh mạnh mẽ, rồi để cơ thể trả thay cho những điều miệng chưa nói.",
+        "lifeAdviceText":  "Bạn hãy ghi lại áp lực theo nguồn: tiền, danh, trách nhiệm, quan hệ; nguồn nào lặp nhiều nhất phải có ranh giới cụ thể trong tuần tới; trong bảy ngày tới, bạn áp dụng ngay vào một tình huống thật thuộc nhịp nghỉ và phản ứng khi quá tải.",
+        "teaserQuestion":  "Áp lực nào đang được cơ thể bạn gánh thay vì được bạn gọi tên và xử lý?",
+        "evidenceLabel":  "Dấu hiệu này đến từ bộ sao chuyển hóa chạm vào vùng thân tâm và khả năng chịu tải."
+    },
+    {
+        "version":  "interpretation-rules-v2",
+        "status":  "active",
+        "key":  "group:khoa-quyen-loc-ky:thien-di",
+        "scope":  "CAREER",
+        "pattern":  {
+                        "kind":  "support-group",
+                        "group":  "khoa quyền lộc kỵ",
+                        "palace":  "Thiên Di",
+                        "stars":  [
+                                      "Hóa Khoa",
+                                      "Hóa Quyền",
+                                      "Hóa Lộc",
+                                      "Hóa Kỵ"
+                                  ]
+                    },
+        "priority":  61,
+        "title":  "Khoa Quyền Lộc Kỵ tại Thiên Di",
+        "summary":  "Bạn dễ nhận ra rằng bên ngoài dễ mang đến cơ hội, danh tiếng, lợi ích xã hội nhưng cũng kèm điều kiện, nghĩa vụ hoặc bài học về ranh giới. Bạn muốn tạo kết quả mà không phải ôm hết việc, nhưng cũng cần để ý việc bị hấp dẫn bởi sân khấu bên ngoài mà chưa kiểm tra ai đang hưởng lợi, ai chịu rủi ro và ai giữ quyền quyết.",
+        "strengthText":  "Khi trách nhiệm công việc đã rõ, bạn có thể dùng môi trường, truyền thông hoặc mạng lưới để mở rộng vị thế và nguồn thu.",
+        "cautionText":  "Bạn có thể dễ bị hấp dẫn bởi sân khấu bên ngoài mà chưa kiểm tra ai đang hưởng lợi, ai chịu rủi ro và ai giữ quyền quyết nếu chưa đặt giới hạn rõ.",
+        "lifeAdviceText":  "Bạn hãy trước khi bước vào hợp tác mới, hãy yêu cầu rõ mục tiêu, quyền sử dụng hình ảnh, chia lợi ích và điều kiện rút lui; trong mười bốn ngày tới, bạn áp dụng ngay vào một tình huống thật thuộc môi trường bên ngoài và cơ hội mới.",
+        "teaserQuestion":  "Lời mời nào đang mở ra sân chơi lớn, và lời mời nào đang giấu một điều kiện bạn cần đọc kỹ?",
+        "evidenceLabel":  "Dấu hiệu này đến từ bộ sao chuyển hóa nằm ở vùng môi trường xã hội và cơ hội bên ngoài."
+    },
+    {
+        "version":  "interpretation-rules-v2",
+        "status":  "active",
+        "key":  "group:khoa-quyen-loc-ky:phuc-duc",
+        "scope":  "RELATIONSHIP",
+        "pattern":  {
+                        "kind":  "support-group",
+                        "group":  "khoa quyền lộc kỵ",
+                        "palace":  "Phúc Đức",
+                        "stars":  [
+                                      "Hóa Khoa",
+                                      "Hóa Quyền",
+                                      "Hóa Lộc",
+                                      "Hóa Kỵ"
+                                  ]
+                    },
+        "priority":  60,
+        "title":  "Khoa Quyền Lộc Kỵ tại Phúc Đức",
+        "summary":  "Bạn dễ nhận ra rằng nền gia đình có thể trao cho bạn giá trị tốt, nhưng cũng đặt lên bạn những trách nhiệm cần được đọc lại. Bạn muốn giữ hòa khí mà vẫn nói rõ nhu cầu, nhưng cũng cần để ý việc tiếp tục sống theo danh dự hoặc kỳ vọng cũ, dù nó khiến bạn mất tự do lựa chọn, nhất là trong nếp nhà và chỗ nghỉ tinh thần.",
+        "strengthText":  "Khi kỳ vọng giữa các bên đã rõ, bạn có thể dùng nền tảng gia đình, học vấn hoặc uy tín dòng nhà để xây niềm tin và sự ổn định dài hạn.",
+        "cautionText":  "Nếu kéo dài, bạn có thể dễ tiếp tục sống theo danh dự hoặc kỳ vọng cũ, dù nó khiến bạn mất tự do lựa chọn.",
+        "lifeAdviceText":  "Bạn hãy chọn điều nên kế thừa bằng hành động cụ thể, đồng thời nói rõ điều bạn không còn muốn gánh thay cho thế hệ trước; trong ba ngày tới, bạn áp dụng ngay vào một tình huống thật thuộc nếp nhà và chỗ nghỉ tinh thần.",
+        "teaserQuestion":  "Bạn đang nhận phúc khí nào từ gốc nhà, và đang gánh điều gì không còn thuộc về bạn?",
+        "evidenceLabel":  "Dấu hiệu này đến từ bộ sao chuyển hóa nằm ở vùng nền tinh thần và nếp gia đình."
+    },
+    {
+        "version":  "interpretation-rules-v2",
+        "status":  "active",
+        "key":  "gate:tuan:menh",
+        "scope":  "IDENTITY",
+        "pattern":  {
+                        "kind":  "gate",
+                        "gate":  "Tuần",
+                        "palace":  "Mệnh"
+                    },
+        "priority":  62,
+        "title":  "Tuần tại Mệnh",
+        "summary":  "Bạn dễ nhận ra rằng bản sắc và hướng đi cá nhân thường mở chậm, qua thử nghiệm, vấp váp và những lần lọc bớt kỳ vọng bên ngoài. Bạn muốn sống đúng với điều bạn tin là phù hợp, nhưng cũng cần để ý việc hiểu nhầm sự chậm mở thành kém cỏi, rồi tự giảm tiêu chuẩn trước khi thật sự biết bạn hợp gì, nhất là trong cách bạn tự quyết và nhận trách nhiệm.",
+        "strengthText":  "Khi mục tiêu và vai trò của bạn đã rõ, bạn có thể phát huy khả năng tự quan sát sâu, giúp bạn tránh chọn nghề hoặc hướng kiếm tiền chỉ vì người khác bảo ổn.",
+        "cautionText":  "Khi quá tin vào mặt thuận của Tuần tại Mệnh, bạn có thể dễ hiểu nhầm sự chậm mở thành kém cỏi, rồi tự giảm tiêu chuẩn trước khi thật sự biết bạn hợp gì.",
+        "lifeAdviceText":  "Bạn hãy thử mục tiêu bằng phiên bản nhỏ trong 30 ngày trước khi định nghĩa nó là con đường dài hạn; trong bảy ngày tới, bạn áp dụng ngay vào một tình huống thật thuộc cách bạn tự quyết và nhận trách nhiệm.",
+        "teaserQuestion":  "Bạn đang chậm vì thiếu năng lực, hay vì bản thân cần thêm dữ kiện để chọn đúng đường?",
+        "evidenceLabel":  "Dấu hiệu này đến từ một lớp lọc đặt ở vùng khí chất và cách bạn tự nhận diện bạn."
+    },
+    {
+        "version":  "interpretation-rules-v2",
+        "status":  "active",
+        "key":  "gate:tuan:than",
+        "scope":  "AXIS",
+        "pattern":  {
+                        "kind":  "gate",
+                        "gate":  "Tuần",
+                        "palace":  "Thân"
+                    },
+        "priority":  60,
+        "title":  "Tuần tại Thân",
+        "summary":  "Bạn dễ nhận ra rằng hành động thực tế của bạn thường cần thử nhỏ, chỉnh nhịp và qua vài lần kiểm chứng trước khi đi nhanh. Bạn muốn đưa những lựa chọn khác nhau về cùng một hướng, nhưng cũng cần để ý việc thử mãi nhưng không đặt mốc quyết, khiến đường vòng thành nơi trú ẩn, nhất là trong vai trò thực tế và lịch sống mỗi ngày.",
+        "strengthText":  "Khi thứ tự ưu tiên đã rõ, bạn có thể giảm rủi ro bằng cách kiểm tra thực địa, rất hữu ích khi đổi việc, nhận dự án hoặc đầu tư công sức lớn.",
+        "cautionText":  "Bạn có thể dễ thử mãi nhưng không đặt mốc quyết, khiến đường vòng thành nơi trú ẩn nếu chưa đặt giới hạn rõ; khi đó bạn sẽ khó giữ nhịp ổn định trong vai trò thực tế và lịch sống mỗi ngày.",
+        "lifeAdviceText":  "Bạn hãy đặt ngày kết luận cho mọi thử nghiệm: sau mốc đó, chỉ chọn một trong ba hướng là tăng tốc, sửa cách làm hoặc dừng; trong mười bốn ngày tới, bạn áp dụng ngay vào một tình huống thật thuộc vai trò thực tế và lịch sống mỗi ngày.",
+        "teaserQuestion":  "Việc nào bạn cần thử nhỏ thêm, và việc nào đã đủ dữ kiện để thôi trì hoãn?",
+        "evidenceLabel":  "Dấu hiệu này đến từ một lớp lọc đặt ở vùng hành động và trải nghiệm ngoài đời."
+    },
+    {
+        "version":  "interpretation-rules-v2",
+        "status":  "active",
+        "key":  "gate:tuan:quan-loc",
+        "scope":  "CAREER",
+        "pattern":  {
+                        "kind":  "gate",
+                        "gate":  "Tuần",
+                        "palace":  "Quan Lộc"
+                    },
+        "priority":  61,
+        "title":  "Tuần tại Quan Lộc",
+        "summary":  "Bạn dễ nhận ra rằng đường nghề thường cần thêm điều kiện, thêm thời gian hoặc thêm bằng chứng trước khi vị trí thật sự rõ. Bạn muốn tạo kết quả mà không phải ôm hết việc, nhưng cũng cần để ý việc nản vì thấy công việc chậm thông, rồi đổi hướng trước khi hoàn thành vòng kiểm chứng cần thiết, nhất là trong công việc và trách nhiệm nghề nghiệp.",
+        "strengthText":  "Khi trách nhiệm công việc đã rõ, bạn có thể xây nền nghề chắc, không vội nhận vai lớn khi tiêu chuẩn và quyền hạn chưa rõ.",
+        "cautionText":  "Nếu kéo dài, bạn có thể dễ nản vì thấy công việc chậm thông, rồi đổi hướng trước khi hoàn thành vòng kiểm chứng cần thiết.",
+        "lifeAdviceText":  "Bạn hãy biến sự chậm thành kế hoạch: chọn kỹ năng lõi, chọn người phản hồi và chọn một sản phẩm nghề nghiệp để chứng minh năng lực; trong ba ngày tới, bạn áp dụng ngay vào một tình huống thật thuộc công việc và trách nhiệm nghề nghiệp.",
+        "teaserQuestion":  "Sự nghiệp đang chặn bạn, hay đang bắt bạn chuẩn bị đủ chứng cứ trước khi bước lên tầng mới?",
+        "evidenceLabel":  "Dấu hiệu này đến từ một lớp lọc đặt ở vùng nghề nghiệp và vị trí xã hội."
+    },
+    {
+        "version":  "interpretation-rules-v2",
+        "status":  "active",
+        "key":  "gate:tuan:tai-bach",
+        "scope":  "MONEY",
+        "pattern":  {
+                        "kind":  "gate",
+                        "gate":  "Tuần",
+                        "palace":  "Tài Bạch"
+                    },
+        "priority":  61,
+        "title":  "Tuần tại Tài Bạch",
+        "summary":  "Bạn dễ nhận ra rằng nguồn lực nên đi qua bước kiểm chứng trước khi chi, nhận, đầu tư hoặc cam kết dài hạn. Bạn muốn giữ an toàn mà không tự bỏ lỡ cơ hội, nhưng cũng cần để ý việc giữ quá lâu ở trạng thái chờ, khiến tiền và năng lực không được đưa vào nơi sinh giá trị, nhất là trong tiền bạc, công sức và quyền lựa chọn.",
+        "strengthText":  "Khi giới hạn tiền bạc đã rõ, bạn có thể thử nhỏ và bảo toàn vốn, giúp bạn tránh mất tiền vì lời hứa đẹp hoặc cảm xúc nhất thời.",
+        "cautionText":  "Khi quá tin vào mặt thuận của Tuần tại Tài Bạch, bạn có thể dễ giữ quá lâu ở trạng thái chờ, khiến tiền và năng lực không được đưa vào nơi sinh giá trị.",
+        "lifeAdviceText":  "Bạn hãy chia quyết định tài chính thành mức thử nghiệm và mức cam kết; chỉ nâng mức khi kết quả nhỏ đã chứng minh được logic; trong bảy ngày tới, bạn áp dụng ngay vào một tình huống thật thuộc tiền bạc, công sức và quyền lựa chọn.",
+        "teaserQuestion":  "Khoản nào đang cần kiểm chứng thêm, và khoản nào đang bị bạn giữ quá lâu vì sợ sai?",
+        "evidenceLabel":  "Dấu hiệu này đến từ một lớp lọc đặt ở vùng tiền bạc và nguồn lực."
+    },
+    {
+        "version":  "interpretation-rules-v2",
+        "status":  "active",
+        "key":  "gate:tuan:phu-the",
+        "scope":  "RELATIONSHIP",
+        "pattern":  {
+                        "kind":  "gate",
+                        "gate":  "Tuần",
+                        "palace":  "Phu Thê"
+                    },
+        "priority":  59,
+        "title":  "Tuần tại Phu Thê",
+        "summary":  "Bạn dễ nhận ra rằng tình cảm cần thời gian kiểm chứng qua trách nhiệm, cách nói chuyện và cách hai bên xử lý điều không như ý. Bạn muốn giữ hòa khí mà vẫn nói rõ nhu cầu, nhưng cũng cần để ý việc dùng chữ cần thời gian để né nói rõ nhu cầu, khiến sự chậm trở thành im lặng kéo dài, nhất là trong tình cảm, cam kết và trách nhiệm chung.",
+        "strengthText":  "Khi kỳ vọng giữa các bên đã rõ, bạn có thể tránh lao vào quan hệ chỉ vì cảm xúc ban đầu, từ đó bảo vệ cả trái tim lẫn tài sản chung.",
+        "cautionText":  "Bạn có thể dễ dùng chữ cần thời gian để né nói rõ nhu cầu, khiến sự chậm trở thành im lặng kéo dài nếu chưa đặt giới hạn rõ.",
+        "lifeAdviceText":  "Bạn hãy đặt các mốc trò chuyện: sau mỗi giai đoạn, nói rõ kỳ vọng, giới hạn và điều hai bên đã học về nhau; trong mười bốn ngày tới, bạn áp dụng ngay vào một tình huống thật thuộc tình cảm, cam kết và trách nhiệm chung.",
+        "teaserQuestion":  "Bạn đang cần tự hỏi: quan hệ này cần thêm thời gian để chín, hay cần một cuộc nói thẳng để khỏi mơ hồ?",
+        "evidenceLabel":  "Dấu hiệu này đến từ một lớp lọc đặt ở vùng cam kết và quan hệ thân thiết."
+    },
+    {
+        "version":  "interpretation-rules-v2",
+        "status":  "active",
+        "key":  "gate:tuan:tat-ach",
+        "scope":  "HEALTH",
+        "pattern":  {
+                        "kind":  "gate",
+                        "gate":  "Tuần",
+                        "palace":  "Tật Ách"
+                    },
+        "priority":  59,
+        "title":  "Tuần tại Tật Ách",
+        "summary":  "Bạn dễ nhận ra rằng mệt mỏi và căng thẳng thường cần quan sát theo chu kỳ, vì nguyên nhân có thể tích lại từ nhiều việc nhỏ. Bạn muốn làm tròn trách nhiệm mà không kiệt sức, nhưng cũng cần để ý việc bỏ qua tín hiệu nhỏ vì chưa đủ nghiêm trọng, nhất là trong nhịp nghỉ và phản ứng khi quá tải.",
+        "strengthText":  "Khi lịch làm và lịch nghỉ đã rõ, bạn có thể phát hiện mẫu lặp nếu bạn chịu ghi nhận dữ kiện thay vì chỉ phản ứng khi quá tải.",
+        "cautionText":  "Nếu kéo dài, bạn có thể dễ bỏ qua tín hiệu nhỏ vì chưa đủ nghiêm trọng, trong khi chính tín hiệu nhỏ mới cho bạn cơ hội sửa sớm.",
+        "lifeAdviceText":  "Bạn hãy theo dõi ngủ, năng lượng và cảm xúc trong hai tuần; dữ kiện lặp lại ba lần là dấu hiệu cần điều chỉnh lịch sống; trong ba ngày tới, bạn áp dụng ngay vào một tình huống thật thuộc nhịp nghỉ và phản ứng khi quá tải.",
+        "teaserQuestion":  "Tín hiệu nhỏ nào đang lặp lại đủ nhiều để bạn không nên xem nó là ngẫu nhiên nữa?",
+        "evidenceLabel":  "Dấu hiệu này đến từ một lớp lọc đặt ở vùng thân tâm và nhịp hồi phục."
+    },
+    {
+        "version":  "interpretation-rules-v2",
+        "status":  "active",
+        "key":  "gate:tuan:thien-di",
+        "scope":  "CAREER",
+        "pattern":  {
+                        "kind":  "gate",
+                        "gate":  "Tuần",
+                        "palace":  "Thiên Di"
+                    },
+        "priority":  59,
+        "title":  "Tuần tại Thiên Di",
+        "summary":  "Bạn dễ nhận ra rằng cơ hội bên ngoài nên được thử từng bước, vì lời mời tốt vẫn cần điều kiện và người phù hợp. Bạn muốn tạo kết quả mà không phải ôm hết việc, nhưng cũng cần để ý việc chần chừ vì muốn chắc tuyệt đối, rồi bỏ lỡ thời điểm thử nhỏ đáng giá, nhất là trong môi trường bên ngoài và cơ hội mới.",
+        "strengthText":  "Khi trách nhiệm công việc đã rõ, bạn có thể đánh giá môi trường mới trước khi đầu tư lớn, giúp giảm rủi ro khi đổi việc, hợp tác hoặc mở rộng thị trường.",
+        "cautionText":  "Khi quá tin vào mặt thuận của Tuần tại Thiên Di, bạn có thể dễ chần chừ vì muốn chắc tuyệt đối, rồi bỏ lỡ thời điểm thử nhỏ đáng giá.",
+        "lifeAdviceText":  "Bạn hãy tạo một bước thử ít rủi ro cho mỗi cơ hội bên ngoài: gặp một lần, làm một phần, ký ngắn hạn hoặc đặt điều kiện rõ; trong bảy ngày tới, bạn áp dụng ngay vào một tình huống thật thuộc môi trường bên ngoài và cơ hội mới.",
+        "teaserQuestion":  "Lời mời nào cần bạn thử nhỏ ngay, trước khi nó nguội đi hoặc kéo bạn đi quá xa?",
+        "evidenceLabel":  "Dấu hiệu này đến từ một lớp lọc đặt ở vùng môi trường xã hội và cơ hội bên ngoài."
+    },
+    {
+        "version":  "interpretation-rules-v2",
+        "status":  "active",
+        "key":  "gate:tuan:phuc-duc",
+        "scope":  "RELATIONSHIP",
+        "pattern":  {
+                        "kind":  "gate",
+                        "gate":  "Tuần",
+                        "palace":  "Phúc Đức"
+                    },
+        "priority":  58,
+        "title":  "Tuần tại Phúc Đức",
+        "summary":  "Bạn dễ nhận ra rằng chuyện gia đình, niềm tin và nền tinh thần cần được hiểu từng lớp thay vì phủ nhận hoặc ôm trọn một lần. Bạn muốn giữ hòa khí mà vẫn nói rõ nhu cầu, nhưng cũng cần để ý việc dùng sự chậm để trì hoãn việc đặt ranh giới với nếp cũ đang làm bạn hao, nhất là trong nếp nhà và chỗ nghỉ tinh thần.",
+        "strengthText":  "Khi kỳ vọng giữa các bên đã rõ, bạn có thể phát huy khả năng quan sát gốc rễ, giúp bạn chọn điều nên kế thừa và điều cần thay đổi một cách ít cực đoan hơn.",
+        "cautionText":  "Bạn có thể dễ dùng sự chậm để trì hoãn việc đặt ranh giới với nếp cũ đang làm bạn hao nếu chưa đặt giới hạn rõ.",
+        "lifeAdviceText":  "Bạn hãy chọn một thói quen gia đình để xem lại trong tháng này, rồi quyết định giữ, sửa hay dừng bằng hành động cụ thể; trong mười bốn ngày tới, bạn áp dụng ngay vào một tình huống thật thuộc nếp nhà và chỗ nghỉ tinh thần.",
+        "teaserQuestion":  "Nếp cũ nào cần được nhìn chậm lại để bạn không tiếp tục sống theo nó một cách tự động?",
+        "evidenceLabel":  "Dấu hiệu này đến từ một lớp lọc đặt ở vùng nền tinh thần và gia đình."
+    },
+    {
+        "version":  "interpretation-rules-v2",
+        "status":  "active",
+        "key":  "gate:triet:menh",
+        "scope":  "IDENTITY",
+        "pattern":  {
+                        "kind":  "gate",
+                        "gate":  "Triệt",
+                        "palace":  "Mệnh"
+                    },
+        "priority":  65,
+        "title":  "Triệt tại Mệnh",
+        "summary":  "Bạn dễ nhận ra rằng có giai đoạn bạn bị buộc dừng lại để bỏ bớt hình ảnh không còn đúng, dù cảm giác ban đầu là bị chặn. Bạn muốn sống đúng với điều bạn tin là phù hợp, nhưng cũng cần để ý việc biến cảm giác bị chặn thành tự nghi ngờ giá trị, thay vì đọc nó như lời nhắc đổi cách đi, nhất là trong cách bạn tự quyết và nhận trách nhiệm.",
+        "strengthText":  "Khi mục tiêu và vai trò của bạn đã rõ, bạn có thể phát huy khả năng tự tái cấu trúc bản thân, không sống mãi bằng nhãn cũ hoặc kỳ vọng người khác đặt lên bạn.",
+        "cautionText":  "Nếu kéo dài, bạn có thể dễ biến cảm giác bị chặn thành tự nghi ngờ giá trị, thay vì đọc nó như lời nhắc đổi cách đi.",
+        "lifeAdviceText":  "Bạn hãy viết lại ba điều bạn không còn muốn chứng minh; năng lượng tiết kiệm được nên chuyển sang kỹ năng hoặc dự án có thể đo kết quả.",
+        "teaserQuestion":  "Điều gì đang bị chặn để bảo vệ bạn khỏi một phiên bản không còn phù hợp?",
+        "evidenceLabel":  "Dấu hiệu này đến từ một lớp chặn mạnh đặt ở vùng bản sắc và khí chất."
+    },
+    {
+        "version":  "interpretation-rules-v2",
+        "status":  "active",
+        "key":  "gate:triet:than",
+        "scope":  "AXIS",
+        "pattern":  {
+                        "kind":  "gate",
+                        "gate":  "Triệt",
+                        "palace":  "Thân"
+                    },
+        "priority":  63,
+        "title":  "Triệt tại Thân",
+        "summary":  "Bạn dễ nhận ra rằng cách hành động của bạn thường phải được lọc kỹ để tránh lao vào việc không có quyền quyết hoặc không đúng sức chịu. Bạn muốn đưa những lựa chọn khác nhau về cùng một hướng, nhưng cũng cần để ý việc phòng thủ quá mạnh, khiến bạn không dám bước vào trải nghiệm mới dù đã có đủ dữ kiện, nhất là trong vai trò thực tế và lịch sống mỗi ngày.",
+        "strengthText":  "Khi thứ tự ưu tiên đã rõ, bạn có thể phát huy khả năng dừng đúng lúc, cắt lỗ công sức và không tiếp tục chỉ vì đã lỡ đi xa.",
+        "cautionText":  "Khi quá tin vào mặt thuận của Triệt tại Thân, bạn có thể dễ phòng thủ quá mạnh, khiến bạn không dám bước vào trải nghiệm mới dù đã có đủ dữ kiện.",
+        "lifeAdviceText":  "Bạn hãy đặt tiêu chí mở lại hành động: cần thêm dữ kiện gì, cần ai cùng chịu trách nhiệm, cần giới hạn nào để bạn bước tiếp an toàn.",
+        "teaserQuestion":  "Bạn đang dừng vì sáng suốt, hay vì một nỗi sợ cũ đang giữ tay lái?",
+        "evidenceLabel":  "Dấu hiệu này đến từ một lớp chặn mạnh đặt ở vùng hành động và đời sống thực tế."
+    },
+    {
+        "version":  "interpretation-rules-v2",
+        "status":  "active",
+        "key":  "gate:triet:quan-loc",
+        "scope":  "CAREER",
+        "pattern":  {
+                        "kind":  "gate",
+                        "gate":  "Triệt",
+                        "palace":  "Quan Lộc"
+                    },
+        "priority":  64,
+        "title":  "Triệt tại Quan Lộc",
+        "summary":  "Bạn dễ nhận ra rằng nghề nghiệp thường không hợp lối đi quá sẵn mà cần tái thiết vai trò, quy trình hoặc quyền hạn trước khi tăng tốc. Bạn muốn tạo kết quả mà không phải ôm hết việc, nhưng cũng cần để ý việc tự làm mọi thứ vì không tin hệ thống, rồi biến năng lực tự chủ thành kiệt sức, nhất là trong công việc và trách nhiệm nghề nghiệp.",
+        "strengthText":  "Khi trách nhiệm công việc đã rõ, bạn có thể nhìn ra điểm hỏng trong hệ thống công việc và có khả năng cải tổ thay vì chỉ chạy theo guồng cũ.",
+        "cautionText":  "Bạn có thể dễ tự làm mọi thứ vì không tin hệ thống, rồi biến năng lực tự chủ thành kiệt sức nếu chưa đặt giới hạn rõ.",
+        "lifeAdviceText":  "Bạn hãy xác định phần nào cần bạn kiểm soát trực tiếp và phần nào phải được phân quyền; tự chủ không có nghĩa là tự gánh hết; trong mười bốn ngày tới, bạn áp dụng ngay vào một tình huống thật thuộc công việc và trách nhiệm nghề nghiệp.",
+        "teaserQuestion":  "Sự nghiệp đang chặn bạn khỏi sai đường, hay đang yêu cầu bạn xây một hệ thống mới để đi xa hơn?",
+        "evidenceLabel":  "Dấu hiệu này đến từ một lớp chặn mạnh đặt ở vùng nghề nghiệp và trách nhiệm xã hội."
+    },
+    {
+        "version":  "interpretation-rules-v2",
+        "status":  "active",
+        "key":  "gate:triet:tai-bach",
+        "scope":  "MONEY",
+        "pattern":  {
+                        "kind":  "gate",
+                        "gate":  "Triệt",
+                        "palace":  "Tài Bạch"
+                    },
+        "priority":  64,
+        "title":  "Triệt tại Tài Bạch",
+        "summary":  "Bạn dễ nhận ra rằng nguồn lực thường cần được bảo vệ khỏi quyết định nóng, lời mời mơ hồ hoặc cam kết thiếu đường lui. Bạn muốn giữ an toàn mà không tự bỏ lỡ cơ hội, nhưng cũng cần để ý việc khóa quá chặt, khiến tiền, kỹ năng và cơ hội không được đưa vào nơi có thể sinh giá trị, nhất là trong tiền bạc, công sức và quyền lựa chọn.",
+        "strengthText":  "Khi giới hạn tiền bạc đã rõ, bạn có thể phát huy khả năng kiểm soát rủi ro tài chính, đặc biệt khi bạn biết hỏi khó trước khi xuất tiền hoặc nhận việc.",
+        "cautionText":  "Nếu kéo dài, bạn có thể dễ khóa quá chặt, khiến tiền, kỹ năng và cơ hội không được đưa vào nơi có thể sinh giá trị.",
+        "lifeAdviceText":  "Bạn hãy đặt hai ngưỡng: ngưỡng bảo vệ không được đụng tới và ngưỡng thử nghiệm có thể chấp nhận mất; mọi cơ hội phải nằm rõ ở một trong hai ngưỡng.",
+        "teaserQuestion":  "Bạn đang bảo toàn nguồn lực đúng lúc, hay đang giữ quá chặt vì chưa tin bạn có thể chọn đúng?",
+        "evidenceLabel":  "Dấu hiệu này đến từ một lớp chặn mạnh đặt ở vùng tiền bạc và tài nguyên cá nhân."
+    },
+    {
+        "version":  "interpretation-rules-v2",
+        "status":  "active",
+        "key":  "gate:triet:phu-the",
+        "scope":  "RELATIONSHIP",
+        "pattern":  {
+                        "kind":  "gate",
+                        "gate":  "Triệt",
+                        "palace":  "Phu Thê"
+                    },
+        "priority":  62,
+        "title":  "Triệt tại Phu Thê",
+        "summary":  "Bạn dễ nhận ra rằng quan hệ cần đi qua lớp kiểm chứng về niềm tin, trách nhiệm và ranh giới trước khi thật sự mở sâu. Bạn muốn giữ hòa khí mà vẫn nói rõ nhu cầu, nhưng cũng cần để ý việc khép lòng quá mạnh, khiến người phù hợp cũng khó bước vào vì bạn chỉ nhìn thấy rủi ro, nhất là trong tình cảm, cam kết và trách nhiệm chung.",
+        "strengthText":  "Khi kỳ vọng giữa các bên đã rõ, bạn có thể lọc quan hệ, tránh cam kết vì cô đơn, áp lực gia đình hoặc cảm xúc nhất thời.",
+        "cautionText":  "Khi quá tin vào mặt thuận của Triệt tại Phu Thê, bạn có thể dễ khép lòng quá mạnh, khiến người phù hợp cũng khó bước vào vì bạn chỉ nhìn thấy rủi ro.",
+        "lifeAdviceText":  "Bạn hãy cho quan hệ một lộ trình mở dần: chia sẻ nhỏ, trách nhiệm nhỏ, kế hoạch nhỏ; ai đi đều qua các mốc đó mới đáng đi xa.",
+        "teaserQuestion":  "Bạn đang lọc để bảo vệ trái tim, hay đang khóa cửa vì một vết cũ chưa được gọi tên?",
+        "evidenceLabel":  "Dấu hiệu này đến từ một lớp chặn mạnh đặt ở vùng cam kết và quan hệ thân thiết."
+    },
+    {
+        "version":  "interpretation-rules-v2",
+        "status":  "active",
+        "key":  "gate:triet:tat-ach",
+        "scope":  "HEALTH",
+        "pattern":  {
+                        "kind":  "gate",
+                        "gate":  "Triệt",
+                        "palace":  "Tật Ách"
+                    },
+        "priority":  62,
+        "title":  "Triệt tại Tật Ách",
+        "summary":  "Có những lúc bạn dừng lại nếu bạn bỏ qua tín hiệu mệt, căng hoặc thiếu hồi phục quá lâu. Bạn muốn làm tròn trách nhiệm mà không kiệt sức, nhưng cũng cần để ý việc coi việc dừng lại như thất bại, nhất là trong nhịp nghỉ và phản ứng khi quá tải.",
+        "strengthText":  "Khi lịch làm và lịch nghỉ đã rõ, bạn có thể học được cách dừng trước khi hỏng, từ đó xây sức bền và hiệu suất làm việc thực tế hơn.",
+        "cautionText":  "Bạn có thể dễ coi việc dừng lại như thất bại, trong khi đôi khi nó là cách duy nhất để bảo vệ hệ thống nếu chưa đặt giới hạn rõ.",
+        "lifeAdviceText":  "Bạn hãy định nghĩa trước các trường hợp phải giảm tải: ngủ dưới mức tối thiểu, cáu gắt kéo dài, đau lặp lại hoặc mất hứng bắt đầu việc; trong mười bốn ngày tới, bạn áp dụng ngay vào một tình huống thật thuộc nhịp nghỉ và phản ứng khi quá tải.",
+        "teaserQuestion":  "Điểm dừng nào đang cứu bạn khỏi quá tải nhưng bạn vẫn cố xem nó như vật cản?",
+        "evidenceLabel":  "Dấu hiệu này đến từ một lớp chặn mạnh đặt ở vùng thân tâm và sức bền."
+    },
+    {
+        "version":  "interpretation-rules-v2",
+        "status":  "active",
+        "key":  "gate:triet:thien-di",
+        "scope":  "CAREER",
+        "pattern":  {
+                        "kind":  "gate",
+                        "gate":  "Triệt",
+                        "palace":  "Thiên Di"
+                    },
+        "priority":  62,
+        "title":  "Triệt tại Thiên Di",
+        "summary":  "Bạn dễ nhận ra rằng cơ hội bên ngoài cần được lọc kỹ vì không phải môi trường sáng sủa nào cũng hợp với bạn. Bạn muốn tạo kết quả mà không phải ôm hết việc, nhưng cũng cần để ý việc quá nghi ngờ nên bỏ lỡ nơi thật sự giúp bạn lớn lên và được công nhận đúng giá trị, nhất là trong môi trường bên ngoài và cơ hội mới.",
+        "strengthText":  "Khi trách nhiệm công việc đã rõ, bạn có thể phát huy khả năng đọc điều kiện ẩn trong lời mời, hợp đồng, nhóm mới hoặc thị trường mới.",
+        "cautionText":  "Nếu kéo dài, bạn có thể dễ quá nghi ngờ nên bỏ lỡ nơi thật sự giúp bạn lớn lên và được công nhận đúng giá trị.",
+        "lifeAdviceText":  "Bạn hãy dùng tiêu chí ba điểm khi bước ra ngoài: người đáng tin, luật chơi rõ và quyền rút lui an toàn; trong ba ngày tới, bạn áp dụng ngay vào một tình huống thật thuộc môi trường bên ngoài và cơ hội mới.",
+        "teaserQuestion":  "Môi trường nào đang bị Triệt chặn để bạn khỏi bước nhầm, và môi trường nào đáng mở thử từng bước?",
+        "evidenceLabel":  "Dấu hiệu này đến từ một lớp chặn mạnh đặt ở vùng môi trường xã hội và cơ hội bên ngoài."
+    },
+    {
+        "version":  "interpretation-rules-v2",
+        "status":  "active",
+        "key":  "gate:triet:phuc-duc",
+        "scope":  "RELATIONSHIP",
+        "pattern":  {
+                        "kind":  "gate",
+                        "gate":  "Triệt",
+                        "palace":  "Phúc Đức"
+                    },
+        "priority":  61,
+        "title":  "Triệt tại Phúc Đức",
+        "summary":  "Bạn dễ nhận ra rằng nền gia đình và niềm tin cũ có thể cần được lọc mạnh để bạn sống nhẹ hơn. Bạn muốn giữ hòa khí mà vẫn nói rõ nhu cầu, nhưng cũng cần để ý việc phủ nhận toàn bộ gốc rễ vì có phần làm đau, nhất là trong nếp nhà và chỗ nghỉ tinh thần.",
+        "strengthText":  "Khi kỳ vọng giữa các bên đã rõ, bạn có thể phát huy khả năng tự chọn di sản tinh thần, không lặp lại mọi khuôn mẫu chỉ vì chúng quen thuộc.",
+        "cautionText":  "Khi quá tin vào mặt thuận của Triệt tại Phúc Đức, bạn có thể dễ phủ nhận toàn bộ gốc rễ vì có phần làm đau, trong khi một số giá trị vẫn đáng giữ và dùng lại.",
+        "lifeAdviceText":  "Bạn hãy viết hai danh sách: điều từ gia đình giúp bạn vững và điều khiến bạn nhỏ lại; danh sách thứ hai cần ranh giới cụ thể; trong bảy ngày tới, bạn áp dụng ngay vào một tình huống thật thuộc nếp nhà và chỗ nghỉ tinh thần.",
+        "teaserQuestion":  "Bạn cần giữ phần phúc nào của nếp nhà, và cần trả lại điều gì cho quá khứ?",
+        "evidenceLabel":  "Dấu hiệu này đến từ một lớp chặn mạnh đặt ở vùng nền tinh thần và nếp gia đình."
+    }
 ]

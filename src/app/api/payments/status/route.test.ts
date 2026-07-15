@@ -5,151 +5,104 @@ const mocks = vi.hoisted(() => ({
   getDb: vi.fn(),
   getPayOSPaymentRequest: vi.fn(),
   isPayOSRequestPaid: vi.fn(),
-  creditPaidTopupOrder: vi.fn(),
+  paidReadingOrderPayload: vi.fn(),
+  settlePaidOrder: vi.fn(),
 }));
 
+vi.mock("next/server", () => ({
+  NextResponse: {
+    json: (body: unknown, init?: ResponseInit) => Response.json(body, init),
+  },
+}));
 vi.mock("@/lib/auth", () => ({ getCurrentUser: mocks.getCurrentUser }));
 vi.mock("@/lib/db", () => ({ getDb: mocks.getDb }));
 vi.mock("@/lib/payos", () => ({
   getPayOSPaymentRequest: mocks.getPayOSPaymentRequest,
   isPayOSRequestPaid: mocks.isPayOSRequestPaid,
-  creditPaidTopupOrder: mocks.creditPaidTopupOrder,
+  paidReadingOrderPayload: mocks.paidReadingOrderPayload,
+  settlePaidOrder: mocks.settlePaidOrder,
 }));
 
-function createDb(order: Record<string, unknown> | null) {
-  return {
-    paymentOrder: {
-      findUnique: vi.fn(async () => order),
-    },
-  };
-}
-
-async function getStatus(orderCode = "123456") {
-  const { GET } = await import("./route");
-  return GET(new Request(`http://test.local/api/payments/status?orderCode=${orderCode}`));
-}
+const directOrder = {
+  id: "order-1",
+  userId: "user-1",
+  orderCode: BigInt(123),
+  status: "PENDING",
+  amountVnd: 199000,
+  coins: 0,
+  paidAt: null,
+  rawPayload: { directReading: { chartId: "chart-1", type: "FULL", scopeKey: "all" } },
+  package: null,
+};
 
 describe("payment status conversion endpoint", () => {
+  const db = { paymentOrder: { findUnique: vi.fn() } };
+
   beforeEach(() => {
     vi.clearAllMocks();
-    mocks.getPayOSPaymentRequest.mockResolvedValue(null);
-    mocks.isPayOSRequestPaid.mockReturnValue(false);
-    mocks.creditPaidTopupOrder.mockResolvedValue(null);
-    mocks.getCurrentUser.mockResolvedValue({
-      id: "user-1",
-      email: "user@example.com",
-      name: "User",
-      role: "USER",
-      coinBalance: 0,
-    });
-  });
-
-  it("only marks a user's paid order as verified after webhook status is PAID", async () => {
-    const db = createDb({
-      id: "order-1",
-      userId: "user-1",
-      orderCode: BigInt(123456),
-      status: "PAID",
-      amountVnd: 199000,
-      coins: 209,
-      paidAt: new Date("2026-06-01T12:00:00+07:00"),
-      rawPayload: {},
-      package: { key: "full-reading" },
-    });
+    mocks.getCurrentUser.mockResolvedValue({ id: "user-1" });
     mocks.getDb.mockReturnValue(db);
-
-    const response = await getStatus();
-    const json = await response.json();
-
-    expect(response.status).toBe(200);
-    expect(json).toEqual({
-      verified: true,
-      status: "PAID",
-      transactionId: "123456",
-      value: 199000,
-      currency: "VND",
-      packageKey: "full-reading",
-      coins: 209,
-    });
-  });
-
-  it("does not expose conversion value for pending or unrelated orders", async () => {
-    const pendingDb = createDb({
-      id: "order-1",
-      userId: "user-1",
-      orderCode: BigInt(123456),
-      status: "PENDING",
-      amountVnd: 199000,
-      coins: 209,
-      paidAt: null,
-      rawPayload: {},
-      package: { key: "full-reading" },
-    });
-    mocks.getDb.mockReturnValue(pendingDb);
-
-    const pendingResponse = await getStatus();
-    expect(await pendingResponse.json()).toEqual({ verified: false, status: "PENDING", transactionId: "123456" });
-
-    const otherUserDb = createDb({
-      id: "order-1",
-      userId: "user-2",
-      orderCode: BigInt(123456),
-      status: "PAID",
-      amountVnd: 199000,
-      coins: 209,
-      paidAt: new Date(),
-      rawPayload: {},
-      package: { key: "full-reading" },
-    });
-    mocks.getDb.mockReturnValue(otherUserDb);
-
-    const forbiddenResponse = await getStatus();
-    expect(forbiddenResponse.status).toBe(404);
-  });
-
-  it("reconciles a pending topup when PayOS confirms the order is paid", async () => {
-    const db = createDb({
-      id: "order-1",
-      userId: "user-1",
-      orderCode: BigInt(123456),
-      status: "PENDING",
-      amountVnd: 199000,
-      coins: 209,
-      paidAt: null,
-      rawPayload: { checkout: true },
-      package: { key: "full-reading" },
-    });
-    mocks.getDb.mockReturnValue(db);
-    const payosStatus = { status: "PAID", amountPaid: 199000, raw: { data: { status: "PAID" } } };
-    mocks.getPayOSPaymentRequest.mockResolvedValue(payosStatus);
+    db.paymentOrder.findUnique.mockResolvedValue(directOrder);
+    mocks.getPayOSPaymentRequest.mockResolvedValue({ status: "PAID", amountPaid: 199000, raw: { ok: true } });
     mocks.isPayOSRequestPaid.mockReturnValue(true);
-    mocks.creditPaidTopupOrder.mockResolvedValue({
-      userId: "user-1",
+    mocks.paidReadingOrderPayload.mockReturnValue({
+      kind: "directReading",
+      chartId: "chart-1",
+      type: "FULL",
+      scopeKey: "all",
+    });
+    mocks.settlePaidOrder.mockResolvedValue({
       status: "PAID",
       amountVnd: 199000,
-      coins: 209,
-      paidAt: new Date("2026-07-11T18:47:09+07:00"),
-      package: { key: "full-reading" },
+      coins: 0,
+      readingId: "reading-1",
+      chartId: "chart-1",
+      purchaseType: "direct_full",
     });
+  });
 
-    const response = await getStatus();
-    const json = await response.json();
+  it("verifies PayOS, settles the direct order, and returns purchase attribution", async () => {
+    const { GET } = await import("./route");
+    const response = await GET(new Request("http://test.local/api/payments/status?orderCode=123"));
+    const body = await response.json();
 
-    expect(response.status).toBe(200);
-    expect(mocks.getPayOSPaymentRequest).toHaveBeenCalledWith("123456");
-    expect(mocks.creditPaidTopupOrder).toHaveBeenCalledWith(
-      db,
-      expect.objectContaining({ id: "order-1", status: "PENDING", amountVnd: 199000 }),
-      { raw: { checkout: true }, reconciliation: payosStatus.raw },
-    );
-    expect(json).toMatchObject({
+    expect(body).toMatchObject({
       verified: true,
-      status: "PAID",
-      transactionId: "123456",
+      transactionId: "123",
       value: 199000,
-      currency: "VND",
-      packageKey: "full-reading",
-      coins: 209,
+      chartId: "chart-1",
+      purchaseType: "direct_full",
+      readingId: "reading-1",
+      coins: 0,
     });
+    expect(mocks.getPayOSPaymentRequest).toHaveBeenCalledWith("123");
+    expect(mocks.settlePaidOrder).toHaveBeenCalledTimes(1);
+  });
+
+  it("calls PayOS again even when the webhook already marked the order paid", async () => {
+    db.paymentOrder.findUnique.mockResolvedValue({ ...directOrder, status: "PAID", paidAt: new Date() });
+    const { GET } = await import("./route");
+
+    await GET(new Request("http://test.local/api/payments/status?orderCode=123"));
+
+    expect(mocks.getPayOSPaymentRequest).toHaveBeenCalledWith("123");
+    expect(mocks.settlePaidOrder).toHaveBeenCalledTimes(1);
+  });
+
+  it("does not verify or settle an unpaid pending order", async () => {
+    mocks.isPayOSRequestPaid.mockReturnValue(false);
+    mocks.settlePaidOrder.mockResolvedValue(null);
+    const { GET } = await import("./route");
+    const body = await (await GET(new Request("http://test.local/api/payments/status?orderCode=123"))).json();
+
+    expect(body).toEqual({ verified: false, status: "PENDING", transactionId: "123" });
+    expect(mocks.settlePaidOrder).not.toHaveBeenCalled();
+  });
+
+  it("hides orders owned by another user", async () => {
+    db.paymentOrder.findUnique.mockResolvedValue({ ...directOrder, userId: "user-2" });
+    const { GET } = await import("./route");
+
+    expect((await GET(new Request("http://test.local/api/payments/status?orderCode=123"))).status).toBe(404);
   });
 });

@@ -8,8 +8,8 @@ const items = [
   { key: "yearly-months", title: "Thời điểm có quý nhân trong năm 2026", description: "Mốc nên chủ động." },
 ];
 
-describe("personalized VIP report outline", () => {
-  it("shows every personalized title and the zero-friction purchase promise", () => {
+describe("personalized FULL report offer", () => {
+  it("shows one compact, trackable offer with the approved benefits and dynamic price", () => {
     const html = renderToStaticMarkup(
       createElement(PersonalizedReportOutline, {
         chartId: "chart-1",
@@ -19,17 +19,18 @@ describe("personalized VIP report outline", () => {
       }),
     );
 
-    expect(html).toContain("Hồ sơ VIP của bạn gồm");
+    expect(html).toContain("Bản FULL 9 chương cá nhân hóa");
+    expect(html).toContain("<details");
     expect(html).toContain("Vì sao cung Tài Bạch gặp Tuần?");
-    expect(html).toContain("Thời điểm có quý nhân trong năm 2026");
-    expect(html).toContain("Mở hồ sơ đầy đủ — 199 xu");
-    expect(html).toContain("Đọc lại không mất thêm xu");
+    expect(html).toContain("Đọc lại không mất thêm phí");
     expect(html).toContain("Tặng 3 câu hỏi với Cố vấn AI");
+    expect(html).toContain("199.000đ (199 xu)");
     expect(html).toContain('popoverTarget="premium-confirm-chart-1"');
-    expect(html).not.toContain('href="#mo-khoa-ho-so-vip"');
+    expect(html).toContain('data-ad-view="full_offer_viewed"');
+    expect(html).toContain('data-ad-click="full_offer_clicked"');
   });
 
-  it("turns the preview into an unlocked contents list after purchase", () => {
+  it("turns the outline into a reread link after purchase", () => {
     const html = renderToStaticMarkup(
       createElement(PersonalizedReportOutline, {
         chartId: "chart-1",
@@ -39,9 +40,9 @@ describe("personalized VIP report outline", () => {
       }),
     );
 
-    expect(html).toContain("Hồ sơ đã mở");
-    expect(html).not.toContain("Mở hồ sơ đầy đủ");
+    expect(html).toContain("Bản FULL đã mở");
     expect(html).toContain('href="/la-so/chart-1/nang-cao"');
-    expect(html).not.toContain('href="#luan-giai"');
+    expect(html).not.toContain("Mở lựa chọn thanh toán");
+    expect(html).not.toContain("full_offer_viewed");
   });
 });

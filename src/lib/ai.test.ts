@@ -1,9 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   FREE_OVERVIEW_MAX_WORDS,
-  FREE_OVERVIEW_MAX_TOKENS,
   FREE_OVERVIEW_MIN_WORDS,
-  FREE_OVERVIEW_REPAIR_MAX_TOKENS,
   FREE_OVERVIEW_TEMPLATE_MAX_WORDS,
   FREE_OVERVIEW_TEMPLATE_MIN_WORDS,
   FREE_OVERVIEW_VERSION,
@@ -233,49 +231,27 @@ describe("AI reading format", () => {
     expect(promptMeta).not.toHaveProperty("modelPolicy");
   });
 
-  it("asks the free overview LLM for a roughly 1,200-word personal mini-report", async () => {
+  it("always generates the free overview from seed rules without calling an LLM provider", async () => {
     clearProviderEnv();
+    llmRouterMocks.hasExternalLlmProvider.mockReturnValue(true);
+    llmRouterMocks.generateWithLlmRouter.mockResolvedValue({
+      text: "Nội dung từ provider không được sử dụng",
+      model: "deepseek/deepseek-chat",
+      provider: "deepseek",
+    });
 
-    const chart = sampleChart();
-    const { prompt } = await generateFreeOverview(chart);
+    const result = await generateFreeOverview(sampleChart());
 
-    expect(prompt).toContain(String(FREE_OVERVIEW_MIN_WORDS));
-    expect(prompt).toContain(String(FREE_OVERVIEW_MAX_WORDS));
-    expect(FREE_OVERVIEW_MIN_WORDS).toBe(1000);
-    expect(FREE_OVERVIEW_MAX_WORDS).toBe(1200);
-    expect(FREE_OVERVIEW_MAX_TOKENS).toBeLessThanOrEqual(3800);
-    expect(FREE_OVERVIEW_REPAIR_MAX_TOKENS).toBeLessThanOrEqual(3300);
-    expect(FREE_OVERVIEW_VERSION).toBe("free-mini-report-v9");
-    expect(prompt.length).toBeLessThan(7500);
-    expect(prompt).toContain("Hồ sơ bằng chứng rút gọn");
-    expect(prompt).not.toContain("Dữ liệu cung:");
-    expect(prompt).toContain("1.000-1.200");
-    expect(prompt).toContain("## Tín hiệu nổi bật của lá số");
-    expect(prompt).toContain("650-900 ký tự");
-    expect(prompt).toContain("người đọc thấy đúng");
-    expect(prompt).toContain("muốn mở hồ sơ chuyên sâu");
-    expect(prompt).toContain("## Mỏ neo");
-    expect(prompt).toContain("## Điểm đáng chú ý nhất");
-    expect(prompt).toContain("## Khí chất và nội lực");
-    expect(prompt).toContain("## Công việc và tài chính");
-    expect(prompt).toContain("## Tình cảm và quan hệ");
-    expect(prompt).toContain("## Sức khỏe và nhịp sống");
-    expect(prompt).toContain(`## Vận năm ${chart.input.viewYear}`);
-    expect(prompt).toContain("không dùng điểm số thô");
-    expect(prompt).toContain("12-21 tuổi");
-    expect(prompt).toContain("tiền tiêu vặt");
-    expect(prompt).toContain("bài tập nhóm");
-    expect(prompt).toContain("người lớn tuổi");
-    expect(prompt).toContain("câu ngắn");
-    expect(prompt).toContain("giải thích thuật ngữ ngay bằng lời đời thường");
-    expect(prompt).toContain("không dùng giọng học thuật");
-    expect(prompt).toContain("## Câu hỏi mở trước khi đi sâu");
-    expect(prompt).not.toContain("## Cẩm nang hành động");
-    expect(prompt).toContain("Không viết như bài blog");
-    expect(prompt).toContain("What/Why");
+    expect(FREE_OVERVIEW_MIN_WORDS).toBe(1400);
+    expect(FREE_OVERVIEW_MAX_WORDS).toBe(1650);
+    expect(FREE_OVERVIEW_VERSION).toBe("free-seed-overview-v10");
+    expect(result.model).toBe("interpretation-rules-v2");
+    expect(result).not.toHaveProperty("prompt");
+    expect(isCompleteFreeOverview(result.content)).toBe(true);
+    expect(llmRouterMocks.generateWithLlmRouter).not.toHaveBeenCalled();
   });
 
-  it("renders a useful instant free overview before the background LLM finishes", () => {
+  it("renders the four personalized seed clusters within the approved length", () => {
     const chart = youngSampleChart();
     const content = buildInstantFreeOverview(chart);
 
@@ -283,141 +259,27 @@ describe("AI reading format", () => {
     expect(FREE_OVERVIEW_TEMPLATE_MAX_WORDS).toBe(1650);
     expect(countWords(content)).toBeGreaterThanOrEqual(FREE_OVERVIEW_TEMPLATE_MIN_WORDS);
     expect(countWords(content)).toBeLessThanOrEqual(FREE_OVERVIEW_TEMPLATE_MAX_WORDS);
-    expect(content).not.toContain("## Mỏ neo");
-    expect(content).toContain("# Bản đọc thử lá số tử vi");
-    expect(content).toContain("## 1. Vì sao bạn hay tự kiểm tra trước khi tin");
-    expect(content).toContain("## 2. Công việc: cần rõ vai, rõ luật chơi");
-    expect(content).toContain("## 3. Tiền bạc: giữ an toàn nhưng đừng tự khóa mình");
-    expect(content).toContain("## 4. Quan hệ và nhịp sống: đừng để mình thành người gánh hết");
-    expect(content).toContain("## Mở khóa bản luận giải chuyên sâu");
-    expect(content).not.toContain("**Điểm chính:**");
-    expect(content).not.toContain("**Cần chú ý:**");
-    expect(content).not.toContain("**Nên đọc tiếp:**");
-    expect(content).not.toContain("**Điểm bổ sung:**");
-    expect(content).not.toContain("Lợi thế là");
-    expect(content).not.toContain("Điểm mù là");
-    expect(content).not.toContain("Cạm bẫy là");
-    expect(content).not.toContain("Điểm có thể nâng bạn lên");
-    expect((content.match(/\sgiống\s/g) || []).length).toBeLessThanOrEqual(1);
-    expect(content).not.toMatch(/Căn cứ:/);
-    expect(content).not.toMatch(/\b(vì|và|hoặc|nhưng|là|rằng|khi|nếu|mà)\./i);
-    expect(content).toMatch(/\bbạn\b/);
-    expect(content).not.toContain("người đọc");
-    expect(content).not.toContain("## Cẩm nang hành động");
-    expect(content).not.toMatch(/\d+\/100/);
-    expect(content).toContain("tiền tiêu vặt");
-    expect(content).toContain("part-time");
-    expect(content).toContain("bài tập nhóm");
-    expect(content).not.toContain("vốn thử nghiệm");
-    expect(content).not.toContain("văn bản phạm vi công việc");
-    expect(content).not.toContain("dòng tiền");
-    expect(content).toContain("Bản chuyên sâu sẽ đi tiếp");
-    expect(content).toContain("tấm bản đồ");
-    expect(content).toContain("Nếu phần đọc thử này làm bạn thấy có vài điều đúng với mình");
-    expect(content).not.toContain("bề nổi của tảng băng chìm");
-    expect(content).not.toContain("phần còn đang được giữ lại");
-    expect(content).toContain("Bản Luận Giải Chuyên Sâu");
-    expect(content).not.toContain("tháng tử huyệt");
-    expect(content).not.toContain("thời điểm vàng");
+    expect(content).toContain("# Bản tổng quan lá số của bạn");
+    expect(content).toContain("## 1. Khí chất và cách ra quyết định");
+    expect(content).toContain("## 2. Công việc và nguồn lực");
+    expect(content).toContain("## 3. Quan hệ và nhịp sống");
+    expect(content).toContain("## 4. Vận hiện tại");
+    expect(content).toContain("## Hai câu hỏi để bạn tự đối chiếu");
+    expect(content).toContain("Bản FULL 9 chương cá nhân hóa");
     expect(content).toContain(chart.input.fullName);
-    expect(content).toContain(chart.menh);
-    expect(content).toContain(chart.than);
+    expect(content).toMatch(/\bbạn\b/iu);
+    expect(content).not.toMatch(/người đọc|người này|đương số|\bmình\b/iu);
+    expect(content).not.toContain("giống như");
     expect(content).not.toContain(PAID_FULL_WORD_TARGET);
-    expect(content).not.toContain("## Luận giải chính");
   });
 
-  it("uses the explicit DeepSeek-to-Groq router for free overview", async () => {
-    clearProviderEnv();
-    llmRouterMocks.hasExternalLlmProvider.mockReturnValue(true);
-    llmRouterMocks.generateWithLlmRouter.mockResolvedValue({
-      text: "Groq free overview",
-      model: "groq/llama-3.1-8b-instant",
-      provider: "groq",
-    });
-
-    const result = await generateFreeOverview(sampleChart());
-
-    expect(result.model).toBe("groq/llama-3.1-8b-instant");
-    expect(llmRouterMocks.generateWithLlmRouter).toHaveBeenCalledWith(
-      expect.objectContaining({
-        maxTokens: FREE_OVERVIEW_MAX_TOKENS,
-        providerOrder: ["deepseek", "groq"],
-      }),
-    );
-  });
-
-  it("repairs an empty DeepSeek free overview with a compact retry prompt", async () => {
-    clearProviderEnv();
-    llmRouterMocks.hasExternalLlmProvider.mockReturnValue(true);
-    llmRouterMocks.generateWithLlmRouter
-      .mockResolvedValueOnce({
-        text: "   ",
-        model: "deepseek/deepseek-chat",
-        provider: "deepseek",
-      })
-      .mockResolvedValueOnce({
-        text: "Compact repaired free overview",
-        model: "deepseek/deepseek-chat",
-        provider: "deepseek",
-      });
-
-    const result = await generateFreeOverview(sampleChart());
-
-    expect(result.content).toBe("Compact repaired free overview");
-    expect(result.model).toBe("deepseek/deepseek-chat");
-    expect(llmRouterMocks.generateWithLlmRouter).toHaveBeenCalledTimes(2);
-
-    const firstCall = llmRouterMocks.generateWithLlmRouter.mock.calls[0][0] as { prompt: string; maxTokens: number; providerOrder?: string[] };
-    const repairCall = llmRouterMocks.generateWithLlmRouter.mock.calls[1][0] as { prompt: string; maxTokens: number; providerOrder?: string[] };
-
-    expect(repairCall.prompt).toContain("PROMPT REPAIR COMPACT");
-    expect(repairCall.prompt.length).toBeLessThan(firstCall.prompt.length);
-    expect(repairCall.maxTokens).toBeLessThanOrEqual(firstCall.maxTokens);
-    expect(repairCall.providerOrder).toEqual(["deepseek"]);
-  });
-
-  it("accepts only evidence-based mini-reports within the guard range", () => {
-    const buildContent = (fillerWords: number) => {
-      const filler = Array.from({ length: fillerWords }, (_, index) => `dữ-liệu-${index}`).join(" ");
-      return `## Tín hiệu nổi bật của lá số
-Với cung Mệnh có Tử Vi, lá số này không đi theo kiểu may rủi nhất thời mà nghiêng về năng lực dựng khung, nhìn vấn đề và giữ nhịp khi xung quanh bắt đầu rối. Điểm khiến người đọc dễ thấy đúng là bên ngoài có thể khá điềm, nhưng bên trong lại thường tự tính rất nhiều đường trước khi quyết. Trục Quan Lộc và Tài Bạch cho thấy cơ hội không thiếu, nhưng chỉ mở ra giá trị thật khi phạm vi, quyền hạn và dòng tiền được nói rõ từ đầu. Nếu muốn biết nên chọn cơ hội nào, tránh điểm nghẽn nào và năm 2026 nên đi nhanh hay đi chắc, phần hồ sơ chuyên sâu sẽ nối các cung, sao và đại vận thành một bản định hướng cụ thể hơn.
-
-## Mỏ neo
-- **Năng lượng nội lực: nền ổn định** — Cung Mệnh có Tử Vi.
-- **Nhịp công việc & tài chính: chọn lọc trước khi nhận** — Cung Quan Lộc cần chủ động.
-- **Tín hiệu năm 2026: tiến từng bước có kiểm chứng** — Đại vận nhắc giữ nhịp.
-
-## Điểm đáng chú ý nhất
-Cung Mệnh có Tử Vi và đại vận hiện tại tạo ra một điểm chuyển. ${filler}
-
-## Khí chất và nội lực
-Mệnh và Thân cho thấy khả năng tổ chức.
-
-## Công việc và tài chính
-Cung Quan Lộc và Tài Bạch cần được đối chiếu trước quyết định.
-
-## Tình cảm và quan hệ
-Cung Phu Thê nhắc giữ ranh giới rõ ràng.
-
-## Sức khỏe và nhịp sống
-Cung Tật Ách chỉ dùng để nhắc nhịp nghỉ ngơi, không thay thế tư vấn y khoa.
-
-## Vận năm 2026
-Tuần tại Thiên Di là tín hiệu nên kiểm chứng.
-
-## Câu hỏi mở trước khi đi sâu
-- Năm 2026, đâu là lựa chọn cần đọc sâu trước khi quyết?
-- Cơ hội nào đang mở ra thật, và cơ hội nào chỉ tạo áp lực?
-- Vì sao cùng một mối quan hệ có lúc hỗ trợ, có lúc làm hao sức?
-- Điểm nghẽn nào cần đối chiếu với đại vận trước khi hành động?`;
-    };
-    const content = buildContent(750);
+  it("accepts only complete four-cluster seed reports inside the guard range", () => {
+    const content = buildInstantFreeOverview(sampleChart());
 
     expect(isCompleteFreeOverview(content)).toBe(true);
-    expect(isCompleteFreeOverview(content.replace("## Tín hiệu nổi bật của lá số", "## Gợi mở"))).toBe(false);
-    expect(isCompleteFreeOverview(content.replace("## Tình cảm và quan hệ", "## Ghi chú"))).toBe(false);
-    expect(isCompleteFreeOverview(buildContent(500))).toBe(false);
-    expect(isCompleteFreeOverview(buildContent(1300))).toBe(false);
+    expect(isCompleteFreeOverview(content.replace("## 2. Công việc và nguồn lực", "## Ghi chú"))).toBe(false);
+    expect(isCompleteFreeOverview(content.split("## 3. Quan hệ và nhịp sống")[0])).toBe(false);
+    expect(isCompleteFreeOverview(`${content} ${"thêm ".repeat(300)}`)).toBe(false);
   });
 
   it("defines eight interpretive chapters and one consolidated action chapter", () => {

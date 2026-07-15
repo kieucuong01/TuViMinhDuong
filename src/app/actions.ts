@@ -7,7 +7,7 @@ import { clearSession, createMagicSession, getCurrentUser, getOrCreateEmailUser,
 import { ARTICLES_CACHE_TAG, FEATURE_PRICES_CACHE_TAG, OPERATION_SETTINGS_CACHE_TAG, claimGuestChartForUserFromPath, countRecentChartsForIp, getCachedReading, getChart, getFeaturePrice, getOperationSettings, getUserBalance, saveArticleCategoryFromForm, saveArticleFromForm, saveChart, saveReading, adjustCoins, deleteArticleBySlug, deleteUserChart, getReadingJobByScope, createPendingReading, updateOperationSettings, updateFeaturePrices, getCompletedReadingsForScopes, hasReadingBundleAccess, type ChartCreationMetadata } from "@/lib/data";
 import { generateReading } from "@/lib/ai";
 import { getDb } from "@/lib/db";
-import { createPayOSCheckout, createPayOSCustomCheckout } from "@/lib/payos";
+import { completePaidReadingOrder, createPayOSCheckout, createPayOSCustomCheckout } from "@/lib/payos";
 import type { CalendarType, Gender } from "@/lib/chart";
 import { COIN_PACKAGES, FEATURE_PRICE_KEYS, TEMPORARY_FULL_ACCESS } from "@/lib/pricing";
 import type { ReadingKey } from "@/lib/pricing";
@@ -323,6 +323,87 @@ async function getReadingUser(chartId: string, nextPath: string, currentUser?: S
   };
   await setSession(guest);
   return guest;
+}
+
+export async function checkoutFullReadingAction(formData: FormData) {
+  const chartId = String(formData.get("chartId") || "").trim();
+  const nextPath = `/la-so/${chartId}`;
+  if (!/^[a-zA-Z0-9_-]{1,100}$/.test(chartId)) redirect("/la-so?checkout=invalid");
+
+  const [user, operationSettings] = await Promise.all([getCurrentUser(), getOperationSettings()]);
+  if (!user) {
+    redirect(withQueryParams(nextPath, { login: "1", next: nextPath, paywall: "login" }));
+  }
+  if (!operationSettings.paymentsEnabled || !operationSettings.paidReadingsEnabled) {
+    redirect(withQueryParams(nextPath, { checkout: "disabled" }));
+  }
+
+  const record = await getChart(chartId);
+  if (!record || (record.userId !== user.id && user.role !== "ADMIN")) {
+    redirect(withQueryParams(nextPath, { checkout: "forbidden" }));
+  }
+
+  const [cached, pending, price] = await Promise.all([
+    getCachedReading(user.id, chartId, "FULL", "all"),
+    getReadingJobByScope(user.id, chartId, "FULL", "all"),
+    getFeaturePrice("FULL"),
+  ]);
+  if (cached) redirect(`/la-so/${chartId}/nang-cao?reading=${cached.id}`);
+  if (pending?.status === "PENDING") {
+    redirect(`/la-so/${chartId}/nang-cao?reading=${pending.id}&generating=1`);
+  }
+
+  const amountVnd = price.priceCoins * 1000;
+  const checkout = await createPayOSCustomCheckout({
+    amountVnd,
+    description: "Luan giai FULL",
+    itemName: price.label,
+    buyerName: user.name,
+    buyerEmail: user.email,
+    returnPath: "/api/payments/payos/full-return",
+    cancelPath: `/la-so/${chartId}`,
+  }).catch(() => redirect(withQueryParams(nextPath, { checkout: "error" })));
+
+  const db = getDb();
+  const isDemoCheckout = checkout.raw && typeof checkout.raw === "object" && "mode" in checkout.raw;
+  if (!db) {
+    if (!isDemoCheckout) redirect(withQueryParams(nextPath, { checkout: "unavailable" }));
+    const reading = await createPendingReading(user, chartId, "FULL", "all", 0, {
+      type: "FULL",
+      scopeKey: "all",
+      source: "direct-full-checkout-demo",
+    });
+    redirect(`/la-so/${chartId}/nang-cao?reading=${reading.id}&generating=1&status=demo-paid&orderCode=${checkout.orderCode}`);
+  }
+
+  const order = await db.paymentOrder.create({
+    data: {
+      userId: user.id,
+      orderCode: BigInt(checkout.orderCode),
+      paymentLinkId: checkout.paymentLinkId,
+      amountVnd,
+      coins: 0,
+      status: isDemoCheckout ? "PAID" : "PENDING",
+      paidAt: isDemoCheckout ? new Date() : undefined,
+      checkoutUrl: checkout.checkoutUrl,
+      rawPayload: {
+        raw: checkout.raw,
+        directReading: {
+          chartId,
+          type: "FULL",
+          scopeKey: "all",
+        },
+      },
+    },
+  });
+
+  if (isDemoCheckout) {
+    const settled = await completePaidReadingOrder(db, order, checkout.raw);
+    if (!settled) redirect(withQueryParams(nextPath, { checkout: "error" }));
+    redirect(`/la-so/${chartId}/nang-cao?reading=${settled.readingId}&generating=1&status=demo-paid&orderCode=${checkout.orderCode}`);
+  }
+
+  redirect(checkout.checkoutUrl);
 }
 
 export async function requestReadingAction(formData: FormData) {

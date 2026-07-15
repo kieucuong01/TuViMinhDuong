@@ -1,92 +1,92 @@
 [
-  {
-    "version": "interpretation-rules-v1",
-    "status": "active",
-    "key": "state:mieu",
-    "scope": "AXIS",
-    "pattern": {
-      "kind": "state",
-      "state": "M"
+    {
+        "version":  "interpretation-rules-v2",
+        "status":  "active",
+        "key":  "state:mieu",
+        "scope":  "AXIS",
+        "pattern":  {
+                        "kind":  "state",
+                        "state":  "M"
+                    },
+        "priority":  74,
+        "title":  "Trạng thái Miếu",
+        "summary":  "Bạn dễ nhận ra rằng đây là trạng thái cho thấy năng lực dễ đi vào đúng việc, tạo uy tín nhanh hơn nếu bạn biết chọn mục tiêu đủ lớn. Bạn muốn đưa những lựa chọn khác nhau về cùng một hướng, nhưng cũng cần để ý việc tự tin quá sớm vào lợi thế sẵn có, rồi bỏ qua phản hồi nhỏ trước khi nó thành chi phí lớn.",
+        "strengthText":  "Khi thứ tự ưu tiên đã rõ, bạn có thể phát huy khả năng biến chuyên môn thành vị thế: bạn dễ được tin khi đứng đúng vai, nhất là trong công việc cần quyết định, tiêu chuẩn và trách nhiệm rõ.",
+        "cautionText":  "Bạn có thể dễ tự tin quá sớm vào lợi thế sẵn có, rồi bỏ qua phản hồi nhỏ trước khi nó thành chi phí lớn nếu chưa đặt giới hạn rõ.",
+        "lifeAdviceText":  "Bạn hãy dùng trạng thái này như vốn chủ lực: chọn một mũi nhọn để đầu tư sâu, đặt chỉ số đo kết quả và chủ động xin phản hồi trước khi mở rộng.",
+        "teaserQuestion":  "Nếu bạn đã có một lợi thế sáng rõ, bạn đang dùng nó để xây vị thế dài hạn hay chỉ tiêu hao vào những việc vụn?",
+        "evidenceLabel":  "Dấu ấn này đến từ vùng năng lượng đang ở độ sáng mạnh nhất, nơi năng lực dễ lộ ra thành kết quả nhìn thấy được."
     },
-    "priority": 74,
-    "title": "Trạng thái Miếu",
-    "summary": "Miếu giống một ngọn đèn đặt đúng chao: ánh sáng gom lại, rõ nét và không bị tản mạn. Trong đời sống, đây là trạng thái cho thấy năng lực dễ đi vào đúng việc, tạo uy tín nhanh hơn nếu bạn biết chọn mục tiêu đủ lớn.",
-    "strengthText": "Lợi thế thực tế là khả năng biến chuyên môn thành vị thế: bạn dễ được tin khi đứng đúng vai, nhất là trong công việc cần quyết định, tiêu chuẩn và trách nhiệm rõ.",
-    "cautionText": "Điểm mù là tự tin quá sớm vào lợi thế sẵn có, rồi bỏ qua phản hồi nhỏ trước khi nó thành chi phí lớn.",
-    "lifeAdviceText": "Hãy dùng trạng thái này như vốn chủ lực: chọn một mũi nhọn để đầu tư sâu, đặt chỉ số đo kết quả và chủ động xin phản hồi trước khi mở rộng.",
-    "teaserQuestion": "Nếu bạn đã có một lợi thế sáng rõ, bạn đang dùng nó để xây vị thế dài hạn hay chỉ tiêu hao vào những việc vụn?",
-    "evidenceLabel": "Dấu ấn này đến từ vùng năng lượng đang ở độ sáng mạnh nhất, nơi năng lực dễ lộ ra thành kết quả nhìn thấy được."
-  },
-  {
-    "version": "interpretation-rules-v1",
-    "status": "active",
-    "key": "state:vuong",
-    "scope": "AXIS",
-    "pattern": {
-      "kind": "state",
-      "state": "V"
+    {
+        "version":  "interpretation-rules-v2",
+        "status":  "active",
+        "key":  "state:vuong",
+        "scope":  "AXIS",
+        "pattern":  {
+                        "kind":  "state",
+                        "state":  "V"
+                    },
+        "priority":  68,
+        "title":  "Trạng thái Vượng",
+        "summary":  "Bạn dễ nhận ra rằng đây là dấu hiệu bạn có sức bật tốt, dễ tạo bước tiến nhanh khi thời điểm, người hỗ trợ và mục tiêu cùng khớp. Bạn muốn đưa những lựa chọn khác nhau về cùng một hướng, nhưng cũng cần để ý việc nhầm đà lên với sự chắc chắn, khiến bạn nhận thêm quá nhiều việc khi hệ thống chưa kịp chịu tải, nhất là trong những quyết định nối nhiều mặt đời sống.",
+        "strengthText":  "Khi thứ tự ưu tiên đã rõ, bạn có thể tăng tốc dự án, đàm phán vai trò hoặc chốt cơ hội khi thị trường và đội nhóm đã có đủ tín hiệu ủng hộ.",
+        "cautionText":  "Nếu kéo dài, bạn có thể dễ nhầm đà lên với sự chắc chắn, khiến bạn nhận thêm quá nhiều việc khi hệ thống chưa kịp chịu tải.",
+        "lifeAdviceText":  "Bạn hãy chia cơ hội thành ba mức: việc phải làm ngay, việc cần thử nhỏ và việc nên để sau; nhờ vậy bạn giữ được lực tăng trưởng mà không khiến bạn quá tải.",
+        "teaserQuestion":  "Cơ hội nào đang có lực đẩy thật, và cơ hội nào chỉ khiến bạn bận rộn hơn mà không nâng vị thế?",
+        "evidenceLabel":  "Dấu hiệu này đến từ nguồn năng lượng đang vào chu kỳ mạnh, đủ lực để mở đường nếu bạn biết kiểm soát nhịp."
     },
-    "priority": 68,
-    "title": "Trạng thái Vượng",
-    "summary": "Vượng giống một con sóng đang lên: có lực đẩy mạnh, nhưng cần tay lái chắc để không tràn khỏi bờ. Trong đời sống, đây là dấu hiệu bạn có sức bật tốt, dễ tạo bước tiến nhanh khi thời điểm, người hỗ trợ và mục tiêu cùng khớp.",
-    "strengthText": "Lợi thế có thể dùng ngay là khả năng tăng tốc dự án, đàm phán vai trò hoặc chốt cơ hội khi thị trường và đội nhóm đã đủ tín hiệu ủng hộ.",
-    "cautionText": "Cạm bẫy tâm lý là nhầm đà lên với sự chắc chắn, khiến bạn nhận thêm quá nhiều việc khi hệ thống chưa kịp chịu tải.",
-    "lifeAdviceText": "Hãy chia cơ hội thành ba mức: việc phải làm ngay, việc cần thử nhỏ và việc nên để sau; nhờ vậy bạn giữ được lực tăng trưởng mà không tự làm mình quá tải.",
-    "teaserQuestion": "Cơ hội nào đang có lực đẩy thật, và cơ hội nào chỉ khiến bạn bận rộn hơn mà không nâng vị thế?",
-    "evidenceLabel": "Dấu hiệu này đến từ nguồn năng lượng đang vào chu kỳ mạnh, đủ lực để mở đường nếu bạn biết kiểm soát nhịp."
-  },
-  {
-    "version": "interpretation-rules-v1",
-    "status": "active",
-    "key": "state:dac",
-    "scope": "AXIS",
-    "pattern": {
-      "kind": "state",
-      "state": "Đ"
+    {
+        "version":  "interpretation-rules-v2",
+        "status":  "active",
+        "key":  "state:dac",
+        "scope":  "AXIS",
+        "pattern":  {
+                        "kind":  "state",
+                        "state":  "Đ"
+                    },
+        "priority":  58,
+        "title":  "Trạng thái Đắc",
+        "summary":  "Bạn dễ nhận ra rằng đây là dấu hiệu bạn có khả năng thích nghi tốt, biết chọn cách đi mềm hơn để vẫn đạt được kết quả thực tế. Bạn muốn đưa những lựa chọn khác nhau về cùng một hướng, nhưng cũng cần để ý việc quá giỏi thích nghi nên chấp nhận một môi trường chỉ ở mức tạm ổn, rồi bỏ lỡ cơ hội đòi hỏi bạn phải đứng ra chọn cuộc chơi lớn hơn.",
+        "strengthText":  "Khi thứ tự ưu tiên đã rõ, bạn có thể phát huy khả năng xoay chuyển nguồn lực: bạn có thể đổi cách làm, đổi vai trò hoặc đổi điểm tập trung mà không làm đứt mạch công việc và nguồn thu.",
+        "cautionText":  "Khi quá tin vào mặt thuận của Trạng thái Đắc, bạn có thể dễ quá giỏi thích nghi nên đôi khi chấp nhận một môi trường chỉ ở mức tạm ổn, rồi bỏ lỡ cơ hội đòi hỏi bạn phải đứng ra chọn cuộc chơi lớn hơn.",
+        "lifeAdviceText":  "Bạn hãy phân bổ 70% sức cho hướng đang tạo kết quả ổn định và giữ 30% để thử nghiệm cơ hội mới; cách này giúp bạn tận dụng sự linh hoạt mà không bị phân tán.",
+        "teaserQuestion":  "Nếu bạn đang sống khá ổn nhưng vẫn thấy bản thân chưa bật hẳn lên, đâu là sân chơi đúng mà trạng thái Đắc đang âm thầm chỉ cho bạn?",
+        "evidenceLabel":  "Dấu hiệu này đến từ một nguồn năng lượng đang ở môi trường vừa vặn, đủ linh hoạt để tiến khi cần và lùi khi phải giữ lực."
     },
-    "priority": 58,
-    "title": "Trạng thái Đắc",
-    "summary": "Đắc giống một chiếc xe chạy đúng làn: không phô trương tốc độ, nhưng vào cua rất chắc và biết tăng ga khi đường mở. Trong đời sống, đây là dấu hiệu bạn có khả năng thích nghi tốt, biết chọn cách đi mềm hơn để vẫn đạt được kết quả thực tế.",
-    "strengthText": "Lợi thế lớn nhất là khả năng xoay chuyển nguồn lực: bạn có thể đổi cách làm, đổi vai trò hoặc đổi điểm tập trung mà không làm đứt mạch công việc và nguồn thu.",
-    "cautionText": "Điểm mù dễ mắc là quá giỏi thích nghi nên đôi khi chấp nhận một môi trường chỉ ở mức tạm ổn, rồi bỏ lỡ cơ hội đòi hỏi bạn phải đứng ra chọn cuộc chơi lớn hơn.",
-    "lifeAdviceText": "Hãy phân bổ 70% sức cho hướng đang tạo kết quả ổn định và giữ 30% để thử nghiệm cơ hội mới; cách này giúp bạn tận dụng sự linh hoạt mà không bị phân tán.",
-    "teaserQuestion": "Nếu bạn đang sống khá ổn nhưng vẫn thấy mình chưa bật hẳn lên, đâu là sân chơi đúng mà trạng thái Đắc đang âm thầm chỉ cho bạn?",
-    "evidenceLabel": "Dấu hiệu này đến từ một nguồn năng lượng đang ở môi trường vừa vặn, đủ linh hoạt để tiến khi cần và lùi khi phải giữ lực."
-  },
-  {
-    "version": "interpretation-rules-v1",
-    "status": "active",
-    "key": "state:binh",
-    "scope": "AXIS",
-    "pattern": {
-      "kind": "state",
-      "state": "B"
+    {
+        "version":  "interpretation-rules-v2",
+        "status":  "active",
+        "key":  "state:binh",
+        "scope":  "AXIS",
+        "pattern":  {
+                        "kind":  "state",
+                        "state":  "B"
+                    },
+        "priority":  48,
+        "title":  "Trạng thái Bình",
+        "summary":  "Bạn dễ nhận ra rằng trạng thái này cho thấy kết quả phụ thuộc nhiều vào kỷ luật nhỏ mỗi ngày hơn là một cú bứt phá bất ngờ. Bạn muốn đưa những lựa chọn khác nhau về cùng một hướng, nhưng cũng cần để ý việc đánh giá thấp những việc bình thường, rồi chờ một biến cố lớn mới chịu thay đổi cách vận hành, nhất là trong những quyết định nối nhiều mặt đời sống.",
+        "strengthText":  "Khi thứ tự ưu tiên đã rõ, bạn có thể xây nền đều, tích lũy kỹ năng, tiền bạc hoặc niềm tin qua những bước nhỏ được lặp lại ổn định.",
+        "cautionText":  "Bạn có thể dễ đánh giá thấp những việc bình thường, rồi chờ một biến cố lớn mới chịu thay đổi cách vận hành nếu chưa đặt giới hạn rõ.",
+        "lifeAdviceText":  "Bạn hãy chọn một thói quen có tác động kép đến công việc và tiền bạc, đặt lịch cố định cho nó trong 30 ngày và đo bằng kết quả cụ thể thay vì cảm hứng.",
+        "teaserQuestion":  "Thói quen nhỏ nào đang âm thầm quyết định việc bạn tiến lên đều đặn hay đứng yên thêm một năm nữa?",
+        "evidenceLabel":  "Dấu hiệu này đến từ vùng năng lượng trung tính, nơi thành quả được tạo ra bởi cách bạn duy trì nhịp chứ không phải bởi may rủi."
     },
-    "priority": 48,
-    "title": "Trạng thái Bình",
-    "summary": "Bình giống một mặt hồ không gợn lớn: không tạo cao trào ngay, nhưng phản chiếu rất rõ cách bạn quản trị thói quen. Trong đời sống, trạng thái này cho thấy kết quả phụ thuộc nhiều vào kỷ luật nhỏ mỗi ngày hơn là một cú bứt phá bất ngờ.",
-    "strengthText": "Lợi thế thực dụng là khả năng xây nền đều: bạn có thể tích lũy kỹ năng, tiền bạc hoặc niềm tin qua các bước nhỏ nhưng lặp lại ổn định.",
-    "cautionText": "Điểm mù là dễ đánh giá thấp những việc bình thường, rồi chờ một biến cố lớn mới chịu thay đổi cách vận hành.",
-    "lifeAdviceText": "Hãy chọn một thói quen có tác động kép đến công việc và tiền bạc, đặt lịch cố định cho nó trong 30 ngày và đo bằng kết quả cụ thể thay vì cảm hứng.",
-    "teaserQuestion": "Thói quen nhỏ nào đang âm thầm quyết định việc bạn tiến lên đều đặn hay đứng yên thêm một năm nữa?",
-    "evidenceLabel": "Dấu hiệu này đến từ vùng năng lượng trung tính, nơi thành quả được tạo ra bởi cách bạn duy trì nhịp chứ không phải bởi may rủi."
-  },
-  {
-    "version": "interpretation-rules-v1",
-    "status": "active",
-    "key": "state:ham",
-    "scope": "AXIS",
-    "pattern": {
-      "kind": "state",
-      "state": "H"
-    },
-    "priority": 72,
-    "title": "Trạng thái Hãm",
-    "summary": "Hãm giống một hạt giống bị ép dưới lớp đất nặng: nảy mầm chậm hơn, nhưng rễ buộc phải cắm sâu hơn để sống. Trong đời sống, đây là vùng bạn thường phải trả giá bằng nhiều công sức, nhiều lần sửa sai và một mức kỷ luật cao hơn người khác.",
-    "strengthText": "Lợi thế thực chiến là sức bền dưới áp lực: khi người khác bỏ cuộc vì va chạm, bạn có thể trở thành người giữ nhịp, xử lý khủng hoảng và biến kinh nghiệm khó thành năng lực kiếm tiền.",
-    "cautionText": "Cạm bẫy tâm lý lớn nhất là đồng nhất trở ngại với giá trị bản thân; càng bị chặn, bạn càng dễ nghĩ mình kém, rồi phản ứng bằng cách gồng quá mức hoặc tự phòng thủ.",
-    "lifeAdviceText": "Hãy biến mọi việc khó thành quy trình nhỏ có mốc đo rõ ràng: giảm quyết định cảm tính, ghi lại bài học sau mỗi lần vấp và chỉ tăng tốc khi hệ thống chịu tải đã ổn.",
-    "teaserQuestion": "Trở ngại nào trong đời bạn không phải để đánh gục bạn, mà đang ép bạn xây một năng lực bền đến mức người khác khó sao chép?",
-    "evidenceLabel": "Dấu ấn này xuất hiện khi một nguồn lực quan trọng bị đặt vào môi trường nghịch chiều, buộc bạn phải rèn sức bền trước khi thấy thành quả."
-  }
+    {
+        "version":  "interpretation-rules-v2",
+        "status":  "active",
+        "key":  "state:ham",
+        "scope":  "AXIS",
+        "pattern":  {
+                        "kind":  "state",
+                        "state":  "H"
+                    },
+        "priority":  72,
+        "title":  "Trạng thái Hãm",
+        "summary":  "Bạn dễ nhận ra rằng đây là vùng bạn thường phải trả giá bằng nhiều công sức, nhiều lần sửa sai và một mức kỷ luật cao hơn người khác. Bạn muốn đưa những lựa chọn khác nhau về cùng một hướng, nhưng cũng cần để ý việc đồng nhất trở ngại với giá trị bản thân, nhất là trong những quyết định nối nhiều mặt đời sống.",
+        "strengthText":  "Khi thứ tự ưu tiên đã rõ, bạn có thể phát huy sức bền dưới áp lực: khi người khác bỏ cuộc vì va chạm, bạn có thể trở thành người giữ nhịp, xử lý khủng hoảng và biến kinh nghiệm khó thành năng lực kiếm tiền.",
+        "cautionText":  "Nếu kéo dài, bạn có thể dễ đồng nhất trở ngại với giá trị bản thân; càng bị chặn, bạn càng dễ nghĩ bạn kém, rồi phản ứng bằng cách gồng quá mức hoặc tự phòng thủ.",
+        "lifeAdviceText":  "Bạn hãy biến mọi việc khó thành quy trình nhỏ có mốc đo rõ ràng: giảm quyết định cảm tính, ghi lại bài học sau mỗi lần vấp và chỉ tăng tốc khi hệ thống chịu tải đã ổn.",
+        "teaserQuestion":  "Trở ngại nào trong đời bạn không phải để đánh gục bạn, mà đang ép bạn xây một năng lực bền đến mức người khác khó sao chép?",
+        "evidenceLabel":  "Dấu ấn này xuất hiện khi một nguồn lực quan trọng bị đặt vào môi trường nghịch chiều, buộc bạn phải rèn sức bền trước khi thấy thành quả."
+    }
 ]

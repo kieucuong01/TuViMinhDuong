@@ -13208,3 +13208,71 @@ button.is-loading:not(.icon-button)::before {
     transition-duration: 0.001ms !important;
   }
 }
+
+.personal-report-outline-details {
+  margin-top: 1rem;
+  border: 1px solid #fed7aa;
+  border-radius: 1rem;
+  background: rgb(255 255 255 / 0.72);
+  padding: 0.8rem;
+}
+
+.personal-report-outline-details summary {
+  min-height: 2.75rem;
+  color: #9a3412;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.personal-report-outline-details .personal-report-outline-list {
+  margin-top: 0.65rem;
+}
+
+.personal-report-outline-offer ul {
+  display: grid;
+  gap: 0.4rem;
+  margin: 0;
+  padding: 0;
+  color: #7c2d12;
+  list-style: none;
+}
+
+.personal-report-outline-offer li::before {
+  content: "✓";
+  margin-right: 0.5rem;
+  color: #059669;
+  font-weight: 900;
+}
+
+.premium-confirm-actions {
+  display: grid;
+}
+
+.premium-confirm-actions .btn {
+  width: 100%;
+}
+
+.premium-confirm-coin-action {
+  margin-top: 0.55rem;
+}
+
+@media (max-width: 640px) {
+  .personal-report-outline-heading,
+  .personal-report-outline-offer {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .personal-report-outline-badge {
+    align-self: flex-start;
+  }
+
+  .personal-report-outline-cta {
+    width: 100%;
+    white-space: normal;
+  }
+
+  .free-overview-guest-gate > .btn {
+    width: 100%;
+  }
+}

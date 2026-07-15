@@ -30,7 +30,7 @@ describe("reading detail CTA flow", () => {
     expect(ctaSource).toContain("loginModalHref");
     expect(ctaSource).toContain("onClick={() => scrollToPremiumReading()}");
     expect(chartPageSource).toContain("<ReadingHashScrollRestorer");
-    expect(chartPageSource).toContain('style={{ scrollMarginTop: "7rem" }}');
+    expect(chartPageSource).toContain('<section className="panel reading-content-panel mt-8" id="luan-giai"');
   });
 
   it("keeps the premium target aligned while content above it finishes rendering", () => {
@@ -46,12 +46,14 @@ describe("reading detail CTA flow", () => {
   it("returns guests to the free reading before offering the premium dossier", () => {
     expect(loaderSource).toContain('const nextPath = `${chartPath}#luan-giai`');
     expect(loaderSource).toContain("loginModalHref(chartPath, undefined, nextPath)");
-    expect(loaderSource).toContain("Đăng nhập miễn phí để xem toàn bộ luận giải");
-    expect(loaderSource).toContain("Xem hồ sơ luận giải chuyên sâu");
+    expect(loaderSource).toContain("Lưu lá số để đọc tiếp 2 phần còn lại");
+    expect(loaderSource).toContain("Đăng nhập hoặc tạo tài khoản");
   });
 
-  it("keeps the existing premium confirmation form as the only paid action", () => {
-    expect(premiumSource).toContain("premiumReadingModalId(props.chartId)");
+  it("keeps PayOS primary and the coin path conditional", () => {
+    expect(premiumSource).toContain("premiumReadingModalId(chartId)");
+    expect(premiumSource.match(/action=\{checkoutFullReadingAction\}/g)).toHaveLength(1);
     expect(premiumSource.match(/action=\{requestReadingAction\}/g)).toHaveLength(1);
+    expect(premiumSource).toContain("hasEnoughCoins ?");
   });
 });

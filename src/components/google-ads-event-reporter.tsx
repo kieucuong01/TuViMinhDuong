@@ -25,6 +25,9 @@ type PaymentStatusResponse = {
   currency?: string;
   packageKey?: string;
   coins?: number;
+  chartId?: string;
+  purchaseType?: string;
+  readingId?: string;
 };
 
 const DEDUPE_PREFIX = "lsth-ad-event";
@@ -115,14 +118,6 @@ export function GoogleAdsEventReporter() {
 
     const status = params.get("status");
     const orderCode = params.get("orderCode");
-    if (status === "demo-paid" && orderCode) {
-      sendOnce(`demo-orderCode:${orderCode}`, "purchase", {
-        transaction_id: orderCode,
-        payment_status: status,
-        package_key: params.get("adPackage") || undefined,
-        value: numberFrom(params.get("adValue")),
-      });
-    }
 
     if (status === "success" && orderCode) {
       fetch(`/api/payments/status?orderCode=${encodeURIComponent(orderCode)}`, {
@@ -142,6 +137,9 @@ export function GoogleAdsEventReporter() {
             value: numberFromUnknown(paymentStatus.value),
             currency: paymentStatus.currency || "VND",
             coins: paymentStatus.coins,
+            chart_id: paymentStatus.chartId,
+            purchase_type: paymentStatus.purchaseType,
+            reading_id: paymentStatus.readingId,
           });
         })
         .catch(() => {
@@ -172,6 +170,7 @@ export function GoogleAdsEventReporter() {
         placement: form.dataset.adPlacement,
         value: numberFrom(form.dataset.adValue),
         package_key: form.dataset.adPackage,
+        chart_id: form.dataset.chartId || (pathname.startsWith("/la-so/") ? pathname.split("/")[2] : undefined),
       });
     }
 
@@ -183,6 +182,7 @@ export function GoogleAdsEventReporter() {
       sendGtagEvent(eventName, {
         placement: element.dataset.adPlacement,
         href: element instanceof HTMLAnchorElement ? element.href : undefined,
+        chart_id: element.dataset.chartId || (pathname.startsWith("/la-so/") ? pathname.split("/")[2] : undefined),
       });
     }
 
@@ -192,7 +192,41 @@ export function GoogleAdsEventReporter() {
       document.removeEventListener("submit", onSubmit, true);
       document.removeEventListener("click", onClick, true);
     };
-  }, []);
+  }, [pathname]);
+
+  useEffect(() => {
+    const elements = Array.from(document.querySelectorAll<HTMLElement>("[data-ad-view]"));
+    if (elements.length === 0) return;
+
+    const report = (element: HTMLElement) => {
+      const eventName = element.dataset.adView;
+      if (!eventName) return;
+      const chartId = element.dataset.chartId || (pathname.startsWith("/la-so/") ? pathname.split("/")[2] : "");
+      const depth = numberFromUnknown(element.dataset.adDepth);
+      sendOnce(`${pathname}:${chartId}:${depth || ""}`, eventName, {
+        chart_id: chartId || undefined,
+        depth,
+      });
+    };
+
+    if (!("IntersectionObserver" in window)) {
+      elements.forEach(report);
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue;
+          report(entry.target as HTMLElement);
+          observer.unobserve(entry.target);
+        }
+      },
+      { threshold: 0.35 },
+    );
+    elements.forEach((element) => observer.observe(element));
+    return () => observer.disconnect();
+  }, [pathname]);
 
   return null;
 }

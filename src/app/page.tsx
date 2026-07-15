@@ -5,8 +5,7 @@ import type { CSSProperties } from "react";
 import { ChartForm } from "@/components/chart-form";
 import { DayFortuneCard } from "@/components/day-fortune-card";
 import { DeferredSocialProof } from "@/components/deferred-social-proof";
-import { QuickReadingForm } from "@/components/quick-reading-form";
-import { getOperationSettings, listArticles } from "@/lib/data";
+import { listArticles } from "@/lib/data";
 import { routeMetadata } from "@/lib/metadata";
 import { faqJsonLd, organizationJsonLd, webPageJsonLd, websiteJsonLd } from "@/lib/seo";
 
@@ -47,9 +46,8 @@ function safeHomeAdSource(params: HomeSearchParams) {
 
 export default async function Home({ searchParams }: { searchParams?: Promise<HomeSearchParams> }) {
   const paramsPromise: Promise<HomeSearchParams> = searchParams ?? Promise.resolve({});
-  const [params, articleList, operationSettings] = await Promise.all([paramsPromise, listArticles(), getOperationSettings()]);
+  const [params, articleList] = await Promise.all([paramsPromise, listArticles()]);
   const articles = articleList.slice(0, 3);
-  const showQuickReading = operationSettings.paymentsEnabled && operationSettings.paidReadingsEnabled;
   const chartErrorMessage = chartFormErrorMessage(params.chartError);
   const chartAdSource = safeHomeAdSource(params);
   const homeFaqs = [
@@ -334,11 +332,6 @@ export default async function Home({ searchParams }: { searchParams?: Promise<Ho
           </div>
         </div>
       </section>
-      {showQuickReading ? <section className="section">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <QuickReadingForm />
-        </div>
-      </section> : null}
 
       <section className="section">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">

@@ -26,7 +26,7 @@ describe("assistant entitlement UI", () => {
     expect(chartPageSource).toContain("buildPersonalizedReportOutline(record.chart)");
     expect(chartPageSource).toContain("listAssistantQuestions");
     expect(chartPageSource).toContain("<PersonalizedReportOutline");
-    expect(chartPageSource).toContain("id={PREMIUM_READING_TARGET_ID}");
+    expect(chartPageSource).toContain("<PremiumReadingCta");
     expect(globalStyles).not.toMatch(
       /\.chart-page \.assistant-widget\s*\{\s*display:\s*none\s*!important;\s*\}/,
     );

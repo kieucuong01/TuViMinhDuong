@@ -129,6 +129,130 @@ export async function creditPaidTopupOrder(db: PrismaClient, order: TopupPayment
   });
 }
 
+export type PaidReadingOrderMetadata = {
+  chartId: string;
+  type: "FULL";
+  scopeKey: "all";
+};
+
+export type PaidReadingOrderPayload = PaidReadingOrderMetadata & {
+  kind: "directReading" | "quickReading";
+};
+
+export function paidReadingOrderPayload(rawPayload: unknown): PaidReadingOrderPayload | null {
+  if (!rawPayload || typeof rawPayload !== "object") return null;
+  for (const kind of ["directReading", "quickReading"] as const) {
+    if (!(kind in rawPayload)) continue;
+    const value = (rawPayload as Record<string, unknown>)[kind];
+    if (!value || typeof value !== "object") continue;
+    const payload = value as Record<string, unknown>;
+    if (typeof payload.chartId !== "string" || payload.type !== "FULL" || payload.scopeKey !== "all") continue;
+    return { kind, chartId: payload.chartId, type: "FULL", scopeKey: "all" };
+  }
+  return null;
+}
+
+export async function completePaidReadingOrder(
+  db: PrismaClient,
+  order: TopupPaymentOrder,
+  rawPayload: unknown,
+  paidAt = new Date(),
+) {
+  return db.$transaction(async (tx) => {
+    const fresh = await tx.paymentOrder.findUnique({
+      where: { id: order.id },
+      select: {
+        id: true,
+        userId: true,
+        orderCode: true,
+        amountVnd: true,
+        coins: true,
+        status: true,
+        paidAt: true,
+        rawPayload: true,
+      },
+    });
+    if (!fresh) return null;
+
+    const metadata = paidReadingOrderPayload(fresh.rawPayload ?? order.rawPayload);
+    if (!metadata) return null;
+    const metadataValue = {
+      chartId: metadata.chartId,
+      type: metadata.type,
+      scopeKey: metadata.scopeKey,
+    };
+
+    await tx.paymentOrder.update({
+      where: { id: fresh.id },
+      data: {
+        status: "PAID",
+        paidAt: fresh.paidAt || paidAt,
+        rawPayload: {
+          raw: rawPayload,
+          [metadata.kind]: metadataValue,
+        } as Prisma.InputJsonValue,
+      },
+    });
+
+    const uniqueReading = {
+      userId_chartId_type_scopeKey: {
+        userId: fresh.userId,
+        chartId: metadata.chartId,
+        type: metadata.type,
+        scopeKey: metadata.scopeKey,
+      },
+    };
+    let reading = await tx.reading.findUnique({ where: uniqueReading });
+    if (!reading) {
+      reading = await tx.reading.create({
+        data: {
+          userId: fresh.userId,
+          chartId: metadata.chartId,
+          type: metadata.type,
+          scopeKey: metadata.scopeKey,
+          status: "PENDING",
+          priceCoins: 0,
+          content: null,
+          promptMeta: {
+            type: metadata.type,
+            scopeKey: metadata.scopeKey,
+            source: metadata.kind === "directReading" ? "direct-full-checkout" : "quick-email-checkout",
+            paymentOrderId: fresh.id,
+          },
+        },
+      });
+    } else if (reading.status === "FAILED") {
+      reading = await tx.reading.update({
+        where: { id: reading.id },
+        data: { status: "PENDING", error: null },
+      });
+    }
+
+    return {
+      orderId: fresh.id,
+      userId: fresh.userId,
+      status: "PAID" as const,
+      amountVnd: fresh.amountVnd,
+      coins: fresh.coins,
+      paidAt: fresh.paidAt || paidAt,
+      readingId: reading.id,
+      chartId: metadata.chartId,
+      purchaseType: "direct_full" as const,
+    };
+  });
+}
+
+export async function settlePaidOrder(
+  db: PrismaClient,
+  order: TopupPaymentOrder,
+  rawPayload: unknown,
+  paidAt = new Date(),
+) {
+  return paidReadingOrderPayload(order.rawPayload)
+    ? completePaidReadingOrder(db, order, rawPayload, paidAt)
+    : creditPaidTopupOrder(db, order, rawPayload, paidAt);
+}
+
 function normalizeReturnPath(returnPath?: string) {
   if (!returnPath || !returnPath.startsWith("/") || returnPath.startsWith("//")) return "/nap-xu";
   return returnPath;
@@ -148,14 +272,18 @@ export async function createPayOSCustomCheckout(input: CheckoutInput) {
   const orderCode = Number(`${Date.now()}${Math.floor(Math.random() * 90 + 10)}`.slice(-12));
   const returnPath = normalizeReturnPath(input.returnPath);
   const cancelPath = normalizeReturnPath(input.cancelPath);
+  const returnJoin = returnPath.includes("?") ? "&" : "?";
+  const cancelJoin = cancelPath.includes("?") ? "&" : "?";
+  const successUrl = `${APP_URL}${returnPath}${returnJoin}status=success&orderCode=${orderCode}`;
+  const cancelledUrl = `${APP_URL}${cancelPath}${cancelJoin}status=cancelled&orderCode=${orderCode}`;
   const body = {
     orderCode,
     amount: input.amountVnd,
     description: input.description.slice(0, 25),
     buyerName: input.buyerName || undefined,
     buyerEmail: input.buyerEmail || undefined,
-    returnUrl: `${APP_URL}${returnPath}`,
-    cancelUrl: `${APP_URL}${cancelPath}`,
+    returnUrl: successUrl,
+    cancelUrl: cancelledUrl,
     items: [{ name: input.itemName, quantity: 1, price: input.amountVnd }],
   };
   const signature = signPayOSData({
@@ -170,7 +298,7 @@ export async function createPayOSCustomCheckout(input: CheckoutInput) {
     return {
       orderCode,
       amountVnd: input.amountVnd,
-      checkoutUrl: `${APP_URL}${returnPath}${returnPath.includes("?") ? "&" : "?"}status=demo-paid&orderCode=${orderCode}`,
+      checkoutUrl: successUrl,
       paymentLinkId: `demo-${orderCode}`,
       raw: { ...body, signature, mode: "demo" },
     };
@@ -194,7 +322,7 @@ export async function createPayOSCustomCheckout(input: CheckoutInput) {
   return {
     orderCode,
     amountVnd: input.amountVnd,
-    checkoutUrl: json.data?.checkoutUrl || `${APP_URL}${returnPath}`,
+    checkoutUrl: json.data?.checkoutUrl || successUrl,
     paymentLinkId: json.data?.paymentLinkId,
     raw: json,
   };

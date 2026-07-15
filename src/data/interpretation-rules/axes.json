@@ -1,134 +1,134 @@
 [
-  {
-    "version": "interpretation-rules-v1",
-    "status": "active",
-    "key": "axis:menh-than",
-    "scope": "IDENTITY",
-    "pattern": {
-      "kind": "axis",
-      "axis": "menh-than",
-      "palaces": [
-        "Mệnh",
-        "Thân"
-      ]
+    {
+        "version":  "interpretation-rules-v2",
+        "status":  "active",
+        "key":  "axis:menh-than",
+        "scope":  "IDENTITY",
+        "pattern":  {
+                        "kind":  "axis",
+                        "axis":  "menh-than",
+                        "palaces":  [
+                                        "Mệnh",
+                                        "Thân"
+                                    ]
+                    },
+        "priority":  62,
+        "title":  "Trục Mệnh - Thân",
+        "summary":  "Bạn dễ nhận ra rằng trục này cho thấy điểm cần chỉnh không chỉ nằm ở suy nghĩ, mà còn ở lịch sống, vai trò, môi trường và cách bạn dùng sức. Bạn muốn sống đúng với điều bạn tin là phù hợp, nhưng cũng cần để ý việc hiểu rất rõ bạn muốn gì nhưng lại duy trì một cách sống trái với điều đó, khiến năng lực bị tiêu hao vào các vai không phù hợp.",
+        "strengthText":  "Khi mục tiêu và vai trò của bạn đã rõ, bạn có thể phát huy khả năng nhìn bản thân như một hệ thống vận hành, từ đó chọn đúng vai trò công việc và tránh kiếm tiền bằng cách khiến bạn kiệt sức.",
+        "cautionText":  "Khi quá tin vào mặt thuận của Trục Mệnh - Thân, bạn có thể dễ hiểu rất rõ bạn muốn gì nhưng lại duy trì một cách sống trái với điều đó, khiến năng lực bị tiêu hao vào các vai không phù hợp.",
+        "lifeAdviceText":  "Bạn hãy tách mục tiêu thành hai lớp: điều bạn muốn trở thành và lịch hành động đang chứng minh điều đó; nếu hai lớp lệch nhau, ưu tiên sửa lịch trước khi đặt thêm mục tiêu mới.",
+        "teaserQuestion":  "Bạn đang cần thay đổi con người bên trong, hay thật ra chỉ cần thay đổi cách bạn đang vận hành mỗi ngày?",
+        "evidenceLabel":  "Dấu hiệu này đến từ việc hai điểm cốt lõi của lá số đang được đọc cùng nhau: phần khí chất gốc và phần hành động ngoài đời."
     },
-    "priority": 62,
-    "title": "Trục Mệnh - Thân",
-    "summary": "Mệnh - Thân giống khoảng cách giữa bản thiết kế và căn nhà đã xây xong: một bên là khí chất gốc, một bên là cách bạn thật sự sống ngoài đời. Trong thực tế, trục này cho thấy điểm cần chỉnh không chỉ nằm ở suy nghĩ, mà còn ở lịch sống, vai trò, môi trường và cách bạn dùng sức.",
-    "strengthText": "Lợi thế là khả năng nhìn mình như một hệ thống vận hành, từ đó chọn đúng vai trò công việc và tránh kiếm tiền bằng cách tự làm mình kiệt sức.",
-    "cautionText": "Điểm mù là hiểu rất rõ mình muốn gì nhưng lại duy trì một cách sống trái với điều đó, khiến năng lực bị tiêu hao vào các vai không phù hợp.",
-    "lifeAdviceText": "Hãy tách mục tiêu thành hai lớp: điều bạn muốn trở thành và lịch hành động đang chứng minh điều đó; nếu hai lớp lệch nhau, ưu tiên sửa lịch trước khi đặt thêm mục tiêu mới.",
-    "teaserQuestion": "Bạn đang cần thay đổi con người bên trong, hay thật ra chỉ cần thay đổi cách mình đang vận hành mỗi ngày?",
-    "evidenceLabel": "Dấu hiệu này đến từ việc hai điểm cốt lõi của lá số đang được đọc cùng nhau: phần khí chất gốc và phần hành động ngoài đời."
-  },
-  {
-    "version": "interpretation-rules-v1",
-    "status": "active",
-    "key": "axis:quan-tai",
-    "scope": "CAREER",
-    "pattern": {
-      "kind": "axis",
-      "axis": "quan-tai",
-      "palaces": [
-        "Quan Lộc",
-        "Tài Bạch"
-      ]
+    {
+        "version":  "interpretation-rules-v2",
+        "status":  "active",
+        "key":  "axis:quan-tai",
+        "scope":  "CAREER",
+        "pattern":  {
+                        "kind":  "axis",
+                        "axis":  "quan-tai",
+                        "palaces":  [
+                                        "Quan Lộc",
+                                        "Tài Bạch"
+                                    ]
+                    },
+        "priority":  64,
+        "title":  "Trục Quan - Tài",
+        "summary":  "Bạn dễ nhận ra rằng trục này cho thấy vấn đề tài chính nhiều khi không nằm ở chăm chỉ, mà ở việc vị trí nghề nghiệp, quyền hạn và cách định giá công sức chưa khớp nhau. Bạn muốn tạo kết quả mà không phải ôm hết việc, nhưng cũng cần để ý việc chỉ nhìn thu nhập trước mắt mà không tính cái giá phải trả bằng thời gian, sức khỏe và quyền lựa chọn dài hạn.",
+        "strengthText":  "Khi trách nhiệm công việc đã rõ, bạn có thể phát huy khả năng tối ưu nghề nghiệp như một mô hình kinh doanh cá nhân: vai trò rõ hơn, giá trị đo được hơn và nguồn thu bền hơn.",
+        "cautionText":  "Bạn có thể dễ chỉ nhìn thu nhập trước mắt mà không tính cái giá phải trả bằng thời gian, sức khỏe và quyền lựa chọn dài hạn nếu chưa đặt giới hạn rõ.",
+        "lifeAdviceText":  "Bạn hãy kiểm tra mỗi cơ hội bằng ba câu hỏi: nó tăng kỹ năng gì, tăng vị thế gì và tăng nguồn lực gì; nếu chỉ tăng bận rộn, cần thương lượng lại hoặc từ chối.",
+        "teaserQuestion":  "Công việc hiện tại đang thật sự tạo tự do tài chính cho bạn, hay chỉ đang đổi sức lực lấy cảm giác an toàn ngắn hạn?",
+        "evidenceLabel":  "Dấu hiệu này đến từ việc đường nghề và đường nguồn lực đang được nối thành một mạch thay vì đọc tách rời."
     },
-    "priority": 64,
-    "title": "Trục Quan - Tài",
-    "summary": "Quan - Tài giống một đường ống nối giữa giá trị bạn tạo ra và nguồn lực bạn giữ lại. Trong đời sống, trục này cho thấy vấn đề tài chính nhiều khi không nằm ở chăm chỉ, mà ở việc vị trí nghề nghiệp, quyền hạn và cách định giá công sức chưa khớp nhau.",
-    "strengthText": "Lợi thế là khả năng tối ưu nghề nghiệp như một mô hình kinh doanh cá nhân: vai trò rõ hơn, giá trị đo được hơn và nguồn thu bền hơn.",
-    "cautionText": "Cạm bẫy là chỉ nhìn thu nhập trước mắt mà không tính cái giá phải trả bằng thời gian, sức khỏe và quyền lựa chọn dài hạn.",
-    "lifeAdviceText": "Hãy kiểm tra mỗi cơ hội bằng ba câu hỏi: nó tăng kỹ năng gì, tăng vị thế gì và tăng nguồn lực gì; nếu chỉ tăng bận rộn, cần thương lượng lại hoặc từ chối.",
-    "teaserQuestion": "Công việc hiện tại đang thật sự tạo tự do tài chính cho bạn, hay chỉ đang đổi sức lực lấy cảm giác an toàn ngắn hạn?",
-    "evidenceLabel": "Dấu hiệu này đến từ việc đường nghề và đường nguồn lực đang được nối thành một mạch thay vì đọc tách rời."
-  },
-  {
-    "version": "interpretation-rules-v1",
-    "status": "active",
-    "key": "axis:phu-phuc",
-    "scope": "RELATIONSHIP",
-    "pattern": {
-      "kind": "axis",
-      "axis": "phu-phuc",
-      "palaces": [
-        "Phu Thê",
-        "Phúc Đức"
-      ]
+    {
+        "version":  "interpretation-rules-v2",
+        "status":  "active",
+        "key":  "axis:phu-phuc",
+        "scope":  "RELATIONSHIP",
+        "pattern":  {
+                        "kind":  "axis",
+                        "axis":  "phu-phuc",
+                        "palaces":  [
+                                        "Phu Thê",
+                                        "Phúc Đức"
+                                    ]
+                    },
+        "priority":  59,
+        "title":  "Trục Phu - Phúc",
+        "summary":  "Bạn dễ nhận ra rằng trục này cho thấy chuyện thân mật không chỉ là hợp hay không hợp, mà còn là cách hai người mang nền gia đình và kỳ vọng cũ vào cam kết hiện tại. Bạn muốn giữ hòa khí mà vẫn nói rõ nhu cầu, nhưng cũng cần để ý việc nhầm sự quen thuộc với sự an toàn, rồi lặp lại một kiểu gắn bó cũ dù nó khiến bạn phải gồng.",
+        "strengthText":  "Khi kỳ vọng giữa các bên đã rõ, bạn có thể phát huy khả năng nhìn quan hệ dài hạn qua nền giá trị, giúp bạn chọn người đồng hành ít làm hao năng lượng và dễ cùng xây tài sản chung hơn.",
+        "cautionText":  "Nếu kéo dài, bạn có thể dễ nhầm sự quen thuộc với sự an toàn, rồi lặp lại một kiểu gắn bó cũ dù nó khiến bạn phải gồng.",
+        "lifeAdviceText":  "Bạn có thể bắt đầu bằng việc khi một quan hệ quan trọng xuất hiện, hãy nói rõ ba tầng: tiền bạc, trách nhiệm gia đình và cách xử lý xung đột; đừng chỉ dựa vào cảm xúc tốt ở giai đoạn đầu.",
+        "teaserQuestion":  "Mối quan hệ bạn đang giữ là nơi nâng đỡ bạn, hay là nơi tái diễn một nếp cũ mà bạn chưa gọi tên?",
+        "evidenceLabel":  "Dấu hiệu này đến từ việc vùng cam kết thân mật được đặt cạnh nền tinh thần và nếp gia đình trong lá số."
     },
-    "priority": 59,
-    "title": "Trục Phu - Phúc",
-    "summary": "Phu - Phúc giống phần rễ nằm dưới một mối quan hệ: bên trên là tình cảm, bên dưới là nếp nhà, niềm tin và ký ức cảm xúc. Trong đời sống, trục này cho thấy chuyện thân mật không chỉ là hợp hay không hợp, mà còn là cách hai người mang nền gia đình và kỳ vọng cũ vào cam kết hiện tại.",
-    "strengthText": "Lợi thế là khả năng nhìn quan hệ dài hạn qua nền giá trị, giúp bạn chọn người đồng hành ít làm hao năng lượng và dễ cùng xây tài sản chung hơn.",
-    "cautionText": "Điểm mù là nhầm sự quen thuộc với sự an toàn, rồi lặp lại một kiểu gắn bó cũ dù nó khiến bạn phải gồng.",
-    "lifeAdviceText": "Khi một quan hệ quan trọng xuất hiện, hãy nói rõ ba tầng: tiền bạc, trách nhiệm gia đình và cách xử lý xung đột; đừng chỉ dựa vào cảm xúc tốt ở giai đoạn đầu.",
-    "teaserQuestion": "Mối quan hệ bạn đang giữ là nơi nâng đỡ bạn, hay là nơi tái diễn một nếp cũ mà bạn chưa gọi tên?",
-    "evidenceLabel": "Dấu hiệu này đến từ việc vùng cam kết thân mật được đặt cạnh nền tinh thần và nếp gia đình trong lá số."
-  },
-  {
-    "version": "interpretation-rules-v1",
-    "status": "active",
-    "key": "axis:tat-menh",
-    "scope": "HEALTH",
-    "pattern": {
-      "kind": "axis",
-      "axis": "tat-menh",
-      "palaces": [
-        "Tật Ách",
-        "Mệnh"
-      ]
+    {
+        "version":  "interpretation-rules-v2",
+        "status":  "active",
+        "key":  "axis:tat-menh",
+        "scope":  "HEALTH",
+        "pattern":  {
+                        "kind":  "axis",
+                        "axis":  "tat-menh",
+                        "palaces":  [
+                                        "Tật Ách",
+                                        "Mệnh"
+                                    ]
+                    },
+        "priority":  63,
+        "title":  "Trục Tật - Mệnh",
+        "summary":  "Bạn dễ nhận ra rằng trục này cho thấy sức khỏe tinh thần liên quan trực tiếp đến cách bạn nhận trách nhiệm, phản ứng với áp lực và tự định nghĩa giá trị bản thân. Bạn muốn làm tròn trách nhiệm mà không kiệt sức, nhưng cũng cần để ý việc chỉ sửa triệu chứng mệt mỏi mà không sửa kiểu sống tạo ra mệt mỏi, nhất là thói quen chứng minh bản thân bằng việc gánh thêm.",
+        "strengthText":  "Khi lịch làm và lịch nghỉ đã rõ, bạn có thể phát huy khả năng phát hiện sớm rủi ro vận hành: bạn có thể bảo vệ hiệu suất công việc bằng cách quản trị giấc ngủ, nhịp nghỉ và ranh giới nhận việc.",
+        "cautionText":  "Khi quá tin vào mặt thuận của Trục Tật - Mệnh, bạn có thể dễ chỉ sửa triệu chứng mệt mỏi mà không sửa kiểu sống tạo ra mệt mỏi, nhất là thói quen chứng minh bản thân bằng việc gánh thêm.",
+        "lifeAdviceText":  "Bạn hãy lập một bảng theo dõi ba tín hiệu trong 14 ngày: ngủ, mức cáu gắt và năng lượng bắt đầu việc mới; nếu cả ba giảm, hãy cắt bớt cam kết trước khi tìm thêm động lực.",
+        "teaserQuestion":  "Cơ thể bạn đang cảnh báo điều gì mà lịch làm việc của bạn vẫn cố tình bỏ qua?",
+        "evidenceLabel":  "Dấu hiệu này đến từ việc vùng thân tâm được soi cùng vùng bản ngã, cho thấy áp lực bên trong có thể đi thẳng vào nhịp sống."
     },
-    "priority": 63,
-    "title": "Trục Tật - Mệnh",
-    "summary": "Tật - Mệnh giống bảng điều khiển báo nhiệt của một cỗ máy: cơ thể thường sáng đèn trước khi lý trí chịu thừa nhận mình quá tải. Trong đời sống, trục này cho thấy sức khỏe tinh thần liên quan trực tiếp đến cách bạn nhận trách nhiệm, phản ứng với áp lực và tự định nghĩa giá trị bản thân.",
-    "strengthText": "Lợi thế là khả năng phát hiện sớm rủi ro vận hành: bạn có thể bảo vệ hiệu suất công việc bằng cách quản trị giấc ngủ, nhịp nghỉ và ranh giới nhận việc.",
-    "cautionText": "Cạm bẫy là chỉ sửa triệu chứng mệt mỏi mà không sửa kiểu sống tạo ra mệt mỏi, nhất là thói quen chứng minh bản thân bằng việc gánh thêm.",
-    "lifeAdviceText": "Hãy lập một bảng theo dõi ba tín hiệu trong 14 ngày: ngủ, mức cáu gắt và năng lượng bắt đầu việc mới; nếu cả ba giảm, hãy cắt bớt cam kết trước khi tìm thêm động lực.",
-    "teaserQuestion": "Cơ thể bạn đang cảnh báo điều gì mà lịch làm việc của bạn vẫn cố tình bỏ qua?",
-    "evidenceLabel": "Dấu hiệu này đến từ việc vùng thân tâm được soi cùng vùng bản ngã, cho thấy áp lực bên trong có thể đi thẳng vào nhịp sống."
-  },
-  {
-    "version": "interpretation-rules-v1",
-    "status": "active",
-    "key": "axis:di-quan",
-    "scope": "CAREER",
-    "pattern": {
-      "kind": "axis",
-      "axis": "di-quan",
-      "palaces": [
-        "Thiên Di",
-        "Quan Lộc"
-      ]
+    {
+        "version":  "interpretation-rules-v2",
+        "status":  "active",
+        "key":  "axis:di-quan",
+        "scope":  "CAREER",
+        "pattern":  {
+                        "kind":  "axis",
+                        "axis":  "di-quan",
+                        "palaces":  [
+                                        "Thiên Di",
+                                        "Quan Lộc"
+                                    ]
+                    },
+        "priority":  61,
+        "title":  "Trục Di - Quan",
+        "summary":  "Bạn dễ nhận ra rằng trục này cho thấy sự nghiệp không chỉ phát triển nhờ năng lực nội bộ, mà còn nhờ chọn đúng môi trường, đúng mạng lưới và đúng sân chơi để được nhìn thấy. Bạn muốn tạo kết quả mà không phải ôm hết việc, nhưng cũng cần để ý việc chạy theo cơ hội bên ngoài quá nhanh, nhất là trong môi trường bên ngoài và cơ hội mới.",
+        "strengthText":  "Khi trách nhiệm công việc đã rõ, bạn có thể phát huy khả năng dùng quan hệ xã hội, thị trường hoặc môi trường mới để mở vị trí nghề nghiệp và tăng giá trị thương lượng.",
+        "cautionText":  "Bạn có thể dễ chạy theo cơ hội bên ngoài quá nhanh, trong khi vai trò cốt lõi và năng lực giao hàng chưa đủ rõ nếu chưa đặt giới hạn rõ.",
+        "lifeAdviceText":  "Bạn hãy đánh giá mỗi lời mời bằng hai lớp: nó cho bạn tiếp xúc với ai và nó buộc bạn chịu trách nhiệm điều gì; chỉ bước sâu khi cả hai lớp đều đáng giá.",
+        "teaserQuestion":  "Cơ hội bên ngoài nào đang thật sự mở đường nghề nghiệp, và lời mời nào chỉ làm bạn lệch khỏi trọng tâm?",
+        "evidenceLabel":  "Dấu hiệu này đến từ việc môi trường bên ngoài được nối trực tiếp với đường nghề nghiệp và vị trí xã hội."
     },
-    "priority": 61,
-    "title": "Trục Di - Quan",
-    "summary": "Di - Quan giống một cánh cửa nối văn phòng của bạn với thế giới bên ngoài. Trong đời sống, trục này cho thấy sự nghiệp không chỉ phát triển nhờ năng lực nội bộ, mà còn nhờ chọn đúng môi trường, đúng mạng lưới và đúng sân chơi để được nhìn thấy.",
-    "strengthText": "Lợi thế là khả năng dùng quan hệ xã hội, thị trường hoặc môi trường mới để mở vị trí nghề nghiệp và tăng giá trị thương lượng.",
-    "cautionText": "Điểm mù là chạy theo cơ hội bên ngoài quá nhanh, trong khi vai trò cốt lõi và năng lực giao hàng chưa đủ rõ.",
-    "lifeAdviceText": "Hãy đánh giá mỗi lời mời bằng hai lớp: nó cho bạn tiếp xúc với ai và nó buộc bạn chịu trách nhiệm điều gì; chỉ bước sâu khi cả hai lớp đều đáng giá.",
-    "teaserQuestion": "Cơ hội bên ngoài nào đang thật sự mở đường nghề nghiệp, và lời mời nào chỉ làm bạn lệch khỏi trọng tâm?",
-    "evidenceLabel": "Dấu hiệu này đến từ việc môi trường bên ngoài được nối trực tiếp với đường nghề nghiệp và vị trí xã hội."
-  },
-  {
-    "version": "interpretation-rules-v1",
-    "status": "active",
-    "key": "axis:tai-phuc",
-    "scope": "MONEY",
-    "pattern": {
-      "kind": "axis",
-      "axis": "tai-phuc",
-      "palaces": [
-        "Tài Bạch",
-        "Phúc Đức"
-      ]
-    },
-    "priority": 60,
-    "title": "Trục Tài - Phúc",
-    "summary": "Tài - Phúc giống dòng nước chảy qua một nền đất: tiền có tụ hay rò rỉ phụ thuộc rất nhiều vào nền niềm tin và nếp sống bên dưới. Trong đời sống, trục này cho thấy cách bạn dùng tiền thường gắn với cảm giác an toàn, trách nhiệm gia đình và những khuôn mẫu đã học từ trước.",
-    "strengthText": "Lợi thế là khả năng xây nền tài chính bền nếu bạn biết biến giá trị gia đình, uy tín và sự nâng đỡ thành hệ thống tích lũy rõ ràng.",
-    "cautionText": "Cạm bẫy là dùng tiền để bù cảm giác thiếu an toàn hoặc gánh thay trách nhiệm cảm xúc của người khác.",
-    "lifeAdviceText": "Hãy tách ngân sách thành ba phần: phần sống, phần tích lũy và phần hỗ trợ người thân; mọi khoản vượt ranh giới cần được nói rõ trước khi chuyển tiền hoặc nhận cam kết.",
-    "teaserQuestion": "Tiền của bạn đang phục vụ tương lai của bạn, hay đang âm thầm trả nợ cho một cảm giác bất an cũ?",
-    "evidenceLabel": "Dấu hiệu này đến từ việc nguồn lực vật chất được soi cùng nền tinh thần và nếp gia đình."
-  }
+    {
+        "version":  "interpretation-rules-v2",
+        "status":  "active",
+        "key":  "axis:tai-phuc",
+        "scope":  "MONEY",
+        "pattern":  {
+                        "kind":  "axis",
+                        "axis":  "tai-phuc",
+                        "palaces":  [
+                                        "Tài Bạch",
+                                        "Phúc Đức"
+                                    ]
+                    },
+        "priority":  60,
+        "title":  "Trục Tài - Phúc",
+        "summary":  "Bạn dễ nhận ra rằng trục này cho thấy cách bạn dùng tiền thường gắn với cảm giác an toàn, trách nhiệm gia đình và những khuôn mẫu đã học từ trước. Bạn muốn giữ an toàn mà không tự bỏ lỡ cơ hội, nhưng cũng cần để ý việc dùng tiền để bù cảm giác thiếu an toàn hoặc gánh thay trách nhiệm cảm xúc của người khác, nhất là trong tiền bạc, công sức và quyền lựa chọn.",
+        "strengthText":  "Khi giới hạn tiền bạc đã rõ, bạn có thể phát huy khả năng xây nền tài chính bền nếu bạn biết biến giá trị gia đình, uy tín và sự nâng đỡ thành hệ thống tích lũy rõ ràng.",
+        "cautionText":  "Nếu kéo dài, bạn có thể dễ dùng tiền để bù cảm giác thiếu an toàn hoặc gánh thay trách nhiệm cảm xúc của người khác.",
+        "lifeAdviceText":  "Bạn hãy tách ngân sách thành ba phần: phần sống, phần tích lũy và phần hỗ trợ người thân; mọi khoản vượt ranh giới cần được nói rõ trước khi chuyển tiền hoặc nhận cam kết.",
+        "teaserQuestion":  "Tiền của bạn đang phục vụ tương lai của bạn, hay đang âm thầm trả nợ cho một cảm giác bất an cũ?",
+        "evidenceLabel":  "Dấu hiệu này đến từ việc nguồn lực vật chất được soi cùng nền tinh thần và nếp gia đình."
+    }
 ]

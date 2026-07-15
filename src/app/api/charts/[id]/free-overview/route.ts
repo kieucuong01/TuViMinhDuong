@@ -20,9 +20,8 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
     timer.time("overviewStatus", () => getFreeOverviewStatus(record.chart)),
     userPromise,
   ]);
-  const guestContent = !user && overview.status === "ready" ? buildFreeOverviewTeaser(overview.content) : null;
-  const visibleOverview = guestContent
-    ? { ...overview, content: guestContent, wordCount: countWords(guestContent) }
+  const visibleOverview = !user && overview.status === "ready"
+    ? { ...overview, content: buildFreeOverviewTeaser(overview.content), wordCount: countWords(buildFreeOverviewTeaser(overview.content)) }
     : overview;
   logPerfEvent("free_overview_get_timing", timer.total(), {
     chartId: id,

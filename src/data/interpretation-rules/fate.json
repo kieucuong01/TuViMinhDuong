@@ -1,306 +1,306 @@
 [
-  {
-    "version": "interpretation-rules-v1",
-    "status": "active",
-    "key": "fate:dai-van:menh",
-    "scope": "YEAR",
-    "pattern": {
-      "kind": "fate",
-      "fate": "dai-van",
-      "palace": "Mệnh"
+    {
+        "version":  "interpretation-rules-v2",
+        "status":  "active",
+        "key":  "fate:dai-van:menh",
+        "scope":  "YEAR",
+        "pattern":  {
+                        "kind":  "fate",
+                        "fate":  "dai-van",
+                        "palace":  "Mệnh"
+                    },
+        "priority":  69,
+        "title":  "Đại vận kích hoạt Mệnh",
+        "summary":  "Có những lúc bạn nhìn lại bản sắc, cách phản ứng và kiểu mục tiêu mà bạn đang theo đuổi. Bạn muốn nắm cơ hội nhưng không quyết vội, nhưng cũng cần để ý việc cố bảo vệ một hình ảnh cũ chỉ vì nó từng giúp bạn an toàn, nhất là trong cách bạn tự quyết và nhận trách nhiệm.",
+        "strengthText":  "Khi dữ kiện của giai đoạn hiện tại đã rõ, bạn có thể phát huy khả năng tái định vị bản thân, từ đó chọn lại vai trò công việc hoặc hướng kiếm tiền phù hợp hơn với con người hiện tại.",
+        "cautionText":  "Khi quá tin vào mặt thuận của Đại vận kích hoạt Mệnh, bạn có thể dễ cố bảo vệ một hình ảnh cũ chỉ vì nó từng giúp bạn an toàn, trong khi vận mới đang yêu cầu cách sống khác.",
+        "lifeAdviceText":  "Bạn hãy viết ra ba vai trò bạn đang gánh và chấm điểm từng vai theo mức tạo năng lượng, tạo tiền, tạo tự do; vai nào thấp cả ba nên được thu nhỏ.",
+        "teaserQuestion":  "Bạn đang trưởng thành thành một phiên bản mới, hay vẫn dùng mục tiêu cũ để ép bạn đi tiếp?",
+        "evidenceLabel":  "Dấu hiệu này xuất hiện khi chu kỳ mười năm chạm vào vùng bản sắc và cách bạn tự định nghĩa bạn."
     },
-    "priority": 69,
-    "title": "Đại vận kích hoạt Mệnh",
-    "summary": "Đại vận tại Mệnh giống một mùa thay da: những điều từng là thói quen tự nhiên bỗng cần được định nghĩa lại. Trong đời sống, giai đoạn này thường buộc bạn nhìn lại bản sắc, cách phản ứng và kiểu mục tiêu mà mình đang theo đuổi.",
-    "strengthText": "Lợi thế là khả năng tái định vị bản thân, từ đó chọn lại vai trò công việc hoặc hướng kiếm tiền phù hợp hơn với con người hiện tại.",
-    "cautionText": "Điểm mù là cố bảo vệ một hình ảnh cũ chỉ vì nó từng giúp bạn an toàn, trong khi vận mới đang yêu cầu cách sống khác.",
-    "lifeAdviceText": "Hãy viết ra ba vai trò bạn đang gánh và chấm điểm từng vai theo mức tạo năng lượng, tạo tiền, tạo tự do; vai nào thấp cả ba nên được thu nhỏ.",
-    "teaserQuestion": "Bạn đang trưởng thành thành một phiên bản mới, hay vẫn dùng mục tiêu cũ để ép mình đi tiếp?",
-    "evidenceLabel": "Dấu hiệu này xuất hiện khi chu kỳ mười năm chạm vào vùng bản sắc và cách bạn tự định nghĩa mình."
-  },
-  {
-    "version": "interpretation-rules-v1",
-    "status": "active",
-    "key": "fate:dai-van:than",
-    "scope": "YEAR",
-    "pattern": {
-      "kind": "fate",
-      "fate": "dai-van",
-      "palace": "Thân"
+    {
+        "version":  "interpretation-rules-v2",
+        "status":  "active",
+        "key":  "fate:dai-van:than",
+        "scope":  "YEAR",
+        "pattern":  {
+                        "kind":  "fate",
+                        "fate":  "dai-van",
+                        "palace":  "Thân"
+                    },
+        "priority":  67,
+        "title":  "Đại vận kích hoạt Thân",
+        "summary":  "Bạn dễ nhận ra rằng giai đoạn này nhấn mạnh lịch sống, trách nhiệm, sức chịu tải và khả năng biến nhận thức thành kết quả cụ thể. Bạn muốn nắm cơ hội nhưng không quyết vội, nhưng cũng cần để ý việc nhận quá nhiều việc để chứng minh bạn làm được, rồi biến đời sống thành một danh sách nghĩa vụ không có điểm dừng, nhất là trong vai trò thực tế và lịch sống mỗi ngày.",
+        "strengthText":  "Khi dữ kiện của giai đoạn hiện tại đã rõ, bạn có thể xây được năng lực thực chiến qua trải nghiệm trực tiếp, đặc biệt trong công việc cần tự chủ và chịu trách nhiệm đến cùng.",
+        "cautionText":  "Bạn có thể dễ nhận quá nhiều việc để chứng minh bạn làm được, rồi biến đời sống thành một danh sách nghĩa vụ không có điểm dừng nếu chưa đặt giới hạn rõ.",
+        "lifeAdviceText":  "Bạn hãy thiết kế tuần làm việc theo sức chịu thật: giữ một việc chủ lực, một việc phụ tạo tiền hoặc kỹ năng, và một khoảng hồi phục không được xâm phạm.",
+        "teaserQuestion":  "Lựa chọn nào đang buộc bạn hành động khác đi, chứ không chỉ nghĩ khác đi?",
+        "evidenceLabel":  "Dấu hiệu này đến từ chu kỳ mười năm đang kích hoạt phần đời sống thực tế và cách bạn dùng sức ngoài đời."
     },
-    "priority": 67,
-    "title": "Đại vận kích hoạt Thân",
-    "summary": "Đại vận tại Thân giống lúc bản vẽ phải bước ra công trường: mọi ý tưởng đều bị kiểm tra bằng hành động thật. Trong đời sống, giai đoạn này nhấn mạnh lịch sống, trách nhiệm, sức chịu tải và khả năng biến nhận thức thành kết quả cụ thể.",
-    "strengthText": "Lợi thế là xây được năng lực thực chiến qua trải nghiệm trực tiếp, đặc biệt trong công việc cần tự chủ và chịu trách nhiệm đến cùng.",
-    "cautionText": "Cạm bẫy là nhận quá nhiều việc để chứng minh mình làm được, rồi biến đời sống thành một danh sách nghĩa vụ không có điểm dừng.",
-    "lifeAdviceText": "Hãy thiết kế tuần làm việc theo sức chịu thật: giữ một việc chủ lực, một việc phụ tạo tiền hoặc kỹ năng, và một khoảng hồi phục không được xâm phạm.",
-    "teaserQuestion": "Lựa chọn nào đang buộc bạn hành động khác đi, chứ không chỉ nghĩ khác đi?",
-    "evidenceLabel": "Dấu hiệu này đến từ chu kỳ mười năm đang kích hoạt phần đời sống thực tế và cách bạn dùng sức ngoài đời."
-  },
-  {
-    "version": "interpretation-rules-v1",
-    "status": "active",
-    "key": "fate:dai-van:quan-loc",
-    "scope": "YEAR",
-    "pattern": {
-      "kind": "fate",
-      "fate": "dai-van",
-      "palace": "Quan Lộc"
+    {
+        "version":  "interpretation-rules-v2",
+        "status":  "active",
+        "key":  "fate:dai-van:quan-loc",
+        "scope":  "YEAR",
+        "pattern":  {
+                        "kind":  "fate",
+                        "fate":  "dai-van",
+                        "palace":  "Quan Lộc"
+                    },
+        "priority":  69,
+        "title":  "Đại vận kích hoạt Quan Lộc",
+        "summary":  "Bạn dễ nhận ra rằng giai đoạn này tập trung vào vị trí nghề nghiệp, quyền hạn, uy tín và cách bạn biến năng lực thành kết quả được thị trường công nhận. Bạn muốn nắm cơ hội nhưng không quyết vội, nhưng cũng cần để ý việc nhầm bận rộn với tiến bộ, khiến nhiều năm trôi qua trong trạng thái làm nhiều nhưng không tăng quyền quyết, nhất là trong công việc và trách nhiệm nghề nghiệp.",
+        "strengthText":  "Khi dữ kiện của giai đoạn hiện tại đã rõ, bạn có thể có cửa xây vị thế nghề nghiệp rõ hơn, đặc biệt nếu bạn biết chọn một mũi nhọn thay vì dàn sức cho mọi lời mời.",
+        "cautionText":  "Nếu kéo dài, bạn có thể dễ nhầm bận rộn với tiến bộ, khiến nhiều năm trôi qua trong trạng thái làm nhiều nhưng không tăng quyền quyết.",
+        "lifeAdviceText":  "Bạn hãy đặt một tiêu chuẩn nghề nghiệp cho đại vận này: chức năng nào bạn muốn sở hữu, kỹ năng nào cần định giá lại và quan hệ nào giúp bạn bước lên đúng tầng.",
+        "teaserQuestion":  "Mười năm này đang giúp bạn xây vị trí thật, hay chỉ đang khiến bạn trở thành người giỏi xử lý việc của người khác?",
+        "evidenceLabel":  "Dấu hiệu này đến từ chu kỳ dài hạn đang chiếu vào vùng nghề nghiệp, trách nhiệm xã hội và uy tín cá nhân."
     },
-    "priority": 69,
-    "title": "Đại vận kích hoạt Quan Lộc",
-    "summary": "Đại vận tại Quan Lộc giống một sân khấu dài hạn nơi vai diễn cũ không còn đủ sức kéo câu chuyện. Trong đời sống, giai đoạn này tập trung vào vị trí nghề nghiệp, quyền hạn, uy tín và cách bạn biến năng lực thành kết quả được thị trường công nhận.",
-    "strengthText": "Lợi thế là có cửa xây vị thế nghề nghiệp rõ hơn, đặc biệt nếu bạn biết chọn một mũi nhọn thay vì dàn sức cho mọi lời mời.",
-    "cautionText": "Điểm mù là nhầm bận rộn với tiến bộ, khiến nhiều năm trôi qua trong trạng thái làm nhiều nhưng không tăng quyền quyết.",
-    "lifeAdviceText": "Hãy đặt một tiêu chuẩn nghề nghiệp cho đại vận này: chức năng nào bạn muốn sở hữu, kỹ năng nào cần định giá lại và quan hệ nào giúp bạn bước lên đúng tầng.",
-    "teaserQuestion": "Mười năm này đang giúp bạn xây vị trí thật, hay chỉ đang khiến bạn trở thành người giỏi xử lý việc của người khác?",
-    "evidenceLabel": "Dấu hiệu này đến từ chu kỳ dài hạn đang chiếu vào vùng nghề nghiệp, trách nhiệm xã hội và uy tín cá nhân."
-  },
-  {
-    "version": "interpretation-rules-v1",
-    "status": "active",
-    "key": "fate:dai-van:tai-bach",
-    "scope": "YEAR",
-    "pattern": {
-      "kind": "fate",
-      "fate": "dai-van",
-      "palace": "Tài Bạch"
+    {
+        "version":  "interpretation-rules-v2",
+        "status":  "active",
+        "key":  "fate:dai-van:tai-bach",
+        "scope":  "YEAR",
+        "pattern":  {
+                        "kind":  "fate",
+                        "fate":  "dai-van",
+                        "palace":  "Tài Bạch"
+                    },
+        "priority":  69,
+        "title":  "Đại vận kích hoạt Tài Bạch",
+        "summary":  "Bạn dễ nhận ra rằng giai đoạn này hỏi bạn đang dùng thời gian, công sức, kỹ năng và tiền bạc để mua thêm tự do hay mua thêm trách nhiệm. Bạn muốn nắm cơ hội nhưng không quyết vội, nhưng cũng cần để ý việc phản ứng với nỗi sợ thiếu bằng cách giữ quá chặt, hoặc ngược lại nhận mọi cơ hội kiếm tiền khiến sức lực bị bào mòn.",
+        "strengthText":  "Khi dữ kiện của giai đoạn hiện tại đã rõ, bạn có thể phát huy khả năng thiết kế lại mô hình thu nhập, định giá công sức tốt hơn và chuyển năng lực thành tài sản bền hơn.",
+        "cautionText":  "Khi quá tin vào mặt thuận của Đại vận kích hoạt Tài Bạch, bạn có thể dễ phản ứng với nỗi sợ thiếu bằng cách giữ quá chặt, hoặc ngược lại nhận mọi cơ hội kiếm tiền khiến sức lực bị bào mòn.",
+        "lifeAdviceText":  "Bạn hãy chia nguồn lực theo ba rổ: bảo toàn, tăng trưởng và thử nghiệm; mỗi quyết định tài chính phải biết nó thuộc rổ nào trước khi xuống tiền hoặc nhận việc.",
+        "teaserQuestion":  "Đại vận này đang dạy bạn kiếm thêm tiền, giữ thêm tự do hay ngừng trả giá cho những cam kết sai?",
+        "evidenceLabel":  "Dấu hiệu này đến từ chu kỳ dài hạn đang kích hoạt vùng tiền bạc, nguồn lực và cảm giác an toàn."
     },
-    "priority": 69,
-    "title": "Đại vận kích hoạt Tài Bạch",
-    "summary": "Đại vận tại Tài Bạch giống lúc bạn phải kiểm kê toàn bộ kho nguồn lực, không chỉ đếm tiền trong két. Trong đời sống, giai đoạn này hỏi bạn đang dùng thời gian, công sức, kỹ năng và tiền bạc để mua thêm tự do hay mua thêm trách nhiệm.",
-    "strengthText": "Lợi thế là khả năng thiết kế lại mô hình thu nhập, định giá công sức tốt hơn và chuyển năng lực thành tài sản bền hơn.",
-    "cautionText": "Cạm bẫy là phản ứng với nỗi sợ thiếu bằng cách giữ quá chặt, hoặc ngược lại nhận mọi cơ hội kiếm tiền khiến sức lực bị bào mòn.",
-    "lifeAdviceText": "Hãy chia nguồn lực theo ba rổ: bảo toàn, tăng trưởng và thử nghiệm; mỗi quyết định tài chính phải biết nó thuộc rổ nào trước khi xuống tiền hoặc nhận việc.",
-    "teaserQuestion": "Đại vận này đang dạy bạn kiếm thêm tiền, giữ thêm tự do hay ngừng trả giá cho những cam kết sai?",
-    "evidenceLabel": "Dấu hiệu này đến từ chu kỳ dài hạn đang kích hoạt vùng tiền bạc, nguồn lực và cảm giác an toàn."
-  },
-  {
-    "version": "interpretation-rules-v1",
-    "status": "active",
-    "key": "fate:dai-van:phu-the",
-    "scope": "YEAR",
-    "pattern": {
-      "kind": "fate",
-      "fate": "dai-van",
-      "palace": "Phu Thê"
+    {
+        "version":  "interpretation-rules-v2",
+        "status":  "active",
+        "key":  "fate:dai-van:phu-the",
+        "scope":  "YEAR",
+        "pattern":  {
+                        "kind":  "fate",
+                        "fate":  "dai-van",
+                        "palace":  "Phu Thê"
+                    },
+        "priority":  68,
+        "title":  "Đại vận kích hoạt Phu Thê",
+        "summary":  "Bạn dễ nhận ra rằng giai đoạn này khiến quan hệ thân mật trở thành nơi kiểm tra sự trưởng thành cảm xúc, trách nhiệm và khả năng cùng xây một đời sống thực tế. Bạn muốn nắm cơ hội nhưng không quyết vội, nhưng cũng cần để ý việc dùng tình cảm để né đối thoại khó về tiền bạc, trách nhiệm gia đình hoặc mức tự do cá nhân.",
+        "strengthText":  "Khi dữ kiện của giai đoạn hiện tại đã rõ, bạn có thể nhìn rõ hơn người đồng hành nào giúp bạn ổn định, làm việc tốt hơn và đưa ra quyết định tài chính ít cảm tính hơn.",
+        "cautionText":  "Bạn có thể dễ dùng tình cảm để né đối thoại khó về tiền bạc, trách nhiệm gia đình hoặc mức tự do cá nhân nếu chưa đặt giới hạn rõ.",
+        "lifeAdviceText":  "Bạn hãy đưa các chủ đề thực tế vào đối thoại sớm: cách tiêu tiền, cách chăm gia đình, nhịp làm việc và cách xử lý áp lực; cam kết chỉ bền khi những điểm này được nói rõ.",
+        "teaserQuestion":  "Quan hệ hiện tại đang giúp bạn lớn lên, hay đang khiến bạn trì hoãn những cuộc nói chuyện cần thiết?",
+        "evidenceLabel":  "Dấu hiệu này đến từ chu kỳ dài hạn đang kích hoạt vùng cam kết, bạn đời và trách nhiệm thân mật."
     },
-    "priority": 68,
-    "title": "Đại vận kích hoạt Phu Thê",
-    "summary": "Đại vận tại Phu Thê giống một chiếc gương dài hạn đặt trước cách bạn yêu, cam kết và thương lượng ranh giới. Trong đời sống, giai đoạn này khiến quan hệ thân mật trở thành nơi kiểm tra sự trưởng thành cảm xúc, trách nhiệm và khả năng cùng xây một đời sống thực tế.",
-    "strengthText": "Lợi thế là nhìn rõ hơn người đồng hành nào giúp bạn ổn định, làm việc tốt hơn và đưa ra quyết định tài chính ít cảm tính hơn.",
-    "cautionText": "Điểm mù là dùng tình cảm để né đối thoại khó về tiền bạc, trách nhiệm gia đình hoặc mức tự do cá nhân.",
-    "lifeAdviceText": "Hãy đưa các chủ đề thực tế vào đối thoại sớm: cách tiêu tiền, cách chăm gia đình, nhịp làm việc và cách xử lý áp lực; cam kết chỉ bền khi những điểm này được nói rõ.",
-    "teaserQuestion": "Quan hệ hiện tại đang giúp bạn lớn lên, hay đang khiến bạn trì hoãn những cuộc nói chuyện cần thiết?",
-    "evidenceLabel": "Dấu hiệu này đến từ chu kỳ dài hạn đang kích hoạt vùng cam kết, bạn đời và trách nhiệm thân mật."
-  },
-  {
-    "version": "interpretation-rules-v1",
-    "status": "active",
-    "key": "fate:dai-van:tat-ach",
-    "scope": "YEAR",
-    "pattern": {
-      "kind": "fate",
-      "fate": "dai-van",
-      "palace": "Tật Ách"
+    {
+        "version":  "interpretation-rules-v2",
+        "status":  "active",
+        "key":  "fate:dai-van:tat-ach",
+        "scope":  "YEAR",
+        "pattern":  {
+                        "kind":  "fate",
+                        "fate":  "dai-van",
+                        "palace":  "Tật Ách"
+                    },
+        "priority":  68,
+        "title":  "Đại vận kích hoạt Tật Ách",
+        "summary":  "Bạn dễ nhận ra rằng giai đoạn này nhấn mạnh sức khỏe tinh thần, nhịp hồi phục và các áp lực tích tụ từ công việc, tiền bạc hoặc quan hệ. Bạn muốn nắm cơ hội nhưng không quyết vội, nhưng cũng cần để ý việc xem mệt mỏi như chuyện nhỏ, rồi chỉ phản ứng khi cơ thể đã buộc bạn dừng lại, nhất là trong nhịp nghỉ và phản ứng khi quá tải.",
+        "strengthText":  "Khi dữ kiện của giai đoạn hiện tại đã rõ, bạn có thể có cơ hội xây sức bền thật, biến quản trị năng lượng thành lợi thế cạnh tranh trong công việc dài hạn.",
+        "cautionText":  "Nếu kéo dài, bạn có thể dễ xem mệt mỏi như chuyện nhỏ, rồi chỉ phản ứng khi cơ thể đã buộc bạn dừng lại.",
+        "lifeAdviceText":  "Bạn hãy lập ngân sách năng lượng giống ngân sách tiền: việc nào rút sức nhiều phải có thời gian hồi phục tương ứng, nếu không thì không nhận thêm.",
+        "teaserQuestion":  "Áp lực nào đang âm thầm lấy sức của bạn mỗi ngày mà bạn vẫn gọi nó là bình thường?",
+        "evidenceLabel":  "Dấu hiệu này đến từ chu kỳ dài hạn đang chiếu vào vùng thân tâm, sức bền và những tín hiệu quá tải."
     },
-    "priority": 68,
-    "title": "Đại vận kích hoạt Tật Ách",
-    "summary": "Đại vận tại Tật Ách giống một hệ thống cảnh báo chạy nền, âm thầm đo xem bạn đang tiêu hao ở đâu. Trong đời sống, giai đoạn này nhấn mạnh sức khỏe tinh thần, nhịp hồi phục và các áp lực tích tụ từ công việc, tiền bạc hoặc quan hệ.",
-    "strengthText": "Lợi thế là có cơ hội xây sức bền thật, biến quản trị năng lượng thành lợi thế cạnh tranh trong công việc dài hạn.",
-    "cautionText": "Cạm bẫy là xem mệt mỏi như chuyện nhỏ, rồi chỉ phản ứng khi cơ thể đã buộc bạn dừng lại.",
-    "lifeAdviceText": "Hãy lập ngân sách năng lượng giống ngân sách tiền: việc nào rút sức nhiều phải có thời gian hồi phục tương ứng, nếu không thì không nhận thêm.",
-    "teaserQuestion": "Áp lực nào đang âm thầm lấy sức của bạn mỗi ngày mà bạn vẫn gọi nó là bình thường?",
-    "evidenceLabel": "Dấu hiệu này đến từ chu kỳ dài hạn đang chiếu vào vùng thân tâm, sức bền và những tín hiệu quá tải."
-  },
-  {
-    "version": "interpretation-rules-v1",
-    "status": "active",
-    "key": "fate:dai-van:thien-di",
-    "scope": "YEAR",
-    "pattern": {
-      "kind": "fate",
-      "fate": "dai-van",
-      "palace": "Thiên Di"
+    {
+        "version":  "interpretation-rules-v2",
+        "status":  "active",
+        "key":  "fate:dai-van:thien-di",
+        "scope":  "YEAR",
+        "pattern":  {
+                        "kind":  "fate",
+                        "fate":  "dai-van",
+                        "palace":  "Thiên Di"
+                    },
+        "priority":  68,
+        "title":  "Đại vận kích hoạt Thiên Di",
+        "summary":  "Bạn dễ nhận ra rằng giai đoạn này đẩy bạn ra khỏi vùng quen để kiểm tra khả năng chọn môi trường, xây mạng lưới và định vị bản thân trước người khác. Bạn muốn nắm cơ hội nhưng không quyết vội, nhưng cũng cần để ý việc bị hấp dẫn bởi sự mới mẻ bên ngoài mà chưa đọc kỹ luật chơi, chi phí và ràng buộc phía sau.",
+        "strengthText":  "Khi dữ kiện của giai đoạn hiện tại đã rõ, bạn có thể mở rộng sân chơi nghề nghiệp, khách hàng, cộng đồng hoặc thị trường nếu bạn biết chọn nơi làm bạn tăng giá trị.",
+        "cautionText":  "Khi quá tin vào mặt thuận của Đại vận kích hoạt Thiên Di, bạn có thể dễ bị hấp dẫn bởi sự mới mẻ bên ngoài mà chưa đọc kỹ luật chơi, chi phí và ràng buộc phía sau.",
+        "lifeAdviceText":  "Bạn hãy thử môi trường mới bằng cam kết nhỏ trước: một dự án, một hợp tác, một cộng đồng; chỉ tăng mức đầu tư khi dữ kiện thực tế chứng minh nó đáng giá.",
+        "teaserQuestion":  "Cánh cửa bên ngoài nào đang mở đúng đường, và cánh cửa nào chỉ đẹp vì bạn chưa thấy cái giá phía sau?",
+        "evidenceLabel":  "Dấu hiệu này đến từ chu kỳ dài hạn đang kích hoạt vùng môi trường xã hội, di chuyển và cơ hội bên ngoài."
     },
-    "priority": 68,
-    "title": "Đại vận kích hoạt Thiên Di",
-    "summary": "Đại vận tại Thiên Di giống một cửa khẩu mở ra thế giới rộng hơn, nơi mỗi lời mời đều có cả cơ hội và điều kiện đi kèm. Trong đời sống, giai đoạn này đẩy bạn ra khỏi vùng quen để kiểm tra khả năng chọn môi trường, xây mạng lưới và định vị bản thân trước người khác.",
-    "strengthText": "Lợi thế là mở rộng sân chơi nghề nghiệp, khách hàng, cộng đồng hoặc thị trường nếu bạn biết chọn nơi làm mình tăng giá trị.",
-    "cautionText": "Điểm mù là bị hấp dẫn bởi sự mới mẻ bên ngoài mà chưa đọc kỹ luật chơi, chi phí và ràng buộc phía sau.",
-    "lifeAdviceText": "Hãy thử môi trường mới bằng cam kết nhỏ trước: một dự án, một hợp tác, một cộng đồng; chỉ tăng mức đầu tư khi dữ kiện thực tế chứng minh nó đáng giá.",
-    "teaserQuestion": "Cánh cửa bên ngoài nào đang mở đúng đường, và cánh cửa nào chỉ đẹp vì bạn chưa thấy cái giá phía sau?",
-    "evidenceLabel": "Dấu hiệu này đến từ chu kỳ dài hạn đang kích hoạt vùng môi trường xã hội, di chuyển và cơ hội bên ngoài."
-  },
-  {
-    "version": "interpretation-rules-v1",
-    "status": "active",
-    "key": "fate:dai-van:phuc-duc",
-    "scope": "YEAR",
-    "pattern": {
-      "kind": "fate",
-      "fate": "dai-van",
-      "palace": "Phúc Đức"
+    {
+        "version":  "interpretation-rules-v2",
+        "status":  "active",
+        "key":  "fate:dai-van:phuc-duc",
+        "scope":  "YEAR",
+        "pattern":  {
+                        "kind":  "fate",
+                        "fate":  "dai-van",
+                        "palace":  "Phúc Đức"
+                    },
+        "priority":  67,
+        "title":  "Đại vận kích hoạt Phúc Đức",
+        "summary":  "Bạn dễ nhận ra rằng giai đoạn này làm nổi bật nếp gia đình, đời sống tinh thần, cảm giác được nâng đỡ và những khuôn mẫu cũ đang ảnh hưởng đến quyết định hiện tại. Bạn muốn nắm cơ hội nhưng không quyết vội, nhưng cũng cần để ý việc sống theo kỳ vọng cũ của gia đình hoặc quá khứ, dù hoàn cảnh hiện tại đã cần một bộ quy tắc mới.",
+        "strengthText":  "Khi dữ kiện của giai đoạn hiện tại đã rõ, bạn có thể tái thiết nền tinh thần, từ đó ra quyết định tiền bạc và quan hệ ít bị kéo bởi cảm giác thiếu an toàn.",
+        "cautionText":  "Bạn có thể dễ sống theo kỳ vọng cũ của gia đình hoặc quá khứ, dù hoàn cảnh hiện tại đã cần một bộ quy tắc mới nếu chưa đặt giới hạn rõ.",
+        "lifeAdviceText":  "Bạn hãy phân loại di sản tinh thần thành ba nhóm: điều nên giữ, điều cần thương lượng lại và điều cần trả về quá khứ; đừng gánh tất cả như nghĩa vụ.",
+        "teaserQuestion":  "Nền gia đình đang nâng bạn lên, hay đang khiến bạn tiếp tục mang một vai không còn thuộc về bạn?",
+        "evidenceLabel":  "Dấu hiệu này đến từ chu kỳ dài hạn đang kích hoạt vùng nền tảng tinh thần, nếp nhà và sức nâng đỡ bên trong."
     },
-    "priority": 67,
-    "title": "Đại vận kích hoạt Phúc Đức",
-    "summary": "Đại vận tại Phúc Đức giống việc quay về kiểm tra nền móng trước khi xây thêm tầng mới. Trong đời sống, giai đoạn này làm nổi bật nếp gia đình, đời sống tinh thần, cảm giác được nâng đỡ và những khuôn mẫu cũ đang ảnh hưởng đến quyết định hiện tại.",
-    "strengthText": "Lợi thế là tái thiết nền tinh thần, từ đó ra quyết định tiền bạc và quan hệ ít bị kéo bởi cảm giác thiếu an toàn.",
-    "cautionText": "Cạm bẫy là sống theo kỳ vọng cũ của gia đình hoặc quá khứ, dù hoàn cảnh hiện tại đã cần một bộ quy tắc mới.",
-    "lifeAdviceText": "Hãy phân loại di sản tinh thần thành ba nhóm: điều nên giữ, điều cần thương lượng lại và điều cần trả về quá khứ; đừng gánh tất cả như nghĩa vụ.",
-    "teaserQuestion": "Nền gia đình đang nâng bạn lên, hay đang khiến bạn tiếp tục mang một vai không còn thuộc về mình?",
-    "evidenceLabel": "Dấu hiệu này đến từ chu kỳ dài hạn đang kích hoạt vùng nền tảng tinh thần, nếp nhà và sức nâng đỡ bên trong."
-  },
-  {
-    "version": "interpretation-rules-v1",
-    "status": "active",
-    "key": "fate:yearly:menh",
-    "scope": "IDENTITY",
-    "pattern": {
-      "kind": "fate",
-      "fate": "yearly",
-      "palace": "Mệnh"
+    {
+        "version":  "interpretation-rules-v2",
+        "status":  "active",
+        "key":  "fate:yearly:menh",
+        "scope":  "IDENTITY",
+        "pattern":  {
+                        "kind":  "fate",
+                        "fate":  "yearly",
+                        "palace":  "Mệnh"
+                    },
+        "priority":  63,
+        "title":  "Vận năm kích hoạt Mệnh",
+        "summary":  "Bạn dễ nhận ra rằng năm này thường khiến câu chuyện bản thân trở nên rõ hơn: bạn muốn gì, sợ gì và đang để ai định nghĩa bạn. Bạn muốn sống đúng với điều bạn tin là phù hợp, nhưng cũng cần để ý việc phản ứng quá mạnh với đánh giá bên ngoài, rồi đổi hướng vì muốn được công nhận ngay, nhất là trong cách bạn tự quyết và nhận trách nhiệm.",
+        "strengthText":  "Khi mục tiêu và vai trò của bạn đã rõ, bạn có thể chỉnh nhanh hình ảnh cá nhân, cách giao tiếp và lựa chọn ưu tiên để tạo hiệu quả tốt hơn trong công việc.",
+        "cautionText":  "Nếu kéo dài, bạn có thể dễ phản ứng quá mạnh với đánh giá bên ngoài, rồi đổi hướng vì muốn được công nhận ngay.",
+        "lifeAdviceText":  "Bạn hãy chọn một thông điệp cá nhân cho năm này: bạn muốn người khác nhớ đến bạn vì năng lực gì, thái độ gì và kết quả gì; trong ba ngày tới, bạn áp dụng ngay vào một tình huống thật thuộc cách bạn tự quyết và nhận trách nhiệm.",
+        "teaserQuestion":  "Năm này đang yêu cầu bạn sống đúng bản thân hơn, hay chỉ đang làm lộ ra hình ảnh bạn vẫn cố giữ?",
+        "evidenceLabel":  "Dấu hiệu này đến từ vận từng năm đang chiếu vào vùng khí chất và cách bạn tự thể hiện."
     },
-    "priority": 63,
-    "title": "Vận năm kích hoạt Mệnh",
-    "summary": "Vận năm tại Mệnh giống một chiếc đèn rọi gần, chiếu thẳng vào cách bạn phản ứng trong những quyết định trước mắt. Trong đời sống, năm này thường khiến câu chuyện bản thân trở nên rõ hơn: bạn muốn gì, sợ gì và đang để ai định nghĩa mình.",
-    "strengthText": "Lợi thế là có thể chỉnh nhanh hình ảnh cá nhân, cách giao tiếp và lựa chọn ưu tiên để tạo hiệu quả tốt hơn trong công việc.",
-    "cautionText": "Điểm mù là phản ứng quá mạnh với đánh giá bên ngoài, rồi đổi hướng vì muốn được công nhận ngay.",
-    "lifeAdviceText": "Hãy chọn một thông điệp cá nhân cho năm này: bạn muốn người khác nhớ đến mình vì năng lực gì, thái độ gì và kết quả gì.",
-    "teaserQuestion": "Năm này đang yêu cầu bạn sống đúng bản thân hơn, hay chỉ đang làm lộ ra hình ảnh bạn vẫn cố giữ?",
-    "evidenceLabel": "Dấu hiệu này đến từ vận từng năm đang chiếu vào vùng khí chất và cách bạn tự thể hiện."
-  },
-  {
-    "version": "interpretation-rules-v1",
-    "status": "active",
-    "key": "fate:yearly:than",
-    "scope": "AXIS",
-    "pattern": {
-      "kind": "fate",
-      "fate": "yearly",
-      "palace": "Thân"
+    {
+        "version":  "interpretation-rules-v2",
+        "status":  "active",
+        "key":  "fate:yearly:than",
+        "scope":  "AXIS",
+        "pattern":  {
+                        "kind":  "fate",
+                        "fate":  "yearly",
+                        "palace":  "Thân"
+                    },
+        "priority":  61,
+        "title":  "Vận năm kích hoạt Thân",
+        "summary":  "Bạn dễ nhận ra rằng năm này dễ lộ rõ bạn đang dùng sức ra sao, nhận việc thế nào và có đang sống đúng khả năng chịu tải không. Bạn muốn đưa những lựa chọn khác nhau về cùng một hướng, nhưng cũng cần để ý việc tưởng bạn cần cố thêm, nhất là trong vai trò thực tế và lịch sống mỗi ngày.",
+        "strengthText":  "Khi thứ tự ưu tiên đã rõ, bạn có thể chỉnh được lịch làm việc, nhịp học hoặc nhịp kiếm tiền để tăng hiệu suất mà không cần gồng quá lâu.",
+        "cautionText":  "Khi quá tin vào mặt thuận của Vận năm kích hoạt Thân, bạn có thể dễ tưởng bạn cần cố thêm, trong khi điều cần làm là bỏ bớt một vai hoặc đổi cách vận hành.",
+        "lifeAdviceText":  "Bạn hãy kiểm toán tuần của bạn: việc nào tạo kết quả, việc nào chỉ giữ thể diện, việc nào nên ủy quyền hoặc dừng lại; trong bảy ngày tới, bạn áp dụng ngay vào một tình huống thật thuộc vai trò thực tế và lịch sống mỗi ngày.",
+        "teaserQuestion":  "Năm này đang chỉ ra việc gì bạn cần làm khác đi ngay trong lịch sống hằng tuần?",
+        "evidenceLabel":  "Dấu hiệu này đến từ vận từng năm đang kích hoạt phần hành động thực tế và sức chịu ngoài đời."
     },
-    "priority": 61,
-    "title": "Vận năm kích hoạt Thân",
-    "summary": "Vận năm tại Thân giống một bài kiểm tra thể lực trong đời sống thật: kế hoạch nào cũng phải chứng minh bằng nhịp hành động. Trong thực tế, năm này dễ lộ rõ bạn đang dùng sức ra sao, nhận việc thế nào và có đang sống đúng khả năng chịu tải không.",
-    "strengthText": "Lợi thế là chỉnh được lịch làm việc, nhịp học hoặc nhịp kiếm tiền để tăng hiệu suất mà không cần gồng quá lâu.",
-    "cautionText": "Cạm bẫy là tưởng mình cần cố thêm, trong khi điều cần làm là bỏ bớt một vai hoặc đổi cách vận hành.",
-    "lifeAdviceText": "Hãy kiểm toán tuần của bạn: việc nào tạo kết quả, việc nào chỉ giữ thể diện, việc nào nên ủy quyền hoặc dừng lại.",
-    "teaserQuestion": "Năm này đang chỉ ra việc gì bạn cần làm khác đi ngay trong lịch sống hằng tuần?",
-    "evidenceLabel": "Dấu hiệu này đến từ vận từng năm đang kích hoạt phần hành động thực tế và sức chịu ngoài đời."
-  },
-  {
-    "version": "interpretation-rules-v1",
-    "status": "active",
-    "key": "fate:yearly:quan-loc",
-    "scope": "CAREER",
-    "pattern": {
-      "kind": "fate",
-      "fate": "yearly",
-      "palace": "Quan Lộc"
+    {
+        "version":  "interpretation-rules-v2",
+        "status":  "active",
+        "key":  "fate:yearly:quan-loc",
+        "scope":  "CAREER",
+        "pattern":  {
+                        "kind":  "fate",
+                        "fate":  "yearly",
+                        "palace":  "Quan Lộc"
+                    },
+        "priority":  63,
+        "title":  "Vận năm kích hoạt Quan Lộc",
+        "summary":  "Bạn dễ nhận ra rằng năm này thường kéo sự chú ý về công việc, vị trí, trách nhiệm và cách bạn chứng minh giá trị. Bạn muốn tạo kết quả mà không phải ôm hết việc, nhưng cũng cần để ý việc nhận thêm việc để chứng minh năng lực nhưng không thương lượng lại quyền hạn, tiền bạc hoặc phạm vi trách nhiệm, nhất là trong công việc và trách nhiệm nghề nghiệp.",
+        "strengthText":  "Khi trách nhiệm công việc đã rõ, bạn có thể tạo bước tiến nghề nghiệp nhanh nếu bạn chọn đúng dự án có người nhìn thấy và có tiêu chí đo rõ.",
+        "cautionText":  "Bạn có thể dễ nhận thêm việc để chứng minh năng lực nhưng không thương lượng lại quyền hạn, tiền bạc hoặc phạm vi trách nhiệm nếu chưa đặt giới hạn rõ.",
+        "lifeAdviceText":  "Bạn hãy trước khi nhận việc mới, hãy viết rõ ba điều: kết quả cần giao, quyền bạn có và giá trị bạn nhận lại; trong mười bốn ngày tới, bạn áp dụng ngay vào một tình huống thật thuộc công việc và trách nhiệm nghề nghiệp.",
+        "teaserQuestion":  "Năm này đang mở cơ hội thăng vị thế, hay đang thử xem bạn có dám định giá lại công sức của bạn không?",
+        "evidenceLabel":  "Dấu hiệu này đến từ vận từng năm đang chiếu vào vùng nghề nghiệp và trách nhiệm xã hội."
     },
-    "priority": 63,
-    "title": "Vận năm kích hoạt Quan Lộc",
-    "summary": "Vận năm tại Quan Lộc giống một cuộc họp đánh giá hiệu suất, nơi kết quả và vai trò đều được đặt lên bàn. Trong đời sống, năm này thường kéo sự chú ý về công việc, vị trí, trách nhiệm và cách bạn chứng minh giá trị.",
-    "strengthText": "Lợi thế là có thể tạo bước tiến nghề nghiệp nhanh nếu bạn chọn đúng dự án có người nhìn thấy và có tiêu chí đo rõ.",
-    "cautionText": "Điểm mù là nhận thêm việc để chứng minh năng lực nhưng không thương lượng lại quyền hạn, tiền bạc hoặc phạm vi trách nhiệm.",
-    "lifeAdviceText": "Trước khi nhận việc mới, hãy viết rõ ba điều: kết quả cần giao, quyền bạn có và giá trị bạn nhận lại.",
-    "teaserQuestion": "Năm này đang mở cơ hội thăng vị thế, hay đang thử xem bạn có dám định giá lại công sức của mình không?",
-    "evidenceLabel": "Dấu hiệu này đến từ vận từng năm đang chiếu vào vùng nghề nghiệp và trách nhiệm xã hội."
-  },
-  {
-    "version": "interpretation-rules-v1",
-    "status": "active",
-    "key": "fate:yearly:tai-bach",
-    "scope": "MONEY",
-    "pattern": {
-      "kind": "fate",
-      "fate": "yearly",
-      "palace": "Tài Bạch"
+    {
+        "version":  "interpretation-rules-v2",
+        "status":  "active",
+        "key":  "fate:yearly:tai-bach",
+        "scope":  "MONEY",
+        "pattern":  {
+                        "kind":  "fate",
+                        "fate":  "yearly",
+                        "palace":  "Tài Bạch"
+                    },
+        "priority":  63,
+        "title":  "Vận năm kích hoạt Tài Bạch",
+        "summary":  "Bạn dễ nhận ra rằng năm này thường yêu cầu bạn nhìn lại cách kiếm, cách giữ và cách đổi nguồn lực lấy cảm giác an toàn. Bạn muốn giữ an toàn mà không tự bỏ lỡ cơ hội, nhưng cũng cần để ý việc để những khoản nhỏ, lời hứa nhỏ hoặc trách nhiệm nhỏ rút sức đều đều mà bạn không nhận ra, nhất là trong tiền bạc, công sức và quyền lựa chọn.",
+        "strengthText":  "Khi giới hạn tiền bạc đã rõ, bạn có thể sửa nhanh thói quen tài chính, định giá lại công sức hoặc cắt khoản cam kết đang làm hao nguồn lực.",
+        "cautionText":  "Nếu kéo dài, bạn có thể dễ để những khoản nhỏ, lời hứa nhỏ hoặc trách nhiệm nhỏ rút sức đều đều mà bạn không nhận ra.",
+        "lifeAdviceText":  "Bạn hãy đặt một ngưỡng quyết định: khoản tiền hoặc cam kết nào vượt ngưỡng phải có thời gian suy nghĩ, điều kiện rõ và phương án thoát; trong ba ngày tới, bạn áp dụng ngay vào một tình huống thật thuộc tiền bạc, công sức và quyền lựa chọn.",
+        "teaserQuestion":  "Năm này đang nhắc bạn giữ tiền, giữ sức hay giữ quyền lựa chọn trước một cam kết mới?",
+        "evidenceLabel":  "Dấu hiệu này đến từ vận từng năm đang kích hoạt vùng tiền bạc và nguồn lực cá nhân."
     },
-    "priority": 63,
-    "title": "Vận năm kích hoạt Tài Bạch",
-    "summary": "Vận năm tại Tài Bạch giống một bảng sao kê mở rộng, ghi cả tiền, thời gian, sự tập trung và sức lực. Trong đời sống, năm này thường yêu cầu bạn nhìn lại cách kiếm, cách giữ và cách đổi nguồn lực lấy cảm giác an toàn.",
-    "strengthText": "Lợi thế là có thể sửa nhanh thói quen tài chính, định giá lại công sức hoặc cắt khoản cam kết đang làm hao nguồn lực.",
-    "cautionText": "Cạm bẫy là để những khoản nhỏ, lời hứa nhỏ hoặc trách nhiệm nhỏ rút sức đều đều mà bạn không nhận ra.",
-    "lifeAdviceText": "Hãy đặt một ngưỡng quyết định: khoản tiền hoặc cam kết nào vượt ngưỡng phải có thời gian suy nghĩ, điều kiện rõ và phương án thoát.",
-    "teaserQuestion": "Năm này đang nhắc bạn giữ tiền, giữ sức hay giữ quyền lựa chọn trước một cam kết mới?",
-    "evidenceLabel": "Dấu hiệu này đến từ vận từng năm đang kích hoạt vùng tiền bạc và nguồn lực cá nhân."
-  },
-  {
-    "version": "interpretation-rules-v1",
-    "status": "active",
-    "key": "fate:yearly:phu-the",
-    "scope": "RELATIONSHIP",
-    "pattern": {
-      "kind": "fate",
-      "fate": "yearly",
-      "palace": "Phu Thê"
+    {
+        "version":  "interpretation-rules-v2",
+        "status":  "active",
+        "key":  "fate:yearly:phu-the",
+        "scope":  "RELATIONSHIP",
+        "pattern":  {
+                        "kind":  "fate",
+                        "fate":  "yearly",
+                        "palace":  "Phu Thê"
+                    },
+        "priority":  62,
+        "title":  "Vận năm kích hoạt Phu Thê",
+        "summary":  "Bạn dễ nhận ra rằng năm này khiến chuyện tình cảm, hợp tác thân thiết hoặc cam kết lâu dài dễ lộ ra điểm cần nói rõ. Bạn muốn giữ hòa khí mà vẫn nói rõ nhu cầu, nhưng cũng cần để ý việc im lặng để giữ hòa khí, rồi để sự khó chịu tích tụ thành khoảng cách, nhất là trong tình cảm, cam kết và trách nhiệm chung.",
+        "strengthText":  "Khi kỳ vọng giữa các bên đã rõ, bạn có thể nâng chất lượng quan hệ bằng đối thoại cụ thể về trách nhiệm, tiền bạc, thời gian và kỳ vọng.",
+        "cautionText":  "Khi quá tin vào mặt thuận của Vận năm kích hoạt Phu Thê, bạn có thể dễ im lặng để giữ hòa khí, rồi để sự khó chịu tích tụ thành khoảng cách.",
+        "lifeAdviceText":  "Bạn hãy chọn một cuộc trò chuyện khó nhưng cần thiết trong năm này, chuẩn bị bằng dữ kiện và nhu cầu thật thay vì trách móc; trong bảy ngày tới, bạn áp dụng ngay vào một tình huống thật thuộc tình cảm, cam kết và trách nhiệm chung.",
+        "teaserQuestion":  "Bạn đang cần tự hỏi: quan hệ nào đang cần một cuộc nói thật để đi sâu hơn, thay vì tiếp tục đoán ý nhau?",
+        "evidenceLabel":  "Dấu hiệu này đến từ vận từng năm đang kích hoạt vùng cam kết, bạn đời và mối quan hệ thân thiết."
     },
-    "priority": 62,
-    "title": "Vận năm kích hoạt Phu Thê",
-    "summary": "Vận năm tại Phu Thê giống một chiếc kính lúp đặt lên cách hai người giữ lời hứa với nhau. Trong đời sống, năm này khiến chuyện tình cảm, hợp tác thân thiết hoặc cam kết lâu dài dễ lộ ra điểm cần nói rõ.",
-    "strengthText": "Lợi thế là có thể nâng chất lượng quan hệ bằng đối thoại cụ thể về trách nhiệm, tiền bạc, thời gian và kỳ vọng.",
-    "cautionText": "Điểm mù là im lặng để giữ hòa khí, rồi để sự khó chịu tích tụ thành khoảng cách.",
-    "lifeAdviceText": "Hãy chọn một cuộc trò chuyện khó nhưng cần thiết trong năm này, chuẩn bị bằng dữ kiện và nhu cầu thật thay vì trách móc.",
-    "teaserQuestion": "Quan hệ nào đang cần một cuộc nói thật để đi sâu hơn, thay vì tiếp tục đoán ý nhau?",
-    "evidenceLabel": "Dấu hiệu này đến từ vận từng năm đang kích hoạt vùng cam kết, bạn đời và mối quan hệ thân thiết."
-  },
-  {
-    "version": "interpretation-rules-v1",
-    "status": "active",
-    "key": "fate:yearly:tat-ach",
-    "scope": "HEALTH",
-    "pattern": {
-      "kind": "fate",
-      "fate": "yearly",
-      "palace": "Tật Ách"
+    {
+        "version":  "interpretation-rules-v2",
+        "status":  "active",
+        "key":  "fate:yearly:tat-ach",
+        "scope":  "HEALTH",
+        "pattern":  {
+                        "kind":  "fate",
+                        "fate":  "yearly",
+                        "palace":  "Tật Ách"
+                    },
+        "priority":  62,
+        "title":  "Vận năm kích hoạt Tật Ách",
+        "summary":  "Bạn dễ nhận ra rằng năm này nhắc bạn nhìn kỹ sức khỏe tinh thần, nhịp ngủ, khả năng hồi phục và mức áp lực đang tích tụ. Bạn muốn làm tròn trách nhiệm mà không kiệt sức, nhưng cũng cần để ý việc xem nghỉ ngơi như phần thưởng sau khi làm xong mọi việc, nhất là trong nhịp nghỉ và phản ứng khi quá tải.",
+        "strengthText":  "Khi lịch làm và lịch nghỉ đã rõ, bạn có thể phát hiện sớm điểm hao năng lượng để điều chỉnh trước khi hiệu suất công việc và tài chính bị kéo xuống.",
+        "cautionText":  "Bạn có thể dễ xem nghỉ ngơi như phần thưởng sau khi làm xong mọi việc, trong khi nghỉ ngơi chính là điều kiện để làm việc tốt nếu chưa đặt giới hạn rõ.",
+        "lifeAdviceText":  "Bạn hãy đặt lịch hồi phục trước rồi mới xếp việc; nếu lịch không còn chỗ để nghỉ, đó là dữ kiện cho thấy bạn đang nhận quá tải; trong mười bốn ngày tới, bạn áp dụng ngay vào một tình huống thật thuộc nhịp nghỉ và phản ứng khi quá tải.",
+        "teaserQuestion":  "Tín hiệu mệt nào đang lặp lại trong năm này nhưng bạn vẫn cố giải thích là không sao?",
+        "evidenceLabel":  "Dấu hiệu này đến từ vận từng năm đang kích hoạt vùng thân tâm và khả năng hồi phục."
     },
-    "priority": 62,
-    "title": "Vận năm kích hoạt Tật Ách",
-    "summary": "Vận năm tại Tật Ách giống một thông báo pin yếu hiện lên đúng lúc bạn định mở thêm ứng dụng nặng. Trong đời sống, năm này nhắc bạn nhìn kỹ sức khỏe tinh thần, nhịp ngủ, khả năng hồi phục và mức áp lực đang tích tụ.",
-    "strengthText": "Lợi thế là phát hiện sớm điểm hao năng lượng để điều chỉnh trước khi hiệu suất công việc và tài chính bị kéo xuống.",
-    "cautionText": "Cạm bẫy là xem nghỉ ngơi như phần thưởng sau khi làm xong mọi việc, trong khi nghỉ ngơi chính là điều kiện để làm việc tốt.",
-    "lifeAdviceText": "Hãy đặt lịch hồi phục trước rồi mới xếp việc; nếu lịch không còn chỗ để nghỉ, đó là dữ kiện cho thấy bạn đang nhận quá tải.",
-    "teaserQuestion": "Tín hiệu mệt nào đang lặp lại trong năm này nhưng bạn vẫn cố giải thích là không sao?",
-    "evidenceLabel": "Dấu hiệu này đến từ vận từng năm đang kích hoạt vùng thân tâm và khả năng hồi phục."
-  },
-  {
-    "version": "interpretation-rules-v1",
-    "status": "active",
-    "key": "fate:yearly:thien-di",
-    "scope": "CAREER",
-    "pattern": {
-      "kind": "fate",
-      "fate": "yearly",
-      "palace": "Thiên Di"
+    {
+        "version":  "interpretation-rules-v2",
+        "status":  "active",
+        "key":  "fate:yearly:thien-di",
+        "scope":  "CAREER",
+        "pattern":  {
+                        "kind":  "fate",
+                        "fate":  "yearly",
+                        "palace":  "Thiên Di"
+                    },
+        "priority":  62,
+        "title":  "Vận năm kích hoạt Thiên Di",
+        "summary":  "Bạn dễ nhận ra rằng năm này làm nổi bật môi trường mới, quan hệ xã hội, di chuyển và cách bạn được nhìn nhận bên ngoài. Bạn muốn tạo kết quả mà không phải ôm hết việc, nhưng cũng cần để ý việc bị kéo bởi lời mời hấp dẫn nhưng thiếu điều kiện rõ, khiến bạn mất thời gian vào nơi không thật sự nâng bạn lên, nhất là trong môi trường bên ngoài và cơ hội mới.",
+        "strengthText":  "Khi trách nhiệm công việc đã rõ, bạn có thể mở rộng mạng lưới, tìm khách hàng, đổi môi trường học/làm hoặc thử một sân chơi giúp tăng giá trị cá nhân.",
+        "cautionText":  "Nếu kéo dài, bạn có thể dễ bị kéo bởi lời mời hấp dẫn nhưng thiếu điều kiện rõ, khiến bạn mất thời gian vào nơi không thật sự nâng bạn lên.",
+        "lifeAdviceText":  "Bạn hãy thử cơ hội bên ngoài bằng phiên bản nhỏ: một buổi gặp, một hợp tác ngắn, một dự án thử; chỉ cam kết sâu khi giá trị và ranh giới đã rõ.",
+        "teaserQuestion":  "Lời mời nào trong năm này đang mở đường thật, và lời mời nào chỉ khiến bạn xa trọng tâm hơn?",
+        "evidenceLabel":  "Dấu hiệu này đến từ vận từng năm đang kích hoạt vùng môi trường bên ngoài và cơ hội xã hội."
     },
-    "priority": 62,
-    "title": "Vận năm kích hoạt Thiên Di",
-    "summary": "Vận năm tại Thiên Di giống một lời mời bước ra khỏi căn phòng quen, nhưng không phải cánh cửa nào cũng dẫn đến nơi tốt hơn. Trong đời sống, năm này làm nổi bật môi trường mới, quan hệ xã hội, di chuyển và cách bạn được nhìn nhận bên ngoài.",
-    "strengthText": "Lợi thế là có thể mở rộng mạng lưới, tìm khách hàng, đổi môi trường học/làm hoặc thử một sân chơi giúp tăng giá trị cá nhân.",
-    "cautionText": "Điểm mù là bị kéo bởi lời mời hấp dẫn nhưng thiếu điều kiện rõ, khiến bạn mất thời gian vào nơi không thật sự nâng mình lên.",
-    "lifeAdviceText": "Hãy thử cơ hội bên ngoài bằng phiên bản nhỏ: một buổi gặp, một hợp tác ngắn, một dự án thử; chỉ cam kết sâu khi giá trị và ranh giới đã rõ.",
-    "teaserQuestion": "Lời mời nào trong năm này đang mở đường thật, và lời mời nào chỉ khiến bạn xa trọng tâm hơn?",
-    "evidenceLabel": "Dấu hiệu này đến từ vận từng năm đang kích hoạt vùng môi trường bên ngoài và cơ hội xã hội."
-  },
-  {
-    "version": "interpretation-rules-v1",
-    "status": "active",
-    "key": "fate:yearly:phuc-duc",
-    "scope": "RELATIONSHIP",
-    "pattern": {
-      "kind": "fate",
-      "fate": "yearly",
-      "palace": "Phúc Đức"
-    },
-    "priority": 61,
-    "title": "Vận năm kích hoạt Phúc Đức",
-    "summary": "Vận năm tại Phúc Đức giống một buổi dọn kho trong tâm trí, nơi những nếp cũ và cảm giác cũ được lôi ra ánh sáng. Trong đời sống, năm này thường khiến bạn nhìn lại gia đình, nền tinh thần, niềm tin và những điều âm thầm chi phối quyết định.",
-    "strengthText": "Lợi thế là có thể sửa nền cảm xúc, từ đó ra quyết định quan hệ và tiền bạc tỉnh táo hơn.",
-    "cautionText": "Cạm bẫy là tiếp tục gánh trách nhiệm vì quen cảm giác phải gánh, chứ không phải vì nó còn đúng với hiện tại.",
-    "lifeAdviceText": "Hãy chọn một khuôn mẫu gia đình hoặc niềm tin cũ để xem lại: điều gì còn giúp bạn vững, điều gì đang làm bạn nhỏ lại.",
-    "teaserQuestion": "Niềm tin nào bạn tưởng là của mình, nhưng thật ra là một chiếc áo cũ được khoác lên từ rất lâu?",
-    "evidenceLabel": "Dấu hiệu này đến từ vận từng năm đang kích hoạt vùng nền tinh thần, gia đình và cảm giác được nâng đỡ."
-  }
+    {
+        "version":  "interpretation-rules-v2",
+        "status":  "active",
+        "key":  "fate:yearly:phuc-duc",
+        "scope":  "RELATIONSHIP",
+        "pattern":  {
+                        "kind":  "fate",
+                        "fate":  "yearly",
+                        "palace":  "Phúc Đức"
+                    },
+        "priority":  61,
+        "title":  "Vận năm kích hoạt Phúc Đức",
+        "summary":  "Có những lúc bạn nhìn lại gia đình, nền tinh thần, niềm tin và những điều âm thầm chi phối quyết định. Bạn muốn giữ hòa khí mà vẫn nói rõ nhu cầu, nhưng cũng cần để ý việc tiếp tục gánh trách nhiệm vì quen cảm giác phải gánh, chứ không phải vì nó còn đúng với hiện tại, nhất là trong nếp nhà và chỗ nghỉ tinh thần.",
+        "strengthText":  "Khi kỳ vọng giữa các bên đã rõ, bạn có thể sửa nền cảm xúc, từ đó ra quyết định quan hệ và tiền bạc tỉnh táo hơn.",
+        "cautionText":  "Khi quá tin vào mặt thuận của Vận năm kích hoạt Phúc Đức, bạn có thể dễ tiếp tục gánh trách nhiệm vì quen cảm giác phải gánh, chứ không phải vì nó còn đúng với hiện tại.",
+        "lifeAdviceText":  "Bạn hãy chọn một khuôn mẫu gia đình hoặc niềm tin cũ để xem lại: điều gì còn giúp bạn vững, điều gì đang làm bạn nhỏ lại; trong bảy ngày tới, bạn áp dụng ngay vào một tình huống thật thuộc nếp nhà và chỗ nghỉ tinh thần.",
+        "teaserQuestion":  "Niềm tin nào bạn tưởng là của bạn, nhưng thật ra là một chiếc áo cũ được khoác lên từ rất lâu?",
+        "evidenceLabel":  "Dấu hiệu này đến từ vận từng năm đang kích hoạt vùng nền tinh thần, gia đình và cảm giác được nâng đỡ."
+    }
 ]

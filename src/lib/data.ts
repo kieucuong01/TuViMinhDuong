@@ -9,12 +9,7 @@ import { articleWithScore, seedArticles, type ArticleCategoryView, type ArticleV
 import { getDb } from "@/lib/db";
 import { FEATURE_PRICE_KEYS, FEATURE_PRICES, COIN_PACKAGES, type FeaturePriceMap, type ReadingKey } from "@/lib/pricing";
 import { isReadingBundleKey, readingBundleScopeKey } from "@/lib/reading-bundles";
-import {
-  FREE_OVERVIEW_VERSION,
-  buildInstantFreeOverview,
-  countWords,
-  isCompleteFreeOverview,
-} from "@/lib/ai";
+import { buildInstantFreeOverview, countWords } from "@/lib/ai";
 import { scoreArticleSeo } from "@/lib/seo";
 import { slugify } from "@/lib/format";
 import { MAIN_STARS, PALACES, SUPPORT_STARS, buildPseoInventory } from "@/lib/pseo-registry";
@@ -290,28 +285,12 @@ export type AdminChartSubmission = {
   creationUserAgent: string | null;
 };
 
-type ChartWithFreeOverview = TuViChart & {
-  freeOverview?: {
-    content: string;
-    model: string;
-    generatedAt: string;
-    version?: string;
-  };
-  freeOverviewJob?: {
-    status: "PENDING" | "COMPLETED" | "FAILED";
-    startedAt: string;
-    updatedAt: string;
-    version?: string;
-    error?: string;
-  };
-};
-
 export type FreeOverviewStatus =
   | {
       status: "ready";
       content: string;
-      source: "ai-cache";
-      model: string;
+      source: "seed-rules";
+      model: "interpretation-rules-v2";
       generatedAt: string;
       wordCount: number;
       jobStatus: "completed";
@@ -319,7 +298,7 @@ export type FreeOverviewStatus =
   | {
       status: "fallback";
       content: string;
-      source: "template-fallback";
+      source: "seed-rules";
       wordCount: number;
       jobStatus: "idle" | "processing" | "stale" | "failed";
       error?: string;
@@ -338,7 +317,6 @@ const DELETED_ARTICLE_STATUS = "deleted";
 export const OPERATION_SETTINGS_CACHE_TAG = "operation-settings";
 export const FEATURE_PRICES_CACHE_TAG = "feature-prices";
 export const ARTICLES_CACHE_TAG = "articles";
-const FREE_OVERVIEW_JOB_STALE_MS = 90_000;
 
 export type ChartHistoryItem = StoredChart & {
   hasAdvancedReading: boolean;
@@ -969,158 +947,37 @@ export async function getChart(id: string) {
   return upgraded;
 }
 
-async function updateStoredChartPayload(chartId: string, chart: TuViChart) {
-  const db = getDb();
-  if (!db) {
-    const record = charts().get(chartId);
-    if (record) charts().set(chartId, { ...record, chart });
-    return;
-  }
-
-  await db.chart.update({
-    where: { id: chartId },
-    data: { chart },
-  });
-}
-
-function isFreshFreeOverviewJob(job: ChartWithFreeOverview["freeOverviewJob"]) {
-  if (!job?.startedAt) return false;
-  const startedAt = Date.parse(job.startedAt);
-  return Number.isFinite(startedAt) && Date.now() - startedAt < FREE_OVERVIEW_JOB_STALE_MS;
-}
-
-export function getFreeOverviewStatus(chart: TuViChart): FreeOverviewStatus {
-  const chartWithOverview = chart as ChartWithFreeOverview;
-  if (
-    chartWithOverview.freeOverview?.content &&
-    chartWithOverview.freeOverview.version === FREE_OVERVIEW_VERSION &&
-    isCompleteFreeOverview(chartWithOverview.freeOverview.content)
-  ) {
-    return {
-      status: "ready",
-      content: chartWithOverview.freeOverview.content,
-      source: "ai-cache",
-      model: chartWithOverview.freeOverview.model,
-      generatedAt: chartWithOverview.freeOverview.generatedAt,
-      wordCount: countWords(chartWithOverview.freeOverview.content),
-      jobStatus: "completed",
-    };
-  }
-
-  const job = chartWithOverview.freeOverviewJob;
-  const hasCurrentJobVersion = job?.version === FREE_OVERVIEW_VERSION;
-  const jobStatus =
-    hasCurrentJobVersion && job?.status === "PENDING" && isFreshFreeOverviewJob(job)
-      ? "processing"
-      : hasCurrentJobVersion && job?.status === "PENDING"
-        ? "stale"
-        : hasCurrentJobVersion && job?.status === "FAILED"
-          ? "failed"
-          : "idle";
-
-  const fallbackContent = buildInstantFreeOverview(chart);
-
+export function getFreeOverviewStatus(chart: TuViChart): Extract<FreeOverviewStatus, { status: "ready" }> {
+  const content = buildInstantFreeOverview(chart);
   return {
-    status: "fallback",
-    content: fallbackContent,
-    source: "template-fallback",
-    wordCount: countWords(fallbackContent),
-    jobStatus,
-    ...(jobStatus === "failed" && job?.error ? { error: job.error } : {}),
+    status: "ready",
+    content,
+    source: "seed-rules",
+    model: "interpretation-rules-v2",
+    generatedAt: new Date().toISOString(),
+    wordCount: countWords(content),
+    jobStatus: "completed",
   };
 }
 
-export async function claimFreeOverviewGeneration(chartId: string, chart: TuViChart): Promise<FreeOverviewGenerationClaim> {
-  const current = getFreeOverviewStatus(chart);
-  if (current.status === "ready") return { status: "ready", overview: current };
-  if (current.jobStatus === "processing") return { status: "processing", overview: current };
-
-  const now = new Date().toISOString();
-  const nextChart: ChartWithFreeOverview = {
-    ...chart,
-    freeOverviewJob: {
-      status: "PENDING",
-      startedAt: now,
-      updatedAt: now,
-      version: FREE_OVERVIEW_VERSION,
-    },
-  };
-
-  await updateStoredChartPayload(chartId, nextChart);
-  return { status: "claimed" };
+export async function claimFreeOverviewGeneration(_chartId: string, chart: TuViChart): Promise<FreeOverviewGenerationClaim> {
+  return { status: "ready", overview: getFreeOverviewStatus(chart) as Extract<FreeOverviewStatus, { status: "ready" }> };
 }
 
 export async function failFreeOverviewGeneration(chartId: string, error: string) {
+  void error;
   const record = await getChart(chartId);
-  if (!record) return null;
-  const chartWithOverview = record.chart as ChartWithFreeOverview;
-  const now = new Date().toISOString();
-  const nextChart: ChartWithFreeOverview = {
-    ...record.chart,
-    freeOverviewJob: {
-      status: "FAILED",
-      startedAt: chartWithOverview.freeOverviewJob?.startedAt || now,
-      updatedAt: now,
-      version: FREE_OVERVIEW_VERSION,
-      error,
-    },
-  };
-  await updateStoredChartPayload(chartId, nextChart);
-  return getFreeOverviewStatus(nextChart);
+  return record ? getFreeOverviewStatus(record.chart) : null;
 }
 
 export async function generateAndStoreFreeOverview(chartId: string) {
   const record = await getChart(chartId);
-  if (!record) throw new Error("Khong tim thay la so.");
-
-  const current = getFreeOverviewStatus(record.chart);
-  if (current.status === "ready") return current;
-
-  const { generateFreeOverview } = await import("@/lib/ai");
-  const fullOverviewPromise = generateFreeOverview(record.chart);
-
-  const result = await fullOverviewPromise;
-  if (result.model.includes("template-fallback")) {
-    const message = "LLM tong quan chua san sang, dang tiep tuc dung ban template.";
-    await failFreeOverviewGeneration(chartId, message);
-    throw new Error(message);
-  }
-  if (!isCompleteFreeOverview(result.content)) {
-    const message = "Ban AI tong quan chua du do dai hoac thieu muc can thiet.";
-    await failFreeOverviewGeneration(chartId, message);
-    throw new Error(message);
-  }
-
-  const latestRecord = await getChart(chartId);
-  if (!latestRecord) throw new Error("Khong tim thay la so khi luu ban tong quan AI.");
-  const now = new Date().toISOString();
-  const updatedChart: ChartWithFreeOverview = {
-    ...latestRecord.chart,
-    freeOverview: {
-      content: result.content,
-      model: result.model,
-      generatedAt: now,
-      version: FREE_OVERVIEW_VERSION,
-    },
-    freeOverviewJob: {
-      status: "COMPLETED",
-      startedAt: (latestRecord.chart as ChartWithFreeOverview).freeOverviewJob?.startedAt || now,
-      updatedAt: now,
-      version: FREE_OVERVIEW_VERSION,
-    },
-  };
-
-  await updateStoredChartPayload(chartId, updatedChart);
-  const ready = getFreeOverviewStatus(updatedChart);
-  if (ready.status !== "ready") throw new Error("Chua luu duoc ban tong quan AI.");
-  return ready;
+  if (!record) throw new Error("Không tìm thấy lá số.");
+  return getFreeOverviewStatus(record.chart) as Extract<FreeOverviewStatus, { status: "ready" }>;
 }
 
-export async function getOrCreateFreeOverview(chartId: string, chart: TuViChart) {
-  const current = getFreeOverviewStatus(chart);
-  if (current.status === "ready") return current.content;
-  const generated = await generateAndStoreFreeOverview(chartId);
-  return generated.content;
+export async function getOrCreateFreeOverview(_chartId: string, chart: TuViChart) {
+  return getFreeOverviewStatus(chart).content;
 }
 
 export async function listUserCharts(userId: string, includeAll = false): Promise<ChartHistoryItem[]> {

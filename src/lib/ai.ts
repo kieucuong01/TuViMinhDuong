@@ -4,17 +4,12 @@ import { buildFreeOverviewFromInterpretationRules } from "@/lib/free-overview-en
 import { generateWithLlmRouter, hasExternalLlmProvider } from "@/lib/llm-router";
 import { FEATURE_PRICES, type ReadingKey } from "@/lib/pricing";
 
-export const FREE_OVERVIEW_MIN_WORDS = 1000;
-export const FREE_OVERVIEW_MAX_WORDS = 1200;
-export const FREE_OVERVIEW_MAX_TOKENS = 3800;
-export const FREE_OVERVIEW_REPAIR_MAX_TOKENS = 3200;
-export const FREE_OVERVIEW_TEMPLATE_MIN_WORDS = 1400;
-export const FREE_OVERVIEW_TEMPLATE_MAX_WORDS = 1650;
-export const FREE_OVERVIEW_PREVIEW_MIN_WORDS = 150;
-export const FREE_OVERVIEW_PREVIEW_MAX_WORDS = 200;
-export const FREE_OVERVIEW_PREVIEW_MAX_TOKENS = 900;
+export const FREE_OVERVIEW_MIN_WORDS = 1400;
+export const FREE_OVERVIEW_MAX_WORDS = 1650;
+export const FREE_OVERVIEW_TEMPLATE_MIN_WORDS = FREE_OVERVIEW_MIN_WORDS;
+export const FREE_OVERVIEW_TEMPLATE_MAX_WORDS = FREE_OVERVIEW_MAX_WORDS;
 export const PAID_READING_CHAPTER_MAX_TOKENS = 7000;
-export const FREE_OVERVIEW_VERSION = "free-mini-report-v9";
+export const FREE_OVERVIEW_VERSION = "free-seed-overview-v10";
 export const PAID_READING_VERSION = "paid-personal-dossier-v6";
 export const PAID_FULL_WORD_TARGET = "5.000-7.000 từ";
 export const READING_PROVIDER_ORDER = ["deepseek", "groq"] as const;
@@ -100,38 +95,22 @@ export function isCompletePaidChapter(content: string, chapter: PaidReadingChapt
 
 export function isCompleteFreeOverview(content: string) {
   const requiredHeadings = [
-    "## Tín hiệu nổi bật của lá số",
-    "## Mỏ neo",
-    "## Điểm đáng chú ý nhất",
-    "## Khí chất và nội lực",
-    "## Công việc và tài chính",
-    "## Tình cảm và quan hệ",
-    "## Sức khỏe và nhịp sống",
-    "## Vận năm",
-    "## Câu hỏi mở trước khi đi sâu",
+    "## 1. Khí chất và cách ra quyết định",
+    "## 2. Công việc và nguồn lực",
+    "## 3. Quan hệ và nhịp sống",
+    "## 4. Vận hiện tại",
+    "## Hai câu hỏi để bạn tự đối chiếu",
   ];
   const wordCount = countWords(content);
-  const hasChartEvidence = /(cung|mệnh|thân|sao|đại vận|tuần|triệt)/i.test(content);
-  const questionBulletCount = (content.match(/^\s*[-*]\s+.+\?/gm) || []).length;
-  const hasOldActionChecklist = content.includes("## Cẩm nang hành động");
+  const hasChartEvidence = /(cung|mệnh|thân|sao|đại vận|tuần|triệt)/iu.test(content);
+  const questionBulletCount = (content.match(/^\s*[-*]\s+.+\?$/gmu) || []).length;
 
   return (
     wordCount >= FREE_OVERVIEW_MIN_WORDS &&
     wordCount <= FREE_OVERVIEW_MAX_WORDS &&
     hasChartEvidence &&
-    questionBulletCount >= 3 &&
-    !hasOldActionChecklist &&
+    questionBulletCount === 2 &&
     requiredHeadings.every((heading) => content.includes(heading))
-  );
-}
-
-export function isCompleteFreeOverviewPreview(content: string) {
-  const wordCount = countWords(content);
-  const hasChartEvidence = /(cung|mệnh|thân|sao|đại vận|tuần|triệt)/i.test(content);
-  return (
-    wordCount >= FREE_OVERVIEW_PREVIEW_MIN_WORDS &&
-    wordCount <= FREE_OVERVIEW_PREVIEW_MAX_WORDS &&
-    hasChartEvidence
   );
 }
 
@@ -148,50 +127,6 @@ function viewerAddress(chart: TuViChart) {
   if (age >= 55) return chart.input.gender === "female" ? "cô" : "chú";
   if (age >= 35) return chart.input.gender === "female" ? "chị" : "anh";
   return "bạn";
-}
-
-function freeOverviewAudienceContext(chart: TuViChart) {
-  const age = chartAge(chart);
-  if (age <= 21) {
-    return {
-      lifeStage: "12-21 tuổi, học sinh/sinh viên hoặc mới bắt đầu đi làm thêm",
-      workMoneyLanguage:
-        "học tập, chọn ngành, lịch học, bài tập nhóm, câu lạc bộ, bạn bè, tiền tiêu vặt, tiền làm thêm part-time",
-      workFocus: "học tập, chọn ngành, hoạt động nhóm và việc part-time",
-      moneyFocus: "tiền tiêu vặt, học phí, khoản làm thêm và cách giữ một phần nhỏ để tự chủ",
-      collaborationFocus: "bài tập nhóm, câu lạc bộ, dự án ở trường hoặc cam kết khi nhận việc part-time",
-      decisionFocus: "chọn ngành học, định hướng tương lai gần và cách không bị cuốn theo áp lực bạn bè",
-      anchorWorkLabel: "Nhịp học tập & định hướng",
-      paidTeaser:
-        "hồ sơ chuyên sâu sẽ chỉ ra ba bẫy tâm lý dễ gặp trong giai đoạn chọn ngành, bạn bè, nhóm học và tiền part-time",
-    };
-  }
-  if (age <= 29) {
-    return {
-      lifeStage: "22-29 tuổi, giai đoạn vào nghề và tự lập",
-      workMoneyLanguage:
-        "công việc đầu đời, chọn môi trường, thu nhập mới, quỹ dự phòng nhỏ, hợp tác dự án, kỹ năng và hướng đi 1-3 năm",
-      workFocus: "công việc đầu đời, kỹ năng, môi trường làm việc và hướng đi 1-3 năm",
-      moneyFocus: "thu nhập mới, khoản dự phòng và các quyết định chi tiêu lớn đầu tiên",
-      collaborationFocus: "dự án, hợp đồng thử việc, nhóm làm chung và kỳ vọng giữa đôi bên",
-      decisionFocus: "chọn môi trường, chọn người hướng dẫn và chọn nhịp tăng trưởng",
-      anchorWorkLabel: "Nhịp vào nghề & tài chính",
-      paidTeaser:
-        "hồ sơ chuyên sâu sẽ bóc tách điểm nên tăng tốc, điểm nên giữ nhịp và cách tránh chọn sai môi trường",
-    };
-  }
-  return {
-    lifeStage: "người trưởng thành, cần cân bằng công việc, tài chính, gia đình và sức khỏe",
-    workMoneyLanguage:
-      "vai trò công việc, dòng tiền, ngân sách, hợp tác, ranh giới trách nhiệm, gia đình và nhịp nghỉ",
-    workFocus: "công việc, vai trò, tài chính và các cam kết dài hạn",
-    moneyFocus: "dòng tiền, quỹ dự phòng và khả năng chịu rủi ro",
-    collaborationFocus: "hợp tác, phạm vi trách nhiệm, quyền quyết định và cách dừng khi điều kiện thay đổi",
-    decisionFocus: "ưu tiên sự nghiệp, gia đình, tài chính và sức khỏe trong cùng một nhịp sống",
-    anchorWorkLabel: "Nhịp công việc & tài chính",
-    paidTeaser:
-      "hồ sơ chuyên sâu sẽ nối từng cung, đại vận và vận năm thành một lộ trình ưu tiên rõ hơn",
-  };
 }
 
 function palaceByName(chart: TuViChart, name: string) {
@@ -496,45 +431,6 @@ function compactDecadeContext(chart: TuViChart) {
   };
 }
 
-function compactFreeOverviewEvidence(
-  chart: TuViChart,
-  options: { starLimit?: number; signalLimit?: number } = {},
-) {
-  const profile = buildChartEvidenceProfile(chart);
-  const starLimit = options.starLimit ?? 3;
-  const signalLimit = options.signalLimit ?? 3;
-  const thanPalaceName = chart.palaces.find((palace) => palace.isThan)?.name;
-  const palaceNames = Array.from(
-    new Set(
-      ["Mệnh", thanPalaceName, "Quan Lộc", "Tài Bạch", "Phu Thê", "Tật Ách", "Thiên Di"].filter(
-        (name): name is string => Boolean(name),
-      ),
-    ),
-  );
-  const palaceLines = palaceNames.map((name) => {
-    const palace = profile.palaces.find((item) => item.name === name);
-    if (!palace) return `- ${name}: chưa có dữ liệu nổi bật`;
-    const stars = palace.stars.slice(0, starLimit).join(", ") || "không có sao nổi bật";
-    const gates = [palace.hasTuan ? "Tuần" : "", palace.hasTriet ? "Triệt" : ""].filter(Boolean).join(", ");
-    return `- ${name} tại ${palace.branch}: ${stars}${gates ? `; án ngữ ${gates}` : ""}`;
-  });
-  const signalLines = profile.signals.slice(0, signalLimit).map((signal) => {
-    const evidence = signal.evidence.slice(0, 2).join(" | ");
-    return `- ${signal.area}: ${signal.summary}${evidence ? ` (${evidence})` : ""}`;
-  });
-
-  return [
-    "Hồ sơ bằng chứng rút gọn:",
-    `- Họ tên: ${profile.fullName}`,
-    `- Năm xem: ${profile.viewYear}`,
-    `- Mệnh/Thân/Cục: ${profile.menh} / ${profile.than} / ${profile.cuc}`,
-    "- Cung trọng tâm rút gọn:",
-    ...palaceLines,
-    "- Tín hiệu ưu tiên:",
-    ...signalLines,
-  ].join("\n");
-}
-
 function focusedPalaceNames(chart: TuViChart, type: ReadingKey, scopeKey: string) {
   const names = new Set<string>(["Mệnh"]);
   const thanName = chart.than?.replace("Thân cư ", "");
@@ -830,129 +726,12 @@ function getFocusData(chart: TuViChart, type: ReadingKey, scopeKey: string) {
   };
 }
 
-function freeOverviewPrompt(chart: TuViChart) {
-  const decade = compactDecadeContext(chart);
-  const audience = freeOverviewAudienceContext(chart);
-
-  return `Bạn là chuyên gia tử vi Việt Nam có 30 năm kinh nghiệm tư vấn đời sống. Hãy đọc dữ liệu lá số đã được hệ thống tính sẵn và viết một mini-report cá nhân có chiều sâu. Không viết như bài blog.
-
-Hồ sơ bằng chứng:
-${compactFreeOverviewEvidence(chart)}
-- Đại vận hiện tại: ${decade.current}
-- Tuổi trong năm xem: ${decade.currentAge}
-- Bối cảnh ngôn ngữ cần dùng: ${audience.lifeStage}. Khi luận công việc/tài chính, hãy dịch sang các tình huống gần với người đọc: ${audience.workMoneyLanguage}.
-
-Yêu cầu bắt buộc:
-- Chỉ dùng bằng chứng đã cấp; không tự an sao, không tự thêm sự kiện.
-- Mục tiêu 1.000-1.200 từ tiếng Việt. Hệ thống chấp nhận trong khoảng ${FREE_OVERVIEW_MIN_WORDS}-${FREE_OVERVIEW_MAX_WORDS} từ.
-- Mở đầu bằng mục "Tín hiệu nổi bật của lá số" dài 650-900 ký tự, viết như một đoạn luận giải cô đọng cho người chưa đăng nhập: đánh trúng một cảm giác tâm lý thật trước, sau đó mới lồng 1-2 thuật ngữ tử vi trong ngoặc nếu cần. Không mở đầu bằng danh sách sao. Làm người đọc thấy đúng, tò mò và muốn mở hồ sơ chuyên sâu. Không dùng bullet trong mục này.
-- Mỗi nhận định quan trọng phải gắn với một cung, sao, trạng thái sao, Tuần/Triệt hoặc đại vận trong hồ sơ.
-- Không dùng lời khen chung chung, không dọa nạt, không khẳng định chắc chắn tương lai.
-- Dùng ngôn ngữ tư vấn đời sống đúng độ tuổi. Nếu người đọc 12-21 tuổi, không dùng giọng của người đi làm lâu năm: "dòng tiền" phải chuyển thành tiền tiêu vặt/tiền part-time; "hợp tác văn bản" chuyển thành bài tập nhóm/câu lạc bộ/cam kết khi làm thêm; "phạm vi công việc" chuyển thành chọn ngành, hướng học, vai trò trong nhóm.
-- Viết để người lớn tuổi vẫn đọc thấm: câu ngắn, ý rõ, không dùng giọng học thuật. Nếu cần nhắc thuật ngữ như Mệnh, Thân, Tuần, Triệt, Hóa Lộc, hãy giải thích thuật ngữ ngay bằng lời đời thường trong cùng câu hoặc câu kế tiếp.
-- Nêu một cơ hội cụ thể và một vùng rủi ro cụ thể, nhưng luôn diễn đạt là tín hiệu cần đối chiếu.
-- Mục "Mỏ neo" không dùng điểm số thô kiểu 35/100, 42/100. Hãy dùng nhãn trạng thái trung lập như "Năng lượng tĩnh", "Nhịp độ: cẩn trọng", "Tín hiệu năm: đi chậm để chắc". Nếu bắt buộc nhắc chỉ số, phải giải thích ngay đó là chỉ số biến động/cần đi chậm, không phải điểm kém.
-- Chọn một mâu thuẫn, cơ hội hoặc điểm nghẽn cá nhân làm "Điểm đáng chú ý nhất" để tạo động lực đọc tiếp.
-- Lồng cung và sao tự nhiên vào lời khuyên; không tạo mục liệt kê dữ kiện kỹ thuật.
-- Mỗi phần phải bổ sung một góc nhìn mới, không lặp lại cùng một nhận định bằng cách đổi câu chữ.
-- Phần sức khỏe chỉ đưa khuyến nghị nhịp sống thận trọng, không chẩn đoán và không thay thế tư vấn y khoa.
-- Không chào hỏi dài, không giải thích tử vi như kiến thức phổ thông, không quảng cáo quá mức.
-- Dùng đúng năm xem ${chart.input.viewYear}.
-- Kết thúc bằng mục "Câu hỏi mở trước khi đi sâu": 4-6 câu hỏi gợi mở có dấu hỏi, chỉ nêu What/Why và nhá hàng ${audience.paidTeaser}; không đưa checklist How-to chi tiết trong bản miễn phí.
-
-Markdown đúng thứ tự:
-## Tín hiệu nổi bật của lá số
-## Mỏ neo
-## Điểm đáng chú ý nhất
-## Khí chất và nội lực
-## Công việc và tài chính
-## Tình cảm và quan hệ
-## Sức khỏe và nhịp sống
-## Vận năm ${chart.input.viewYear}
-## Câu hỏi mở trước khi đi sâu`;
-}
-
-function freeOverviewRepairPrompt(chart: TuViChart) {
-  const decade = compactDecadeContext(chart);
-  const audience = freeOverviewAudienceContext(chart);
-
-  return `PROMPT REPAIR COMPACT
-Viết lại mini-report miễn phí bằng tiếng Việt vì lần gọi trước trả về rỗng. Dùng ít dữ liệu, không tự an sao, không nhắc AI/LLM.
-
-${compactFreeOverviewEvidence(chart, { starLimit: 2, signalLimit: 2 })}
-- Đại vận hiện tại: ${decade.current}
-- Tuổi trong năm xem: ${decade.currentAge}
-- Bối cảnh người đọc: ${audience.lifeStage}. Nếu 12-21 tuổi, dùng ví dụ tiền tiêu vặt, part-time, bài tập nhóm, chọn ngành/hướng học.
-
-Yêu cầu:
-- Mục tiêu 1.050-1.200 từ, hệ thống chấp nhận ${FREE_OVERVIEW_MIN_WORDS}-${FREE_OVERVIEW_MAX_WORDS} từ.
-- Viết dễ hiểu cho người lớn tuổi: câu ngắn, ý rõ, thuật ngữ tử vi phải giải thích ngay bằng lời đời thường.
-- Mở đầu đánh đúng cảm giác tâm lý thật, không mở đầu bằng danh sách sao.
-- Mỗi phần chỉ thêm một góc nhìn mới, không lặp ý, không đưa checklist How-to chi tiết.
-- "Mỏ neo" dùng nhãn trạng thái trung lập, không dùng điểm số kiểu 35/100.
-- Kết thúc bằng 4-6 câu hỏi What/Why để người đọc muốn mở hồ sơ chuyên sâu.
-
-Markdown đúng thứ tự:
-## Tín hiệu nổi bật của lá số
-## Mỏ neo
-## Điểm đáng chú ý nhất
-## Khí chất và nội lực
-## Công việc và tài chính
-## Tình cảm và quan hệ
-## Sức khỏe và nhịp sống
-## Vận năm ${chart.input.viewYear}
-## Câu hỏi mở trước khi đi sâu`;
-}
-
-function freeOverviewPreviewPrompt(chart: TuViChart) {
-  const evidence = formatChartEvidence(buildChartEvidenceProfile(chart));
-  const audience = freeOverviewAudienceContext(chart);
-  const address = viewerAddress(chart);
-
-  return `Bạn là chuyên gia Tử Vi viết lời mở đầu riêng cho ${chart.input.fullName}.
-
-Hãy viết đúng ${FREE_OVERVIEW_PREVIEW_MIN_WORDS}-${FREE_OVERVIEW_PREVIEW_MAX_WORDS} từ tiếng Việt, không tiêu đề, không danh sách.
-- Mở đầu bằng một quan sát tâm lý hoặc hoàn cảnh đủ cụ thể để người đọc thấy mình trong đó.
-- Bám vào ít nhất hai dữ kiện lá số được cung cấp, nhưng chỉ nhắc tối đa hai thuật ngữ Tử Vi và giải thích ngay bằng lời đời thường.
-- Xưng hô với người đọc là "${address}". Văn phong ấm, rõ, câu ngắn, dễ hiểu với người lớn tuổi.
-- Điều chỉnh ví dụ theo giai đoạn: ${audience.lifeStage}. Ưu tiên ngôn ngữ về ${audience.workFocus}.
-- Chỉ nói điều gì đang nổi bật và vì sao cần đọc sâu hơn. Không đưa checklist hoặc giải pháp đầy đủ.
-- Không dùng điểm số, không hù dọa, không khẳng định số phận, không nhắc LLM/AI, không mời mua hàng.
-- Kết bằng một câu tự nhiên cho biết bản đầy đủ đang tiếp tục làm rõ công việc, tài chính, tình cảm và vận năm.
-
-Dữ liệu lá số:
-${evidence}`;
-}
-
 export function buildInstantFreeOverview(chart: TuViChart) {
   return buildFreeOverviewFromInterpretationRules(chart);
 }
 
 export async function generateFreeOverview(chart: TuViChart) {
-  const prompt = freeOverviewPrompt(chart);
-  if (isLlmDisabledForSmoke()) return { content: buildInstantFreeOverview(chart), model: "template-fallback", prompt };
-  if (!hasExternalLlmProvider()) return { content: buildInstantFreeOverview(chart), model: "template-fallback", prompt };
-
-  const routed = await generateWithLlmRouter({
-    prompt,
-    maxTokens: FREE_OVERVIEW_MAX_TOKENS,
-    temperature: 0.55,
-    providerOrder: [...READING_PROVIDER_ORDER],
-  });
-
-  if (routed?.text?.trim()) return { content: routed.text.trim(), model: routed.model, prompt };
-
-  const repairPrompt = freeOverviewRepairPrompt(chart);
-  const repaired = await generateWithLlmRouter({
-    prompt: repairPrompt,
-    maxTokens: FREE_OVERVIEW_REPAIR_MAX_TOKENS,
-    temperature: 0.5,
-    providerOrder: ["deepseek"],
-  });
-
-  if (repaired?.text?.trim()) return { content: repaired.text.trim(), model: repaired.model, prompt: repairPrompt };
-
-  return { content: buildInstantFreeOverview(chart), model: "template-fallback", prompt };
+  return { content: buildInstantFreeOverview(chart), model: "interpretation-rules-v2" };
 }
 
 export function paidReadingChapters(chart: TuViChart, type: ReadingKey): PaidReadingChapter[] {
@@ -1069,19 +848,6 @@ export function paidReadingChapters(chart: TuViChart, type: ReadingKey): PaidRea
       targetWords: "450-700 từ",
     },
   ];
-}
-
-export async function generateFreeOverviewPreview(chart: TuViChart) {
-  const prompt = freeOverviewPreviewPrompt(chart);
-  if (isLlmDisabledForSmoke()) return { content: "", model: "llm-disabled", prompt };
-  const routed = await generateWithLlmRouter({
-    prompt,
-    maxTokens: FREE_OVERVIEW_PREVIEW_MAX_TOKENS,
-    temperature: 0.55,
-    providerOrder: [...READING_PROVIDER_ORDER],
-  });
-  if (routed) return { content: routed.text.trim(), model: routed.model, prompt };
-  return { content: "", model: "llm-unavailable", prompt };
 }
 
 function paidReadingQualityRules() {

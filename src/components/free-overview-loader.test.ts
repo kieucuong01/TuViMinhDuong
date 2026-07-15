@@ -3,106 +3,35 @@ import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 
 const loaderSource = readFileSync(fileURLToPath(new URL("./free-overview-loader.tsx", import.meta.url)), "utf8");
-const globalsCss = readFileSync(fileURLToPath(new URL("../app/globals.css", import.meta.url)), "utf8");
 const chartPageSource = readFileSync(fileURLToPath(new URL("../app/la-so/[id]/page.tsx", import.meta.url)), "utf8");
 
-describe("FreeOverviewLoader template-first flow", () => {
-  it("renders the 800-900 word template while starting the background overview process", () => {
-    expect(loaderSource).toContain('status: "fallback"');
-    expect(loaderSource).toContain("/free-overview/process");
-    expect(loaderSource).toContain("schedulePoll()");
-    expect(loaderSource).toContain("free-overview-inline-status");
-    expect(loaderSource).toContain('state.status === "fallback"');
-    expect(loaderSource).toContain("<MarkdownContent content={state.content} />");
-    expect(loaderSource).toContain("Bản miễn phí bên dưới là bản đọc nhanh khoảng 800-900 từ");
-    expect(loaderSource).not.toContain('status: "preview"');
+describe("FreeOverviewLoader seed-only gate", () => {
+  it("renders server-projected seed content without polling or background LLM work", () => {
+    expect(loaderSource).toContain("<MarkdownContent content={initialOverview.content} />");
+    expect(loaderSource).not.toContain("useEffect");
+    expect(loaderSource).not.toContain("fetch(");
+    expect(loaderSource).not.toContain("/free-overview/process");
+    expect(loaderSource).not.toContain("schedulePoll");
+    expect(loaderSource).not.toContain("LLM");
   });
 
-  it("keeps the login CTA visible for guests while the detailed LLM report is being written", () => {
-    expect(loaderSource).toContain("function GuestOverviewLoginCta");
-    expect(loaderSource).toContain("Đăng nhập miễn phí để xem chi tiết");
-    expect(loaderSource).toContain("Đang viết bản chi tiết dưới nền");
-    expect(loaderSource).toContain("free-overview-detail-loader");
-    expect(loaderSource.match(/<GuestOverviewLoginCta/g)?.length).toBeGreaterThanOrEqual(3);
-    expect(loaderSource).toContain("#luan-giai");
-  });
-
-  it("passes server-generated template copy into the free overview UI immediately", () => {
-    expect(loaderSource).toContain("initialOverview");
-    expect(loaderSource).toContain("useState<FreeOverviewState>(() =>");
-    expect(chartPageSource).toContain("getFreeOverviewStatus(record.chart)");
-    expect(chartPageSource).toContain("initialOverview={visibleFreeOverviewStatus}");
-    expect(chartPageSource).not.toContain("buildInstantFreeOverview");
-    expect(chartPageSource).not.toContain("instantOverviewContent=");
-    expect(chartPageSource).not.toContain("deferUntilVisible");
-    expect(chartPageSource).not.toContain('freeOverviewStatus?.status === "fallback"');
-  });
-
-  it("projects only ready LLM guest content while keeping fallback template visible", () => {
-    expect(chartPageSource).toContain('import { buildFreeOverviewTeaser } from "@/lib/free-overview-presentation"');
-    expect(chartPageSource).toContain('freeOverviewStatus?.status === "ready"');
+  it("keeps insight three and four server-side for guests", () => {
+    expect(chartPageSource).toContain("buildFreeOverviewTeaser");
     expect(chartPageSource).toContain("buildFreeOverviewTeaser(freeOverviewStatus.content)");
+    expect(chartPageSource).toContain("initialOverview={visibleFreeOverviewStatus}");
+    expect(loaderSource).not.toContain("detailContent");
+    expect(loaderSource).not.toContain("expandedOverviewContent");
   });
 
-  it("polls with no-store and refreshes the route when the full overview is ready", () => {
-    expect(loaderSource).toContain('import { useRouter } from "next/navigation"');
-    expect(loaderSource).toContain("router.refresh()");
-    expect(loaderSource).toContain('cache: "no-store"');
-    expect(loaderSource).toContain("MAX_POLL_ATTEMPTS = 72");
-  });
-
-  it("renders only the ready LLM overview once available", () => {
-    expect(loaderSource).toContain("function hideFreeOverviewTemplateHeading(content: string)");
-    expect(loaderSource).toContain("Tổng quan miễn phí");
-    expect(loaderSource).toContain('if (state.status === "ready")');
-    expect(loaderSource).toContain("const expandedOverviewContent = hideFreeOverviewTemplateHeading(state.detailContent)");
-    expect(loaderSource).not.toContain("{!hasExpandedOverview ? <MarkdownContent content={state.content} /> : null}");
-    expect(loaderSource).toContain("<MarkdownContent content={expandedOverviewContent} />");
-  });
-
-  it("lets readers retry failed or stale background overview jobs without reloading", () => {
-    expect(loaderSource).toContain("retryOverview");
-    expect(loaderSource).toContain("Thử viết lại");
-    expect(loaderSource).toContain('state.jobStatus === "stale"');
-    expect(loaderSource).toContain('state.jobStatus === "failed"');
-  });
-
-  it("tells signed-in readers when the detailed LLM overview failed instead of presenting the template as final", () => {
-    expect(loaderSource).toContain("isSignedInFailedFallback");
-    expect(loaderSource).toContain('isSignedIn && state.jobStatus === "failed"');
-    expect(loaderSource).toContain("Bản chi tiết đang lỗi, chưa phải bản cuối");
-    expect(loaderSource).toContain("Bạn vẫn có thể đọc bản nhanh bên dưới");
-    expect(loaderSource).toContain("Thử viết lại bản chi tiết");
-    expect(globalsCss).toContain(".free-overview-failed-detail");
-  });
-
-  it("has inline status styling for the fast overview state", () => {
-    expect(globalsCss).toContain(".free-overview-inline-status");
-    expect(globalsCss).toContain(".free-overview-template-shell");
-  });
-
-  it("shows guests a locked preview and preserves the chart through login", () => {
-    expect(loaderSource).toContain('import Link from "next/link"');
-    expect(loaderSource).toContain('import { loginModalHref } from "@/components/login-modal-link"');
-    expect(loaderSource).toContain("Đăng nhập miễn phí để xem toàn bộ luận giải");
-    expect(loaderSource).toContain("Lá số này sẽ được giữ nguyên");
-    expect(loaderSource).toContain("free-overview-locked-sections");
-    expect(loaderSource).toContain("Khí chất và nội lực");
-    expect(loaderSource).toContain("Công việc và tài chính");
-    expect(loaderSource).toContain("Tình cảm và quan hệ");
-    expect(loaderSource).toContain("Vận năm và cẩm nang hành động");
-    expect(loaderSource).toContain("#luan-giai");
-    expect(globalsCss).toContain(".free-overview-guest-gate");
-    expect(globalsCss).toContain(".free-overview-locked-row");
-    expect(globalsCss).toContain(".free-overview-login-copy");
-  });
-
-  it("offers the VIP dossier only after the signed-in free report", () => {
-    expect(loaderSource).toContain("free-overview-vip-transition");
-    expect(loaderSource).toContain('import { premiumReadingModalId } from "@/components/premium-reading-target"');
-    expect(loaderSource).toContain("popoverTarget={premiumReadingModalId(chartId)}");
-    expect(loaderSource).not.toContain("<ReadingDetailCta");
-    expect(loaderSource).toContain("Xem hồ sơ luận giải chuyên sâu");
-    expect(globalsCss).toContain(".free-overview-vip-transition");
+  it("uses the approved login gate copy and tracks the 2/4 funnel depth", () => {
+    expect(loaderSource).toContain("Lưu lá số để đọc tiếp 2 phần còn lại");
+    expect(loaderSource).toContain("Email mới sẽ tự tạo tài khoản và nhận 30 xu");
+    expect(loaderSource).toContain("Đăng nhập hoặc tạo tài khoản");
+    expect(loaderSource).toContain("data-ad-view=\"free_insights_viewed\"");
+    expect(loaderSource).toContain("data-ad-depth={isSignedIn ? \"4\" : \"2\"}");
+    expect(loaderSource).toContain("data-ad-view=\"login_gate_viewed\"");
+    expect(loaderSource).toContain("data-ad-click=\"login_gate_clicked\"");
+    expect(loaderSource).toContain("Quan hệ và nhịp sống");
+    expect(loaderSource).toContain("Vận hiện tại");
   });
 });

@@ -1,206 +1,104 @@
+import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+const routeSource = readFileSync(fileURLToPath(new URL("./route.ts", import.meta.url)), "utf8");
 const mocks = vi.hoisted(() => ({
   getDb: vi.fn(),
   verifyPayOSWebhook: vi.fn(),
-  creditPaidTopupOrder: vi.fn(),
-  generateReading: vi.fn(),
+  settlePaidOrder: vi.fn(),
 }));
 
+vi.mock("next/server", () => ({
+  NextResponse: {
+    json: (body: unknown, init?: ResponseInit) => Response.json(body, init),
+  },
+}));
 vi.mock("@/lib/db", () => ({ getDb: mocks.getDb }));
 vi.mock("@/lib/payos", () => ({
-  creditPaidTopupOrder: mocks.creditPaidTopupOrder,
   verifyPayOSWebhook: mocks.verifyPayOSWebhook,
+  settlePaidOrder: mocks.settlePaidOrder,
 }));
-vi.mock("@/lib/ai", () => ({ generateReading: mocks.generateReading }));
 
-type FakePaymentOrder = {
-  id: string;
-  orderCode: bigint;
-  userId: string;
-  coins: number;
-  status: "PENDING" | "PAID" | "FAILED";
-  rawPayload: unknown;
+const order = {
+  id: "order-1",
+  userId: "user-1",
+  orderCode: BigInt(123),
+  amountVnd: 199000,
+  coins: 0,
+  status: "PENDING",
+  paidAt: null,
+  rawPayload: { directReading: { chartId: "chart-1", type: "FULL", scopeKey: "all" } },
 };
 
-function createDb(orderOverrides: Partial<FakePaymentOrder> = {}) {
-  const order: FakePaymentOrder = {
-    id: "order-1",
-    orderCode: BigInt(123456),
-    userId: "user-1",
-    coins: 199,
-    status: "PENDING",
-    rawPayload: {},
-    ...orderOverrides,
-  };
-
-  const db = {
-    paymentOrder: {
-      findUnique: vi.fn(async ({ where }: { where: { id?: string; orderCode?: bigint } }) => {
-        if (where.id === order.id || where.orderCode === order.orderCode) return order;
-        return null;
-      }),
-      update: vi.fn(async ({ data }: { data: Partial<FakePaymentOrder> }) => {
-        Object.assign(order, data);
-        return order;
-      }),
-    },
-    user: {
-      findUniqueOrThrow: vi.fn(async () => ({ coinBalance: 10 })),
-      update: vi.fn(async () => null),
-    },
-    coinLedger: {
-      create: vi.fn(async () => null),
-    },
-    reading: {
-      findUnique: vi.fn(async () => null),
-      upsert: vi.fn(async () => null),
-    },
-    chart: {
-      findUnique: vi.fn(async () => ({ id: "chart-1", chart: { input: { fullName: "Test User" }, palaces: [] } })),
-    },
-    $transaction: vi.fn(async (callback: (tx: typeof db) => Promise<unknown>) => callback(db)),
-  };
-
-  return { db, order };
-}
-
-async function postWebhook(payload: unknown) {
-  const { POST } = await import("./route");
-  return POST(
-    new Request("http://test.local/api/webhooks/payos", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify(payload),
-    }),
-  );
+function request(data: Record<string, unknown>, signature = "valid") {
+  return new Request("http://test.local/api/webhooks/payos", {
+    method: "POST",
+    body: JSON.stringify({ data, signature }),
+  });
 }
 
 describe("PayOS webhook", () => {
+  const db = {
+    paymentOrder: {
+      findUnique: vi.fn(),
+      update: vi.fn(),
+    },
+  };
+
   beforeEach(() => {
     vi.clearAllMocks();
+    mocks.getDb.mockReturnValue(db);
     mocks.verifyPayOSWebhook.mockReturnValue(true);
-    mocks.creditPaidTopupOrder.mockImplementation(async (_db, order: FakePaymentOrder) => {
-      order.status = "PAID";
-      return order;
-    });
-    mocks.generateReading.mockResolvedValue({
-      content: "paid quick reading",
-      model: "test-model",
-      prompt: "test prompt",
+    db.paymentOrder.findUnique.mockResolvedValue(order);
+    mocks.settlePaidOrder.mockResolvedValue({
+      status: "PAID",
+      readingId: "reading-1",
+      chartId: "chart-1",
+      purchaseType: "direct_full",
     });
   });
 
-  it("rejects invalid signatures before touching payment orders", async () => {
-    const { db } = createDb();
-    mocks.getDb.mockReturnValue(db);
+  it("rejects an invalid signature", async () => {
     mocks.verifyPayOSWebhook.mockReturnValue(false);
+    const { POST } = await import("./route");
 
-    const response = await postWebhook({
-      data: { orderCode: 123456, status: "PAID" },
-      signature: "bad-signature",
-    });
-
-    expect(response.status).toBe(401);
-    expect(db.paymentOrder.findUnique).not.toHaveBeenCalled();
-    expect(db.coinLedger.create).not.toHaveBeenCalled();
+    expect((await POST(request({ orderCode: "123", status: "PAID" }))).status).toBe(401);
+    expect(mocks.settlePaidOrder).not.toHaveBeenCalled();
   });
 
-  it("delegates paid topup crediting to the idempotent PayOS helper", async () => {
-    const { db } = createDb();
-    mocks.getDb.mockReturnValue(db);
+  it("delegates a paid direct order to the idempotent settlement helper", async () => {
+    const { POST } = await import("./route");
+    const response = await POST(request({ orderCode: "123", status: "PAID" }));
 
-    const response = await postWebhook({
-      data: { orderCode: 123456, status: "PAID" },
-      signature: "valid-signature",
-    });
-
-    expect(response.status).toBe(200);
-    expect(mocks.creditPaidTopupOrder).toHaveBeenCalledWith(
-      db,
-      expect.objectContaining({ id: "order-1" }),
-      expect.objectContaining({ data: { orderCode: 123456, status: "PAID" } }),
-    );
-    expect(db.coinLedger.create).not.toHaveBeenCalled();
-
-    const duplicateResponse = await postWebhook({
-      data: { orderCode: 123456, status: "PAID" },
-      signature: "valid-signature",
-    });
-
-    expect(duplicateResponse.status).toBe(200);
-    expect(mocks.creditPaidTopupOrder).toHaveBeenCalledTimes(2);
+    expect(await response.json()).toEqual({ ok: true, idempotent: false });
+    expect(mocks.settlePaidOrder).toHaveBeenCalledWith(db, order, expect.any(Object));
+    expect(db.paymentOrder.update).not.toHaveBeenCalled();
+    expect(routeSource).not.toContain("generateReading");
   });
 
-  it.each([
-    { status: "CANCELLED", code: "01" },
-    { status: "FAILED", code: "02" },
-    { status: "EXPIRED", code: "03" },
-  ])("marks $status webhook payloads as failed without crediting coins", async (data) => {
-    const { db } = createDb();
-    mocks.getDb.mockReturnValue(db);
+  it("settles a duplicate paid callback idempotently", async () => {
+    db.paymentOrder.findUnique.mockResolvedValue({ ...order, status: "PAID", paidAt: new Date() });
+    const { POST } = await import("./route");
+    const response = await POST(request({ orderCode: "123", code: "00" }));
 
-    const response = await postWebhook({
-      data: { orderCode: 123456, ...data },
-      signature: "valid-signature",
-    });
+    expect(await response.json()).toEqual({ ok: true, idempotent: true });
+    expect(mocks.settlePaidOrder).toHaveBeenCalledTimes(1);
+  });
 
-    expect(response.status).toBe(200);
+  it("marks an unpaid pending callback failed but never downgrades a paid order", async () => {
+    const { POST } = await import("./route");
+    await POST(request({ orderCode: "123", status: "CANCELLED" }));
     expect(db.paymentOrder.update).toHaveBeenCalledWith({
       where: { id: "order-1" },
-      data: expect.objectContaining({ status: "FAILED" }),
+      data: { status: "FAILED", rawPayload: expect.any(Object) },
     });
-    expect(db.user.update).not.toHaveBeenCalled();
-    expect(db.coinLedger.create).not.toHaveBeenCalled();
-  });
 
-  it("does not downgrade or double-credit a paid order when a later failed webhook arrives", async () => {
-    const { db } = createDb({ status: "PAID" });
+    vi.clearAllMocks();
     mocks.getDb.mockReturnValue(db);
-
-    const response = await postWebhook({
-      data: { orderCode: 123456, status: "FAILED", code: "02" },
-      signature: "valid-signature",
-    });
-
-    expect(response.status).toBe(200);
+    mocks.verifyPayOSWebhook.mockReturnValue(true);
+    db.paymentOrder.findUnique.mockResolvedValue({ ...order, status: "PAID", paidAt: new Date() });
+    await POST(request({ orderCode: "123", status: "CANCELLED" }));
     expect(db.paymentOrder.update).not.toHaveBeenCalled();
-    expect(db.user.update).not.toHaveBeenCalled();
-    expect(db.coinLedger.create).not.toHaveBeenCalled();
-  });
-
-  it("completes quick email readings after payment without crediting coins", async () => {
-    const { db } = createDb({
-      rawPayload: {
-        quickReading: {
-          chartId: "chart-1",
-          type: "FULL",
-          scopeKey: "all",
-        },
-      },
-    });
-    mocks.getDb.mockReturnValue(db);
-
-    const response = await postWebhook({
-      data: { orderCode: 123456, code: "00", desc: "success" },
-      signature: "valid-signature",
-    });
-
-    expect(response.status).toBe(200);
-    expect(db.user.update).not.toHaveBeenCalled();
-    expect(db.coinLedger.create).not.toHaveBeenCalled();
-    expect(mocks.generateReading).toHaveBeenCalledTimes(1);
-    expect(db.reading.upsert).toHaveBeenCalledWith(
-      expect.objectContaining({
-        where: {
-          userId_chartId_type_scopeKey: {
-            userId: "user-1",
-            chartId: "chart-1",
-            type: "FULL",
-            scopeKey: "all",
-          },
-        },
-      }),
-    );
   });
 });
