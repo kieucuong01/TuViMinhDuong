@@ -16,6 +16,7 @@ vi.mock("next/server", () => ({
 }));
 vi.mock("@/lib/auth", () => ({ getCurrentUser: mocks.getCurrentUser }));
 vi.mock("@/lib/db", () => ({ getDb: mocks.getDb }));
+vi.mock("@/lib/env", () => ({ APP_URL: "https://lasotinhhoa.vn" }));
 vi.mock("@/lib/payos", () => ({
   getPayOSPaymentRequest: mocks.getPayOSPaymentRequest,
   isPayOSRequestPaid: mocks.isPayOSRequestPaid,
@@ -60,7 +61,7 @@ describe("direct FULL PayOS return", () => {
 
     expect(mocks.getPayOSPaymentRequest).toHaveBeenCalledWith("123");
     expect(mocks.settlePaidOrder).toHaveBeenCalledTimes(1);
-    expect(location).toContain("/la-so/chart-1/nang-cao");
+    expect(location.startsWith("https://lasotinhhoa.vn/la-so/chart-1/nang-cao")).toBe(true);
     expect(location).toContain("reading=reading-1");
     expect(location).toContain("status=success");
   });
