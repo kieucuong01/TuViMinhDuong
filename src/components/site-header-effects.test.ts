@@ -36,6 +36,15 @@ describe("site header featured nav effects", () => {
     expect(mobileMenuSource).toContain("mobile-lookup-group");
   });
 
+  it("places the six-tool Xem Tuổi menu next to Xem Ngày on desktop and mobile", () => {
+    expect(headerSource).toContain('href: "/xem-tuoi"');
+    expect(headerSource).toContain('tone: "age"');
+    expect(headerSource).toContain("AGE_TOOL_LINKS");
+    expect(headerSource).toContain("site-nav-flyout site-age-menu");
+    expect(mobileMenuSource).toContain("AGE_TOOL_LINKS");
+    expect(mobileMenuSource).toContain("mobile-age-group");
+  });
+
   it("opens desktop date and lookup dropdowns on hover/focus without sticky details state", () => {
     expect(headerSource).toContain("site-nav-flyout site-date-menu");
     expect(headerSource).toContain("site-nav-flyout site-lookup-menu");

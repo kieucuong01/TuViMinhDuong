@@ -23,11 +23,13 @@ import {
 import { UserHeaderBadge } from "@/components/user-header-badge";
 import { MobileSiteMenu } from "@/components/mobile-site-menu";
 import { dateCountdownMenuLinks, dateTaskMenuLinks, type DateMenuIcon } from "@/lib/date-menu";
+import { AGE_TOOL_LINKS, type AgeToolSlug } from "@/lib/age-tools";
 import { APP_NAME } from "@/lib/env";
 
 const baseNav = [
   { href: "/", label: "Lập lá số", tone: "primary" },
   { href: "/xem-ngay", label: "Xem ngày", tone: "date" },
+  { href: "/xem-tuoi", label: "Xem tuổi", tone: "age" },
   { href: "/kien-thuc-tu-vi", label: "Kiến thức", tone: "knowledge" },
 ];
 
@@ -57,6 +59,15 @@ const lookupMenuIcons: Record<string, ComponentType<{ size?: number; strokeWidth
   spark: Sparkles,
 };
 
+const ageMenuIcons: Record<AgeToolSlug, ComponentType<{ size?: number; strokeWidth?: number; "aria-hidden"?: boolean }>> = {
+  "xong-dat": Gift,
+  "vo-chong": HeartHandshake,
+  "sinh-con": Flower2,
+  "ket-hon": CalendarCheck2,
+  "lam-an": Sparkles,
+  "lam-nha": Hammer,
+};
+
 export async function SiteHeader() {
   const nav = baseNav;
 
@@ -79,8 +90,8 @@ export async function SiteHeader() {
 
         <nav className="site-nav hidden items-center rounded-full border border-orange-100 bg-white/70 p-1 text-sm font-semibold text-stone-600 shadow-sm lg:flex">
           {nav.map((item, index) => {
-            const Icon = item.tone === "date" ? CalendarDays : item.tone === "knowledge" ? BookOpenText : null;
-            const linkClass = `site-nav-link rounded-full px-3.5 py-2 transition hover:bg-orange-50 hover:text-orange-700 ${index === 0 ? "site-nav-primary" : ""} ${item.tone === "date" ? "site-nav-date" : ""} ${item.tone === "knowledge" ? "site-nav-knowledge" : ""}`;
+            const Icon = item.tone === "date" ? CalendarDays : item.tone === "age" ? HeartHandshake : item.tone === "knowledge" ? BookOpenText : null;
+            const linkClass = `site-nav-link rounded-full px-3.5 py-2 transition hover:bg-orange-50 hover:text-orange-700 ${index === 0 ? "site-nav-primary" : ""} ${item.tone === "date" ? "site-nav-date" : ""} ${item.tone === "age" ? "site-nav-age" : ""} ${item.tone === "knowledge" ? "site-nav-knowledge" : ""}`;
 
             if (item.tone === "date") {
               return (
@@ -113,6 +124,31 @@ export async function SiteHeader() {
                           <Link key={link.href} href={link.href} className="site-date-panel-link compact" prefetch={false}>
                             <span className="site-date-panel-icon"><MenuIcon aria-hidden={true} size={17} strokeWidth={2.35} /></span>
                             <strong>{link.label}</strong>
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+              );
+            }
+
+            if (item.tone === "age") {
+              return (
+                <div key={item.href} className="site-nav-flyout site-age-menu">
+                  <Link href={item.href} className={`${linkClass} site-age-menu-trigger`} prefetch={false} aria-haspopup="true">
+                    <HeartHandshake aria-hidden="true" size={16} strokeWidth={2.4} />
+                    <span>{item.label}</span>
+                    <ChevronDown aria-hidden="true" size={14} />
+                  </Link>
+                  <div className="site-date-panel site-age-panel" aria-label="Chọn công cụ xem tuổi">
+                    <div className="site-date-panel-grid">
+                      {AGE_TOOL_LINKS.map((link) => {
+                        const MenuIcon = ageMenuIcons[link.slug];
+                        return (
+                          <Link key={link.href} href={link.href} className="site-date-panel-link" prefetch={false}>
+                            <span className="site-date-panel-icon"><MenuIcon aria-hidden={true} size={17} strokeWidth={2.35} /></span>
+                            <span><strong>{link.label}</strong><small>{link.description}</small></span>
                           </Link>
                         );
                       })}

@@ -61,7 +61,7 @@ function ResultSummary({ summary }: { summary: AnalysisSummary }) {
       </dl>
       <div className="age-criteria-list">
         {summary.criteria.map((criterion) => (
-          <article key={criterion.key} data-status={criterion.status}>
+          <article className="age-criterion" key={criterion.key} data-status={criterion.status}>
             <StatusIcon status={criterion.status} />
             <div>
               <div className="age-criterion-heading">
@@ -207,7 +207,7 @@ export function AgeTool({ tool }: { tool: AgeToolSlug }) {
       </form>
 
       {result ? (
-        <section id="age-tool-result" className="age-tool-result" tabIndex={-1} aria-live="polite">
+        <section id="age-tool-result" className="age-tool-result age-tool-results" tabIndex={-1} aria-live="polite">
           <div className="age-result-head">
             <span>Kết quả tra cứu</span>
             <h2>{result.title}</h2>
@@ -239,7 +239,7 @@ export function AgeTool({ tool }: { tool: AgeToolSlug }) {
                     <summary>Xem {yearResult.summary.criteria.length} tiêu chí</summary>
                     <div className="age-criteria-list">
                       {yearResult.summary.criteria.map((criterion) => (
-                        <article key={criterion.key} data-status={criterion.status}>
+                        <article className="age-criterion" key={criterion.key} data-status={criterion.status}>
                           <StatusIcon status={criterion.status} />
                           <div><div className="age-criterion-heading"><strong>{criterion.label}</strong><span>{STATUS_LABEL[criterion.status]}</span></div><p>{criterion.explanation}</p></div>
                         </article>

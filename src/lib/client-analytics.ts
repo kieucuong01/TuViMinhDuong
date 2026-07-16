@@ -26,6 +26,8 @@ const BLOCKED_PARAM_KEYS = new Set([
   "name",
   "gender",
   "sex",
+  "personGender",
+  "person_gender",
   "lunarYear",
   "lunar_year",
   "canChi",

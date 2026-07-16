@@ -182,6 +182,7 @@ export const AGE_TOOL_PAGES: AgeToolPage[] = [
 ];
 
 export const AGE_TOOL_LINKS = AGE_TOOL_PAGES.map(({ slug, label, shortDescription }) => ({
+  slug,
   href: `/xem-tuoi/${slug}`,
   label,
   description: shortDescription,

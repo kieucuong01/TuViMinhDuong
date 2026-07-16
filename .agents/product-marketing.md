@@ -1,6 +1,6 @@
 # Product Marketing Context
 
-Last updated: 2026-07-01
+Last updated: 2026-07-16
 
 ## Product Overview
 
@@ -25,6 +25,7 @@ Last updated: 2026-07-01
 - "Help me create a correct tu vi chart without feeling overwhelmed."
 - "Help me understand what this chart section means in plain Vietnamese."
 - "Help me check whether a date or decision needs more caution."
+- "Help me đối chiếu tuổi theo quy tắc Can–Chi, Ngũ hành cho gia đình, công việc và nhà cửa."
 - "Help me decide if a paid interpretation is useful for my situation."
 
 ## Problems & Pain Points
@@ -81,7 +82,7 @@ Last updated: 2026-07-01
 
 **Key conversion action:** Create a free chart at `/#lap-la-so`.
 
-**Secondary actions:** Read related articles, save a chart, return for date fortune, unlock a deeper reading.
+**Secondary actions:** Read related articles, use the Xem tuổi tools, save a chart, return for date fortune, unlock a deeper reading.
 
 **Measurement focus:** Organic impressions/clicks, article engagement, internal clicks to chart creation, account creation, saved charts, paid reading unlocks.
 

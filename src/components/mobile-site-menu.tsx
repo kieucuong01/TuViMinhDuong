@@ -26,6 +26,7 @@ import { useEffect, useRef } from "react";
 import { CoinTopupLink } from "@/components/coin-topup-link";
 import { useCloseDetailsOnOutsideClick } from "@/components/use-close-details-on-outside-click";
 import { dateCountdownMenuLinks, dateTaskMenuLinks, type DateMenuIcon } from "@/lib/date-menu";
+import { AGE_TOOL_LINKS, type AgeToolSlug } from "@/lib/age-tools";
 
 type MobileSiteMenuItem = {
   href: string;
@@ -53,6 +54,15 @@ const dateMenuIcons: Record<DateMenuIcon, ComponentType<{ size?: number; strokeW
   moon: MoonStar,
 };
 
+const ageMenuIcons: Record<AgeToolSlug, ComponentType<{ size?: number; strokeWidth?: number; "aria-hidden"?: boolean }>> = {
+  "xong-dat": Gift,
+  "vo-chong": HeartHandshake,
+  "sinh-con": Flower2,
+  "ket-hon": CalendarCheck2,
+  "lam-an": Sparkles,
+  "lam-nha": Hammer,
+};
+
 export function MobileSiteMenu({ items, lookupLinks }: MobileSiteMenuProps) {
   const pathname = usePathname();
   const detailsRef = useRef<HTMLDetailsElement>(null);
@@ -73,8 +83,8 @@ export function MobileSiteMenu({ items, lookupLinks }: MobileSiteMenuProps) {
       </summary>
       <div className="mobile-site-menu-panel absolute left-0 mt-3 grid w-60 gap-1 rounded-2xl border border-orange-100 bg-white/95 p-2 shadow-2xl shadow-orange-950/10 backdrop-blur-xl">
         {items.map((item) => {
-          const Icon = item.tone === "date" ? CalendarDays : item.tone === "knowledge" ? BookOpenText : item.tone === "primary" ? Sparkles : null;
-          const itemClass = `mobile-menu-link rounded-xl px-3 py-2.5 text-sm font-semibold text-stone-700 transition hover:bg-orange-50 hover:text-orange-700 ${item.tone === "date" ? "mobile-menu-date" : ""} ${item.tone === "knowledge" ? "mobile-menu-knowledge" : ""}`;
+          const Icon = item.tone === "date" ? CalendarDays : item.tone === "age" ? HeartHandshake : item.tone === "knowledge" ? BookOpenText : item.tone === "primary" ? Sparkles : null;
+          const itemClass = `mobile-menu-link rounded-xl px-3 py-2.5 text-sm font-semibold text-stone-700 transition hover:bg-orange-50 hover:text-orange-700 ${item.tone === "date" ? "mobile-menu-date" : ""} ${item.tone === "age" ? "mobile-menu-age" : ""} ${item.tone === "knowledge" ? "mobile-menu-knowledge" : ""}`;
 
           if (item.tone === "date") {
             return (
@@ -97,6 +107,29 @@ export function MobileSiteMenu({ items, lookupLinks }: MobileSiteMenuProps) {
                   <p>Xem thêm</p>
                   {dateCountdownMenuLinks.map((link) => {
                     const MenuIcon = dateMenuIcons[link.icon];
+                    return (
+                      <Link key={link.href} href={link.href} prefetch={false} onClick={closeMenu}>
+                        <MenuIcon aria-hidden={true} size={15} strokeWidth={2.35} />
+                        <span>{link.label}</span>
+                      </Link>
+                    );
+                  })}
+                </div>
+              </details>
+            );
+          }
+
+          if (item.tone === "age") {
+            return (
+              <details key={item.href} className="mobile-date-group mobile-age-group">
+                <summary className={itemClass}>
+                  <HeartHandshake aria-hidden="true" size={16} strokeWidth={2.4} />
+                  <span>Xem tuổi</span>
+                  <ChevronDown aria-hidden="true" size={15} />
+                </summary>
+                <div>
+                  {AGE_TOOL_LINKS.map((link) => {
+                    const MenuIcon = ageMenuIcons[link.slug];
                     return (
                       <Link key={link.href} href={link.href} prefetch={false} onClick={closeMenu}>
                         <MenuIcon aria-hidden={true} size={15} strokeWidth={2.35} />

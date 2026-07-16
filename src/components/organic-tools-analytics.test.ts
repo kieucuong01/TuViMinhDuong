@@ -67,6 +67,8 @@ describe("trackOrganicToolEvent", () => {
       fullName: "Test",
       gender: "female",
       sex: "female",
+      personGender: "female",
+      person_gender: "female",
       lunarYear: 1989,
       canChi: "Kỷ Tỵ",
     });

@@ -1015,6 +1015,45 @@ button.is-loading:not(.icon-button)::before {
   color: #9a3412;
 }
 
+.site-nav-age {
+  border: 1px solid rgb(244 114 182 / 0.32);
+  background: linear-gradient(135deg, rgb(253 242 248 / 0.96), rgb(255 247 237 / 0.92));
+  color: #be185d;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.86), 0 8px 18px rgb(131 24 67 / 0.05);
+}
+
+.site-nav-age:hover,
+.site-nav-age:focus-visible,
+.site-age-menu:hover .site-age-menu-trigger,
+.site-age-menu:focus-within .site-age-menu-trigger {
+  border-color: rgb(244 114 182 / 0.56);
+  background: linear-gradient(135deg, #fdf2f8, #fff7ed);
+  color: #be185d;
+  transform: translateY(-1px);
+}
+
+.site-age-menu:hover .site-age-panel,
+.site-age-menu:focus-within .site-age-panel {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateX(-50%) translateY(0);
+  visibility: visible;
+}
+
+.site-age-panel .site-date-panel-icon {
+  background: linear-gradient(135deg, #fdf2f8, #fff7ed);
+  color: #be185d;
+}
+
+.mobile-menu-age {
+  background: linear-gradient(135deg, rgb(253 242 248 / 0.96), rgb(255 247 237 / 0.76));
+  color: #be185d;
+}
+
+.mobile-age-group > div a svg {
+  color: #be185d;
+}
+
 .mobile-date-group {
   border-radius: 0.85rem;
 }
@@ -4020,6 +4059,938 @@ button.is-loading:not(.icon-button)::before {
 
   .premium-confirm-actions .btn-ghost {
     order: 2;
+  }
+}
+
+/* Xem tuoi tools */
+.age-page {
+  min-height: 100vh;
+  background: #fbfaf7;
+  color: #292524;
+}
+
+.age-page-container {
+  width: min(100% - 2rem, 74rem);
+  margin-inline: auto;
+}
+
+.age-hub-hero {
+  padding: clamp(3.5rem, 8vw, 6.75rem) 0 clamp(3rem, 7vw, 5.5rem);
+  border-bottom: 1px solid #fed7aa;
+  background:
+    radial-gradient(circle at 82% 20%, rgb(251 146 60 / 0.16), transparent 28rem),
+    #fffdf9;
+}
+
+.age-hub-hero .age-page-container {
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) minmax(18rem, 0.55fr);
+  gap: clamp(2rem, 6vw, 5rem);
+  align-items: end;
+}
+
+.age-hub-hero-copy {
+  max-width: 49rem;
+}
+
+.age-hub-hero h1,
+.age-tool-hero h1 {
+  margin: 0;
+  color: #1c1917;
+  font-size: clamp(2.35rem, 6vw, 4.75rem);
+  font-weight: 850;
+  letter-spacing: -0.055em;
+  line-height: 0.99;
+}
+
+.age-hub-hero-copy > p,
+.age-tool-hero > div > p {
+  max-width: 47rem;
+  margin: 1.4rem 0 1.75rem;
+  color: #57534e;
+  font-size: clamp(1.03rem, 2vw, 1.22rem);
+  line-height: 1.72;
+}
+
+.age-hub-hero .btn,
+.age-tool-next .btn {
+  min-height: 3rem;
+  gap: 0.5rem;
+}
+
+.age-hub-principles {
+  padding: 1.4rem;
+  border: 1px solid #fdba74;
+  border-radius: 1.35rem;
+  background: rgb(255 255 255 / 0.84);
+  box-shadow: 0 1.2rem 3rem rgb(124 45 18 / 0.08);
+}
+
+.age-hub-principles svg {
+  width: 1.75rem;
+  height: 1.75rem;
+  margin-bottom: 1rem;
+  color: #c2410c;
+}
+
+.age-hub-principles strong {
+  display: block;
+  color: #7c2d12;
+  font-size: 1.05rem;
+}
+
+.age-hub-principles p {
+  margin: 0.55rem 0 0;
+  color: #57534e;
+  line-height: 1.65;
+}
+
+.age-hub-tools,
+.age-hub-trust {
+  padding-block: clamp(3.5rem, 7vw, 6rem);
+}
+
+.age-section-head {
+  max-width: 47rem;
+}
+
+.age-section-head > span,
+.age-tool-form-head span,
+.age-result-head > span,
+.age-tool-guide-grid article > span,
+.age-tool-example > span,
+.age-tool-related > div:first-child > span,
+.age-tool-next > div > span {
+  display: block;
+  margin-bottom: 0.55rem;
+  color: #c2410c;
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.105em;
+  text-transform: uppercase;
+}
+
+.age-section-head h2,
+.age-tool-form-head h2,
+.age-result-head h2,
+.age-tool-guide-grid h2,
+.age-tool-example h2,
+.age-tool-related h2,
+.age-tool-next h2 {
+  margin: 0;
+  color: #292524;
+  font-size: clamp(1.65rem, 3vw, 2.45rem);
+  font-weight: 820;
+  letter-spacing: -0.035em;
+  line-height: 1.12;
+}
+
+.age-section-head > p {
+  margin: 0.8rem 0 0;
+  color: #78716c;
+  line-height: 1.65;
+}
+
+.age-tool-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.age-tool-card {
+  display: flex;
+  min-height: 16.5rem;
+  padding: 1.45rem;
+  border: 1px solid #e7e5e4;
+  border-radius: 1.35rem;
+  background: #fff;
+  color: inherit;
+  flex-direction: column;
+  text-decoration: none;
+  transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+}
+
+.age-tool-card:hover {
+  border-color: #fb923c;
+  box-shadow: 0 1.2rem 2.6rem rgb(124 45 18 / 0.1);
+  transform: translateY(-3px);
+}
+
+.age-tool-card:focus-visible,
+.age-tool-panel input:focus-visible,
+.age-tool-panel select:focus-visible,
+.age-year-card summary:focus-visible,
+.age-tool-faq summary:focus-visible {
+  outline: 3px solid rgb(234 88 12 / 0.28);
+  outline-offset: 3px;
+}
+
+.age-tool-card > span {
+  color: #ea580c;
+  font-size: 0.78rem;
+  font-weight: 850;
+  letter-spacing: 0.1em;
+}
+
+.age-tool-card h2 {
+  margin: 2rem 0 0.7rem;
+  color: #292524;
+  font-size: 1.28rem;
+  font-weight: 800;
+}
+
+.age-tool-card p {
+  margin: 0;
+  color: #78716c;
+  line-height: 1.62;
+}
+
+.age-tool-card > strong {
+  display: flex;
+  margin-top: auto;
+  padding-top: 1.5rem;
+  color: #c2410c;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.age-hub-method {
+  padding-block: clamp(3.5rem, 7vw, 5.5rem);
+  background: #292524;
+  color: #fafaf9;
+}
+
+.age-hub-method .age-section-head > span {
+  color: #fdba74;
+}
+
+.age-hub-method .age-section-head h2 {
+  color: #fff;
+}
+
+.age-method-steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(1.5rem, 4vw, 3.5rem);
+  margin: 2.75rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.age-method-steps li {
+  display: grid;
+  grid-template-columns: 2.5rem 1fr;
+  gap: 1rem;
+}
+
+.age-method-steps li > span {
+  display: grid;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 1px solid #fb923c;
+  border-radius: 50%;
+  color: #fdba74;
+  font-weight: 850;
+  place-items: center;
+}
+
+.age-method-steps strong {
+  color: #fff;
+  font-size: 1.05rem;
+}
+
+.age-method-steps p {
+  margin: 0.55rem 0 0;
+  color: #d6d3d1;
+  line-height: 1.65;
+}
+
+.age-hub-trust {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.age-hub-trust article {
+  display: grid;
+  padding: 1.5rem;
+  border: 1px solid #e7e5e4;
+  border-radius: 1.25rem;
+  background: #fff;
+  grid-template-columns: 2.4rem 1fr;
+  gap: 1rem;
+}
+
+.age-hub-trust svg {
+  color: #c2410c;
+}
+
+.age-hub-trust h2 {
+  margin: 0;
+  font-size: 1.15rem;
+}
+
+.age-hub-trust p {
+  margin: 0.55rem 0 0;
+  color: #78716c;
+  line-height: 1.65;
+}
+
+.age-tool-shell {
+  padding-bottom: 5rem;
+}
+
+.age-breadcrumb {
+  display: flex;
+  min-height: 3.25rem;
+  padding-top: 1.1rem;
+  color: #78716c;
+  font-size: 0.86rem;
+  align-items: center;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.age-breadcrumb a {
+  color: #9a3412;
+  text-decoration: none;
+}
+
+.age-tool-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.55fr) minmax(16rem, 0.45fr);
+  gap: clamp(2rem, 5vw, 4.5rem);
+  padding: clamp(3rem, 7vw, 5.25rem) 0;
+  align-items: end;
+}
+
+.age-tool-hero h1 {
+  max-width: 51rem;
+  font-size: clamp(2.2rem, 5.7vw, 4.4rem);
+}
+
+.age-tool-hero aside {
+  padding: 1.2rem 0 0 1.2rem;
+  border-left: 3px solid #f97316;
+}
+
+.age-tool-hero aside strong {
+  color: #9a3412;
+}
+
+.age-tool-hero aside p {
+  margin: 0.45rem 0 0;
+  color: #78716c;
+  line-height: 1.6;
+}
+
+.age-tool-panel {
+  overflow: hidden;
+  border: 1px solid #fed7aa;
+  border-radius: 1.5rem;
+  background: #fff;
+  box-shadow: 0 1.5rem 4rem rgb(124 45 18 / 0.08);
+}
+
+.age-tool-form-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(15rem, 0.55fr);
+  gap: 2rem;
+  padding: clamp(1.35rem, 3vw, 2rem);
+  border-bottom: 1px solid #ffedd5;
+  background: #fffaf3;
+  align-items: end;
+}
+
+.age-tool-form-head h2 {
+  font-size: clamp(1.45rem, 3vw, 2rem);
+}
+
+.age-tool-form-head > p {
+  margin: 0;
+  color: #78716c;
+  line-height: 1.6;
+}
+
+.age-tool-form {
+  padding: clamp(1.35rem, 3vw, 2rem);
+}
+
+.age-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.15rem;
+}
+
+.age-field {
+  display: flex;
+  min-width: 0;
+  color: #44403c;
+  font-weight: 750;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.age-field input,
+.age-field select {
+  width: 100%;
+  min-height: 3rem;
+  padding: 0.7rem 0.85rem;
+  border: 1px solid #d6d3d1;
+  border-radius: 0.8rem;
+  background: #fff;
+  color: #292524;
+  font: inherit;
+  font-weight: 600;
+}
+
+.age-field small {
+  color: #78716c;
+  font-size: 0.78rem;
+  font-weight: 500;
+  line-height: 1.45;
+}
+
+.age-submit {
+  min-height: 3rem;
+  margin-top: 1.35rem;
+}
+
+.age-form-error {
+  margin: 1rem 0 0;
+  padding: 0.8rem 1rem;
+  border-left: 3px solid #dc2626;
+  border-radius: 0.45rem;
+  background: #fef2f2;
+  color: #991b1b;
+  line-height: 1.55;
+}
+
+.age-tool-result,
+.age-tool-results {
+  padding: clamp(1.35rem, 3vw, 2rem);
+  border-top: 1px solid #fed7aa;
+  background: #fffdf9;
+  scroll-margin-top: 6rem;
+}
+
+.age-tool-result:focus {
+  outline: none;
+}
+
+.age-result-head > p {
+  max-width: 48rem;
+  margin: 0.75rem 0 0;
+  color: #78716c;
+  line-height: 1.65;
+}
+
+.age-profile-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.8rem;
+  margin-top: 1.5rem;
+}
+
+.age-profile-grid article {
+  padding: 1rem;
+  border: 1px solid #e7e5e4;
+  border-radius: 1rem;
+  background: #fff;
+}
+
+.age-profile-grid span,
+.age-profile-grid small {
+  display: block;
+  color: #78716c;
+  font-size: 0.78rem;
+}
+
+.age-profile-grid strong {
+  display: block;
+  margin-top: 0.35rem;
+  color: #9a3412;
+  font-size: 1.2rem;
+}
+
+.age-profile-grid p {
+  margin: 0.3rem 0;
+  line-height: 1.5;
+}
+
+.age-result-summary {
+  margin-top: 1rem;
+  padding: 1.2rem;
+  border: 1px solid #e7e5e4;
+  border-left: 4px solid #a8a29e;
+  border-radius: 1rem;
+  background: #fff;
+}
+
+.age-result-summary[data-band="favorable"] {
+  border-left-color: #059669;
+}
+
+.age-result-summary[data-band="caution"] {
+  border-left-color: #dc2626;
+}
+
+.age-result-summary > div:first-child span {
+  color: #78716c;
+  font-size: 0.78rem;
+  font-weight: 750;
+}
+
+.age-result-summary h3 {
+  margin: 0.25rem 0 0;
+  font-size: 1.4rem;
+}
+
+.age-result-summary dl {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.55rem;
+  margin: 1rem 0 0;
+}
+
+.age-result-summary dl > div {
+  display: flex;
+  min-height: 2.75rem;
+  padding: 0.55rem 0.7rem;
+  border-radius: 0.7rem;
+  background: #f5f5f4;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.age-result-summary dt {
+  color: #78716c;
+  font-size: 0.82rem;
+}
+
+.age-result-summary dd {
+  margin: 0;
+  font-weight: 850;
+}
+
+.age-criteria-list {
+  display: grid;
+  gap: 0.7rem;
+  margin-top: 1rem;
+}
+
+.age-criterion,
+.age-criteria-list > article {
+  display: grid;
+  grid-template-columns: 1.35rem minmax(0, 1fr);
+  gap: 0.75rem;
+  padding: 0.85rem;
+  border: 1px solid #e7e5e4;
+  border-radius: 0.8rem;
+  background: #fff;
+}
+
+.age-criterion > svg,
+.age-criteria-list > article > svg {
+  width: 1.25rem;
+  height: 1.25rem;
+  margin-top: 0.1rem;
+}
+
+.age-criterion[data-status="favorable"] > svg,
+.age-criteria-list > article[data-status="favorable"] > svg {
+  color: #047857;
+}
+
+.age-criterion[data-status="caution"] > svg,
+.age-criteria-list > article[data-status="caution"] > svg {
+  color: #b91c1c;
+}
+
+.age-criterion[data-status="neutral"] > svg,
+.age-criteria-list > article[data-status="neutral"] > svg {
+  color: #78716c;
+}
+
+.age-criterion-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.age-criterion-heading span {
+  color: #78716c;
+  font-size: 0.75rem;
+  font-weight: 750;
+}
+
+.age-criteria-list p {
+  margin: 0.35rem 0 0;
+  color: #57534e;
+  line-height: 1.55;
+}
+
+.age-criteria-list small {
+  display: block;
+  margin-top: 0.35rem;
+  color: #9a3412;
+}
+
+.age-year-results {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.8rem;
+  margin-top: 1rem;
+}
+
+.age-year-card {
+  min-width: 0;
+  padding: 1rem;
+  border: 1px solid #e7e5e4;
+  border-top: 3px solid #a8a29e;
+  border-radius: 1rem;
+  background: #fff;
+}
+
+.age-year-card[data-band="favorable"] {
+  border-top-color: #059669;
+}
+
+.age-year-card[data-band="caution"] {
+  border-top-color: #dc2626;
+}
+
+.age-year-card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.age-year-card-head span {
+  color: #c2410c;
+  font-size: 0.7rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.age-year-card h3 {
+  margin: 0.2rem 0 0;
+  font-size: 1.1rem;
+}
+
+.age-year-card-head > strong {
+  max-width: 8.5rem;
+  color: #57534e;
+  font-size: 0.78rem;
+  text-align: right;
+}
+
+.age-year-card > p {
+  margin: 0.55rem 0;
+  color: #78716c;
+}
+
+.age-year-card summary,
+.age-tool-faq summary {
+  min-height: 2.75rem;
+  color: #9a3412;
+  font-weight: 750;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.age-tool-disclaimer {
+  display: grid;
+  margin-top: 1rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid #fde68a;
+  border-radius: 0.8rem;
+  background: #fffbeb;
+  color: #78350f;
+  grid-template-columns: 1.3rem 1fr;
+  gap: 0.7rem;
+}
+
+.age-tool-disclaimer p {
+  margin: 0;
+  line-height: 1.55;
+}
+
+.age-tool-next {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(14rem, 0.45fr);
+  gap: 2rem;
+  padding: clamp(1.35rem, 3vw, 2rem);
+  border-top: 1px solid #fed7aa;
+  background: #fff7ed;
+  align-items: end;
+}
+
+.age-tool-next p {
+  margin: 0.6rem 0 1rem;
+  color: #78716c;
+  line-height: 1.6;
+}
+
+.age-tool-next nav {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.age-tool-next nav > strong {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+}
+
+.age-tool-next nav a {
+  min-height: 2.75rem;
+  padding: 0.65rem 0.8rem;
+  border: 1px solid #fed7aa;
+  border-radius: 0.7rem;
+  background: #fff;
+  color: #9a3412;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.age-tool-editorial {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1.25rem;
+}
+
+.age-tool-guide-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.age-tool-guide-grid > article,
+.age-tool-example,
+.age-tool-faq,
+.age-tool-related {
+  padding: clamp(1.35rem, 3vw, 2rem);
+  border: 1px solid #e7e5e4;
+  border-radius: 1.25rem;
+  background: #fff;
+}
+
+.age-tool-guide-grid h2,
+.age-tool-example h2,
+.age-tool-related h2 {
+  font-size: clamp(1.35rem, 2.5vw, 1.85rem);
+}
+
+.age-tool-guide-grid ol,
+.age-tool-guide-grid ul {
+  display: grid;
+  gap: 0.8rem;
+  margin: 1.25rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.age-tool-guide-grid ol li {
+  display: grid;
+  grid-template-columns: 2rem 1fr;
+  gap: 0.7rem;
+}
+
+.age-tool-guide-grid ol li > span {
+  display: grid;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background: #ffedd5;
+  color: #9a3412;
+  font-weight: 800;
+  place-items: center;
+}
+
+.age-tool-guide-grid li p,
+.age-tool-guide-grid ul li,
+.age-tool-example p {
+  margin: 0;
+  color: #57534e;
+  line-height: 1.65;
+}
+
+.age-tool-guide-grid ul li {
+  position: relative;
+  padding-left: 1.1rem;
+}
+
+.age-tool-guide-grid ul li::before {
+  position: absolute;
+  left: 0;
+  color: #ea580c;
+  content: "—";
+}
+
+.age-tool-example {
+  border-color: #fed7aa;
+  background: #fffaf3;
+}
+
+.age-tool-example p {
+  max-width: 56rem;
+  margin-top: 0.85rem;
+}
+
+.age-tool-faq > div:last-child {
+  display: grid;
+  gap: 0.65rem;
+  margin-top: 1.25rem;
+}
+
+.age-tool-faq details {
+  padding: 0.9rem 1rem;
+  border: 1px solid #e7e5e4;
+  border-radius: 0.8rem;
+  background: #fff;
+}
+
+.age-tool-faq p {
+  margin: 0.35rem 0 0;
+  color: #57534e;
+  line-height: 1.65;
+}
+
+.age-tool-related {
+  display: grid;
+  grid-template-columns: minmax(0, 0.6fr) minmax(0, 1.4fr);
+  gap: 2rem;
+  align-items: start;
+}
+
+.age-tool-related > div:last-child {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.age-tool-related a {
+  display: flex;
+  min-height: 4.5rem;
+  padding: 0.8rem 1rem;
+  border: 1px solid #e7e5e4;
+  border-radius: 0.8rem;
+  color: #292524;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  text-decoration: none;
+}
+
+.age-tool-related a:hover {
+  border-color: #fb923c;
+}
+
+.age-tool-related a span,
+.age-tool-related a small {
+  display: block;
+}
+
+.age-tool-related a small {
+  margin-top: 0.25rem;
+  color: #78716c;
+  line-height: 1.45;
+}
+
+.age-tool-related a svg {
+  color: #c2410c;
+  flex: 0 0 auto;
+}
+
+@media (max-width: 900px) {
+  .age-tool-grid,
+  .age-method-steps {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .age-hub-hero .age-page-container,
+  .age-tool-hero,
+  .age-tool-form-head,
+  .age-tool-next,
+  .age-tool-related {
+    grid-template-columns: 1fr;
+  }
+
+  .age-hub-principles {
+    max-width: 32rem;
+  }
+}
+
+@media (max-width: 767px) {
+  .age-page-container {
+    width: min(100% - 1.25rem, 74rem);
+  }
+
+  .age-hub-hero {
+    padding-top: 3rem;
+  }
+
+  .age-hub-hero h1,
+  .age-tool-hero h1 {
+    letter-spacing: -0.045em;
+    line-height: 1.04;
+  }
+
+  .age-tool-grid,
+  .age-method-steps,
+  .age-hub-trust,
+  .age-form-grid,
+  .age-profile-grid,
+  .age-year-results,
+  .age-tool-guide-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .age-tool-card {
+    min-height: 13rem;
+  }
+
+  .age-method-steps {
+    gap: 1.5rem;
+  }
+
+  .age-tool-hero {
+    padding: 2.5rem 0 3rem;
+  }
+
+  .age-tool-panel {
+    border-radius: 1rem;
+  }
+
+  .age-field input,
+  .age-field select,
+  .age-submit,
+  .age-tool-next .btn {
+    min-height: 3rem;
+    font-size: 1rem;
+  }
+
+  .age-submit,
+  .age-tool-next .btn {
+    width: 100%;
+  }
+
+  .age-result-summary dl {
+    grid-template-columns: 1fr;
+  }
+
+  .age-year-card-head,
+  .age-criterion-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  .age-year-card-head > strong {
+    max-width: none;
+    text-align: left;
   }
 }
 
