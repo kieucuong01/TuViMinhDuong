@@ -55,7 +55,7 @@ Purpose: this is the first low-token context file for any new AI agent. Read thi
 - Use port `4000` for local app checks.
 - Production is on the VPS at `/opt/lasotinhhoa/current`, served by Nginx at `https://lasotinhhoa.vn`, and run by PM2 process `lasotinhhoa` on `127.0.0.1:4100`.
 - Preferred SSH entrypoint from this Windows machine is `ssh tuvi-vps`; the alias should keep strict host-key checking and the dedicated key `C:\Users\ASUS\.ssh\id_ed25519_tuvi_vps`.
-- The database is still the remote PostgreSQL URL from env until a VPS-local DB migration is explicitly requested.
+- Production database is PostgreSQL 17 on the VPS. The live app uses `DATABASE_URL` pointing to `127.0.0.1:5433/lasotinhhoa`.
 - In Codex on this Windows workspace, `npm` may use Node 18. Next.js 16 needs Node >=20.9. Prefer the bundled Node path from `docs/agent/verification.md` when checks fail with Node/runtime errors.
 - Headroom is the default for large logs, JSON arrays, DB rows, audit dumps, and long tool output; see `docs/agent/headroom.md`.
 - Google Ads env values are not committed. Required public envs are documented in `docs/google-ads.md`.

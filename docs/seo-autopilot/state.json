@@ -1,15 +1,15 @@
 {
-  "lastRunAt": "2026-07-14T02:03:25.800Z",
+  "lastRunAt": "2026-07-15T21:45:07.552Z",
   "lastStatus": "ok",
-  "lastPublishedSlug": "sao-thien-dong",
-  "lastPublishedAt": "2026-07-14T12:43:46.037Z",
+  "lastPublishedSlug": "sao-liem-trinh",
+  "lastPublishedAt": "2026-07-15T22:14:07.3485735Z",
   "lastAction": {
     "type": "single_article_publish",
-    "slug": "sao-thien-dong",
+    "slug": "sao-liem-trinh",
     "slugs": [
-      "sao-thien-dong"
+      "sao-liem-trinh"
     ],
-    "reason": "Publish 1 people-first articles from SEMrush intent clusters; first topic: Nguoi doc muon hieu sao Thien Dong ve kha nang thich nghi, phuc khi, thay doi moi truong va gioi han khi doc mot sao rieng le.",
+    "reason": "Publish 1 people-first articles from SEMrush intent clusters; first topic: Nguoi doc muon hieu sao Liem Trinh ve ky luat, ranh gioi, danh du va cach doc cung bo sao di kem.",
     "approvalRequired": false,
     "allowedToCommitDeployAfterVerification": true
   },
@@ -22,9 +22,9 @@
     "status": "skipped"
   },
   "lastDraftPaths": [
-    "docs/seo-autopilot/drafts/sao-thien-dong.md"
+    "docs/seo-autopilot/drafts/sao-liem-trinh.md"
   ],
-  "lastReportPath": "docs/seo-autopilot/reports/2026-07-14-weekly-content-batch.md",
+  "lastReportPath": "docs/seo-autopilot/reports/2026-07-15-weekly-content-batch.md",
   "nextVerificationCommands": [
     "npm run seo:autopilot",
     "npm test -- src/lib/content.test.ts src/lib/article-cover-assets.test.ts src/lib/seo-autopilot-core.test.ts",

@@ -47,6 +47,7 @@ Tài liệu này là ảnh chụp nhanh trạng thái dự án **Lá số tinh h
 - Brand: **Lá số tinh hoa**
 - Domain chính: `lasotinhhoa.vn`
 - Production host: VPS self-hosted behind Nginx, PM2 process `lasotinhhoa`, internal port `4100`
+- Production database: PostgreSQL 17 local on the VPS, `127.0.0.1:5433/lasotinhhoa`.
 - Đối tượng chính: người Việt 30-60 tuổi, muốn lập lá số dễ hiểu, ít thuật ngữ kỹ thuật.
 - Hướng UX: form-first, chữ rõ, CTA dễ bấm, giải thích ngắn, không tạo cảm giác quá "AI/SaaS".
 - Conversion chính: lập lá số miễn phí trước, sau đó mở luận giải toàn bộ hoặc các phần trả phí.

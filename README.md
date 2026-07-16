@@ -121,7 +121,7 @@ npm run perf:smoke
 
 Canonical production flow: `npm run ship` commits local changes when present, pushes `origin/master`, SSHes to `tuvi-vps`, fetches the pushed commit into `/opt/lasotinhhoa/source`, builds a clean release under `/opt/lasotinhhoa/releases/<timestamp>-<sha>`, switches `/opt/lasotinhhoa/current`, restarts PM2, and smokes the public URLs. Use `npm run ship -- "<message>"` when you want a custom commit message.
 
-Target deploy là VPS self-hosted + Postgres. App production chạy tại `/opt/lasotinhhoa/current`, PM2 process `lasotinhhoa`, internal port `127.0.0.1:4100`; Nginx phục vụ public HTTPS tại `https://lasotinhhoa.vn`.
+Target deploy là VPS self-hosted + Postgres local trên VPS. App production chạy tại `/opt/lasotinhhoa/current`, PM2 process `lasotinhhoa`, internal port `127.0.0.1:4100`; Nginx phục vụ public HTTPS tại `https://lasotinhhoa.vn`.
 
 Quy trình commit, push và deploy production một lệnh:
 
@@ -167,7 +167,7 @@ Các env quan trọng:
 ### Checklist production tối thiểu
 
 1. Đảm bảo `.env` production trên VPS có `DATABASE_URL`, `NEXT_PUBLIC_APP_URL`, `AUTH_SECRET`, `ADMIN_EMAIL`, `ADMIN_PASSWORD` và các env PayOS/Google/LLM cần dùng.
-2. DB hiện vẫn trỏ remote qua `DATABASE_URL`; chỉ tạo DB local trên VPS khi có yêu cầu migration riêng.
+2. DB production là PostgreSQL 17 local trên VPS; `DATABASE_URL` phải trỏ `127.0.0.1:5433/lasotinhhoa`, không trỏ về DB remote.
 3. Chạy migration/seed khi schema hoặc seed thay đổi: `npm run db:deploy` và `npm run db:seed`.
 4. Build release bằng Node >=20.9 trong thư mục mới `/opt/lasotinhhoa/releases/<timestamp>-<sha>`: `npm ci`, `npm run build`.
 5. Copy production `.env*` từ release đang chạy sang release mới trước khi build hoặc start.

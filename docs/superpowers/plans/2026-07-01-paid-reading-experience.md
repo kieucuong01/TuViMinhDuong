@@ -10,7 +10,7 @@
 
 **Execution status (2026-07-02):** Completed on `master`. Verified with ESLint, 388 Vitest tests, Prisma client generation, production build, and local desktop/mobile guest-route smoke testing.
 
-**Production migration note:** `20260702120000_add_reading_progress` was applied transactionally through the app PostgreSQL driver after Prisma's schema-engine connectivity probe stalled against the transaction pooler; the migration history row and all `ReadingProgress` columns were verified before deployment continued.
+**Production migration note:** `20260702120000_add_reading_progress` was applied transactionally through the app PostgreSQL driver after Prisma's schema-engine connectivity probe stalled against the old remote connection; the migration history row and all `ReadingProgress` columns were verified before deployment continued.
 
 ---
 

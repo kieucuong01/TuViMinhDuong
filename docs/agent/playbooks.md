@@ -207,8 +207,8 @@ Rules:
 - Preferred SSH entrypoint from this workspace is `ssh tuvi-vps`; keep strict host-key checking and use the dedicated key in the local SSH config instead of password-only SSH.
 - PM2 process name is `lasotinhhoa`; internal app port is `127.0.0.1:4100`.
 - Nginx owns public HTTP/HTTPS and reverse proxies to the internal app port. Avoid port collisions with the other VPS app on `127.0.0.1:5000`.
-- Production DB is PostgreSQL, not local demo fallback.
-- DB currently remains remote through `DATABASE_URL`; do not assume a VPS-local database exists until the migration is requested.
+- Production DB is PostgreSQL 17 on the VPS, not local demo fallback.
+- Production `DATABASE_URL` should point to the VPS-local DB at `127.0.0.1:5433/lasotinhhoa`; do not route production back to remote hosted Postgres.
 - Required envs: `DATABASE_URL`, `NEXT_PUBLIC_APP_URL`, `AUTH_SECRET`, `ADMIN_EMAIL`, `ADMIN_PASSWORD`.
 - PayOS and Google OAuth only work when their envs exist.
 - Run migrations before trusting production data flows.
