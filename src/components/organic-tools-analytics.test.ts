@@ -7,6 +7,7 @@ function source(path: string) {
 
 const dateFinderSource = source("src/components/date-range-finder.tsx");
 const birthHourSource = source("src/components/birth-hour-comparison.tsx");
+const ageToolSource = source("src/components/age-tool.tsx");
 const homeSource = source("src/app/page.tsx");
 
 describe("organic tool analytics", () => {
@@ -37,6 +38,19 @@ describe("organic tool analytics", () => {
     expect(homeSource).toContain("<ChartForm adSource={chartAdSource} />");
     expect(homeSource).toContain('params.source === "seo_article"');
   });
+
+  it("tracks the Xem Tuổi funnel without birth details", () => {
+    expect(ageToolSource).toContain('trackOrganicToolEvent("age_tool_view"');
+    expect(ageToolSource).toContain('trackOrganicToolEvent("age_tool_submit"');
+    expect(ageToolSource).toContain('trackOrganicToolEvent("age_tool_result"');
+    expect(ageToolSource).toContain('trackOrganicToolEvent("age_tool_related_click"');
+    expect(ageToolSource).toContain('trackOrganicToolEvent("age_tool_chart_cta"');
+    const analyticsCalls = ageToolSource.match(/trackOrganicToolEvent\([\s\S]*?\}\)/g)?.join("\n") || "";
+    expect(analyticsCalls).not.toContain("firstDate:");
+    expect(analyticsCalls).not.toContain("secondDate:");
+    expect(analyticsCalls).not.toContain("firstGender:");
+    expect(analyticsCalls).not.toContain("secondGender:");
+  });
 });
 
 describe("trackOrganicToolEvent", () => {
@@ -51,6 +65,10 @@ describe("trackOrganicToolEvent", () => {
       has_birth_year: true,
       birthYear: 1990,
       fullName: "Test",
+      gender: "female",
+      sex: "female",
+      lunarYear: 1989,
+      canChi: "Kỷ Tỵ",
     });
 
     expect(gtag).toHaveBeenCalledWith("event", "date_finder_submitted", {

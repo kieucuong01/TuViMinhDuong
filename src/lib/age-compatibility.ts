@@ -280,7 +280,8 @@ function napAmCriterion(left: LunarYearProfile, right: LunarYearProfile): Criter
 
 function cungPhiCriterion(left: LunarYearProfile, right: LunarYearProfile): Criterion | undefined {
   if (!left.cungPhi || !right.cungPhi) return undefined;
-  const relation = DU_NIEN_BY_XOR[TRIGRAM_BINARY[left.cungPhi.name] ^ TRIGRAM_BINARY[right.cungPhi.name]];
+  const xor = (TRIGRAM_BINARY[left.cungPhi.name] ^ TRIGRAM_BINARY[right.cungPhi.name]) as keyof typeof DU_NIEN_BY_XOR;
+  const relation = DU_NIEN_BY_XOR[xor];
   return {
     key: "cung-phi",
     label: "Cung Phi",

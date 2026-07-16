@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { AGE_TOOL_PAGES } from "@/lib/age-tools";
 import {
   analyzeKetHon,
   analyzeLamNha,
@@ -99,5 +100,20 @@ describe("year selection rules", () => {
       "Lục Hoang Ốc",
     ]);
     expect(analyzeLamNha("1996-06-01", "male", 2026, 2026).years[0].details.hoangOc.name).toBe("Tứ Tấn Tài");
+  });
+});
+
+describe("age tool registry", () => {
+  it("publishes exactly six distinct tool intents", () => {
+    expect(AGE_TOOL_PAGES.map((page) => page.slug)).toEqual([
+      "xong-dat",
+      "vo-chong",
+      "sinh-con",
+      "ket-hon",
+      "lam-an",
+      "lam-nha",
+    ]);
+    expect(new Set(AGE_TOOL_PAGES.map((page) => page.title)).size).toBe(6);
+    expect(AGE_TOOL_PAGES.every((page) => page.faqs.length >= 3)).toBe(true);
   });
 });
