@@ -18,7 +18,6 @@ import {
   Map,
   Menu,
   MoonStar,
-  Search,
   Sparkles,
   TreePine,
 } from "lucide-react";
@@ -142,6 +141,31 @@ export function MobileSiteMenu({ items, lookupLinks }: MobileSiteMenuProps) {
             );
           }
 
+          if (item.tone === "knowledge") {
+            return (
+              <details key={item.href} className="mobile-lookup-group mobile-article-group">
+                <summary className={itemClass}>
+                  <BookOpenText aria-hidden="true" size={16} strokeWidth={2.4} />
+                  <span>Bài Viết</span>
+                  <ChevronDown aria-hidden="true" size={15} />
+                </summary>
+                <div>
+                  <Link href="/kien-thuc-tu-vi" prefetch={false} onClick={closeMenu}>
+                    Kiến thức tử vi
+                  </Link>
+                  <Link href="/tra-cuu" prefetch={false} onClick={closeMenu}>
+                    Tra cứu tổng quan
+                  </Link>
+                  {lookupLinks.map((lookupItem) => (
+                    <Link key={lookupItem.href} href={lookupItem.href} prefetch={false} onClick={closeMenu}>
+                      {lookupItem.label}
+                    </Link>
+                  ))}
+                </div>
+              </details>
+            );
+          }
+
           return item.modal ? (
             <CoinTopupLink key={item.href} className={itemClass} onClick={closeMenu}>
               {Icon ? <Icon aria-hidden="true" size={16} strokeWidth={2.4} /> : null}
@@ -154,20 +178,6 @@ export function MobileSiteMenu({ items, lookupLinks }: MobileSiteMenuProps) {
             </Link>
           );
         })}
-        <details className="mobile-lookup-group">
-          <summary className="mobile-menu-link rounded-xl px-3 py-2.5 text-sm font-semibold text-stone-700">
-            <Search aria-hidden="true" size={16} strokeWidth={2.4} />
-            <span>Tra cứu</span>
-            <ChevronDown aria-hidden="true" size={15} />
-          </summary>
-          <div>
-            {lookupLinks.map((item) => (
-              <Link key={item.href} href={item.href} prefetch={false} onClick={closeMenu}>
-                {item.label}
-              </Link>
-            ))}
-          </div>
-        </details>
       </div>
     </details>
   );

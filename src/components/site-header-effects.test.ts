@@ -8,11 +8,12 @@ const layoutSource = readFileSync(fileURLToPath(new URL("../app/layout.tsx", imp
 const globalsCss = readFileSync(fileURLToPath(new URL("../app/globals.css", import.meta.url)), "utf8");
 
 describe("site header featured nav effects", () => {
-  it("marks Xem ngay and Kien thuc as featured nav tabs with icons", () => {
+  it("marks Xem ngay and Bai Viet as featured nav tabs with icons", () => {
     expect(headerSource).toContain("CalendarDays");
     expect(headerSource).toContain("BookOpenText");
     expect(headerSource).toContain('tone: "date"');
     expect(headerSource).toContain('tone: "knowledge"');
+    expect(headerSource).toContain("Bài Viết");
     expect(headerSource).toContain("site-nav-date");
     expect(headerSource).toContain("site-nav-knowledge");
   });
@@ -26,14 +27,18 @@ describe("site header featured nav effects", () => {
     expect(headerSource).toContain('href: "/kien-thuc-tu-vi"');
   });
 
-  it("adds a three-hub lookup dropdown without leaf links", () => {
-    expect(headerSource).toContain("Tra cứu");
+  it("moves knowledge and lookup links under the Bai Viet dropdown without changing SEO URLs", () => {
+    expect(headerSource).toContain("site-article-menu");
+    expect(headerSource).toContain("Kiến thức tử vi");
+    expect(headerSource).toContain('href="/tra-cuu"');
+    expect(headerSource).not.toContain("site-nav-lookup");
     expect(headerSource).toContain("/tra-cuu/y-nghia-14-chinh-tinh");
     expect(headerSource).toContain("/tra-cuu/y-nghia-12-cung");
     expect(headerSource).toContain("/tra-cuu/phu-tinh");
     expect(headerSource).toContain("site-lookup-panel-icon");
     expect(headerSource).not.toContain("sao-thai-am-cung-tai-bach");
-    expect(mobileMenuSource).toContain("mobile-lookup-group");
+    expect(mobileMenuSource).toContain("mobile-article-group");
+    expect(mobileMenuSource).not.toContain("<span>Tra cứu</span>");
   });
 
   it("places the six-tool Xem Tuổi menu next to Xem Ngày on desktop and mobile", () => {

@@ -30,7 +30,7 @@ const baseNav = [
   { href: "/", label: "Lập lá số", tone: "primary" },
   { href: "/xem-ngay", label: "Xem ngày", tone: "date" },
   { href: "/xem-tuoi", label: "Xem tuổi", tone: "age" },
-  { href: "/kien-thuc-tu-vi", label: "Kiến thức", tone: "knowledge" },
+  { href: "/kien-thuc-tu-vi", label: "Bài Viết", tone: "knowledge" },
 ];
 
 const lookupLinks = [
@@ -158,6 +158,37 @@ export async function SiteHeader() {
               );
             }
 
+            if (item.tone === "knowledge") {
+              return (
+                <div key={item.href} className="site-nav-flyout site-lookup-menu site-article-menu">
+                  <Link href={item.href} className={linkClass} prefetch={false} aria-haspopup="true">
+                    <BookOpenText aria-hidden="true" size={16} strokeWidth={2.4} />
+                    <span>{item.label}</span>
+                    <ChevronDown aria-hidden="true" size={14} />
+                  </Link>
+                  <div className="site-lookup-panel">
+                    <Link href="/kien-thuc-tu-vi" prefetch={false}>
+                      <span className="site-lookup-panel-icon"><BookOpenText aria-hidden={true} size={16} strokeWidth={2.35} /></span>
+                      <strong>Kiến thức tử vi</strong>
+                    </Link>
+                    <Link href="/tra-cuu" prefetch={false}>
+                      <span className="site-lookup-panel-icon"><Search aria-hidden={true} size={16} strokeWidth={2.35} /></span>
+                      <strong>Tra cứu tổng quan</strong>
+                    </Link>
+                    {lookupLinks.map((lookupItem) => {
+                      const LookupIcon = lookupMenuIcons[lookupItem.icon];
+                      return (
+                        <Link key={lookupItem.href} href={lookupItem.href} prefetch={false}>
+                          <span className="site-lookup-panel-icon"><LookupIcon aria-hidden={true} size={16} strokeWidth={2.35} /></span>
+                          <strong>{lookupItem.label}</strong>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            }
+
             return (
               <Link key={item.href} href={item.href} className={linkClass} prefetch={false}>
                 {Icon ? <Icon aria-hidden="true" size={16} strokeWidth={2.4} /> : null}
@@ -165,24 +196,6 @@ export async function SiteHeader() {
               </Link>
             );
           })}
-          <div className="site-nav-flyout site-lookup-menu">
-            <Link href="/tra-cuu" className="site-nav-link site-nav-lookup rounded-full px-3.5 py-2" prefetch={false} aria-haspopup="true">
-              <Search aria-hidden="true" size={16} strokeWidth={2.4} />
-              <span>Tra cứu</span>
-              <ChevronDown aria-hidden="true" size={14} />
-            </Link>
-            <div className="site-lookup-panel">
-              {lookupLinks.map((item) => {
-                const LookupIcon = lookupMenuIcons[item.icon];
-                return (
-                  <Link key={item.href} href={item.href} prefetch={false}>
-                    <span className="site-lookup-panel-icon"><LookupIcon aria-hidden={true} size={16} strokeWidth={2.35} /></span>
-                    <strong>{item.label}</strong>
-                  </Link>
-                );
-              })}
-            </div>
-          </div>
         </nav>
 
         <div className="site-header-actions flex items-center gap-2">

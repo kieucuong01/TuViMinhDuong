@@ -3,7 +3,7 @@
 ## Recent Update: Mobile Header Navigation
 
 - Mobile bottom navigation has been removed. Do not reintroduce it unless the user explicitly asks.
-- Mobile header uses three zones: left menu for `Lá số`, `Xem ngày`, `Kiến thức`; centered logo/brand; right account trigger.
+- Mobile header uses three zones: left menu for `Lá số`, `Xem ngày`, `Xem tuổi`, `Bài Viết`; centered logo/brand; right account trigger.
 - `src/components/mobile-site-menu.tsx` owns the left mobile navigation menu. `src/components/user-header-badge.tsx` owns account/login on the right and must keep logout available for logged-in users.
 - Do not add payment/refund policy links to account menus. The authenticated payment/refund policy remains a logged-in footer link only.
 - Mobile floating surfaces should use `--mobile-floating-bottom` and `--mobile-safe-bottom`; there is no bottom tabbar height to reserve.
