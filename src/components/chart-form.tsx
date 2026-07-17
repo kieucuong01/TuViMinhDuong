@@ -1,4 +1,5 @@
 import { createChartAction } from "@/app/actions";
+import { ChartAttributionFields } from "@/components/chart-attribution-fields";
 import { LoadingSubmitButton } from "@/components/loading-submit-button";
 import { Sparkles } from "lucide-react";
 
@@ -32,6 +33,7 @@ export function ChartForm({ compact = false, adSource = "chart_form" }: ChartFor
       data-loading-label="Đang lập lá số..."
     >
       <input type="hidden" name="adSource" value={adSource} />
+      <ChartAttributionFields />
       <div className="form-grid">
         <label className="chart-name-field md:col-span-2">
           <span className="chart-field-label">Họ và tên</span>

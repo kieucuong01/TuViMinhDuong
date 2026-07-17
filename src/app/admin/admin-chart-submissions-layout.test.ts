@@ -10,6 +10,8 @@ describe("admin chart submissions layout", () => {
     expect(adminPageSource).toContain("listAdminChartSubmissions");
     expect(adminPageSource).toContain("/admin?tab=charts");
     expect(adminPageSource).toContain("data-testid=\"admin-chart-submissions\"");
+    expect(adminPageSource).toContain("sourceLabel(item)");
+    expect(adminPageSource).toContain("sourceDetail(item)");
   });
 
   it("surfaces guest and logged-in submitter context", () => {

@@ -49,12 +49,25 @@ describe("chart creation metadata", () => {
     await saveChart(chartInput, null, {
       requestIp: "203.0.113.10",
       userAgent: "Mozilla/5.0 Test",
+      attribution: {
+        source: "ads",
+        label: "Ads",
+        confidence: "high",
+        utm: { source: "google", medium: "cpc", campaign: "brand" },
+        landingPath: "/lap-la-so",
+        placement: "google_ads_landing",
+      },
     });
 
     expect(db.chart.create).toHaveBeenCalledWith(expect.objectContaining({
       data: expect.objectContaining({
         creationIp: "203.0.113.10",
         creationUserAgent: "Mozilla/5.0 Test",
+        creationSource: "ads",
+        creationAttribution: expect.objectContaining({
+          label: "Ads",
+          utm: expect.objectContaining({ source: "google", medium: "cpc" }),
+        }),
       }),
     }));
   });

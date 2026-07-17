@@ -3,7 +3,7 @@ import { Banknote, ClipboardList, Coins, Eye, FilePenLine, Plus, ReceiptText, Se
 import { redirect } from "next/navigation";
 import { adjustUserCoinsAction, deleteUserAction, saveArticleAction, saveArticleCategoryAction, saveFeaturePricesAction, saveOperationSettingsAction } from "@/app/actions";
 import { getCurrentUser } from "@/lib/auth";
-import { getAdminArticleBySlug, getAdminBusinessDashboard, getAdminOverview, listAdminArticles, listAdminChartSubmissions, listArticleCategories, normalizeAdminTrendPeriod } from "@/lib/data";
+import { getAdminArticleBySlug, getAdminBusinessDashboard, getAdminOverview, listAdminArticles, listAdminChartSubmissions, listArticleCategories, normalizeAdminTrendPeriod, type AdminChartSubmission } from "@/lib/data";
 import type { ArticleView } from "@/lib/content";
 import { LoadingSubmitButton } from "@/components/loading-submit-button";
 import { AdminArticleDeleteForm } from "@/components/admin-article-delete-form";
@@ -155,6 +155,30 @@ function submitterLabel(item: { submitterType: "guest" | "user"; userName: strin
 function submitterDetail(item: { submitterType: "guest" | "user"; userId: string | null; userEmail: string | null }) {
   if (item.submitterType === "guest") return "Không gắn tài khoản";
   return item.userEmail || item.userId || "User đã đăng nhập";
+}
+
+function sourceLabel(item: AdminChartSubmission) {
+  const source = item.creationAttribution?.source || item.creationSource;
+  if (source === "ads") return "Ads";
+  if (source === "organic_search") return "Search";
+  if (source === "ai") return "AI";
+  if (source === "internal") return "Nội bộ";
+  if (source === "referral") return "Referral";
+  if (source === "direct") return "Direct";
+  return "Chưa rõ";
+}
+
+function sourceDetail(item: AdminChartSubmission) {
+  const attribution = item.creationAttribution;
+  if (!attribution) return "Chưa có UTM/referrer";
+  const utm = attribution.utm;
+  const utmLine = [utm?.source, utm?.medium, utm?.campaign].filter(Boolean).join(" / ");
+  if (utmLine) return utmLine;
+  if (attribution.source === "organic_search" && attribution.referrerHost) return `${attribution.referrerHost} organic`;
+  if (attribution.referrerHost) return attribution.referrerHost;
+  if (attribution.placement) return attribution.placement;
+  if (attribution.landingPath) return attribution.landingPath;
+  return attribution.confidence === "low" ? "Tín hiệu yếu" : "Có tín hiệu nguồn";
 }
 
 function seoChecks(article: ArticleView) {
@@ -439,6 +463,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
                 <tr>
                   <th>Thời gian submit</th>
                   <th>Người submit</th>
+                  <th>Nguồn</th>
                   <th>Họ tên nhập form</th>
                   <th>Ngày giờ sinh</th>
                   <th>Lịch</th>
@@ -460,6 +485,10 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
                       </em>
                     </td>
                     <td>
+                      <strong>{sourceLabel(item)}</strong>
+                      <span>{sourceDetail(item)}</span>
+                    </td>
+                    <td>
                       <strong>{item.fullName}</strong>
                       <span>{item.title}</span>
                     </td>
@@ -476,7 +505,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
                   </tr>
                 )) : (
                   <tr>
-                    <td colSpan={9}>
+                    <td colSpan={10}>
                       <span>Chưa có form lập lá số nào trong dữ liệu hiện tại.</span>
                     </td>
                   </tr>
