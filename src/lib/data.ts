@@ -16,6 +16,7 @@ import { MAIN_STARS, PALACES, SUPPORT_STARS, buildPseoInventory } from "@/lib/ps
 import type { SessionUser } from "@/lib/auth";
 import { createPerfTimer, logPerfEvent } from "@/lib/perf";
 import type { ReadingProgressInput } from "@/lib/reading-progress";
+import type { ChartAttribution } from "@/lib/chart-attribution";
 
 type StoredChart = {
   id: string;
@@ -25,12 +26,15 @@ type StoredChart = {
   userId?: string;
   creationIp?: string | null;
   creationUserAgent?: string | null;
+  creationSource?: string | null;
+  creationAttribution?: ChartAttribution | null;
   createdAt: Date;
 };
 
 export type ChartCreationMetadata = {
   requestIp?: string;
   userAgent?: string;
+  attribution?: ChartAttribution;
 };
 
 export type StoredReading = {
@@ -283,6 +287,8 @@ export type AdminChartSubmission = {
   timezone: string;
   creationIp: string | null;
   creationUserAgent: string | null;
+  creationSource: string | null;
+  creationAttribution: ChartAttribution | null;
 };
 
 export type FreeOverviewStatus =
@@ -439,6 +445,20 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return Boolean(value && typeof value === "object");
 }
 
+function normalizeStoredAttribution(value: unknown): ChartAttribution | null {
+  if (!isRecord(value)) return null;
+  const source = String(value.source || "");
+  const label = String(value.label || "");
+  const confidence = value.confidence === "high" || value.confidence === "medium" || value.confidence === "low" ? value.confidence : "low";
+  if (!source || !label) return null;
+  return {
+    ...value,
+    source,
+    label,
+    confidence,
+  } as ChartAttribution;
+}
+
 function readingProgressEntries() {
   globalStore.demoReadingProgress ||= new Map();
   return globalStore.demoReadingProgress;
@@ -475,12 +495,24 @@ type AdminChartSubmissionRecord = {
   userId?: string | null;
   creationIp?: string | null;
   creationUserAgent?: string | null;
+  creationSource?: string | null;
+  creationAttribution?: unknown;
   createdAt: Date;
   user?: {
     id?: string;
     email: string;
     name: string | null;
   } | null;
+};
+
+type ChartCreateRecord = Omit<AdminChartSubmissionRecord, "user" | "input"> & {
+  input: unknown;
+  chart: unknown;
+};
+
+type ChartDelegateWithAttribution = {
+  create(args: { data: Record<string, unknown> }): Promise<ChartCreateRecord>;
+  findMany(args: Record<string, unknown>): Promise<AdminChartSubmissionRecord[]>;
 };
 
 function normalizeAdminChartSubmission(record: AdminChartSubmissionRecord): AdminChartSubmission {
@@ -506,6 +538,8 @@ function normalizeAdminChartSubmission(record: AdminChartSubmissionRecord): Admi
     timezone: input.timezone || "Asia/Bangkok",
     creationIp: record.creationIp || null,
     creationUserAgent: record.creationUserAgent || null,
+    creationSource: record.creationSource || null,
+    creationAttribution: normalizeStoredAttribution(record.creationAttribution),
   };
 }
 
@@ -846,6 +880,8 @@ export async function saveChart(input: ChartInput, user: SessionUser | null, met
       userId: user?.id,
       creationIp: metadata.requestIp,
       creationUserAgent: metadata.userAgent,
+      creationSource: metadata.attribution?.source,
+      creationAttribution: metadata.attribution,
       createdAt: new Date(),
     };
     charts().set(id, stored);
@@ -857,8 +893,9 @@ export async function saveChart(input: ChartInput, user: SessionUser | null, met
     return stored;
   }
 
+  const chartDelegate = db.chart as unknown as ChartDelegateWithAttribution;
   const created = await timer.time("dbCreate", () =>
-    db.chart.create({
+    chartDelegate.create({
       data: {
         title,
         input: chart.input,
@@ -867,6 +904,8 @@ export async function saveChart(input: ChartInput, user: SessionUser | null, met
         isPrivate: true,
         creationIp: metadata.requestIp,
         creationUserAgent: metadata.userAgent,
+        creationSource: metadata.attribution?.source,
+        creationAttribution: metadata.attribution,
       },
     }),
   );
@@ -878,6 +917,8 @@ export async function saveChart(input: ChartInput, user: SessionUser | null, met
     userId: created.userId || undefined,
     creationIp: created.creationIp || undefined,
     creationUserAgent: created.creationUserAgent || undefined,
+    creationSource: created.creationSource || undefined,
+    creationAttribution: normalizeStoredAttribution(created.creationAttribution),
     createdAt: created.createdAt,
   };
   logPerfEvent("save_chart_timing", timer.total(), {
@@ -2054,13 +2095,16 @@ export async function listAdminChartSubmissions(limit = 80): Promise<AdminChartS
           userId: chart.userId || null,
           creationIp: chart.creationIp || null,
           creationUserAgent: chart.creationUserAgent || null,
+          creationSource: chart.creationSource || null,
+          creationAttribution: chart.creationAttribution || null,
           createdAt: chart.createdAt,
           user: userEmail ? { email: userEmail, name: null } : null,
         });
       });
   }
 
-  const rows = await db.chart.findMany({
+  const chartDelegate = db.chart as unknown as ChartDelegateWithAttribution;
+  const rows = await chartDelegate.findMany({
     orderBy: { createdAt: "desc" },
     take: limit,
     select: {
@@ -2070,6 +2114,8 @@ export async function listAdminChartSubmissions(limit = 80): Promise<AdminChartS
       userId: true,
       creationIp: true,
       creationUserAgent: true,
+      creationSource: true,
+      creationAttribution: true,
       createdAt: true,
       user: {
         select: {

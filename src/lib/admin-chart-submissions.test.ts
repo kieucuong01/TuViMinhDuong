@@ -52,6 +52,14 @@ describe("admin chart submissions", () => {
             title: "La so khach",
             input: guestInput,
             userId: null,
+            creationSource: "ai",
+            creationAttribution: {
+              source: "ai",
+              label: "AI",
+              confidence: "high",
+              utm: { source: "chatgpt", medium: "ai_referral" },
+              landingPath: "/",
+            },
             createdAt: new Date("2026-06-10T08:00:00Z"),
             user: null,
           },
@@ -60,6 +68,14 @@ describe("admin chart submissions", () => {
             title: "La so user",
             input: userInput,
             userId: "user-1",
+            creationSource: "organic_search",
+            creationAttribution: {
+              source: "organic_search",
+              label: "Search",
+              confidence: "medium",
+              referrerHost: "google.com",
+              landingPath: "/",
+            },
             createdAt: new Date("2026-06-09T08:00:00Z"),
             user: { id: "user-1", email: "user@example.com", name: "Nguoi dung" },
           },
@@ -78,6 +94,8 @@ describe("admin chart submissions", () => {
         id: true,
         input: true,
         userId: true,
+        creationSource: true,
+        creationAttribution: true,
         user: expect.any(Object),
       }),
     }));
@@ -93,6 +111,10 @@ describe("admin chart submissions", () => {
       day: 12,
       birthMinute: 15,
       viewYear: 2026,
+      creationSource: "ai",
+      creationAttribution: expect.objectContaining({
+        label: "AI",
+      }),
     });
     expect(submissions[1]).toMatchObject({
       id: "chart-user",
@@ -103,6 +125,10 @@ describe("admin chart submissions", () => {
       fullName: "Nguyen Van A",
       calendarType: "lunar",
       birthHour: 3,
+      creationSource: "organic_search",
+      creationAttribution: expect.objectContaining({
+        referrerHost: "google.com",
+      }),
     });
   });
 });

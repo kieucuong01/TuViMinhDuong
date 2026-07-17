@@ -19,6 +19,7 @@ import { createPerfTimer, logPerfEvent } from "@/lib/perf";
 import { ActionTimeoutError, withActionTimeout } from "@/lib/action-timeout";
 import { savePseoPageFromForm } from "@/lib/pseo-data";
 import { chartCreationRateLimitExceeded, chartCreationRateLimitWindowStart, normalizeRequestIp, normalizeUserAgent, validateChartFullName } from "@/lib/chart-submission-guard";
+import { normalizeChartAttribution } from "@/lib/chart-attribution";
 
 function createChartTimeoutMs(value = process.env.CREATE_CHART_ACTION_TIMEOUT_MS) {
   const parsed = Number(value);
@@ -121,6 +122,24 @@ function safeAdSource(value: FormDataEntryValue | null) {
   return /^[a-z0-9_-]{1,64}$/i.test(source) ? source : "chart_form";
 }
 
+function textField(formData: FormData, name: string) {
+  return String(formData.get(name) || "");
+}
+
+function chartAttributionFromForm(formData: FormData, adSource: string) {
+  return normalizeChartAttribution({
+    utmSource: textField(formData, "utm_source"),
+    utmMedium: textField(formData, "utm_medium"),
+    utmCampaign: textField(formData, "utm_campaign"),
+    utmContent: textField(formData, "utm_content"),
+    utmTerm: textField(formData, "utm_term"),
+    sourceParam: textField(formData, "source"),
+    referrer: textField(formData, "referrer"),
+    landingPath: textField(formData, "landing_path"),
+    placement: adSource,
+  });
+}
+
 function chartInputFromForm(formData: FormData) {
   return {
     fullName: String(formData.get("fullName") || ""),
@@ -136,7 +155,7 @@ function chartInputFromForm(formData: FormData) {
   };
 }
 
-async function getChartCreationMetadata(): Promise<ChartCreationMetadata> {
+async function getChartCreationMetadata(formData: FormData, adSource: string): Promise<ChartCreationMetadata> {
   const headerList = await headers();
   return {
     requestIp: normalizeRequestIp(
@@ -146,15 +165,16 @@ async function getChartCreationMetadata(): Promise<ChartCreationMetadata> {
         headerList.get("x-client-ip"),
     ),
     userAgent: normalizeUserAgent(headerList.get("user-agent")),
+    attribution: chartAttributionFromForm(formData, adSource),
   };
 }
 
-async function guardChartSubmission(input: ReturnType<typeof chartInputFromForm>) {
+async function guardChartSubmission(input: ReturnType<typeof chartInputFromForm>, formData: FormData, adSource: string) {
   const validation = validateChartFullName(input.fullName);
   if (!validation.ok) throw new ChartSubmissionRejectedError("invalid");
   input.fullName = validation.fullName;
 
-  const metadata = await getChartCreationMetadata();
+  const metadata = await getChartCreationMetadata(formData, adSource);
   const recentCount = await countRecentChartsForIp(metadata.requestIp, chartCreationRateLimitWindowStart());
   if (chartCreationRateLimitExceeded(recentCount)) throw new ChartSubmissionRejectedError("rate_limited");
   return metadata;
@@ -174,7 +194,7 @@ export async function createChartAction(formData: FormData) {
 
   try {
     result = await withActionTimeout("createChartAction", CREATE_CHART_ACTION_TIMEOUT_MS, async () => {
-      const metadata = await timer.time("guardChartSubmission", () => guardChartSubmission(input));
+      const metadata = await timer.time("guardChartSubmission", () => guardChartSubmission(input, formData, adSource));
       const user = await timer.time("getCurrentUser", () => getCurrentUser());
       const chart = await timer.time("saveChart", () => saveChart(input, user, metadata));
       return { user, chart };
@@ -207,9 +227,10 @@ export async function quickReadingCheckoutAction(formData: FormData) {
   if (!operationSettings.paymentsEnabled || !operationSettings.paidReadingsEnabled) redirect("/?paid=disabled");
 
   const input = chartInputFromForm(formData);
+  const adSource = safeAdSource(formData.get("adSource"));
   let metadata: ChartCreationMetadata;
   try {
-    metadata = await guardChartSubmission(input);
+    metadata = await guardChartSubmission(input, formData, adSource);
   } catch (error) {
     redirect(withQueryParams("/#lap-la-so", { chartError: chartSubmissionErrorParam(error) }));
   }
