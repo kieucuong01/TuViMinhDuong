@@ -41,6 +41,7 @@ describe("SEO content cluster", () => {
     expect(slugs).toContain("menh-tham-lang-la-gi");
     expect(slugs).toContain("sao-vu-khuc");
     expect(slugs).toContain("sao-thai-am");
+    expect(slugs).toContain("sao-thien-phu");
     expect(slugs).toContain("sao-thien-dong");
     expect(slugs).toContain("sao-liem-trinh");
     expect(slugs).toContain("sao-thien-co");
@@ -75,6 +76,7 @@ describe("SEO content cluster", () => {
     const menhThamLangGuide = seedArticles.find((article) => article.slug === "menh-tham-lang-la-gi");
     const saoVuKhucGuide = seedArticles.find((article) => article.slug === "sao-vu-khuc");
     const saoThaiAmGuide = seedArticles.find((article) => article.slug === "sao-thai-am");
+    const saoThienPhuGuide = seedArticles.find((article) => article.slug === "sao-thien-phu");
     const saoLiemTrinhGuide = seedArticles.find((article) => article.slug === "sao-liem-trinh");
 
     expect(hub?.content).toContain("/#lap-la-so");
@@ -163,6 +165,12 @@ describe("SEO content cluster", () => {
     expect(saoThaiAmGuide?.content).toContain("/kien-thuc-tu-vi/cung-phuc-duc-trong-tu-vi");
     expect(saoThaiAmGuide?.content).toContain("| Dữ liệu nền cần khóa |");
     expect(saoThaiAmGuide?.content).toContain("| Điều kiện cần đối chiếu |");
+    expect(saoThienPhuGuide?.content).toContain("/#lap-la-so");
+    expect(saoThienPhuGuide?.content).toContain("/kien-thuc-tu-vi/cung-tai-bach-trong-tu-vi");
+    expect(saoThienPhuGuide?.content).toContain("/kien-thuc-tu-vi/cung-dien-trach-trong-tu-vi");
+    expect(saoThienPhuGuide?.content).toContain("/kien-thuc-tu-vi/cung-phuc-duc-trong-tu-vi");
+    expect(saoThienPhuGuide?.content).toContain("| Dữ liệu nền cần khóa |");
+    expect(saoThienPhuGuide?.content).toContain("| Điều kiện cần đối chiếu |");
     expect(saoLiemTrinhGuide?.content).toContain("/#lap-la-so");
     expect(saoLiemTrinhGuide?.content).toContain("/kien-thuc-tu-vi/cung-quan-loc-trong-tu-vi");
     expect(saoLiemTrinhGuide?.content).toContain("/kien-thuc-tu-vi/cung-tai-bach-trong-tu-vi");
@@ -253,6 +261,23 @@ describe("SEO content cluster", () => {
     expect(saoThaiAmGuide?.content).toContain("| Điều kiện cần đối chiếu |");
     expect(saoThaiAmGuide?.content).toContain("## Khung causal analysis để đọc sao Thái Âm không thành nhãn \"hiền hay yếu\"");
     expect(saoThaiAmGuide?.faqs?.length).toBeGreaterThanOrEqual(3);
+  });
+
+  it("ships the sao Thiên Phủ article as a distinct star-intent page with resource and foundation context", () => {
+    const saoThienPhuGuide = seedArticles.find((article) => article.slug === "sao-thien-phu");
+
+    expect(saoThienPhuGuide).toBeTruthy();
+    expect(saoThienPhuGuide?.coverImage).toBe("/articles/sao-thien-phu.webp");
+    expect(saoThienPhuGuide?.ogImage).toBe("/articles/sao-thien-phu.webp");
+    expect(saoThienPhuGuide?.coverAlt).toContain("sổ ngân sách gia đình");
+    expect(saoThienPhuGuide?.coverAlt).toContain("đọc sao Thiên Phủ");
+    expect(saoThienPhuGuide?.content).toContain("/kien-thuc-tu-vi/cung-tai-bach-trong-tu-vi");
+    expect(saoThienPhuGuide?.content).toContain("/kien-thuc-tu-vi/cung-dien-trach-trong-tu-vi");
+    expect(saoThienPhuGuide?.content).toContain("/kien-thuc-tu-vi/cung-phuc-duc-trong-tu-vi");
+    expect(saoThienPhuGuide?.content).toContain("| Vị trí hoặc câu hỏi đang hỏi |");
+    expect(saoThienPhuGuide?.content).toContain("| Điều kiện cần đối chiếu |");
+    expect(saoThienPhuGuide?.content).toContain("## Khung causal analysis để đọc sao Thiên Phủ không thành nhãn \"người giữ của\" hay \"người phải gánh\"");
+    expect(saoThienPhuGuide?.faqs?.length).toBeGreaterThanOrEqual(3);
   });
 
   it("ships the sao Thiên Đồng article as a distinct star-intent page with adaptability and environment context", () => {
