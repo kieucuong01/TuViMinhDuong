@@ -37,7 +37,7 @@ export type ChartAttributionInput = {
 
 const PAID_MEDIUMS = new Set(["cpc", "paid", "ppc", "paid_search", "paid-social", "paid_social"]);
 const SEARCH_HOSTS = ["google.", "bing.", "coccoc.", "yahoo.", "duckduckgo."];
-const AI_SOURCES = new Set(["chatgpt", "openai", "gemini", "perplexity", "claude", "copilot"]);
+const AI_SOURCES = new Set(["chatgpt", "chatgpt.com", "openai", "gemini", "perplexity", "claude", "copilot"]);
 const AI_HOSTS = ["chatgpt.com", "openai.com", "gemini.google.com", "perplexity.ai", "claude.ai", "copilot.microsoft.com"];
 const INTERNAL_SOURCES = new Set(["seo_article", "date_finder", "xem_tuoi_vo_chong", "xem_tuoi_sinh_con", "pseo_inline"]);
 const INTERNAL_HOSTS = new Set(["lasotinhhoa.vn", "www.lasotinhhoa.vn"]);

@@ -71,6 +71,7 @@ export default async function DatePurposePage({
           initialFinderFrom={query.from}
           initialFinderTo={query.to}
           initialBirthYear={query.birthYear}
+          showPageHeading={false}
         />
 
         <section className="date-purpose-guide panel mt-8">

@@ -19,7 +19,10 @@ describe("Google Ads tracking markers", () => {
     expect(analyticsSource).toContain("GoogleAnalyticsDeferredLoader");
     expect(analyticsSource).toContain("GOOGLE_ADS_ID");
     expect(deferredLoaderSource).toContain("googletagmanager.com/gtag/js");
-    expect(deferredLoaderSource).toContain("setTimeout(loadGoogleTag, 12000)");
+    expect(deferredLoaderSource).toContain('from "next/script"');
+    expect(deferredLoaderSource).toContain('strategy="afterInteractive"');
+    expect(deferredLoaderSource).not.toContain("setTimeout(loadGoogleTag, 12000)");
+    expect(deferredLoaderSource).not.toContain('document.addEventListener("pointerdown"');
     expect(deferredLoaderSource).toContain('gtag("config", adsId)');
   });
 

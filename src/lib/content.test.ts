@@ -682,4 +682,18 @@ describe("SEO content cluster", () => {
     expect(corePillars[1]!.content).toContain("[Cung Quan Lộc khi đang hỏi về công việc](/kien-thuc-tu-vi/cung-quan-loc-trong-tu-vi)");
     expect(corePillars[2]!.content).toContain("[12 cung trong lá số tử vi để đặt Mệnh - Thân vào bức tranh đầy đủ](/kien-thuc-tu-vi/12-cung-trong-la-so-tu-vi)");
   });
+
+  it("links relevant palace guides to the matching age tools", () => {
+    const expectedLinks = [
+      ["cung-phu-the-trong-tu-vi", "/xem-tuoi/vo-chong"],
+      ["cung-quan-loc-trong-tu-vi", "/xem-tuoi/lam-an"],
+      ["cung-dien-trach-trong-tu-vi", "/xem-tuoi/lam-nha"],
+      ["cung-tu-tuc-trong-tu-vi", "/xem-tuoi/sinh-con"],
+    ] as const;
+
+    for (const [slug, href] of expectedLinks) {
+      const article = seedArticles.find((item) => item.slug === slug);
+      expect(article?.content, `${slug} should link to ${href}`).toContain(href);
+    }
+  });
 });

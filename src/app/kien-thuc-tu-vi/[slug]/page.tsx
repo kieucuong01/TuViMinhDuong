@@ -55,6 +55,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
   );
   const relatedArticles = [...relatedByCategory, ...fallbackArticles].slice(0, 3);
   const midArticleCta = <ArticlePersonalizedCta articleSlug={article.slug} articleTitle={article.title} categoryName={article.category?.name} />;
+  const displayDate = article.updatedAt || article.publishedAt;
   const articleLd = articleJsonLd(article);
   const breadcrumbLd = breadcrumbJsonLd([
     { name: "Trang chủ", url: APP_URL },
@@ -77,10 +78,10 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
         <p className="eyebrow">Kiến thức tử vi</p>
         <h1 className="text-balance text-4xl font-black leading-tight text-stone-950 sm:text-5xl">{article.title}</h1>
         <p className="mt-4 text-pretty text-lg leading-8 text-stone-700">{article.excerpt}</p>
-        {article.publishedAt ? (
+        {displayDate ? (
           <div className="mt-5 flex flex-wrap gap-2">
             {article.category ? <Link href={`/kien-thuc-tu-vi?category=${article.category.slug}`} className="tag tag-soft">{article.category.name}</Link> : null}
-            <span className="tag tag-soft">Cập nhật {new Date(article.publishedAt).toLocaleDateString("vi-VN")}</span>
+            <span className="tag tag-soft">Cập nhật {new Date(displayDate).toLocaleDateString("vi-VN")}</span>
           </div>
         ) : null}
         {tableOfContents.length ? (

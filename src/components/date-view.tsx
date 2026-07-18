@@ -82,6 +82,7 @@ export function DateView({
   initialFinderTask,
   initialFinderFrom,
   initialFinderTo,
+  showPageHeading = true,
 }: {
   initialDate?: string | string[];
   initialBirthYear?: string | string[];
@@ -89,6 +90,7 @@ export function DateView({
   initialFinderTask?: string | string[];
   initialFinderFrom?: string | string[];
   initialFinderTo?: string | string[];
+  showPageHeading?: boolean;
 }) {
   const [selectedDate, setSelectedDate] = useState(() => safeInputDate(initialDate));
   const [birthYear, setBirthYear] = useState(() => safeBirthYear(initialBirthYear));
@@ -106,7 +108,7 @@ export function DateView({
       <section className="date-quick-start">
         <div className="date-quick-copy">
           <p className="eyebrow">Xem ngày tốt xấu</p>
-          <h1>Xem ngày tốt xấu theo tuổi</h1>
+          {showPageHeading ? <h1>Xem ngày tốt xấu theo tuổi</h1> : null}
           <p>Chọn ngày, nhập năm sinh và chọn việc đang chuẩn bị. Kết quả hiện ngay để bạn biết nên làm, nên tránh và nên đọc phần nào tiếp theo.</p>
           <div className="date-quick-status">
             <strong>{fortune.weekday}, {fortune.solar.day}/{fortune.solar.month}/{fortune.solar.year}</strong>

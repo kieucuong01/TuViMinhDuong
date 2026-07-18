@@ -45,6 +45,16 @@ describe("normalizeChartAttribution", () => {
     });
 
     expect(normalizeChartAttribution({
+      utmSource: "chatgpt.com",
+      utmMedium: "ai_referral",
+      landingPath: "/",
+    })).toMatchObject({
+      source: "ai",
+      label: "AI",
+      confidence: "high",
+    });
+
+    expect(normalizeChartAttribution({
       referrer: "https://gemini.google.com/app",
       landingPath: "/",
     })).toMatchObject({

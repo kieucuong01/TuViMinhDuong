@@ -803,6 +803,8 @@ ${cta}`,
 
 Điền Trạch không nên được hiểu như lời hứa chắc chắn rằng ai đó sẽ giàu bất động sản hay không có nhà. Cung này giống một lớp thông tin về nền vật chất: cách một người tạo chỗ ở, tích lũy tài sản, chịu ảnh hưởng từ gia đình, môi trường sống và các giai đoạn vận hạn liên quan tới nhà đất.
 
+Khi kế hoạch là xây hoặc sửa nhà, có thể xem thêm [tuổi làm nhà](/xem-tuoi/lam-nha) để đối chiếu quy tắc dân gian; pháp lý, tài chính và điều kiện thi công vẫn là phần quyết định.
+
 ## Cung Điền Trạch là gì?
 
 Trong lá số tử vi, Cung Điền Trạch thường được dùng để đọc nhà cửa, đất đai, tài sản cố định, nơi cư trú và môi trường sống. Nếu Cung Tài Bạch nói về cách tạo tiền, Cung Quan Lộc nói về công việc tạo giá trị, thì Cung Điền Trạch cho thấy phần tài sản có xu hướng kết tinh thành nơi ở hoặc cơ sở vật chất ra sao.
@@ -898,6 +900,8 @@ ${cta}`,
 ![Minh họa cung Tử Tức trong tử vi về con cái nuôi dạy và hậu vận](/articles/cung-tu-tuc-trong-tu-vi.webp)
 
 Đọc Cung Tử Tức cần rất thận trọng. Đây là chủ đề liên quan đến sinh nở, lựa chọn cá nhân, sức khỏe, hôn nhân và hoàn cảnh sống. Vì vậy, một lá số không nên được dùng để phán chắc chắn hay tạo áp lực cho ai đó phải có con, sinh con sớm, sinh con muộn hoặc đánh giá con cái tốt xấu. Cách đọc lành mạnh hơn là xem Cung Tử Tức như một lớp thông tin về trách nhiệm kế thừa, khả năng nuôi dưỡng, cách kết nối với con trẻ và bài học gia đình.
+
+Nếu muốn đối chiếu tuổi cha mẹ và năm dự sinh theo Can Chi - Ngũ hành, có thể dùng [xem tuổi sinh con](/xem-tuoi/sinh-con); công cụ không dự đoán sức khỏe sinh sản hay bảo đảm kết quả.
 
 ## Cung Tử Tức là gì?
 
@@ -1438,6 +1442,8 @@ Quan Lộc nói về con đường tạo giá trị, Tài Bạch nói về cách
 
 Luận Quan Lộc tốt nên kết thúc bằng hành động: học kỹ năng nào, chọn môi trường nào, tránh kiểu xung đột nào và nên xây uy tín trong bao lâu.
 
+Nếu đang cân nhắc người cùng hợp tác, dùng [xem tuổi làm ăn](/xem-tuoi/lam-an) như một lớp đối chiếu Can Chi - Ngũ hành, sau đó vẫn ưu tiên năng lực, vai trò và thỏa thuận rõ ràng.
+
 ${cta}`,
   }),
   article({
@@ -1963,6 +1969,8 @@ Một cung Phu Thê có tín hiệu thử thách không có nghĩa là hôn nhâ
 ## Nên đọc cùng những bài nào?
 
 Để hiểu đầy đủ, bạn nên đọc cùng [Cung Mệnh và Cung Thân](/kien-thuc-tu-vi/cung-menh-cung-than), [12 cung trong lá số tử vi](/kien-thuc-tu-vi/12-cung-trong-la-so-tu-vi) và [Đại vận là gì](/kien-thuc-tu-vi/dai-van-la-gi). Khi có lá số cá nhân, phần luận giải sẽ chỉ ra cung Phu Thê đang chịu ảnh hưởng của vận nào.
+
+Nếu câu hỏi là mức độ hòa hợp giữa hai tuổi, có thể dùng thêm [công cụ xem tuổi vợ chồng](/xem-tuoi/vo-chong) để đối chiếu Can Chi và Ngũ hành; kết quả chỉ là lớp tham khảo, không thay cho cách hai người giao tiếp.
 
 ${cta}`,
   }),
