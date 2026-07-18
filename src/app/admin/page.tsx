@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Banknote, ClipboardList, Coins, Eye, FilePenLine, Plus, ReceiptText, SearchCheck, SlidersHorizontal, Trash2, UsersRound, X } from "lucide-react";
+import { Banknote, Bot, ClipboardList, Coins, Eye, FilePenLine, Globe2, Megaphone, MousePointerClick, Plus, ReceiptText, SearchCheck, SlidersHorizontal, Trash2, UsersRound, X } from "lucide-react";
 import { redirect } from "next/navigation";
 import { adjustUserCoinsAction, deleteUserAction, saveArticleAction, saveArticleCategoryAction, saveFeaturePricesAction, saveOperationSettingsAction } from "@/app/actions";
 import { getCurrentUser } from "@/lib/auth";
@@ -8,6 +8,7 @@ import type { ArticleView } from "@/lib/content";
 import { LoadingSubmitButton } from "@/components/loading-submit-button";
 import { AdminArticleDeleteForm } from "@/components/admin-article-delete-form";
 import { AdminTrendCharts } from "@/components/admin-trend-charts";
+import { displayChartAttributionSource, type ChartAttributionSource } from "@/lib/chart-attribution";
 
 export const metadata = {
   title: "Admin",
@@ -157,16 +158,35 @@ function submitterDetail(item: { submitterType: "guest" | "user"; userId: string
   return item.userEmail || item.userId || "User đã đăng nhập";
 }
 
-function sourceLabel(item: AdminChartSubmission) {
-  const source = item.creationAttribution?.source || item.creationSource;
-  if (source === "ads") return "Ads";
-  if (source === "organic_search") return "Search";
-  if (source === "ai") return "AI";
-  if (source === "internal") return "Nội bộ";
-  if (source === "referral") return "Referral";
-  if (source === "direct") return "Direct";
-  return "Chưa rõ";
+function sourceDisplay(item: AdminChartSubmission) {
+  return displayChartAttributionSource({
+    source: item.creationAttribution?.source || item.creationSource,
+    utmSource: item.creationAttribution?.utm?.source,
+    referrerHost: item.creationAttribution?.referrerHost,
+  });
 }
+
+function SourceIcon({ source }: { source: ChartAttributionSource }) {
+  const Icon =
+    source === "ads" ? Megaphone :
+    source === "organic_search" ? SearchCheck :
+    source === "ai" ? Bot :
+    source === "internal" ? ClipboardList :
+    source === "referral" ? Globe2 :
+    source === "direct" ? MousePointerClick :
+    Eye;
+  return <Icon aria-hidden="true" size={15} strokeWidth={2.4} />;
+}
+
+const sourceToneClasses: Record<ChartAttributionSource, string> = {
+  ads: "admin-source-ads",
+  organic_search: "admin-source-organic_search",
+  ai: "admin-source-ai",
+  internal: "admin-source-internal",
+  referral: "admin-source-referral",
+  direct: "admin-source-direct",
+  unknown: "admin-source-unknown",
+};
 
 function sourceDetail(item: AdminChartSubmission) {
   const attribution = item.creationAttribution;
@@ -222,14 +242,14 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
   const closeArticleModalHref = adminContentHref({ articlePage });
   const trendPeriod = normalizeAdminTrendPeriod(overview.trendPeriod);
   const reportMetrics = [
-    { label: "Doanh thu", value: formatVnd(business.revenue.totalPaidVnd), note: `${formatInteger(business.revenue.paidOrders)} đơn đã thanh toán` },
-    { label: "Tổng Tài khoản", value: formatInteger(overview.users), note: "Tài khoản đã đăng ký" },
-    { label: "Lá số được lập", value: formatInteger(overview.charts), note: "Tổng form lập lá số đã lưu" },
-    { label: "Luận giải đã mở khóa", value: formatInteger(overview.unlockedReadings), note: `${formatInteger(overview.readings)} lượt luận giải trong hệ thống` },
-    { label: "Tổng số Bài viết SEO", value: formatInteger(overview.seoArticles), note: "CMS bài viết không bị xóa" },
-    { label: "Tổng số Bài viết pSEO", value: formatInteger(overview.pseoArticles), note: "Trang tra cứu published và entity pSEO" },
-    { label: "Tỷ lệ Lá số vãng lai", value: formatPercent(overview.guestChartRate), note: `${formatInteger(overview.guestCharts)} / ${formatInteger(overview.charts)} lá số không gắn tài khoản` },
-    { label: "Số Sitemap", value: formatInteger(overview.sitemapFiles), note: `${formatInteger(overview.sitemapMainUrls)} URL trong sitemap chính` },
+    { label: "Doanh thu", value: formatVnd(business.revenue.totalPaidVnd), note: `${formatInteger(business.revenue.paidOrders)} đơn đã thanh toán`, icon: Banknote, tone: "revenue" },
+    { label: "Tổng Tài khoản", value: formatInteger(overview.users), note: "Tài khoản đã đăng ký", icon: UsersRound, tone: "users" },
+    { label: "Lá số được lập", value: formatInteger(overview.charts), note: "Tổng form lập lá số đã lưu", icon: ClipboardList, tone: "charts" },
+    { label: "Luận giải đã mở khóa", value: formatInteger(overview.unlockedReadings), note: `${formatInteger(overview.readings)} lượt luận giải trong hệ thống`, icon: Eye, tone: "readings" },
+    { label: "Tổng số Bài viết SEO", value: formatInteger(overview.seoArticles), note: "CMS bài viết không bị xóa", icon: FilePenLine, tone: "content" },
+    { label: "Tổng số Bài viết pSEO", value: formatInteger(overview.pseoArticles), note: "Trang tra cứu published và entity pSEO", icon: SearchCheck, tone: "pseo" },
+    { label: "Tỷ lệ Lá số vãng lai", value: formatPercent(overview.guestChartRate), note: `${formatInteger(overview.guestCharts)} / ${formatInteger(overview.charts)} lá số không gắn tài khoản`, icon: UsersRound, tone: "guest" },
+    { label: "Số Sitemap", value: formatInteger(overview.sitemapFiles), note: `${formatInteger(overview.sitemapMainUrls)} URL trong sitemap chính`, icon: Globe2, tone: "sitemap" },
   ];
 
   return (
@@ -273,13 +293,17 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
             </div>
           </div>
           <div className="admin-report-metrics">
-            {reportMetrics.map((metric) => (
-              <article key={metric.label} className="admin-report-metric">
-                <span>{metric.label}</span>
-                <strong>{metric.value}</strong>
-                <small>{metric.note}</small>
-              </article>
-            ))}
+            {reportMetrics.map((metric) => {
+              const MetricIcon = metric.icon;
+              return (
+                <article key={metric.label} className={`admin-report-metric tone-${metric.tone}`}>
+                  <span className={`admin-report-metric-icon ${metric.tone}`}><MetricIcon aria-hidden="true" size={18} strokeWidth={2.35} /></span>
+                  <span className="admin-report-metric-label">{metric.label}</span>
+                  <strong>{metric.value}</strong>
+                  <small>{metric.note}</small>
+                </article>
+              );
+            })}
           </div>
 
           <AdminTrendCharts initialPeriod={trendPeriod} trendGroups={overview.trendGroups} />
@@ -474,7 +498,9 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
                 </tr>
               </thead>
               <tbody>
-                {chartSubmissions.length ? chartSubmissions.map((item) => (
+                {chartSubmissions.length ? chartSubmissions.map((item) => {
+                  const source = sourceDisplay(item);
+                  return (
                   <tr key={item.id}>
                     <td>{readableDateTime(item.createdAt)}</td>
                     <td>
@@ -485,7 +511,9 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
                       </em>
                     </td>
                     <td>
-                      <strong>{sourceLabel(item)}</strong>
+                      <strong className={`admin-source-pill ${sourceToneClasses[source.source]}`}>
+                        <SourceIcon source={source.source} /> {source.label}
+                      </strong>
                       <span>{sourceDetail(item)}</span>
                     </td>
                     <td>
@@ -503,7 +531,8 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
                       </Link>
                     </td>
                   </tr>
-                )) : (
+                  );
+                }) : (
                   <tr>
                     <td colSpan={10}>
                       <span>Chưa có form lập lá số nào trong dữ liệu hiện tại.</span>

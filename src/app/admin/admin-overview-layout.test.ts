@@ -20,4 +20,10 @@ describe("admin overview layout", () => {
     expect(globalsCss).toMatch(/\.admin-trend-grid\s*{[\s\S]*grid-template-columns:\s*minmax\(0,\s*1fr\)/);
     expect(globalsCss).toContain(".admin-compact-chart-data");
   });
+
+  it("adds scannable icon and tone treatments to overview metrics", () => {
+    expect(adminPageSource).toContain("admin-report-metric-icon");
+    expect(adminPageSource).toContain("tone: \"revenue\"");
+    expect(globalsCss).toContain(".admin-report-metric-icon");
+  });
 });

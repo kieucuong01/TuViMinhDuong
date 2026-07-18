@@ -41,6 +41,7 @@ const AI_SOURCES = new Set(["chatgpt", "chatgpt.com", "openai", "gemini", "perpl
 const AI_HOSTS = ["chatgpt.com", "openai.com", "gemini.google.com", "perplexity.ai", "claude.ai", "copilot.microsoft.com"];
 const INTERNAL_SOURCES = new Set(["seo_article", "date_finder", "xem_tuoi_vo_chong", "xem_tuoi_sinh_con", "pseo_inline"]);
 const INTERNAL_HOSTS = new Set(["lasotinhhoa.vn", "www.lasotinhhoa.vn"]);
+const STORED_SOURCES = new Set<ChartAttributionSource>(["ads", "organic_search", "ai", "internal", "referral", "direct", "unknown"]);
 
 function clean(value?: string | null, max = 160) {
   const normalized = String(value || "").replace(/\s+/g, " ").trim();
@@ -59,6 +60,35 @@ function referrerHost(referrer?: string | null) {
   } catch {
     return undefined;
   }
+}
+
+function isAiHost(host?: string) {
+  return Boolean(host && AI_HOSTS.some((item) => host === item || host.endsWith(`.${item}`)));
+}
+
+function labelForSource(source: ChartAttributionSource) {
+  if (source === "ads") return "Ads";
+  if (source === "organic_search") return "Search";
+  if (source === "ai") return "AI";
+  if (source === "internal") return "Nội bộ";
+  if (source === "referral") return "Referral";
+  if (source === "direct") return "Direct";
+  return "Chưa rõ";
+}
+
+export function displayChartAttributionSource(input: { source?: string | null; utmSource?: string | null; referrerHost?: string | null } = {}) {
+  const source = cleanKey(input.source);
+  const utmSource = cleanKey(input.utmSource);
+  const host = cleanKey(input.referrerHost);
+  const knownSource = source && STORED_SOURCES.has(source as ChartAttributionSource) ? (source as ChartAttributionSource) : undefined;
+
+  if (knownSource && knownSource !== "unknown") return { source: knownSource, label: labelForSource(knownSource) };
+  if (AI_SOURCES.has(source || "") || AI_SOURCES.has(utmSource || "") || isAiHost(host)) return { source: "ai" as const, label: "AI" };
+  if (INTERNAL_SOURCES.has(source || "") || INTERNAL_SOURCES.has(utmSource || "") || (host && INTERNAL_HOSTS.has(host))) return { source: "internal" as const, label: "Nội bộ" };
+  if (host && SEARCH_HOSTS.some((item) => host.includes(item))) return { source: "organic_search" as const, label: "Search" };
+  if (host) return { source: "referral" as const, label: "Referral" };
+  if (knownSource === "unknown" || source || utmSource) return { source: "unknown" as const, label: "Chưa rõ" };
+  return { source: "direct" as const, label: "Direct" };
 }
 
 function utm(input: ChartAttributionInput) {
@@ -94,7 +124,7 @@ export function normalizeChartAttribution(input: ChartAttributionInput = {}): Ch
     return detail({ source: "ads", label: "Ads", confidence: "high" }, input);
   }
 
-  if (AI_SOURCES.has(source) || (host && AI_HOSTS.some((item) => host === item || host.endsWith(`.${item}`)))) {
+  if (AI_SOURCES.has(source) || isAiHost(host)) {
     return detail({ source: "ai", label: "AI", confidence: source ? "high" : "medium" }, input);
   }
 

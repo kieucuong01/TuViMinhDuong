@@ -6025,6 +6025,7 @@ button.is-loading:not(.icon-button)::before {
 .admin-report-metric {
   display: grid;
   gap: 0.35rem;
+  grid-template-columns: auto minmax(0, 1fr);
   min-height: 8.25rem;
   border: 1px solid #ffedd5;
   border-radius: 0.85rem;
@@ -6033,7 +6034,42 @@ button.is-loading:not(.icon-button)::before {
   box-shadow: 0 12px 34px rgb(124 45 18 / 0.06);
 }
 
-.admin-report-metric span {
+.admin-report-metric-icon {
+  display: grid;
+  width: 2.15rem;
+  height: 2.15rem;
+  place-items: center;
+  border-radius: 0.75rem;
+  background: #fff7ed;
+  color: #9a3412;
+}
+
+.admin-report-metric-icon.revenue,
+.admin-report-metric-icon.sitemap {
+  background: #ecfdf5;
+  color: #047857;
+}
+
+.admin-report-metric-icon.users,
+.admin-report-metric-icon.guest {
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+.admin-report-metric-icon.charts,
+.admin-report-metric-icon.readings {
+  background: #fdf2f8;
+  color: #be185d;
+}
+
+.admin-report-metric-icon.content,
+.admin-report-metric-icon.pseo {
+  background: #fff7ed;
+  color: #c2410c;
+}
+
+.admin-report-metric-label {
+  align-self: center;
   color: #78716c;
   font-size: 0.82rem;
   font-weight: 850;
@@ -6041,6 +6077,7 @@ button.is-loading:not(.icon-button)::before {
 }
 
 .admin-report-metric strong {
+  grid-column: 1 / -1;
   color: #1c1917;
   font-size: clamp(1.75rem, 3vw, 2.45rem);
   font-weight: 950;
@@ -6049,6 +6086,7 @@ button.is-loading:not(.icon-button)::before {
 }
 
 .admin-report-metric small {
+  grid-column: 1 / -1;
   color: #78716c;
   font-size: 0.78rem;
   font-weight: 720;
@@ -6518,6 +6556,52 @@ button.is-loading:not(.icon-button)::before {
 .admin-role-pill.guest {
   background: #fff7ed;
   color: #9a3412;
+}
+
+.admin-source-pill {
+  display: inline-flex !important;
+  width: max-content;
+  align-items: center;
+  gap: 0.35rem;
+  border-radius: 999px;
+  padding: 0.22rem 0.58rem;
+  font-size: 0.78rem;
+  line-height: 1.2;
+}
+
+.admin-source-ads {
+  background: #fff7ed;
+  color: #c2410c !important;
+}
+
+.admin-source-organic_search {
+  background: #eff6ff;
+  color: #1d4ed8 !important;
+}
+
+.admin-source-ai {
+  background: #fdf2f8;
+  color: #be185d !important;
+}
+
+.admin-source-internal {
+  background: #ecfdf5;
+  color: #047857 !important;
+}
+
+.admin-source-referral {
+  background: #f0f9ff;
+  color: #0369a1 !important;
+}
+
+.admin-source-direct {
+  background: #f5f5f4;
+  color: #57534e !important;
+}
+
+.admin-source-unknown {
+  background: #fef2f2;
+  color: #991b1b !important;
 }
 
 .admin-empty-note {
@@ -12759,6 +12843,13 @@ button.is-loading:not(.icon-button)::before {
   pointer-events: auto;
   transform: translateY(0);
   visibility: visible;
+}
+
+.site-nav.is-closing .site-date-panel,
+.site-nav.is-closing .site-lookup-panel {
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
 }
 
 .mobile-lookup-group {

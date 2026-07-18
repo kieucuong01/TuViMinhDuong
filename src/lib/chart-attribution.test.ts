@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { normalizeChartAttribution } from "@/lib/chart-attribution";
+import { displayChartAttributionSource, normalizeChartAttribution } from "@/lib/chart-attribution";
 
 describe("normalizeChartAttribution", () => {
   it("classifies paid Google traffic from UTM parameters", () => {
@@ -92,6 +92,15 @@ describe("normalizeChartAttribution", () => {
       source: "direct",
       label: "Direct",
       confidence: "low",
+    });
+  });
+});
+
+describe("displayChartAttributionSource", () => {
+  it("keeps historical unknown chatgpt.com attribution in the AI bucket", () => {
+    expect(displayChartAttributionSource({ source: "unknown", utmSource: "chatgpt.com" })).toEqual({
+      source: "ai",
+      label: "AI",
     });
   });
 });

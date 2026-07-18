@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 import { UserHeaderBadge } from "@/components/user-header-badge";
 import { MobileSiteMenu } from "@/components/mobile-site-menu";
+import { SiteNavShell } from "@/components/site-nav-shell";
 import { dateCountdownMenuLinks, dateTaskMenuLinks, type DateMenuIcon } from "@/lib/date-menu";
 import { AGE_TOOL_LINKS, type AgeToolSlug } from "@/lib/age-tools";
 import { APP_NAME } from "@/lib/env";
@@ -88,7 +89,7 @@ export async function SiteHeader() {
           </span>
         </Link>
 
-        <nav className="site-nav hidden items-center rounded-full border border-orange-100 bg-white/70 p-1 text-sm font-semibold text-stone-600 shadow-sm lg:flex">
+        <SiteNavShell>
           {nav.map((item, index) => {
             const Icon = item.tone === "date" ? CalendarDays : item.tone === "age" ? HeartHandshake : item.tone === "knowledge" ? BookOpenText : null;
             const linkClass = `site-nav-link rounded-full px-3.5 py-2 transition hover:bg-orange-50 hover:text-orange-700 ${index === 0 ? "site-nav-primary" : ""} ${item.tone === "date" ? "site-nav-date" : ""} ${item.tone === "age" ? "site-nav-age" : ""} ${item.tone === "knowledge" ? "site-nav-knowledge" : ""}`;
@@ -196,7 +197,7 @@ export async function SiteHeader() {
               </Link>
             );
           })}
-        </nav>
+        </SiteNavShell>
 
         <div className="site-header-actions flex items-center gap-2">
           <Suspense fallback={<div className="user-header-skeleton" aria-hidden="true"><span /></div>}>
