@@ -7,6 +7,7 @@ function source(path: string) {
 
 const registrySource = source("src/lib/date-purpose-pages.ts");
 const landingSource = source("src/app/xem-ngay/[purpose]/page.tsx");
+const dateViewSource = source("src/components/date-view.tsx");
 const sitemapSource = source("src/app/sitemap.ts");
 const lookupComponentSource = source("src/components/pseo-lookup-hub.tsx");
 const lookupRootSource = source("src/app/tra-cuu/page.tsx");
@@ -31,6 +32,16 @@ describe("bounded date-purpose SEO pages", () => {
     expect(landingSource).toContain("faqJsonLd(page.faqs)");
     expect(landingSource).toContain("page.criteria.map");
     expect(landingSource).toContain("page.faqs.map");
+  });
+
+  it("keeps purpose pages static while preserving finder query parameters on the client", () => {
+    expect(landingSource).not.toContain("searchParams");
+    expect(landingSource).toContain("<Suspense");
+    expect(landingSource).toContain("<DatePurposeView");
+    expect(dateViewSource).toContain("useSearchParams");
+    expect(dateViewSource).toContain('searchParams.get("from")');
+    expect(dateViewSource).toContain('searchParams.get("to")');
+    expect(dateViewSource).toContain('searchParams.get("birthYear")');
   });
 
   it("adds only the three approved purpose pages to the main sitemap", () => {

@@ -1,0 +1,25 @@
+# Lá số tinh hoa
+
+> Công cụ lập lá số tử vi, xem ngày tốt xấu, xem tuổi và thư viện kiến thức tử vi bằng tiếng Việt. Nội dung mang tính tham khảo, giúp người đọc đối chiếu bối cảnh; không cam kết kết quả về vận mệnh, sức khỏe hay tài chính.
+
+## Trang chính
+
+- [Lập lá số tử vi miễn phí](https://lasotinhhoa.vn/): Nhập thông tin sinh để lập lá số và xem phần giải thích cơ bản.
+- [Xem ngày tốt xấu](https://lasotinhhoa.vn/xem-ngay): Xem ngày, giờ và mức độ phù hợp theo việc cần làm.
+- [Xem tuổi](https://lasotinhhoa.vn/xem-tuoi): Đối chiếu tuổi theo Can Chi và Ngũ hành.
+- [Tra cứu tử vi](https://lasotinhhoa.vn/tra-cuu): Tra cứu chính tinh, phụ tinh và 12 cung.
+- [Kiến thức tử vi](https://lasotinhhoa.vn/kien-thuc-tu-vi): Bài giải thích tử vi cho người mới.
+
+## Công cụ theo mục đích
+
+- [Xem ngày cưới hỏi](https://lasotinhhoa.vn/xem-ngay/cuoi-hoi)
+- [Xem ngày khai trương](https://lasotinhhoa.vn/xem-ngay/khai-truong)
+- [Xem ngày động thổ](https://lasotinhhoa.vn/xem-ngay/dong-tho)
+- [Xem tuổi vợ chồng](https://lasotinhhoa.vn/xem-tuoi/vo-chong)
+- [Xem tuổi sinh con](https://lasotinhhoa.vn/xem-tuoi/sinh-con)
+
+## Thông tin kỹ thuật
+
+- [Sitemap](https://lasotinhhoa.vn/sitemap.xml)
+- [Sitemap tra cứu](https://lasotinhhoa.vn/sitemap-index.xml)
+- [Robots](https://lasotinhhoa.vn/robots.txt)

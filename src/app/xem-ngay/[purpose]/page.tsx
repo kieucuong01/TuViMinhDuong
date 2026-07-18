@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { DateView } from "@/components/date-view";
+import { Suspense } from "react";
+import { DatePurposeView, DateView } from "@/components/date-view";
 import { DATE_PURPOSE_PAGES, getDatePurposePage } from "@/lib/date-purpose-pages";
 import { routeMetadata } from "@/lib/metadata";
 import { faqJsonLd, webApplicationJsonLd, webPageJsonLd } from "@/lib/seo";
@@ -26,12 +27,10 @@ export async function generateMetadata({ params }: { params: Promise<{ purpose: 
 
 export default async function DatePurposePage({
   params,
-  searchParams,
 }: {
   params: Promise<{ purpose: string }>;
-  searchParams: Promise<{ from?: string | string[]; to?: string | string[]; birthYear?: string | string[] }>;
 }) {
-  const [{ purpose }, query] = await Promise.all([params, searchParams]);
+  const { purpose } = await params;
   const page = getDatePurposePage(purpose);
   if (!page) notFound();
 
@@ -65,14 +64,9 @@ export default async function DatePurposePage({
           <p>{page.intro}</p>
         </section>
 
-        <DateView
-          initialMode="finder"
-          initialFinderTask={page.task}
-          initialFinderFrom={query.from}
-          initialFinderTo={query.to}
-          initialBirthYear={query.birthYear}
-          showPageHeading={false}
-        />
+        <Suspense fallback={<DateView initialMode="finder" initialFinderTask={page.task} showPageHeading={false} />}>
+          <DatePurposeView task={page.task} />
+        </Suspense>
 
         <section className="date-purpose-guide panel mt-8">
           <div className="date-purpose-grid">

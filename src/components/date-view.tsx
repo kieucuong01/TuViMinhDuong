@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import type { ComponentType } from "react";
 import { useMemo, useState } from "react";
 import {
@@ -73,6 +74,21 @@ function formatLunarDate(lunar: { day: number; month: number; year: number; leap
 function TaskIcon({ type }: { type: DateTaskKey }) {
   const Icon = taskIcons[type];
   return <Icon size={19} className="date-task-icon" />;
+}
+
+export function DatePurposeView({ task }: { task: DateTaskKey }) {
+  const searchParams = useSearchParams();
+
+  return (
+    <DateView
+      initialMode="finder"
+      initialFinderTask={task}
+      initialFinderFrom={searchParams.get("from") || undefined}
+      initialFinderTo={searchParams.get("to") || undefined}
+      initialBirthYear={searchParams.get("birthYear") || undefined}
+      showPageHeading={false}
+    />
+  );
 }
 
 export function DateView({
