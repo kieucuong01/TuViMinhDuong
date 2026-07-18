@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 
 const headerSource = readFileSync(fileURLToPath(new URL("./site-header.tsx", import.meta.url)), "utf8");
 const mobileMenuSource = readFileSync(fileURLToPath(new URL("./mobile-site-menu.tsx", import.meta.url)), "utf8");
+const navShellSource = readFileSync(fileURLToPath(new URL("./site-nav-shell.tsx", import.meta.url)), "utf8");
 const layoutSource = readFileSync(fileURLToPath(new URL("../app/layout.tsx", import.meta.url)), "utf8");
 const globalsCss = readFileSync(fileURLToPath(new URL("../app/globals.css", import.meta.url)), "utf8");
 
@@ -60,6 +61,13 @@ describe("site header featured nav effects", () => {
     expect(globalsCss).toMatch(/\.site-date-panel\s*{[\s\S]*opacity:\s*0;[\s\S]*pointer-events:\s*none;[\s\S]*visibility:\s*hidden;/);
     expect(globalsCss).toMatch(/\.site-date-menu:hover \.site-date-panel,\s*\n\.site-date-menu:focus-within \.site-date-panel\s*{[\s\S]*opacity:\s*1;[\s\S]*pointer-events:\s*auto;/);
     expect(globalsCss).toMatch(/\.site-lookup-menu:hover \.site-lookup-panel,\s*\n\.site-lookup-menu:focus-within \.site-lookup-panel\s*{[\s\S]*opacity:\s*1;[\s\S]*pointer-events:\s*auto;/);
+  });
+
+  it("keeps desktop header navigation visible through stable CSS instead of Tailwind-only display classes", () => {
+    expect(navShellSource).not.toContain("hidden");
+    expect(navShellSource).not.toContain("lg:flex");
+    expect(globalsCss).toMatch(/\.site-nav\s*{[\s\S]*display:\s*none;[\s\S]*align-items:\s*center;/);
+    expect(globalsCss).toMatch(/@media \(min-width:\s*1024px\)\s*{[\s\S]*\.site-nav\s*{[\s\S]*display:\s*flex;/);
   });
 
   it("removes the mobile bottom nav in favor of a three-zone mobile header", () => {

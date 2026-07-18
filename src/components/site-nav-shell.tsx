@@ -7,7 +7,7 @@ export function SiteNavShell({ children }: { children: ReactNode }) {
 
   return (
     <nav
-      className={`site-nav hidden items-center rounded-full border border-orange-100 bg-white/70 p-1 text-sm font-semibold text-stone-600 shadow-sm lg:flex${isClosing ? " is-closing" : ""}`}
+      className={isClosing ? "site-nav is-closing" : "site-nav"}
       onClickCapture={(event) => {
         if ((event.target as HTMLElement).closest("a")) setIsClosing(true);
       }}

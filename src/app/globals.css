@@ -784,7 +784,17 @@ button.is-loading:not(.icon-button)::before {
 }
 
 .site-nav {
+  display: none;
+  align-items: center;
   gap: 0.1rem;
+  border: 1px solid #ffedd5;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.7);
+  padding: 0.25rem;
+  color: #57534e;
+  font-size: 0.875rem;
+  font-weight: 600;
+  box-shadow: 0 1px 2px rgb(124 45 18 / 0.06);
 }
 
 .site-nav-link {
@@ -1367,6 +1377,12 @@ button.is-loading:not(.icon-button)::before {
 
   .site-footer-bottom {
     display: grid;
+  }
+}
+
+@media (min-width: 1024px) {
+  .site-nav {
+    display: flex;
   }
 }
 
