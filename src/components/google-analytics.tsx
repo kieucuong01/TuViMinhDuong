@@ -1,7 +1,6 @@
 import { Suspense } from "react";
 import { GoogleAdsEventReporter } from "@/components/google-ads-event-reporter";
 import { GoogleAnalyticsDeferredLoader } from "@/components/google-analytics-deferred-loader";
-import { GoogleAnalyticsPageView } from "@/components/google-analytics-page-view";
 import { GOOGLE_ADS_ID, GOOGLE_ANALYTICS_ID } from "@/lib/env";
 
 export function GoogleAnalytics() {
@@ -15,11 +14,6 @@ export function GoogleAnalytics() {
         measurementId={GOOGLE_ANALYTICS_ID}
         adsId={GOOGLE_ADS_ID}
       />
-      {GOOGLE_ANALYTICS_ID ? (
-        <Suspense fallback={null}>
-          <GoogleAnalyticsPageView measurementId={GOOGLE_ANALYTICS_ID} />
-        </Suspense>
-      ) : null}
       <Suspense fallback={null}>
         <GoogleAdsEventReporter />
       </Suspense>

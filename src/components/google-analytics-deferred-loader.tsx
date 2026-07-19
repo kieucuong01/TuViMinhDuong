@@ -36,7 +36,7 @@ export function GoogleAnalyticsDeferredLoader({
     const gtag = ensureGtagQueue();
     gtag("js", new Date());
     if (measurementId) {
-      gtag("config", measurementId, { send_page_view: false });
+      gtag("config", measurementId);
     }
     if (adsId) {
       gtag("config", adsId);
