@@ -37,8 +37,9 @@ function ensureGtagQueue() {
   window.dataLayer = window.dataLayer || [];
   window.gtag =
     window.gtag ||
-    function gtag(...args: unknown[]) {
-      window.dataLayer?.push(args);
+    function gtag() {
+      // eslint-disable-next-line prefer-rest-params -- gtag.js requires an Arguments object, not a rest-parameter array.
+      window.dataLayer?.push(arguments);
     };
   return window.gtag;
 }
