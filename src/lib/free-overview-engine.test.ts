@@ -41,6 +41,26 @@ function repeatedSentences(content: string) {
   return repeated;
 }
 
+function repeatedWordWindows(content: string, size: number) {
+  const normalized = content
+    .normalize("NFD")
+    .replace(/\p{Diacritic}/gu, "")
+    .toLocaleLowerCase("vi")
+    .replace(/đ/gu, "d")
+    .replace(/[^a-z0-9\s]/gu, " ")
+    .replace(/\s+/gu, " ")
+    .trim();
+  const words = normalized.split(" ").filter(Boolean);
+  const seen = new Set<string>();
+  const repeated = new Set<string>();
+  for (let index = 0; index <= words.length - size; index += 1) {
+    const window = words.slice(index, index + size).join(" ");
+    if (seen.has(window)) repeated.add(window);
+    seen.add(window);
+  }
+  return repeated;
+}
+
 const sectionSubheadings = [
   "Điểm nổi bật",
   "Lợi thế",
@@ -110,6 +130,7 @@ describe("free overview interpretation engine", () => {
       expect(countVisibleMarkdownWords(overview)).toBeLessThanOrEqual(1650);
       expect(overview).toContain("# Bản tổng quan lá số của bạn");
       expect(overview.match(/^### Đọc nhanh$/gmu)).toHaveLength(1);
+      expect([...repeatedWordWindows(quickRead(overview), 8)]).toEqual([]);
       expect(overview).toContain("## 1. Khí chất và cách ra quyết định");
       expect(overview).toContain("## 2. Công việc và nguồn lực");
       expect(overview).toContain("## 3. Quan hệ và nhịp sống");
@@ -117,6 +138,9 @@ describe("free overview interpretation engine", () => {
       expect(overview.match(/^##\s+[1-4]\.\s+/gmu)).toHaveLength(4);
       expect(overview.match(/^\*\*Câu hỏi tự đối chiếu:\*\*/gmu)).toHaveLength(1);
       expect(overview).toContain("Bản FULL 9 chương");
+      expect(overview).toContain("Bản miễn phí mới cho bạn thấy 2 lớp đầu");
+      expect(overview).toContain("4 câu hỏi thực tế");
+      expect(overview).toContain("90 ngày tới");
       expect(overview).toMatch(/\bbạn\b/iu);
       expect(overview).not.toMatch(/người đọc|người này|đương số|\bmình\b/iu);
       expect(overview).not.toContain("phần còn đang được giữ lại");
@@ -140,6 +164,19 @@ describe("free overview interpretation engine", () => {
     }
 
     expect(new Set(overviews).size).toBe(3);
+  });
+
+  it("keeps under-18 overviews in school and family context instead of adult purchase contexts", () => {
+    const overview = buildFreeOverviewFromInterpretationRules(makeChart("Nguyễn Minh Anh", "female", 19, 5, 2012, 8));
+
+    expect(overview).toContain("lịch học");
+    expect(overview).toContain("chọn ngành");
+    expect(overview).toContain("Bản miễn phí");
+    expect(overview).toContain("Bản FULL 9 chương");
+    expect(overview).toContain("## 2. Học tập và nguồn lực");
+    expect(countVisibleMarkdownWords(overview)).toBeGreaterThanOrEqual(1400);
+    expect(countVisibleMarkdownWords(overview)).toBeLessThanOrEqual(1650);
+    expect(overview).not.toMatch(/lương|lương, phí|quyền quyết|thành tiền|tình yêu|hôn nhân|bạn đời|quan hệ thân mật|công việc|nghề nghiệp/iu);
   });
 
   it("keeps the quick-read support evidence related across gender, birth-hour, and birth-year variants", () => {

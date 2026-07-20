@@ -32,7 +32,7 @@ describe("free overview status", () => {
     expect(source).not.toContain("fullOverviewPromise");
   });
 
-  it("returns a ready 1,400-1,650 visible-word v11 seed overview immediately", async () => {
+  it("returns a ready 1,400-1,650 visible-word v12 seed overview immediately", async () => {
     const { FREE_OVERVIEW_MAX_WORDS, FREE_OVERVIEW_MIN_WORDS, FREE_OVERVIEW_VERSION } = await import("@/lib/ai");
     const { getFreeOverviewStatus } = await import("@/lib/data");
     const status = getFreeOverviewStatus(chartFixture());
@@ -40,7 +40,7 @@ describe("free overview status", () => {
     expect(status.status).toBe("ready");
     expect(status.source).toBe("seed-rules");
     expect(status.model).toBe("interpretation-rules-v2");
-    expect(FREE_OVERVIEW_VERSION).toBe("free-seed-overview-v11");
+    expect(FREE_OVERVIEW_VERSION).toBe("free-seed-overview-v12");
     expect(status.jobStatus).toBe("completed");
     expect(status.content).toContain("# Bản tổng quan lá số của bạn");
     expect(status.content).toContain("## 4. Vận hiện tại");

@@ -244,7 +244,7 @@ describe("AI reading format", () => {
 
     expect(FREE_OVERVIEW_MIN_WORDS).toBe(1400);
     expect(FREE_OVERVIEW_MAX_WORDS).toBe(1650);
-    expect(FREE_OVERVIEW_VERSION).toBe("free-seed-overview-v11");
+    expect(FREE_OVERVIEW_VERSION).toBe("free-seed-overview-v12");
     expect(result.model).toBe("interpretation-rules-v2");
     expect(result).not.toHaveProperty("prompt");
     expect(isCompleteFreeOverview(result.content)).toBe(true);

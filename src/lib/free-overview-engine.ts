@@ -288,6 +288,30 @@ function summarySentences(rule: ScoredInterpretationRule) {
     .filter(Boolean);
 }
 
+function normalizedWords(value: string) {
+  return value
+    .normalize("NFD")
+    .replace(/\p{Diacritic}/gu, "")
+    .toLocaleLowerCase("vi")
+    .replace(/đ/gu, "d")
+    .replace(/[^a-z0-9\s]/gu, " ")
+    .replace(/\s+/gu, " ")
+    .trim()
+    .split(" ")
+    .filter(Boolean);
+}
+
+function hasRepeatedWordWindow(value: string, size: number) {
+  const words = normalizedWords(value);
+  const seen = new Set<string>();
+  for (let index = 0; index <= words.length - size; index += 1) {
+    const window = words.slice(index, index + size).join(" ");
+    if (seen.has(window)) return true;
+    seen.add(window);
+  }
+  return false;
+}
+
 function buildQuickReadCopy(primary: ScoredInterpretationRule, support: ScoredInterpretationRule) {
   const primarySentences = summarySentences(primary).map((sentence) => ({ sentence, source: "primary" }));
   const supportSentences = summarySentences(support).map((sentence) => ({ sentence, source: "support" }));
@@ -302,6 +326,7 @@ function buildQuickReadCopy(primary: ScoredInterpretationRule, support: ScoredIn
     const copy = selected.map((item) => item.sentence).join(" ");
     const words = countVisibleMarkdownWords(copy);
     if (words < 80 || words > 120) continue;
+    if (hasRepeatedWordWindow(copy, 8)) continue;
     if (!best || words > best.words) best = { copy, words };
   }
 
@@ -379,7 +404,37 @@ function joinParagraph(...values: Array<string | undefined>) {
   return values.filter((value): value is string => Boolean(value)).join(" ");
 }
 
-function renderCluster(cluster: FreeOverviewCluster, index: number, supportDetails: Set<string>) {
+function youthCopy(value: string) {
+  return value
+    .replace(/Công việc và nguồn lực/gu, "Học tập và nguồn lực")
+    .replace(/công việc và trách nhiệm nghề nghiệp/giu, "học tập, trách nhiệm ở lớp và định hướng tương lai")
+    .replace(/trách nhiệm công việc/giu, "trách nhiệm học tập")
+    .replace(/vị trí nghề nghiệp/giu, "vị trí trong môi trường học tập")
+    .replace(/tiêu chuẩn giao hàng/giu, "tiêu chuẩn hoàn thành")
+    .replace(/nghề nghiệp/giu, "định hướng tương lai")
+    .replace(/công việc/giu, "việc học")
+    .replace(/kiếm tiền/giu, "tạo kết quả")
+    .replace(/làm việc/giu, "học và làm việc")
+    .replace(/part-time/giu, "việc làm thêm phù hợp")
+    .replace(/thương lượng lại quyền hạn/giu, "trao đổi lại phạm vi")
+    .replace(/quyền hạn/giu, "phạm vi được tự chọn")
+    .replace(/tiền nên giữ hay xoay/giu, "nguồn lực nên giữ hay dùng")
+    .replace(/quan hệ thân mật/giu, "quan hệ gần gũi")
+    .replace(/tình yêu/giu, "tình cảm")
+    .replace(/hôn nhân/giu, "quan hệ lâu dài")
+    .replace(/bạn đời/giu, "người đồng hành")
+    .replace(/thành tiền/giu, "thành kết quả")
+    .replace(/lương/giu, "phần thưởng")
+    .replace(/chi phí/giu, "phần đóng góp")
+    .replace(/quyền quyết định/giu, "quyền tự chọn trong phạm vi của bạn")
+    .replace(/quyền quyết/giu, "quyền tự chọn");
+}
+
+function audienceCopy(value: string, facts: FreeOverviewFacts) {
+  return facts.age < 18 ? youthCopy(value) : value;
+}
+
+function renderCluster(cluster: FreeOverviewCluster, index: number, supportDetails: Set<string>, facts: FreeOverviewFacts) {
   const { primary, support } = cluster;
   const firstCluster = index === 0;
   const highlight =
@@ -405,7 +460,7 @@ function renderCluster(cluster: FreeOverviewCluster, index: number, supportDetai
     support ? `**Dấu hiệu liên quan:** ${evidence(support)}` : undefined,
   );
 
-  return `## ${index + 1}. ${cluster.title}
+  return audienceCopy(`## ${index + 1}. ${cluster.title}
 
 ### Điểm nổi bật
 
@@ -425,7 +480,7 @@ ${advice}
 
 ### Vì sao có nhận định này
 
-${evidenceText}`;
+${evidenceText}`, facts);
 }
 
 function overviewCopy(
@@ -446,16 +501,19 @@ Bạn đang ở tuổi ${plan.facts.age}, trong đại vận ${plan.facts.curren
   const quickRead = `### Đọc nhanh
 
 ${quickReadCopy}`;
-  const sections = plan.clusters.map((cluster, index) => renderCluster(cluster, index, supportDetails));
+  const sections = plan.clusters.map((cluster, index) => renderCluster(cluster, index, supportDetails, plan.facts));
   const reflection = `**Câu hỏi tự đối chiếu:** ${clean(firstCluster.primary.teaserQuestion)}`;
-  const fullBridge = `Hai phần trên đã cho bạn thấy cách khí chất nối với công việc và nguồn lực. **Bản FULL 9 chương cá nhân hóa** sẽ tiếp tục đối chiếu quan hệ, sức khỏe, tài chính và vận năm ${chart.input.viewYear} trên cùng dữ kiện lá số, để bạn thấy điểm nào đang hỗ trợ nhau và điểm nào cần cân nhắc trước khi hành động.`;
+  const fullBridge = audienceCopy(
+    `Bản miễn phí mới cho bạn thấy 2 lớp đầu: khí chất và nguồn lực. **Bản FULL 9 chương cá nhân hóa** đi tiếp vào 4 câu hỏi thực tế: quan hệ nên mở hay giữ ranh giới, tiền nên giữ hay xoay, vận năm ${chart.input.viewYear} cần chậm ở đâu, và 90 ngày tới nên làm việc gì trước.`,
+    plan.facts,
+  );
 
   return [
-    intro,
-    quickRead,
+    audienceCopy(intro, plan.facts),
+    audienceCopy(quickRead, plan.facts),
     sections[0],
     sections[1],
-    reflection,
+    audienceCopy(reflection, plan.facts),
     fullBridge,
     sections[2],
     sections[3],
