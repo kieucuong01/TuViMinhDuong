@@ -24,27 +24,18 @@ export function FreeOverviewLoader({
   isSignedIn?: boolean;
   canReadFullOverview?: boolean;
 }) {
-  const overviewContent = initialOverview?.content || "";
-  const isLlmReady = Boolean(overviewContent && initialOverview?.source === "llm");
-
-  if (!isLlmReady) {
+  if (!initialOverview?.content) {
     return (
-      <article className="free-overview-loading" role="status" aria-live="polite" data-ad-view="free_overview_loading" data-chart-id={chartId}>
-        <FreeOverviewRefreshTrigger chartId={chartId} shouldRefresh />
-        <div>
-          <strong>Đang viết bản luận giải tổng quan bằng AI...</strong>
-          <span>Phần này được luận riêng theo lá số của {fullName}. Bạn có thể xem bàn lá số phía trên trong lúc chờ.</span>
-        </div>
-        <i />
-        <i />
-        <i />
-        <i />
-      </article>
+      <div className="free-overview-error" role="status">
+        <strong>Chưa tải được luận giải miễn phí.</strong>
+        <span>Bạn có thể tải lại trang hoặc xem bàn lá số phía trên.</span>
+      </div>
     );
   }
 
   const chartPath = `/la-so/${chartId}`;
   const nextPath = `${chartPath}#luan-giai`;
+  const isLlmReady = initialOverview.source === "llm";
 
   return (
     <article
@@ -53,7 +44,21 @@ export function FreeOverviewLoader({
       data-ad-depth={canReadFullOverview ? "4" : "2"}
       data-chart-id={chartId}
     >
-      <MarkdownContent content={overviewContent} />
+      <MarkdownContent content={initialOverview.content} />
+
+      {!isLlmReady ? (
+        <section className="free-overview-loading" role="status" aria-live="polite" data-ad-view="free_overview_loading" data-chart-id={chartId}>
+          <FreeOverviewRefreshTrigger chartId={chartId} shouldRefresh />
+          <div>
+            <strong>Đang viết tiếp bản luận giải AI cá nhân hóa...</strong>
+            <span>Bản đọc nhanh phía trên hiển thị trước để bạn không phải chờ. Khi bản AI xong, hệ thống sẽ tự thay thế nội dung này.</span>
+          </div>
+          <i />
+          <i />
+          <i />
+          <i />
+        </section>
+      ) : null}
 
       {!canReadFullOverview && !isSignedIn ? (
         <section

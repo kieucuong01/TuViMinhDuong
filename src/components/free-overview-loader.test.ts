@@ -11,13 +11,13 @@ const chartPageSource = readFileSync(fileURLToPath(new URL("../app/la-so/[id]/pa
 const normalizedChartPageSource = chartPageSource.replace(/\s+/g, " ");
 const overview = { status: "ready" as const, source: "llm" as const, content: "## 1. Khí chất\n\nNội dung đã chiếu từ server." };
 
-describe("FreeOverviewLoader LLM-only gate", () => {
-  it("renders only LLM content and uses a tiny client trigger while the LLM is not ready", () => {
-    expect(loaderSource).toContain('initialOverview?.source === "llm"');
-    expect(loaderSource).toContain("Đang viết bản luận giải tổng quan bằng AI");
-    expect(loaderSource).toContain("<MarkdownContent content={overviewContent} />");
+describe("FreeOverviewLoader seed-first LLM refresh gate", () => {
+  it("renders seed content first and shows a loading handoff until the LLM replaces it", () => {
+    expect(loaderSource).toContain('const isLlmReady = initialOverview.source === "llm"');
+    expect(loaderSource).toContain("Đang viết tiếp bản luận giải AI cá nhân hóa");
+    expect(loaderSource).toContain("Bản đọc nhanh phía trên hiển thị trước");
+    expect(loaderSource).toContain("<MarkdownContent content={initialOverview.content} />");
     expect(loaderSource).toContain("FreeOverviewRefreshTrigger");
-    expect(loaderSource).not.toContain("shouldRefreshOverview");
     expect(loaderSource).not.toContain("useEffect");
     expect(loaderSource).not.toContain("fetch(");
     expect(refreshSource).toContain("\"use client\"");
