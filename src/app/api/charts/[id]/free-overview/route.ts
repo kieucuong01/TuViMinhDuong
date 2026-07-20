@@ -27,6 +27,9 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
     ? overview
     : {
         status: overview.status,
+        source: overview.source,
+        jobStatus: overview.jobStatus,
+        ...(overview.status === "ready" ? { model: overview.model, generatedAt: overview.generatedAt } : {}),
         content: visibleContent,
         wordCount: countVisibleMarkdownWords(visibleContent),
       };

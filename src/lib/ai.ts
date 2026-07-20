@@ -761,7 +761,6 @@ export function buildInstantFreeOverview(chart: TuViChart) {
 
 function buildFreeOverviewPrompt(chart: TuViChart) {
   const evidence = formatChartEvidence(buildChartEvidenceProfile(chart));
-  const fallbackOutline = buildInstantFreeOverview(chart);
 
   return `Bạn là chuyên gia luận giải tử vi cho website Lá số tinh hoa.
 
@@ -781,7 +780,35 @@ Dữ liệu bằng chứng:
 ${evidence}
 
 Mẫu cấu trúc cần giữ, chỉ dùng như khung và nguồn tham chiếu giọng điệu; hãy viết lại tự nhiên hơn, không sao chép máy móc:
-${fallbackOutline}
+Cấu trúc Markdown bắt buộc:
+# Bản tổng quan lá số của bạn
+### Đọc nhanh
+## 1. Khí chất và cách ra quyết định
+### Điểm nổi bật
+### Lợi thế
+### Điểm cần lưu ý
+### Gợi ý thực tế
+### Vì sao có nhận định này
+## 2. Công việc và nguồn lực
+### Điểm nổi bật
+### Lợi thế
+### Điểm cần lưu ý
+### Gợi ý thực tế
+### Vì sao có nhận định này
+**Câu hỏi tự đối chiếu:**
+**Bản FULL 9 chương cá nhân hóa**
+## 3. Quan hệ và nhịp sống
+### Điểm nổi bật
+### Lợi thế
+### Điểm cần lưu ý
+### Gợi ý thực tế
+### Vì sao có nhận định này
+## 4. Vận hiện tại
+### Điểm nổi bật
+### Lợi thế
+### Điểm cần lưu ý
+### Gợi ý thực tế
+### Vì sao có nhận định này
 
 Trả về duy nhất nội dung Markdown hoàn chỉnh.`;
 }
@@ -793,7 +820,7 @@ export async function generateFreeOverview(chart: TuViChart) {
   const routed = await generateWithLlmRouter({
     prompt: buildFreeOverviewPrompt(chart),
     temperature: 0.45,
-    maxTokens: 4200,
+    maxTokens: 3200,
     providerOrder: [...READING_PROVIDER_ORDER],
   });
 

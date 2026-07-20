@@ -74,7 +74,9 @@ describe("free overview GET route", () => {
     expect(body.content).toContain("INSIGHT_HAI");
     expect(body.content).not.toContain("SECRET_INSIGHT_BA");
     expect(body.content).not.toContain("SECRET_INSIGHT_BỐN");
-    expect(Object.keys(body).sort()).toEqual(["content", "status", "wordCount"]);
+    expect(body.source).toBe("seed-rules");
+    expect(body.jobStatus).toBe("completed");
+    expect(Object.keys(body).sort()).toEqual(["content", "generatedAt", "jobStatus", "model", "source", "status", "wordCount"]);
     expect(response.headers.get("cache-control")).toBe("private, no-store");
   });
 
@@ -94,8 +96,11 @@ describe("free overview GET route", () => {
     expect(body).toEqual({
       status: "fallback",
       content: "Fallback content.",
+      source: "seed-rules",
       wordCount: expect.any(Number),
+      jobStatus: "failed",
     });
+    expect(body).not.toHaveProperty("error");
   });
 
   it("returns all four insights to the chart owner", async () => {

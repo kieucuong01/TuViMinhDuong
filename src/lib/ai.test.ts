@@ -255,10 +255,13 @@ describe("AI reading format", () => {
     expect(result).not.toHaveProperty("prompt");
     expect(isCompleteFreeOverview(result.content)).toBe(true);
     expect(llmRouterMocks.generateWithLlmRouter).toHaveBeenCalledTimes(1);
+    const prompt = String(llmRouterMocks.generateWithLlmRouter.mock.calls[0][0].prompt);
+    expect(prompt.length).toBeLessThan(5200);
+    expect(prompt).not.toContain(llmContent.slice(0, 120));
     expect(llmRouterMocks.generateWithLlmRouter).toHaveBeenCalledWith(
       expect.objectContaining({
         temperature: 0.45,
-        maxTokens: 4200,
+        maxTokens: 3200,
         providerOrder: ["deepseek", "groq"],
       }),
     );
