@@ -24,19 +24,27 @@ export function FreeOverviewLoader({
   isSignedIn?: boolean;
   canReadFullOverview?: boolean;
 }) {
-  if (!initialOverview?.content) {
+  const overviewContent = initialOverview?.content || "";
+  const isLlmReady = Boolean(overviewContent && initialOverview?.source === "llm");
+
+  if (!isLlmReady) {
     return (
-      <div className="free-overview-error" role="status">
-        <strong>Chưa tải được luận giải miễn phí.</strong>
-        <span>Bạn có thể tải lại trang hoặc xem bàn lá số phía trên.</span>
-      </div>
+      <article className="free-overview-loading" role="status" aria-live="polite" data-ad-view="free_overview_loading" data-chart-id={chartId}>
+        <FreeOverviewRefreshTrigger chartId={chartId} shouldRefresh />
+        <div>
+          <strong>Đang viết bản luận giải tổng quan bằng AI...</strong>
+          <span>Phần này được luận riêng theo lá số của {fullName}. Bạn có thể xem bàn lá số phía trên trong lúc chờ.</span>
+        </div>
+        <i />
+        <i />
+        <i />
+        <i />
+      </article>
     );
   }
 
   const chartPath = `/la-so/${chartId}`;
   const nextPath = `${chartPath}#luan-giai`;
-  const shouldRefreshOverview =
-    initialOverview.source !== "llm" && (initialOverview.jobStatus === "idle" || initialOverview.jobStatus === "stale");
 
   return (
     <article
@@ -45,8 +53,7 @@ export function FreeOverviewLoader({
       data-ad-depth={canReadFullOverview ? "4" : "2"}
       data-chart-id={chartId}
     >
-      {shouldRefreshOverview ? <FreeOverviewRefreshTrigger chartId={chartId} shouldRefresh /> : null}
-      <MarkdownContent content={initialOverview.content} />
+      <MarkdownContent content={overviewContent} />
 
       {!canReadFullOverview && !isSignedIn ? (
         <section

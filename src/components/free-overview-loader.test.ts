@@ -9,17 +9,21 @@ const loaderSource = readFileSync(fileURLToPath(new URL("./free-overview-loader.
 const refreshSource = readFileSync(fileURLToPath(new URL("./free-overview-refresh-trigger.tsx", import.meta.url)), "utf8");
 const chartPageSource = readFileSync(fileURLToPath(new URL("../app/la-so/[id]/page.tsx", import.meta.url)), "utf8");
 const normalizedChartPageSource = chartPageSource.replace(/\s+/g, " ");
-const overview = { status: "ready" as const, content: "## 1. Khí chất\n\nNội dung đã chiếu từ server." };
+const overview = { status: "ready" as const, source: "llm" as const, content: "## 1. Khí chất\n\nNội dung đã chiếu từ server." };
 
-describe("FreeOverviewLoader LLM refresh gate", () => {
-  it("renders server-projected content and uses a tiny client trigger for background LLM refresh", () => {
-    expect(loaderSource).toContain("<MarkdownContent content={initialOverview.content} />");
+describe("FreeOverviewLoader LLM-only gate", () => {
+  it("renders only LLM content and uses a tiny client trigger while the LLM is not ready", () => {
+    expect(loaderSource).toContain('initialOverview?.source === "llm"');
+    expect(loaderSource).toContain("Đang viết bản luận giải tổng quan bằng AI");
+    expect(loaderSource).toContain("<MarkdownContent content={overviewContent} />");
     expect(loaderSource).toContain("FreeOverviewRefreshTrigger");
+    expect(loaderSource).not.toContain("shouldRefreshOverview");
     expect(loaderSource).not.toContain("useEffect");
     expect(loaderSource).not.toContain("fetch(");
     expect(refreshSource).toContain("\"use client\"");
     expect(refreshSource).toContain("/free-overview/process");
     expect(refreshSource).toContain("router.refresh()");
+    expect(refreshSource).toContain("attempt >= 30");
     expect(loaderSource).not.toContain("schedulePoll");
   });
 

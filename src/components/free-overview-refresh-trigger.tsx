@@ -13,7 +13,7 @@ export function FreeOverviewRefreshTrigger({ chartId, shouldRefresh }: { chartId
     let timeoutId: ReturnType<typeof setTimeout> | null = null;
 
     async function pollUntilReady(attempt = 0) {
-      if (cancelled || attempt >= 8) return;
+      if (cancelled || attempt >= 30) return;
 
       try {
         const response = await fetch(`/api/charts/${encodeURIComponent(chartId)}/free-overview`, {
