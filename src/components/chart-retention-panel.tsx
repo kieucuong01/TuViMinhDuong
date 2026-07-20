@@ -8,9 +8,10 @@ type ChartRetentionPanelProps = {
   chartId: string;
   chart: TuViChart;
   isSignedIn: boolean;
+  canUsePaidFateViews: boolean;
 };
 
-export function ChartRetentionPanel({ chartId, chart, isSignedIn }: ChartRetentionPanelProps) {
+export function ChartRetentionPanel({ chartId, chart, isSignedIn, canUsePaidFateViews }: ChartRetentionPanelProps) {
   const chartPath = `/la-so/${chartId}`;
   const birthYear = chart.solar.year.toString();
   const today = toInputDate(new Date());
@@ -34,11 +35,13 @@ export function ChartRetentionPanel({ chartId, chart, isSignedIn }: ChartRetenti
           <span>{isSignedIn ? "Mở danh sách lá số và nội dung đã từng xem." : "Lưu đường dẫn này vào tài khoản để quay lại đúng lá số."}</span>
         </Link>
 
-        <Link href={`${chartPath}?view=nguyet-van`} className="chart-retention-card" prefetch={false}>
-          <CalendarDays size={19} />
-          <strong>Quay lại xem Nguyệt vận</strong>
-          <span>Đầu tháng mới, mở mục này để đọc trọng tâm tháng theo lá số.</span>
-        </Link>
+        {canUsePaidFateViews ? (
+          <Link href={`${chartPath}?view=nguyet-van`} className="chart-retention-card" prefetch={false}>
+            <CalendarDays size={19} />
+            <strong>Quay lại xem Nguyệt vận</strong>
+            <span>Đầu tháng mới, mở mục này để đọc trọng tâm tháng theo lá số.</span>
+          </Link>
+        ) : null}
 
         <Link href={`/xem-ngay?${dateParams.toString()}`} className="chart-retention-card" prefetch={false}>
           <CalendarDays size={19} />

@@ -12,6 +12,15 @@ export type MarkdownHeading = {
   title: string;
 };
 
+const READING_BLOCK_BY_TITLE = {
+  "Đọc nhanh": "quick",
+  "Điểm nổi bật": "highlight",
+  "Lợi thế": "strength",
+  "Điểm cần lưu ý": "caution",
+  "Gợi ý thực tế": "action",
+  "Vì sao có nhận định này": "evidence",
+} as const;
+
 export function parseInlineMarkdown(text: string): InlineToken[] {
   const tokens: InlineToken[] = [];
   const inlinePattern = /(\*\*([^*]+)\*\*)|\[([^\]]+)]\(([^)]+)\)/g;
@@ -169,8 +178,9 @@ export function MarkdownContent({ content, afterFirstSection }: MarkdownContentP
 
     if (text.startsWith("### ")) {
       const title = text.slice(4);
+      const readingBlock = READING_BLOCK_BY_TITLE[title as keyof typeof READING_BLOCK_BY_TITLE];
       nodes.push(
-        <h3 key={nodeKey} id={headingId(title, 3)}>
+        <h3 key={nodeKey} id={headingId(title, 3)} {...(readingBlock ? { "data-reading-block": readingBlock } : {})}>
           {renderInline(title)}
         </h3>,
       );

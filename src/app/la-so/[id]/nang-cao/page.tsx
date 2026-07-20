@@ -36,7 +36,8 @@ export default async function AdvancedReadingPage({
     notFound();
   }
 
-  const requestedReading = query.reading ? await getReadingJobById(user.id, query.reading) : null;
+  const requestedReadingCandidate = query.reading ? await getReadingJobById(user.id, query.reading) : null;
+  const requestedReading = requestedReadingCandidate?.chartId === id ? requestedReadingCandidate : null;
   const currentFullJob = await getReadingJobByScope(user.id, id, "FULL", "all");
   const fullReading =
     (requestedReading?.status === "COMPLETED" && requestedReading.content ? requestedReading : null) ||
@@ -113,7 +114,12 @@ export default async function AdvancedReadingPage({
           </div>
         </div>
 
-        <section className="panel reading-content-panel mt-8" data-testid="advanced-reading-panel">
+        <section
+          className="panel reading-content-panel mt-8"
+          data-testid="advanced-reading-panel"
+          data-ad-view="reading_completed"
+          data-reading-id={fullReading!.id}
+        >
           <PaidReadingExperience
             readingId={fullReading!.id}
             content={normalizedReading!.content}

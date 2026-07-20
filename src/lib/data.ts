@@ -9,7 +9,8 @@ import { articleWithScore, seedArticles, type ArticleCategoryView, type ArticleV
 import { getDb } from "@/lib/db";
 import { FEATURE_PRICE_KEYS, FEATURE_PRICES, COIN_PACKAGES, type FeaturePriceMap, type ReadingKey } from "@/lib/pricing";
 import { isReadingBundleKey, readingBundleScopeKey } from "@/lib/reading-bundles";
-import { buildInstantFreeOverview, countWords } from "@/lib/ai";
+import { buildInstantFreeOverview } from "@/lib/ai";
+import { countVisibleMarkdownWords } from "@/lib/free-overview-presentation";
 import { scoreArticleSeo } from "@/lib/seo";
 import { slugify } from "@/lib/format";
 import { MAIN_STARS, PALACES, SUPPORT_STARS, buildPseoInventory } from "@/lib/pseo-registry";
@@ -996,7 +997,7 @@ export function getFreeOverviewStatus(chart: TuViChart): Extract<FreeOverviewSta
     source: "seed-rules",
     model: "interpretation-rules-v2",
     generatedAt: new Date().toISOString(),
-    wordCount: countWords(content),
+    wordCount: countVisibleMarkdownWords(content),
     jobStatus: "completed",
   };
 }

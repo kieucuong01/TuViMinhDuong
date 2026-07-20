@@ -13,6 +13,13 @@ export type SessionUser = {
   coinBalance: number;
 };
 
+export type AccountCompletionResult = "login" | "register";
+
+export type LoginOrRegisterResult = {
+  user: SessionUser;
+  accountResult: AccountCompletionResult;
+};
+
 const COOKIE_NAME = "tuvi_session";
 
 function secret() {
@@ -175,7 +182,7 @@ export async function getCurrentUser(): Promise<SessionUser | null> {
     : null;
 }
 
-export async function loginOrRegister(email: string, password: string, name?: string) {
+export async function loginOrRegister(email: string, password: string, name?: string): Promise<LoginOrRegisterResult> {
   const normalizedEmail = email.trim().toLowerCase();
   if (!normalizedEmail || password.length < 6) {
     throw new Error("Email hợp lệ và mật khẩu tối thiểu 6 ký tự.");
@@ -195,7 +202,7 @@ export async function loginOrRegister(email: string, password: string, name?: st
       coinBalance: role === "ADMIN" ? 999999 : 30,
     };
     await setSession(user);
-    return user;
+    return { user, accountResult: "register" };
   }
 
   const existing = await db.user.findUnique({ where: { email: normalizedEmail } });
@@ -216,7 +223,7 @@ export async function loginOrRegister(email: string, password: string, name?: st
         coinBalance: synced.coinBalance,
       };
       await setSession(user);
-      return user;
+      return { user, accountResult: "login" };
     }
     const passwordMatches = verifyPassword(password, existing.passwordHash);
     if (!passwordMatches && !isConfiguredAdminLogin) {
@@ -243,7 +250,7 @@ export async function loginOrRegister(email: string, password: string, name?: st
       coinBalance: synced.coinBalance,
     };
     await setSession(user);
-    return user;
+    return { user, accountResult: "login" };
   }
 
   const created = await db.user.create({
@@ -263,5 +270,5 @@ export async function loginOrRegister(email: string, password: string, name?: st
     coinBalance: created.coinBalance,
   };
   await setSession(user);
-  return user;
+  return { user, accountResult: "register" };
 }

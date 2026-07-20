@@ -106,6 +106,7 @@ describe("interpretation rule knowledge base", () => {
       expect(rule.strengthText).toMatch(/^Khi(?:\s|$).+\bbạn\b/iu);
       expect(rule.cautionText).toMatch(/^(Nếu kéo dài,|Khi quá|Bạn có thể dễ)(?:\s|$)/iu);
       expect(rule.lifeAdviceText).toMatch(/\bbạn\b/iu);
+      expect(rule.lifeAdviceText).not.toMatch(/^Bạn hãy trước khi/iu);
       expect(rule.teaserQuestion.trim()).toMatch(/\?$/);
       expect(rule.evidenceLabel).not.toMatch(/^Căn cứ:/i);
       expect(JSON.stringify(rule)).not.toMatch(/TODO|TBD|placeholder|thầy bói|số phận an bài|chết chắc|chắc chắn thất bại|người đọc|người này|đương số|\bmình\b|bạn mạnh mẽ nhưng đôi lúc yếu lòng/iu);

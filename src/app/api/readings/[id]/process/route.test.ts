@@ -92,4 +92,54 @@ describe("full reading process route", () => {
     );
     expect(mocks.revalidatePath).toHaveBeenCalledWith("/la-so/chart-1/nang-cao");
   });
+
+  it("preserves the paid order id through processing progress and completion", async () => {
+    const reading = await mocks.getReadingJobById();
+    mocks.getReadingJobById.mockResolvedValue({
+      ...reading,
+      promptMeta: { source: "direct-full-checkout", paymentOrderId: "order-1" },
+    });
+    mocks.generateReadingWithProgress.mockImplementation(async (_chart, _type, _scopeKey, onProgress) => {
+      await onProgress({ completedChapters: [], totalChapters: 8 });
+      return {
+        content: "# Full reading",
+        model: "test-model",
+        prompt: JSON.stringify({ promptVersion: "test" }),
+      };
+    });
+
+    await postProcess();
+    await mocks.after.mock.calls[0][0]();
+
+    expect(mocks.updateReadingJobProgress.mock.calls.map((call) => call[2])).toEqual([
+      expect.objectContaining({ paymentOrderId: "order-1", phase: "processing" }),
+      expect.objectContaining({ paymentOrderId: "order-1", phase: "processing" }),
+    ]);
+    expect(mocks.completeReadingJob).toHaveBeenCalledWith(
+      "reading-1",
+      "# Full reading",
+      expect.objectContaining({ paymentOrderId: "order-1", phase: "completed" }),
+      "test-model",
+    );
+  });
+
+  it("preserves the paid order id when generation fails", async () => {
+    const reading = await mocks.getReadingJobById();
+    mocks.getReadingJobById.mockResolvedValue({
+      ...reading,
+      priceCoins: 0,
+      promptMeta: { source: "direct-full-checkout", paymentOrderId: "order-1" },
+    });
+    mocks.generateReadingWithProgress.mockRejectedValue(new Error("AI unavailable"));
+
+    await postProcess();
+    await mocks.after.mock.calls[0][0]();
+
+    expect(mocks.failReadingJob).toHaveBeenCalledWith(
+      "reading-1",
+      "AI unavailable",
+      false,
+      expect.objectContaining({ paymentOrderId: "order-1", phase: "failed" }),
+    );
+  });
 });

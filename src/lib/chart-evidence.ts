@@ -168,6 +168,11 @@ export function buildPersonalizedReportOutline(chart: TuViChart): ReportOutlineI
       title: `Thời điểm cơ hội và rủi ro trong năm ${profile.viewYear}`,
       description: "Các mốc nên chủ động, nên kiểm chứng và gợi ý hành động theo từng tháng.",
     },
+    {
+      key: "action-plan",
+      title: "Kế hoạch hành động cá nhân trong 90 ngày",
+      description: "Chuyển các điểm mạnh, điểm cần lưu ý và vận hiện tại thành ba ưu tiên có thể bắt đầu ngay.",
+    },
   ];
 }
 

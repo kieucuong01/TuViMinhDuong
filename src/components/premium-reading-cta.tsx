@@ -52,7 +52,9 @@ export function PremiumReadingCta({
       <form
         action={checkoutFullReadingAction}
         className="premium-confirm-actions"
-        data-ad-event="full_checkout_submit"
+        data-ad-event="begin_checkout"
+        data-ad-method="payos"
+        data-chart-id={chartId}
         data-ad-placement="full_offer_modal"
         data-loading-message="Đang mở PayOS..."
       >
@@ -66,7 +68,9 @@ export function PremiumReadingCta({
         <form
           action={requestReadingAction}
           className="premium-confirm-actions premium-confirm-coin-action"
-          data-ad-event="paid_reading_request"
+          data-ad-event="begin_checkout"
+          data-ad-method="coins"
+          data-chart-id={chartId}
           data-ad-placement="full_offer_modal_coins"
           data-loading-message="Đang dùng xu..."
         >

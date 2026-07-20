@@ -2,7 +2,7 @@ import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { ADMIN_EMAIL, APP_URL, isGoogleOAuthEnabled } from "@/lib/env";
 import { getDb } from "@/lib/db";
-import { setSession, type SessionUser } from "@/lib/auth";
+import { setSession, type AccountCompletionResult, type SessionUser } from "@/lib/auth";
 import { claimGuestChartForUserFromPath } from "@/lib/data";
 import {
   googleOAuthCallbackUrl,
@@ -59,8 +59,14 @@ export async function GET(request: Request) {
     const role = profile.email === ADMIN_EMAIL ? "ADMIN" : "USER";
     const db = getDb();
     let user: SessionUser;
+    let accountResult: AccountCompletionResult = "register";
 
     if (db) {
+      const existingUser = await db.user.findUnique({
+        where: { email: profile.email },
+        select: { id: true },
+      });
+      accountResult = existingUser ? "login" : "register";
       const saved = await db.user.upsert({
         where: { email: profile.email },
         update: { name: profile.name, avatarUrl: profile.picture, role },
@@ -111,8 +117,9 @@ export async function GET(request: Request) {
     }
 
     await setSession(user);
+    let claimed = false;
     try {
-      await claimGuestChartForUserFromPath(parsed.next, user);
+      claimed = await claimGuestChartForUserFromPath(parsed.next, user);
     } catch (error) {
       console.error("claim_guest_chart_after_google_login_failed", {
         next: parsed.next,
@@ -120,7 +127,10 @@ export async function GET(request: Request) {
         error: error instanceof Error ? error.message : String(error),
       });
     }
-    return NextResponse.redirect(new URL(parsed.next, APP_URL));
+    const successUrl = new URL(parsed.next, APP_URL);
+    successUrl.searchParams.set("account", accountResult);
+    if (claimed) successUrl.searchParams.set("claimed", "1");
+    return NextResponse.redirect(successUrl);
   } catch (error) {
     console.error("google_oauth_callback_failed", error);
     return NextResponse.redirect(googleOAuthErrorUrl("Đăng nhập Google tạm thời chưa hoàn tất. Bạn thử lại giúp mình nhé.", parsed.next));

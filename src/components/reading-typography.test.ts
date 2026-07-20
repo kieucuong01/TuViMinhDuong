@@ -49,4 +49,45 @@ describe("reading typography", () => {
     expect(longFormRule).toContain("text-align: justify");
     expect(longFormRule).toContain("text-justify: inter-word");
   });
+
+  it("keeps the free overview at a readable measure with left-aligned 17px body text", () => {
+    const contentRule = cssRule(".free-reading-summary .prose-content");
+    const bodyRule = cssRule(".free-reading-summary .prose-content p,\n.free-reading-summary .prose-content li");
+
+    expect(contentRule).toContain("max-width: 72ch");
+    expect(contentRule).toContain("font-size: 1.0625rem");
+    expect(contentRule).toContain("line-height: 1.75");
+    expect(bodyRule).toContain("text-align: left");
+    expect(bodyRule).toContain("text-justify: auto");
+  });
+
+  it("uses solid, labeled semantic callouts without gradients or animation", () => {
+    const callouts = [
+      '.free-reading-summary h3[data-reading-block="quick"] + p',
+      '.free-reading-summary h3[data-reading-block="highlight"] + p',
+      '.free-reading-summary h3[data-reading-block="strength"] + p',
+      '.free-reading-summary h3[data-reading-block="caution"] + p',
+      '.free-reading-summary h3[data-reading-block="action"] + p',
+      '.free-reading-summary h3[data-reading-block="evidence"] + p',
+    ];
+
+    expect(cssRule(".free-reading-summary h3[data-reading-block] + p")).toContain("border-left: 4px solid");
+    for (const selector of callouts) {
+      const rule = cssRule(selector);
+      expect(rule).toContain("background:");
+      expect(rule).toContain("border-left-color:");
+      expect(rule).not.toContain("gradient");
+      expect(rule).not.toContain("animation");
+    }
+
+    for (const selector of [
+      ".free-overview-guest-gate",
+      ".free-reading-summary .prose-content li",
+      ".personal-report-outline",
+      ".premium-confirm-modal",
+      ".premium-confirm-icon",
+    ]) {
+      expect(cssRule(selector)).not.toContain("gradient");
+    }
+  });
 });

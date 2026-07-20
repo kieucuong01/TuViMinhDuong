@@ -4,6 +4,7 @@ import {
   type InterpretationRule,
   loadInterpretationRules,
 } from "@/lib/interpretation-rules";
+import { buildFreeOverviewTeaser, countVisibleMarkdownWords } from "@/lib/free-overview-presentation";
 
 type FreeOverviewPalaceFact = {
   name: string;
@@ -48,10 +49,6 @@ export type FreeOverviewNarrativePlan = {
   selectedRules: ScoredInterpretationRule[];
   allMatches: ScoredInterpretationRule[];
 };
-
-function countWords(content: string) {
-  return content.trim().split(/\s+/).filter(Boolean).length;
-}
 
 function chartAge(chart: TuViChart) {
   return chart.input.viewYear - chart.solar.year;
@@ -279,6 +276,52 @@ function clusterScore(rule: ScoredInterpretationRule, spec: (typeof CLUSTER_SPEC
   return rule.score + (scopeIndex === 0 ? 18 : 8) + (palaceMatch ? 14 : 0) + (primaryPattern ? 4 : 0);
 }
 
+function rulesSharePalace(left: ScoredInterpretationRule, right: ScoredInterpretationRule) {
+  const rightPalaces = new Set(rulePalaces(right));
+  return rulePalaces(left).some((palace) => rightPalaces.has(palace));
+}
+
+function summarySentences(rule: ScoredInterpretationRule) {
+  return clean(rule.summary)
+    .split(/(?<=[.!?])\s+/u)
+    .map((sentence) => sentence.trim())
+    .filter(Boolean);
+}
+
+function buildQuickReadCopy(primary: ScoredInterpretationRule, support: ScoredInterpretationRule) {
+  const primarySentences = summarySentences(primary).map((sentence) => ({ sentence, source: "primary" }));
+  const supportSentences = summarySentences(support).map((sentence) => ({ sentence, source: "support" }));
+  const sentences = [...primarySentences, ...supportSentences];
+  let best: { copy: string; words: number } | null = null;
+
+  for (let mask = 1; mask < 2 ** sentences.length; mask += 1) {
+    const selected = sentences.filter((_, index) => (mask & (1 << index)) !== 0);
+    if (!selected.some((item) => item.source === "primary") || !selected.some((item) => item.source === "support")) {
+      continue;
+    }
+    const copy = selected.map((item) => item.sentence).join(" ");
+    const words = countVisibleMarkdownWords(copy);
+    if (words < 80 || words > 120) continue;
+    if (!best || words > best.words) best = { copy, words };
+  }
+
+  return best?.copy ?? null;
+}
+
+function findRelatedSupport(
+  candidates: ScoredInterpretationRule[],
+  primary: ScoredInterpretationRule,
+  used: Set<string>,
+  requireQuickReadRange: boolean,
+) {
+  return candidates.find((rule) => {
+    if (rule.key === primary.key || used.has(rule.key) || rule.evidence === primary.evidence) return false;
+    if (!rulesSharePalace(primary, rule)) return false;
+    if (!requireQuickReadRange) return true;
+    return Boolean(buildQuickReadCopy(primary, rule));
+  });
+}
+
 function selectClusters(matches: ScoredInterpretationRule[]) {
   const used = new Set<string>();
   const clusters: FreeOverviewCluster[] = [];
@@ -288,11 +331,14 @@ function selectClusters(matches: ScoredInterpretationRule[]) {
       .filter((rule) => (spec.key === "current" ? rule.pattern.kind === "fate" : spec.scopes.includes(rule.scope as never)) && !used.has(rule.key))
       .sort((left, right) => clusterScore(right, spec) - clusterScore(left, spec) || left.key.localeCompare(right.key, "vi"));
 
-    const primary = candidates[0];
+    const primary =
+      spec.key === "identity"
+        ? candidates.find((candidate) => Boolean(findRelatedSupport(candidates, candidate, used, true)))
+        : candidates[0];
     if (!primary) throw new Error(`Không tìm thấy seed rule phù hợp cho cụm ${spec.key}`);
     used.add(primary.key);
 
-    const support = candidates.find((rule) => !used.has(rule.key) && rule.evidence !== primary.evidence);
+    const support = findRelatedSupport(candidates, primary, used, spec.key === "identity");
     if (support) used.add(support.key);
     clusters.push({ key: spec.key, title: spec.title, primary, support });
   }
@@ -325,22 +371,66 @@ function evidence(rule: ScoredInterpretationRule) {
 
 type SupportDetail = "strength" | "caution" | "advice";
 
-function renderRule(rule: ScoredInterpretationRule, primary: boolean, supportDetails: Set<string>) {
-  const lines = [
-    `### ${rule.title}`,
-    clean(rule.summary),
-    `**Dữ kiện lá số:** ${evidence(rule)}`,
-    clean(rule.strengthText),
-  ];
-  if (primary || supportDetails.has(`${rule.key}:caution`)) lines.push(clean(rule.cautionText));
-  if (primary || supportDetails.has(`${rule.key}:advice`)) lines.push(clean(rule.lifeAdviceText));
-  return lines.join("\n\n");
+function supportDetailKey(rule: ScoredInterpretationRule, detail: SupportDetail) {
+  return `${rule.key}:${detail}`;
+}
+
+function joinParagraph(...values: Array<string | undefined>) {
+  return values.filter((value): value is string => Boolean(value)).join(" ");
+}
+
+function renderCluster(cluster: FreeOverviewCluster, index: number, supportDetails: Set<string>) {
+  const { primary, support } = cluster;
+  const firstCluster = index === 0;
+  const highlight =
+    firstCluster && support
+      ? clean(support.strengthText)
+      : joinParagraph(clean(primary.summary), support ? clean(support.summary) : undefined);
+  const strength = joinParagraph(
+    clean(primary.strengthText),
+    !firstCluster && support && supportDetails.has(supportDetailKey(support, "strength"))
+      ? clean(support.strengthText)
+      : undefined,
+  );
+  const caution = joinParagraph(
+    clean(primary.cautionText),
+    support && supportDetails.has(supportDetailKey(support, "caution")) ? clean(support.cautionText) : undefined,
+  );
+  const advice = joinParagraph(
+    clean(primary.lifeAdviceText),
+    support && supportDetails.has(supportDetailKey(support, "advice")) ? clean(support.lifeAdviceText) : undefined,
+  );
+  const evidenceText = joinParagraph(
+    `**Dữ kiện lá số:** ${evidence(primary)}`,
+    support ? `**Dấu hiệu liên quan:** ${evidence(support)}` : undefined,
+  );
+
+  return `## ${index + 1}. ${cluster.title}
+
+### Điểm nổi bật
+
+${highlight}
+
+### Lợi thế
+
+${strength}
+
+### Điểm cần lưu ý
+
+${caution}
+
+### Gợi ý thực tế
+
+${advice}
+
+### Vì sao có nhận định này
+
+${evidenceText}`;
 }
 
 function overviewCopy(
   plan: FreeOverviewNarrativePlan,
   chart: TuViChart,
-  supportStrengths: Set<string>,
   supportDetails: Set<string>,
 ) {
   const intro = `# Bản tổng quan lá số của bạn
@@ -349,58 +439,83 @@ ${chart.input.fullName}, bản đọc này được ghép trực tiếp từ nh�
 
 Bạn đang ở tuổi ${plan.facts.age}, trong đại vận ${plan.facts.currentDecade.range} tại cung ${plan.facts.currentDecade.palace}. ${plan.facts.lifeContext} Vì vậy, hãy đọc chậm ở những đoạn gợi đúng một hành vi đang lặp lại, một áp lực bạn thường nhận thêm, hoặc một nhu cầu bạn vẫn khó nói thành lời.`;
 
-  const sections = plan.clusters.map((cluster, index) => {
-    const support = cluster.support
-      ? `\n\n### Dấu hiệu bổ sung: ${cluster.support.title}\n\n${clean(cluster.support.summary)}\n\n**Dữ kiện lá số:** ${evidence(cluster.support)}${supportStrengths.has(cluster.support.key) ? `\n\n${clean(cluster.support.strengthText)}` : ""}${supportDetails.has(`${cluster.support.key}:caution`) ? `\n\n${clean(cluster.support.cautionText)}` : ""}${supportDetails.has(`${cluster.support.key}:advice`) ? `\n\n${clean(cluster.support.lifeAdviceText)}` : ""}`
-      : "";
-    return `## ${index + 1}. ${cluster.title}
+  const firstCluster = plan.clusters[0];
+  if (!firstCluster.support) throw new Error("Cụm đầu tiên cần một dấu hiệu liên quan cho phần đọc nhanh");
+  const quickReadCopy = buildQuickReadCopy(firstCluster.primary, firstCluster.support);
+  if (!quickReadCopy) throw new Error("Không thể tạo phần đọc nhanh 80-120 từ từ các câu seed nguyên vẹn");
+  const quickRead = `### Đọc nhanh
 
-${renderRule(cluster.primary, true, supportDetails)}${support}`;
+${quickReadCopy}`;
+  const sections = plan.clusters.map((cluster, index) => renderCluster(cluster, index, supportDetails));
+  const reflection = `**Câu hỏi tự đối chiếu:** ${clean(firstCluster.primary.teaserQuestion)}`;
+  const fullBridge = `Hai phần trên đã cho bạn thấy cách khí chất nối với công việc và nguồn lực. **Bản FULL 9 chương cá nhân hóa** sẽ tiếp tục đối chiếu quan hệ, sức khỏe, tài chính và vận năm ${chart.input.viewYear} trên cùng dữ kiện lá số, để bạn thấy điểm nào đang hỗ trợ nhau và điểm nào cần cân nhắc trước khi hành động.`;
+
+  return [
+    intro,
+    quickRead,
+    sections[0],
+    sections[1],
+    reflection,
+    fullBridge,
+    sections[2],
+    sections[3],
+  ].join("\n\n");
+}
+
+function optionalSupportDetails(plan: FreeOverviewNarrativePlan) {
+  return plan.clusters.flatMap((cluster, index) => {
+    if (!cluster.support) return [];
+    return [
+      ...(index === 0 ? [] : [supportDetailKey(cluster.support, "strength")]),
+      supportDetailKey(cluster.support, "caution"),
+      supportDetailKey(cluster.support, "advice"),
+    ];
   });
+}
 
-  const questions = [...plan.selectedRules]
-    .sort((left, right) => right.score - left.score || left.key.localeCompare(right.key, "vi"))
-    .map((rule) => clean(rule.teaserQuestion))
-    .filter((question, index, all) => all.indexOf(question) === index)
-    .slice(0, 2);
-
-  return `${intro}
-
-${sections.join("\n\n")}
-
-## Hai câu hỏi để bạn tự đối chiếu
-
-- ${questions[0]}
-- ${questions[1]}
-
-Nếu bạn muốn nối bốn cụm này thành một lộ trình rõ hơn cho công việc, tài chính, quan hệ và vận năm ${chart.input.viewYear}, **Bản FULL 9 chương cá nhân hóa** sẽ đi sâu từ chính các dấu hiệu trên. Bạn có thể đọc tiếp khi thấy phù hợp, không cần quyết định vội.`.trim();
+function overviewWordBudgets(content: string) {
+  return {
+    guest: countVisibleMarkdownWords(buildFreeOverviewTeaser(content)),
+    full: countVisibleMarkdownWords(content),
+  };
 }
 
 export function buildFreeOverviewFromInterpretationRules(chart: TuViChart) {
   const plan = buildFreeOverviewNarrativePlan(chart);
-  const supports = plan.clusters.flatMap((cluster) => (cluster.support ? [cluster.support] : []));
-  const supportStrengths = new Set(supports.map((rule) => rule.key));
-  const supportDetails = new Set<string>();
-  let output = overviewCopy(plan, chart, supportStrengths, supportDetails);
+  const options = optionalSupportDetails(plan);
+  const baseOutput = overviewCopy(plan, chart, new Set());
+  const baseWords = overviewWordBudgets(baseOutput);
+  const optionDeltas = options.map((option) => {
+    const words = overviewWordBudgets(overviewCopy(plan, chart, new Set([option])));
+    return { guest: words.guest - baseWords.guest, full: words.full - baseWords.full };
+  });
+  let best: { mask: number; guest: number; full: number } | null = null;
 
-  for (const detail of ["caution", "advice"] as SupportDetail[]) {
-    for (const rule of supports) {
-      if (countWords(output) >= 1400) break;
-      supportDetails.add(`${rule.key}:${detail}`);
-      const candidate = overviewCopy(plan, chart, supportStrengths, supportDetails);
-      if (countWords(candidate) <= 1650) output = candidate;
-      else supportDetails.delete(`${rule.key}:${detail}`);
+  for (let mask = 0; mask < 2 ** options.length; mask += 1) {
+    const words = optionDeltas.reduce(
+      (total, delta, index) => {
+        if ((mask & (1 << index)) !== 0) {
+          total.guest += delta.guest;
+          total.full += delta.full;
+        }
+        return total;
+      },
+      { ...baseWords },
+    );
+    if (words.guest < 800 || words.guest > 950 || words.full < 1400 || words.full > 1650) continue;
+    if (!best || words.guest + words.full > best.guest + best.full) {
+      best = { mask, ...words };
     }
   }
 
-  for (const rule of [...supports].reverse()) {
-    if (countWords(output) <= 1650) break;
-    supportStrengths.delete(rule.key);
-    output = overviewCopy(plan, chart, supportStrengths, supportDetails);
+  if (!best) {
+    const minimum = overviewWordBudgets(overviewCopy(plan, chart, new Set()));
+    const maximum = overviewWordBudgets(overviewCopy(plan, chart, new Set(options)));
+    throw new Error(
+      `Seed overview cannot satisfy visible-word budgets; guest ${minimum.guest}-${maximum.guest}, full ${minimum.full}-${maximum.full}`,
+    );
   }
 
-  if (countWords(output) < 1400 || countWords(output) > 1650) {
-    throw new Error(`Seed overview has ${countWords(output)} words; expected 1400-1650`);
-  }
-  return output;
+  const enabled = new Set(options.filter((_, index) => (best.mask & (1 << index)) !== 0));
+  return overviewCopy(plan, chart, enabled);
 }

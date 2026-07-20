@@ -53,7 +53,7 @@ describe("free overview GET route", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mocks.getCurrentUser.mockResolvedValue(null);
-    mocks.getChart.mockResolvedValue({ id: "chart-1", chart: { input: { fullName: "Test" } } });
+    mocks.getChart.mockResolvedValue({ id: "chart-1", userId: null, chart: { input: { fullName: "Test" } } });
     mocks.getFreeOverviewStatus.mockReturnValue({
       status: "ready",
       content: fullContent,
@@ -74,17 +74,60 @@ describe("free overview GET route", () => {
     expect(body.content).toContain("INSIGHT_HAI");
     expect(body.content).not.toContain("SECRET_INSIGHT_BA");
     expect(body.content).not.toContain("SECRET_INSIGHT_BỐN");
+    expect(Object.keys(body).sort()).toEqual(["content", "status", "wordCount"]);
     expect(response.headers.get("cache-control")).toBe("private, no-store");
   });
 
-  it("returns all four insights to a signed-in user", async () => {
+  it("allowlists fallback fields for a restricted viewer", async () => {
+    mocks.getFreeOverviewStatus.mockReturnValue({
+      status: "fallback",
+      content: "Fallback content.",
+      source: "seed-rules",
+      wordCount: 2,
+      jobStatus: "failed",
+      error: "internal-only",
+    });
+
+    const response = await getOverview();
+    const body = await response.json();
+
+    expect(body).toEqual({
+      status: "fallback",
+      content: "Fallback content.",
+      wordCount: expect.any(Number),
+    });
+  });
+
+  it("returns all four insights to the chart owner", async () => {
     mocks.getCurrentUser.mockResolvedValue({ id: "user-1", role: "USER" });
+    mocks.getChart.mockResolvedValue({ id: "chart-1", userId: "user-1", chart: { input: { fullName: "Test" } } });
 
     const response = await getOverview();
     const body = await response.json();
 
     expect(body.content).toContain("SECRET_INSIGHT_BA");
     expect(body.content).toContain("SECRET_INSIGHT_BỐN");
+  });
+
+  it("keeps a signed-in non-owner at the first two insights", async () => {
+    mocks.getCurrentUser.mockResolvedValue({ id: "user-1", role: "USER" });
+
+    const response = await getOverview();
+    const body = await response.json();
+
+    expect(body.content).toContain("INSIGHT_HAI");
+    expect(body.content).not.toContain("SECRET_");
+  });
+
+  it("returns all four insights to an admin even when the chart has another owner", async () => {
+    mocks.getCurrentUser.mockResolvedValue({ id: "admin-1", role: "ADMIN" });
+    mocks.getChart.mockResolvedValue({ id: "chart-1", userId: "user-2", chart: { input: { fullName: "Test" } } });
+
+    const response = await getOverview();
+    const body = await response.json();
+
+    expect(body.content).toContain("SECRET_INSIGHT_BA");
+    expect(body.content).toContain("SECRET_");
   });
 
   it("fails closed for a guest when the seed structure is malformed", async () => {

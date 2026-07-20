@@ -37,6 +37,7 @@ function createDeps(options: {
   pendingReadingId?: string;
   generateFails?: boolean;
   priceCoins?: number;
+  ownerId?: string;
 } = {}) {
   const chart = fixtureChart();
   let balance = options.balance ?? 0;
@@ -47,7 +48,7 @@ function createDeps(options: {
   const chartId = "chart-1";
 
   const deps: ReadingUnlockDeps = {
-    getChart: vi.fn(async () => ({ id: chartId, chart })),
+    getChart: vi.fn(async () => ({ id: chartId, chart, userId: options.ownerId ?? "user-1" })),
     getCachedReading: vi.fn(async (userId: string, id: string, type: ReadingKey, scopeKey: string) =>
       options.cachedReadingId
         ? {
@@ -146,6 +147,37 @@ function createDeps(options: {
 }
 
 describe("reading unlock paywall flow", () => {
+  it("rejects foreign charts before any unlock work across all shared entry points", async () => {
+    const harness = createDeps({ balance: 999, ownerId: "user-2" });
+    const currentUser = user({ coinBalance: 999 });
+
+    const results = await Promise.all([
+      startFullReadingJobForUser(harness.deps, { user: currentUser, chartId: harness.chartId }),
+      unlockReadingForUser(harness.deps, {
+        user: currentUser,
+        chartId: harness.chartId,
+        type: "PALACE",
+        scopeKey: "Mệnh",
+      }),
+      unlockReadingBundleForUser(harness.deps, {
+        user: currentUser,
+        chartId: harness.chartId,
+        type: "PALACE",
+      }),
+    ]);
+
+    expect(results).toEqual([
+      { status: "forbidden" },
+      { status: "forbidden" },
+      { status: "forbidden" },
+    ]);
+    expect(harness.deps.getUserBalance).not.toHaveBeenCalled();
+    expect(harness.deps.adjustCoins).not.toHaveBeenCalled();
+    expect(harness.deps.generateReading).not.toHaveBeenCalled();
+    expect(harness.deps.createPendingReading).not.toHaveBeenCalled();
+    expect(harness.deps.saveReading).not.toHaveBeenCalled();
+  });
+
   it("blocks normal users when they do not have enough coins", async () => {
     const harness = createDeps({ balance: 120, priceCoins: 199 });
 

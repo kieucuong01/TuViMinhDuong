@@ -18,8 +18,7 @@ import { PaywallPopup } from "@/components/paywall-popup";
 import { FreeOverviewLoader } from "@/components/free-overview-loader";
 import { ReadingHashScrollRestorer } from "@/components/reading-detail-cta";
 import { MarkdownContent } from "@/components/markdown-content";
-import { countWords } from "@/lib/ai";
-import { buildFreeOverviewTeaser } from "@/lib/free-overview-presentation";
+import { buildFreeOverviewTeaser, countVisibleMarkdownWords } from "@/lib/free-overview-presentation";
 import { PersonalizedReportOutline } from "@/components/personalized-report-outline";
 import { buildPersonalizedReportOutline } from "@/lib/chart-evidence";
 import { listAssistantQuestions } from "@/lib/chart-assistant-store";
@@ -59,20 +58,25 @@ export default async function ChartPage({
   const record = await getChart(id);
   if (!record) notFound();
   const [user, operationSettings] = await Promise.all([getCurrentUser(), getOperationSettings()]);
+  const canReadFullOverview = Boolean(user && (user.role === "ADMIN" || record.userId === user.id));
   const paidFeaturesVisible = operationSettings.paidReadingsEnabled || user?.role === "ADMIN";
+  const canUsePaidFateViews = paidFeaturesVisible && canReadFullOverview;
   const featurePrices = paidFeaturesVisible ? await getFeaturePrices() : null;
-  const fateViews: FateView[] = paidFeaturesVisible ? ["la-so", "luan-cung", "dai-van", "tieu-van", "nguyet-van", "nhat-van"] : ["la-so"];
+  const fateViews: FateView[] = canUsePaidFateViews ? ["la-so", "luan-cung", "dai-van", "tieu-van", "nguyet-van", "nhat-van"] : ["la-so"];
   const activeView: FateView = fateViews.includes(query.view as FateView) ? (query.view as FateView) : "la-so";
   const isScopedReadingView = ["luan-cung", "dai-van", "tieu-van", "nguyet-van", "nhat-van"].includes(activeView);
 
-  const selectedReading = user && query.reading && !isScopedReadingView ? await getReadingById(user.id, query.reading) : null;
-  const fullReading = user && !isScopedReadingView
+  const selectedReadingCandidate = canReadFullOverview && user && query.reading && !isScopedReadingView
+    ? await getReadingById(user.id, query.reading)
+    : null;
+  const selectedReading = selectedReadingCandidate?.chartId === id ? selectedReadingCandidate : null;
+  const fullReading = canReadFullOverview && user && !isScopedReadingView
     ? (await getCachedReading(user.id, id, "FULL", "all")) ||
       (user.role === "ADMIN" ? await getAnyCompletedReading(id, "FULL", "all") : null)
     : null;
   const activeReading = selectedReading || fullReading;
   const hasAdvancedReading = Boolean(fullReading);
-  const assistantFullReading = user
+  const assistantFullReading = canReadFullOverview && user
     ? fullReading ||
       (await getCachedReading(user.id, id, "FULL", "all")) ||
       (user.role === "ADMIN" ? await getAnyCompletedReading(id, "FULL", "all") : null)
@@ -90,20 +94,20 @@ export default async function ChartPage({
         };
   const reportOutline = buildPersonalizedReportOutline(record.chart);
   const paymentNotice = checkoutNotice(query.checkout, query.status);
-  const coinBalance = user ? await getUserBalance(user) : 0;
+  const coinBalance = canReadFullOverview && user ? await getUserBalance(user) : 0;
   const activeLabel = activeReading ? readingLabels[activeReading.type] : "Luận giải tổng quan";
   const freeOverviewStatus = activeReading || isScopedReadingView ? null : getFreeOverviewStatus(record.chart);
-  const guestOverviewContent = !user && freeOverviewStatus?.status === "ready"
+  const restrictedOverviewContent = !canReadFullOverview && freeOverviewStatus?.status === "ready"
     ? buildFreeOverviewTeaser(freeOverviewStatus.content)
     : null;
-  const visibleFreeOverviewStatus = !user && freeOverviewStatus
-    ? { ...freeOverviewStatus, content: guestOverviewContent || "", wordCount: countWords(guestOverviewContent || "") }
+  const visibleFreeOverviewStatus = !canReadFullOverview && freeOverviewStatus
+    ? { ...freeOverviewStatus, content: restrictedOverviewContent || "", wordCount: countVisibleMarkdownWords(restrictedOverviewContent || "") }
     : freeOverviewStatus;
 
   return (
     <main className="chart-page" data-testid="chart-page">
       <ReadingHashScrollRestorer />
-      {paidFeaturesVisible ? <FateTabs chartId={id} active={activeView} /> : null}
+      {canUsePaidFateViews ? <FateTabs chartId={id} active={activeView} /> : null}
 
       <div className="mx-auto max-w-6xl px-3 pb-10 sm:px-6 lg:px-8">
         {activeView === "dai-van" && featurePrices ? <MajorFateView chartId={id} chart={record.chart} user={user} activeReadingId={query.reading} featurePrices={featurePrices} /> : null}
@@ -118,7 +122,12 @@ export default async function ChartPage({
         </div>
         {paymentNotice ? <p className="chart-checkout-notice" role="status">{paymentNotice}</p> : null}
 
-        <ChartRetentionPanel chartId={id} chart={record.chart} isSignedIn={Boolean(user)} />
+        <ChartRetentionPanel
+          chartId={id}
+          chart={record.chart}
+          isSignedIn={Boolean(user)}
+          canUsePaidFateViews={canUsePaidFateViews}
+        />
 
         <MobileChartReader chart={record.chart} />
 
@@ -131,7 +140,7 @@ export default async function ChartPage({
         <DeferredChartActionPanel chartId={id} chart={record.chart} />
 
         <div className="chart-quick-panels">
-          {paidFeaturesVisible ? (
+          {canUsePaidFateViews ? (
             <PromptChips
               chartId={id}
               chart={record.chart}
@@ -161,23 +170,27 @@ export default async function ChartPage({
             <>
               <FreeOverviewLoader
                 chartId={id}
+                fullName={record.chart.input.fullName}
                 initialOverview={visibleFreeOverviewStatus}
                 isSignedIn={Boolean(user)}
+                canReadFullOverview={canReadFullOverview}
               />
             </>
           )}
         </section>
 
-        {user && paidFeaturesVisible ? (
+        {paidFeaturesVisible ? (
           <>
             <PersonalizedReportOutline
               chartId={id}
               items={reportOutline}
               unlocked={hasAdvancedReading}
               priceCoins={featurePrices?.FULL.priceCoins ?? 199}
+              isSignedIn={Boolean(user)}
+              canReadFullOverview={canReadFullOverview}
             />
-            {featurePrices ? <ReadingTabs chartId={id} chart={record.chart} featurePrices={featurePrices} /> : null}
-            {featurePrices ? <PremiumReadingCta chartId={id} fullName={record.chart.input.fullName} hasAdvancedReading={hasAdvancedReading} fullPriceCoins={featurePrices.FULL.priceCoins} coinBalance={coinBalance} /> : null}
+            {canReadFullOverview && featurePrices ? <ReadingTabs chartId={id} chart={record.chart} featurePrices={featurePrices} /> : null}
+            {canReadFullOverview && featurePrices ? <PremiumReadingCta chartId={id} fullName={record.chart.input.fullName} hasAdvancedReading={hasAdvancedReading} fullPriceCoins={featurePrices.FULL.priceCoins} coinBalance={coinBalance} /> : null}
           </>
         ) : null}
         </>

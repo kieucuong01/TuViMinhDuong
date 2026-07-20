@@ -30,6 +30,11 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return Boolean(value && typeof value === "object" && !Array.isArray(value));
 }
 
+function preservePaymentOrderId(meta: Record<string, unknown>, promptMeta: unknown) {
+  const paymentOrderId = isRecord(promptMeta) ? promptMeta.paymentOrderId : undefined;
+  return typeof paymentOrderId === "string" && paymentOrderId ? { ...meta, paymentOrderId } : meta;
+}
+
 function progressMeta(phase: "processing" | "completed", completedChapters: PaidReadingChapterOutput[], totalChapters: number) {
   return {
     phase,
@@ -57,16 +62,21 @@ async function runFullReadingJob(readingId: string, user: ProcessUser, reading: 
     const record = await getChart(reading.chartId);
     if (!record) throw new Error("Không tìm thấy lá số.");
 
-    await updateReadingJobProgress(readingId, reading.content || "", {
+    await updateReadingJobProgress(readingId, reading.content || "", preservePaymentOrderId({
       phase: "processing",
       startedAt: new Date().toISOString(),
       progress: { completed: 0, total: 8, chapters: [] },
-    });
+    }, reading.promptMeta));
 
     const result = await generateReadingWithProgress(record.chart, "FULL", "all", async (progress) => {
       const partialContent = progress.completedChapters.map((chapter) => chapter.content.trim()).join("\n\n");
       const model = Array.from(new Set(progress.completedChapters.map((chapter) => chapter.model))).join(" + ");
-      await updateReadingJobProgress(readingId, partialContent, progressMeta("processing", progress.completedChapters, progress.totalChapters), model);
+      await updateReadingJobProgress(
+        readingId,
+        partialContent,
+        preservePaymentOrderId(progressMeta("processing", progress.completedChapters, progress.totalChapters), reading.promptMeta),
+        model,
+      );
     });
 
     const parsedPromptMeta = parsePromptMeta(result.prompt);
@@ -75,7 +85,7 @@ async function runFullReadingJob(readingId: string, user: ProcessUser, reading: 
       phase: "completed",
       completedAt: new Date().toISOString(),
     };
-    await completeReadingJob(readingId, result.content, completedMeta, result.model);
+    await completeReadingJob(readingId, result.content, preservePaymentOrderId(completedMeta, reading.promptMeta), result.model);
     revalidatePath(`/la-so/${reading.chartId}`);
     revalidatePath(`/la-so/${reading.chartId}/nang-cao`);
   } catch (error) {
@@ -86,12 +96,12 @@ async function runFullReadingJob(readingId: string, user: ProcessUser, reading: 
       readingId,
       message,
       shouldRefund,
-      {
+      preservePaymentOrderId({
         phase: "failed",
         failedAt: new Date().toISOString(),
         refunded: shouldRefund,
         error: message,
-      },
+      }, reading.promptMeta),
     );
   } finally {
     readingJobLocks().delete(readingId);

@@ -34,4 +34,13 @@ describe("direct FULL checkout action contract", () => {
     expect(checkout).toContain("createPendingReading");
     expect(checkout).not.toContain("generateReading(");
   });
+
+  it("reuses a verified paid entitlement before creating another checkout", () => {
+    expect(checkout).toContain("retryPaidFullReading");
+    expect(checkout.indexOf("retryPaidFullReading")).toBeLessThan(checkout.indexOf("createPayOSCustomCheckout"));
+  });
+
+  it("handles forbidden unlock results before reading their payload", () => {
+    expect(source.match(/result\.status === "forbidden"/g)).toHaveLength(3);
+  });
 });

@@ -13,6 +13,7 @@ import {
 type ChartRecord = {
   id: string;
   chart: TuViChart;
+  userId?: string;
 };
 
 type FeaturePrice = {
@@ -78,6 +79,7 @@ export type ReadingUnlockDeps = {
 export type ReadingUnlockResult =
   | { status: "cached"; readingId: string; chargedCoins: 0 }
   | { status: "created"; readingId: string; chargedCoins: number }
+  | { status: "forbidden" }
   | { status: "disabled" }
   | { status: "insufficient_coins"; needCoins: number; priceCoins: number; balance: number };
 
@@ -85,14 +87,20 @@ export type FullReadingJobStartResult =
   | { status: "cached"; readingId: string; chargedCoins: 0 }
   | { status: "pending"; readingId: string; chargedCoins: 0 }
   | { status: "queued"; readingId: string; chargedCoins: number }
+  | { status: "forbidden" }
   | { status: "disabled" }
   | { status: "insufficient_coins"; needCoins: number; priceCoins: number; balance: number };
 
 export type ReadingBundleUnlockResult =
   | { status: "cached"; readingId: string; chargedCoins: 0; unlockedCount: number; totalCount: number }
   | { status: "created"; readingId: string; chargedCoins: number; unlockedCount: number; totalCount: number }
+  | { status: "forbidden" }
   | { status: "disabled" }
   | { status: "insufficient_coins"; needCoins: number; priceCoins: number; balance: number };
+
+function canUnlockChart(user: SessionUser, chart: ChartRecord) {
+  return user.role === "ADMIN" || chart.userId === user.id;
+}
 
 export async function startFullReadingJobForUser(
   deps: ReadingUnlockDeps,
@@ -108,6 +116,7 @@ export async function startFullReadingJobForUser(
 
   const chartRecord = await deps.getChart(chartId);
   if (!chartRecord) throw new Error("Không tìm thấy lá số.");
+  if (!canUnlockChart(user, chartRecord)) return { status: "forbidden" };
 
   const cached = await deps.getCachedReading(user.id, chartId, "FULL", "all");
   if (cached) return { status: "cached", readingId: cached.id, chargedCoins: 0 };
@@ -169,6 +178,7 @@ export async function unlockReadingForUser(
 
   const chartRecord = await deps.getChart(chartId);
   if (!chartRecord) throw new Error("Không tìm thấy lá số.");
+  if (!canUnlockChart(user, chartRecord)) return { status: "forbidden" };
 
   const cached = await deps.getCachedReading(user.id, chartId, type, scopeKey);
   if (cached) return { status: "cached", readingId: cached.id, chargedCoins: 0 };
@@ -234,6 +244,7 @@ export async function unlockReadingBundleForUser(
 
   const chartRecord = await deps.getChart(chartId);
   if (!chartRecord) throw new Error("KhÃ´ng tÃ¬m tháº¥y lÃ¡ sá»‘.");
+  if (!canUnlockChart(user, chartRecord)) return { status: "forbidden" };
 
   const bundleScopeKey = readingBundleScopeKey(type);
   const items = readingBundleItems(chartRecord.chart, type);

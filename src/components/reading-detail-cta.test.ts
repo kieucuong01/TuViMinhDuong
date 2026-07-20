@@ -46,8 +46,9 @@ describe("reading detail CTA flow", () => {
   it("returns guests to the free reading before offering the premium dossier", () => {
     expect(loaderSource).toContain('const nextPath = `${chartPath}#luan-giai`');
     expect(loaderSource).toContain("loginModalHref(chartPath, undefined, nextPath)");
-    expect(loaderSource).toContain("Lưu lá số để đọc tiếp 2 phần còn lại");
-    expect(loaderSource).toContain("Đăng nhập hoặc tạo tài khoản");
+    expect(loaderSource).toContain("Lưu lá số của {fullName} để đọc tiếp miễn phí");
+    expect(loaderSource).toContain("Lưu lá số &amp; đọc tiếp miễn phí");
+    expect(loaderSource).toContain("Email mới tự tạo tài khoản • Tặng 30 xu • Có thể dùng Google • Chưa mất phí");
   });
 
   it("keeps PayOS primary and the coin path conditional", () => {

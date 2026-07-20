@@ -32,6 +32,8 @@ type PaymentStatusResponse = {
 
 const DEDUPE_PREFIX = "lsth-ad-event";
 const CREATED_CHART_FLAG = "created=1";
+const CHECKOUT_FAILURES = new Set(["error", "unavailable", "invalid", "forbidden", "disabled"]);
+const trackedEvents = new Set<string>();
 
 function ensureGtagQueue() {
   window.dataLayer = window.dataLayer || [];
@@ -55,13 +57,14 @@ function numberFromUnknown(value: unknown) {
 }
 
 function markTrackedOnce(key: string) {
+  const storageKey = `${DEDUPE_PREFIX}:${key}`;
+  if (trackedEvents.has(storageKey)) return false;
+  trackedEvents.add(storageKey);
+
   try {
-    const storageKey = `${DEDUPE_PREFIX}:${key}`;
     if (window.localStorage.getItem(storageKey)) return false;
     window.localStorage.setItem(storageKey, new Date().toISOString());
-  } catch {
-    return true;
-  }
+  } catch {}
   return true;
 }
 
@@ -100,6 +103,13 @@ function sendOnce(dedupeKey: string, eventName: string, payload: AdEventPayload 
   sendGtagEvent(eventName, payload);
 }
 
+function sendOnceInMemory(dedupeKey: string, eventName: string, payload: AdEventPayload = {}) {
+  const memoryKey = `${DEDUPE_PREFIX}:${eventName}:${dedupeKey}`;
+  if (trackedEvents.has(memoryKey)) return;
+  trackedEvents.add(memoryKey);
+  sendGtagEvent(eventName, payload);
+}
+
 export function GoogleAdsEventReporter() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -119,6 +129,33 @@ export function GoogleAdsEventReporter() {
 
     const status = params.get("status");
     const orderCode = params.get("orderCode");
+    const accountResult = params.get("account");
+    const checkout = params.get("checkout");
+    const reportCheckoutEvent = orderCode ? sendOnce : sendOnceInMemory;
+
+    if (accountResult === "login" || accountResult === "register") {
+      sendOnceInMemory(`${pathname}:${chartId}:${accountResult}`, "account_completed", {
+        result: accountResult,
+        chart_id: chartId || undefined,
+      });
+    }
+
+    if (params.get("claimed") === "1" && chartId) {
+      sendOnce(chartId, "guest_chart_claimed", { chart_id: chartId });
+    }
+
+    if (checkout === "cancelled" || status === "cancelled") {
+      reportCheckoutEvent(orderCode || `${pathname}:${chartId}`, "checkout_cancelled", {
+        chart_id: chartId || undefined,
+        method: "payos",
+      });
+    } else if (checkout && CHECKOUT_FAILURES.has(checkout)) {
+      reportCheckoutEvent(`${checkout}:${orderCode || `${pathname}:${chartId}`}`, "checkout_failed", {
+        chart_id: chartId || undefined,
+        method: "payos",
+        reason: checkout,
+      });
+    }
 
     if (status === "success" && orderCode) {
       fetch(`/api/payments/status?orderCode=${encodeURIComponent(orderCode)}`, {
@@ -156,6 +193,16 @@ export function GoogleAdsEventReporter() {
       });
     }
 
+    const shouldCleanMarkers = params.has("account") || params.has("claimed") || params.has("checkout");
+    params.delete("account");
+    params.delete("claimed");
+    params.delete("checkout");
+    if (shouldCleanMarkers) {
+      const query = params.toString();
+      const cleanUrl = `${pathname}${query ? `?${query}` : ""}${window.location.hash}`;
+      window.history.replaceState(window.history.state, "", cleanUrl);
+    }
+
     return () => {
       cancelled = true;
       controller.abort();
@@ -169,6 +216,7 @@ export function GoogleAdsEventReporter() {
       if (!form || !eventName) return;
       sendGtagEvent(eventName, {
         placement: form.dataset.adPlacement,
+        method: form.dataset.adMethod,
         value: numberFrom(form.dataset.adValue),
         package_key: form.dataset.adPackage,
         chart_id: form.dataset.chartId || (pathname.startsWith("/la-so/") ? pathname.split("/")[2] : undefined),
@@ -203,9 +251,11 @@ export function GoogleAdsEventReporter() {
       const eventName = element.dataset.adView;
       if (!eventName) return;
       const chartId = element.dataset.chartId || (pathname.startsWith("/la-so/") ? pathname.split("/")[2] : "");
+      const readingId = element.dataset.readingId;
       const depth = numberFromUnknown(element.dataset.adDepth);
-      sendOnce(`${pathname}:${chartId}:${depth || ""}`, eventName, {
+      sendOnce(`${pathname}:${chartId}:${readingId || ""}:${depth || ""}`, eventName, {
         chart_id: chartId || undefined,
+        reading_id: readingId || undefined,
         depth,
       });
     };
@@ -227,7 +277,7 @@ export function GoogleAdsEventReporter() {
     );
     elements.forEach((element) => observer.observe(element));
     return () => observer.disconnect();
-  }, [pathname]);
+  }, [pathname, searchParams]);
 
   return null;
 }

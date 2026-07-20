@@ -1,8 +1,7 @@
 import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
-import { countWords } from "@/lib/ai";
 import { getChart, getFreeOverviewStatus } from "@/lib/data";
-import { buildFreeOverviewTeaser } from "@/lib/free-overview-presentation";
+import { buildFreeOverviewTeaser, countVisibleMarkdownWords } from "@/lib/free-overview-presentation";
 import { createPerfTimer, logPerfEvent } from "@/lib/perf";
 
 export const runtime = "nodejs";
@@ -20,13 +19,21 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
     timer.time("overviewStatus", () => getFreeOverviewStatus(record.chart)),
     userPromise,
   ]);
-  const visibleOverview = !user && overview.status === "ready"
-    ? { ...overview, content: buildFreeOverviewTeaser(overview.content), wordCount: countWords(buildFreeOverviewTeaser(overview.content)) }
-    : overview;
+  const canReadFullOverview = Boolean(user && (user.role === "ADMIN" || record.userId === user.id));
+  const visibleContent = !canReadFullOverview && overview.status === "ready"
+    ? buildFreeOverviewTeaser(overview.content)
+    : overview.content;
+  const visibleOverview = canReadFullOverview
+    ? overview
+    : {
+        status: overview.status,
+        content: visibleContent,
+        wordCount: countVisibleMarkdownWords(visibleContent),
+      };
   logPerfEvent("free_overview_get_timing", timer.total(), {
     chartId: id,
-    status: visibleOverview.status,
-    jobStatus: visibleOverview.jobStatus,
+    status: overview.status,
+    jobStatus: overview.jobStatus,
     timings: timer.timings(),
   });
 

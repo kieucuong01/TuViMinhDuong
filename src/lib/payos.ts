@@ -221,10 +221,26 @@ export async function completePaidReadingOrder(
           },
         },
       });
-    } else if (reading.status === "FAILED") {
+    } else if (reading.status === "FAILED" || reading.status === "REFUNDED") {
+      const previousPromptMeta =
+        reading.promptMeta && typeof reading.promptMeta === "object" && !Array.isArray(reading.promptMeta)
+          ? (reading.promptMeta as Record<string, unknown>)
+          : {};
       reading = await tx.reading.update({
         where: { id: reading.id },
-        data: { status: "PENDING", error: null },
+        data: {
+          status: "PENDING",
+          priceCoins: 0,
+          content: null,
+          error: null,
+          promptMeta: {
+            type: metadata.type,
+            scopeKey: metadata.scopeKey,
+            source: metadata.kind === "directReading" ? "direct-full-checkout" : "quick-email-checkout",
+            ...previousPromptMeta,
+            paymentOrderId: fresh.id,
+          },
+        },
       });
     }
 
@@ -240,6 +256,48 @@ export async function completePaidReadingOrder(
       purchaseType: "direct_full" as const,
     };
   });
+}
+
+type PaidFullReadingRetryCandidate = {
+  id: string;
+  userId: string;
+  chartId: string;
+  type: string;
+  scopeKey: string;
+  status?: string;
+  promptMeta?: unknown;
+};
+
+export async function retryPaidFullReading(
+  db: PrismaClient,
+  userId: string,
+  chartId: string,
+  reading: PaidFullReadingRetryCandidate,
+) {
+  if (
+    reading.status !== "FAILED" ||
+    reading.userId !== userId ||
+    reading.chartId !== chartId ||
+    reading.type !== "FULL" ||
+    reading.scopeKey !== "all"
+  ) return null;
+
+  const promptMeta = reading.promptMeta;
+  const paymentOrderId = promptMeta && typeof promptMeta === "object" && !Array.isArray(promptMeta)
+    ? (promptMeta as Record<string, unknown>).paymentOrderId
+    : null;
+  if (typeof paymentOrderId !== "string" || !paymentOrderId) return null;
+
+  const order = await db.paymentOrder.findFirst({
+    where: { id: paymentOrderId, userId, status: "PAID", paidAt: { not: null } },
+  });
+  if (!order || order.userId !== userId || order.status !== "PAID" || !order.paidAt) return null;
+
+  const metadata = paidReadingOrderPayload(order.rawPayload);
+  if (!metadata || metadata.chartId !== chartId || metadata.type !== "FULL" || metadata.scopeKey !== "all") return null;
+
+  const settled = await completePaidReadingOrder(db, order, order.rawPayload);
+  return settled?.readingId === reading.id ? settled : null;
 }
 
 export async function settlePaidOrder(

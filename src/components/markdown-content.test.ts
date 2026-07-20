@@ -80,6 +80,41 @@ Lá số này nên đọc từ phần tổng quan.
     expect(html).toContain("<li>BÆ°á»›c hai</li>");
     expect(html).not.toContain("<p>1. BÆ°á»›c má»™t 2. BÆ°á»›c hai 3. BÆ°á»›c ba</p>");
   });
+
+  it("marks only the six approved free-reading H3 labels with semantic data attributes", () => {
+    const html = renderToStaticMarkup(
+      createElement(MarkdownContent, {
+        content: `### Đọc nhanh
+Tóm tắt.
+
+### Điểm nổi bật
+Nhận định.
+
+### Lợi thế
+Điểm mạnh.
+
+### Điểm cần lưu ý
+Điều cần quan sát.
+
+### Gợi ý thực tế
+Hành động phù hợp.
+
+### Vì sao có nhận định này
+Căn cứ lá số.
+
+### Ghi chú khác
+Không thuộc grammar luận giải miễn phí.`,
+      }),
+    );
+
+    expect(html).toContain('<h3 id="doc-nhanh" data-reading-block="quick">Đọc nhanh</h3>');
+    expect(html).toContain('<h3 id="diem-noi-bat" data-reading-block="highlight">Điểm nổi bật</h3>');
+    expect(html).toContain('<h3 id="loi-the" data-reading-block="strength">Lợi thế</h3>');
+    expect(html).toContain('<h3 id="diem-can-luu-y" data-reading-block="caution">Điểm cần lưu ý</h3>');
+    expect(html).toContain('<h3 id="goi-y-thuc-te" data-reading-block="action">Gợi ý thực tế</h3>');
+    expect(html).toContain('<h3 id="vi-sao-co-nhan-dinh-nay" data-reading-block="evidence">Vì sao có nhận định này</h3>');
+    expect(html).toContain('<h3 id="ghi-chu-khac">Ghi chú khác</h3>');
+  });
 });
 
 describe("extractMarkdownHeadings", () => {

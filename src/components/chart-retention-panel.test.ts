@@ -26,6 +26,12 @@ describe("ChartRetentionPanel", () => {
     expect(chartPageSource.indexOf("<ChartRetentionPanel")).toBeLessThan(chartPageSource.indexOf("<DeferredChartActionPanel"));
   });
 
+  it("does not offer a dead monthly-fortune link to guests or non-owners", () => {
+    expect(retentionSource).toContain("canUsePaidFateViews: boolean");
+    expect(retentionSource).toContain("{canUsePaidFateViews ? (");
+    expect(chartPageSource).toContain("canUsePaidFateViews={canUsePaidFateViews}");
+  });
+
   it("passes the chart birth year into date fortune from the URL", () => {
     expect(datePageSource).toContain("birthYear?: string | string[]");
     expect(datePageSource).toContain("initialBirthYear={query.birthYear}");

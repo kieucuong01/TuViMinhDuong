@@ -63,4 +63,12 @@ describe("chart evidence profile", () => {
     expect(plainMoneyTitle).not.toMatch(/Tuần|Triệt/);
     expect(blockedMoneyTitle).toContain("Tuần");
   });
+
+  it("previews all nine chapters that the FULL reading actually contains", () => {
+    const outline = buildPersonalizedReportOutline(testChart());
+
+    expect(outline).toHaveLength(9);
+    expect(outline.map((item) => item.key)).toContain("action-plan");
+    expect(outline.at(-1)?.title).toContain("Kế hoạch hành động cá nhân");
+  });
 });

@@ -11,7 +11,6 @@ import {
   type PaidReadingGenerationProgress,
   buildPaidActionPlanContext,
   buildInstantFreeOverview,
-  countWords,
   generateFreeOverview,
   generateReading,
   generateReadingWithProgress,
@@ -24,6 +23,7 @@ import {
   runReadingChapterTasks,
 } from "@/lib/ai";
 import { generateTuViChart } from "@/lib/chart";
+import { countVisibleMarkdownWords } from "@/lib/free-overview-presentation";
 
 const llmRouterMocks = vi.hoisted(() => ({
   generateWithLlmRouter: vi.fn(),
@@ -244,7 +244,7 @@ describe("AI reading format", () => {
 
     expect(FREE_OVERVIEW_MIN_WORDS).toBe(1400);
     expect(FREE_OVERVIEW_MAX_WORDS).toBe(1650);
-    expect(FREE_OVERVIEW_VERSION).toBe("free-seed-overview-v10");
+    expect(FREE_OVERVIEW_VERSION).toBe("free-seed-overview-v11");
     expect(result.model).toBe("interpretation-rules-v2");
     expect(result).not.toHaveProperty("prompt");
     expect(isCompleteFreeOverview(result.content)).toBe(true);
@@ -257,14 +257,15 @@ describe("AI reading format", () => {
 
     expect(FREE_OVERVIEW_TEMPLATE_MIN_WORDS).toBe(1400);
     expect(FREE_OVERVIEW_TEMPLATE_MAX_WORDS).toBe(1650);
-    expect(countWords(content)).toBeGreaterThanOrEqual(FREE_OVERVIEW_TEMPLATE_MIN_WORDS);
-    expect(countWords(content)).toBeLessThanOrEqual(FREE_OVERVIEW_TEMPLATE_MAX_WORDS);
+    expect(countVisibleMarkdownWords(content)).toBeGreaterThanOrEqual(FREE_OVERVIEW_TEMPLATE_MIN_WORDS);
+    expect(countVisibleMarkdownWords(content)).toBeLessThanOrEqual(FREE_OVERVIEW_TEMPLATE_MAX_WORDS);
+    expect(content).toContain("### Đọc nhanh");
     expect(content).toContain("# Bản tổng quan lá số của bạn");
     expect(content).toContain("## 1. Khí chất và cách ra quyết định");
     expect(content).toContain("## 2. Công việc và nguồn lực");
     expect(content).toContain("## 3. Quan hệ và nhịp sống");
     expect(content).toContain("## 4. Vận hiện tại");
-    expect(content).toContain("## Hai câu hỏi để bạn tự đối chiếu");
+    expect(content).toContain("**Câu hỏi tự đối chiếu:**");
     expect(content).toContain("Bản FULL 9 chương cá nhân hóa");
     expect(content).toContain(chart.input.fullName);
     expect(content).toMatch(/\bbạn\b/iu);

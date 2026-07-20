@@ -1,6 +1,7 @@
 import { type TuViChart } from "@/lib/chart";
 import { buildChartEvidenceProfile, formatChartEvidence } from "@/lib/chart-evidence";
 import { buildFreeOverviewFromInterpretationRules } from "@/lib/free-overview-engine";
+import { countVisibleMarkdownWords } from "@/lib/free-overview-presentation";
 import { generateWithLlmRouter, hasExternalLlmProvider } from "@/lib/llm-router";
 import { FEATURE_PRICES, type ReadingKey } from "@/lib/pricing";
 
@@ -9,7 +10,7 @@ export const FREE_OVERVIEW_MAX_WORDS = 1650;
 export const FREE_OVERVIEW_TEMPLATE_MIN_WORDS = FREE_OVERVIEW_MIN_WORDS;
 export const FREE_OVERVIEW_TEMPLATE_MAX_WORDS = FREE_OVERVIEW_MAX_WORDS;
 export const PAID_READING_CHAPTER_MAX_TOKENS = 7000;
-export const FREE_OVERVIEW_VERSION = "free-seed-overview-v10";
+export const FREE_OVERVIEW_VERSION = "free-seed-overview-v11";
 export const PAID_READING_VERSION = "paid-personal-dossier-v6";
 export const PAID_FULL_WORD_TARGET = "5.000-7.000 từ";
 export const READING_PROVIDER_ORDER = ["deepseek", "groq"] as const;
@@ -99,18 +100,46 @@ export function isCompleteFreeOverview(content: string) {
     "## 2. Công việc và nguồn lực",
     "## 3. Quan hệ và nhịp sống",
     "## 4. Vận hiện tại",
-    "## Hai câu hỏi để bạn tự đối chiếu",
   ];
-  const wordCount = countWords(content);
+  const requiredBlocks = [
+    "Điểm nổi bật",
+    "Lợi thế",
+    "Điểm cần lưu ý",
+    "Gợi ý thực tế",
+    "Vì sao có nhận định này",
+  ];
+  const wordCount = countVisibleMarkdownWords(content);
   const hasChartEvidence = /(cung|mệnh|thân|sao|đại vận|tuần|triệt)/iu.test(content);
-  const questionBulletCount = (content.match(/^\s*[-*]\s+.+\?$/gmu) || []).length;
+  const quickRead = content.match(/### Đọc nhanh\s+([\s\S]*?)(?=\n## 1\.)/u)?.[1] || "";
+  const quickReadWords = countVisibleMarkdownWords(quickRead);
+  const h2Headings = Array.from(content.matchAll(/^##\s+.+$/gmu), (match) => match[0].trim());
+  const sectionsHaveExpectedBlocks = requiredHeadings.every((heading, index) => {
+    const start = content.indexOf(heading);
+    const end = index + 1 < requiredHeadings.length ? content.indexOf(requiredHeadings[index + 1]) : content.length;
+    if (start < 0 || end < 0) return false;
+    const blocks = Array.from(content.slice(start, end).matchAll(/^###\s+(.+)$/gmu), (match) => match[1].trim());
+    return blocks.length === requiredBlocks.length && blocks.every((block, blockIndex) => block === requiredBlocks[blockIndex]);
+  });
+  const reflectionMarker = "**Câu hỏi tự đối chiếu:**";
+  const fullBridgeMarker = "**Bản FULL 9 chương cá nhân hóa**";
+  const sectionTwoIndex = content.indexOf(requiredHeadings[1]);
+  const sectionThreeIndex = content.indexOf(requiredHeadings[2]);
+  const reflectionIndex = content.indexOf(reflectionMarker);
+  const fullBridgeIndex = content.indexOf(fullBridgeMarker);
 
   return (
     wordCount >= FREE_OVERVIEW_MIN_WORDS &&
     wordCount <= FREE_OVERVIEW_MAX_WORDS &&
+    quickReadWords >= 80 &&
+    quickReadWords <= 120 &&
     hasChartEvidence &&
-    questionBulletCount === 2 &&
-    requiredHeadings.every((heading) => content.includes(heading))
+    h2Headings.length === requiredHeadings.length &&
+    h2Headings.every((heading, index) => heading === requiredHeadings[index]) &&
+    sectionsHaveExpectedBlocks &&
+    content.split(reflectionMarker).length === 2 &&
+    sectionTwoIndex < reflectionIndex &&
+    reflectionIndex < fullBridgeIndex &&
+    fullBridgeIndex < sectionThreeIndex
   );
 }
 

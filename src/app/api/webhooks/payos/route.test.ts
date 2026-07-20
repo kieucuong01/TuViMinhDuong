@@ -5,6 +5,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const routeSource = readFileSync(fileURLToPath(new URL("./route.ts", import.meta.url)), "utf8");
 const mocks = vi.hoisted(() => ({
   getDb: vi.fn(),
+  paidReadingOrderPayload: vi.fn(),
   verifyPayOSWebhook: vi.fn(),
   settlePaidOrder: vi.fn(),
 }));
@@ -16,6 +17,7 @@ vi.mock("next/server", () => ({
 }));
 vi.mock("@/lib/db", () => ({ getDb: mocks.getDb }));
 vi.mock("@/lib/payos", () => ({
+  paidReadingOrderPayload: mocks.paidReadingOrderPayload,
   verifyPayOSWebhook: mocks.verifyPayOSWebhook,
   settlePaidOrder: mocks.settlePaidOrder,
 }));
@@ -49,6 +51,12 @@ describe("PayOS webhook", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mocks.getDb.mockReturnValue(db);
+    mocks.paidReadingOrderPayload.mockReturnValue({
+      kind: "directReading",
+      chartId: "chart-1",
+      type: "FULL",
+      scopeKey: "all",
+    });
     mocks.verifyPayOSWebhook.mockReturnValue(true);
     db.paymentOrder.findUnique.mockResolvedValue(order);
     mocks.settlePaidOrder.mockResolvedValue({
@@ -91,7 +99,13 @@ describe("PayOS webhook", () => {
     await POST(request({ orderCode: "123", status: "CANCELLED" }));
     expect(db.paymentOrder.update).toHaveBeenCalledWith({
       where: { id: "order-1" },
-      data: { status: "FAILED", rawPayload: expect.any(Object) },
+      data: {
+        status: "FAILED",
+        rawPayload: {
+          raw: expect.any(Object),
+          directReading: { chartId: "chart-1", type: "FULL", scopeKey: "all" },
+        },
+      },
     });
 
     vi.clearAllMocks();

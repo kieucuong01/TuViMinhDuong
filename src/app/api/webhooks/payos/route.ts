@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
-import { settlePaidOrder, verifyPayOSWebhook } from "@/lib/payos";
+import { paidReadingOrderPayload, settlePaidOrder, verifyPayOSWebhook } from "@/lib/payos";
 
 export async function POST(request: Request) {
   const payload = await request.json().catch(() => null);
@@ -27,9 +27,22 @@ export async function POST(request: Request) {
   const isPaid = payload.data.code === "00" || payload.data.desc === "success" || payload.data.status === "PAID";
   if (!isPaid) {
     if (order.status !== "PAID") {
+      const readingMetadata = paidReadingOrderPayload(order.rawPayload);
       await db.paymentOrder.update({
         where: { id: order.id },
-        data: { status: "FAILED", rawPayload: payload },
+        data: {
+          status: "FAILED",
+          rawPayload: readingMetadata
+            ? {
+                raw: payload,
+                [readingMetadata.kind]: {
+                  chartId: readingMetadata.chartId,
+                  type: readingMetadata.type,
+                  scopeKey: readingMetadata.scopeKey,
+                },
+              }
+            : payload,
+        },
       });
     }
     return NextResponse.json({ ok: true, paid: false });

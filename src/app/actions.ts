@@ -7,7 +7,7 @@ import { clearSession, createMagicSession, getCurrentUser, getOrCreateEmailUser,
 import { ARTICLES_CACHE_TAG, FEATURE_PRICES_CACHE_TAG, OPERATION_SETTINGS_CACHE_TAG, claimGuestChartForUserFromPath, countRecentChartsForIp, getCachedReading, getChart, getFeaturePrice, getOperationSettings, getUserBalance, saveArticleCategoryFromForm, saveArticleFromForm, saveChart, saveReading, adjustCoins, deleteArticleBySlug, deleteUserChart, getReadingJobByScope, createPendingReading, updateOperationSettings, updateFeaturePrices, getCompletedReadingsForScopes, hasReadingBundleAccess, type ChartCreationMetadata } from "@/lib/data";
 import { generateReading } from "@/lib/ai";
 import { getDb } from "@/lib/db";
-import { completePaidReadingOrder, createPayOSCheckout, createPayOSCustomCheckout } from "@/lib/payos";
+import { completePaidReadingOrder, createPayOSCheckout, createPayOSCustomCheckout, retryPaidFullReading } from "@/lib/payos";
 import type { CalendarType, Gender } from "@/lib/chart";
 import { COIN_PACKAGES, FEATURE_PRICE_KEYS, TEMPORARY_FULL_ACCESS } from "@/lib/pricing";
 import type { ReadingKey } from "@/lib/pricing";
@@ -40,10 +40,11 @@ export async function loginAction(formData: FormData) {
   const password = String(formData.get("password") || "");
   const next = safeNextPath(formData.get("next"), "/");
   const mode = String(formData.get("mode") || "page");
-  let user: SessionUser | null = null;
+  let loginResult: Awaited<ReturnType<typeof loginOrRegister>> | null = null;
+  let authError = "";
 
   try {
-    user = await loginOrRegister(email, password);
+    loginResult = await loginOrRegister(email, password);
   } catch (error) {
     const rawMessage = error instanceof Error ? error.message : "";
     const isExpectedAuthError =
@@ -51,7 +52,7 @@ export async function loginAction(formData: FormData) {
       rawMessage.includes("Mật khẩu") ||
       rawMessage.includes("mat khau") ||
       rawMessage.includes("password");
-    const message = isExpectedAuthError
+    authError = isExpectedAuthError
       ? rawMessage
       : "Chưa đăng nhập được. Bạn kiểm tra lại email, mật khẩu rồi thử lần nữa nhé.";
 
@@ -62,28 +63,32 @@ export async function loginAction(formData: FormData) {
         message: rawMessage || "Unknown login error",
       }));
     }
+  }
 
+  if (!loginResult) {
     if (mode === "modal") {
-      redirect(withQueryParams(next, { login: "1", next, authError: message }));
+      redirect(withQueryParams(next, { login: "1", next, authError }));
     }
-    redirect(`/dang-nhap?next=${encodeURIComponent(next)}&error=${encodeURIComponent(message)}`);
+    redirect(`/dang-nhap?next=${encodeURIComponent(next)}&error=${encodeURIComponent(authError)}`);
   }
 
-  if (user) {
-    try {
-      await claimGuestChartForUserFromPath(next, user);
-    } catch (error) {
-      console.error(JSON.stringify({
-        level: "error",
-        event: "claim_guest_chart_after_login_failed",
-        next,
-        userId: user.id,
-        message: error instanceof Error ? error.message : String(error),
-      }));
-    }
+  let claimed = false;
+  try {
+    claimed = await claimGuestChartForUserFromPath(next, loginResult.user);
+  } catch (error) {
+    console.error(JSON.stringify({
+      level: "error",
+      event: "claim_guest_chart_after_login_failed",
+      next,
+      userId: loginResult.user.id,
+      message: error instanceof Error ? error.message : String(error),
+    }));
   }
 
-  redirect(next);
+  redirect(withQueryParams(next, {
+    account: loginResult.accountResult,
+    claimed: claimed ? "1" : null,
+  }));
 }
 
 export async function logoutAction() {
@@ -374,6 +379,14 @@ export async function checkoutFullReadingAction(formData: FormData) {
     redirect(`/la-so/${chartId}/nang-cao?reading=${pending.id}&generating=1`);
   }
 
+  const db = getDb();
+  if (db && pending?.status === "FAILED") {
+    const retried = await retryPaidFullReading(db, user.id, chartId, pending);
+    if (retried) {
+      redirect(`/la-so/${chartId}/nang-cao?reading=${retried.readingId}&generating=1`);
+    }
+  }
+
   const amountVnd = price.priceCoins * 1000;
   const checkout = await createPayOSCustomCheckout({
     amountVnd,
@@ -385,7 +398,6 @@ export async function checkoutFullReadingAction(formData: FormData) {
     cancelPath: `/la-so/${chartId}`,
   }).catch(() => redirect(withQueryParams(nextPath, { checkout: "error" })));
 
-  const db = getDb();
   const isDemoCheckout = checkout.raw && typeof checkout.raw === "object" && "mode" in checkout.raw;
   if (!db) {
     if (!isDemoCheckout) redirect(withQueryParams(nextPath, { checkout: "unavailable" }));
@@ -462,6 +474,10 @@ export async function requestReadingAction(formData: FormData) {
       redirect(withQueryParams(nextPath, { paid: "disabled" }));
     }
 
+    if (result.status === "forbidden") {
+      redirect(withQueryParams(nextPath, { paid: "forbidden" }));
+    }
+
     if (result.status === "insufficient_coins") {
       redirect(withQueryParams(nextPath, { paywall: "coins", need: result.needCoins }));
     }
@@ -490,6 +506,10 @@ export async function requestReadingAction(formData: FormData) {
 
   if (result.status === "disabled") {
     redirect(withQueryParams(nextPath, { paid: "disabled" }));
+  }
+
+  if (result.status === "forbidden") {
+    redirect(withQueryParams(nextPath, { paid: "forbidden" }));
   }
 
   if (result.status === "insufficient_coins") {
@@ -532,6 +552,10 @@ export async function requestReadingBundleAction(formData: FormData) {
 
   if (result.status === "disabled") {
     redirect(withQueryParams(nextPath, { paid: "disabled" }));
+  }
+
+  if (result.status === "forbidden") {
+    redirect(withQueryParams(nextPath, { paid: "forbidden" }));
   }
 
   if (result.status === "insufficient_coins") {
