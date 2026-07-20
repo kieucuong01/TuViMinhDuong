@@ -2,10 +2,13 @@ import Link from "next/link";
 import { LockKeyhole } from "lucide-react";
 import { loginModalHref } from "@/components/login-modal-link";
 import { MarkdownContent } from "@/components/markdown-content";
+import { FreeOverviewRefreshTrigger } from "@/components/free-overview-refresh-trigger";
 
 type FreeOverviewPayload = {
-  status: "ready";
+  status: "ready" | "fallback";
   content: string;
+  source?: "llm" | "seed-rules";
+  jobStatus?: "completed" | "idle" | "processing" | "stale" | "failed";
 };
 
 export function FreeOverviewLoader({
@@ -32,6 +35,8 @@ export function FreeOverviewLoader({
 
   const chartPath = `/la-so/${chartId}`;
   const nextPath = `${chartPath}#luan-giai`;
+  const shouldRefreshOverview =
+    initialOverview.source !== "llm" && (initialOverview.jobStatus === "idle" || initialOverview.jobStatus === "stale");
 
   return (
     <article
@@ -40,6 +45,7 @@ export function FreeOverviewLoader({
       data-ad-depth={canReadFullOverview ? "4" : "2"}
       data-chart-id={chartId}
     >
+      {shouldRefreshOverview ? <FreeOverviewRefreshTrigger chartId={chartId} shouldRefresh /> : null}
       <MarkdownContent content={initialOverview.content} />
 
       {!canReadFullOverview && !isSignedIn ? (

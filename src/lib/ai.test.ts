@@ -231,12 +231,18 @@ describe("AI reading format", () => {
     expect(promptMeta).not.toHaveProperty("modelPolicy");
   });
 
-  it("always generates the free overview from seed rules without calling an LLM provider", async () => {
+  it("generates the free overview with a lightweight LLM when a provider is available", async () => {
     clearProviderEnv();
     llmRouterMocks.hasExternalLlmProvider.mockReturnValue(true);
+    const llmContent = buildInstantFreeOverview(sampleChart());
     llmRouterMocks.generateWithLlmRouter.mockResolvedValue({
       text: "Nội dung từ provider không được sử dụng",
       model: "deepseek/deepseek-chat",
+      provider: "deepseek",
+    });
+    llmRouterMocks.generateWithLlmRouter.mockResolvedValue({
+      text: llmContent,
+      model: "deepseek/deepseek-v4-flash",
       provider: "deepseek",
     });
 
@@ -244,11 +250,34 @@ describe("AI reading format", () => {
 
     expect(FREE_OVERVIEW_MIN_WORDS).toBe(1400);
     expect(FREE_OVERVIEW_MAX_WORDS).toBe(1650);
-    expect(FREE_OVERVIEW_VERSION).toBe("free-seed-overview-v12");
-    expect(result.model).toBe("interpretation-rules-v2");
+    expect(FREE_OVERVIEW_VERSION).toBe("free-llm-overview-v13");
+    expect(result.model).toBe("deepseek/deepseek-v4-flash");
     expect(result).not.toHaveProperty("prompt");
     expect(isCompleteFreeOverview(result.content)).toBe(true);
-    expect(llmRouterMocks.generateWithLlmRouter).not.toHaveBeenCalled();
+    expect(llmRouterMocks.generateWithLlmRouter).toHaveBeenCalledTimes(1);
+    expect(llmRouterMocks.generateWithLlmRouter).toHaveBeenCalledWith(
+      expect.objectContaining({
+        temperature: 0.45,
+        maxTokens: 4200,
+        providerOrder: ["deepseek", "groq"],
+      }),
+    );
+    expect(String(llmRouterMocks.generateWithLlmRouter.mock.calls[0][0].prompt)).toContain("1.500 từ");
+  });
+
+  it("falls back to the instant seed overview when the free LLM is unavailable or invalid", async () => {
+    clearProviderEnv();
+    llmRouterMocks.hasExternalLlmProvider.mockReturnValue(true);
+    llmRouterMocks.generateWithLlmRouter.mockResolvedValue({
+      text: "Nội dung quá ngắn",
+      model: "deepseek/deepseek-v4-flash",
+      provider: "deepseek",
+    });
+
+    const result = await generateFreeOverview(sampleChart());
+
+    expect(result.model).toBe("interpretation-rules-v2");
+    expect(isCompleteFreeOverview(result.content)).toBe(true);
   });
 
   it("renders the four personalized seed clusters within the approved length", () => {

@@ -10,7 +10,7 @@ export const FREE_OVERVIEW_MAX_WORDS = 1650;
 export const FREE_OVERVIEW_TEMPLATE_MIN_WORDS = FREE_OVERVIEW_MIN_WORDS;
 export const FREE_OVERVIEW_TEMPLATE_MAX_WORDS = FREE_OVERVIEW_MAX_WORDS;
 export const PAID_READING_CHAPTER_MAX_TOKENS = 7000;
-export const FREE_OVERVIEW_VERSION = "free-seed-overview-v12";
+export const FREE_OVERVIEW_VERSION = "free-llm-overview-v13";
 export const PAID_READING_VERSION = "paid-personal-dossier-v6";
 export const PAID_FULL_WORD_TARGET = "5.000-7.000 từ";
 export const READING_PROVIDER_ORDER = ["deepseek", "groq"] as const;
@@ -759,8 +759,46 @@ export function buildInstantFreeOverview(chart: TuViChart) {
   return buildFreeOverviewFromInterpretationRules(chart);
 }
 
+function buildFreeOverviewPrompt(chart: TuViChart) {
+  const evidence = formatChartEvidence(buildChartEvidenceProfile(chart));
+  const fallbackOutline = buildInstantFreeOverview(chart);
+
+  return `Bạn là chuyên gia luận giải tử vi cho website Lá số tinh hoa.
+
+Mục tiêu: viết bản luận giải tổng quan miễn phí khoảng 1.500 từ cho người đọc Việt Nam 30-60 tuổi. Văn phong phải tự nhiên, có chiều sâu, dễ hiểu, không máy móc, không hù dọa, không khẳng định định mệnh tuyệt đối.
+
+Quy tắc bắt buộc:
+- Chỉ diễn giải từ dữ liệu bằng chứng dưới đây; không tự tính lại lá số, không bịa sao/cung không có trong dữ liệu.
+- Viết bằng tiếng Việt, xưng hô trực tiếp với người đọc là "bạn".
+- Tổng độ dài phải nằm trong ${FREE_OVERVIEW_MIN_WORDS}-${FREE_OVERVIEW_MAX_WORDS} từ hiển thị.
+- Phần "Đọc nhanh" phải dài 80-120 từ.
+- Giữ đúng cấu trúc Markdown và đúng thứ tự heading/subheading như mẫu. Không thêm heading khác.
+- Trong mỗi mục, nêu rõ ít nhất một bằng chứng tử vi: cung, sao, Mệnh/Thân/Cục, đại vận, Tuần hoặc Triệt nếu phù hợp.
+- Không nhắc giá, không nói "mua ngay", không dùng lời lẽ giật gân. Cầu nối FULL phải tự nhiên: bản miễn phí giúp nhận diện hướng chính, bản FULL mở rộng thành kế hoạch chi tiết.
+- Nhấn mạnh các điểm quan trọng bằng **in đậm** vừa phải.
+
+Dữ liệu bằng chứng:
+${evidence}
+
+Mẫu cấu trúc cần giữ, chỉ dùng như khung và nguồn tham chiếu giọng điệu; hãy viết lại tự nhiên hơn, không sao chép máy móc:
+${fallbackOutline}
+
+Trả về duy nhất nội dung Markdown hoàn chỉnh.`;
+}
+
 export async function generateFreeOverview(chart: TuViChart) {
-  return { content: buildInstantFreeOverview(chart), model: "interpretation-rules-v2" };
+  const fallback = { content: buildInstantFreeOverview(chart), model: "interpretation-rules-v2" };
+  if (isLlmDisabledForSmoke() || !hasExternalLlmProvider()) return fallback;
+
+  const routed = await generateWithLlmRouter({
+    prompt: buildFreeOverviewPrompt(chart),
+    temperature: 0.45,
+    maxTokens: 4200,
+    providerOrder: [...READING_PROVIDER_ORDER],
+  });
+
+  if (!routed || !isCompleteFreeOverview(routed.text)) return fallback;
+  return { content: routed.text, model: routed.model };
 }
 
 export function paidReadingChapters(chart: TuViChart, type: ReadingKey): PaidReadingChapter[] {

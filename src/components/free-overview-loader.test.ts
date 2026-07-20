@@ -6,18 +6,21 @@ import { describe, expect, it } from "vitest";
 import { FreeOverviewLoader } from "@/components/free-overview-loader";
 
 const loaderSource = readFileSync(fileURLToPath(new URL("./free-overview-loader.tsx", import.meta.url)), "utf8");
+const refreshSource = readFileSync(fileURLToPath(new URL("./free-overview-refresh-trigger.tsx", import.meta.url)), "utf8");
 const chartPageSource = readFileSync(fileURLToPath(new URL("../app/la-so/[id]/page.tsx", import.meta.url)), "utf8");
 const normalizedChartPageSource = chartPageSource.replace(/\s+/g, " ");
 const overview = { status: "ready" as const, content: "## 1. Khí chất\n\nNội dung đã chiếu từ server." };
 
-describe("FreeOverviewLoader seed-only gate", () => {
-  it("renders server-projected seed content without polling or background LLM work", () => {
+describe("FreeOverviewLoader LLM refresh gate", () => {
+  it("renders server-projected content and uses a tiny client trigger for background LLM refresh", () => {
     expect(loaderSource).toContain("<MarkdownContent content={initialOverview.content} />");
+    expect(loaderSource).toContain("FreeOverviewRefreshTrigger");
     expect(loaderSource).not.toContain("useEffect");
     expect(loaderSource).not.toContain("fetch(");
-    expect(loaderSource).not.toContain("/free-overview/process");
+    expect(refreshSource).toContain("\"use client\"");
+    expect(refreshSource).toContain("/free-overview/process");
+    expect(refreshSource).toContain("router.refresh()");
     expect(loaderSource).not.toContain("schedulePoll");
-    expect(loaderSource).not.toContain("LLM");
   });
 
   it("keeps insight three and four server-side for guests and signed-in non-owners", () => {

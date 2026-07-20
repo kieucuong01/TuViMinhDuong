@@ -24,28 +24,51 @@ function chartFixture(): TuViChart {
 }
 
 describe("free overview status", () => {
-  it("contains no free LLM generation, preview, router, or repair job", () => {
+  it("keeps the page status synchronous and delegates LLM work to the process path", () => {
     const source = readFileSync(fileURLToPath(new URL("./data.ts", import.meta.url)), "utf8");
 
-    expect(source).not.toContain("generateFreeOverview(record.chart)");
+    expect(source).toContain("generateFreeOverview(record.chart)");
     expect(source).not.toContain("generateFreeOverviewPreview");
     expect(source).not.toContain("fullOverviewPromise");
   });
 
-  it("returns a ready 1,400-1,650 visible-word v12 seed overview immediately", async () => {
+  it("returns a fast 1,400-1,650 visible-word fallback while the LLM overview is missing", async () => {
     const { FREE_OVERVIEW_MAX_WORDS, FREE_OVERVIEW_MIN_WORDS, FREE_OVERVIEW_VERSION } = await import("@/lib/ai");
     const { getFreeOverviewStatus } = await import("@/lib/data");
     const status = getFreeOverviewStatus(chartFixture());
 
-    expect(status.status).toBe("ready");
+    expect(status.status).toBe("fallback");
     expect(status.source).toBe("seed-rules");
-    expect(status.model).toBe("interpretation-rules-v2");
-    expect(FREE_OVERVIEW_VERSION).toBe("free-seed-overview-v12");
-    expect(status.jobStatus).toBe("completed");
+    expect(FREE_OVERVIEW_VERSION).toBe("free-llm-overview-v13");
+    expect(status.jobStatus).toBe("idle");
     expect(status.content).toContain("# Bản tổng quan lá số của bạn");
     expect(status.content).toContain("## 4. Vận hiện tại");
     expect(status.wordCount).toBeGreaterThanOrEqual(FREE_OVERVIEW_MIN_WORDS);
     expect(status.wordCount).toBeLessThanOrEqual(FREE_OVERVIEW_MAX_WORDS);
+  });
+
+  it("serves a cached current-version LLM overview when available", async () => {
+    const { FREE_OVERVIEW_VERSION, buildInstantFreeOverview } = await import("@/lib/ai");
+    const { getFreeOverviewStatus } = await import("@/lib/data");
+    const content = buildInstantFreeOverview(chartFixture());
+    const chart = {
+      ...chartFixture(),
+      freeOverview: {
+        content,
+        model: "deepseek/deepseek-v4-flash",
+        generatedAt: "2026-07-20T00:00:00.000Z",
+        version: FREE_OVERVIEW_VERSION,
+        jobStatus: "completed",
+      },
+    } as TuViChart;
+
+    const status = getFreeOverviewStatus(chart);
+
+    expect(status.status).toBe("ready");
+    expect(status.source).toBe("llm");
+    expect(status.model).toBe("deepseek/deepseek-v4-flash");
+    expect(status.content).toBe(content);
+    expect(status.jobStatus).toBe("completed");
   });
 
   it("does not serve legacy provider-generated free content", async () => {
@@ -62,7 +85,7 @@ describe("free overview status", () => {
 
     const status = getFreeOverviewStatus(chart);
 
-    expect(status.status).toBe("ready");
+    expect(status.status).toBe("fallback");
     expect(status.content).not.toContain("LEGACY_DEEPSEEK_FREE_CONTENT");
     expect(status.source).toBe("seed-rules");
   });

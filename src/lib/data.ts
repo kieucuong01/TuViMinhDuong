@@ -9,7 +9,7 @@ import { articleWithScore, seedArticles, type ArticleCategoryView, type ArticleV
 import { getDb } from "@/lib/db";
 import { FEATURE_PRICE_KEYS, FEATURE_PRICES, COIN_PACKAGES, type FeaturePriceMap, type ReadingKey } from "@/lib/pricing";
 import { isReadingBundleKey, readingBundleScopeKey } from "@/lib/reading-bundles";
-import { buildInstantFreeOverview } from "@/lib/ai";
+import { FREE_OVERVIEW_VERSION, buildInstantFreeOverview, generateFreeOverview, isCompleteFreeOverview } from "@/lib/ai";
 import { countVisibleMarkdownWords } from "@/lib/free-overview-presentation";
 import { scoreArticleSeo } from "@/lib/seo";
 import { slugify } from "@/lib/format";
@@ -296,8 +296,8 @@ export type FreeOverviewStatus =
   | {
       status: "ready";
       content: string;
-      source: "seed-rules";
-      model: "interpretation-rules-v2";
+      source: "llm" | "seed-rules";
+      model: string;
       generatedAt: string;
       wordCount: number;
       jobStatus: "completed";
@@ -989,33 +989,140 @@ export async function getChart(id: string) {
   return upgraded;
 }
 
-export function getFreeOverviewStatus(chart: TuViChart): Extract<FreeOverviewStatus, { status: "ready" }> {
+const FREE_OVERVIEW_PROCESSING_TTL_MS = 2 * 60 * 1000;
+
+function storedFreeOverview(chart: TuViChart) {
+  return chart.freeOverview || null;
+}
+
+function freeOverviewFallback(
+  chart: TuViChart,
+  jobStatus: Extract<FreeOverviewStatus, { status: "fallback" }>["jobStatus"] = "idle",
+  error?: string,
+): Extract<FreeOverviewStatus, { status: "fallback" }> {
   const content = buildInstantFreeOverview(chart);
   return {
-    status: "ready",
+    status: "fallback",
     content,
     source: "seed-rules",
-    model: "interpretation-rules-v2",
-    generatedAt: new Date().toISOString(),
     wordCount: countVisibleMarkdownWords(content),
+    jobStatus,
+    ...(error ? { error } : {}),
+  };
+}
+
+function cachedFreeOverviewStatus(chart: TuViChart): Extract<FreeOverviewStatus, { status: "ready" }> | null {
+  const overview = storedFreeOverview(chart);
+  if (
+    overview?.version !== FREE_OVERVIEW_VERSION ||
+    overview.jobStatus !== "completed" ||
+    !overview.content ||
+    !overview.model ||
+    !overview.generatedAt ||
+    !isCompleteFreeOverview(overview.content)
+  ) {
+    return null;
+  }
+
+  return {
+    status: "ready",
+    content: overview.content,
+    source: overview.model === "interpretation-rules-v2" ? "seed-rules" : "llm",
+    model: overview.model,
+    generatedAt: overview.generatedAt,
+    wordCount: countVisibleMarkdownWords(overview.content),
     jobStatus: "completed",
   };
 }
 
-export async function claimFreeOverviewGeneration(_chartId: string, chart: TuViChart): Promise<FreeOverviewGenerationClaim> {
-  return { status: "ready", overview: getFreeOverviewStatus(chart) as Extract<FreeOverviewStatus, { status: "ready" }> };
+function freeOverviewJobStatus(chart: TuViChart): Extract<FreeOverviewStatus, { status: "fallback" }>["jobStatus"] {
+  const overview = storedFreeOverview(chart);
+  if (overview?.version !== FREE_OVERVIEW_VERSION) return "idle";
+  if (overview.jobStatus === "failed") return "failed";
+  if (overview.jobStatus !== "processing" || !overview.generatedAt) return "stale";
+  return Date.now() - new Date(overview.generatedAt).getTime() <= FREE_OVERVIEW_PROCESSING_TTL_MS ? "processing" : "stale";
+}
+
+export function getFreeOverviewStatus(chart: TuViChart): FreeOverviewStatus {
+  const cached = cachedFreeOverviewStatus(chart);
+  if (cached) return cached;
+
+  const overview = storedFreeOverview(chart);
+  return freeOverviewFallback(chart, freeOverviewJobStatus(chart), overview?.error);
+}
+
+async function updateChartFreeOverview(chartId: string, chart: TuViChart, freeOverview: NonNullable<TuViChart["freeOverview"]>) {
+  const nextChart = { ...chart, freeOverview };
+  const db = getDb();
+  if (!db) {
+    const record = charts().get(chartId);
+    if (record) charts().set(chartId, { ...record, chart: nextChart });
+    return nextChart;
+  }
+
+  await db.chart.update({
+    where: { id: chartId },
+    data: { chart: nextChart },
+  });
+  return nextChart;
+}
+
+export async function claimFreeOverviewGeneration(chartId: string, chart: TuViChart): Promise<FreeOverviewGenerationClaim> {
+  const status = getFreeOverviewStatus(chart);
+  if (status.status === "ready" && status.source === "llm") return { status: "ready", overview: status };
+  if (status.status === "fallback" && status.jobStatus === "processing") return { status: "processing", overview: status };
+
+  await updateChartFreeOverview(chartId, chart, {
+    version: FREE_OVERVIEW_VERSION,
+    jobStatus: "processing",
+    generatedAt: new Date().toISOString(),
+  });
+  return { status: "claimed" };
 }
 
 export async function failFreeOverviewGeneration(chartId: string, error: string) {
-  void error;
   const record = await getChart(chartId);
-  return record ? getFreeOverviewStatus(record.chart) : null;
+  if (!record) return null;
+  const nextChart = await updateChartFreeOverview(chartId, record.chart, {
+    version: FREE_OVERVIEW_VERSION,
+    jobStatus: "failed",
+    generatedAt: new Date().toISOString(),
+    error,
+  });
+  return getFreeOverviewStatus(nextChart);
 }
 
 export async function generateAndStoreFreeOverview(chartId: string) {
   const record = await getChart(chartId);
   if (!record) throw new Error("Không tìm thấy lá số.");
-  return getFreeOverviewStatus(record.chart) as Extract<FreeOverviewStatus, { status: "ready" }>;
+  const status = getFreeOverviewStatus(record.chart);
+  if (status.status === "ready" && status.source === "llm") return status;
+  if (status.status === "fallback" && status.jobStatus === "processing") return status;
+
+  await updateChartFreeOverview(chartId, record.chart, {
+    version: FREE_OVERVIEW_VERSION,
+    jobStatus: "processing",
+    generatedAt: new Date().toISOString(),
+  });
+
+  try {
+    const generated = await generateFreeOverview(record.chart);
+    if (generated.model === "interpretation-rules-v2" || !isCompleteFreeOverview(generated.content)) {
+      return failFreeOverviewGeneration(chartId, "FREE_OVERVIEW_LLM_UNAVAILABLE_OR_INVALID");
+    }
+
+    const nextChart = await updateChartFreeOverview(chartId, record.chart, {
+      content: generated.content,
+      model: generated.model,
+      generatedAt: new Date().toISOString(),
+      version: FREE_OVERVIEW_VERSION,
+      jobStatus: "completed",
+    });
+    return getFreeOverviewStatus(nextChart);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    return failFreeOverviewGeneration(chartId, message);
+  }
 }
 
 export async function getOrCreateFreeOverview(_chartId: string, chart: TuViChart) {

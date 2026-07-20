@@ -1,5 +1,5 @@
-import { NextResponse } from "next/server";
-import { getChart, getFreeOverviewStatus } from "@/lib/data";
+import { after, NextResponse } from "next/server";
+import { generateAndStoreFreeOverview, getChart, getFreeOverviewStatus } from "@/lib/data";
 import { createPerfTimer } from "@/lib/perf";
 
 export const runtime = "nodejs";
@@ -13,8 +13,21 @@ export async function POST(_request: Request, { params }: { params: Promise<{ id
   if (!record) return NextResponse.json({ error: "Không tìm thấy lá số." }, { status: 404 });
 
   const overview = getFreeOverviewStatus(record.chart);
+  if (overview.status === "ready" && overview.source === "llm") {
+    return NextResponse.json(
+      { status: "ready", chartId: id },
+      { headers: { "cache-control": "private, no-store", "server-timing": timer.serverTiming() } },
+    );
+  }
+
+  after(() => {
+    void generateAndStoreFreeOverview(id).catch((error) => {
+      console.error("free_overview_generation_failed", error);
+    });
+  });
+
   return NextResponse.json(
-    { status: overview.status, chartId: id },
-    { headers: { "cache-control": "private, no-store", "server-timing": timer.serverTiming() } },
+    { status: "processing", chartId: id },
+    { status: 202, headers: { "cache-control": "private, no-store", "server-timing": timer.serverTiming() } },
   );
 }

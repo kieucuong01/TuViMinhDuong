@@ -97,7 +97,7 @@ export default async function ChartPage({
   const coinBalance = canReadFullOverview && user ? await getUserBalance(user) : 0;
   const activeLabel = activeReading ? readingLabels[activeReading.type] : "Luận giải tổng quan";
   const freeOverviewStatus = activeReading || isScopedReadingView ? null : getFreeOverviewStatus(record.chart);
-  const restrictedOverviewContent = !canReadFullOverview && freeOverviewStatus?.status === "ready"
+  const restrictedOverviewContent = !canReadFullOverview && freeOverviewStatus?.content
     ? buildFreeOverviewTeaser(freeOverviewStatus.content)
     : null;
   const visibleFreeOverviewStatus = !canReadFullOverview && freeOverviewStatus

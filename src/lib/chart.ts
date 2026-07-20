@@ -71,6 +71,14 @@ export type TuViChart = {
     starProfile: string;
     notes: string[];
   };
+  freeOverview?: {
+    content?: string;
+    model?: string;
+    generatedAt?: string;
+    version?: string;
+    jobStatus?: "processing" | "completed" | "failed";
+    error?: string;
+  };
 };
 
 type CucElement = "K" | "M" | "T" | "H" | "O";
