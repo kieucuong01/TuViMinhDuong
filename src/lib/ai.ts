@@ -13,7 +13,7 @@ export const PAID_READING_CHAPTER_MAX_TOKENS = 7000;
 export const FREE_OVERVIEW_VERSION = "free-llm-overview-v13";
 export const PAID_READING_VERSION = "paid-personal-dossier-v6";
 export const PAID_FULL_WORD_TARGET = "5.000-7.000 từ";
-export const READING_PROVIDER_ORDER = ["deepseek", "groq"] as const;
+export const READING_PROVIDER_ORDER = ["deepseek"] as const;
 
 const IMPORTANT_PALACES = ["Mệnh", "Thân", "Quan Lộc", "Tài Bạch", "Phu Thê", "Tật Ách", "Thiên Di"];
 const GOOD_STAR_HINTS = ["Lộc", "Khoa", "Quyền", "Tả", "Hữu", "Xương", "Khúc", "Khôi", "Việt", "Thiên Mã", "Long Trì", "Phượng"];

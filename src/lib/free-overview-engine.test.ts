@@ -27,6 +27,8 @@ const charts = [
   makeChart("Nguyễn Hồ Bảo Linh", "female", 12, 8, 2008, 7),
 ];
 
+const productionCurrentFallbackChart = makeChart("Lê thị mi na", "female", 13, 8, 2006, 10);
+
 function repeatedSentences(content: string) {
   const seen = new Set<string>();
   const repeated = new Set<string>();
@@ -207,5 +209,14 @@ describe("free overview interpretation engine", () => {
       expect(countVisibleMarkdownWords(quickRead(overview))).toBeGreaterThanOrEqual(80);
       expect(countVisibleMarkdownWords(quickRead(overview))).toBeLessThanOrEqual(120);
     }
+  });
+
+  it("does not crash when a chart has no direct current fate rule match", () => {
+    const plan = buildFreeOverviewNarrativePlan(productionCurrentFallbackChart);
+    const overview = buildFreeOverviewFromInterpretationRules(productionCurrentFallbackChart);
+
+    expect(plan.clusters.map((cluster) => cluster.title)).toContain("Vận hiện tại");
+    expect(countVisibleMarkdownWords(overview)).toBeGreaterThanOrEqual(1400);
+    expect(countVisibleMarkdownWords(overview)).toBeLessThanOrEqual(1650);
   });
 });

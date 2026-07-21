@@ -355,15 +355,20 @@ function selectClusters(matches: ScoredInterpretationRule[]) {
     const candidates = matches
       .filter((rule) => (spec.key === "current" ? rule.pattern.kind === "fate" : spec.scopes.includes(rule.scope as never)) && !used.has(rule.key))
       .sort((left, right) => clusterScore(right, spec) - clusterScore(left, spec) || left.key.localeCompare(right.key, "vi"));
+    const fallbackCandidates = spec.key === "current" && candidates.length === 0
+      ? matches
+          .filter((rule) => !used.has(rule.key))
+          .sort((left, right) => clusterScore(right, spec) - clusterScore(left, spec) || left.key.localeCompare(right.key, "vi"))
+      : candidates;
 
     const primary =
       spec.key === "identity"
-        ? candidates.find((candidate) => Boolean(findRelatedSupport(candidates, candidate, used, true)))
-        : candidates[0];
+        ? fallbackCandidates.find((candidate) => Boolean(findRelatedSupport(fallbackCandidates, candidate, used, true)))
+        : fallbackCandidates[0];
     if (!primary) throw new Error(`Không tìm thấy seed rule phù hợp cho cụm ${spec.key}`);
     used.add(primary.key);
 
-    const support = findRelatedSupport(candidates, primary, used, spec.key === "identity");
+    const support = findRelatedSupport(fallbackCandidates, primary, used, spec.key === "identity");
     if (support) used.add(support.key);
     clusters.push({ key: spec.key, title: spec.title, primary, support });
   }

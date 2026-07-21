@@ -21,7 +21,7 @@ const assistantDeps: ChartAssistantDeps = {
       prompt,
       temperature: 0.45,
       maxTokens: 900,
-      providerOrder: ["deepseek", "groq"],
+      providerOrder: ["deepseek"],
     });
     return generated ? { text: generated.text, model: generated.model } : null;
   },

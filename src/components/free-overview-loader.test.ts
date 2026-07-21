@@ -81,6 +81,26 @@ describe("FreeOverviewLoader seed-first LLM refresh gate", () => {
     expect(html).not.toContain("/lap-la-so");
   });
 
+  it("does not keep the AI loading handoff visible after generation fails", () => {
+    const html = renderToStaticMarkup(
+      createElement(FreeOverviewLoader, {
+        chartId: "chart-1",
+        fullName: "Nguyễn Minh Anh",
+        initialOverview: {
+          status: "fallback",
+          source: "seed-rules",
+          jobStatus: "failed",
+          content: "## 1. Khí chất\n\nBản seed vẫn đọc được.",
+        },
+        isSignedIn: true,
+        canReadFullOverview: true,
+      }),
+    );
+
+    expect(html).toContain("Bản seed vẫn đọc được.");
+    expect(html).not.toContain("Đang viết tiếp bản luận giải AI cá nhân hóa");
+  });
+
   it("keeps a signed-in non-owner at 2/4 with a safe recovery path", () => {
     const html = renderToStaticMarkup(
       createElement(FreeOverviewLoader, {

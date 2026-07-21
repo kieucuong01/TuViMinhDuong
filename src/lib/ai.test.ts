@@ -180,7 +180,7 @@ describe("AI reading format", () => {
     expect(progressSnapshots.at(-1)?.completedChapters).toHaveLength(9);
   });
 
-  it("routes paid chapters through DeepSeek then Groq", async () => {
+  it("routes paid chapters through DeepSeek only", async () => {
     clearProviderEnv();
     llmRouterMocks.hasExternalLlmProvider.mockReturnValue(true);
 
@@ -200,15 +200,15 @@ describe("AI reading format", () => {
       if (chapter.key === weakChapter.key && attempt === 1) {
         return {
           text: `# ${chapter.title}\n\n## ${chapter.requiredSections[0]}\nToo short.`,
-          model: "groq/llama-3.1-8b-instant",
-          provider: "groq",
+          model: "deepseek/deepseek-v4-flash",
+          provider: "deepseek",
         };
       }
 
       return {
         text: completeGeneratedChapter(chapter, `generated-${chapter.key}-attempt-${attempt}`),
-        model: "groq/llama-3.1-8b-instant",
-        provider: "groq",
+        model: "deepseek/deepseek-v4-flash",
+        provider: "deepseek",
       };
     });
 
@@ -223,11 +223,11 @@ describe("AI reading format", () => {
     );
 
     expect(weakChapterCalls).toHaveLength(2);
-    expect((weakChapterCalls[0][0] as { providerOrder?: string[] }).providerOrder).toEqual(["deepseek", "groq"]);
-    expect((weakChapterCalls[1][0] as { providerOrder?: string[] }).providerOrder).toEqual(["deepseek", "groq"]);
+    expect((weakChapterCalls[0][0] as { providerOrder?: string[] }).providerOrder).toEqual(["deepseek"]);
+    expect((weakChapterCalls[1][0] as { providerOrder?: string[] }).providerOrder).toEqual(["deepseek"]);
     expect(yearlyCalls).toHaveLength(1);
     expect(result.content).toContain(`generated-${weakChapter.key}-attempt-2`);
-    expect(weakChapterMeta).toMatchObject({ key: weakChapter.key, model: "groq/llama-3.1-8b-instant", formatGuarded: false });
+    expect(weakChapterMeta).toMatchObject({ key: weakChapter.key, model: "deepseek/deepseek-v4-flash", formatGuarded: false });
     expect(promptMeta).not.toHaveProperty("modelPolicy");
   });
 
@@ -262,7 +262,7 @@ describe("AI reading format", () => {
       expect.objectContaining({
         temperature: 0.45,
         maxTokens: 3200,
-        providerOrder: ["deepseek", "groq"],
+        providerOrder: ["deepseek"],
       }),
     );
     expect(String(llmRouterMocks.generateWithLlmRouter.mock.calls[0][0].prompt)).toContain("1.500 từ");

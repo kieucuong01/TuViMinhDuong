@@ -36,6 +36,7 @@ export function FreeOverviewLoader({
   const chartPath = `/la-so/${chartId}`;
   const nextPath = `${chartPath}#luan-giai`;
   const isLlmReady = initialOverview.source === "llm";
+  const shouldAttemptLlm = !isLlmReady && initialOverview.jobStatus !== "failed";
 
   return (
     <article
@@ -46,7 +47,7 @@ export function FreeOverviewLoader({
     >
       <MarkdownContent content={initialOverview.content} />
 
-      {!isLlmReady ? (
+      {shouldAttemptLlm ? (
         <section className="free-overview-loading" role="status" aria-live="polite" data-ad-view="free_overview_loading" data-chart-id={chartId}>
           <FreeOverviewRefreshTrigger chartId={chartId} shouldRefresh />
           <div>

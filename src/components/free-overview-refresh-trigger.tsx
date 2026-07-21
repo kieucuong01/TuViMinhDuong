@@ -21,7 +21,11 @@ export function FreeOverviewRefreshTrigger({ chartId, shouldRefresh }: { chartId
           credentials: "same-origin",
         });
         const payload = await response.json().catch(() => null);
-        if (payload?.status === "ready" && payload?.source === "llm") {
+        if (
+          (payload?.status === "ready" && payload?.source === "llm") ||
+          payload?.jobStatus === "failed" ||
+          payload?.jobStatus === "stale"
+        ) {
           router.refresh();
           return;
         }
