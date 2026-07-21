@@ -9,6 +9,9 @@ import { isSelfCanonicalArticle, robotsAllowsIndex } from "@/lib/seo";
 const STATIC_LAST_MODIFIED = new Date("2026-05-21T00:00:00+07:00");
 
 const TRUST_ROUTES = [
+  { path: "/gioi-thieu", changeFrequency: "monthly" as const, priority: 0.62 },
+  { path: "/phuong-phap-luan", changeFrequency: "monthly" as const, priority: 0.6 },
+  { path: "/tac-gia", changeFrequency: "monthly" as const, priority: 0.58 },
   { path: "/pricing", changeFrequency: "weekly" as const, priority: 0.6 },
   { path: "/chinh-sach-bao-mat", changeFrequency: "yearly" as const, priority: 0.4 },
   { path: "/dieu-khoan-su-dung", changeFrequency: "yearly" as const, priority: 0.4 },

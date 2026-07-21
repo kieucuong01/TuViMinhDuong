@@ -186,7 +186,7 @@ describe("admin business dashboard", () => {
     expect(overview.guestCharts).toBe(1);
     expect(overview.guestChartRate).toBe(33.3);
     expect(overview.sitemapFiles).toBe(16);
-    expect(overview.sitemapMainUrls).toBe(18);
+    expect(overview.sitemapMainUrls).toBe(21);
     expect(overview.trendPeriod).toBe("day");
     expect(overview.trends).toHaveLength(14);
     expect(overview.trendGroups.day).toHaveLength(14);

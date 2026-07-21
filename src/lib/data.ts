@@ -133,7 +133,7 @@ export type AdminTrendGroups = Record<AdminTrendPeriod, AdminTrendPoint[]>;
 const ADMIN_TREND_PERIODS = new Set<AdminTrendPeriod>(["day", "week", "month"]);
 const ADMIN_TREND_PERIOD_LIST: AdminTrendPeriod[] = ["day", "week", "month"];
 const CORE_SITEMAP_URLS = 7;
-const TRUST_SITEMAP_URLS = 4;
+const TRUST_SITEMAP_URLS = 7;
 
 export function normalizeAdminTrendPeriod(value?: string | null): AdminTrendPeriod {
   return ADMIN_TREND_PERIODS.has(value as AdminTrendPeriod) ? (value as AdminTrendPeriod) : "day";
@@ -1107,7 +1107,7 @@ export async function generateAndStoreFreeOverview(chartId: string) {
 
   try {
     const generated = await generateFreeOverview(record.chart);
-    if (generated.model === "interpretation-rules-v2" || !isCompleteFreeOverview(generated.content)) {
+    if (generated.model === "interpretation-rules-v2" || !isDisplayableFreeOverview(generated.content)) {
       return failFreeOverviewGeneration(chartId, "FREE_OVERVIEW_LLM_UNAVAILABLE_OR_INVALID");
     }
 
