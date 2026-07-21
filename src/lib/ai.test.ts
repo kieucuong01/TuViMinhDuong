@@ -250,7 +250,7 @@ describe("AI reading format", () => {
 
     expect(FREE_OVERVIEW_MIN_WORDS).toBe(1400);
     expect(FREE_OVERVIEW_MAX_WORDS).toBe(1650);
-    expect(FREE_OVERVIEW_VERSION).toBe("free-llm-overview-v13");
+    expect(FREE_OVERVIEW_VERSION).toBe("free-llm-overview-v14");
     expect(result.model).toBe("deepseek/deepseek-v4-flash");
     expect(result).not.toHaveProperty("prompt");
     expect(isCompleteFreeOverview(result.content)).toBe(true);
@@ -281,6 +281,26 @@ describe("AI reading format", () => {
 
     expect(result.model).toBe("interpretation-rules-v2");
     expect(isCompleteFreeOverview(result.content)).toBe(true);
+  });
+
+  it("accepts a structured free LLM overview that is slightly outside the strict seed word budget", async () => {
+    clearProviderEnv();
+    llmRouterMocks.hasExternalLlmProvider.mockReturnValue(true);
+    const extra = Array.from(
+      { length: 12 },
+      () => "Ghi chú thêm: cung Mệnh và đại vận hiện tại cần được đọc cùng nhịp sống thực tế của bạn để tránh quyết định quá vội.",
+    ).join(" ");
+    const content = `${buildInstantFreeOverview(sampleChart())}\n\n${extra}`;
+    expect(isCompleteFreeOverview(content)).toBe(false);
+    llmRouterMocks.generateWithLlmRouter.mockResolvedValue({
+      text: content,
+      model: "deepseek/deepseek-v4-flash",
+      provider: "deepseek",
+    });
+
+    const result = await generateFreeOverview(sampleChart());
+
+    expect(result.model).toBe("deepseek/deepseek-v4-flash");
   });
 
   it("renders the four personalized seed clusters within the approved length", () => {

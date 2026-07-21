@@ -9,7 +9,7 @@ import { articleWithScore, seedArticles, type ArticleCategoryView, type ArticleV
 import { getDb } from "@/lib/db";
 import { FEATURE_PRICE_KEYS, FEATURE_PRICES, COIN_PACKAGES, type FeaturePriceMap, type ReadingKey } from "@/lib/pricing";
 import { isReadingBundleKey, readingBundleScopeKey } from "@/lib/reading-bundles";
-import { FREE_OVERVIEW_VERSION, buildInstantFreeOverview, generateFreeOverview, isCompleteFreeOverview } from "@/lib/ai";
+import { FREE_OVERVIEW_VERSION, buildInstantFreeOverview, generateFreeOverview, isDisplayableFreeOverview } from "@/lib/ai";
 import { countVisibleMarkdownWords } from "@/lib/free-overview-presentation";
 import { scoreArticleSeo } from "@/lib/seo";
 import { slugify } from "@/lib/format";
@@ -1019,7 +1019,7 @@ function cachedFreeOverviewStatus(chart: TuViChart): Extract<FreeOverviewStatus,
     !overview.content ||
     !overview.model ||
     !overview.generatedAt ||
-    !isCompleteFreeOverview(overview.content)
+    !isDisplayableFreeOverview(overview.content)
   ) {
     return null;
   }

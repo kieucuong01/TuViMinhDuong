@@ -10,7 +10,7 @@ export const FREE_OVERVIEW_MAX_WORDS = 1650;
 export const FREE_OVERVIEW_TEMPLATE_MIN_WORDS = FREE_OVERVIEW_MIN_WORDS;
 export const FREE_OVERVIEW_TEMPLATE_MAX_WORDS = FREE_OVERVIEW_MAX_WORDS;
 export const PAID_READING_CHAPTER_MAX_TOKENS = 7000;
-export const FREE_OVERVIEW_VERSION = "free-llm-overview-v13";
+export const FREE_OVERVIEW_VERSION = "free-llm-overview-v14";
 export const PAID_READING_VERSION = "paid-personal-dossier-v6";
 export const PAID_FULL_WORD_TARGET = "5.000-7.000 từ";
 export const READING_PROVIDER_ORDER = ["deepseek"] as const;
@@ -140,6 +140,26 @@ export function isCompleteFreeOverview(content: string) {
     sectionTwoIndex < reflectionIndex &&
     reflectionIndex < fullBridgeIndex &&
     fullBridgeIndex < sectionThreeIndex
+  );
+}
+
+export function isDisplayableFreeOverview(content: string) {
+  if (isCompleteFreeOverview(content)) return true;
+  const requiredHeadings = [
+    "## 1. Khí chất và cách ra quyết định",
+    "## 2. Công việc và nguồn lực",
+    "## 3. Quan hệ và nhịp sống",
+    "## 4. Vận hiện tại",
+  ];
+  const wordCount = countVisibleMarkdownWords(content);
+  const hasChartEvidence = /(cung|mệnh|thân|sao|đại vận|tuần|triệt)/iu.test(content);
+  const headingIndexes = requiredHeadings.map((heading) => content.indexOf(heading));
+  return (
+    wordCount >= 900 &&
+    wordCount <= 2300 &&
+    hasChartEvidence &&
+    headingIndexes.every((index) => index >= 0) &&
+    headingIndexes.every((index, position) => position === 0 || index > headingIndexes[position - 1])
   );
 }
 
@@ -824,7 +844,7 @@ export async function generateFreeOverview(chart: TuViChart) {
     providerOrder: [...READING_PROVIDER_ORDER],
   });
 
-  if (!routed || !isCompleteFreeOverview(routed.text)) return fallback;
+  if (!routed || !isDisplayableFreeOverview(routed.text)) return fallback;
   return { content: routed.text, model: routed.model };
 }
 

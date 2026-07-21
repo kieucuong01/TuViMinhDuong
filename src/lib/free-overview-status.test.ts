@@ -39,7 +39,7 @@ describe("free overview status", () => {
 
     expect(status.status).toBe("fallback");
     expect(status.source).toBe("seed-rules");
-    expect(FREE_OVERVIEW_VERSION).toBe("free-llm-overview-v13");
+    expect(FREE_OVERVIEW_VERSION).toBe("free-llm-overview-v14");
     expect(status.jobStatus).toBe("idle");
     expect(status.content).toContain("# Bản tổng quan lá số của bạn");
     expect(status.content).toContain("## 4. Vận hiện tại");
