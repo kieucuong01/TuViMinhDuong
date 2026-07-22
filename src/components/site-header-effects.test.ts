@@ -28,6 +28,20 @@ describe("site header featured nav effects", () => {
     expect(headerSource).toContain('href: "/kien-thuc-tu-vi"');
   });
 
+  it("adds a Tu vi dropdown with only lifetime reading linked for now", () => {
+    expect(headerSource).toContain('tone: "tuvi"');
+    expect(headerSource).toContain("site-nav-flyout site-tuvi-menu");
+    expect(headerSource).toContain("site-tuvi-panel");
+    expect(headerSource).toContain("Xem Tử vi trọn đời");
+    expect(headerSource).toContain("/xem-tu-vi-tron-doi");
+    expect(headerSource).toContain("Xem Tử vi 2026");
+    expect(headerSource).toContain("Tử vi tài lộc & Đầu tư");
+    expect(headerSource).toContain("Tương hợp lá số");
+    expect(headerSource).toContain('className="site-date-panel-link disabled"');
+    expect(mobileMenuSource).toContain("mobile-tuvi-group");
+    expect(mobileMenuSource).toContain("mobile-menu-disabled");
+  });
+
   it("moves knowledge and lookup links under the Bai Viet dropdown without changing SEO URLs", () => {
     expect(headerSource).toContain("site-article-menu");
     expect(headerSource).toContain("Kiến thức tử vi");
@@ -54,12 +68,14 @@ describe("site header featured nav effects", () => {
   it("opens desktop date and lookup dropdowns on hover/focus without sticky details state", () => {
     expect(headerSource).toContain("SiteNavShell");
     expect(headerSource).toContain("site-nav-flyout site-date-menu");
+    expect(headerSource).toContain("site-nav-flyout site-tuvi-menu");
     expect(headerSource).toContain("site-nav-flyout site-lookup-menu");
     expect(headerSource).not.toContain("<details key={item.href} className=\"site-date-menu\"");
     expect(headerSource).not.toContain("<details className=\"site-lookup-menu\"");
     expect(globalsCss).toContain(".site-nav.is-closing .site-date-panel");
     expect(globalsCss).toMatch(/\.site-date-panel\s*{[\s\S]*opacity:\s*0;[\s\S]*pointer-events:\s*none;[\s\S]*visibility:\s*hidden;/);
     expect(globalsCss).toMatch(/\.site-date-menu:hover \.site-date-panel,\s*\n\.site-date-menu:focus-within \.site-date-panel\s*{[\s\S]*opacity:\s*1;[\s\S]*pointer-events:\s*auto;/);
+    expect(globalsCss).toMatch(/\.site-tuvi-menu:hover \.site-tuvi-panel,\s*\n\.site-tuvi-menu:focus-within \.site-tuvi-panel\s*{[\s\S]*opacity:\s*1;[\s\S]*pointer-events:\s*auto;/);
     expect(globalsCss).toMatch(/\.site-lookup-menu:hover \.site-lookup-panel,\s*\n\.site-lookup-menu:focus-within \.site-lookup-panel\s*{[\s\S]*opacity:\s*1;[\s\S]*pointer-events:\s*auto;/);
   });
 
@@ -88,9 +104,10 @@ describe("site header featured nav effects", () => {
 
   it("adds restrained chip glint and hover polish through CSS", () => {
     expect(globalsCss).toContain("@keyframes nav-chip-glint");
-    expect(globalsCss).toMatch(/\.site-nav-date,\s*\n\.site-nav-knowledge\s*{[\s\S]*box-shadow:/);
-    expect(globalsCss).toMatch(/\.site-nav-date::before,\s*\n\.site-nav-knowledge::before\s*{[\s\S]*animation:\s*nav-chip-glint\s+5\.4s/);
+    expect(globalsCss).toMatch(/\.site-nav-tuvi,\s*\n\.site-nav-date,\s*\n\.site-nav-knowledge\s*{[\s\S]*box-shadow:/);
+    expect(globalsCss).toMatch(/\.site-nav-tuvi::before,\s*\n\.site-nav-date::before,\s*\n\.site-nav-knowledge::before\s*{[\s\S]*animation:\s*nav-chip-glint\s+5\.4s/);
     expect(globalsCss).toMatch(/\.site-nav-date:hover,\s*\n\.site-nav-knowledge:hover[\s\S]*translateY\(-1px\)/);
+    expect(globalsCss).toMatch(/\.mobile-menu-tuvi\s*{[\s\S]*linear-gradient/);
     expect(globalsCss).toMatch(/\.mobile-menu-date\s*{[\s\S]*linear-gradient/);
     expect(globalsCss).toMatch(/\.mobile-menu-knowledge\s*{[\s\S]*linear-gradient/);
   });

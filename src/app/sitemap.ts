@@ -25,6 +25,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   );
   return [
     { url: APP_URL, lastModified: STATIC_LAST_MODIFIED, changeFrequency: "daily", priority: 1 },
+    { url: `${APP_URL}/xem-tu-vi-tron-doi`, lastModified: STATIC_LAST_MODIFIED, changeFrequency: "weekly", priority: 0.86 },
     { url: `${APP_URL}/kien-thuc-tu-vi`, lastModified: STATIC_LAST_MODIFIED, changeFrequency: "daily", priority: 0.8 },
     { url: `${APP_URL}/xem-ngay`, lastModified: STATIC_LAST_MODIFIED, changeFrequency: "daily", priority: 0.8 },
     ...DATE_PURPOSE_PAGES.map((page) => ({

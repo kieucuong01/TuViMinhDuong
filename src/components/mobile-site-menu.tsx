@@ -19,7 +19,9 @@ import {
   Menu,
   MoonStar,
   Sparkles,
+  TrendingUp,
   TreePine,
+  Users,
 } from "lucide-react";
 import { useEffect, useRef } from "react";
 import { CoinTopupLink } from "@/components/coin-topup-link";
@@ -37,6 +39,7 @@ type MobileSiteMenuItem = {
 type MobileSiteMenuProps = {
   items: MobileSiteMenuItem[];
   lookupLinks: { href: string; label: string }[];
+  tuViLinks: { href?: string; label: string; description: string; icon: string }[];
 };
 
 const dateMenuIcons: Record<DateMenuIcon, ComponentType<{ size?: number; strokeWidth?: number; "aria-hidden"?: boolean }>> = {
@@ -62,7 +65,14 @@ const ageMenuIcons: Record<AgeToolSlug, ComponentType<{ size?: number; strokeWid
   "lam-nha": Hammer,
 };
 
-export function MobileSiteMenu({ items, lookupLinks }: MobileSiteMenuProps) {
+const tuViMenuIcons: Record<string, ComponentType<{ size?: number; strokeWidth?: number; "aria-hidden"?: boolean }>> = {
+  spark: Sparkles,
+  calendar: CalendarDays,
+  trend: TrendingUp,
+  users: Users,
+};
+
+export function MobileSiteMenu({ items, lookupLinks, tuViLinks }: MobileSiteMenuProps) {
   const pathname = usePathname();
   const detailsRef = useRef<HTMLDetailsElement>(null);
   useCloseDetailsOnOutsideClick(detailsRef);
@@ -82,8 +92,36 @@ export function MobileSiteMenu({ items, lookupLinks }: MobileSiteMenuProps) {
       </summary>
       <div className="mobile-site-menu-panel absolute left-0 mt-3 grid w-60 gap-1 rounded-2xl border border-orange-100 bg-white/95 p-2 shadow-2xl shadow-orange-950/10 backdrop-blur-xl">
         {items.map((item) => {
-          const Icon = item.tone === "date" ? CalendarDays : item.tone === "age" ? HeartHandshake : item.tone === "knowledge" ? BookOpenText : item.tone === "primary" ? Sparkles : null;
-          const itemClass = `mobile-menu-link rounded-xl px-3 py-2.5 text-sm font-semibold text-stone-700 transition hover:bg-orange-50 hover:text-orange-700 ${item.tone === "date" ? "mobile-menu-date" : ""} ${item.tone === "age" ? "mobile-menu-age" : ""} ${item.tone === "knowledge" ? "mobile-menu-knowledge" : ""}`;
+          const Icon = item.tone === "tuvi" ? Sparkles : item.tone === "date" ? CalendarDays : item.tone === "age" ? HeartHandshake : item.tone === "knowledge" ? BookOpenText : item.tone === "primary" ? Sparkles : null;
+          const itemClass = `mobile-menu-link rounded-xl px-3 py-2.5 text-sm font-semibold text-stone-700 transition hover:bg-orange-50 hover:text-orange-700 ${item.tone === "tuvi" ? "mobile-menu-tuvi" : ""} ${item.tone === "date" ? "mobile-menu-date" : ""} ${item.tone === "age" ? "mobile-menu-age" : ""} ${item.tone === "knowledge" ? "mobile-menu-knowledge" : ""}`;
+
+          if (item.tone === "tuvi") {
+            return (
+              <details key={item.href} className="mobile-date-group mobile-tuvi-group">
+                <summary className={itemClass}>
+                  <Sparkles aria-hidden="true" size={16} strokeWidth={2.4} />
+                  <span>Tử vi</span>
+                  <ChevronDown aria-hidden="true" size={15} />
+                </summary>
+                <div>
+                  {tuViLinks.map((link) => {
+                    const MenuIcon = tuViMenuIcons[link.icon];
+                    return link.href ? (
+                      <Link key={link.label} href={link.href} prefetch={false} onClick={closeMenu}>
+                        <MenuIcon aria-hidden={true} size={15} strokeWidth={2.35} />
+                        <span>{link.label}</span>
+                      </Link>
+                    ) : (
+                      <span key={link.label} className="mobile-menu-disabled" aria-disabled="true">
+                        <MenuIcon aria-hidden={true} size={15} strokeWidth={2.35} />
+                        <span>{link.label}</span>
+                      </span>
+                    );
+                  })}
+                </div>
+              </details>
+            );
+          }
 
           if (item.tone === "date") {
             return (

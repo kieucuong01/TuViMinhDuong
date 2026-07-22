@@ -25,7 +25,11 @@ $npmCommand = Get-Command npm.cmd -ErrorAction SilentlyContinue
 if (-not $npmCommand) {
   $npmCommand = Get-Command npm -ErrorAction Stop
 }
+$node = (Get-Command node.exe -ErrorAction Stop).Source
 $npm = $npmCommand.Source
+$npmCli = Join-Path (Split-Path -Parent $npm) "node_modules\npm\bin\npm-cli.js"
+$localNpmFile = if (Test-Path -LiteralPath $npmCli) { $node } else { $npm }
+[string[]]$localNpmPrefixArgs = if (Test-Path -LiteralPath $npmCli) { @($npmCli) } else { @() }
 $ssh = (Get-Command ssh.exe -ErrorAction Stop).Source
 $curl = (Get-Command curl.exe -ErrorAction Stop).Source
 
@@ -72,6 +76,16 @@ function Get-NativeOutput {
     throw ($output -join [Environment]::NewLine)
   }
   return @($output)
+}
+
+function Invoke-LocalNpmCommand {
+  param(
+    [Parameter(Mandatory = $true)]
+    [string]$Label,
+    [string[]]$Arguments = @()
+  )
+
+  Invoke-NativeCommand -Label $Label -FilePath $localNpmFile -Arguments ($localNpmPrefixArgs + $Arguments)
 }
 
 function Get-RepositoryStatus {
@@ -170,9 +184,9 @@ if ([int]$divergence[0] -gt 0) {
   throw "Local master is behind origin/master. Pull and resolve changes before releasing."
 }
 
-Invoke-NativeCommand -Label "npm run lint" -FilePath $npm -Arguments @("run", "lint")
-Invoke-NativeCommand -Label "npm test" -FilePath $npm -Arguments @("test")
-Invoke-NativeCommand -Label "npm run build" -FilePath $npm -Arguments @("run", "build")
+Invoke-LocalNpmCommand -Label "npm run lint" -Arguments @("run", "lint")
+Invoke-LocalNpmCommand -Label "npm test" -Arguments @("test")
+Invoke-LocalNpmCommand -Label "npm run build" -Arguments @("run", "build")
 
 $statusLines = @(Get-RepositoryStatus)
 if ($statusLines.Count -gt 0) {

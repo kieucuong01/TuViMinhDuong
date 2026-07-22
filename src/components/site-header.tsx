@@ -18,6 +18,8 @@ import {
   MoonStar,
   Search,
   Sparkles,
+  TrendingUp,
+  Users,
   TreePine,
 } from "lucide-react";
 import { UserHeaderBadge } from "@/components/user-header-badge";
@@ -29,9 +31,17 @@ import { APP_NAME } from "@/lib/env";
 
 const baseNav = [
   { href: "/", label: "Lập lá số", tone: "primary" },
+  { href: "/xem-tu-vi-tron-doi", label: "Tử vi", tone: "tuvi" },
   { href: "/xem-ngay", label: "Xem ngày", tone: "date" },
   { href: "/xem-tuoi", label: "Xem tuổi", tone: "age" },
   { href: "/kien-thuc-tu-vi", label: "Bài Viết", tone: "knowledge" },
+];
+
+const tuViLinks = [
+  { href: "/xem-tu-vi-tron-doi", label: "Xem Tử vi trọn đời", description: "Lập lá số, đọc tổng quan và mở bản FULL 9 chương.", icon: "spark" },
+  { label: "Xem Tử vi 2026", description: "Sẽ làm sau.", icon: "calendar" },
+  { label: "Tử vi tài lộc & Đầu tư", description: "Chấm Tài - Quan - Di và biểu đồ 5 năm tới.", icon: "trend" },
+  { label: "Tương hợp lá số", description: "So 2 lá số theo sao cụ thể.", icon: "users" },
 ];
 
 const lookupLinks = [
@@ -60,6 +70,13 @@ const lookupMenuIcons: Record<string, ComponentType<{ size?: number; strokeWidth
   spark: Sparkles,
 };
 
+const tuViMenuIcons: Record<string, ComponentType<{ size?: number; strokeWidth?: number; "aria-hidden"?: boolean }>> = {
+  spark: Sparkles,
+  calendar: CalendarDays,
+  trend: TrendingUp,
+  users: Users,
+};
+
 const ageMenuIcons: Record<AgeToolSlug, ComponentType<{ size?: number; strokeWidth?: number; "aria-hidden"?: boolean }>> = {
   "xong-dat": Gift,
   "vo-chong": HeartHandshake,
@@ -76,7 +93,7 @@ export async function SiteHeader() {
     <header className="site-header sticky top-0 z-50 border-b border-orange-100/70 bg-white/75 shadow-sm shadow-orange-950/5 backdrop-blur-2xl supports-[backdrop-filter]:bg-white/70">
       <div className="site-header-shell mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <div className="site-header-menu-slot">
-          <MobileSiteMenu items={nav} lookupLinks={lookupLinks} />
+          <MobileSiteMenu items={nav} lookupLinks={lookupLinks} tuViLinks={tuViLinks} />
         </div>
 
         <Link href="/" className="site-brand group flex min-w-0 items-center gap-2 font-semibold text-stone-950" prefetch={false}>
@@ -91,8 +108,38 @@ export async function SiteHeader() {
 
         <SiteNavShell>
           {nav.map((item, index) => {
-            const Icon = item.tone === "date" ? CalendarDays : item.tone === "age" ? HeartHandshake : item.tone === "knowledge" ? BookOpenText : null;
-            const linkClass = `site-nav-link rounded-full px-3.5 py-2 transition hover:bg-orange-50 hover:text-orange-700 ${index === 0 ? "site-nav-primary" : ""} ${item.tone === "date" ? "site-nav-date" : ""} ${item.tone === "age" ? "site-nav-age" : ""} ${item.tone === "knowledge" ? "site-nav-knowledge" : ""}`;
+            const Icon = item.tone === "tuvi" ? Sparkles : item.tone === "date" ? CalendarDays : item.tone === "age" ? HeartHandshake : item.tone === "knowledge" ? BookOpenText : null;
+            const linkClass = `site-nav-link rounded-full px-3.5 py-2 transition hover:bg-orange-50 hover:text-orange-700 ${index === 0 ? "site-nav-primary" : ""} ${item.tone === "tuvi" ? "site-nav-tuvi" : ""} ${item.tone === "date" ? "site-nav-date" : ""} ${item.tone === "age" ? "site-nav-age" : ""} ${item.tone === "knowledge" ? "site-nav-knowledge" : ""}`;
+
+            if (item.tone === "tuvi") {
+              return (
+                <div key={item.href} className="site-nav-flyout site-tuvi-menu">
+                  <Link href={item.href} className={`${linkClass} site-tuvi-menu-trigger`} prefetch={false} aria-haspopup="true">
+                    <Sparkles aria-hidden="true" size={16} strokeWidth={2.4} />
+                    <span>{item.label}</span>
+                    <ChevronDown aria-hidden="true" size={14} />
+                  </Link>
+                  <div className="site-date-panel site-tuvi-panel" aria-label="Chọn mục tử vi">
+                    <div className="site-date-panel-grid">
+                      {tuViLinks.map((link) => {
+                        const MenuIcon = tuViMenuIcons[link.icon];
+                        return link.href ? (
+                          <Link key={link.label} href={link.href} className="site-date-panel-link" prefetch={false}>
+                            <span className="site-date-panel-icon"><MenuIcon aria-hidden={true} size={17} strokeWidth={2.35} /></span>
+                            <span><strong>{link.label}</strong><small>{link.description}</small></span>
+                          </Link>
+                        ) : (
+                          <span key={link.label} className="site-date-panel-link disabled" aria-disabled="true">
+                            <span className="site-date-panel-icon"><MenuIcon aria-hidden={true} size={17} strokeWidth={2.35} /></span>
+                            <span><strong>{link.label}</strong><small>{link.description}</small></span>
+                          </span>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+              );
+            }
 
             if (item.tone === "date") {
               return (
