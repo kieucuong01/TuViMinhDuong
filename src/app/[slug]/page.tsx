@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 import { APP_URL } from "@/lib/env";
 import { getArticleBySlug, listArticles } from "@/lib/data";
-import { articlePath } from "@/lib/article-path";
+import { articlePath, isLifetimeTuViSlug } from "@/lib/article-path";
 import { absoluteUrl } from "@/lib/seo";
 import { ArticlePageContent } from "@/components/article-page-content";
 
@@ -11,11 +11,12 @@ export const dynamicParams = true;
 
 export async function generateStaticParams() {
   const articles = await listArticles();
-  return articles.map((article) => ({ slug: article.slug }));
+  return articles.filter((article) => isLifetimeTuViSlug(article.slug)).map((article) => ({ slug: article.slug }));
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
+  if (!isLifetimeTuViSlug(slug)) return {};
   const article = await getArticleBySlug(slug);
   if (!article) return {};
   const canonicalPath = articlePath(article);
@@ -41,12 +42,13 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   };
 }
 
-export default async function ArticlePage({ params }: { params: Promise<{ slug: string }> }) {
+export default async function LifetimeArticlePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
+  if (!isLifetimeTuViSlug(slug)) notFound();
   const [article, articles] = await Promise.all([getArticleBySlug(slug), listArticles()]);
   if (!article) notFound();
   const canonicalPath = articlePath(article);
-  if (canonicalPath !== `/kien-thuc-tu-vi/${slug}`) redirect(canonicalPath);
+  if (canonicalPath !== `/${slug}`) redirect(canonicalPath);
 
-  return <ArticlePageContent article={article} articles={articles} sectionName="Kiến thức tử vi" sectionHref="/kien-thuc-tu-vi" />;
+  return <ArticlePageContent article={article} articles={articles} sectionName="Tử vi trọn đời" sectionHref="/xem-tu-vi-tron-doi" />;
 }

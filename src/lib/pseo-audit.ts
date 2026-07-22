@@ -44,6 +44,16 @@ function shingles(value: string, size = 7) {
   return result;
 }
 
+const shingleCache = new Map<string, Set<string>>();
+
+function cachedShingles(value: string) {
+  const cached = shingleCache.get(value);
+  if (cached) return cached;
+  const result = shingles(value);
+  shingleCache.set(value, result);
+  return result;
+}
+
 function normalizeSerpFormula(value: string) {
   return value
     .toLowerCase()
@@ -59,8 +69,8 @@ function normalizeSerpFormula(value: string) {
 }
 
 export function contentSimilarityScore(first: string, second: string) {
-  const firstSet = shingles(first);
-  const secondSet = shingles(second);
+  const firstSet = cachedShingles(first);
+  const secondSet = cachedShingles(second);
   if (firstSet.size === 0 && secondSet.size === 0) return 1;
   let intersection = 0;
   for (const item of firstSet) {

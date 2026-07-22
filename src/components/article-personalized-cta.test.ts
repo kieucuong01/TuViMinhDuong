@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 
 const componentPath = fileURLToPath(new URL("./article-personalized-cta.tsx", import.meta.url));
 const ctaSource = existsSync(componentPath) ? readFileSync(componentPath, "utf8") : "";
-const articlePageSource = readFileSync(fileURLToPath(new URL("../app/kien-thuc-tu-vi/[slug]/page.tsx", import.meta.url)), "utf8");
+const articlePageSource = readFileSync(fileURLToPath(new URL("./article-page-content.tsx", import.meta.url)), "utf8");
 const globalsSource = readFileSync(fileURLToPath(new URL("../app/globals.css", import.meta.url)), "utf8");
 
 describe("ArticlePersonalizedCta", () => {

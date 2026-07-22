@@ -46,7 +46,7 @@ type LifetimeCard = {
 const lifetimeCards: LifetimeCard[] = [
   {
     id: "tu-vi-tron-doi-ky-dau-1969-nam-mang",
-    detailsPath: "/kien-thuc-tu-vi/tu-vi-tron-doi-tuoi-ky-dau-1969-nam-mang",
+    detailsPath: "/tu-vi-tron-doi-tuoi-ky-dau-1969-nam-mang",
     title: "Tử vi trọn đời tuổi Kỷ Dậu 1969 nam mạng",
     year: "1969",
     canChi: "Kỷ Dậu",
@@ -58,7 +58,7 @@ const lifetimeCards: LifetimeCard[] = [
   },
   {
     id: "tu-vi-tron-doi-ky-dau-1969-nu-mang",
-    detailsPath: "/kien-thuc-tu-vi/tu-vi-tron-doi-tuoi-ky-dau-1969-nu-mang",
+    detailsPath: "/tu-vi-tron-doi-tuoi-ky-dau-1969-nu-mang",
     title: "Tử vi trọn đời tuổi Kỷ Dậu 1969 nữ mạng",
     year: "1969",
     canChi: "Kỷ Dậu",
@@ -114,7 +114,7 @@ const lifetimeCards: LifetimeCard[] = [
   },
   {
     id: "tu-vi-tron-doi-at-hoi-1995-nam-mang",
-    detailsPath: "/kien-thuc-tu-vi/tu-vi-tron-doi-tuoi-at-hoi-1995-nam-mang",
+    detailsPath: "/tu-vi-tron-doi-tuoi-at-hoi-1995-nam-mang",
     title: "Tử vi trọn đời tuổi Ất Hợi 1995 nam mạng",
     year: "1995",
     canChi: "Ất Hợi",
@@ -126,7 +126,7 @@ const lifetimeCards: LifetimeCard[] = [
   },
   {
     id: "tu-vi-tron-doi-at-hoi-1995-nu-mang",
-    detailsPath: "/kien-thuc-tu-vi/tu-vi-tron-doi-tuoi-at-hoi-1995-nu-mang",
+    detailsPath: "/tu-vi-tron-doi-tuoi-at-hoi-1995-nu-mang",
     title: "Tử vi trọn đời tuổi Ất Hợi 1995 nữ mạng",
     year: "1995",
     canChi: "Ất Hợi",
@@ -138,7 +138,7 @@ const lifetimeCards: LifetimeCard[] = [
   },
   {
     id: "tu-vi-tron-doi-at-suu-1985-nam-mang",
-    detailsPath: "/kien-thuc-tu-vi/tu-vi-tron-doi-tuoi-at-suu-1985-nam-mang",
+    detailsPath: "/tu-vi-tron-doi-tuoi-at-suu-1985-nam-mang",
     title: "Tử vi trọn đời tuổi Ất Sửu 1985 nam mạng",
     year: "1985",
     canChi: "Ất Sửu",

@@ -592,6 +592,11 @@ type LifetimeAgeArticleInput = {
   canChi: string;
   gender: "nam mạng" | "nữ mạng";
   napAm: string;
+  cungPhi: string;
+  animalSymbol: string;
+  compatibility: string;
+  riskAges: string;
+  fengShui: string;
   quickFocus: string;
   summary: string;
   personality: string;
@@ -617,7 +622,7 @@ function lifetimeAgeArticle(input: LifetimeAgeArticleInput): ArticleView {
     ogImage: `/articles/${input.slug}.webp`,
     metaTitle: input.title,
     metaDescription: `Xem ${input.title}: tổng quan đời sống, công việc, tiền bạc, tình cảm, sức khỏe và bảng giai đoạn để tham khảo trước khi lập lá số.`,
-    canonicalUrl: `/kien-thuc-tu-vi/${input.slug}`,
+    canonicalUrl: `/${input.slug}`,
     date: "2026-07-22",
     faqs: [
       {
@@ -646,10 +651,18 @@ Nếu cần độ cá nhân hóa cao hơn, hãy xem bài này như lớp mở đ
 | Năm sinh | ${input.year} |
 | Can chi | ${input.canChi} |
 | Nạp âm | ${input.napAm} |
+| Cung phi tham khảo | ${input.cungPhi} |
+| Con giáp | ${input.animalSymbol} |
 | Giới tính luận giải | ${input.gender} |
 | Trọng tâm nên đọc | ${input.quickFocus} |
 
 ${input.summary}
+
+## Cơ sở tử vi dùng trong bài
+
+Phần luận giải này dựa trên lớp tuổi ${input.canChi}, nạp âm ${input.napAm}, cung phi ${input.cungPhi}, con giáp ${input.animalSymbol} và cách đối chiếu ngũ hành sinh khắc. Đây là lớp nền tương tự các bài tử vi trọn đời truyền thống: trước hết xét can chi và mệnh nạp âm, sau đó mới đặt vào từng trục đời sống như công danh, tài lộc, gia đạo, sức khỏe và các giai đoạn vận.
+
+Về ngũ hành, ${input.compatibility} Khi đọc hợp hay kỵ, nên hiểu là mức độ thuận khi phối hợp môi trường, con người và thói quen, không phải quy tắc cứng để loại bỏ một người hay một cơ hội. Nếu lập lá số đầy đủ, các sao tại cung Mệnh, Quan Lộc, Tài Bạch, Phu Thê, Thiên Di và đại vận có thể làm kết quả chi tiết đổi khác đáng kể.
 
 ## Cách đọc tử vi trọn đời theo tuổi
 
@@ -687,6 +700,12 @@ ${input.health}
 
 Phần sức khỏe chỉ là gợi ý thói quen, không thay thế tư vấn y khoa. Nếu có triệu chứng kéo dài, đau bất thường hoặc căng thẳng ảnh hưởng sinh hoạt, bạn nên gặp chuyên gia phù hợp. Tử vi nên giúp bạn chú ý sớm hơn đến nhịp sống, không khiến bạn lo lắng hoặc bỏ qua điều trị.
 
+## Hợp kỵ, phong thủy và việc nên cân nhắc
+
+${input.fengShui}
+
+Các tuổi hoặc giai đoạn cần cẩn trọng trong bài này được hiểu theo nghĩa giảm rủi ro, không phải né tránh tuyệt đối. ${input.riskAges} Khi có việc lớn như mua nhà, đổi nghề, đầu tư, cưới hỏi hoặc ký kết, nên kết hợp thêm lịch việc thật, khả năng tài chính, giấy tờ pháp lý và [xem ngày tốt xấu](/xem-ngay) thay vì chỉ dựa vào tuổi.
+
 ## Bảng đọc nhanh theo giai đoạn
 
 | Giai đoạn | Trọng tâm nên lưu ý |
@@ -718,6 +737,11 @@ const lifetimeAgeArticles = [
     canChi: "Kỷ Dậu",
     gender: "nam mạng",
     napAm: "Đại Trạch Thổ",
+    cungPhi: "Tốn Mộc, Đông tứ mệnh",
+    animalSymbol: "Gà đất, thiên can Kỷ thuộc Thổ, địa chi Dậu thuộc Kim",
+    compatibility: "mệnh Thổ thường được Hỏa sinh và sinh Kim, nên hợp cách làm có nền tảng, kỷ luật, tài sản thật và quy trình rõ; cần tiết chế môi trường quá Mộc hoặc Thủy nếu làm bản thân hao sức, phân tán hoặc khó giữ nhịp.",
+    riskAges: "Với Kỷ Dậu nam mạng, các mốc thay đổi nghề, hùn hạp vốn hoặc đứng tên tài sản nên xem kỹ hơn ở giai đoạn cuối 30, giữa 40 và sau 50 tuổi, vì đây thường là lúc trách nhiệm gia đình và tài chính cùng tăng.",
+    fengShui: "Kỷ Dậu nam mạng có thể ưu tiên hướng sinh hoạt và làm việc thuộc nhóm Đông tứ khi phù hợp mặt bằng thực tế, dùng màu đất, đỏ ấm, trắng hoặc ánh kim ở mức vừa phải. Quan trọng hơn màu sắc là sự gọn gàng, ánh sáng tốt, giấy tờ tài sản rõ và bàn làm việc không để quá nhiều việc dang dở.",
     quickFocus: "Giữ uy tín, quản trị tiền bạc chắc tay, giảm ôm việc và mềm lời trong gia đạo.",
     summary: "Kỷ Dậu 1969 nam mạng thường là mẫu người coi trọng trách nhiệm, thích rõ ràng và không dễ đặt niềm tin bừa bãi. Khi trẻ dễ vất vả vì muốn tự chứng minh, nhưng càng về sau càng có lợi nếu đi theo hướng tích lũy kinh nghiệm, quản trị ổn định và giữ chữ tín.",
     personality: "Nam Kỷ Dậu thường có tính nguyên tắc, làm việc có tiêu chuẩn và không thích sự nhập nhằng. Điểm mạnh là bền, kỹ, biết giữ lời và có khả năng đứng mũi chịu sào khi gia đình hoặc công việc cần người quyết. Điểm cần tiết chế là dễ căng khi mọi việc không theo ý, đôi khi nói thẳng quá khiến người thân khó tiếp nhận.",
@@ -740,6 +764,11 @@ const lifetimeAgeArticles = [
     canChi: "Kỷ Dậu",
     gender: "nữ mạng",
     napAm: "Đại Trạch Thổ",
+    cungPhi: "Khôn Thổ, Tây tứ mệnh",
+    animalSymbol: "Gà đất, thiên can Kỷ thuộc Thổ, địa chi Dậu thuộc Kim",
+    compatibility: "mệnh Thổ được Hỏa trợ sinh và có xu hướng hợp cách tích lũy chắc, chăm nếp nhà, quản tài sản; cần tránh để yếu tố Mộc hoặc Thủy biểu hiện thành lo nghĩ quá mức, cảm xúc thất thường hoặc chi tiêu vì nể tình.",
+    riskAges: "Với Kỷ Dậu nữ mạng, những năm đổi nhà, đổi việc, lo chuyện con cái hoặc đứng tên tài sản nên chậm một nhịp để kiểm giấy tờ, người cùng làm và khả năng chịu áp lực của bản thân.",
+    fengShui: "Kỷ Dậu nữ mạng có thể ưu tiên không gian ổn định, màu đất, đỏ ấm, trắng, ánh kim và các hướng thuộc Tây tứ khi điều kiện nhà cửa cho phép. Vật dụng phong thủy chỉ nên dùng như lời nhắc giữ nếp sống, không thay thế kế hoạch tiền bạc hay đối thoại gia đình.",
     quickFocus: "Bền bỉ, biết lo xa, cần bớt ôm trách nhiệm và tách bạch tài chính rõ hơn.",
     summary: "Kỷ Dậu 1969 nữ mạng thường tháo vát, chu đáo và có khả năng giữ nếp nhà. Đây là mẫu người càng từng trải càng biết tính toán, nhưng cũng dễ mệt vì tự đặt tiêu chuẩn cao cho bản thân và khó nhờ người khác chia sẻ.",
     personality: "Nữ Kỷ Dậu có nét thực tế, kỹ lưỡng, thích mọi việc có trật tự và thường không yên tâm khi giao việc quan trọng cho người thiếu trách nhiệm. Điểm mạnh là khả năng quán xuyến, giữ tiền, giữ lời hứa và duy trì nếp sống ổn định. Điểm cần cân bằng là bớt khắt khe với chính mình, nhất là khi chuyện gia đình không thể hoàn hảo như kế hoạch.",
@@ -762,6 +791,11 @@ const lifetimeAgeArticles = [
     canChi: "Ất Hợi",
     gender: "nam mạng",
     napAm: "Sơn Đầu Hỏa",
+    cungPhi: "Khôn Thổ, Tây tứ mệnh",
+    animalSymbol: "Lợn núi, thiên can Ất thuộc Mộc, địa chi Hợi thuộc Thủy",
+    compatibility: "mệnh Hỏa được Mộc sinh và sinh Thổ, nên hợp cách xây chuyên môn từ tri thức, sáng tạo, công nghệ, dịch vụ rồi chuyển thành tài sản bền; cần thận trọng khi yếu tố Thủy hoặc Kim khiến cảm xúc dao động, lời rủ rê hấp dẫn nhưng thiếu nền.",
+    riskAges: "Với Ất Hợi nam mạng, giai đoạn từ cuối 20 đến giữa 30 tuổi nên đặc biệt kiểm soát góp vốn, vay nợ, đổi nghề vì cảm hứng và các quan hệ tài chính với người quen.",
+    fengShui: "Ất Hợi nam mạng có thể dùng màu xanh, đỏ ấm, tím nhạt hoặc màu đất ở mức tiết chế; không gian làm việc nên sáng, có mục tiêu treo rõ và hạn chế đồ gây phân tán. Hướng thuộc Tây tứ chỉ là lớp tham khảo nếu phù hợp nhà cửa thực tế.",
     quickFocus: "Xây chuyên môn, chọn bạn đồng hành kỹ, tránh quyết định tài chính vì cả tin hoặc sĩ diện.",
     summary: "Ất Hợi 1995 nam mạng thường có tình nghĩa, lòng tự trọng và không thích bị ép vào khuôn quá chặt. Tuổi này hợp lối đi đường dài: xây kỹ năng, giữ quan hệ ít nhưng chất lượng, làm việc có uy tín và quản lý tiền bạc bằng nguyên tắc rõ.",
     personality: "Nam Ất Hợi có xu hướng sống tình cảm nhưng bên trong khá tự trọng. Khi được tôn trọng, họ làm việc có trách nhiệm và biết giúp người khác. Khi bị thúc ép hoặc nghi ngờ, họ dễ im lặng, tránh đối đầu hoặc quyết định theo cảm xúc. Điểm mạnh là sự bền tình, khả năng cảm nhận người khác và tinh thần muốn tạo cuộc sống ổn định.",
@@ -784,6 +818,11 @@ const lifetimeAgeArticles = [
     canChi: "Ất Hợi",
     gender: "nữ mạng",
     napAm: "Sơn Đầu Hỏa",
+    cungPhi: "Khảm Thủy, Đông tứ mệnh",
+    animalSymbol: "Lợn núi, thiên can Ất thuộc Mộc, địa chi Hợi thuộc Thủy",
+    compatibility: "mệnh Hỏa cần nguồn Mộc để nuôi cảm hứng và sinh Thổ để tạo kết quả thực tế; khi Thủy quá mạnh trong đời sống, người tuổi này dễ mềm lòng, lo nhiều hoặc bị cuốn vào cảm xúc của người khác.",
+    riskAges: "Với Ất Hợi nữ mạng, các mốc lập gia đình, sinh con, đổi việc hoặc bắt đầu kinh doanh cá nhân nên có quỹ dự phòng và ranh giới tiền chung - tiền riêng trước khi quyết định.",
+    fengShui: "Ất Hợi nữ mạng hợp không gian có ánh sáng ấm, cây xanh vừa đủ, màu xanh lá, đỏ ấm hoặc màu đất nhẹ. Nên tránh bày quá nhiều đồ kỷ niệm khiến cảm xúc kéo dài; bàn làm việc cần rõ nơi để giấy tờ, tiền bạc và kế hoạch cá nhân.",
     quickFocus: "Giữ ranh giới cảm xúc, tách tiền chung - riêng, phát triển nghề có tính chăm sóc hoặc sáng tạo.",
     summary: "Ất Hợi 1995 nữ mạng thường sống tình cảm, có duyên giao tiếp và dễ tạo thiện cảm. Điểm mạnh là biết quan tâm, biết nhường và có sức bền khi đã chọn đúng việc. Điểm cần giữ là đừng để sự tử tế biến thành chịu đựng quá lâu.",
     personality: "Nữ Ất Hợi có trực giác tốt, dễ cảm nhận bầu không khí xung quanh và thường muốn giữ hòa khí. Khi có mục tiêu rõ, họ làm việc khá bền và có khả năng gom người, chăm việc, giữ quan hệ. Nhưng nếu thiếu ranh giới, họ dễ bị kéo vào chuyện của người khác, tiêu hao cảm xúc rồi mất tập trung cho kế hoạch riêng.",
@@ -806,6 +845,11 @@ const lifetimeAgeArticles = [
     canChi: "Ất Sửu",
     gender: "nam mạng",
     napAm: "Hải Trung Kim",
+    cungPhi: "Càn Kim, Tây tứ mệnh",
+    animalSymbol: "Trâu biển, thiên can Ất thuộc Mộc, địa chi Sửu thuộc Thổ",
+    compatibility: "mệnh Kim được Thổ sinh và sinh Thủy, nên hợp việc có tài sản nền, kỹ thuật, vận hành, quản trị và tiêu chuẩn rõ; cần tránh để Hỏa hoặc Mộc biểu hiện thành áp lực chứng minh, nóng trong quyết định hoặc mở rộng vượt sức.",
+    riskAges: "Với Ất Sửu nam mạng, những mốc mua tài sản, vay vốn, đứng tên hộ, mở rộng kinh doanh hoặc đổi vai trò quản lý cần đọc kỹ hợp đồng và tính kịch bản xấu nhất.",
+    fengShui: "Ất Sửu nam mạng có thể ưu tiên màu trắng, xám, ánh kim, vàng đất và bố trí không gian làm việc gọn, chắc, ít thay đổi. Hướng thuộc Tây tứ là lớp tham khảo; điều quan trọng hơn là quản trị nợ, giấy tờ và lịch nghỉ đều.",
     quickFocus: "Bền bỉ, hợp tài sản thật và vận hành, cần quản trị nợ, sức khỏe và áp lực chứng minh.",
     summary: "Ất Sửu 1985 nam mạng thường chịu khó, có trách nhiệm và thích kết quả thực tế. Tuổi này không nhất thiết bứt phá sớm, nhưng có lợi thế tích lũy nếu giữ nhịp đều, chọn tài sản rõ và tránh làm quá sức để chứng minh bản thân.",
     personality: "Nam Ất Sửu có nền tính cách bền, thực tế, ít thích nói nhiều về khó khăn. Khi đã nhận việc, họ thường cố làm đến nơi đến chốn. Điểm mạnh là sức chịu đựng, tinh thần xây dựng và khả năng đi từng bước. Điểm cần sửa là dễ tự gồng, ngại nhờ hỗ trợ và đôi khi chậm thay đổi khi hoàn cảnh đã khác.",

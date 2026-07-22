@@ -151,6 +151,7 @@ describe("SEO URL guards", () => {
     expect(robotsAllowsIndex("index,follow")).toBe(true);
     expect(robotsAllowsIndex("noindex,nofollow")).toBe(false);
     expect(isSelfCanonicalArticle({ slug: "cung-menh", canonicalUrl: "/kien-thuc-tu-vi/cung-menh" })).toBe(true);
+    expect(isSelfCanonicalArticle({ slug: "tu-vi-tron-doi-tuoi-ky-dau-1969-nam-mang", canonicalUrl: "/tu-vi-tron-doi-tuoi-ky-dau-1969-nam-mang" })).toBe(true);
     expect(isSelfCanonicalArticle({ slug: "cung-menh", canonicalUrl: "/kien-thuc-tu-vi/bai-khac" })).toBe(false);
   });
 });

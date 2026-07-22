@@ -248,9 +248,9 @@ describe("AI reading format", () => {
 
     const result = await generateFreeOverview(sampleChart());
 
-    expect(FREE_OVERVIEW_MIN_WORDS).toBe(1400);
-    expect(FREE_OVERVIEW_MAX_WORDS).toBe(1650);
-    expect(FREE_OVERVIEW_VERSION).toBe("free-llm-overview-v14");
+    expect(FREE_OVERVIEW_MIN_WORDS).toBe(520);
+    expect(FREE_OVERVIEW_MAX_WORDS).toBe(950);
+    expect(FREE_OVERVIEW_VERSION).toBe("free-block-preview-v1");
     expect(result.model).toBe("deepseek/deepseek-v4-flash");
     expect(result).not.toHaveProperty("prompt");
     expect(isCompleteFreeOverview(result.content)).toBe(true);
@@ -265,7 +265,7 @@ describe("AI reading format", () => {
         providerOrder: ["deepseek"],
       }),
     );
-    expect(String(llmRouterMocks.generateWithLlmRouter.mock.calls[0][0].prompt)).toContain("1.500 từ");
+    expect(String(llmRouterMocks.generateWithLlmRouter.mock.calls[0][0].prompt)).toContain("520-950 từ");
   });
 
   it("falls back to the instant seed overview when the free LLM is unavailable or invalid", async () => {

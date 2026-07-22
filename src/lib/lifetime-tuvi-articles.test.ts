@@ -4,6 +4,8 @@ import { seedArticles } from "@/lib/content";
 
 const contentSource = readFileSync("src/lib/content.ts", "utf8");
 const pageSource = readFileSync("src/app/xem-tu-vi-tron-doi/page.tsx", "utf8");
+const rootArticleRouteSource = readFileSync("src/app/[slug]/page.tsx", "utf8");
+const knowledgeArticleRouteSource = readFileSync("src/app/kien-thuc-tu-vi/[slug]/page.tsx", "utf8");
 
 const lifetimeArticleSlugs = [
   "tu-vi-tron-doi-tuoi-ky-dau-1969-nam-mang",
@@ -17,16 +19,18 @@ describe("lifetime Tu vi SEO article cluster", () => {
   it("publishes the first five detailed lifetime age articles", () => {
     for (const slug of lifetimeArticleSlugs) {
       expect(contentSource).toContain(`slug: "${slug}"`);
-      expect(contentSource).toContain(`canonicalUrl: \`/kien-thuc-tu-vi/\${input.slug}\``);
-      expect(pageSource).toContain(`/kien-thuc-tu-vi/${slug}`);
+      expect(contentSource).toContain(`canonicalUrl: \`/\${input.slug}\``);
+      expect(pageSource).toContain(`/${slug}`);
     }
   });
 
   it("keeps the article template useful for SEO readers", () => {
     expect(contentSource).toContain("categoryId: \"cat-van-han\"");
     expect(contentSource).toContain("## Tóm tắt nhanh");
+    expect(contentSource).toContain("## Cơ sở tử vi dùng trong bài");
     expect(contentSource).toContain("## Công việc và đường sự nghiệp");
     expect(contentSource).toContain("## Tiền bạc, tích lũy và đầu tư");
+    expect(contentSource).toContain("## Hợp kỵ, phong thủy và việc nên cân nhắc");
     expect(contentSource).toContain("## Bảng đọc nhanh theo giai đoạn");
     expect(contentSource).toContain("## Đọc tiếp trong cụm Tử vi trọn đời");
     expect(contentSource).toContain("[trang Tử vi trọn đời](/xem-tu-vi-tron-doi)");
@@ -39,7 +43,7 @@ describe("lifetime Tu vi SEO article cluster", () => {
       const article = seedArticles.find((item) => item.slug === slug);
       expect(article).toBeTruthy();
       expect(article?.categoryId).toBe("cat-van-han");
-      expect(article?.canonicalUrl).toBe(`/kien-thuc-tu-vi/${slug}`);
+      expect(article?.canonicalUrl).toBe(`/${slug}`);
       expect(article?.faqs).toHaveLength(3);
 
       const content = article?.content || "";
@@ -50,5 +54,11 @@ describe("lifetime Tu vi SEO article cluster", () => {
       expect(internalLinkCount).toBeGreaterThanOrEqual(8);
       expect(content).not.toMatch(/chắc chắn (giàu|phát tài|hôn nhân|khỏi bệnh|thành công)/i);
     }
+  });
+
+  it("serves lifetime articles from root slugs and redirects old knowledge URLs", () => {
+    expect(rootArticleRouteSource).toContain("isLifetimeTuViSlug");
+    expect(rootArticleRouteSource).toContain("sectionName=\"Tử vi trọn đời\"");
+    expect(knowledgeArticleRouteSource).toContain("redirect(canonicalPath)");
   });
 });

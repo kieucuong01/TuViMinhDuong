@@ -4,6 +4,7 @@ import { listArticles } from "@/lib/data";
 import { DATE_PURPOSE_PAGES } from "@/lib/date-purpose-pages";
 import { AGE_TOOL_PAGES } from "@/lib/age-tools";
 import { SUPPORT_STARS } from "@/lib/pseo-registry";
+import { articlePath } from "@/lib/article-path";
 import { isSelfCanonicalArticle, robotsAllowsIndex } from "@/lib/seo";
 
 const STATIC_LAST_MODIFIED = new Date("2026-05-21T00:00:00+07:00");
@@ -62,7 +63,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: route.priority,
     })),
     ...indexableArticles.map((article) => ({
-      url: `${APP_URL}/kien-thuc-tu-vi/${article.slug}`,
+      url: `${APP_URL}${articlePath(article)}`,
       lastModified: article.updatedAt || article.publishedAt || STATIC_LAST_MODIFIED,
       changeFrequency: "weekly" as const,
       priority: 0.7,
