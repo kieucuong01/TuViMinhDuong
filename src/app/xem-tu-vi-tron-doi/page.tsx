@@ -1,43 +1,32 @@
 import Link from "next/link";
-import {
-  BookOpenText,
-  CalendarDays,
-  CheckCircle2,
-  Compass,
-  Layers3,
-  Search,
-  ShieldCheck,
-  Sparkles,
-  UserRound,
-} from "lucide-react";
-import { ChartForm } from "@/components/chart-form";
+import { BookOpenText, CalendarDays, Compass, Layers3, Search, ShieldCheck, Sparkles, UserRound } from "lucide-react";
 import { routeMetadata } from "@/lib/metadata";
 import { faqJsonLd, itemListJsonLd, webPageJsonLd } from "@/lib/seo";
 
 export const revalidate = 300;
 
 export const metadata = routeMetadata({
-  title: "Tử vi trọn đời cho nam nữ theo lá số cá nhân",
+  title: "Tử vi trọn đời cho nam nữ theo từng tuổi",
   description:
-    "Xem Tử vi trọn đời cho nam nữ theo năm sinh, giới tính và lá số cá nhân. Lập lá số miễn phí, đọc 12 cung, đại vận và bản FULL khi cần luận sâu.",
+    "Xem Tử vi trọn đời cho nam nữ theo từng tuổi, năm sinh và can chi. Có nội dung tổng quan, công việc, tiền bạc, tình cảm, gia đạo và lưu ý vận hạn.",
   path: "/xem-tu-vi-tron-doi",
-  imageSubtitle: "Tử vi trọn đời cho nam nữ theo năm sinh, giới tính, 12 cung và đại vận",
+  imageSubtitle: "Tử vi trọn đời cho nam nữ theo từng tuổi, năm sinh, can chi và vận hạn",
 });
 
 const updatedAt = "22/07/2026";
 
 const readingLayers = [
   {
-    title: "Nền lá số",
-    body: "Khóa đúng ngày giờ sinh, giới tính, lịch âm/dương và bố cục 12 cung trước khi đọc dài hạn.",
+    title: "Nền tuổi",
+    body: "Dùng năm sinh, can chi, ngũ hành nạp âm và giới tính để định hướng phần đọc nhanh.",
   },
   {
     title: "Trục đời sống",
-    body: "Ghép Mệnh - Thân với Tài Bạch, Quan Lộc, Phu Thê, Phúc Đức, Điền Trạch thay vì phán từng cung riêng lẻ.",
+    body: "Tách rõ công việc, tiền bạc, tình cảm, gia đạo và sức khỏe để người đọc tìm đúng phần cần xem.",
   },
   {
-    title: "Vận theo thời gian",
-    body: "Đặt đại vận, tiểu vận và năm đang xem lên nền lá số để phân biệt xu hướng dài hạn với nhịp tạm thời.",
+    title: "Giới hạn luận giải",
+    body: "Luận theo tuổi là bản tổng quan. Giờ sinh và lá số cá nhân vẫn làm thay đổi nhiều chi tiết sâu.",
   },
 ];
 
@@ -48,7 +37,10 @@ const lifetimeCards = [
     year: "1969",
     canChi: "Kỷ Dậu",
     gender: "Nam mạng",
-    body: "Gợi ý cách nhìn công việc, tiền bạc, gia đạo và đại vận theo lá số cá nhân thay vì chỉ dựa vào tuổi âm.",
+    overview: "Kỷ Dậu nam mạng thường có xu hướng sống nguyên tắc, trọng chữ tín và thích tự tay kiểm soát việc quan trọng. Giai đoạn trẻ dễ chịu áp lực về nghề nghiệp hoặc trách nhiệm gia đình, nhưng càng về sau càng hợp cách làm bền bỉ, tích lũy chậm và giữ uy tín.",
+    work: "Công việc hợp môi trường cần kinh nghiệm, quy trình, kỹ thuật, quản lý vận hành hoặc vai trò cố vấn. Tiền bạc nên đi theo hướng chắc, tránh hùn hạp cảm tính và các quyết định đầu tư chỉ dựa vào lời rủ rê.",
+    family: "Tình cảm và gia đạo cần mềm lời hơn khi góp ý. Người tuổi này dễ đúng lý nhưng khô cách nói; biết lắng nghe sẽ giảm xung đột với bạn đời và con cháu.",
+    caution: "Vận trình nên tránh cố ôm mọi việc một mình. Sức khỏe cần để ý tiêu hóa, xương khớp, giấc ngủ và thói quen làm việc quá sức.",
   },
   {
     id: "tu-vi-tron-doi-ky-dau-1969-nu-mang",
@@ -56,7 +48,10 @@ const lifetimeCards = [
     year: "1969",
     canChi: "Kỷ Dậu",
     gender: "Nữ mạng",
-    body: "Tập trung đọc Mệnh - Thân, Phu Thê, Tài Bạch và các giai đoạn dễ đổi hướng trong đời sống.",
+    overview: "Kỷ Dậu nữ mạng thường tháo vát, biết lo xa và có khả năng giữ nếp nhà. Điểm mạnh là sự bền bỉ, biết tính toán, nhưng đôi lúc dễ tự đặt tiêu chuẩn cao khiến bản thân mệt.",
+    work: "Công việc hợp các vai trò quản lý tài chính gia đình, kinh doanh nhỏ, dịch vụ, hành chính, chăm sóc khách hàng hoặc nghề cần sự tỉ mỉ. Tiền bạc tốt khi có sổ sách rõ, không nên cho vay vì nể tình.",
+    family: "Gia đạo nên tránh ôm hết phần lo rồi sinh tủi thân. Khi phân chia trách nhiệm rõ, quan hệ vợ chồng và con cái nhẹ hơn.",
+    caution: "Các giai đoạn đổi nhà, đổi việc hoặc lo chuyện con cái cần đi từng bước. Không nên lấy cảm giác bất an ngắn hạn làm quyết định dài hạn.",
   },
   {
     id: "tu-vi-tron-doi-nham-thin-2012-nam-mang",
@@ -64,7 +59,10 @@ const lifetimeCards = [
     year: "2012",
     canChi: "Nhâm Thìn",
     gender: "Nam mạng",
-    body: "Phù hợp để phụ huynh tham khảo nền tính cách, học tập, môi trường phát triển và nhịp vận theo từng chặng.",
+    overview: "Nhâm Thìn nam mạng có nền tính cách nhanh nhạy, tò mò và dễ bị cuốn vào những việc có tính khám phá. Khi được định hướng đúng, tuổi này phát triển tốt qua học tập, kỹ năng số và môi trường có kỷ luật vừa phải.",
+    work: "Đường học tập nên ưu tiên tư duy logic, ngoại ngữ, công nghệ, nghiên cứu hoặc các môn cần quan sát. Về sau hợp nghề có không gian phát triển, không quá gò trong một khuôn cứng.",
+    family: "Gia đình nên hướng dẫn bằng quy tắc rõ thay vì ép bằng áp lực. Trẻ tuổi này cần được giải thích lý do, nếu chỉ cấm đoán dễ phản ứng ngược.",
+    caution: "Cần rèn sự kiên trì, quản lý thời gian và khả năng hoàn thành việc nhỏ. Tránh để thiết bị số làm giảm tập trung.",
   },
   {
     id: "tu-vi-tron-doi-nham-thin-2012-nu-mang",
@@ -72,7 +70,10 @@ const lifetimeCards = [
     year: "2012",
     canChi: "Nhâm Thìn",
     gender: "Nữ mạng",
-    body: "Đọc theo lá số đầy đủ giúp tránh kết luận quá sớm chỉ vì cùng năm sinh hoặc cùng can chi.",
+    overview: "Nhâm Thìn nữ mạng thường có trực giác tốt, dễ học nhanh khi có cảm hứng và thích được công nhận. Nền tuổi này nên được nuôi dưỡng bằng sự tự tin, kỷ luật mềm và môi trường học tập có tính sáng tạo.",
+    work: "Học tập hợp các nhóm môn ngôn ngữ, nghệ thuật ứng dụng, công nghệ, truyền thông hoặc phân tích. Khi lớn lên, nên chọn việc có cả tính chuyên môn lẫn giao tiếp.",
+    family: "Gia đạo cần chú ý cách động viên. Lời so sánh quá nhiều dễ làm trẻ thu mình hoặc cố chứng minh bản thân quá mức.",
+    caution: "Nên rèn thói quen ngủ nghỉ, vận động và tự quản cảm xúc từ sớm. Khi gặp áp lực học tập, cần chia nhỏ mục tiêu thay vì dồn nén.",
   },
   {
     id: "tu-vi-tron-doi-tan-mao-2011-nam-mang",
@@ -80,7 +81,10 @@ const lifetimeCards = [
     year: "2011",
     canChi: "Tân Mão",
     gender: "Nam mạng",
-    body: "Xem nền Mệnh, cung học tập, quan hệ gia đình và các đại vận đầu đời trên dữ liệu sinh cụ thể.",
+    overview: "Tân Mão nam mạng thường nhạy cảm, quan sát kỹ và phản ứng nhanh với môi trường xung quanh. Nếu được đặt vào nếp sinh hoạt ổn định, tuổi này dễ phát huy sự khéo léo và khả năng học từ chi tiết.",
+    work: "Đường học tập nên chú trọng nền tảng, không ép nhảy quá nhanh. Về nghề nghiệp, hợp các việc cần thẩm mỹ, phân tích, kỹ năng mềm, công nghệ ứng dụng hoặc hỗ trợ chuyên môn.",
+    family: "Trong gia đình, nên nói rõ kỳ vọng và ghi nhận tiến bộ nhỏ. Tuổi này không hợp cách dạy quá gay gắt hoặc thay đổi quy tắc liên tục.",
+    caution: "Cần rèn sự quyết đoán và sức bền. Khi thiếu tự tin, dễ trì hoãn hoặc né việc khó.",
   },
   {
     id: "tu-vi-tron-doi-tan-mao-2011-nu-mang",
@@ -88,7 +92,10 @@ const lifetimeCards = [
     year: "2011",
     canChi: "Tân Mão",
     gender: "Nữ mạng",
-    body: "Dùng lá số cá nhân để đọc khuynh hướng dài hạn, không gom mọi người cùng tuổi vào một mẫu cố định.",
+    overview: "Tân Mão nữ mạng có nét mềm, tinh tế và dễ để ý cảm xúc của người khác. Điểm mạnh nằm ở sự khéo léo, nhưng cần học cách đặt ranh giới để không bị cuốn vào kỳ vọng bên ngoài.",
+    work: "Học tập và nghề nghiệp hợp các lĩnh vực cần giao tiếp, thẩm mỹ, chăm sóc, thiết kế, ngôn ngữ hoặc phân tích dữ liệu nhẹ. Thành tựu đến tốt hơn khi có lịch trình ổn định.",
+    family: "Gia đạo nên khuyến khích bày tỏ suy nghĩ thật. Nếu bị chê nhiều, tuổi này dễ giữ trong lòng và mất động lực.",
+    caution: "Cần tránh tâm lý làm vừa lòng mọi người. Sức khỏe nên chú ý mắt, giấc ngủ và vận động đều.",
   },
   {
     id: "tu-vi-tron-doi-at-hoi-1995-nam-mang",
@@ -96,7 +103,10 @@ const lifetimeCards = [
     year: "1995",
     canChi: "Ất Hợi",
     gender: "Nam mạng",
-    body: "Nên xem kỹ trục Quan Lộc - Tài Bạch - Thiên Di khi đang xây sự nghiệp, đổi việc hoặc tự kinh doanh.",
+    overview: "Ất Hợi nam mạng thường có lòng tự trọng, giàu tình nghĩa và không thích bị thúc ép. Tuổi này hợp cách đi đường dài: xây kỹ năng, giữ uy tín, chọn bạn đồng hành ít nhưng chắc.",
+    work: "Sự nghiệp tốt khi có chuyên môn rõ, đặc biệt trong kinh doanh dịch vụ, công nghệ, vận hành, tài chính cá nhân hoặc nghề cần quan hệ bền. Tiền bạc cần tránh cả tin, nhất là khi người quen rủ góp vốn.",
+    family: "Tình cảm cần sự thẳng thắn. Khi im lặng quá lâu, hiểu lầm dễ tích lại thành khoảng cách.",
+    caution: "Giai đoạn lập nghiệp nên ưu tiên quỹ dự phòng, tránh tiêu vì sĩ diện. Sức khỏe cần để ý gan mật, tiêu hóa và thói quen thức khuya.",
   },
   {
     id: "tu-vi-tron-doi-at-hoi-1995-nu-mang",
@@ -104,7 +114,10 @@ const lifetimeCards = [
     year: "1995",
     canChi: "Ất Hợi",
     gender: "Nữ mạng",
-    body: "Đọc cân bằng giữa công việc, tài chính, tình cảm và nhịp đại vận để có góc nhìn thực tế hơn.",
+    overview: "Ất Hợi nữ mạng thường sống tình cảm, có duyên với người xung quanh và dễ lo cho gia đình. Điểm cần cân bằng là đừng để sự nhường nhịn biến thành chịu đựng.",
+    work: "Công việc hợp môi trường có tính chăm sóc, tư vấn, dịch vụ, sáng tạo nội dung, giáo dục hoặc kinh doanh cá nhân. Tài chính tốt hơn khi tách bạch tiền chung, tiền riêng và khoản dự phòng.",
+    family: "Tình cảm thuận khi có người bạn đời biết chia sẻ trách nhiệm. Không nên tự ôm hết chuyện nhà rồi mong người khác tự hiểu.",
+    caution: "Các năm đổi việc, sinh con, mua nhà hoặc đầu tư lớn cần tính dòng tiền trước. Đừng ra quyết định vì áp lực tuổi tác.",
   },
   {
     id: "tu-vi-tron-doi-at-suu-1985-nam-mang",
@@ -112,7 +125,10 @@ const lifetimeCards = [
     year: "1985",
     canChi: "Ất Sửu",
     gender: "Nam mạng",
-    body: "Phù hợp khi cần soi lại giai đoạn giữa đời: trách nhiệm gia đình, tài sản, sự nghiệp và sức bền tinh thần.",
+    overview: "Ất Sửu nam mạng thường chịu khó, giữ trách nhiệm và có sức bền tốt. Đời sống dễ đi lên bằng tích lũy thực tế hơn là may mắn đột ngột.",
+    work: "Sự nghiệp hợp các lĩnh vực vận hành, kỹ thuật, xây dựng, tài sản, quản lý đội nhóm hoặc kinh doanh có tài sản nền. Tiền bạc nên ưu tiên tài sản thật, kế hoạch dài hạn và hợp đồng rõ.",
+    family: "Gia đạo cần tránh kiểu im lặng chịu đựng. Khi nói rõ nhu cầu và giới hạn, quan hệ thân gần sẽ bớt nặng.",
+    caution: "Không nên cố chứng minh bằng cách làm quá sức. Cần giữ nhịp nghỉ, khám sức khỏe định kỳ và quản trị nợ.",
   },
   {
     id: "tu-vi-tron-doi-at-suu-1985-nu-mang",
@@ -120,7 +136,10 @@ const lifetimeCards = [
     year: "1985",
     canChi: "Ất Sửu",
     gender: "Nữ mạng",
-    body: "Kết hợp 12 cung với vận hạn để đọc các lựa chọn lớn, không dùng tử vi thay cho quyết định cá nhân.",
+    overview: "Ất Sửu nữ mạng thường thực tế, bền bỉ và giỏi xoay xở. Nhiều việc trong nhà hoặc công việc có thể dựa vào người tuổi này, nhưng chính vì vậy dễ bị quá tải.",
+    work: "Công việc hợp quản lý, tài chính, giáo dục, chăm sóc khách hàng, bất động sản, vận hành hoặc nghề cần uy tín lâu năm. Tiền bạc nên có kế hoạch riêng, không chỉ dựa vào gia đình.",
+    family: "Tình cảm cần chia sẻ trách nhiệm rõ ràng. Người tuổi này càng biết nói nhu cầu, gia đạo càng bớt áp lực.",
+    caution: "Nên tránh dồn việc, dồn cảm xúc và dồn tiền vào một chỗ. Sức khỏe cần chú ý xương khớp, nội tiết và giấc ngủ.",
   },
   {
     id: "tu-vi-tron-doi-at-mao-1975-nam-mang",
@@ -128,7 +147,10 @@ const lifetimeCards = [
     year: "1975",
     canChi: "Ất Mão",
     gender: "Nam mạng",
-    body: "Gợi ý các cung nên đối chiếu khi nhìn lại sự nghiệp, tài sản, con cái và kế hoạch cho chặng sau.",
+    overview: "Ất Mão nam mạng có nét mềm trong ứng xử nhưng bên trong khá kiên định. Tuổi này thường thuận khi biết dùng kinh nghiệm, quan hệ và uy tín để tạo giá trị dài hạn.",
+    work: "Công việc hợp vai trò cố vấn, quản lý, kinh doanh dịch vụ, giáo dục, pháp lý, tài sản hoặc những việc cần sự tin cậy. Tài chính nên ưu tiên bảo toàn và chuyển giao kinh nghiệm hơn là mạo hiểm lớn.",
+    family: "Gia đạo cần sự hiện diện và lắng nghe. Đừng để công việc hoặc trách nhiệm bên ngoài làm xa cách người thân.",
+    caution: "Giai đoạn sau trung niên nên giảm việc ôm đồm, để ý huyết áp, giấc ngủ và nhịp sinh hoạt.",
   },
   {
     id: "tu-vi-tron-doi-at-mao-1975-nu-mang",
@@ -136,80 +158,44 @@ const lifetimeCards = [
     year: "1975",
     canChi: "Ất Mão",
     gender: "Nữ mạng",
-    body: "Đọc theo lá số giúp tách bạch nền tuổi, môi trường sống và lựa chọn thực tế của từng người.",
+    overview: "Ất Mão nữ mạng thường tinh tế, biết giữ hòa khí và có khả năng quán xuyến gia đình. Điểm mạnh là sự mềm dẻo, nhưng cần tránh nhịn quá lâu rồi mệt trong lòng.",
+    work: "Công việc hợp dịch vụ, tư vấn, giáo dục, kinh doanh gia đình hoặc vai trò kết nối. Tiền bạc tốt khi có kế hoạch bảo toàn, không nên đứng tên hoặc bảo lãnh vì nể.",
+    family: "Tình cảm thuận khi có đối thoại đều đặn. Với con cái, nên chuyển từ kiểm soát sang đồng hành để giảm va chạm.",
+    caution: "Nên dành thời gian cho sức khỏe, bạn bè và sở thích riêng. Vận sau tốt hơn khi biết buông bớt trách nhiệm không còn thuộc về mình.",
   },
 ];
 
 const relatedLinks = [
-  {
-    href: "/kien-thuc-tu-vi/la-so-tu-vi-tron-doi",
-    title: "Lá số tử vi trọn đời là gì?",
-    body: "Nền tảng để hiểu vì sao cần ngày giờ sinh trước khi luận dài hạn.",
-  },
-  {
-    href: "/kien-thuc-tu-vi/cach-doc-la-so-tu-vi-cho-nguoi-moi",
-    title: "Cách đọc lá số tử vi cho người mới",
-    body: "Bắt đầu từ Mệnh, Thân, tam hợp, xung chiếu và các cung trọng tâm.",
-  },
-  {
-    href: "/kien-thuc-tu-vi/cung-menh-cung-than",
-    title: "Cung Mệnh và cung Thân",
-    body: "Hai trục quan trọng khi đọc nền tính cách và hướng đời sống.",
-  },
-  {
-    href: "/kien-thuc-tu-vi/12-cung-trong-la-so-tu-vi",
-    title: "12 cung trong lá số tử vi",
-    body: "Bản đồ để đối chiếu công việc, tiền bạc, gia đình và quan hệ.",
-  },
-  {
-    href: "/kien-thuc-tu-vi/dai-van-la-gi",
-    title: "Đại vận là gì?",
-    body: "Cách nhìn các chặng vận dài hạn mà không phán tuyệt đối.",
-  },
-  {
-    href: "/xem-ngay",
-    title: "Xem ngày tốt xấu",
-    body: "Tra cứu ngày theo việc cụ thể khi cần chọn thời điểm hành động.",
-  },
-];
-
-const fullReportItems = [
-  "Tổng quan khí chất, điểm mạnh và phần cần tự điều chỉnh.",
-  "12 cung chính với trọng tâm công việc, tiền bạc, gia đình, tình cảm và sức khỏe.",
-  "Đại vận, vận năm và gợi ý hành động thực tế để tự đối chiếu.",
-  "Bản đọc được lưu trong tài khoản; đã mở thì xem lại không trừ thêm xu.",
-];
+  ["/kien-thuc-tu-vi/la-so-tu-vi-tron-doi", "Lá số tử vi trọn đời là gì?", "Hiểu khác nhau giữa luận theo tuổi và luận theo lá số cá nhân."],
+  ["/kien-thuc-tu-vi/cach-doc-la-so-tu-vi-cho-nguoi-moi", "Cách đọc lá số tử vi cho người mới", "Bắt đầu từ Mệnh, Thân, tam hợp, xung chiếu và các cung trọng tâm."],
+  ["/kien-thuc-tu-vi/12-cung-trong-la-so-tu-vi", "12 cung trong lá số tử vi", "Bản đồ để đối chiếu công việc, tiền bạc, gia đình và quan hệ."],
+  ["/kien-thuc-tu-vi/dai-van-la-gi", "Đại vận là gì?", "Cách nhìn các chặng vận dài hạn mà không phán tuyệt đối."],
+] as const;
 
 const futureTools = ["Xem Tử vi 2026", "Tử vi tài lộc & Đầu tư", "Tương hợp lá số"];
 
 const faqs = [
   {
-    question: "Tử vi trọn đời cho nam nữ có giống nhau nếu cùng năm sinh không?",
+    question: "Có cần lập lá số mới xem được tử vi trọn đời không?",
     answer:
-      "Không hoàn toàn giống nhau. Cùng năm sinh chỉ cho một phần nền can chi; lá số còn phụ thuộc ngày sinh, giờ sinh, giới tính, cục, 12 cung, sao và vận hạn từng giai đoạn.",
+      "Không. Trang này có nội dung xem nhanh theo tuổi, năm sinh và nam nữ. Nếu muốn cá nhân hóa sâu hơn theo giờ sinh, cung Mệnh, cung Thân và đại vận riêng, bạn có thể lập lá số sau.",
   },
   {
-    question: "Xem Tử vi trọn đời có phải là lời khẳng định chắc chắn về tương lai không?",
+    question: "Tử vi trọn đời theo tuổi có chính xác tuyệt đối không?",
     answer:
-      "Không. Trang đọc theo hướng tham khảo có điều kiện: xem xu hướng dài hạn, đối chiếu dữ liệu sinh và bối cảnh thật, không dùng lá số như một bản án số phận.",
+      "Không. Luận theo tuổi là lớp tổng quan, phù hợp để tham khảo xu hướng. Ngày sinh, giờ sinh, môi trường sống và lựa chọn cá nhân vẫn làm kết quả thực tế khác nhau.",
   },
   {
-    question: "Tôi cần chuẩn bị gì trước khi xem Tử vi trọn đời?",
+    question: "Nam mạng và nữ mạng cùng năm sinh khác nhau ở điểm nào?",
     answer:
-      "Bạn nên chuẩn bị ngày sinh, giờ sinh gần đúng, giới tính và biết mình dùng lịch âm hay dương. Nếu chưa chắc giờ sinh, hãy chọn khung giờ gần nhất rồi đối chiếu lại sau.",
-  },
-  {
-    question: "Trang này khác gì các bài tử vi trọn đời theo tuổi cố định?",
-    answer:
-      "Các bài theo tuổi giúp tra cứu nhanh. Lá số cá nhân giúp đọc sâu hơn vì xét ngày giờ sinh, bố cục sao, cung Mệnh - Thân, đại vận và các cung đời sống của riêng từng người.",
+      "Cùng năm sinh có chung can chi và nạp âm, nhưng cách nhìn cung mệnh, vai trò gia đình, nhịp đời sống và trọng tâm quyết định thường khác nhau nên cần tách nam mạng và nữ mạng.",
   },
 ];
 
 export default function LifetimeTuViPage() {
   const pageLd = webPageJsonLd({
-    name: "Tử vi trọn đời cho nam nữ theo lá số cá nhân",
-    description:
-      "Hub xem Tử vi trọn đời cho nam nữ theo năm sinh, giới tính và lá số cá nhân, có form lập lá số miễn phí và các chủ đề đọc liên quan.",
+    name: "Tử vi trọn đời cho nam nữ theo từng tuổi",
+    description: "Hub xem Tử vi trọn đời theo tuổi, năm sinh và giới tính, có nội dung đọc nhanh ngay trên trang.",
     url: "/xem-tu-vi-tron-doi",
     breadcrumb: [
       { name: "Trang chủ", url: "/" },
@@ -217,13 +203,7 @@ export default function LifetimeTuViPage() {
       { name: "Tử vi trọn đời cho nam nữ", url: "/xem-tu-vi-tron-doi" },
     ],
   });
-
-  const listLd = itemListJsonLd(
-    lifetimeCards.map((item) => ({
-      name: item.title,
-      url: `/xem-tu-vi-tron-doi#${item.id}`,
-    })),
-  );
+  const listLd = itemListJsonLd(lifetimeCards.map((item) => ({ name: item.title, url: `/xem-tu-vi-tron-doi#${item.id}` })));
 
   return (
     <main>
@@ -235,17 +215,17 @@ export default function LifetimeTuViPage() {
         <div className="mx-auto grid max-w-7xl gap-8 px-4 sm:px-6 lg:grid-cols-[1fr_0.85fr] lg:px-8">
           <div>
             <p className="eyebrow">Tử vi trọn đời cho nam nữ</p>
-            <h1 className="section-title max-w-4xl">Tử vi trọn đời cho nam nữ theo năm sinh và lá số cá nhân</h1>
+            <h1 className="section-title max-w-4xl">Tử vi trọn đời theo từng tuổi, có nội dung xem ngay</h1>
             <p className="mt-5 max-w-3xl text-lg leading-8 text-stone-600" data-answer-block="true">
-              Tử vi trọn đời cho nam nữ là cách đọc lá số theo năm sinh, giới tính, 12 cung, sao chính phụ và đại vận để nhìn các xu hướng dài hạn về tính cách, công việc, tiền bạc, tình cảm, gia đạo và sức khỏe. Trên Lá số tinh hoa, bạn lập lá số trước rồi mới đọc luận giải để tránh phán chung chung theo tuổi.
+              Tử vi trọn đời theo tuổi là phần luận nhanh dựa trên năm sinh, can chi, nam mạng hoặc nữ mạng để tham khảo tổng quan về tính cách, công việc, tiền bạc, tình cảm, gia đạo và sức khỏe. Bạn có thể đọc ngay từng tuổi bên dưới, không cần lập lá số trước.
             </p>
             <p className="mt-3 text-sm font-semibold text-stone-500">Cập nhật nội dung: {updatedAt}</p>
             <div className="mt-6 flex flex-wrap gap-3">
-              <Link href="#lap-la-so-tron-doi" className="btn btn-primary btn-large">
-                <Sparkles size={20} /> Lập lá số để xem trọn đời
+              <Link href="#danh-sach-tuoi" className="btn btn-primary btn-large">
+                <Search size={20} /> Xem từng tuổi
               </Link>
-              <Link href="#danh-sach-tuoi" className="btn btn-ghost btn-large">
-                <Search size={20} /> Tra theo tuổi phổ biến
+              <Link href="#doc-sau-hon" className="btn btn-ghost btn-large">
+                <Sparkles size={20} /> Đọc sâu hơn
               </Link>
             </div>
           </div>
@@ -256,8 +236,8 @@ export default function LifetimeTuViPage() {
                 <Layers3 size={24} />
               </span>
               <div>
-                <h2 className="text-2xl font-black text-stone-950">Đọc theo 3 lớp</h2>
-                <p className="mt-2 text-stone-600">Không tách một sao hay một cung để kết luận cả đời.</p>
+                <h2 className="text-2xl font-black text-stone-950">Cách đọc trang này</h2>
+                <p className="mt-2 text-stone-600">Đọc theo tuổi trước, sau đó đối chiếu thêm lá số nếu cần cá nhân hóa.</p>
               </div>
             </div>
             <div className="mt-5 grid gap-3">
@@ -276,95 +256,63 @@ export default function LifetimeTuViPage() {
       <section id="danh-sach-tuoi" className="section">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="section-heading">
-            <p className="eyebrow">Danh mục tra cứu</p>
-            <h2>Xem tử vi trọn đời theo tuổi, năm sinh và nam nữ</h2>
+            <p className="eyebrow">Luận chi tiết từng tuổi</p>
+            <h2>Xem tử vi trọn đời theo năm sinh, can chi và nam nữ</h2>
             <p className="mt-4 text-stone-600">
-              Các nhóm tuổi dưới đây được trình bày như mục tra cứu nhanh. Khi bấm xem chi tiết, hệ thống đưa bạn về form lập lá số để đọc theo ngày giờ sinh thật, không tạo trang mỏng chỉ đổi năm sinh.
+              Mỗi tuổi có phần đọc ngay: tổng quan, công việc - tiền bạc, tình cảm - gia đạo và lưu ý vận hạn. Nội dung dùng để tham khảo, không thay thế quyết định cá nhân.
             </p>
           </div>
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          <div className="grid gap-5">
             {lifetimeCards.map((item) => (
-              <article id={item.id} key={item.id} className="feature-card scroll-mt-24">
-                <div className="flex items-center justify-between gap-3">
+              <article id={item.id} key={item.id} className="scroll-mt-24 rounded-2xl border border-orange-100 bg-white p-5 shadow-sm">
+                <div className="flex flex-wrap items-center gap-3">
                   <span className="rounded-full bg-orange-100 px-3 py-1 text-sm font-black text-orange-700">{item.year}</span>
-                  <span className="text-sm font-black text-stone-500">{item.gender}</span>
+                  <span className="rounded-full bg-stone-100 px-3 py-1 text-sm font-black text-stone-700">{item.canChi}</span>
+                  <span className="rounded-full bg-emerald-50 px-3 py-1 text-sm font-black text-emerald-700">{item.gender}</span>
                 </div>
-                <h3>{item.title}</h3>
-                <dl className="grid grid-cols-2 gap-2 text-sm text-stone-600">
-                  <div className="rounded-xl bg-stone-50 p-3">
-                    <dt className="font-black text-stone-950">Tuổi</dt>
-                    <dd>{item.canChi}</dd>
+                <h3 className="mt-4 text-2xl font-black text-stone-950">{item.title}</h3>
+                <div className="mt-4 grid gap-4 lg:grid-cols-2">
+                  <div className="rounded-2xl bg-orange-50/70 p-4">
+                    <h4 className="font-black text-stone-950">Tổng quan trọn đời</h4>
+                    <p className="mt-2 leading-7 text-stone-700">{item.overview}</p>
                   </div>
-                  <div className="rounded-xl bg-stone-50 p-3">
-                    <dt className="font-black text-stone-950">Giới tính</dt>
-                    <dd>{item.gender}</dd>
+                  <div className="rounded-2xl bg-stone-50 p-4">
+                    <h4 className="font-black text-stone-950">Công việc và tiền bạc</h4>
+                    <p className="mt-2 leading-7 text-stone-700">{item.work}</p>
                   </div>
-                </dl>
-                <p>{item.body}</p>
-                <Link href="#lap-la-so-tron-doi" className="btn btn-ghost mt-2 w-full justify-center">
-                  <UserRound size={18} /> Lập lá số tuổi {item.canChi}
-                </Link>
+                  <div className="rounded-2xl bg-stone-50 p-4">
+                    <h4 className="font-black text-stone-950">Tình cảm và gia đạo</h4>
+                    <p className="mt-2 leading-7 text-stone-700">{item.family}</p>
+                  </div>
+                  <div className="rounded-2xl bg-amber-50 p-4">
+                    <h4 className="font-black text-stone-950">Lưu ý vận hạn</h4>
+                    <p className="mt-2 leading-7 text-stone-700">{item.caution}</p>
+                  </div>
+                </div>
               </article>
             ))}
           </div>
         </div>
       </section>
 
-      <section id="lap-la-so-tron-doi" className="section bg-white/70">
-        <div className="mx-auto grid max-w-7xl gap-8 px-4 sm:px-6 lg:grid-cols-[0.9fr_1.1fr] lg:px-8">
-          <div>
-            <p className="eyebrow">Bước đầu tiên</p>
-            <h2 className="section-title">Lập lá số trước, rồi mới đọc phần trọn đời</h2>
-            <p className="mt-4 text-lg leading-8 text-stone-600">
-              Phần trọn đời chỉ có giá trị khi dữ liệu sinh đủ rõ. Sau khi tạo lá số, bạn sẽ thấy bản tổng quan miễn phí và nút mở bản FULL nếu muốn đi vào 9 chương cá nhân hóa.
-            </p>
-            <ul className="mt-6 grid gap-3 text-stone-700">
-              {fullReportItems.map((item) => (
-                <li key={item} className="flex gap-3 rounded-2xl border border-orange-100 bg-orange-50/50 p-4">
-                  <CheckCircle2 className="mt-1 shrink-0 text-emerald-600" size={20} />
-                  <span>{item}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div className="hero-form-card">
-            <div className="mb-5 text-center">
-              <p className="eyebrow">Nhập thông tin sinh</p>
-              <h2 className="text-2xl font-black text-stone-950">Tạo lá số tử vi miễn phí</h2>
-              <p className="mt-2 text-stone-600">Dùng chính flow lập lá số của Lá số tinh hoa, không cần tạo tài khoản trước.</p>
-            </div>
-            <ChartForm compact adSource="tu_vi_tron_doi" />
-          </div>
-        </div>
-      </section>
-
-      <section className="section">
+      <section id="doc-sau-hon" className="section bg-white/70">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr]">
             <div>
-              <p className="eyebrow">Cách đọc đúng</p>
-              <h2 className="section-title">Tử vi trọn đời không chỉ là năm sinh</h2>
+              <p className="eyebrow">Đọc sâu hơn</p>
+              <h2 className="section-title">Luận theo tuổi là bản mở đầu, không phải lá số cá nhân</h2>
               <p className="mt-4 text-lg leading-8 text-stone-600">
-                Các truy vấn như “tử vi trọn đời tuổi Ất Hợi 1995 nữ mạng” hay “Kỷ Dậu 1969 nam mạng” có giá trị tra cứu, nhưng để luận sâu cần thêm giờ sinh, vị trí sao và mối liên hệ giữa các cung.
+                Nếu chỉ cần tra nhanh, các phần trên là đủ để đọc tổng quan. Khi cần xem kỹ vì sao cùng tuổi nhưng đời sống khác nhau, hãy đối chiếu thêm giờ sinh, cung Mệnh, cung Thân, đại vận và các sao trong 12 cung.
               </p>
+              <Link href="/lap-la-so" className="btn btn-ghost mt-6">
+                <UserRound size={18} /> Lập lá số cá nhân khi cần
+              </Link>
             </div>
             <div className="grid gap-4 sm:grid-cols-3">
               {[
-                {
-                  icon: CalendarDays,
-                  title: "Năm sinh",
-                  body: "Cho nền can chi, mệnh nạp âm và nhóm tuổi để bắt đầu tra cứu.",
-                },
-                {
-                  icon: UserRound,
-                  title: "Nam nữ",
-                  body: "Ảnh hưởng cách an lá số và cách nhìn một số cung đời sống.",
-                },
-                {
-                  icon: Compass,
-                  title: "Lá số",
-                  body: "Quyết định phần đọc sâu qua 12 cung, sao, tam hợp và đại vận.",
-                },
+                { icon: CalendarDays, title: "Năm sinh", body: "Cho nền can chi và nhóm tuổi để đọc nhanh." },
+                { icon: UserRound, title: "Nam nữ", body: "Giúp tách trọng tâm đời sống theo giới tính." },
+                { icon: Compass, title: "Lá số", body: "Dùng khi cần luận sâu theo 12 cung và đại vận." },
               ].map((item) => (
                 <article key={item.title} className="feature-card">
                   <item.icon className="text-orange-600" size={24} />
@@ -377,25 +325,25 @@ export default function LifetimeTuViPage() {
         </div>
       </section>
 
-      <section className="section bg-white/70">
+      <section className="section">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="section-heading">
             <p className="eyebrow">Đọc thêm</p>
             <h2>Chủ đề liên quan đến tử vi trọn đời</h2>
           </div>
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-            {relatedLinks.map((item) => (
-              <Link key={item.href} href={item.href} className="feature-card group">
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+            {relatedLinks.map(([href, title, body]) => (
+              <Link key={href} href={href} className="feature-card group">
                 <BookOpenText className="text-orange-600" size={24} />
-                <h3 className="group-hover:text-orange-700">{item.title}</h3>
-                <p>{item.body}</p>
+                <h3 className="group-hover:text-orange-700">{title}</h3>
+                <p>{body}</p>
               </Link>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="section">
+      <section className="section bg-white/70">
         <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
           <div className="rounded-3xl border border-stone-200 bg-white p-5 sm:p-7">
             <div className="flex items-start gap-3">
@@ -403,7 +351,7 @@ export default function LifetimeTuViPage() {
               <div>
                 <p className="eyebrow">Làm sau</p>
                 <h2 className="text-2xl font-black text-stone-950">Các mục còn lại đã đặt trong tab Tử vi, nhưng chưa mở route riêng</h2>
-                <p className="mt-2 text-stone-600">Tôi giữ chúng ở trạng thái sắp làm để không sinh trang mỏng hoặc công cụ chưa có logic thật.</p>
+                <p className="mt-2 text-stone-600">Giữ trạng thái sắp làm để không sinh công cụ chưa có logic thật.</p>
               </div>
             </div>
             <div className="mt-5 grid gap-3 sm:grid-cols-3">
@@ -421,7 +369,7 @@ export default function LifetimeTuViPage() {
         <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
           <div className="section-heading">
             <p className="eyebrow">Câu hỏi thường gặp</p>
-            <h2>Trước khi xem lá số trọn đời</h2>
+            <h2>Trước khi xem tử vi trọn đời theo tuổi</h2>
           </div>
           <div className="grid gap-3">
             {faqs.map((item) => (
