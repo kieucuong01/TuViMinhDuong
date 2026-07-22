@@ -585,7 +585,246 @@ function enrichArticleContent(slug: string, content: string) {
   return `${content.trim()}\n\n${renderArticleInsightBlock(refresh)}`;
 }
 
+type LifetimeAgeArticleInput = {
+  slug: string;
+  title: string;
+  year: string;
+  canChi: string;
+  gender: "nam mạng" | "nữ mạng";
+  napAm: string;
+  quickFocus: string;
+  summary: string;
+  personality: string;
+  work: string;
+  money: string;
+  family: string;
+  health: string;
+  stages: [string, string][];
+  advice: string;
+};
+
+function lifetimeAgeArticle(input: LifetimeAgeArticleInput): ArticleView {
+  const stageRows = input.stages.map(([stage, note]) => `| ${stage} | ${note} |`).join("\n");
+
+  return article({
+    categoryId: "cat-van-han",
+    title: input.title,
+    slug: input.slug,
+    excerpt: `${input.title} theo tuổi, can chi và ${input.gender}: tổng quan tính cách, công việc, tiền bạc, tình cảm, gia đạo, sức khỏe và lưu ý từng giai đoạn.`,
+    focusKeyword: input.title.toLowerCase(),
+    coverImage: `/articles/${input.slug}.webp`,
+    coverAlt: `Minh họa ${input.title} trên Lá số tinh hoa`,
+    ogImage: `/articles/${input.slug}.webp`,
+    metaTitle: input.title,
+    metaDescription: `Xem ${input.title}: tổng quan đời sống, công việc, tiền bạc, tình cảm, sức khỏe và bảng giai đoạn để tham khảo trước khi lập lá số.`,
+    canonicalUrl: `/kien-thuc-tu-vi/${input.slug}`,
+    date: "2026-07-22",
+    faqs: [
+      {
+        question: `${input.title} có cần giờ sinh không?`,
+        answer: `Bài này đọc theo năm sinh ${input.year}, can chi ${input.canChi} và ${input.gender}, nên chưa cần giờ sinh. Nếu muốn luận sâu cung Mệnh, cung Thân, đại vận và từng sao, bạn nên lập lá số cá nhân.`,
+      },
+      {
+        question: `${input.title} có chính xác tuyệt đối không?`,
+        answer: "Không. Tử vi theo tuổi là lớp tham khảo tổng quan. Ngày sinh, giờ sinh, môi trường sống, nghề nghiệp và lựa chọn cá nhân vẫn làm kết quả thực tế khác nhau.",
+      },
+      {
+        question: `Nên đọc phần nào trước trong ${input.title}?`,
+        answer: "Nên đọc tóm tắt nhanh trước, sau đó đối chiếu các mục công việc - tiền bạc, tình cảm - gia đạo, sức khỏe và bảng giai đoạn. Nếu đang có việc lớn, hãy lập lá số để xem chi tiết hơn.",
+      },
+    ],
+    content: `${input.title} là bài đọc tổng quan dành cho người muốn tra cứu ngay theo tuổi, không cần nhập ngày giờ sinh trước. Nội dung dưới đây dùng năm sinh ${input.year}, can chi ${input.canChi}, nạp âm ${input.napAm} và phân tách ${input.gender} để giúp bạn nắm những nét chính về tính cách, công việc, tiền bạc, tình cảm, gia đạo, sức khỏe và các giai đoạn đáng chú ý trong đời.
+
+![Minh họa ${input.title} trên Lá số tinh hoa](/articles/${input.slug}.webp)
+
+Nếu cần độ cá nhân hóa cao hơn, hãy xem bài này như lớp mở đầu rồi đối chiếu thêm với [trang Tử vi trọn đời](/xem-tu-vi-tron-doi), bài [lá số tử vi trọn đời là gì](/kien-thuc-tu-vi/la-so-tu-vi-tron-doi) và công cụ [lập lá số tử vi miễn phí](/#lap-la-so). Tử vi nên được dùng như một khung tự soi chiếu và lập kế hoạch, không phải lời cam kết chắc chắn về số phận.
+
+## Tóm tắt nhanh ${input.canChi} ${input.year} ${input.gender}
+
+| Hạng mục | Nội dung tham khảo |
+| --- | --- |
+| Năm sinh | ${input.year} |
+| Can chi | ${input.canChi} |
+| Nạp âm | ${input.napAm} |
+| Giới tính luận giải | ${input.gender} |
+| Trọng tâm nên đọc | ${input.quickFocus} |
+
+${input.summary}
+
+## Cách đọc tử vi trọn đời theo tuổi
+
+Với ${input.title}, phần luận theo tuổi chỉ cho thấy nền khí của người sinh năm ${input.year}; riêng lớp ${input.gender} giúp đặt trọng tâm vào ${input.quickFocus.toLowerCase()} Người cùng tuổi vẫn khác nhau do tháng sinh, ngày sinh, giờ sinh, môi trường gia đình, giáo dục, nghề nghiệp và cách ra quyết định. Vì vậy, điểm nào hợp thì dùng để hiểu mình, điểm nào chưa đúng thì xem như gợi ý cần kiểm chứng bằng lá số cá nhân.
+
+Khi đọc sâu cho ${input.canChi} ${input.gender}, bạn nên hiểu thêm [12 cung trong lá số tử vi](/kien-thuc-tu-vi/12-cung-trong-la-so-tu-vi), nhất là cung Mệnh, cung Quan Lộc, cung Tài Bạch, cung Phu Thê và cung Thiên Di. Nếu muốn biết vì sao mỗi chặng đời đổi khác, bài [đại vận là gì](/kien-thuc-tu-vi/dai-van-la-gi) giúp đặt các giai đoạn của ${input.year} vào một khung dài hơi hơn.
+
+## Tổng quan tính cách và nền đời sống
+
+${input.personality}
+
+Với nhóm tuổi này, điểm quan trọng là không tự gắn nhãn mình quá sớm. Một nét tính cách có thể là điểm mạnh trong hoàn cảnh này nhưng thành áp lực trong hoàn cảnh khác. Người biết dùng ưu điểm đúng chỗ thường đi đường dài vững hơn người chỉ chờ vận may đến nhanh.
+
+## Công việc và đường sự nghiệp
+
+${input.work}
+
+Khi chọn nghề hoặc đổi hướng, nên xem tử vi như một bộ lọc phụ. Việc phù hợp vẫn cần dựa trên năng lực thực tế, thị trường, sức khỏe, trách nhiệm gia đình và khả năng học tiếp. Nếu đang đứng trước quyết định lớn, bạn có thể đọc thêm [cách đọc lá số tử vi cho người mới](/kien-thuc-tu-vi/cach-doc-la-so-tu-vi-cho-nguoi-moi) để hiểu cách đối chiếu cung Quan Lộc, cung Tài Bạch và cung Thiên Di.
+
+## Tiền bạc, tích lũy và đầu tư
+
+${input.money}
+
+Tử vi tiền bạc không nên hiểu là dự báo lời lỗ chắc chắn. Cách đọc là tìm thói quen dễ làm dòng tiền mạnh lên hoặc yếu đi: kiếm tiền bằng chuyên môn nào, có dễ tin người không, có giữ kỷ luật chi tiêu không, có nên ưu tiên an toàn hay tăng trưởng. Với mọi quyết định đầu tư, cần kiểm tra pháp lý, dòng tiền, mức chịu rủi ro và lời khuyên tài chính độc lập.
+
+## Tình cảm và gia đạo
+
+${input.family}
+
+Trong gia đạo, phần tử vi hữu ích nhất thường không nằm ở việc đoán đúng một sự kiện, mà nằm ở cách nhận ra mẫu lặp trong giao tiếp. Khi biết mình dễ cứng lời, dễ nhường quá mức, dễ im lặng hoặc dễ ôm trách nhiệm, bạn có thể sửa nhịp sống trước khi mâu thuẫn thành vấn đề lớn.
+
+## Sức khỏe và thói quen cần giữ
+
+${input.health}
+
+Phần sức khỏe chỉ là gợi ý thói quen, không thay thế tư vấn y khoa. Nếu có triệu chứng kéo dài, đau bất thường hoặc căng thẳng ảnh hưởng sinh hoạt, bạn nên gặp chuyên gia phù hợp. Tử vi nên giúp bạn chú ý sớm hơn đến nhịp sống, không khiến bạn lo lắng hoặc bỏ qua điều trị.
+
+## Bảng đọc nhanh theo giai đoạn
+
+| Giai đoạn | Trọng tâm nên lưu ý |
+| --- | --- |
+${stageRows}
+
+Các mốc trên là khung tham khảo để nhìn lại và lập kế hoạch. Năm nào thật sự thuận hay căng còn cần đối chiếu lưu niên, đại vận và lá số cá nhân. Bạn có thể dùng thêm [xem ngày tốt xấu](/xem-ngay) khi cần chọn thời điểm cho việc cụ thể như khai trương, ký kết, cưới hỏi, chuyển nhà hoặc bắt đầu kế hoạch mới.
+
+## Khi nào nên lập lá số cá nhân?
+
+Nên lập lá số khi bạn cần xem sâu hơn các câu hỏi cụ thể: đổi nghề có phù hợp không, nên giữ tiền theo hướng nào, giai đoạn nào nên chậm lại, mối quan hệ nào cần cẩn trọng, hoặc vì sao cùng tuổi nhưng mỗi người một nhịp đời khác nhau. Lá số cá nhân giúp đưa giờ sinh, cung Mệnh, cung Thân, đại vận và các sao vào cùng một bản đồ, nhờ đó việc đọc bớt chung chung hơn.
+
+${input.advice}
+
+## Đọc tiếp trong cụm Tử vi trọn đời
+
+- Quay lại [hub Tử vi trọn đời theo từng tuổi](/xem-tu-vi-tron-doi) để so sánh ${input.title} với các tuổi đang được mở rộng trong cùng cụm.
+- Đọc [lá số tử vi trọn đời là gì](/kien-thuc-tu-vi/la-so-tu-vi-tron-doi) nếu muốn chuyển từ phần ${input.gender} theo năm sinh sang cách đọc theo lá số cá nhân.
+- Xem [cung Mệnh và cung Thân](/kien-thuc-tu-vi/cung-menh-cung-than) để hiểu trục bản thân trước khi luận sâu ${input.canChi} ${input.year}.
+- Đọc [12 cung trong lá số tử vi](/kien-thuc-tu-vi/12-cung-trong-la-so-tu-vi) để nối các phần nghề nghiệp, tiền bạc, gia đạo và quan hệ của ${input.title}.`,
+  });
+}
+
+const lifetimeAgeArticles = [
+  lifetimeAgeArticle({
+    slug: "tu-vi-tron-doi-tuoi-ky-dau-1969-nam-mang",
+    title: "Tử vi trọn đời tuổi Kỷ Dậu 1969 nam mạng",
+    year: "1969",
+    canChi: "Kỷ Dậu",
+    gender: "nam mạng",
+    napAm: "Đại Trạch Thổ",
+    quickFocus: "Giữ uy tín, quản trị tiền bạc chắc tay, giảm ôm việc và mềm lời trong gia đạo.",
+    summary: "Kỷ Dậu 1969 nam mạng thường là mẫu người coi trọng trách nhiệm, thích rõ ràng và không dễ đặt niềm tin bừa bãi. Khi trẻ dễ vất vả vì muốn tự chứng minh, nhưng càng về sau càng có lợi nếu đi theo hướng tích lũy kinh nghiệm, quản trị ổn định và giữ chữ tín.",
+    personality: "Nam Kỷ Dậu thường có tính nguyên tắc, làm việc có tiêu chuẩn và không thích sự nhập nhằng. Điểm mạnh là bền, kỹ, biết giữ lời và có khả năng đứng mũi chịu sào khi gia đình hoặc công việc cần người quyết. Điểm cần tiết chế là dễ căng khi mọi việc không theo ý, đôi khi nói thẳng quá khiến người thân khó tiếp nhận.",
+    work: "Đường công việc hợp các môi trường cần kinh nghiệm, quy trình và năng lực xử lý thực tế như vận hành, kỹ thuật, tài chính, quản lý đội nhóm, bất động sản, sản xuất, cố vấn hoặc kinh doanh nhỏ có dòng tiền rõ. Càng về sau, lợi thế không nằm ở việc chạy nhanh mà ở năng lực nhìn rủi ro, giữ quan hệ tin cậy và dùng kinh nghiệm để hướng dẫn người khác.",
+    money: "Tiền bạc của Kỷ Dậu nam mạng nên đi theo lối chắc: có quỹ dự phòng, tách tiền gia đình với tiền đầu tư, không hùn hạp chỉ vì thân quen và tránh quyết định lớn khi đang tự ái. Nếu đã có tài sản nền, nên ưu tiên bảo toàn, sửa cấu trúc nợ, giấy tờ pháp lý và kế hoạch chuyển giao hơn là chạy theo cơ hội lợi nhuận cao nhưng thiếu minh bạch.",
+    family: "Trong tình cảm, tuổi này thường thương gia đình bằng hành động nhiều hơn lời nói. Vấn đề dễ gặp là đúng lý nhưng khô cách diễn đạt. Gia đạo thuận hơn khi biết hỏi ý kiến người thân, chia trách nhiệm rõ và không biến sự lo xa thành kiểm soát. Với con cháu, nên chuyển dần từ chỉ đạo sang cố vấn.",
+    health: "Sức khỏe nên để ý tiêu hóa, xương khớp, huyết áp, giấc ngủ và thói quen làm việc kéo dài. Người tuổi này dễ coi nhẹ tín hiệu mệt vì nghĩ mình vẫn chịu được. Càng về sau càng cần lịch nghỉ đều, vận động vừa sức và kiểm tra định kỳ.",
+    stages: [
+      ["Trước 30 tuổi", "Dễ bận lập nền, học nghề, chịu áp lực trách nhiệm hoặc thay đổi môi trường để tìm vị trí vững."],
+      ["30-40 tuổi", "Nên tập trung nghề chính, tích lũy tài sản nền, tránh hùn hạp thiếu giấy tờ."],
+      ["40-50 tuổi", "Giai đoạn dùng kinh nghiệm để ổn định vị thế, nhưng cần giảm nóng nảy trong gia đạo."],
+      ["Sau 50 tuổi", "Phù hợp vai trò cố vấn, quản lý nhẹ, chăm sức khỏe và sắp xếp tài sản rõ ràng."],
+    ],
+    advice: "Lời khuyên chính cho Kỷ Dậu 1969 nam mạng là chọn việc ít nhưng chắc. Khi đã có kinh nghiệm và uy tín, không cần chứng minh bằng cách ôm thêm quá nhiều trách nhiệm. Vận sau thường nhẹ hơn nếu biết giao bớt việc, giữ sổ sách rõ và nói với người thân bằng giọng mềm hơn.",
+  }),
+  lifetimeAgeArticle({
+    slug: "tu-vi-tron-doi-tuoi-ky-dau-1969-nu-mang",
+    title: "Tử vi trọn đời tuổi Kỷ Dậu 1969 nữ mạng",
+    year: "1969",
+    canChi: "Kỷ Dậu",
+    gender: "nữ mạng",
+    napAm: "Đại Trạch Thổ",
+    quickFocus: "Bền bỉ, biết lo xa, cần bớt ôm trách nhiệm và tách bạch tài chính rõ hơn.",
+    summary: "Kỷ Dậu 1969 nữ mạng thường tháo vát, chu đáo và có khả năng giữ nếp nhà. Đây là mẫu người càng từng trải càng biết tính toán, nhưng cũng dễ mệt vì tự đặt tiêu chuẩn cao cho bản thân và khó nhờ người khác chia sẻ.",
+    personality: "Nữ Kỷ Dậu có nét thực tế, kỹ lưỡng, thích mọi việc có trật tự và thường không yên tâm khi giao việc quan trọng cho người thiếu trách nhiệm. Điểm mạnh là khả năng quán xuyến, giữ tiền, giữ lời hứa và duy trì nếp sống ổn định. Điểm cần cân bằng là bớt khắt khe với chính mình, nhất là khi chuyện gia đình không thể hoàn hảo như kế hoạch.",
+    work: "Công việc hợp với các vai trò cần sự tỉ mỉ và uy tín như tài chính gia đình, kế toán, hành chính, dịch vụ khách hàng, kinh doanh nhỏ, chăm sóc, giáo dục, quản lý vận hành hoặc nghề dựa vào kinh nghiệm lâu năm. Nếu làm kinh doanh, nữ Kỷ Dậu nên chọn mô hình dễ kiểm soát chất lượng và dòng tiền thay vì mở rộng quá nhanh.",
+    money: "Tài chính thuận khi có sổ sách, quy tắc chi tiêu và khoản dự phòng riêng. Cần thận trọng với việc cho vay vì nể tình, đứng tên giúp hoặc bảo lãnh khi chưa rõ trách nhiệm pháp lý. Những khoản đầu tư bền, có tài sản thật hoặc dòng tiền kiểm chứng thường hợp hơn các lời mời kiếm nhanh.",
+    family: "Trong gia đạo, nữ Kỷ Dậu hay lo trước cho người khác nên dễ thành người gánh phần nặng. Tình cảm thuận hơn khi nói rõ mong muốn, phân việc cụ thể và cho người thân cơ hội tự chịu trách nhiệm. Không nên im lặng quá lâu rồi tích thành tủi thân.",
+    health: "Sức khỏe nên chú ý tiêu hóa, xương khớp, nội tiết, giấc ngủ và dấu hiệu stress kéo dài. Người tuổi này thường mệt vì nghĩ quá nhiều việc nhỏ. Lịch sinh hoạt đều, vận động nhẹ và giảm việc chăm người khác quá mức sẽ giúp vận sau ổn hơn.",
+    stages: [
+      ["Trước 30 tuổi", "Dễ vất vả vì học cách tự lập, lo gia đình hoặc phải trưởng thành sớm."],
+      ["30-40 tuổi", "Nên xây nền nghề nghiệp và tài chính riêng, tránh để cảm xúc chi phối tiền bạc."],
+      ["40-50 tuổi", "Giai đoạn quán xuyến mạnh, cần chia việc để không quá tải."],
+      ["Sau 50 tuổi", "Nên ưu tiên sức khỏe, tài sản rõ ràng và đời sống tinh thần nhẹ hơn."],
+    ],
+    advice: "Lời khuyên cho Kỷ Dậu 1969 nữ mạng là đừng xem việc tự chịu đựng là thước đo giá trị. Khi biết đặt giới hạn, giữ tiền minh bạch và cho người thân cùng gánh trách nhiệm, vận gia đạo và tài chính thường bớt nặng hơn.",
+  }),
+  lifetimeAgeArticle({
+    slug: "tu-vi-tron-doi-tuoi-at-hoi-1995-nam-mang",
+    title: "Tử vi trọn đời tuổi Ất Hợi 1995 nam mạng",
+    year: "1995",
+    canChi: "Ất Hợi",
+    gender: "nam mạng",
+    napAm: "Sơn Đầu Hỏa",
+    quickFocus: "Xây chuyên môn, chọn bạn đồng hành kỹ, tránh quyết định tài chính vì cả tin hoặc sĩ diện.",
+    summary: "Ất Hợi 1995 nam mạng thường có tình nghĩa, lòng tự trọng và không thích bị ép vào khuôn quá chặt. Tuổi này hợp lối đi đường dài: xây kỹ năng, giữ quan hệ ít nhưng chất lượng, làm việc có uy tín và quản lý tiền bạc bằng nguyên tắc rõ.",
+    personality: "Nam Ất Hợi có xu hướng sống tình cảm nhưng bên trong khá tự trọng. Khi được tôn trọng, họ làm việc có trách nhiệm và biết giúp người khác. Khi bị thúc ép hoặc nghi ngờ, họ dễ im lặng, tránh đối đầu hoặc quyết định theo cảm xúc. Điểm mạnh là sự bền tình, khả năng cảm nhận người khác và tinh thần muốn tạo cuộc sống ổn định.",
+    work: "Sự nghiệp hợp với các lĩnh vực cần chuyên môn và quan hệ bền như công nghệ, vận hành, tài chính cá nhân, kinh doanh dịch vụ, sản phẩm số, tư vấn, chăm sóc khách hàng, logistics hoặc các vai trò kết nối. Không nên đổi hướng chỉ vì thấy người khác thành công nhanh. Tuổi này tiến tốt hơn khi chọn một trục kỹ năng chính rồi bồi thêm quản lý, bán hàng hoặc dữ liệu.",
+    money: "Tài chính cần tránh cả tin, nhất là khi người quen rủ góp vốn, vay mượn hoặc đầu tư theo cảm xúc. Nam Ất Hợi nên có quỹ dự phòng, giới hạn rủi ro từng khoản và nguyên tắc không dùng tiền sinh hoạt để thử cơ hội mới. Khi đã có kỷ luật tiền bạc, tuổi này có thể tích lũy tốt nhờ làm đều và giữ quan hệ uy tín.",
+    family: "Tình cảm cần sự thẳng thắn. Người tuổi này dễ thương bằng hành động nhưng lại ngại nói rõ nhu cầu, khiến hiểu lầm tích lại. Gia đạo thuận hơn khi không im lặng quá lâu, không dùng tiền để tránh đối thoại và biết tách trách nhiệm của mình với trách nhiệm của người khác.",
+    health: "Sức khỏe nên để ý tiêu hóa, gan mật, giấc ngủ và thói quen thức khuya. Giai đoạn lập nghiệp thường dễ căng vì vừa muốn kiếm tiền vừa muốn giữ hình ảnh. Nên duy trì vận động, ngủ đều và hạn chế giải quyết stress bằng chi tiêu hoặc ăn uống thất thường.",
+    stages: [
+      ["Trước 30 tuổi", "Dễ thử nhiều hướng, cần chốt một kỹ năng chính và học quản trị tiền."],
+      ["30-40 tuổi", "Giai đoạn xây vị thế, hợp mở rộng quan hệ chất lượng và tài sản nền."],
+      ["40-50 tuổi", "Nên giảm quyết định cảm tính, củng cố gia đạo và cấu trúc tài chính."],
+      ["Sau 50 tuổi", "Phù hợp chuyển sang cố vấn, đầu tư thận trọng hoặc công việc ít hao sức hơn."],
+    ],
+    advice: "Lời khuyên cho Ất Hợi 1995 nam mạng là chọn người đồng hành kỹ như chọn nghề. Một quan hệ tốt giúp đi xa, nhưng một lời rủ rê thiếu rõ ràng có thể làm hỏng nhiều năm tích lũy. Khi tiền bạc, tình cảm và công việc đều có ranh giới, vận trình thường sáng hơn.",
+  }),
+  lifetimeAgeArticle({
+    slug: "tu-vi-tron-doi-tuoi-at-hoi-1995-nu-mang",
+    title: "Tử vi trọn đời tuổi Ất Hợi 1995 nữ mạng",
+    year: "1995",
+    canChi: "Ất Hợi",
+    gender: "nữ mạng",
+    napAm: "Sơn Đầu Hỏa",
+    quickFocus: "Giữ ranh giới cảm xúc, tách tiền chung - riêng, phát triển nghề có tính chăm sóc hoặc sáng tạo.",
+    summary: "Ất Hợi 1995 nữ mạng thường sống tình cảm, có duyên giao tiếp và dễ tạo thiện cảm. Điểm mạnh là biết quan tâm, biết nhường và có sức bền khi đã chọn đúng việc. Điểm cần giữ là đừng để sự tử tế biến thành chịu đựng quá lâu.",
+    personality: "Nữ Ất Hợi có trực giác tốt, dễ cảm nhận bầu không khí xung quanh và thường muốn giữ hòa khí. Khi có mục tiêu rõ, họ làm việc khá bền và có khả năng gom người, chăm việc, giữ quan hệ. Nhưng nếu thiếu ranh giới, họ dễ bị kéo vào chuyện của người khác, tiêu hao cảm xúc rồi mất tập trung cho kế hoạch riêng.",
+    work: "Công việc hợp với môi trường có tính chăm sóc, tư vấn, giáo dục, dịch vụ, truyền thông, nội dung, thiết kế, kinh doanh cá nhân hoặc các vai trò cần sự tinh tế trong giao tiếp. Nếu đi làm văn phòng, nên chọn nơi có lộ trình kỹ năng rõ. Nếu kinh doanh, nên bắt đầu từ mô hình nhỏ, kiểm soát được chất lượng và không phụ thuộc hoàn toàn vào cảm hứng.",
+    money: "Tài chính tốt hơn khi tách tiền chung, tiền riêng, tiền dự phòng và tiền đầu tư. Nữ Ất Hợi cần tránh chi tiêu để xoa dịu cảm xúc, cho vay vì thương hoặc góp vốn khi chưa có hợp đồng rõ. Khi có thói quen ghi chép và đặt mục tiêu từng quý, tuổi này giữ tiền ổn hơn nhiều.",
+    family: "Trong tình cảm, tuổi này cần người bạn đời biết chia sẻ trách nhiệm và tôn trọng cảm xúc. Không nên tự ôm hết chuyện nhà rồi mong người khác tự hiểu. Gia đạo thuận hơn khi có đối thoại định kỳ về tiền bạc, con cái, công việc và việc chăm sóc hai bên gia đình.",
+    health: "Sức khỏe nên chú ý giấc ngủ, nội tiết, tiêu hóa và dấu hiệu căng thẳng cảm xúc. Người tuổi này dễ để tâm chuyện người khác nên cơ thể mệt trước khi nhận ra mình quá tải. Thói quen vận động nhẹ, viết kế hoạch và giữ khoảng riêng rất cần thiết.",
+    stages: [
+      ["Trước 30 tuổi", "Dễ vừa tìm nghề vừa tìm ranh giới trong tình cảm và tài chính."],
+      ["30-40 tuổi", "Nên ưu tiên kỹ năng kiếm tiền bền, kế hoạch gia đình và tài sản riêng."],
+      ["40-50 tuổi", "Giai đoạn ổn định tốt nếu đã tách bạch trách nhiệm và tiền bạc."],
+      ["Sau 50 tuổi", "Hợp đời sống nhẹ hơn, làm việc theo kinh nghiệm, chăm sức khỏe và tinh thần."],
+    ],
+    advice: "Lời khuyên cho Ất Hợi 1995 nữ mạng là học cách nói rõ trước khi mệt. Khi cảm xúc, tiền bạc và trách nhiệm gia đình được đặt thành nguyên tắc, sự mềm mỏng trở thành lợi thế thay vì gánh nặng.",
+  }),
+  lifetimeAgeArticle({
+    slug: "tu-vi-tron-doi-tuoi-at-suu-1985-nam-mang",
+    title: "Tử vi trọn đời tuổi Ất Sửu 1985 nam mạng",
+    year: "1985",
+    canChi: "Ất Sửu",
+    gender: "nam mạng",
+    napAm: "Hải Trung Kim",
+    quickFocus: "Bền bỉ, hợp tài sản thật và vận hành, cần quản trị nợ, sức khỏe và áp lực chứng minh.",
+    summary: "Ất Sửu 1985 nam mạng thường chịu khó, có trách nhiệm và thích kết quả thực tế. Tuổi này không nhất thiết bứt phá sớm, nhưng có lợi thế tích lũy nếu giữ nhịp đều, chọn tài sản rõ và tránh làm quá sức để chứng minh bản thân.",
+    personality: "Nam Ất Sửu có nền tính cách bền, thực tế, ít thích nói nhiều về khó khăn. Khi đã nhận việc, họ thường cố làm đến nơi đến chốn. Điểm mạnh là sức chịu đựng, tinh thần xây dựng và khả năng đi từng bước. Điểm cần sửa là dễ tự gồng, ngại nhờ hỗ trợ và đôi khi chậm thay đổi khi hoàn cảnh đã khác.",
+    work: "Sự nghiệp hợp với vận hành, kỹ thuật, xây dựng, bất động sản, tài sản, quản lý đội nhóm, sản xuất, tài chính thực tế, chuỗi cung ứng hoặc kinh doanh có tài sản nền. Tuổi này nên chọn chiến lược tăng trưởng có kiểm soát: hiểu chi phí, hiểu hợp đồng, hiểu người cùng làm. Không nên mở rộng chỉ vì muốn chứng minh mình không thua ai.",
+    money: "Tiền bạc nên ưu tiên tài sản thật, dòng tiền rõ, quản trị nợ và kế hoạch dài hạn. Nam Ất Sửu có thể tích lũy tốt khi biết giữ kỷ luật, nhưng dễ bị áp lực gia đình hoặc sĩ diện kéo vào khoản chi lớn. Khi đầu tư, cần tránh vay quá khả năng chịu đựng và luôn kiểm tra pháp lý, thanh khoản, phương án xấu nhất.",
+    family: "Gia đạo cần tránh kiểu im lặng chịu đựng. Người tuổi này thường nghĩ mình lo bằng hành động là đủ, nhưng người thân vẫn cần sự chia sẻ bằng lời. Khi nói rõ nhu cầu, giới hạn và kế hoạch tiền bạc, quan hệ thân gần sẽ bớt nặng.",
+    health: "Sức khỏe nên chú ý xương khớp, lưng, cổ vai gáy, tiêu hóa, huyết áp và giấc ngủ. Đặc biệt cần tránh làm việc kéo dài trong trạng thái căng cứng. Vận sau ổn hơn khi biết nghỉ trước khi cơ thể buộc phải nghỉ.",
+    stages: [
+      ["Trước 30 tuổi", "Dễ làm nhiều để học nghề và chứng minh năng lực, cần giữ nền sức khỏe."],
+      ["30-40 tuổi", "Nên xây tài sản nền, quản trị nợ và chọn cộng sự rõ trách nhiệm."],
+      ["40-50 tuổi", "Giai đoạn củng cố vị thế, tránh ôm việc quá mức và quyết định vì áp lực."],
+      ["Sau 50 tuổi", "Phù hợp giảm nhịp, chuyển sang quản lý/cố vấn và chăm sức khỏe định kỳ."],
+    ],
+    advice: "Lời khuyên cho Ất Sửu 1985 nam mạng là đừng nhầm sức chịu đựng với chiến lược. Làm bền là lợi thế, nhưng vận trình sẽ sáng hơn khi biết chọn việc đáng làm, giữ giấy tờ rõ và bảo vệ sức khỏe như một phần của tài sản.",
+  }),
+] satisfies ArticleView[];
+
 export const seedArticles: ArticleView[] = [
+  ...lifetimeAgeArticles,
   article({
     title: "Xem ngày tốt tháng 6/2026: Ngày đẹp nên chọn, ngày cần tránh",
     slug: "xem-ngay-tot-thang-6-2026",
