@@ -13,10 +13,15 @@ const lifetimeArticleSlugs = [
   "tu-vi-tron-doi-tuoi-at-hoi-1995-nam-mang",
   "tu-vi-tron-doi-tuoi-at-hoi-1995-nu-mang",
   "tu-vi-tron-doi-tuoi-at-suu-1985-nam-mang",
+  "tu-vi-tron-doi-tuoi-at-suu-1985-nu-mang",
+  "tu-vi-tron-doi-tuoi-at-mao-1975-nam-mang",
+  "tu-vi-tron-doi-tuoi-at-mao-1975-nu-mang",
+  "tu-vi-tron-doi-tuoi-giap-ty-1984-nam-mang",
+  "tu-vi-tron-doi-tuoi-giap-ty-1984-nu-mang",
 ];
 
 describe("lifetime Tu vi SEO article cluster", () => {
-  it("publishes the first five detailed lifetime age articles", () => {
+  it("publishes the detailed lifetime age articles that are linked from the hub", () => {
     for (const slug of lifetimeArticleSlugs) {
       expect(contentSource).toContain(`slug: "${slug}"`);
       expect(contentSource).toContain(`canonicalUrl: \`/\${input.slug}\``);
@@ -36,6 +41,7 @@ describe("lifetime Tu vi SEO article cluster", () => {
     expect(contentSource).toContain("[trang Tử vi trọn đời](/xem-tu-vi-tron-doi)");
     expect(contentSource).toContain("[lập lá số tử vi miễn phí](/#lap-la-so)");
     expect(contentSource).toContain("[12 cung trong lá số tử vi](/kien-thuc-tu-vi/12-cung-trong-la-so-tu-vi)");
+    expect(contentSource).toContain("So sánh thêm với [");
   });
 
   it("ships substantial reader-first content for each new age intent", () => {

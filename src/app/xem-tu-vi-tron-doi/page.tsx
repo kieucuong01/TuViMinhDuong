@@ -13,7 +13,7 @@ export const metadata = routeMetadata({
   imageSubtitle: "Tử vi trọn đời cho nam nữ theo từng tuổi, năm sinh, can chi và vận hạn",
 });
 
-const updatedAt = "22/07/2026";
+const updatedAt = "23/07/2026";
 
 const readingLayers = [
   {
@@ -150,6 +150,7 @@ const lifetimeCards: LifetimeCard[] = [
   },
   {
     id: "tu-vi-tron-doi-at-suu-1985-nu-mang",
+    detailsPath: "/tu-vi-tron-doi-tuoi-at-suu-1985-nu-mang",
     title: "Tử vi trọn đời tuổi Ất Sửu 1985 nữ mạng",
     year: "1985",
     canChi: "Ất Sửu",
@@ -161,6 +162,7 @@ const lifetimeCards: LifetimeCard[] = [
   },
   {
     id: "tu-vi-tron-doi-at-mao-1975-nam-mang",
+    detailsPath: "/tu-vi-tron-doi-tuoi-at-mao-1975-nam-mang",
     title: "Tử vi trọn đời tuổi Ất Mão 1975 nam mạng",
     year: "1975",
     canChi: "Ất Mão",
@@ -172,6 +174,7 @@ const lifetimeCards: LifetimeCard[] = [
   },
   {
     id: "tu-vi-tron-doi-at-mao-1975-nu-mang",
+    detailsPath: "/tu-vi-tron-doi-tuoi-at-mao-1975-nu-mang",
     title: "Tử vi trọn đời tuổi Ất Mão 1975 nữ mạng",
     year: "1975",
     canChi: "Ất Mão",
@@ -180,6 +183,30 @@ const lifetimeCards: LifetimeCard[] = [
     work: "Công việc hợp dịch vụ, tư vấn, giáo dục, kinh doanh gia đình hoặc vai trò kết nối. Tiền bạc tốt khi có kế hoạch bảo toàn, không nên đứng tên hoặc bảo lãnh vì nể.",
     family: "Tình cảm thuận khi có đối thoại đều đặn. Với con cái, nên chuyển từ kiểm soát sang đồng hành để giảm va chạm.",
     caution: "Nên dành thời gian cho sức khỏe, bạn bè và sở thích riêng. Vận sau tốt hơn khi biết buông bớt trách nhiệm không còn thuộc về mình.",
+  },
+  {
+    id: "tu-vi-tron-doi-giap-ty-1984-nam-mang",
+    detailsPath: "/tu-vi-tron-doi-tuoi-giap-ty-1984-nam-mang",
+    title: "Tử vi trọn đời tuổi Giáp Tý 1984 nam mạng",
+    year: "1984",
+    canChi: "Giáp Tý",
+    gender: "Nam mạng",
+    overview: "Giáp Tý nam mạng thường nhanh trí, linh hoạt và có khả năng thích nghi tốt. Khi giữ được nguyên tắc, tuổi này tiến bền nhờ chuyên môn, uy tín và sự tỉnh táo hơn là nhờ may mắn ngắn hạn.",
+    work: "Sự nghiệp hợp vận hành, kỹ thuật, kinh doanh dịch vụ, tài chính thực tế, logistics, sản phẩm số hoặc vai trò quản lý cần xử lý nhanh. Tiền bạc nên kỷ luật, tránh chia nhỏ sức vào quá nhiều cơ hội cùng lúc.",
+    family: "Gia đạo thuận hơn khi người tuổi này chia sẻ kế hoạch và áp lực sớm. Thương bằng hành động là tốt, nhưng vẫn cần đối thoại rõ để tránh tích mệt thành khoảng cách.",
+    caution: "Nên để ý giấc ngủ, stress kéo dài, tiêu hóa và thói quen làm việc phân tán. Mọi quyết định tài sản hoặc hùn hạp nên soi kỹ pháp lý và phương án xấu nhất.",
+  },
+  {
+    id: "tu-vi-tron-doi-giap-ty-1984-nu-mang",
+    detailsPath: "/tu-vi-tron-doi-tuoi-giap-ty-1984-nu-mang",
+    title: "Tử vi trọn đời tuổi Giáp Tý 1984 nữ mạng",
+    year: "1984",
+    canChi: "Giáp Tý",
+    gender: "Nữ mạng",
+    overview: "Giáp Tý nữ mạng thường lanh, hiểu việc nhanh và có khả năng xoay xở tốt trong áp lực. Khi có nền nếp rõ, tuổi này tích lũy vững nhờ sự tỉ mỉ và đầu óc thực tế.",
+    work: "Công việc hợp các vai trò cần quán xuyến, kỷ luật và thích nghi như kế toán, vận hành, dịch vụ, giáo dục, kinh doanh thực tế hoặc quản trị nội bộ. Tiền bạc tốt hơn khi tách quỹ rõ và giảm chi vì áp lực.",
+    family: "Gia đạo nhẹ hơn khi trách nhiệm được chia đều. Người tuổi này dễ lo trước và làm trước, nên cần nói nhu cầu sớm thay vì ôm hết để giữ yên cửa nhà.",
+    caution: "Sức khỏe cần chú ý giấc ngủ, nội tiết, stress âm thầm và đau mỏi kéo dài. Các mốc đổi việc, mua bán tài sản hay lo chuyện cha mẹ - con cái nên có quỹ dự phòng rõ.",
   },
 ];
 

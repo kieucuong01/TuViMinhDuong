@@ -606,10 +606,14 @@ type LifetimeAgeArticleInput = {
   health: string;
   stages: [string, string][];
   advice: string;
+  siblingLink?: { href: string; label: string };
 };
 
 function lifetimeAgeArticle(input: LifetimeAgeArticleInput): ArticleView {
   const stageRows = input.stages.map(([stage, note]) => `| ${stage} | ${note} |`).join("\n");
+  const siblingLinkLine = input.siblingLink
+    ? `- So sánh thêm với [${input.siblingLink.label}](${input.siblingLink.href}) nếu bạn muốn đối chiếu khác biệt nam - nữ cùng năm sinh hoặc tuổi sát nhóm quan tâm.\n`
+    : "";
 
   return article({
     categoryId: "cat-van-han",
@@ -723,7 +727,7 @@ ${input.advice}
 ## Đọc tiếp trong cụm Tử vi trọn đời
 
 - Quay lại [hub Tử vi trọn đời theo từng tuổi](/xem-tu-vi-tron-doi) để so sánh ${input.title} với các tuổi đang được mở rộng trong cùng cụm.
-- Đọc [lá số tử vi trọn đời là gì](/kien-thuc-tu-vi/la-so-tu-vi-tron-doi) nếu muốn chuyển từ phần ${input.gender} theo năm sinh sang cách đọc theo lá số cá nhân.
+-${siblingLinkLine ? siblingLinkLine.trimStart() : ""} Đọc [lá số tử vi trọn đời là gì](/kien-thuc-tu-vi/la-so-tu-vi-tron-doi) nếu muốn chuyển từ phần ${input.gender} theo năm sinh sang cách đọc theo lá số cá nhân.
 - Xem [cung Mệnh và cung Thân](/kien-thuc-tu-vi/cung-menh-cung-than) để hiểu trục bản thân trước khi luận sâu ${input.canChi} ${input.year}.
 - Đọc [12 cung trong lá số tử vi](/kien-thuc-tu-vi/12-cung-trong-la-so-tu-vi) để nối các phần nghề nghiệp, tiền bạc, gia đạo và quan hệ của ${input.title}.`,
   });
@@ -864,6 +868,165 @@ const lifetimeAgeArticles = [
       ["Sau 50 tuổi", "Phù hợp giảm nhịp, chuyển sang quản lý/cố vấn và chăm sức khỏe định kỳ."],
     ],
     advice: "Lời khuyên cho Ất Sửu 1985 nam mạng là đừng nhầm sức chịu đựng với chiến lược. Làm bền là lợi thế, nhưng vận trình sẽ sáng hơn khi biết chọn việc đáng làm, giữ giấy tờ rõ và bảo vệ sức khỏe như một phần của tài sản.",
+    siblingLink: {
+      href: "/tu-vi-tron-doi-tuoi-at-suu-1985-nu-mang",
+      label: "Tử vi trọn đời tuổi Ất Sửu 1985 nữ mạng",
+    },
+  }),
+  lifetimeAgeArticle({
+    slug: "tu-vi-tron-doi-tuoi-at-suu-1985-nu-mang",
+    title: "Tử vi trọn đời tuổi Ất Sửu 1985 nữ mạng",
+    year: "1985",
+    canChi: "Ất Sửu",
+    gender: "nữ mạng",
+    napAm: "Hải Trung Kim",
+    cungPhi: "Ly Hỏa, Đông tứ mệnh",
+    animalSymbol: "Trâu biển, thiên can Ất thuộc Mộc, địa chi Sửu thuộc Thổ",
+    compatibility: "mệnh Kim cần nền Thổ để vững và có thể sinh Thủy để mở dòng chảy công việc, nhưng nếu để Hỏa hoặc Mộc biểu hiện thành áp lực cảm xúc, cả nể hoặc ôm việc quá sức thì nhịp sống dễ mất cân bằng.",
+    riskAges: "Với Ất Sửu nữ mạng, các mốc lo nhà cửa, chăm con, đứng tên tài sản, đổi việc hoặc hùn hạp gia đình nên xem kỹ hơn ở giai đoạn giữa 30, đầu 40 và khi chuẩn bị bước sang nhịp sống nhẹ hơn.",
+    fengShui: "Ất Sửu nữ mạng hợp không gian sáng, gọn, có chỗ cất giấy tờ rõ ràng; màu trắng, kem, vàng đất hoặc xanh nhạt dùng vừa phải. Phong thủy nên ưu tiên nếp sinh hoạt điều độ, lịch nghỉ cố định và khu vực làm việc không để việc nhà lẫn việc kiếm tiền chồng lên nhau.",
+    quickFocus: "Giữ ranh giới trách nhiệm, quản trị tiền riêng, bớt ôm việc và chăm sức khỏe như một ưu tiên dài hạn.",
+    summary: "Ất Sửu 1985 nữ mạng thường thực tế, chịu khó và có sức bền tốt trong gia đình lẫn công việc. Khi đi đúng nhịp, tuổi này tích lũy khá vững nhờ uy tín và khả năng lo việc đến nơi đến chốn; điểm cần giữ là đừng để trách nhiệm lâu ngày biến thành quá tải.",
+    personality: "Nữ Ất Sửu thường kín tiếng, làm nhiều hơn nói và có xu hướng giữ sự ổn định cho người thân. Điểm mạnh là bền, chắc, biết lo xa, chịu khó xây nền từng bước và thường giữ được chữ tín. Điểm cần chú ý là dễ tự gồng khi mọi người quen dựa vào mình, lâu dần sinh mệt, ít nhờ hỗ trợ và khó nói ra điều bản thân thật sự cần.",
+    work: "Đường công việc hợp những vai trò cần tính ổn định, trách nhiệm, sự tin cậy và khả năng quán xuyến như quản lý vận hành, kế toán, giáo dục, chăm sóc khách hàng, dịch vụ gia đình, bất động sản, tài chính thực tế, kinh doanh nhỏ hoặc các việc cần bám quy trình. Tuổi này đi xa hơn khi chọn một trục chuyên môn chính rồi bồi thêm kỹ năng tổ chức, thay vì đổi hướng liên tục vì thấy người khác đi nhanh hơn.",
+    money: "Tài chính của Ất Sửu nữ mạng tốt hơn khi có quỹ riêng, sổ theo dõi rõ và nguyên tắc tách bạch tiền gia đình với tiền phòng thân. Tuổi này thường biết giữ tiền nhưng dễ mềm lòng với khoản chi cho người thân, nên cần giới hạn cụ thể cho cho vay, hùn hạp và các khoản mua sắm lớn theo cảm xúc. Khi đầu tư, ưu tiên tài sản hiểu rõ, hợp đồng sáng tỏ và dòng tiền chịu được áp lực xấu nhất trước khi nhìn tới lợi nhuận.",
+    family: "Trong gia đạo, người tuổi này thường là trụ cột hậu cần: lo nhà, lo việc, lo nếp. Điều đó là thế mạnh nhưng cũng dễ thành gánh nặng nếu mọi trách nhiệm dồn về một phía. Gia đình sẽ nhẹ hơn khi nữ Ất Sửu nói thẳng nhu cầu nghỉ ngơi, chia việc nhà, kế hoạch tiền bạc và giới hạn của mình, thay vì chờ người khác tự hiểu. Trong tình cảm, sự điềm tĩnh là lợi thế, nhưng cần tránh tích mệt rồi bùng nổ muộn.",
+    health: "Sức khỏe nên chú ý xương khớp, vai gáy, tiêu hóa, nội tiết, giấc ngủ và dấu hiệu kiệt sức vì làm liên tục. Người tuổi này dễ xem sự mệt là chuyện bình thường nếu mọi việc vẫn chạy được. Thói quen nên giữ là ngủ đủ, vận động nhẹ, khám định kỳ và có khoảng dừng thật sự trong tuần. Đây là gợi ý tham khảo, không thay thế tư vấn y khoa hay chẩn đoán điều trị.",
+    stages: [
+      ["Trước 30 tuổi", "Dễ gánh trách nhiệm sớm, vừa học nghề vừa lo việc gia đình; cần giữ nền sức khỏe và kỹ năng tiền bạc."],
+      ["30-40 tuổi", "Hợp xây tài sản nền, ổn định nghề và học cách chia việc thay vì ôm hết để mọi thứ khỏi đổ lên một người."],
+      ["40-50 tuổi", "Giai đoạn củng cố vị thế và chăm người thân nhiều hơn; cần cân bằng giữa trách nhiệm với nhu cầu cá nhân."],
+      ["Sau 50 tuổi", "Phù hợp giảm nhịp, chọn việc chắc, ưu tiên sức khỏe, tài sản rõ và đời sống tinh thần nhẹ hơn."],
+    ],
+    advice: "Lời khuyên cho Ất Sửu 1985 nữ mạng là đừng xem chịu đựng là cách duy nhất để giữ gia đình và công việc ổn. Khi ranh giới trách nhiệm, tiền bạc và thời gian nghỉ được nói rõ, vận trình thường sáng hơn, bớt hao sức mà vẫn giữ được nền vững.",
+    siblingLink: {
+      href: "/tu-vi-tron-doi-tuoi-at-suu-1985-nam-mang",
+      label: "Tử vi trọn đời tuổi Ất Sửu 1985 nam mạng",
+    },
+  }),
+  lifetimeAgeArticle({
+    slug: "tu-vi-tron-doi-tuoi-at-mao-1975-nam-mang",
+    title: "Tử vi trọn đời tuổi Ất Mão 1975 nam mạng",
+    year: "1975",
+    canChi: "Ất Mão",
+    gender: "nam mạng",
+    napAm: "Đại Khê Thủy",
+    cungPhi: "Đoài Kim, Tây tứ mệnh",
+    animalSymbol: "Mèo rừng, thiên can Ất thuộc Mộc, địa chi Mão thuộc Mộc",
+    compatibility: "mệnh Thủy được Kim sinh và sinh Mộc, nên hợp cách sống mềm mà có nguyên tắc, biết kết nối người và dòng việc; khi Mộc hoặc Hỏa quá mạnh thành nóng lòng, cả nể hay ôm quá nhiều vai, tuổi này dễ hao năng lượng.",
+    riskAges: "Với Ất Mão nam mạng, các mốc chuyển vai trò quản lý, giao quyền cho con cháu, điều chỉnh tài sản gia đình hoặc đổi môi trường làm việc sau trung niên nên đi kèm kiểm tra pháp lý và kế hoạch sức khỏe.",
+    fengShui: "Ất Mão nam mạng hợp không gian thoáng, có ánh sáng tự nhiên, màu trắng, xám, xanh nước hoặc xanh lá dùng vừa phải. Phong thủy thực tế nên ưu tiên lịch làm việc bớt dàn trải, góc làm việc gọn và hồ sơ tài sản, hợp tác được phân loại rõ.",
+    quickFocus: "Dùng uy tín và kinh nghiệm đúng chỗ, giảm ôm đồm, giữ nhịp nghỉ và tái cấu trúc tài sản rõ ràng.",
+    summary: "Ất Mão 1975 nam mạng thường có lối ứng xử mềm nhưng không yếu, biết quan sát, giữ hòa khí và xây uy tín lâu dài. Đường đời thường thuận hơn khi đi bằng kinh nghiệm, quan hệ chất lượng và sự tỉnh táo, thay vì cố thắng nhanh hoặc ôm hết trách nhiệm sau trung niên.",
+    personality: "Nam Ất Mão thường tinh ý, biết nhìn người, cư xử chừng mực và có khả năng giữ nhịp hài hòa trong môi trường sống. Điểm mạnh là mềm dẻo, có tầm nhìn dài, biết lùi một bước để giữ cục diện. Điểm cần để ý là đôi khi vì muốn mọi việc yên mà chậm nói điều khó, để việc nhỏ tích thành áp lực lớn. Khi đã mệt, người tuổi này có thể thu mình, làm người thân khó đoán nhu cầu thật.",
+    work: "Sự nghiệp hợp với các vai trò cần uy tín, kết nối và kinh nghiệm: quản lý, tư vấn, giáo dục, pháp lý, bất động sản, tài chính thực tế, kinh doanh dịch vụ, điều phối đội nhóm hoặc việc làm cầu nối giữa nhiều bên. Tuổi này thường mạnh ở khả năng thuyết phục nhẹ nhàng, giữ khách hàng và xử lý tình huống bằng kinh nghiệm. Về sau, lợi thế không nằm ở chạy nhiều mà ở chọn đúng việc, đúng người và đúng mức trách nhiệm.",
+    money: "Tiền bạc nên theo hướng bảo toàn, tối ưu tài sản có sẵn, cơ cấu lại khoản vay hoặc dòng tiền hơn là lao vào cơ hội lợi nhuận cao thiếu kiểm chứng. Nam Ất Mão thường biết cân đo nhưng dễ nể quan hệ. Vì vậy mọi quyết định đứng tên, bảo lãnh, góp vốn hay chuyển tài sản nên tách tình cảm khỏi giấy tờ. Khi bước sang giai đoạn hậu trung niên, cần ưu tiên minh bạch tài sản, kế hoạch chuyển giao và quỹ sức khỏe.",
+    family: "Gia đạo cần sự hiện diện thực chất. Người tuổi này thường thương gia đình nhưng dễ dồn thời gian cho công việc hoặc việc bên ngoài vì nghĩ đó cũng là cách lo cho nhà. Quan hệ sẽ thuận hơn khi chủ động nói chuyện định kỳ về tiền bạc, tài sản, sức khỏe, vai trò của từng người và kỳ vọng giai đoạn sau. Với con cháu, nên chuyển dần từ chỉ đạo sang cố vấn để giảm va chạm và giữ tôn trọng hai chiều.",
+    health: "Sức khỏe nên chú ý huyết áp, tim mạch, giấc ngủ, tiêu hóa, stress âm thầm và thói quen thức khuya vì công việc. Nhóm tuổi này đôi khi vẫn vận hành tốt dù đã mệt, nên dễ bỏ qua tín hiệu sớm. Điều cần giữ là khám định kỳ, vận động bền vừa sức, giảm lịch xã giao quá dày và để cơ thể có khoảng hồi phục thật sự. Nội dung này chỉ mang tính tham khảo thói quen, không thay thế tư vấn y khoa.",
+    stages: [
+      ["Trước 30 tuổi", "Dễ học nhiều vai, xây quan hệ và tìm chỗ đứng; cần giữ nguyên tắc để không cả nể quá sớm."],
+      ["30-40 tuổi", "Hợp mở rộng nghề theo chiều sâu, tích lũy uy tín, tài sản và cộng sự chất lượng."],
+      ["40-50 tuổi", "Nên tối ưu việc đang mạnh, giảm dàn trải và củng cố gia đạo cùng kế hoạch tiền bạc."],
+      ["Sau 50 tuổi", "Phù hợp vai trò cố vấn, quản trị nhẹ hơn, giữ sức khỏe và chuẩn bị chuyển giao có trật tự."],
+    ],
+    advice: "Lời khuyên cho Ất Mão 1975 nam mạng là đừng để sự mềm dẻo biến thành ôm việc âm thầm. Khi biết chọn đúng trận, đúng người và nói rõ giới hạn, tuổi này thường giữ được cả uy tín lẫn sự an ổn dài hạn.",
+    siblingLink: {
+      href: "/tu-vi-tron-doi-tuoi-at-mao-1975-nu-mang",
+      label: "Tử vi trọn đời tuổi Ất Mão 1975 nữ mạng",
+    },
+  }),
+  lifetimeAgeArticle({
+    slug: "tu-vi-tron-doi-tuoi-at-mao-1975-nu-mang",
+    title: "Tử vi trọn đời tuổi Ất Mão 1975 nữ mạng",
+    year: "1975",
+    canChi: "Ất Mão",
+    gender: "nữ mạng",
+    napAm: "Đại Khê Thủy",
+    cungPhi: "Cấn Thổ, Tây tứ mệnh",
+    animalSymbol: "Mèo rừng, thiên can Ất thuộc Mộc, địa chi Mão thuộc Mộc",
+    compatibility: "mệnh Thủy cần nền ổn định để nuôi dưỡng sự linh hoạt và trực giác; hợp môi trường có trật tự, tin cậy và người đồng hành biết chia việc. Khi cảm xúc bị dồn lâu hoặc trách nhiệm gia đình quá nặng, năng lượng Thủy dễ thành lo xa và mất ngủ.",
+    riskAges: "Với Ất Mão nữ mạng, các mốc lo chuyện con cái, cha mẹ, tài sản gia đình, sang tên hoặc thu gọn công việc sau trung niên nên đi cùng kế hoạch chăm sức và giới hạn trách nhiệm rõ.",
+    fengShui: "Ất Mão nữ mạng hợp không gian sạch, thoáng, có ánh sáng dịu; màu trắng, kem, xanh nước, xanh lá nhạt dùng vừa đủ. Phong thủy hữu ích hơn ở chỗ bớt đồ tồn, có nơi riêng để nghỉ và bố trí hồ sơ tài chính, y tế, gia đình rõ ràng.",
+    quickFocus: "Giữ cân bằng cảm xúc, nói rõ nhu cầu, bảo toàn tài sản và nhường bớt trách nhiệm không còn cần tự ôm.",
+    summary: "Ất Mão 1975 nữ mạng thường tinh tế, biết giữ hòa khí và có năng lực quán xuyến gia đình rất tốt. Khi sống đúng nhịp, tuổi này tạo cảm giác yên ổn cho người xung quanh; điểm cần giữ là không để sự nhẫn nhịn kéo dài thành mệt mỏi âm thầm.",
+    personality: "Nữ Ất Mão thường có trực giác tốt, quan sát nhanh và cư xử mềm mại. Điểm mạnh là biết nhìn toàn cảnh, giữ quan hệ, gắn kết người thân và xử lý tình huống bằng sự tinh tế. Điểm cần chú ý là dễ chịu phần khó về mình để người khác yên, lâu ngày sinh cảm giác một mình phải gồng mọi việc. Khi mệt, người tuổi này thường im lặng hơn là phản ứng ngay, nên người xung quanh có thể không nhận ra áp lực thật.",
+    work: "Công việc hợp với môi trường cần sự tin cậy, giao tiếp, hỗ trợ và kinh nghiệm như giáo dục, chăm sóc khách hàng, tư vấn, dịch vụ, kinh doanh gia đình, quản trị nội bộ, nhân sự, bất động sản, tài chính gia đình hoặc các vai trò kết nối. Tuổi này không nhất thiết cần thay đổi quá mạnh để tiến; ngược lại, thường mạnh khi dùng mối quan hệ chất lượng và sự bền bỉ để giữ đầu việc quan trọng. Về sau, nên ưu tiên công việc ít hao sức nhưng vẫn tận dụng được uy tín cá nhân.",
+    money: "Tài chính phù hợp chiến lược chắc, rõ và có kế hoạch bảo toàn. Nữ Ất Mão nên có quỹ riêng, khoản dự phòng và nguyên tắc không đứng tên hoặc bảo lãnh chỉ vì nể tình. Khi quyết định bán, mua, sửa nhà hay chia tài sản, cần đọc kỹ giấy tờ, hỏi ý kiến độc lập và tính đến phương án chăm sức lâu dài. Tiền bạc sẽ nhẹ hơn khi mọi nghĩa vụ giữa vợ chồng, con cái và người thân được nói rõ từ đầu.",
+    family: "Gia đạo là phần rất mạnh nhưng cũng dễ làm tuổi này hao sức. Người tuổi này thường là nhịp nối giữa nhiều thế hệ, nên cần phân vai rõ cho từng người thay vì cố gánh hết. Trong tình cảm, điều quan trọng là nói ra nhu cầu, không chờ đối phương đoán. Với con cái, giai đoạn hậu trung niên thích hợp chuyển sang đồng hành, lắng nghe và giữ ranh giới, thay vì can thiệp mọi chi tiết vì lo lắng.",
+    health: "Sức khỏe nên chú ý giấc ngủ, nội tiết, tiêu hóa, stress âm thầm, huyết áp và các dấu hiệu mệt vì chăm người khác quá lâu. Người tuổi này cần khoảng riêng để hồi phục cảm xúc, chứ không chỉ nghỉ thân thể. Nên giữ lịch ngủ đều, vận động nhẹ, theo dõi chỉ số định kỳ và đừng trì hoãn thăm khám khi có dấu hiệu kéo dài. Đây chỉ là khuyến nghị lối sống, không thay thế tư vấn y khoa chuyên môn.",
+    stages: [
+      ["Trước 30 tuổi", "Dễ vừa học vừa lo gia đình hoặc công việc; cần xây tự tin và ranh giới trách nhiệm sớm."],
+      ["30-40 tuổi", "Hợp xây nền tài sản, gia đình và nghề ổn định, nhưng không nên bỏ quên quỹ riêng và sức khỏe."],
+      ["40-50 tuổi", "Giai đoạn quán xuyến nhiều đầu việc; cần bớt nhịn âm thầm, chia việc và giữ lịch nghỉ đều."],
+      ["Sau 50 tuổi", "Phù hợp sống nhẹ hơn, làm việc theo kinh nghiệm, bảo toàn tài sản và chăm tinh thần song song sức khỏe."],
+    ],
+    advice: "Lời khuyên cho Ất Mão 1975 nữ mạng là đừng lấy yên cửa yên nhà làm lý do để bỏ quên bản thân. Khi biết nói rõ giới hạn, giữ quỹ riêng và chia trách nhiệm đều, tuổi này thường vừa giữ được hòa khí vừa bớt hao năng lượng.",
+    siblingLink: {
+      href: "/tu-vi-tron-doi-tuoi-at-mao-1975-nam-mang",
+      label: "Tử vi trọn đời tuổi Ất Mão 1975 nam mạng",
+    },
+  }),
+  lifetimeAgeArticle({
+    slug: "tu-vi-tron-doi-tuoi-giap-ty-1984-nam-mang",
+    title: "Tử vi trọn đời tuổi Giáp Tý 1984 nam mạng",
+    year: "1984",
+    canChi: "Giáp Tý",
+    gender: "nam mạng",
+    napAm: "Hải Trung Kim",
+    cungPhi: "Đoài Kim, Tây tứ mệnh",
+    animalSymbol: "Chuột biển, thiên can Giáp thuộc Mộc, địa chi Tý thuộc Thủy",
+    compatibility: "mệnh Kim được Thổ sinh và sinh Thủy, nên hợp lối làm việc có cấu trúc, kỹ năng và kỷ luật tiền bạc; khi Thủy hoặc Mộc biểu hiện thành phân tán, cả nể hoặc đổi hướng quá nhanh thì kết quả dễ thiếu ổn định.",
+    riskAges: "Với Giáp Tý nam mạng, các mốc đổi nghề, mở rộng đầu tư, mua bán tài sản hoặc đứng ra gánh việc gia đình lớn nên xem kỹ dòng tiền, hợp đồng và sức khỏe nền thay vì chỉ nhìn cơ hội.",
+    fengShui: "Giáp Tý nam mạng hợp không gian sáng, ngăn nắp, dùng tông trắng, xám, xanh nước hoặc vàng đất vừa phải. Phong thủy thực tế nên ưu tiên bàn làm việc ít xao nhãng, lịch chi tiêu rõ và hồ sơ tài sản, vay nợ được quản lý có hệ thống.",
+    quickFocus: "Giữ kỷ luật nghề và tiền, chọn việc theo năng lực thật, giảm phân tán và chăm sức bền dài hạn.",
+    summary: "Giáp Tý 1984 nam mạng thường nhanh trí, linh hoạt và có khả năng thích nghi khá tốt trước thay đổi. Khi giữ được nguyên tắc, tuổi này tiến ổn nhờ chuyên môn, uy tín và sự tỉnh táo; điểm cần tránh là làm nhiều hướng cùng lúc rồi hao lực mà không gom được thành quả dài hạn.",
+    personality: "Nam Giáp Tý thường nhạy, quan sát nhanh, xử lý tình huống tốt và có khả năng xoay chuyển trong môi trường nhiều biến động. Điểm mạnh là đầu óc linh hoạt, biết học từ thực tế và dễ tìm lối đi khi người khác đang kẹt. Điểm cần lưu ý là nếu thiếu trục chính, họ dễ bị kéo theo việc gấp, người gấp hoặc cơ hội ngắn hạn. Tuổi này cần nguyên tắc cá nhân đủ rõ để sự nhanh nhạy trở thành lợi thế, không thành phân tán.",
+    work: "Sự nghiệp hợp với các lĩnh vực cần tư duy hệ thống và khả năng ứng biến như vận hành, kỹ thuật, kinh doanh dịch vụ, tài chính thực tế, logistics, sản phẩm số, tư vấn, quản lý đội nhóm, bất động sản hoặc các vai trò giải bài toán thực tế. Giáp Tý nam mạng nên phát triển theo mô hình: một chuyên môn cứng, một kỹ năng giao tiếp hoặc quản trị bổ trợ. Về sau, càng bền khi chọn ít mục tiêu nhưng bám đến cùng thay vì chạy nhiều hướng song song.",
+    money: "Tiền bạc nên đi theo hướng minh bạch và kỷ luật. Tuổi này có thể kiếm cơ hội tốt nhưng cũng dễ phân tán vào nhiều khoản nếu không có nguyên tắc. Nên đặt giới hạn cho vay, hùn hạp, đầu tư thử nghiệm và tách tiền dự phòng khỏi tiền tăng trưởng. Khi mua bán tài sản hoặc nhận cơ hội hợp tác, cần soi kỹ pháp lý, thanh khoản và khả năng chịu rủi ro của gia đình, không chỉ dựa vào cảm giác nắm bắt nhanh cơ hội.",
+    family: "Gia đạo tốt hơn khi nam Giáp Tý nói rõ kế hoạch và cảm xúc thay vì chỉ lo bằng hành động. Người tuổi này đôi khi tự cho rằng mình xoay được hết nên ít chia sẻ áp lực, đến khi mệt mới phản ứng. Trong tình cảm, nên tránh mang kiểu xử lý công việc vào giao tiếp gia đình. Quan hệ sẽ thuận hơn khi có thời gian cố định cho người thân, cuộc nói chuyện định kỳ về tiền bạc và ranh giới giữa việc ngoài xã hội với việc trong nhà.",
+    health: "Sức khỏe cần chú ý thần kinh căng kéo dài, giấc ngủ, tiêu hóa, huyết áp, vai gáy và tình trạng mệt do suy nghĩ liên tục. Người linh hoạt thường khó dừng đầu óc, vì vậy càng cần lịch nghỉ, vận động đều và giới hạn giờ làm rõ. Nếu có dấu hiệu mệt kéo dài, đau lặp lại hoặc stress ảnh hưởng sinh hoạt, nên gặp chuyên gia phù hợp. Đây là khuyến nghị thói quen, không thay thế tư vấn y tế.",
+    stages: [
+      ["Trước 30 tuổi", "Dễ thử nhiều hướng, hợp học kỹ năng nhanh nhưng cần chốt trục nghề sớm để tránh phân tán."],
+      ["30-40 tuổi", "Nên gom chuyên môn, xây vị thế và kỷ luật tiền bạc thay vì chạy theo quá nhiều cơ hội."],
+      ["40-50 tuổi", "Giai đoạn củng cố tài sản, vai trò lãnh đạo và điều chỉnh nhịp làm việc để không hao sức."],
+      ["Sau 50 tuổi", "Phù hợp chuyển sang quản trị, cố vấn hoặc đầu tư thận trọng, ưu tiên sức khỏe và tài sản rõ ràng."],
+    ],
+    advice: "Lời khuyên cho Giáp Tý 1984 nam mạng là lấy sự linh hoạt làm công cụ, không làm tay lái. Khi có nguyên tắc nghề nghiệp, tiền bạc và nghỉ ngơi rõ, tuổi này thường đi xa hơn nhiều so với việc thắng vài cơ hội ngắn hạn.",
+    siblingLink: {
+      href: "/tu-vi-tron-doi-tuoi-giap-ty-1984-nu-mang",
+      label: "Tử vi trọn đời tuổi Giáp Tý 1984 nữ mạng",
+    },
+  }),
+  lifetimeAgeArticle({
+    slug: "tu-vi-tron-doi-tuoi-giap-ty-1984-nu-mang",
+    title: "Tử vi trọn đời tuổi Giáp Tý 1984 nữ mạng",
+    year: "1984",
+    canChi: "Giáp Tý",
+    gender: "nữ mạng",
+    napAm: "Hải Trung Kim",
+    cungPhi: "Cấn Thổ, Tây tứ mệnh",
+    animalSymbol: "Chuột biển, thiên can Giáp thuộc Mộc, địa chi Tý thuộc Thủy",
+    compatibility: "mệnh Kim cần nền chắc để giữ giá trị và có thể sinh Thủy để vận hành linh hoạt; hợp môi trường rõ ràng, có kỷ luật tài chính và người đồng hành biết chia trách nhiệm. Khi để cảm xúc và lo toan dồn lâu, sự sắc sảo dễ biến thành căng thẳng.",
+    riskAges: "Với Giáp Tý nữ mạng, các mốc lo chuyện nhà cửa, tài sản, cha mẹ, con cái, đổi việc hoặc khởi sự riêng nên đi cùng bảng chi tiêu, quỹ dự phòng và kế hoạch chăm sức thực tế.",
+    fengShui: "Giáp Tý nữ mạng hợp không gian gọn, sáng và dễ tập trung; màu trắng, kem, vàng nhạt, xanh nước hoặc xám dùng vừa phải. Phong thủy hữu ích hơn ở việc giảm lộn xộn, có nơi cất giấy tờ rõ, chỗ nghỉ yên và nhịp sinh hoạt ít bị xáo trộn liên tục.",
+    quickFocus: "Giữ nhịp ổn định, rõ tiền bạc, nói nhu cầu sớm và tránh gánh quá nhiều phần việc của người khác.",
+    summary: "Giáp Tý 1984 nữ mạng thường lanh, nhanh hiểu việc và có khả năng xoay xở tốt trong môi trường áp lực. Khi có nền nếp, tuổi này tích lũy tốt nhờ sự tỉ mỉ và đầu óc thực tế; điểm cần giữ là đừng để thói quen lo xa biến thành ôm hết trách nhiệm lẫn mệt mỏi tinh thần.",
+    personality: "Nữ Giáp Tý thường nhạy với hoàn cảnh, biết đọc tình huống và có khả năng thích nghi khá nhanh. Điểm mạnh là sáng dạ, làm việc gọn, biết lo chu toàn và không dễ bỏ cuộc khi đã xác định mục tiêu. Điểm cần chú ý là hay nghĩ trước nhiều khả năng, dễ tự tăng áp lực và đôi khi khó thả lỏng. Khi mọi người dựa vào sự xoay xở của mình quá nhiều, người tuổi này rất dễ rơi vào trạng thái vừa mệt vừa khó nói từ chối.",
+    work: "Công việc hợp với các lĩnh vực cần sự nhanh nhạy, kỷ luật và quán xuyến như kế toán, vận hành, chăm sóc khách hàng, quản trị nội bộ, dịch vụ, giáo dục, kinh doanh thực tế, tài chính gia đình, logistics hoặc các vai trò vừa làm chuyên môn vừa giữ nhịp nhóm. Giáp Tý nữ mạng mạnh khi có quy trình và mục tiêu rõ. Nếu muốn làm riêng, nên bắt đầu từ mô hình kiểm soát được chi phí, chất lượng và thời gian, không nên mở rộng quá sớm vì cảm hứng.",
+    money: "Tiền bạc phù hợp chiến lược chắc, tách bạch và theo dõi đều. Nữ Giáp Tý nên có quỹ dự phòng, quỹ gia đình, quỹ cá nhân và nguyên tắc rõ cho việc hỗ trợ người thân. Nhóm tuổi này dễ lo nên có thể giữ tiền tốt, nhưng cũng dễ chi để giải quyết áp lực nhanh. Vì vậy mọi khoản vay mượn, đầu tư, mua bán tài sản hoặc hùn hạp cần đi qua bước kiểm tra giấy tờ, dòng tiền và thời gian hoàn vốn thực tế.",
+    family: "Gia đạo nhẹ hơn khi mọi việc không dồn vào một người. Nữ Giáp Tý thường lo trước, làm trước và ít muốn người thân phải vất vả, nhưng chính điều đó khiến mình khó nghỉ. Trong tình cảm, tuổi này cần người đồng hành biết chia sẻ thực tế, không chỉ hứa. Quan hệ sẽ tốt hơn khi có thói quen nói sớm về tài chính, kế hoạch gia đình, lịch chăm con hoặc chăm cha mẹ, thay vì cố gắng gánh im lặng cho êm nhà.",
+    health: "Sức khỏe nên chú ý giấc ngủ, stress âm thầm, tiêu hóa, huyết áp, nội tiết và các dấu hiệu đau mỏi kéo dài do căng thẳng. Người tuổi này cần học cách nghỉ trước khi cơ thể buộc phải dừng. Vận động nhẹ, ngủ đúng giờ, giảm công việc muộn tối và định kỳ kiểm tra chỉ số là rất cần. Đây là gợi ý tham khảo về thói quen, không thay thế tư vấn y khoa chuyên môn.",
+    stages: [
+      ["Trước 30 tuổi", "Dễ học nhanh và nhận nhiều việc; cần rèn trục nghề rõ cùng nguyên tắc tiền bạc sớm."],
+      ["30-40 tuổi", "Hợp xây vị thế, tài sản nền và tổ chức gia đình, nhưng cần tránh ôm quá nhiều phần không thuộc mình."],
+      ["40-50 tuổi", "Giai đoạn giữ nhịp bền, tái cấu trúc việc nhà - việc làm và bảo toàn sức khỏe cùng tài sản."],
+      ["Sau 50 tuổi", "Phù hợp sống gọn hơn, làm việc theo kinh nghiệm, ưu tiên sự yên ổn và chăm sức lâu dài."],
+    ],
+    advice: "Lời khuyên cho Giáp Tý 1984 nữ mạng là dùng sự sắc sảo để sắp xếp cuộc sống nhẹ hơn, không để nó biến thành nguồn áp lực liên tục. Khi tiền bạc, lịch nghỉ và ranh giới trách nhiệm được đặt rõ, tuổi này thường bền và an hơn rất nhiều.",
+    siblingLink: {
+      href: "/tu-vi-tron-doi-tuoi-giap-ty-1984-nam-mang",
+      label: "Tử vi trọn đời tuổi Giáp Tý 1984 nam mạng",
+    },
   }),
 ] satisfies ArticleView[];
 
