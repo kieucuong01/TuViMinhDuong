@@ -189,7 +189,9 @@ function renderSection(section: FreeReadingSection, index: number) {
   return `## ${index + 1}. ${section.title}
 
 [Block Nội dung - ${section.blockLabel}]:
-${section.freeText}
+**Lợi thế nổi bật:** ${blockForSignal(section).loi_the}
+
+**Điểm dễ vướng:** ${blockForSignal(section).rao_can}
 
 🔒 Nâng cấp Premium để xem:
 
@@ -201,19 +203,19 @@ export function buildFreeOverviewFromInterpretationRules(chart: TuViChart) {
   const sections = buildFreeReadingSections(chart);
   const age = chartAge(chart);
 
-  return `# Bài mẫu luận giải miễn phí
+  return `# Luận giải miễn phí dành cho ${signals.profileName}
 
 Hồ sơ: ${signals.profileName} (${signals.lifeYearLabel})
 Tuổi xem: ${age} tuổi trong năm ${signals.viewYear}
 Bản Mệnh: ${signals.destinyLine}
 
-Chào bạn, lá số Tử Vi của bạn là sự kết hợp của những mã năng lượng riêng. Bản miễn phí này không cố viết một bài dài dàn trải, mà lắp ghép các khối nội dung rõ ràng từ chính cung, sao và vận đang nổi bật trong lá số. Mục tiêu là để bạn thấy nhanh bốn điểm cốt lõi: năng lực thiên phú, phong cách kiếm tiền, môi trường làm việc hợp hơn và nhịp vận hạn của năm đang xem.
+Đây không phải một đoạn luận chung cho mọi người. Bốn tín hiệu dưới đây được chọn trực tiếp từ cung Mệnh, Tài Bạch, Quan Lộc và vận năm trong chính lá số của bạn. Mỗi mục chỉ ra một lợi thế có thể tận dụng, một điểm dễ vướng thường khó tự nhận ra, cùng câu hỏi quan trọng cần ghép thêm 12 cung và đại vận mới có thể trả lời trọn vẹn.
 
 ${sections.map(renderSection).join("\n\n")}
 
 ## KHAI MỞ BẢN ĐỒ ĐỘC BẢN CỦA RIÊNG BẠN
 
-Bản xem trước này chỉ là phần đầu của những gì lá số đang chứa. Báo cáo FULL Premium đi sâu hơn vào 12 cung, đại vận, vận năm, lộ trình 12 tháng và kế hoạch hành động 90 ngày để biến các tín hiệu trên thành quyết định cụ thể hơn.
+Bản miễn phí đã chỉ ra bốn tín hiệu nổi bật, nhưng từng tín hiệu vẫn có thể đổi chiều khi ghép với Mệnh - Thân, tam hợp, xung chiếu và đại vận. Báo cáo FULL Premium nối toàn bộ 12 cung với vận năm, lộ trình 12 tháng và kế hoạch hành động 90 ngày để làm rõ: lợi thế nào nên dùng ngay, rủi ro nào cần chặn trước và thời điểm nào đáng ưu tiên.
 
 [ MỞ KHÓA BÁO CÁO FULL PREMIUM NGAY ]`;
 }

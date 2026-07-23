@@ -51,6 +51,20 @@ describe("free reading block builder", () => {
     expect(serialized).toContain("premium_hook");
   });
 
+  it("uses specific unanswered questions as premium hooks instead of generic upgrade copy", () => {
+    const collections = [
+      FREE_READING_CONTENT_BLOCKS.cung_menh.chinh_tinh,
+      FREE_READING_CONTENT_BLOCKS.cung_tai_bach.dong_tien_chinh,
+      FREE_READING_CONTENT_BLOCKS.cung_quan_loc.moi_truong,
+      FREE_READING_CONTENT_BLOCKS.van_han.nam,
+    ];
+
+    for (const block of collections.flatMap((collection) => Object.values(collection))) {
+      expect(block.premium_hook).not.toMatch(/^Premium mở/iu);
+      expect(block.premium_hook).toMatch(/\?$/u);
+    }
+  });
+
   it("matches extracted signals to four assembled sections with one premium hook per section", () => {
     const sections = buildFreeReadingSections(sampleChart);
 
@@ -63,25 +77,28 @@ describe("free reading block builder", () => {
     expect(sections).toHaveLength(4);
     for (const section of sections) {
       expect(section.freeText.length).toBeGreaterThan(120);
-      expect(section.premiumHook).toContain("Premium");
+      expect(section.premiumHook).toMatch(/\?$/u);
     }
   });
 
   it("assembles the final free report as a paid-conversion preview, not the old long report", () => {
     const overview = buildFreeOverviewFromInterpretationRules(sampleChart);
 
-    expect(overview).toContain("# Bài mẫu luận giải miễn phí");
+    expect(overview).toContain("# Luận giải miễn phí dành cho Kiều Tấn Cường");
     expect(overview).toContain("Hồ sơ: Kiều Tấn Cường");
     expect(overview).toContain("Bản Mệnh:");
     expect(overview).toContain("## 1. Năng lực thiên phú (Cung Mệnh)");
     expect(overview).toContain("## 2. Phong cách kiếm tiền (Cung Tài Bạch)");
     expect(overview).toContain("## 3. Môi trường làm việc lý tưởng (Cung Quan Lộc)");
     expect(overview).toContain("## 4. Vận hạn năm 2026 (Năm Bính Ngọ)");
+    expect(overview.match(/\*\*Lợi thế nổi bật:\*\*/gu)).toHaveLength(4);
+    expect(overview.match(/\*\*Điểm dễ vướng:\*\*/gu)).toHaveLength(4);
     expect(overview.match(/🔒 Nâng cấp Premium để xem:/gu)).toHaveLength(4);
     expect(overview).toContain("KHAI MỞ BẢN ĐỒ ĐỘC BẢN CỦA RIÊNG BẠN");
     expect(overview).toContain("MỞ KHÓA BÁO CÁO FULL PREMIUM NGAY");
     expect(overview).not.toContain("### Điểm nổi bật");
     expect(overview).not.toContain("### Vì sao có nhận định này");
+    expect(overview).not.toContain("lắp ghép các khối nội dung");
     expect(countVisibleMarkdownWords(overview)).toBeGreaterThanOrEqual(520);
     expect(countVisibleMarkdownWords(overview)).toBeLessThanOrEqual(950);
   });

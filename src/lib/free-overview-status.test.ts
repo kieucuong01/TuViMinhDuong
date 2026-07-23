@@ -39,9 +39,9 @@ describe("free overview status", () => {
 
     expect(status.status).toBe("fallback");
     expect(status.source).toBe("seed-rules");
-    expect(FREE_OVERVIEW_VERSION).toBe("free-block-preview-v1");
+    expect(FREE_OVERVIEW_VERSION).toBe("free-block-preview-v2");
     expect(status.jobStatus).toBe("idle");
-    expect(status.content).toContain("# Bài mẫu luận giải miễn phí");
+    expect(status.content).toContain("# Luận giải miễn phí dành cho");
     expect(status.content).toContain("## 4. Vận hạn năm");
     expect(status.content.match(/🔒 Nâng cấp Premium để xem:/gu)).toHaveLength(4);
     expect(status.wordCount).toBeGreaterThanOrEqual(FREE_OVERVIEW_MIN_WORDS);

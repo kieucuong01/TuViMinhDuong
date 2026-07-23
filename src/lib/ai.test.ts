@@ -250,7 +250,7 @@ describe("AI reading format", () => {
 
     expect(FREE_OVERVIEW_MIN_WORDS).toBe(520);
     expect(FREE_OVERVIEW_MAX_WORDS).toBe(950);
-    expect(FREE_OVERVIEW_VERSION).toBe("free-block-preview-v1");
+    expect(FREE_OVERVIEW_VERSION).toBe("free-block-preview-v2");
     expect(result.model).toBe("deepseek/deepseek-v4-flash");
     expect(result).not.toHaveProperty("prompt");
     expect(isCompleteFreeOverview(result.content)).toBe(true);
@@ -258,6 +258,9 @@ describe("AI reading format", () => {
     const prompt = String(llmRouterMocks.generateWithLlmRouter.mock.calls[0][0].prompt);
     expect(prompt.length).toBeLessThan(5200);
     expect(prompt).not.toContain(llmContent.slice(0, 120));
+    expect(prompt).toContain("Lợi thế nổi bật");
+    expect(prompt).toContain("Điểm dễ vướng");
+    expect(prompt).not.toContain("# Bài mẫu luận giải miễn phí");
     expect(llmRouterMocks.generateWithLlmRouter).toHaveBeenCalledWith(
       expect.objectContaining({
         temperature: 0.45,
@@ -287,7 +290,7 @@ describe("AI reading format", () => {
     clearProviderEnv();
     llmRouterMocks.hasExternalLlmProvider.mockReturnValue(true);
     const extra = Array.from(
-      { length: 12 },
+      { length: 8 },
       () => "Ghi chú thêm: cung Mệnh và đại vận hiện tại cần được đọc cùng nhịp sống thực tế của bạn để tránh quyết định quá vội.",
     ).join(" ");
     const content = `${buildInstantFreeOverview(sampleChart())}\n\n${extra}`;
@@ -311,7 +314,9 @@ describe("AI reading format", () => {
     expect(FREE_OVERVIEW_TEMPLATE_MAX_WORDS).toBe(950);
     expect(countVisibleMarkdownWords(content)).toBeGreaterThanOrEqual(FREE_OVERVIEW_TEMPLATE_MIN_WORDS);
     expect(countVisibleMarkdownWords(content)).toBeLessThanOrEqual(FREE_OVERVIEW_TEMPLATE_MAX_WORDS);
-    expect(content).toContain("# Bài mẫu luận giải miễn phí");
+    expect(content).toContain(`# Luận giải miễn phí dành cho ${chart.input.fullName}`);
+    expect(content.match(/\*\*Lợi thế nổi bật:\*\*/gu)).toHaveLength(4);
+    expect(content.match(/\*\*Điểm dễ vướng:\*\*/gu)).toHaveLength(4);
     expect(content).toContain("## 1. Năng lực thiên phú (Cung Mệnh)");
     expect(content).toContain("## 2. Phong cách kiếm tiền (Cung Tài Bạch)");
     expect(content).toContain("## 3. Môi trường làm việc lý tưởng (Cung Quan Lộc)");
@@ -330,6 +335,8 @@ describe("AI reading format", () => {
 
     expect(isCompleteFreeOverview(content)).toBe(true);
     expect(isCompleteFreeOverview(content.replace("## 2. Phong cách kiếm tiền (Cung Tài Bạch)", "## Ghi chú"))).toBe(false);
+    expect(isCompleteFreeOverview(content.replace("**Lợi thế nổi bật:**", "**Điểm mạnh:**"))).toBe(false);
+    expect(isCompleteFreeOverview(content.replace("**Điểm dễ vướng:**", "**Lưu ý:**"))).toBe(false);
     expect(isCompleteFreeOverview(content.split("## 3. Môi trường làm việc lý tưởng (Cung Quan Lộc)")[0])).toBe(false);
     expect(isCompleteFreeOverview(`${content} ${"thêm ".repeat(300)}`)).toBe(false);
   });

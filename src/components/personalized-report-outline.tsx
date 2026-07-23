@@ -98,11 +98,11 @@ export function PersonalizedReportOutline({
               className="btn btn-primary personal-report-outline-cta"
               href={loginModalHref(chartPath, undefined, `${chartPath}#personal-report-outline`)}
               scroll={false}
-              data-ad-click="login_gate_clicked"
+              data-ad-click="full_offer_outline_clicked"
               data-chart-id={chartId}
               data-testid="premium-reading-cta-bottom"
             >
-              Lưu lá số &amp; đọc tiếp miễn phí
+              Lưu lá số &amp; mở bản FULL
             </Link>
           ) : canReadFullOverview ? (
             <button
