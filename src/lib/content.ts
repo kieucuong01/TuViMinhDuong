@@ -611,10 +611,6 @@ type LifetimeAgeArticleInput = {
 
 function lifetimeAgeArticle(input: LifetimeAgeArticleInput): ArticleView {
   const stageRows = input.stages.map(([stage, note]) => `| ${stage} | ${note} |`).join("\n");
-  const siblingLinkLine = input.siblingLink
-    ? `- So sánh thêm với [${input.siblingLink.label}](${input.siblingLink.href}) nếu bạn muốn đối chiếu khác biệt nam - nữ cùng năm sinh hoặc tuổi sát nhóm quan tâm.\n`
-    : "";
-
   return article({
     categoryId: "cat-van-han",
     title: input.title,
@@ -727,7 +723,7 @@ ${input.advice}
 ## Đọc tiếp trong cụm Tử vi trọn đời
 
 - Quay lại [hub Tử vi trọn đời theo từng tuổi](/xem-tu-vi-tron-doi) để so sánh ${input.title} với các tuổi đang được mở rộng trong cùng cụm.
--${siblingLinkLine ? siblingLinkLine.trimStart() : ""} Đọc [lá số tử vi trọn đời là gì](/kien-thuc-tu-vi/la-so-tu-vi-tron-doi) nếu muốn chuyển từ phần ${input.gender} theo năm sinh sang cách đọc theo lá số cá nhân.
+${input.siblingLink ? `- So sánh thêm với [${input.siblingLink.label}](${input.siblingLink.href}) để thấy điểm khác giữa hai phần nam mạng và nữ mạng cùng năm sinh.\n` : ""}- Đọc [lá số tử vi trọn đời là gì](/kien-thuc-tu-vi/la-so-tu-vi-tron-doi) nếu muốn chuyển từ phần ${input.gender} theo năm sinh sang cách đọc theo lá số cá nhân.
 - Xem [cung Mệnh và cung Thân](/kien-thuc-tu-vi/cung-menh-cung-than) để hiểu trục bản thân trước khi luận sâu ${input.canChi} ${input.year}.
 - Đọc [12 cung trong lá số tử vi](/kien-thuc-tu-vi/12-cung-trong-la-so-tu-vi) để nối các phần nghề nghiệp, tiền bạc, gia đạo và quan hệ của ${input.title}.`,
   });
