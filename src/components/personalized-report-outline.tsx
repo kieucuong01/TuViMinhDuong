@@ -100,6 +100,7 @@ export function PersonalizedReportOutline({
               scroll={false}
               data-ad-click="login_gate_clicked"
               data-chart-id={chartId}
+              data-testid="premium-reading-cta-bottom"
             >
               Lưu lá số &amp; đọc tiếp miễn phí
             </Link>
@@ -110,6 +111,7 @@ export function PersonalizedReportOutline({
               popoverTarget={premiumReadingModalId(chartId)}
               data-ad-click="full_offer_clicked"
               data-chart-id={chartId}
+              data-testid="premium-reading-cta-bottom"
             >
               Mở bản FULL 9 chương — {cashLabel(priceCoins)}
             </button>
@@ -117,7 +119,7 @@ export function PersonalizedReportOutline({
             <div role="status">
               <strong>Lá số này không thuộc tài khoản của bạn</strong>
               <span>Hãy lập lá số của riêng bạn để mở nội dung cá nhân hóa.</span>
-              <Link className="btn btn-primary personal-report-outline-cta" href="/lap-la-so">
+              <Link className="btn btn-primary personal-report-outline-cta" href="/lap-la-so" data-testid="premium-reading-cta-bottom">
                 Lập lá số của bạn
               </Link>
             </div>

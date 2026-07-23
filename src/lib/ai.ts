@@ -5,12 +5,12 @@ import { countVisibleMarkdownWords } from "@/lib/free-overview-presentation";
 import { generateWithLlmRouter, hasExternalLlmProvider } from "@/lib/llm-router";
 import { FEATURE_PRICES, type ReadingKey } from "@/lib/pricing";
 
-export const FREE_OVERVIEW_MIN_WORDS = 1400;
-export const FREE_OVERVIEW_MAX_WORDS = 1650;
+export const FREE_OVERVIEW_MIN_WORDS = 520;
+export const FREE_OVERVIEW_MAX_WORDS = 950;
 export const FREE_OVERVIEW_TEMPLATE_MIN_WORDS = FREE_OVERVIEW_MIN_WORDS;
 export const FREE_OVERVIEW_TEMPLATE_MAX_WORDS = FREE_OVERVIEW_MAX_WORDS;
 export const PAID_READING_CHAPTER_MAX_TOKENS = 7000;
-export const FREE_OVERVIEW_VERSION = "free-llm-overview-v14";
+export const FREE_OVERVIEW_VERSION = "free-block-preview-v1";
 export const PAID_READING_VERSION = "paid-personal-dossier-v6";
 export const PAID_FULL_WORD_TARGET = "5.000-7.000 từ";
 export const READING_PROVIDER_ORDER = ["deepseek"] as const;
@@ -96,68 +96,50 @@ export function isCompletePaidChapter(content: string, chapter: PaidReadingChapt
 
 export function isCompleteFreeOverview(content: string) {
   const requiredHeadings = [
-    "## 1. Khí chất và cách ra quyết định",
-    "## 2. Công việc và nguồn lực",
-    "## 3. Quan hệ và nhịp sống",
-    "## 4. Vận hiện tại",
-  ];
-  const requiredBlocks = [
-    "Điểm nổi bật",
-    "Lợi thế",
-    "Điểm cần lưu ý",
-    "Gợi ý thực tế",
-    "Vì sao có nhận định này",
+    "## 1. Năng lực thiên phú (Cung Mệnh)",
+    "## 2. Phong cách kiếm tiền (Cung Tài Bạch)",
+    "## 3. Môi trường làm việc lý tưởng (Cung Quan Lộc)",
+    /^## 4\. Vận hạn năm \d{4} \(Năm .+\)$/u,
   ];
   const wordCount = countVisibleMarkdownWords(content);
   const hasChartEvidence = /(cung|mệnh|thân|sao|đại vận|tuần|triệt)/iu.test(content);
-  const quickRead = content.match(/### Đọc nhanh\s+([\s\S]*?)(?=\n## 1\.)/u)?.[1] || "";
-  const quickReadWords = countVisibleMarkdownWords(quickRead);
-  const h2Headings = Array.from(content.matchAll(/^##\s+.+$/gmu), (match) => match[0].trim());
-  const sectionsHaveExpectedBlocks = requiredHeadings.every((heading, index) => {
-    const start = content.indexOf(heading);
-    const end = index + 1 < requiredHeadings.length ? content.indexOf(requiredHeadings[index + 1]) : content.length;
-    if (start < 0 || end < 0) return false;
-    const blocks = Array.from(content.slice(start, end).matchAll(/^###\s+(.+)$/gmu), (match) => match[1].trim());
-    return blocks.length === requiredBlocks.length && blocks.every((block, blockIndex) => block === requiredBlocks[blockIndex]);
-  });
-  const reflectionMarker = "**Câu hỏi tự đối chiếu:**";
-  const fullBridgeMarker = "**Bản FULL 9 chương cá nhân hóa**";
-  const sectionTwoIndex = content.indexOf(requiredHeadings[1]);
-  const sectionThreeIndex = content.indexOf(requiredHeadings[2]);
-  const reflectionIndex = content.indexOf(reflectionMarker);
-  const fullBridgeIndex = content.indexOf(fullBridgeMarker);
+  const h2Headings = Array.from(content.matchAll(/^##\s+\d+\.\s+.+$/gmu), (match) => match[0].trim());
+  const headingsMatch =
+    h2Headings.length === requiredHeadings.length &&
+    requiredHeadings.every((heading, index) =>
+      typeof heading === "string" ? h2Headings[index] === heading : heading.test(h2Headings[index] || ""),
+    );
+  const premiumHooks = content.match(/🔒\s*Nâng cấp Premium để xem:/gu)?.length || 0;
+  const blockLabels = content.match(/\[Block Nội dung - .+\]:/gu)?.length || 0;
 
   return (
     wordCount >= FREE_OVERVIEW_MIN_WORDS &&
     wordCount <= FREE_OVERVIEW_MAX_WORDS &&
-    quickReadWords >= 80 &&
-    quickReadWords <= 120 &&
     hasChartEvidence &&
-    h2Headings.length === requiredHeadings.length &&
-    h2Headings.every((heading, index) => heading === requiredHeadings[index]) &&
-    sectionsHaveExpectedBlocks &&
-    content.split(reflectionMarker).length === 2 &&
-    sectionTwoIndex < reflectionIndex &&
-    reflectionIndex < fullBridgeIndex &&
-    fullBridgeIndex < sectionThreeIndex
+    headingsMatch &&
+    premiumHooks === 4 &&
+    blockLabels === 4 &&
+    content.includes("# Bài mẫu luận giải miễn phí") &&
+    content.includes("KHAI MỞ BẢN ĐỒ ĐỘC BẢN CỦA RIÊNG BẠN") &&
+    content.includes("MỞ KHÓA BÁO CÁO FULL PREMIUM NGAY")
   );
 }
 
 export function isDisplayableFreeOverview(content: string) {
   if (isCompleteFreeOverview(content)) return true;
   const requiredHeadings = [
-    "## 1. Khí chất và cách ra quyết định",
-    "## 2. Công việc và nguồn lực",
-    "## 3. Quan hệ và nhịp sống",
-    "## 4. Vận hiện tại",
+    "## 1. Năng lực thiên phú (Cung Mệnh)",
+    "## 2. Phong cách kiếm tiền (Cung Tài Bạch)",
+    "## 3. Môi trường làm việc lý tưởng (Cung Quan Lộc)",
   ];
   const wordCount = countVisibleMarkdownWords(content);
   const hasChartEvidence = /(cung|mệnh|thân|sao|đại vận|tuần|triệt)/iu.test(content);
   const headingIndexes = requiredHeadings.map((heading) => content.indexOf(heading));
   return (
-    wordCount >= 900 &&
-    wordCount <= 2300 &&
+    wordCount >= 500 &&
+    wordCount <= 1100 &&
     hasChartEvidence &&
+    (content.match(/🔒\s*Nâng cấp Premium để xem:/gu)?.length || 0) >= 4 &&
     headingIndexes.every((index) => index >= 0) &&
     headingIndexes.every((index, position) => position === 0 || index > headingIndexes[position - 1])
   );
@@ -784,16 +766,16 @@ function buildFreeOverviewPrompt(chart: TuViChart) {
 
   return `Bạn là chuyên gia luận giải tử vi cho website Lá số tinh hoa.
 
-Mục tiêu: viết bản luận giải tổng quan miễn phí khoảng 1.500 từ cho người đọc Việt Nam 30-60 tuổi. Văn phong phải tự nhiên, có chiều sâu, dễ hiểu, không máy móc, không hù dọa, không khẳng định định mệnh tuyệt đối.
+Mục tiêu: viết bản luận giải miễn phí 520-950 từ cho người đọc Việt Nam 30-60 tuổi. Văn phong phải tự nhiên, rõ lợi ích, có mồi mở Premium ở cuối từng mục, không hù dọa, không khẳng định định mệnh tuyệt đối.
 
 Quy tắc bắt buộc:
 - Chỉ diễn giải từ dữ liệu bằng chứng dưới đây; không tự tính lại lá số, không bịa sao/cung không có trong dữ liệu.
 - Viết bằng tiếng Việt, xưng hô trực tiếp với người đọc là "bạn".
 - Tổng độ dài phải nằm trong ${FREE_OVERVIEW_MIN_WORDS}-${FREE_OVERVIEW_MAX_WORDS} từ hiển thị.
-- Phần "Đọc nhanh" phải dài 80-120 từ.
-- Giữ đúng cấu trúc Markdown và đúng thứ tự heading/subheading như mẫu. Không thêm heading khác.
+- Giữ đúng cấu trúc Markdown và đúng thứ tự heading như mẫu. Không thêm heading khác.
 - Trong mỗi mục, nêu rõ ít nhất một bằng chứng tử vi: cung, sao, Mệnh/Thân/Cục, đại vận, Tuần hoặc Triệt nếu phù hợp.
-- Không nhắc giá, không nói "mua ngay", không dùng lời lẽ giật gân. Cầu nối FULL phải tự nhiên: bản miễn phí giúp nhận diện hướng chính, bản FULL mở rộng thành kế hoạch chi tiết.
+- Mỗi mục phải có đúng một dòng "🔒 Nâng cấp Premium để xem:" và một bullet premium_hook ngay sau đó.
+- Không nhắc giá, không dùng lời lẽ giật gân. Cầu nối FULL phải tự nhiên: bản miễn phí giúp nhận diện hướng chính, bản FULL mở rộng thành kế hoạch chi tiết.
 - Nhấn mạnh các điểm quan trọng bằng **in đậm** vừa phải.
 
 Dữ liệu bằng chứng:
@@ -801,34 +783,27 @@ ${evidence}
 
 Mẫu cấu trúc cần giữ, chỉ dùng như khung và nguồn tham chiếu giọng điệu; hãy viết lại tự nhiên hơn, không sao chép máy móc:
 Cấu trúc Markdown bắt buộc:
-# Bản tổng quan lá số của bạn
-### Đọc nhanh
-## 1. Khí chất và cách ra quyết định
-### Điểm nổi bật
-### Lợi thế
-### Điểm cần lưu ý
-### Gợi ý thực tế
-### Vì sao có nhận định này
-## 2. Công việc và nguồn lực
-### Điểm nổi bật
-### Lợi thế
-### Điểm cần lưu ý
-### Gợi ý thực tế
-### Vì sao có nhận định này
-**Câu hỏi tự đối chiếu:**
-**Bản FULL 9 chương cá nhân hóa**
-## 3. Quan hệ và nhịp sống
-### Điểm nổi bật
-### Lợi thế
-### Điểm cần lưu ý
-### Gợi ý thực tế
-### Vì sao có nhận định này
-## 4. Vận hiện tại
-### Điểm nổi bật
-### Lợi thế
-### Điểm cần lưu ý
-### Gợi ý thực tế
-### Vì sao có nhận định này
+# Bài mẫu luận giải miễn phí
+Hồ sơ: [Tên] ([Can chi năm sinh] [Năm sinh])
+Bản Mệnh: [Mệnh] | Cục: [Cục]
+## 1. Năng lực thiên phú (Cung Mệnh)
+[Block Nội dung - ...]:
+🔒 Nâng cấp Premium để xem:
+- ...
+## 2. Phong cách kiếm tiền (Cung Tài Bạch)
+[Block Nội dung - ...]:
+🔒 Nâng cấp Premium để xem:
+- ...
+## 3. Môi trường làm việc lý tưởng (Cung Quan Lộc)
+[Block Nội dung - ...]:
+🔒 Nâng cấp Premium để xem:
+- ...
+## 4. Vận hạn năm ${chart.input.viewYear} (Năm ${chart.input.viewYear === 2026 ? "Bính Ngọ" : chart.input.viewYear})
+[Block Nội dung - ...]:
+🔒 Nâng cấp Premium để xem:
+- ...
+## KHAI MỞ BẢN ĐỒ ĐỘC BẢN CỦA RIÊNG BẠN
+[ MỞ KHÓA BÁO CÁO FULL PREMIUM NGAY ]
 
 Trả về duy nhất nội dung Markdown hoàn chỉnh.`;
 }

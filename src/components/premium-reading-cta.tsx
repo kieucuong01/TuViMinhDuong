@@ -59,7 +59,7 @@ export function PremiumReadingCta({
         data-loading-message="Đang mở PayOS..."
       >
         <input type="hidden" name="chartId" value={chartId} />
-        <LoadingSubmitButton className="btn btn-primary" loadingText="Đang mở PayOS...">
+        <LoadingSubmitButton className="btn btn-primary" loadingText="Đang mở PayOS..." data-testid="premium-reading-confirm-submit">
           Thanh toán PayOS — {cashLabel(fullPriceCoins)}
         </LoadingSubmitButton>
       </form>

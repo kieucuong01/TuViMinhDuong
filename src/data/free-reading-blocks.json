@@ -1,0 +1,78 @@
+{
+  "cung_menh": {
+    "chinh_tinh": {
+      "thien_co": {
+        "loi_the": "Cung Mệnh của bạn được dẫn dắt bởi Thiên Cơ, mang năng lượng chủ đạo về tư duy logic, khả năng quan sát chi tiết và hoạch định đường đi trước khi hành động. Bạn có lợi thế trong việc nhìn ra cấu trúc lõi của vấn đề, đọc dữ liệu, sắp xếp nguồn lực và tìm cách làm thông minh hơn thay vì chỉ làm nhiều hơn.",
+        "rao_can": "Rào cản của khí chất này là dễ nghĩ quá lâu trước một quyết định quan trọng. Khi mọi thứ chưa đủ chắc, bạn có thể trì hoãn, tự mở thêm nhiều giả định và bỏ lỡ thời điểm nên thử một bước nhỏ.",
+        "premium_hook": "Premium mở phần điểm mù tâm lý khiến bạn hay trì hoãn, kèm cách kích hoạt sự quyết đoán mà vẫn không đánh mất khả năng phân tích."
+      },
+      "that_sat": {
+        "loi_the": "Với Thất Sát thủ Mệnh, bạn có khí chất mạnh, thích hành động rõ ràng và chịu được áp lực tốt hơn nhiều người. Khi đã thấy mục tiêu, bạn thường không ngại đi vào việc khó, tái thiết lại trật tự cũ hoặc nhận vai trò cần bản lĩnh.",
+        "rao_can": "Mặt cần quản trị là nhịp nóng và cái tôi khi bị cản đường. Nếu phản ứng quá nhanh, bạn dễ làm người khác phòng thủ, khiến cơ hội hợp tác hoặc sự ủng hộ quan trọng bị giảm đi.",
+        "premium_hook": "Premium mở chiến lược kiểm soát năng lượng Sát, cách thu phục nhân tâm và xây mạng lưới đồng minh bền hơn."
+      },
+      "thien_phu": {
+        "loi_the": "Cung Mệnh có Thiên Phủ cho thấy bạn thiên về khả năng giữ nền, quản trị nguồn lực và tạo cảm giác tin cậy. Bạn hợp với những việc cần sự bền bỉ, kín kẽ, biết tích lũy và biết giữ lời hứa trong thời gian dài.",
+        "rao_can": "Rào cản thường nằm ở sự an toàn quá mức. Bạn có thể giữ nhiều nguồn lực trong tay nhưng chậm dùng chúng để tạo bước tiến mới, nhất là khi phải chọn giữa ổn định và mở rộng.",
+        "premium_hook": "Premium mở bản đồ dùng nguồn lực đúng lúc: khi nào nên giữ, khi nào nên xoay, và đâu là ngưỡng rủi ro hợp với bản mệnh."
+      },
+      "default": {
+        "loi_the": "Cung Mệnh của bạn cho thấy một lõi tính cách có khả năng thích nghi và tự điều chỉnh theo hoàn cảnh. Điểm đáng chú ý không chỉ là sao nào đứng đầu, mà là cách Mệnh phối hợp với Thân, Cục và các cung trọng yếu để tạo thành một kiểu ra quyết định riêng.",
+        "rao_can": "Rào cản chính là dễ đọc lá số như từng mảnh rời. Nếu chỉ nhìn một sao đơn lẻ, bạn có thể bỏ qua bối cảnh thật: giai đoạn tuổi, môi trường sống và kiểu áp lực đang lặp lại.",
+        "premium_hook": "Premium mở bản phân tích Mệnh - Thân - Cục liền mạch để chỉ ra điểm mạnh, điểm yếu và cách dùng đúng trong 90 ngày tới."
+      }
+    }
+  },
+  "cung_tai_bach": {
+    "dong_tien_chinh": {
+      "dong_luong": {
+        "loi_the": "Dòng tiền của bạn có xu hướng ổn định, thiên về tích lũy và kiếm tiền chân chính dựa trên chuyên môn, uy tín cá nhân và giá trị thật. Bạn không hợp kiểu đánh cược quá lớn; cách tạo tiền bền hơn là xây năng lực, giữ chữ tín và để thành quả tăng dần theo thời gian.",
+        "rao_can": "Điểm cần chú ý là sự thận trọng có thể khiến bạn chậm nắm cơ hội mới. Khi mọi phương án đều phải thật chắc, bạn dễ bỏ qua những cơ hội nhỏ nhưng có khả năng mở đường cho nguồn thu tốt hơn.",
+        "premium_hook": "Premium mở bản đồ đầu tư cá nhân: tỷ lệ giữ tiền, xoay vốn và tái đầu tư hợp với cung Tài Bạch của bạn."
+      },
+      "tu_tham": {
+        "loi_the": "Cung Tài Bạch có tín hiệu nhạy với cơ hội thương mại, dòng tiền biến động và khả năng xoay chuyển nhanh. Bạn có thể kiếm tốt khi đọc đúng nhu cầu thị trường, biết thương lượng và dám thử mô hình mới trong phạm vi kiểm soát được.",
+        "rao_can": "Rủi ro là dễ bị cuốn vào cơ hội sáng bóng nhưng thiếu nền. Nếu không đặt giới hạn vốn, giới hạn thời gian và tiêu chí dừng, dòng tiền có thể lên nhanh nhưng cũng xuống nhanh.",
+        "premium_hook": "Premium mở cảnh báo hố đen tài chính và cách đặt giới hạn trước khi đầu tư, hợp tác hoặc mở rộng."
+      },
+      "default": {
+        "loi_the": "Cung Tài Bạch cho biết cách bạn tạo và giữ nguồn lực. Trong lá số này, tài chính nên được đọc cùng Quan Lộc và Phúc Đức: tiền không chỉ đến từ may mắn, mà từ năng lực tạo giá trị, uy tín và khả năng giữ nhịp ổn định.",
+        "rao_can": "Điểm cần quản trị là quyết định tiền bạc theo cảm xúc hoặc theo áp lực của người khác. Khi chưa có tiêu chí rõ, bạn nên đi chậm, kiểm tra số liệu và tránh cam kết vượt quá sức chịu đựng.",
+        "premium_hook": "Premium mở bảng phân bổ nguồn lực, vùng dễ thất thoát và mốc kiểm tra dòng tiền theo từng giai đoạn."
+      }
+    }
+  },
+  "cung_quan_loc": {
+    "moi_truong": {
+      "thai_am_hoa_ky": {
+        "loi_the": "Cung Quan Lộc với Thái Âm đi cùng Hóa Kỵ cho thấy bạn hợp kiểu làm việc cần chiều sâu, sự độc lập và khả năng xử lý việc phía sau hậu trường. Bạn có thể mạnh khi được tự chủ, làm chuyên môn, quản trị dữ liệu, tài chính, nội dung hoặc những việc đòi hỏi sự tinh tế.",
+        "rao_can": "Rào cản là môi trường nhiều thị phi, thủ tục cứng hoặc cảm xúc âm ỉ. Nếu ở lâu trong nơi thiếu minh bạch, bạn dễ bị hao tâm trí, mất cảm hứng và khó nói rõ giá trị thật của bạn.",
+        "premium_hook": "Premium mở top 3 mô hình nghề nghiệp hợp lá số và chiến lược vượt rào để thoát khỏi thị phi công sở."
+      },
+      "thien_tuong": {
+        "loi_the": "Quan Lộc có Thiên Tướng cho thấy bạn hợp vai trò cần trách nhiệm, điều phối và đứng giữa nhiều bên để giữ trật tự. Bạn có thể phát triển trong môi trường có quy trình, có chuẩn mực và cần người biết cân bằng lợi ích.",
+        "rao_can": "Điểm cần lưu ý là dễ ôm vai người giải quyết cho tất cả. Khi quyền hạn không rõ nhưng trách nhiệm lại nhiều, bạn có thể bị kẹt giữa cấp trên, khách hàng, đội nhóm và áp lực kết quả.",
+        "premium_hook": "Premium mở chiến lược định vị vai trò, thương lượng quyền hạn và chọn môi trường giúp bạn lên chức mà không kiệt sức."
+      },
+      "default": {
+        "loi_the": "Cung Quan Lộc mô tả kiểu môi trường giúp bạn phát huy năng lực. Lá số này cần đọc nghề nghiệp như một hệ sinh thái: vai trò nào làm bạn sáng lên, kiểu trách nhiệm nào đáng nhận và môi trường nào làm hao năng lượng.",
+        "rao_can": "Rào cản thường không nằm ở thiếu cố gắng, mà ở đặt bạn vào cấu trúc không hợp. Khi làm sai môi trường, bạn có thể làm nhiều nhưng kết quả không phản ánh đúng năng lực.",
+        "premium_hook": "Premium mở bản đồ nghề nghiệp: ngành, mô hình dự án và cách xây thương hiệu cá nhân theo cung Quan Lộc."
+      }
+    }
+  },
+  "van_han": {
+    "nam": {
+      "binh_ngo_2026": {
+        "loi_the": "Năm 2026 là một năm có tính bản lề vì năng lượng vận hạn thúc bạn nhìn lại vị trí cá nhân, cách dùng sức và những kế hoạch đã ấp ủ. Đây là thời điểm phù hợp để khởi tạo, sắp xếp lại ưu tiên và chọn một hướng có thể theo đuổi nghiêm túc hơn.",
+        "rao_can": "Áp lực của năm này là dễ muốn làm nhiều việc cùng lúc. Nếu không chọn trọng tâm, bạn có thể tiêu hao sức vào các cam kết song song, trong khi điều cần nhất là một kế hoạch có thứ tự và mốc kiểm tra rõ.",
+        "premium_hook": "Premium mở lộ trình 12 tháng: tháng nên tung việc mới, tháng nên đi chậm, và vùng cần giữ an toàn về tiền bạc, pháp lý, sức khỏe."
+      },
+      "default": {
+        "loi_the": "Vận hạn năm đang xem cho biết nhịp thời gian nào nên chủ động và nhịp nào nên quan sát. Khi đọc đúng vận, bạn không cần quyết định vội; bạn biết việc nào nên làm trước, việc nào cần chờ thêm dữ kiện.",
+        "rao_can": "Điểm cần tránh là xem vận hạn như lời phán chắc chắn. Cách đọc hữu ích hơn là biến tín hiệu thành kế hoạch: giảm rủi ro, giữ sức, kiểm tra tiền bạc và chọn thời điểm hành động phù hợp.",
+        "premium_hook": "Premium mở lịch hành động từng tháng, kèm cảnh báo việc nên tránh và cơ hội nên tận dụng trong năm xem."
+      }
+    }
+  }
+}

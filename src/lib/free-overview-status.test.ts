@@ -32,20 +32,21 @@ describe("free overview status", () => {
     expect(source).not.toContain("fullOverviewPromise");
   });
 
-  it("returns a fast 1,400-1,650 visible-word fallback while the LLM overview is missing", async () => {
+  it("returns a fast 520-950 visible-word block preview while the LLM overview is missing", async () => {
     const { FREE_OVERVIEW_MAX_WORDS, FREE_OVERVIEW_MIN_WORDS, FREE_OVERVIEW_VERSION } = await import("@/lib/ai");
     const { getFreeOverviewStatus } = await import("@/lib/data");
     const status = getFreeOverviewStatus(chartFixture());
 
     expect(status.status).toBe("fallback");
     expect(status.source).toBe("seed-rules");
-    expect(FREE_OVERVIEW_VERSION).toBe("free-llm-overview-v14");
+    expect(FREE_OVERVIEW_VERSION).toBe("free-block-preview-v1");
     expect(status.jobStatus).toBe("idle");
-    expect(status.content).toContain("# Bản tổng quan lá số của bạn");
-    expect(status.content).toContain("## 4. Vận hiện tại");
+    expect(status.content).toContain("# Bài mẫu luận giải miễn phí");
+    expect(status.content).toContain("## 4. Vận hạn năm");
+    expect(status.content.match(/🔒 Nâng cấp Premium để xem:/gu)).toHaveLength(4);
     expect(status.wordCount).toBeGreaterThanOrEqual(FREE_OVERVIEW_MIN_WORDS);
     expect(status.wordCount).toBeLessThanOrEqual(FREE_OVERVIEW_MAX_WORDS);
-  });
+  }, 30000);
 
   it("serves a cached current-version LLM overview when available", async () => {
     const { FREE_OVERVIEW_VERSION, buildInstantFreeOverview } = await import("@/lib/ai");

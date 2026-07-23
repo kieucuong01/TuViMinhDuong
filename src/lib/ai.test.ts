@@ -303,22 +303,21 @@ describe("AI reading format", () => {
     expect(result.model).toBe("deepseek/deepseek-v4-flash");
   });
 
-  it("renders the four personalized seed clusters within the approved length", () => {
+  it("renders the four assembled free preview blocks within the approved length", () => {
     const chart = youngSampleChart();
     const content = buildInstantFreeOverview(chart);
 
-    expect(FREE_OVERVIEW_TEMPLATE_MIN_WORDS).toBe(1400);
-    expect(FREE_OVERVIEW_TEMPLATE_MAX_WORDS).toBe(1650);
+    expect(FREE_OVERVIEW_TEMPLATE_MIN_WORDS).toBe(520);
+    expect(FREE_OVERVIEW_TEMPLATE_MAX_WORDS).toBe(950);
     expect(countVisibleMarkdownWords(content)).toBeGreaterThanOrEqual(FREE_OVERVIEW_TEMPLATE_MIN_WORDS);
     expect(countVisibleMarkdownWords(content)).toBeLessThanOrEqual(FREE_OVERVIEW_TEMPLATE_MAX_WORDS);
-    expect(content).toContain("### Đọc nhanh");
-    expect(content).toContain("# Bản tổng quan lá số của bạn");
-    expect(content).toContain("## 1. Khí chất và cách ra quyết định");
-    expect(content).toContain("## 2. Công việc và nguồn lực");
-    expect(content).toContain("## 3. Quan hệ và nhịp sống");
-    expect(content).toContain("## 4. Vận hiện tại");
-    expect(content).toContain("**Câu hỏi tự đối chiếu:**");
-    expect(content).toContain("Bản FULL 9 chương cá nhân hóa");
+    expect(content).toContain("# Bài mẫu luận giải miễn phí");
+    expect(content).toContain("## 1. Năng lực thiên phú (Cung Mệnh)");
+    expect(content).toContain("## 2. Phong cách kiếm tiền (Cung Tài Bạch)");
+    expect(content).toContain("## 3. Môi trường làm việc lý tưởng (Cung Quan Lộc)");
+    expect(content).toContain(`## 4. Vận hạn năm ${chart.input.viewYear}`);
+    expect(content.match(/🔒 Nâng cấp Premium để xem:/gu)).toHaveLength(4);
+    expect(content).toContain("MỞ KHÓA BÁO CÁO FULL PREMIUM NGAY");
     expect(content).toContain(chart.input.fullName);
     expect(content).toMatch(/\bbạn\b/iu);
     expect(content).not.toMatch(/người đọc|người này|đương số|\bmình\b/iu);
@@ -326,12 +325,12 @@ describe("AI reading format", () => {
     expect(content).not.toContain(PAID_FULL_WORD_TARGET);
   });
 
-  it("accepts only complete four-cluster seed reports inside the guard range", () => {
+  it("accepts only complete four-section premium-hook previews inside the guard range", () => {
     const content = buildInstantFreeOverview(sampleChart());
 
     expect(isCompleteFreeOverview(content)).toBe(true);
-    expect(isCompleteFreeOverview(content.replace("## 2. Công việc và nguồn lực", "## Ghi chú"))).toBe(false);
-    expect(isCompleteFreeOverview(content.split("## 3. Quan hệ và nhịp sống")[0])).toBe(false);
+    expect(isCompleteFreeOverview(content.replace("## 2. Phong cách kiếm tiền (Cung Tài Bạch)", "## Ghi chú"))).toBe(false);
+    expect(isCompleteFreeOverview(content.split("## 3. Môi trường làm việc lý tưởng (Cung Quan Lộc)")[0])).toBe(false);
     expect(isCompleteFreeOverview(`${content} ${"thêm ".repeat(300)}`)).toBe(false);
   });
 

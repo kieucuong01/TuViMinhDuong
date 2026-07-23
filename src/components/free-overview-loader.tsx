@@ -35,14 +35,16 @@ export function FreeOverviewLoader({
 
   const chartPath = `/la-so/${chartId}`;
   const nextPath = `${chartPath}#luan-giai`;
+  const premiumPath = `${chartPath}#personal-report-outline`;
   const isLlmReady = initialOverview.source === "llm";
   const shouldAttemptLlm = !isLlmReady && initialOverview.jobStatus !== "failed";
+  const hasPremiumHookPreview = initialOverview.content.includes("🔒 Nâng cấp Premium để xem:");
 
   return (
     <article
       className="free-reading-summary"
       data-ad-view="free_overview_viewed"
-      data-ad-depth={canReadFullOverview ? "4" : "2"}
+      data-ad-depth={canReadFullOverview || hasPremiumHookPreview ? "4" : "2"}
       data-chart-id={chartId}
     >
       <MarkdownContent content={initialOverview.content} />
@@ -61,7 +63,29 @@ export function FreeOverviewLoader({
         </section>
       ) : null}
 
-      {!canReadFullOverview && !isSignedIn ? (
+      {!canReadFullOverview && !isSignedIn && hasPremiumHookPreview ? (
+        <section
+          className="free-overview-vip-transition"
+          aria-labelledby="free-overview-premium-title"
+          data-ad-view="full_offer_inline_viewed"
+          data-chart-id={chartId}
+        >
+          <div>
+            <p className="eyebrow">Bản FULL Premium</p>
+            <h2 id="free-overview-premium-title">Mở khóa báo cáo cá nhân hóa của {fullName}</h2>
+            <p>Bản miễn phí đã cho bạn bốn lớp chính. Báo cáo FULL đi tiếp vào 12 cung, vận năm, lộ trình 12 tháng và kế hoạch 90 ngày.</p>
+          </div>
+          <Link
+            className="btn btn-primary"
+            href={loginModalHref(chartPath, undefined, premiumPath)}
+            scroll={false}
+            data-ad-click="full_offer_inline_clicked"
+            data-chart-id={chartId}
+          >
+            Lưu lá số &amp; mở bản FULL
+          </Link>
+        </section>
+      ) : !canReadFullOverview && !isSignedIn ? (
         <section
           className="free-overview-guest-gate"
           aria-labelledby="free-overview-login-title"

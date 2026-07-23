@@ -29,6 +29,40 @@ NỘI_DUNG_KHÔNG_ĐƯỢC_GỬI
 
 NỘI_DUNG_VẬN_KHÔNG_ĐƯỢC_GỬI`;
 
+const premiumPreview = `# Bài mẫu luận giải miễn phí
+
+## 1. Năng lực thiên phú (Cung Mệnh)
+
+Nội dung miễn phí.
+
+🔒 Nâng cấp Premium để xem:
+
+- Điểm mù tâm lý của riêng bạn.
+
+## 2. Phong cách kiếm tiền (Cung Tài Bạch)
+
+Nội dung miễn phí.
+
+🔒 Nâng cấp Premium để xem:
+
+- Bản đồ đầu tư cá nhân.
+
+## 3. Môi trường làm việc lý tưởng (Cung Quan Lộc)
+
+Nội dung miễn phí.
+
+🔒 Nâng cấp Premium để xem:
+
+- Top 3 mô hình dự án hợp lá số.
+
+## 4. Vận hạn năm 2026 (Năm Bính Ngọ)
+
+Nội dung miễn phí.
+
+🔒 Nâng cấp Premium để xem:
+
+- Lộ trình 12 tháng.`;
+
 describe("free overview guest presentation", () => {
   it("returns the introduction and exactly the first two insights", () => {
     const teaser = buildFreeOverviewTeaser(report);
@@ -54,5 +88,13 @@ describe("free overview guest presentation", () => {
 
   it("fails closed when the expected third insight boundary is missing", () => {
     expect(buildFreeOverviewTeaser("# Báo cáo cũ\n\nNội dung không rõ cấu trúc")).toBe("");
+  });
+
+  it("keeps all four sections when the free preview already injects premium hooks", () => {
+    const teaser = buildFreeOverviewTeaser(premiumPreview);
+
+    expect(teaser).toContain("## 1. Năng lực thiên phú");
+    expect(teaser).toContain("## 4. Vận hạn năm 2026");
+    expect(teaser.match(/🔒 Nâng cấp Premium để xem:/gu)).toHaveLength(4);
   });
 });

@@ -1,64 +1,82 @@
-import type { TuViChart } from "@/lib/chart";
-import {
-  IMPORTANT_INTERPRETATION_PALACES,
-  type InterpretationRule,
-  loadInterpretationRules,
-} from "@/lib/interpretation-rules";
-import { buildFreeOverviewTeaser, countVisibleMarkdownWords } from "@/lib/free-overview-presentation";
+import type { Palace, TuViChart } from "@/lib/chart";
+import freeReadingBlocks from "../data/free-reading-blocks.json" with { type: "json" };
 
-type FreeOverviewPalaceFact = {
-  name: string;
-  actualName: string;
-  branch: string;
-  mainStars: string[];
-  supportStars: string[];
-  yearlyStars: string[];
-  starStates: Record<string, string>;
-  lifecycle: string;
+type FreeReadingBlock = {
+  loi_the: string;
+  rao_can: string;
+  premium_hook: string;
 };
 
-export type FreeOverviewFacts = {
-  age: number;
-  address: string;
-  lifeContext: string;
-  menhThanLabel: string;
-  currentDecade: { palace: string; branch: string; range: string };
-  importantPalaces: FreeOverviewPalaceFact[];
-  mainStarPalaces: Array<{ star: string; palace: string; branch: string; state?: string }>;
-  gates: Array<{ gate: "Tuần" | "Triệt"; palace: string; actualPalace: string }>;
-  supportGroups: Array<{ group: string; palace: string; stars: string[] }>;
-  states: Array<{ state: string; palace: string; star: string }>;
-  yearlyActivatedPalaces: Array<{ palace: string; stars: string[] }>;
+type FreeReadingContentBlocks = {
+  cung_menh: {
+    chinh_tinh: Record<string, FreeReadingBlock>;
+  };
+  cung_tai_bach: {
+    dong_tien_chinh: Record<string, FreeReadingBlock>;
+  };
+  cung_quan_loc: {
+    moi_truong: Record<string, FreeReadingBlock>;
+  };
+  van_han: {
+    nam: Record<string, FreeReadingBlock>;
+  };
 };
 
-export type ScoredInterpretationRule = InterpretationRule & {
-  score: number;
-  evidence: string;
+export const FREE_READING_CONTENT_BLOCKS = freeReadingBlocks as FreeReadingContentBlocks;
+
+export type FreeReadingSignalSection = {
+  key: "menh" | "tai_bach" | "quan_loc" | "van_han";
+  palace: string;
+  signalLabel: string;
+  matchKey: string;
 };
 
-export type FreeOverviewCluster = {
-  key: string;
+export type FreeReadingSignals = {
+  profileName: string;
+  lifeYearLabel: string;
+  destinyLine: string;
+  viewYear: number;
+  viewYearCanChi: string;
+  sections: FreeReadingSignalSection[];
+};
+
+export type FreeReadingSection = FreeReadingSignalSection & {
   title: string;
-  primary: ScoredInterpretationRule;
-  support?: ScoredInterpretationRule;
-};
-
-export type FreeOverviewNarrativePlan = {
-  facts: FreeOverviewFacts;
-  clusters: FreeOverviewCluster[];
-  selectedRules: ScoredInterpretationRule[];
-  allMatches: ScoredInterpretationRule[];
+  blockLabel: string;
+  freeText: string;
+  premiumHook: string;
 };
 
 function chartAge(chart: TuViChart) {
   return chart.input.viewYear - chart.solar.year;
 }
 
-function lifeContext(chart: TuViChart) {
-  const age = chartAge(chart);
-  if (age <= 21) return "Ở tuổi này, ví dụ gần nhất là lịch học, bài tập nhóm, chọn ngành, bạn bè, tiền tiêu vặt và việc part-time.";
-  if (age <= 29) return "Ở giai đoạn này, trọng tâm thường là vào nghề, chọn môi trường, tự lập tài chính và xây kỹ năng nền.";
-  return "Ở giai đoạn trưởng thành, trọng tâm thường là công việc, tiền bạc, gia đình, quan hệ thân thiết và nhịp nghỉ.";
+function palaceByName(chart: TuViChart, name: string) {
+  if (name === "Thân") return chart.palaces.find((palace) => palace.isThan);
+  return chart.palaces.find((palace) => palace.name === name);
+}
+
+function firstUsefulMainStar(palace?: Palace) {
+  return palace?.mainStars.find((star) => star !== "Vô chính diệu") || palace?.supportStars[0] || "Tổng hợp";
+}
+
+function hasStar(palace: Palace | undefined, starName: string) {
+  if (!palace) return false;
+  return [...palace.mainStars, ...palace.supportStars, ...palace.yearlyStars].some((star) => star.includes(starName));
+}
+
+function normalizeKey(value: string) {
+  return value
+    .toLocaleLowerCase("vi")
+    .normalize("NFD")
+    .replace(/\p{Diacritic}/gu, "")
+    .replace(/đ/gu, "d")
+    .replace(/[^a-z0-9]+/gu, "_")
+    .replace(/^_+|_+$/gu, "");
+}
+
+function blockOrDefault(collection: Record<string, FreeReadingBlock>, key: string) {
+  return collection[key] || collection.default;
 }
 
 function currentDecade(chart: TuViChart) {
@@ -71,514 +89,131 @@ function currentDecade(chart: TuViChart) {
   );
 }
 
-function palaceByName(chart: TuViChart, name: string) {
-  if (name === "Thân") return chart.palaces.find((palace) => palace.isThan);
-  return chart.palaces.find((palace) => palace.name === name);
+function yearCanChi(chart: TuViChart) {
+  return chart.canChi?.year || String(chart.solar.year);
 }
 
-function starsForGroup(stars: string[], groupStars: string[]) {
-  return stars.filter((star) => groupStars.some((groupStar) => star.includes(groupStar)));
+function viewYearCanChi(chart: TuViChart) {
+  if (chart.input.viewYear === 2026) return "Bính Ngọ";
+  return String(chart.input.viewYear);
 }
 
-function unique<T>(values: T[]) {
-  return Array.from(new Set(values));
+function moneyMatchKey(taiBach?: Palace) {
+  if (hasStar(taiBach, "Thiên Đồng") && hasStar(taiBach, "Thiên Lương")) return "dong_luong";
+  if ((hasStar(taiBach, "Tử Vi") || hasStar(taiBach, "Tử")) && hasStar(taiBach, "Tham Lang")) return "tu_tham";
+  return "default";
 }
 
-function palaceFact(chart: TuViChart, name: string): FreeOverviewPalaceFact | null {
-  const palace = palaceByName(chart, name);
-  if (!palace) return null;
-  return {
-    name,
-    actualName: palace.name,
-    branch: palace.branch,
-    mainStars: palace.mainStars,
-    supportStars: palace.supportStars,
-    yearlyStars: palace.yearlyStars,
-    starStates: palace.starStates,
-    lifecycle: palace.lifecycle,
-  };
+function careerMatchKey(quanLoc?: Palace) {
+  if (hasStar(quanLoc, "Thái Âm") && hasStar(quanLoc, "Hóa Kỵ")) return "thai_am_hoa_ky";
+  if (hasStar(quanLoc, "Thiên Tướng")) return "thien_tuong";
+  return "default";
 }
 
-export function extractFreeOverviewFacts(chart: TuViChart): FreeOverviewFacts {
+function yearMatchKey(chart: TuViChart) {
+  return chart.input.viewYear === 2026 ? "binh_ngo_2026" : "default";
+}
+
+export function extractFreeReadingSignals(chart: TuViChart): FreeReadingSignals {
+  const menh = palaceByName(chart, "Mệnh");
+  const taiBach = palaceByName(chart, "Tài Bạch");
+  const quanLoc = palaceByName(chart, "Quan Lộc");
   const decade = currentDecade(chart);
-  const importantPalaces = IMPORTANT_INTERPRETATION_PALACES
-    .map((name) => palaceFact(chart, name))
-    .filter((item): item is FreeOverviewPalaceFact => Boolean(item));
-
-  const mainStarPalaces = chart.palaces.flatMap((palace) =>
-    palace.mainStars
-      .filter((star) => star !== "Vô chính diệu")
-      .map((star) => ({ star, palace: palace.name, branch: palace.branch, state: palace.starStates[star] })),
-  );
-
-  const gates = importantPalaces.flatMap((palace) =>
-    (["Tuần", "Triệt"] as const)
-      .filter((gate) => palace.supportStars.includes(gate))
-      .map((gate) => ({ gate, palace: palace.name, actualPalace: palace.actualName })),
-  );
-
-  const supportGroups = importantPalaces.flatMap((palace) => {
-    const stars = [...palace.supportStars, ...palace.yearlyStars];
-    const groups = [
-      { group: "cát tinh", stars: ["Tả Phù", "Hữu Bật", "Văn Xương", "Văn Khúc", "Khôi", "Việt", "Long Trì", "Phượng"] },
-      { group: "sát tinh", stars: ["Kình", "Đà", "Hỏa", "Linh", "Không", "Kiếp"] },
-      { group: "hao tinh", stars: ["Đại Hao", "Tiểu Hao", "Hao"] },
-      { group: "đào hoa", stars: ["Đào Hoa", "Hồng Loan", "Thiên Hỷ", "Hỷ Thần"] },
-      { group: "khoa quyền lộc kỵ", stars: ["Hóa Khoa", "Hóa Quyền", "Hóa Lộc", "Hóa Kỵ"] },
-    ];
-    return groups
-      .map((group) => ({ group: group.group, palace: palace.name, stars: unique(starsForGroup(stars, group.stars)) }))
-      .filter((group) => group.stars.length > 0);
-  });
-
-  const states = importantPalaces.flatMap((palace) =>
-    [...palace.mainStars, ...palace.supportStars, ...palace.yearlyStars]
-      .map((star) => ({ star, state: palace.starStates[star], palace: palace.name }))
-      .filter((item): item is { star: string; state: string; palace: string } => Boolean(item.state)),
-  );
-
-  const yearlyActivatedPalaces = importantPalaces
-    .filter((palace) => palace.yearlyStars.length > 0)
-    .map((palace) => ({ palace: palace.name, stars: palace.yearlyStars.slice(0, 4) }));
+  const menhStar = firstUsefulMainStar(menh);
 
   return {
-    age: chartAge(chart),
-    address: "bạn",
-    lifeContext: lifeContext(chart),
-    menhThanLabel: `Mệnh ${chart.menh} / Thân ${chart.than}; ${chart.menhCucRelation}; ${chart.cuc}`,
-    currentDecade: decade,
-    importantPalaces,
-    mainStarPalaces,
-    gates,
-    supportGroups,
-    states,
-    yearlyActivatedPalaces,
+    profileName: chart.input.fullName,
+    lifeYearLabel: `${yearCanChi(chart)} ${chart.solar.year}`,
+    destinyLine: `${chart.menh} | Cục: ${chart.cuc}`,
+    viewYear: chart.input.viewYear,
+    viewYearCanChi: viewYearCanChi(chart),
+    sections: [
+      {
+        key: "menh",
+        palace: menh?.name || "Mệnh",
+        signalLabel: menhStar,
+        matchKey: FREE_READING_CONTENT_BLOCKS.cung_menh.chinh_tinh[normalizeKey(menhStar)] ? normalizeKey(menhStar) : "default",
+      },
+      {
+        key: "tai_bach",
+        palace: taiBach?.name || "Tài Bạch",
+        signalLabel: moneyMatchKey(taiBach) === "dong_luong" ? "Đồng Lương" : moneyMatchKey(taiBach) === "tu_tham" ? "Tử Tham" : firstUsefulMainStar(taiBach),
+        matchKey: moneyMatchKey(taiBach),
+      },
+      {
+        key: "quan_loc",
+        palace: quanLoc?.name || "Quan Lộc",
+        signalLabel: careerMatchKey(quanLoc) === "thai_am_hoa_ky" ? "Thái Âm Hóa Kỵ" : firstUsefulMainStar(quanLoc),
+        matchKey: careerMatchKey(quanLoc),
+      },
+      {
+        key: "van_han",
+        palace: decade?.palace || "Đại vận",
+        signalLabel: chart.input.viewYear === 2026 ? "Lưu Thái Tuế và nhịp Bính Ngọ" : `Đại vận ${decade?.range || ""}`.trim(),
+        matchKey: yearMatchKey(chart),
+      },
+    ],
   };
 }
 
-function palaceWeight(name: string) {
-  if (name === "Mệnh" || name === "Thân") return 24;
-  if (["Quan Lộc", "Tài Bạch", "Phu Thê", "Tật Ách", "Thiên Di"].includes(name)) return 18;
-  if (name === "Phúc Đức") return 14;
-  return 6;
+function sectionTitle(signal: FreeReadingSignalSection, viewYear: number, viewYearLabel: string) {
+  if (signal.key === "menh") return "Năng lực thiên phú (Cung Mệnh)";
+  if (signal.key === "tai_bach") return "Phong cách kiếm tiền (Cung Tài Bạch)";
+  if (signal.key === "quan_loc") return "Môi trường làm việc lý tưởng (Cung Quan Lộc)";
+  return `Vận hạn năm ${viewYear} (Năm ${viewYearLabel})`;
 }
 
-function stripEvidenceLabel(value: string) {
-  return value.replace(/^Căn cứ:\s*/i, "").trim();
+function blockForSignal(signal: FreeReadingSignalSection) {
+  if (signal.key === "menh") return blockOrDefault(FREE_READING_CONTENT_BLOCKS.cung_menh.chinh_tinh, signal.matchKey);
+  if (signal.key === "tai_bach") return blockOrDefault(FREE_READING_CONTENT_BLOCKS.cung_tai_bach.dong_tien_chinh, signal.matchKey);
+  if (signal.key === "quan_loc") return blockOrDefault(FREE_READING_CONTENT_BLOCKS.cung_quan_loc.moi_truong, signal.matchKey);
+  return blockOrDefault(FREE_READING_CONTENT_BLOCKS.van_han.nam, signal.matchKey);
 }
 
-function ruleEvidence(rule: InterpretationRule, facts: FreeOverviewFacts) {
-  const pattern = rule.pattern;
-  if (pattern.kind === "main-star-palace") {
-    const fact = facts.mainStarPalaces.find((item) => item.star === pattern.star && item.palace === pattern.palace);
-    return fact
-      ? `Trong lá số, ${pattern.star}${fact.state ? ` (${fact.state})` : ""} nằm tại cung ${pattern.palace} ở địa chi ${fact.branch}.`
-      : stripEvidenceLabel(rule.evidenceLabel);
-  }
-  if (pattern.kind === "gate") {
-    const gate = facts.gates.find((item) => item.gate === pattern.gate && item.palace === pattern.palace);
-    return gate
-      ? `Lá số cho thấy ${pattern.gate} án tại ${pattern.palace}${gate.actualPalace !== pattern.palace ? `, thực cung là ${gate.actualPalace}` : ""}.`
-      : stripEvidenceLabel(rule.evidenceLabel);
-  }
-  if (pattern.kind === "support-group") {
-    const group = facts.supportGroups.find((item) => item.group === pattern.group && item.palace === pattern.palace);
-    return group
-      ? `Dấu hiệu tử vi nổi lên qua ${group.stars.slice(0, 3).join(", ")} tại ${pattern.palace}.`
-      : stripEvidenceLabel(rule.evidenceLabel);
-  }
-  if (pattern.kind === "state") {
-    const state = facts.states.find((item) => item.state === pattern.state);
-    return state
-      ? `Trong lá số, ${state.star} tại ${state.palace} đang ở trạng thái ${pattern.state}.`
-      : stripEvidenceLabel(rule.evidenceLabel);
-  }
-  if (pattern.kind === "fate") {
-    return pattern.fate === "dai-van"
-      ? `Giai đoạn đang xét đi cùng đại vận ${facts.currentDecade.range} tại cung ${facts.currentDecade.palace}.`
-      : stripEvidenceLabel(rule.evidenceLabel);
-  }
-  return stripEvidenceLabel(rule.evidenceLabel);
-}
+export function buildFreeReadingSections(chart: TuViChart): FreeReadingSection[] {
+  const signals = extractFreeReadingSignals(chart);
 
-function matchRule(rule: InterpretationRule, facts: FreeOverviewFacts): ScoredInterpretationRule | null {
-  const pattern = rule.pattern;
-  let matched = false;
-  let score = rule.priority;
-
-  if (pattern.kind === "main-star-palace") {
-    matched = facts.mainStarPalaces.some((item) => item.star === pattern.star && item.palace === pattern.palace);
-    score += palaceWeight(pattern.palace);
-  }
-  if (pattern.kind === "gate") {
-    matched = facts.gates.some((item) => item.gate === pattern.gate && item.palace === pattern.palace);
-    score += palaceWeight(pattern.palace) + 8;
-  }
-  if (pattern.kind === "support-group") {
-    matched = facts.supportGroups.some((item) => item.group === pattern.group && item.palace === pattern.palace);
-    score += palaceWeight(pattern.palace);
-  }
-  if (pattern.kind === "state") {
-    matched = facts.states.some((item) => item.state === pattern.state);
-    score += pattern.state === "H" ? 12 : 4;
-  }
-  if (pattern.kind === "axis") {
-    matched = true;
-    score += pattern.palaces.some((palace) => palace === facts.currentDecade.palace) ? 12 : 0;
-  }
-  if (pattern.kind === "fate") {
-    if (pattern.fate === "dai-van") matched = pattern.palace === facts.currentDecade.palace || (pattern.palace === "Thân" && facts.importantPalaces.some((palace) => palace.name === "Thân" && palace.actualName === facts.currentDecade.palace));
-    if (pattern.fate === "yearly") matched = facts.yearlyActivatedPalaces.some((item) => item.palace === pattern.palace);
-    score += palaceWeight(pattern.palace);
-  }
-
-  if (!matched) return null;
-  return { ...rule, score, evidence: ruleEvidence(rule, facts) };
-}
-
-function rulePalaces(rule: ScoredInterpretationRule) {
-  if ("palace" in rule.pattern) return [rule.pattern.palace];
-  if (rule.pattern.kind === "axis") return rule.pattern.palaces;
-  return [];
-}
-
-const CLUSTER_SPECS = [
-  {
-    key: "identity",
-    title: "Khí chất và cách ra quyết định",
-    scopes: ["IDENTITY", "AXIS"],
-    palaces: ["Mệnh", "Thân"],
-  },
-  {
-    key: "resources",
-    title: "Công việc và nguồn lực",
-    scopes: ["CAREER", "MONEY"],
-    palaces: ["Quan Lộc", "Tài Bạch", "Thiên Di"],
-  },
-  {
-    key: "relationships",
-    title: "Quan hệ và nhịp sống",
-    scopes: ["RELATIONSHIP", "HEALTH"],
-    palaces: ["Phu Thê", "Phúc Đức", "Tật Ách"],
-  },
-  {
-    key: "current",
-    title: "Vận hiện tại",
-    scopes: ["YEAR"],
-    palaces: IMPORTANT_INTERPRETATION_PALACES,
-  },
-] as const;
-
-function clusterScore(rule: ScoredInterpretationRule, spec: (typeof CLUSTER_SPECS)[number]) {
-  const scopeIndex = spec.scopes.indexOf(rule.scope as never);
-  const palaceMatch = rulePalaces(rule).some((palace) => spec.palaces.includes(palace as never));
-  const primaryPattern = rule.pattern.kind === "main-star-palace" || rule.pattern.kind === "fate";
-  return rule.score + (scopeIndex === 0 ? 18 : 8) + (palaceMatch ? 14 : 0) + (primaryPattern ? 4 : 0);
-}
-
-function rulesSharePalace(left: ScoredInterpretationRule, right: ScoredInterpretationRule) {
-  const rightPalaces = new Set(rulePalaces(right));
-  return rulePalaces(left).some((palace) => rightPalaces.has(palace));
-}
-
-function summarySentences(rule: ScoredInterpretationRule) {
-  return clean(rule.summary)
-    .split(/(?<=[.!?])\s+/u)
-    .map((sentence) => sentence.trim())
-    .filter(Boolean);
-}
-
-function normalizedWords(value: string) {
-  return value
-    .normalize("NFD")
-    .replace(/\p{Diacritic}/gu, "")
-    .toLocaleLowerCase("vi")
-    .replace(/đ/gu, "d")
-    .replace(/[^a-z0-9\s]/gu, " ")
-    .replace(/\s+/gu, " ")
-    .trim()
-    .split(" ")
-    .filter(Boolean);
-}
-
-function hasRepeatedWordWindow(value: string, size: number) {
-  const words = normalizedWords(value);
-  const seen = new Set<string>();
-  for (let index = 0; index <= words.length - size; index += 1) {
-    const window = words.slice(index, index + size).join(" ");
-    if (seen.has(window)) return true;
-    seen.add(window);
-  }
-  return false;
-}
-
-function buildQuickReadCopy(primary: ScoredInterpretationRule, support: ScoredInterpretationRule) {
-  const primarySentences = summarySentences(primary).map((sentence) => ({ sentence, source: "primary" }));
-  const supportSentences = summarySentences(support).map((sentence) => ({ sentence, source: "support" }));
-  const sentences = [...primarySentences, ...supportSentences];
-  let best: { copy: string; words: number } | null = null;
-
-  for (let mask = 1; mask < 2 ** sentences.length; mask += 1) {
-    const selected = sentences.filter((_, index) => (mask & (1 << index)) !== 0);
-    if (!selected.some((item) => item.source === "primary") || !selected.some((item) => item.source === "support")) {
-      continue;
-    }
-    const copy = selected.map((item) => item.sentence).join(" ");
-    const words = countVisibleMarkdownWords(copy);
-    if (words < 80 || words > 120) continue;
-    if (hasRepeatedWordWindow(copy, 8)) continue;
-    if (!best || words > best.words) best = { copy, words };
-  }
-
-  return best?.copy ?? null;
-}
-
-function findRelatedSupport(
-  candidates: ScoredInterpretationRule[],
-  primary: ScoredInterpretationRule,
-  used: Set<string>,
-  requireQuickReadRange: boolean,
-) {
-  return candidates.find((rule) => {
-    if (rule.key === primary.key || used.has(rule.key) || rule.evidence === primary.evidence) return false;
-    if (!rulesSharePalace(primary, rule)) return false;
-    if (!requireQuickReadRange) return true;
-    return Boolean(buildQuickReadCopy(primary, rule));
+  return signals.sections.map((signal) => {
+    const block = blockForSignal(signal);
+    return {
+      ...signal,
+      title: sectionTitle(signal, signals.viewYear, signals.viewYearCanChi),
+      blockLabel: signal.signalLabel,
+      freeText: `${block.loi_the} ${block.rao_can}`,
+      premiumHook: block.premium_hook,
+    };
   });
 }
 
-function selectClusters(matches: ScoredInterpretationRule[]) {
-  const used = new Set<string>();
-  const clusters: FreeOverviewCluster[] = [];
+function renderSection(section: FreeReadingSection, index: number) {
+  return `## ${index + 1}. ${section.title}
 
-  for (const spec of CLUSTER_SPECS) {
-    const candidates = matches
-      .filter((rule) => (spec.key === "current" ? rule.pattern.kind === "fate" : spec.scopes.includes(rule.scope as never)) && !used.has(rule.key))
-      .sort((left, right) => clusterScore(right, spec) - clusterScore(left, spec) || left.key.localeCompare(right.key, "vi"));
-    const fallbackCandidates = spec.key === "current" && candidates.length === 0
-      ? matches
-          .filter((rule) => !used.has(rule.key))
-          .sort((left, right) => clusterScore(right, spec) - clusterScore(left, spec) || left.key.localeCompare(right.key, "vi"))
-      : candidates;
+[Block Nội dung - ${section.blockLabel}]:
+${section.freeText}
 
-    const primary =
-      spec.key === "identity"
-        ? fallbackCandidates.find((candidate) => Boolean(findRelatedSupport(fallbackCandidates, candidate, used, true)))
-        : fallbackCandidates[0];
-    if (!primary) throw new Error(`Không tìm thấy seed rule phù hợp cho cụm ${spec.key}`);
-    used.add(primary.key);
+🔒 Nâng cấp Premium để xem:
 
-    const support = findRelatedSupport(fallbackCandidates, primary, used, spec.key === "identity");
-    if (support) used.add(support.key);
-    clusters.push({ key: spec.key, title: spec.title, primary, support });
-  }
-
-  return clusters;
-}
-
-export function buildFreeOverviewNarrativePlan(chart: TuViChart): FreeOverviewNarrativePlan {
-  const facts = extractFreeOverviewFacts(chart);
-  const allMatches = loadInterpretationRules()
-    .map((rule) => matchRule(rule, facts))
-    .filter((rule): rule is ScoredInterpretationRule => Boolean(rule));
-  const clusters = selectClusters(allMatches);
-
-  return {
-    facts,
-    clusters,
-    selectedRules: clusters.flatMap((cluster) => [cluster.primary, ...(cluster.support ? [cluster.support] : [])]),
-    allMatches,
-  };
-}
-
-function clean(value: string) {
-  return value.replace(/^Căn cứ:\s*/iu, "").replace(/\s+/gu, " ").trim();
-}
-
-function evidence(rule: ScoredInterpretationRule) {
-  return clean(rule.evidence);
-}
-
-type SupportDetail = "strength" | "caution" | "advice";
-
-function supportDetailKey(rule: ScoredInterpretationRule, detail: SupportDetail) {
-  return `${rule.key}:${detail}`;
-}
-
-function joinParagraph(...values: Array<string | undefined>) {
-  return values.filter((value): value is string => Boolean(value)).join(" ");
-}
-
-function youthCopy(value: string) {
-  return value
-    .replace(/Công việc và nguồn lực/gu, "Học tập và nguồn lực")
-    .replace(/công việc và trách nhiệm nghề nghiệp/giu, "học tập, trách nhiệm ở lớp và định hướng tương lai")
-    .replace(/trách nhiệm công việc/giu, "trách nhiệm học tập")
-    .replace(/vị trí nghề nghiệp/giu, "vị trí trong môi trường học tập")
-    .replace(/tiêu chuẩn giao hàng/giu, "tiêu chuẩn hoàn thành")
-    .replace(/nghề nghiệp/giu, "định hướng tương lai")
-    .replace(/công việc/giu, "việc học")
-    .replace(/kiếm tiền/giu, "tạo kết quả")
-    .replace(/làm việc/giu, "học và làm việc")
-    .replace(/part-time/giu, "việc làm thêm phù hợp")
-    .replace(/thương lượng lại quyền hạn/giu, "trao đổi lại phạm vi")
-    .replace(/quyền hạn/giu, "phạm vi được tự chọn")
-    .replace(/tiền nên giữ hay xoay/giu, "nguồn lực nên giữ hay dùng")
-    .replace(/quan hệ thân mật/giu, "quan hệ gần gũi")
-    .replace(/tình yêu/giu, "tình cảm")
-    .replace(/hôn nhân/giu, "quan hệ lâu dài")
-    .replace(/bạn đời/giu, "người đồng hành")
-    .replace(/thành tiền/giu, "thành kết quả")
-    .replace(/lương/giu, "phần thưởng")
-    .replace(/chi phí/giu, "phần đóng góp")
-    .replace(/quyền quyết định/giu, "quyền tự chọn trong phạm vi của bạn")
-    .replace(/quyền quyết/giu, "quyền tự chọn");
-}
-
-function audienceCopy(value: string, facts: FreeOverviewFacts) {
-  return facts.age < 18 ? youthCopy(value) : value;
-}
-
-function renderCluster(cluster: FreeOverviewCluster, index: number, supportDetails: Set<string>, facts: FreeOverviewFacts) {
-  const { primary, support } = cluster;
-  const firstCluster = index === 0;
-  const highlight =
-    firstCluster && support
-      ? clean(support.strengthText)
-      : joinParagraph(clean(primary.summary), support ? clean(support.summary) : undefined);
-  const strength = joinParagraph(
-    clean(primary.strengthText),
-    !firstCluster && support && supportDetails.has(supportDetailKey(support, "strength"))
-      ? clean(support.strengthText)
-      : undefined,
-  );
-  const caution = joinParagraph(
-    clean(primary.cautionText),
-    support && supportDetails.has(supportDetailKey(support, "caution")) ? clean(support.cautionText) : undefined,
-  );
-  const advice = joinParagraph(
-    clean(primary.lifeAdviceText),
-    support && supportDetails.has(supportDetailKey(support, "advice")) ? clean(support.lifeAdviceText) : undefined,
-  );
-  const evidenceText = joinParagraph(
-    `**Dữ kiện lá số:** ${evidence(primary)}`,
-    support ? `**Dấu hiệu liên quan:** ${evidence(support)}` : undefined,
-  );
-
-  return audienceCopy(`## ${index + 1}. ${cluster.title}
-
-### Điểm nổi bật
-
-${highlight}
-
-### Lợi thế
-
-${strength}
-
-### Điểm cần lưu ý
-
-${caution}
-
-### Gợi ý thực tế
-
-${advice}
-
-### Vì sao có nhận định này
-
-${evidenceText}`, facts);
-}
-
-function overviewCopy(
-  plan: FreeOverviewNarrativePlan,
-  chart: TuViChart,
-  supportDetails: Set<string>,
-) {
-  const intro = `# Bản tổng quan lá số của bạn
-
-${chart.input.fullName}, bản đọc này được ghép trực tiếp từ những cung, sao và vận đang hiện diện trong lá số của bạn. Tám dấu hiệu phù hợp nhất được chia thành bốn cụm để bạn dễ đối chiếu với công việc, tiền bạc, quan hệ, trách nhiệm và nhịp nghỉ hiện tại. Mỗi nhận định bên dưới đều đi kèm dữ kiện tử vi cụ thể; đây là góc nhìn để bạn quan sát lựa chọn của bạn rõ hơn, không phải lời phán về kết quả chắc chắn.
-
-Bạn đang ở tuổi ${plan.facts.age}, trong đại vận ${plan.facts.currentDecade.range} tại cung ${plan.facts.currentDecade.palace}. ${plan.facts.lifeContext} Vì vậy, hãy đọc chậm ở những đoạn gợi đúng một hành vi đang lặp lại, một áp lực bạn thường nhận thêm, hoặc một nhu cầu bạn vẫn khó nói thành lời.`;
-
-  const firstCluster = plan.clusters[0];
-  if (!firstCluster.support) throw new Error("Cụm đầu tiên cần một dấu hiệu liên quan cho phần đọc nhanh");
-  const quickReadCopy = buildQuickReadCopy(firstCluster.primary, firstCluster.support);
-  if (!quickReadCopy) throw new Error("Không thể tạo phần đọc nhanh 80-120 từ từ các câu seed nguyên vẹn");
-  const quickRead = `### Đọc nhanh
-
-${quickReadCopy}`;
-  const sections = plan.clusters.map((cluster, index) => renderCluster(cluster, index, supportDetails, plan.facts));
-  const reflection = `**Câu hỏi tự đối chiếu:** ${clean(firstCluster.primary.teaserQuestion)}`;
-  const fullBridge = audienceCopy(
-    `Bản miễn phí mới cho bạn thấy 2 lớp đầu: khí chất và nguồn lực. **Bản FULL 9 chương cá nhân hóa** đi tiếp vào 4 câu hỏi thực tế: quan hệ nên mở hay giữ ranh giới, tiền nên giữ hay xoay, vận năm ${chart.input.viewYear} cần chậm ở đâu, và 90 ngày tới nên làm việc gì trước.`,
-    plan.facts,
-  );
-
-  return [
-    audienceCopy(intro, plan.facts),
-    audienceCopy(quickRead, plan.facts),
-    sections[0],
-    sections[1],
-    audienceCopy(reflection, plan.facts),
-    fullBridge,
-    sections[2],
-    sections[3],
-  ].join("\n\n");
-}
-
-function optionalSupportDetails(plan: FreeOverviewNarrativePlan) {
-  return plan.clusters.flatMap((cluster, index) => {
-    if (!cluster.support) return [];
-    return [
-      ...(index === 0 ? [] : [supportDetailKey(cluster.support, "strength")]),
-      supportDetailKey(cluster.support, "caution"),
-      supportDetailKey(cluster.support, "advice"),
-    ];
-  });
-}
-
-function overviewWordBudgets(content: string) {
-  return {
-    guest: countVisibleMarkdownWords(buildFreeOverviewTeaser(content)),
-    full: countVisibleMarkdownWords(content),
-  };
+- ${section.premiumHook}`;
 }
 
 export function buildFreeOverviewFromInterpretationRules(chart: TuViChart) {
-  const plan = buildFreeOverviewNarrativePlan(chart);
-  const options = optionalSupportDetails(plan);
-  const baseOutput = overviewCopy(plan, chart, new Set());
-  const baseWords = overviewWordBudgets(baseOutput);
-  const optionDeltas = options.map((option) => {
-    const words = overviewWordBudgets(overviewCopy(plan, chart, new Set([option])));
-    return { guest: words.guest - baseWords.guest, full: words.full - baseWords.full };
-  });
-  let best: { mask: number; guest: number; full: number } | null = null;
+  const signals = extractFreeReadingSignals(chart);
+  const sections = buildFreeReadingSections(chart);
+  const age = chartAge(chart);
 
-  for (let mask = 0; mask < 2 ** options.length; mask += 1) {
-    const words = optionDeltas.reduce(
-      (total, delta, index) => {
-        if ((mask & (1 << index)) !== 0) {
-          total.guest += delta.guest;
-          total.full += delta.full;
-        }
-        return total;
-      },
-      { ...baseWords },
-    );
-    if (words.guest < 800 || words.guest > 950 || words.full < 1400 || words.full > 1650) continue;
-    if (!best || words.guest + words.full > best.guest + best.full) {
-      best = { mask, ...words };
-    }
-  }
+  return `# Bài mẫu luận giải miễn phí
 
-  if (!best) {
-    const minimum = overviewWordBudgets(overviewCopy(plan, chart, new Set()));
-    const maximum = overviewWordBudgets(overviewCopy(plan, chart, new Set(options)));
-    throw new Error(
-      `Seed overview cannot satisfy visible-word budgets; guest ${minimum.guest}-${maximum.guest}, full ${minimum.full}-${maximum.full}`,
-    );
-  }
+Hồ sơ: ${signals.profileName} (${signals.lifeYearLabel})
+Tuổi xem: ${age} tuổi trong năm ${signals.viewYear}
+Bản Mệnh: ${signals.destinyLine}
 
-  const enabled = new Set(options.filter((_, index) => (best.mask & (1 << index)) !== 0));
-  return overviewCopy(plan, chart, enabled);
+Chào bạn, lá số Tử Vi của bạn là sự kết hợp của những mã năng lượng riêng. Bản miễn phí này không cố viết một bài dài dàn trải, mà lắp ghép các khối nội dung rõ ràng từ chính cung, sao và vận đang nổi bật trong lá số. Mục tiêu là để bạn thấy nhanh bốn điểm cốt lõi: năng lực thiên phú, phong cách kiếm tiền, môi trường làm việc hợp hơn và nhịp vận hạn của năm đang xem.
+
+${sections.map(renderSection).join("\n\n")}
+
+## KHAI MỞ BẢN ĐỒ ĐỘC BẢN CỦA RIÊNG BẠN
+
+Bản xem trước này chỉ là phần đầu của những gì lá số đang chứa. Báo cáo FULL Premium đi sâu hơn vào 12 cung, đại vận, vận năm, lộ trình 12 tháng và kế hoạch hành động 90 ngày để biến các tín hiệu trên thành quyết định cụ thể hơn.
+
+[ MỞ KHÓA BÁO CÁO FULL PREMIUM NGAY ]`;
 }
