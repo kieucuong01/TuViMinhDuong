@@ -1,7 +1,9 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
+import { LIFETIME_CARDS_PER_PAGE, lifetimeCards } from "@/app/xem-tu-vi-tron-doi/page";
 
 const pageSource = readFileSync("src/app/xem-tu-vi-tron-doi/page.tsx", "utf8");
+const cardListSource = readFileSync("src/app/xem-tu-vi-tron-doi/lifetime-card-list.tsx", "utf8");
 const sitemapSource = readFileSync("src/app/sitemap.ts", "utf8");
 
 describe("lifetime Tu vi landing page", () => {
@@ -33,5 +35,13 @@ describe("lifetime Tu vi landing page", () => {
     expect(sitemapSource).not.toContain("/xem-tu-vi-2026");
     expect(sitemapSource).not.toContain("/tu-vi-tai-loc-dau-tu");
     expect(sitemapSource).not.toContain("/tuong-hop-la-so");
+  });
+  it("keeps pagination client-side and a thumbnail on every card", () => {
+    expect(cardListSource).toContain('"use client"');
+    expect(cardListSource).toContain("useState(1)");
+    expect(cardListSource).toContain("<Image");
+    expect(cardListSource).toContain("Phân trang tử vi trọn đời");
+    expect(lifetimeCards.length).toBeGreaterThan(LIFETIME_CARDS_PER_PAGE);
+    expect(lifetimeCards.every((item) => Boolean(item.coverImage && item.coverAlt))).toBe(true);
   });
 });

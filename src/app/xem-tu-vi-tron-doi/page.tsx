@@ -2,6 +2,7 @@ import Link from "next/link";
 import { BookOpenText, CalendarDays, Compass, Layers3, Search, ShieldCheck, Sparkles, UserRound } from "lucide-react";
 import { routeMetadata } from "@/lib/metadata";
 import { faqJsonLd, itemListJsonLd, webPageJsonLd } from "@/lib/seo";
+import { LifetimeCardList, type LifetimeCardListItem } from "./lifetime-card-list";
 
 export const revalidate = 300;
 
@@ -43,7 +44,9 @@ type LifetimeCard = {
   caution: string;
 };
 
-const lifetimeCards: LifetimeCard[] = [
+export const LIFETIME_CARDS_PER_PAGE = 6;
+
+const baseLifetimeCards: LifetimeCard[] = [
   {
     id: "tu-vi-tron-doi-ky-dau-1969-nam-mang",
     detailsPath: "/tu-vi-tron-doi-tuoi-ky-dau-1969-nam-mang",
@@ -210,6 +213,27 @@ const lifetimeCards: LifetimeCard[] = [
   },
 ];
 
+const lifetimeArticleByPath = new Map(
+  baseLifetimeCards
+    .filter((item) => item.detailsPath)
+    .map((item) => [
+      item.detailsPath as string,
+      {
+        coverImage: `/articles/${item.detailsPath?.replace(/^\//, "")}.svg`,
+      },
+    ]),
+);
+
+export const lifetimeCards: LifetimeCardListItem[] = baseLifetimeCards.map((item) => {
+  const articleAsset = item.detailsPath ? lifetimeArticleByPath.get(item.detailsPath) : null;
+
+  return {
+    ...item,
+    coverImage: articleAsset?.coverImage || `/articles/${item.id}.svg`,
+    coverAlt: `Minh họa ${item.title} theo năm sinh ${item.year} và ${item.gender.toLowerCase()}`,
+  };
+});
+
 const relatedLinks = [
   ["/kien-thuc-tu-vi/la-so-tu-vi-tron-doi", "Lá số tử vi trọn đời là gì?", "Hiểu khác nhau giữa luận theo tuổi và luận theo lá số cá nhân."],
   ["/kien-thuc-tu-vi/cach-doc-la-so-tu-vi-cho-nguoi-moi", "Cách đọc lá số tử vi cho người mới", "Bắt đầu từ Mệnh, Thân, tam hợp, xung chiếu và các cung trọng tâm."],
@@ -307,7 +331,8 @@ export default function LifetimeTuViPage() {
               Mỗi tuổi có phần đọc ngay: tổng quan, công việc - tiền bạc, tình cảm - gia đạo và lưu ý vận hạn. Nội dung dùng để tham khảo, không thay thế quyết định cá nhân.
             </p>
           </div>
-          <div className="grid gap-5">
+          <LifetimeCardList cards={lifetimeCards} itemsPerPage={LIFETIME_CARDS_PER_PAGE} />
+          {false ? <div className="grid gap-5">
             {lifetimeCards.map((item) => (
               <article id={item.id} key={item.id} className="scroll-mt-24 rounded-2xl border border-orange-100 bg-white p-5 shadow-sm">
                 <div className="flex flex-wrap items-center gap-3">
@@ -341,7 +366,7 @@ export default function LifetimeTuViPage() {
                 ) : null}
               </article>
             ))}
-          </div>
+          </div> : null}
         </div>
       </section>
 
