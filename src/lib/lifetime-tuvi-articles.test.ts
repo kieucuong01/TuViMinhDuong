@@ -1,11 +1,16 @@
 import { readFileSync } from "node:fs";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+import { generateStaticParams } from "@/app/[slug]/page";
+import { lifetimeCards } from "@/app/xem-tu-vi-tron-doi/page";
 import { seedArticles } from "@/lib/content";
+import { historicalLifetimeAgeArticleInputs, historicalLifetimeArticleSlugs } from "@/lib/lifetime-age-data";
+
+vi.mock("server-only", () => ({}));
 
 const contentSource = readFileSync("src/lib/content.ts", "utf8");
-const pageSource = readFileSync("src/app/xem-tu-vi-tron-doi/page.tsx", "utf8");
 const rootArticleRouteSource = readFileSync("src/app/[slug]/page.tsx", "utf8");
 const knowledgeArticleRouteSource = readFileSync("src/app/kien-thuc-tu-vi/[slug]/page.tsx", "utf8");
+const sitemapSource = readFileSync("src/app/sitemap.ts", "utf8");
 
 const lifetimeArticleSlugs = [
   "tu-vi-tron-doi-tuoi-ky-dau-1969-nam-mang",
@@ -18,14 +23,38 @@ const lifetimeArticleSlugs = [
   "tu-vi-tron-doi-tuoi-at-mao-1975-nu-mang",
   "tu-vi-tron-doi-tuoi-giap-ty-1984-nam-mang",
   "tu-vi-tron-doi-tuoi-giap-ty-1984-nu-mang",
+  ...historicalLifetimeArticleSlugs,
 ];
 
 describe("lifetime Tu vi SEO article cluster", () => {
   it("publishes the detailed lifetime age articles that are linked from the hub", () => {
+    const hubDetailPaths = lifetimeCards.map((item) => item.detailsPath).filter(Boolean);
+
     for (const slug of lifetimeArticleSlugs) {
-      expect(contentSource).toContain(`slug: "${slug}"`);
-      expect(contentSource).toContain(`canonicalUrl: \`/\${input.slug}\``);
-      expect(pageSource).toContain(`/${slug}`);
+      expect(seedArticles.some((item) => item.slug === slug)).toBe(true);
+      expect(hubDetailPaths).toContain(`/${slug}`);
+    }
+
+    expect(contentSource).toContain("canonicalUrl: `/${input.slug}`");
+  });
+
+  it("covers every year from 1940 through 1960 for both genders", () => {
+    expect(historicalLifetimeArticleSlugs).toHaveLength(42);
+    expect(new Set(historicalLifetimeArticleSlugs).size).toBe(42);
+
+    for (let year = 1940; year <= 1960; year += 1) {
+      const inputsForYear = historicalLifetimeAgeArticleInputs.filter((item) => item.year === String(year));
+      expect(inputsForYear.map((item) => item.gender).sort()).toEqual(["nam mạng", "nữ mạng"]);
+      expect(inputsForYear.every((input) => seedArticles.some((articleItem) => articleItem.slug === input.slug))).toBe(true);
+    }
+  });
+
+  it("exposes the historical lifetime articles through root static params", async () => {
+    const params = await generateStaticParams();
+    const rootSlugs = params.map((item) => item.slug);
+
+    for (const slug of historicalLifetimeArticleSlugs) {
+      expect(rootSlugs).toContain(slug);
     }
   });
 
@@ -66,5 +95,6 @@ describe("lifetime Tu vi SEO article cluster", () => {
     expect(rootArticleRouteSource).toContain("isLifetimeTuViSlug");
     expect(rootArticleRouteSource).toContain("sectionName=\"Tử vi trọn đời\"");
     expect(knowledgeArticleRouteSource).toContain("redirect(canonicalPath)");
+    expect(sitemapSource).toContain("articlePath(article)");
   });
 });

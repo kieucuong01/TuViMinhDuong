@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { BookOpenText, CalendarDays, Compass, Layers3, Search, ShieldCheck, Sparkles, UserRound } from "lucide-react";
+import { historicalLifetimeCards } from "@/lib/lifetime-age-data";
 import { routeMetadata } from "@/lib/metadata";
 import { faqJsonLd, itemListJsonLd, webPageJsonLd } from "@/lib/seo";
 import { LifetimeCardList, type LifetimeCardListItem } from "./lifetime-card-list";
@@ -71,6 +72,7 @@ const baseLifetimeCards: LifetimeCard[] = [
     family: "Gia đạo nên tránh ôm hết phần lo rồi sinh tủi thân. Khi phân chia trách nhiệm rõ, quan hệ vợ chồng và con cái nhẹ hơn.",
     caution: "Các giai đoạn đổi nhà, đổi việc hoặc lo chuyện con cái cần đi từng bước. Không nên lấy cảm giác bất an ngắn hạn làm quyết định dài hạn.",
   },
+  ...historicalLifetimeCards,
   {
     id: "tu-vi-tron-doi-nham-thin-2012-nam-mang",
     title: "Tử vi trọn đời tuổi Nhâm Thìn 2012 nam mạng",

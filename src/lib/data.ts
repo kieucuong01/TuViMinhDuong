@@ -1222,8 +1222,12 @@ function cacheServerData<T extends (...args: never[]) => Promise<unknown>>(
 async function readFeaturePricesFromDb(): Promise<FeaturePriceMap> {
   const db = getDb();
   if (!db) return demoFeaturePrices();
-  const prices = await db.featurePrice.findMany();
-  return normalizeFeaturePriceMap(prices);
+  try {
+    const prices = await db.featurePrice.findMany();
+    return normalizeFeaturePriceMap(prices);
+  } catch {
+    return cloneDefaultFeaturePrices();
+  }
 }
 
 const getCachedFeaturePricesFromDb = cacheServerData(readFeaturePricesFromDb, [FEATURE_PRICES_CACHE_TAG], {
