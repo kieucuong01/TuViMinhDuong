@@ -20,4 +20,14 @@ describe("createChartAction timeout guard", () => {
     expect(homeSource).toContain("chartError");
     expect(homeSource).toContain("chart-form-error");
   });
+
+  it("starts free LLM generation before redirecting to the chart page", () => {
+    expect(actionsSource).toContain('import { after } from "next/server"');
+    expect(actionsSource).toContain("generateAndStoreFreeOverview");
+    expect(actionsSource).toContain("after(() => {");
+    expect(actionsSource).toContain("generateAndStoreFreeOverview(result.chart.id)");
+    expect(actionsSource.indexOf("generateAndStoreFreeOverview(result.chart.id)")).toBeLessThan(
+      actionsSource.indexOf("redirect(withQueryParams(`/la-so/${result.chart.id}`"),
+    );
+  });
 });

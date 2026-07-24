@@ -4,9 +4,11 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { FreeOverviewLoader } from "@/components/free-overview-loader";
+import { FreeOverviewTypingReveal } from "@/components/free-overview-typing-reveal";
 
 const loaderSource = readFileSync(fileURLToPath(new URL("./free-overview-loader.tsx", import.meta.url)), "utf8");
 const refreshSource = readFileSync(fileURLToPath(new URL("./free-overview-refresh-trigger.tsx", import.meta.url)), "utf8");
+const typingSource = readFileSync(fileURLToPath(new URL("./free-overview-typing-reveal.tsx", import.meta.url)), "utf8");
 const chartPageSource = readFileSync(fileURLToPath(new URL("../app/la-so/[id]/page.tsx", import.meta.url)), "utf8");
 const normalizedChartPageSource = chartPageSource.replace(/\s+/g, " ");
 const overview = { status: "ready" as const, source: "llm" as const, content: "## 1. Khí chất\n\nNội dung đã chiếu từ server." };
@@ -16,7 +18,7 @@ describe("FreeOverviewLoader seed-first LLM refresh gate", () => {
     expect(loaderSource).toContain('const isLlmReady = initialOverview.source === "llm"');
     expect(loaderSource).toContain("Đang viết tiếp bản luận giải AI cá nhân hóa");
     expect(loaderSource).toContain("Bản đọc nhanh phía trên hiển thị trước");
-    expect(loaderSource).toContain("<MarkdownContent content={initialOverview.content} />");
+    expect(loaderSource).toContain("<FreeOverviewTypingReveal content={initialOverview.content} enabled={shouldAttemptLlm} />");
     expect(loaderSource).toContain("FreeOverviewRefreshTrigger");
     expect(loaderSource).not.toContain("useEffect");
     expect(loaderSource).not.toContain("fetch(");
@@ -29,6 +31,28 @@ describe("FreeOverviewLoader seed-first LLM refresh gate", () => {
     expect(refreshSource).toContain("Đang gọi AI");
     expect(refreshSource).toContain("AI đang luận giải");
     expect(loaderSource).not.toContain("schedulePoll");
+  });
+
+  it("types the seed reading while waiting for the LLM without blocking the background refresh", () => {
+    expect(loaderSource).toContain("FreeOverviewTypingReveal");
+    expect(typingSource).toContain("\"use client\"");
+    expect(typingSource).toContain("setInterval");
+    expect(typingSource).toContain("visibleLength");
+    expect(typingSource).toContain("MarkdownContent");
+    expect(typingSource).toContain("free-overview-typing-cursor");
+    expect(typingSource).not.toContain("fetch(");
+  });
+
+  it("renders only the opening slice while typing and full content when typing is off", () => {
+    const longContent = `# Mở đầu\n\n${"đoạn mở ".repeat(90)}\n\nTAIL_MARKER`;
+
+    const typingHtml = renderToStaticMarkup(createElement(FreeOverviewTypingReveal, { content: longContent, enabled: true }));
+    const fullHtml = renderToStaticMarkup(createElement(FreeOverviewTypingReveal, { content: longContent, enabled: false }));
+
+    expect(typingHtml).not.toContain("TAIL_MARKER");
+    expect(typingHtml).toContain("free-overview-typing-cursor");
+    expect(fullHtml).toContain("TAIL_MARKER");
+    expect(fullHtml).not.toContain("free-overview-typing-cursor");
   });
 
   it("keeps insight three and four server-side for guests and signed-in non-owners", () => {

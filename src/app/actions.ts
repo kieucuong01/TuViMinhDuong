@@ -3,8 +3,9 @@
 import { redirect } from "next/navigation";
 import { headers } from "next/headers";
 import { revalidatePath, revalidateTag } from "next/cache";
+import { after } from "next/server";
 import { clearSession, createMagicSession, getCurrentUser, getOrCreateEmailUser, loginOrRegister, setSession, type SessionUser } from "@/lib/auth";
-import { ARTICLES_CACHE_TAG, FEATURE_PRICES_CACHE_TAG, OPERATION_SETTINGS_CACHE_TAG, claimGuestChartForUserFromPath, countRecentChartsForIp, getCachedReading, getChart, getFeaturePrice, getOperationSettings, getUserBalance, saveArticleCategoryFromForm, saveArticleFromForm, saveChart, saveReading, adjustCoins, deleteArticleBySlug, deleteUserChart, getReadingJobByScope, createPendingReading, updateOperationSettings, updateFeaturePrices, getCompletedReadingsForScopes, hasReadingBundleAccess, type ChartCreationMetadata } from "@/lib/data";
+import { ARTICLES_CACHE_TAG, FEATURE_PRICES_CACHE_TAG, OPERATION_SETTINGS_CACHE_TAG, claimGuestChartForUserFromPath, countRecentChartsForIp, generateAndStoreFreeOverview, getCachedReading, getChart, getFeaturePrice, getOperationSettings, getUserBalance, saveArticleCategoryFromForm, saveArticleFromForm, saveChart, saveReading, adjustCoins, deleteArticleBySlug, deleteUserChart, getReadingJobByScope, createPendingReading, updateOperationSettings, updateFeaturePrices, getCompletedReadingsForScopes, hasReadingBundleAccess, type ChartCreationMetadata } from "@/lib/data";
 import { generateReading } from "@/lib/ai";
 import { getDb } from "@/lib/db";
 import { completePaidReadingOrder, createPayOSCheckout, createPayOSCustomCheckout, retryPaidFullReading } from "@/lib/payos";
@@ -223,6 +224,11 @@ export async function createChartAction(formData: FormData) {
     dbEnvState: databaseEnvState(),
     timeoutMs: CREATE_CHART_ACTION_TIMEOUT_MS,
     timings: timer.timings(),
+  });
+  after(() => {
+    void generateAndStoreFreeOverview(result.chart.id).catch((error) => {
+      console.error("free_overview_early_generation_failed", error);
+    });
   });
   redirect(withQueryParams(`/la-so/${result.chart.id}`, { created: "1", adSource }));
 }

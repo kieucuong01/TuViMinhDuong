@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { LockKeyhole } from "lucide-react";
 import { loginModalHref } from "@/components/login-modal-link";
-import { MarkdownContent } from "@/components/markdown-content";
 import { FreeOverviewRefreshTrigger } from "@/components/free-overview-refresh-trigger";
+import { FreeOverviewTypingReveal } from "@/components/free-overview-typing-reveal";
 
 type FreeOverviewPayload = {
   status: "ready" | "fallback";
@@ -47,7 +47,7 @@ export function FreeOverviewLoader({
       data-ad-depth={canReadFullOverview || hasPremiumHookPreview ? "4" : "2"}
       data-chart-id={chartId}
     >
-      <MarkdownContent content={initialOverview.content} />
+      <FreeOverviewTypingReveal content={initialOverview.content} enabled={shouldAttemptLlm} />
 
       {shouldAttemptLlm ? (
         <section className="free-overview-loading" role="status" aria-live="polite" data-ad-view="free_overview_loading" data-chart-id={chartId}>
