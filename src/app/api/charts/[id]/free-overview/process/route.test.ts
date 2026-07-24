@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const mocks = vi.hoisted(() => ({
   getChart: vi.fn(),
   getFreeOverviewStatus: vi.fn(),
+  claimFreeOverviewGeneration: vi.fn(),
   generateAndStoreFreeOverview: vi.fn(),
   after: vi.fn((callback: () => void) => callback()),
 }));
@@ -15,6 +16,7 @@ vi.mock("next/server", () => ({
 }));
 
 vi.mock("@/lib/data", () => ({
+  claimFreeOverviewGeneration: mocks.claimFreeOverviewGeneration,
   getChart: mocks.getChart,
   getFreeOverviewStatus: mocks.getFreeOverviewStatus,
   generateAndStoreFreeOverview: mocks.generateAndStoreFreeOverview,
@@ -39,6 +41,7 @@ describe("free overview process compatibility route", () => {
       wordCount: 1500,
       jobStatus: "idle",
     });
+    mocks.claimFreeOverviewGeneration.mockResolvedValue({ status: "claimed" });
     mocks.generateAndStoreFreeOverview.mockResolvedValue({
       status: "ready",
       content: "Bản LLM",
@@ -50,14 +53,15 @@ describe("free overview process compatibility route", () => {
     });
   });
 
-  it("returns accepted immediately and schedules LLM generation after the response", async () => {
+  it("returns accepted immediately, persists processing state, and schedules forced LLM generation", async () => {
     const response = await postProcess();
 
     expect(response.status).toBe(202);
     expect(await response.json()).toEqual({ status: "processing", chartId: "chart-1" });
     expect(mocks.getFreeOverviewStatus).toHaveBeenCalledTimes(1);
+    expect(mocks.claimFreeOverviewGeneration).toHaveBeenCalledWith("chart-1", { input: { fullName: "Test" } });
     expect(mocks.after).toHaveBeenCalledTimes(1);
-    expect(mocks.generateAndStoreFreeOverview).toHaveBeenCalledWith("chart-1");
+    expect(mocks.generateAndStoreFreeOverview).toHaveBeenCalledWith("chart-1", { force: true });
   });
 
   it("returns 404 for a missing chart", async () => {

@@ -1,5 +1,5 @@
 import { after, NextResponse } from "next/server";
-import { generateAndStoreFreeOverview, getChart, getFreeOverviewStatus } from "@/lib/data";
+import { claimFreeOverviewGeneration, generateAndStoreFreeOverview, getChart, getFreeOverviewStatus } from "@/lib/data";
 import { createPerfTimer } from "@/lib/perf";
 
 export const runtime = "nodejs";
@@ -20,11 +20,20 @@ export async function POST(_request: Request, { params }: { params: Promise<{ id
     );
   }
 
-  after(() => {
-    void generateAndStoreFreeOverview(id).catch((error) => {
-      console.error("free_overview_generation_failed", error);
+  const claim = await claimFreeOverviewGeneration(id, record.chart);
+  if (claim.status === "ready") {
+    return NextResponse.json(
+      { status: "ready", chartId: id },
+      { headers: { "cache-control": "private, no-store", "server-timing": timer.serverTiming() } },
+    );
+  }
+  if (claim.status === "claimed") {
+    after(() => {
+      void generateAndStoreFreeOverview(id, { force: true }).catch((error) => {
+        console.error("free_overview_generation_failed", error);
+      });
     });
-  });
+  }
 
   return NextResponse.json(
     { status: "processing", chartId: id },

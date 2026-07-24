@@ -1092,12 +1092,12 @@ export async function failFreeOverviewGeneration(chartId: string, error: string)
   return getFreeOverviewStatus(nextChart);
 }
 
-export async function generateAndStoreFreeOverview(chartId: string) {
+export async function generateAndStoreFreeOverview(chartId: string, options: { force?: boolean } = {}) {
   const record = await getChart(chartId);
   if (!record) throw new Error("Không tìm thấy lá số.");
   const status = getFreeOverviewStatus(record.chart);
   if (status.status === "ready" && status.source === "llm") return status;
-  if (status.status === "fallback" && status.jobStatus === "processing") return status;
+  if (!options.force && status.status === "fallback" && status.jobStatus === "processing") return status;
 
   await updateChartFreeOverview(chartId, record.chart, {
     version: FREE_OVERVIEW_VERSION,

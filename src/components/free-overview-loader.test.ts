@@ -22,8 +22,12 @@ describe("FreeOverviewLoader seed-first LLM refresh gate", () => {
     expect(loaderSource).not.toContain("fetch(");
     expect(refreshSource).toContain("\"use client\"");
     expect(refreshSource).toContain("/free-overview/process");
+    expect(refreshSource).toContain("void pollUntilReady();");
     expect(refreshSource).toContain("router.refresh()");
     expect(refreshSource).toContain("attempt >= 30");
+    expect(refreshSource).not.toContain(".finally(() =>");
+    expect(refreshSource).toContain("Đang gọi AI");
+    expect(refreshSource).toContain("AI đang luận giải");
     expect(loaderSource).not.toContain("schedulePoll");
   });
 
