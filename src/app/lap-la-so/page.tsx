@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { CheckCircle2, CreditCard, ShieldCheck, Sparkles } from "lucide-react";
+import { BookOpenText, CalendarRange, CheckCircle2, CreditCard, Layers3, ShieldCheck, Sparkles } from "lucide-react";
 import { ChartForm } from "@/components/chart-form";
 import { routeMetadata } from "@/lib/metadata";
 import { webPageJsonLd } from "@/lib/seo";
@@ -23,6 +23,24 @@ const steps = [
   { title: "1. Nhập ngày giờ sinh", detail: "Chọn ngày, tháng, năm, giờ sinh và năm muốn xem." },
   { title: "2. Xem lá số miễn phí", detail: "Đọc bố cục 12 cung, thông tin nhanh và phần tổng quan." },
   { title: "3. Mở phần cần đọc sâu", detail: "Khi muốn đi tiếp, bạn có thể mở toàn bộ hoặc từng phần bằng xu." },
+];
+
+const resultLayers = [
+  {
+    icon: Layers3,
+    title: "Bản đồ 12 cung",
+    detail: "Thấy ngay Mệnh, Thân, Quan Lộc, Tài Bạch, Phu Thê và các cung đời sống để biết nên đọc phần nào trước.",
+  },
+  {
+    icon: BookOpenText,
+    title: "Luận giải dễ đối chiếu",
+    detail: "Phần miễn phí viết theo hướng tổng quan, gợi điểm mạnh, điểm cần lưu ý và câu hỏi nên đọc sâu tiếp.",
+  },
+  {
+    icon: CalendarRange,
+    title: "Vận năm đang xem",
+    detail: "Năm xem được giữ cùng lá số để bạn đi tiếp vào đại vận, tiểu vận, nguyệt vận hoặc ngày cụ thể khi cần.",
+  },
 ];
 
 export default function AdsChartLandingPage() {
@@ -100,6 +118,28 @@ export default function AdsChartLandingPage() {
                 <p>{step.detail}</p>
               </article>
             ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="section pt-0">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="section-heading">
+            <p className="eyebrow">Sau khi lập lá số</p>
+            <h2>Bạn không chỉ nhận một bảng sao, mà có lộ trình đọc</h2>
+            <p>Lấy ý tốt từ các trang lập lá số nhanh: kết quả phải hiện rõ, giải thích được từng lớp, và giúp người mới biết nên đọc gì tiếp theo.</p>
+          </div>
+          <div className="grid gap-4 md:grid-cols-3">
+            {resultLayers.map((item) => {
+              const Icon = item.icon;
+              return (
+                <article key={item.title} className="result-layer-card">
+                  <Icon className="text-orange-600" size={24} />
+                  <h3>{item.title}</h3>
+                  <p>{item.detail}</p>
+                </article>
+              );
+            })}
           </div>
         </div>
       </section>

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
+import { BookOpenText, CalendarRange, Compass, Layers3, ShieldCheck } from "lucide-react";
 import { ChartBoard, MobileChartReader } from "@/components/chart-board";
 import { getAnyCompletedReading, getCachedReading, getChart, getFeaturePrices, getFreeOverviewStatus, getOperationSettings, getReadingById, getUserBalance } from "@/lib/data";
 import { getCurrentUser } from "@/lib/auth";
@@ -23,6 +24,7 @@ import { PersonalizedReportOutline } from "@/components/personalized-report-outl
 import { buildPersonalizedReportOutline } from "@/lib/chart-evidence";
 import { listAssistantQuestions } from "@/lib/chart-assistant-store";
 import type { AssistantAccess } from "@/components/assistant-widget";
+import type { TuViChart } from "@/lib/chart";
 
 export const metadata: Metadata = {
   title: "Lá số tử vi",
@@ -44,6 +46,75 @@ function checkoutNotice(checkout?: string, status?: string) {
   if (checkout === "disabled") return "Thanh toán bản FULL hiện đang tạm dừng. Bạn có thể quay lại lá số và thử lại sau.";
   if (checkout) return "Chưa thể mở thanh toán cho lá số này. Không có khoản xu nào bị trừ; bạn có thể tải lại trang rồi thử lại.";
   return "";
+}
+
+function palaceSummary(chart: TuViChart, name: string) {
+  const palace = chart.palaces.find((item) => item.name === name);
+  return palace ? `${palace.name} tại ${palace.branch}` : `${name} đang cập nhật`;
+}
+
+function ChartReadingGuide({ chartId, chart, canUsePaidFateViews }: { chartId: string; chart: TuViChart; canUsePaidFateViews: boolean }) {
+  const menh = chart.palaces.find((palace) => palace.isMenh);
+  const than = chart.palaces.find((palace) => palace.isThan);
+  const palaceHref = canUsePaidFateViews ? `/la-so/${chartId}?view=luan-cung` : "#chart-palaces";
+  const fateHref = canUsePaidFateViews ? `/la-so/${chartId}?view=dai-van` : "#luan-giai";
+  const items = [
+    {
+      icon: ShieldCheck,
+      title: "1. Nắm trục Mệnh - Thân",
+      detail: `${menh ? `Mệnh tại ${menh.branch}` : "Mệnh đang cập nhật"}; ${than ? `Thân cư ${than.name}` : "Thân đang cập nhật"}. Đây là nền để đọc các cung còn lại.`,
+      href: "#luan-giai",
+      cta: "Đọc tổng quan",
+    },
+    {
+      icon: Layers3,
+      title: "2. Soi đúng cung đang cần",
+      detail: `${palaceSummary(chart, "Quan Lộc")} và ${palaceSummary(chart, "Tài Bạch")} giúp đọc việc làm, tiền bạc theo cùng một cụm.`,
+      href: palaceHref,
+      cta: canUsePaidFateViews ? "Chọn cung" : "Xem 12 cung",
+    },
+    {
+      icon: CalendarRange,
+      title: `3. Đặt trong năm ${chart.input.viewYear}`,
+      detail: "Đại vận là nền dài hạn; tiểu vận, nguyệt vận và nhật vận chỉ nên mở khi bạn có việc cụ thể cần đối chiếu.",
+      href: fateHref,
+      cta: canUsePaidFateViews ? "Xem vận" : "Đọc trước tổng quan",
+    },
+    {
+      icon: BookOpenText,
+      title: "4. Mở luận giải khi thật sự cần",
+      detail: "Bản miễn phí giúp định hướng; bản FULL đi sâu hơn theo từng chương, không bắt bạn trả tiền trước khi thấy lá số.",
+      href: "#luan-giai",
+      cta: "Xem phần luận",
+    },
+  ];
+
+  return (
+    <section className="chart-reading-guide" aria-labelledby="chart-reading-guide-title">
+      <div className="chart-reading-guide-head">
+        <div>
+          <p className="eyebrow">Cách đọc lá số này</p>
+          <h2 id="chart-reading-guide-title">Đọc theo tầng, đừng đọc rời từng ô</h2>
+        </div>
+        <a href="#luan-giai" className="btn btn-ghost">
+          Đi tới luận giải <Compass size={18} />
+        </a>
+      </div>
+      <div className="chart-reading-guide-grid">
+        {items.map((item) => {
+          const Icon = item.icon;
+          return (
+            <a key={item.title} href={item.href} className="chart-reading-guide-card">
+              <span><Icon size={22} /></span>
+              <strong>{item.title}</strong>
+              <p>{item.detail}</p>
+              <em>{item.cta}</em>
+            </a>
+          );
+        })}
+      </div>
+    </section>
+  );
 }
 
 export default async function ChartPage({
@@ -129,11 +200,15 @@ export default async function ChartPage({
           canUsePaidFateViews={canUsePaidFateViews}
         />
 
-        <MobileChartReader chart={record.chart} />
+        <ChartReadingGuide chartId={id} chart={record.chart} canUsePaidFateViews={canUsePaidFateViews} />
 
-        <div className="chart-frame hidden md:block">
-          <div className="min-w-[980px] md:min-w-0">
-            <ChartBoard chart={record.chart} />
+        <div id="chart-palaces">
+          <MobileChartReader chart={record.chart} />
+
+          <div className="chart-frame hidden md:block">
+            <div className="min-w-[980px] md:min-w-0">
+              <ChartBoard chart={record.chart} />
+            </div>
           </div>
         </div>
 

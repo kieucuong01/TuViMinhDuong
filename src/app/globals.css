@@ -3307,6 +3307,30 @@ button.is-loading:not(.icon-button)::before {
   gap: 0.75rem;
 }
 
+.result-layer-card {
+  border: 1px solid #ffedd5;
+  border-radius: 0.9rem;
+  background: #fff;
+  padding: 1.25rem;
+  box-shadow: 0 10px 28px rgb(120 53 15 / 0.045);
+}
+
+.result-layer-card h3 {
+  margin-top: 0.85rem;
+  color: #1c1917;
+  font-size: 1.22rem;
+  font-weight: 740;
+  line-height: 1.28;
+}
+
+.result-layer-card p {
+  margin-top: 0.5rem;
+  color: #57534e;
+  font-size: 1.02rem;
+  line-height: 1.7;
+  @apply text-pretty;
+}
+
 .feature-card,
 .pricing-card,
 .article-card,
@@ -5266,6 +5290,112 @@ button.is-loading:not(.icon-button)::before {
 
 .mobile-chart-reader {
   margin: 1rem 0 1.5rem;
+}
+
+.chart-reading-guide {
+  margin: 1rem 0 1.5rem;
+  border: 1px solid #fed7aa;
+  border-radius: 1.1rem;
+  background: linear-gradient(180deg, #fffaf0, #fff);
+  padding: 1rem;
+  box-shadow: 0 16px 42px rgb(120 53 15 / 0.08);
+}
+
+.chart-reading-guide-head {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.chart-reading-guide-head h2 {
+  margin-top: 0.2rem;
+  color: #111827;
+  font-size: clamp(1.35rem, 2.4vw, 2rem);
+  font-weight: 950;
+  line-height: 1.15;
+}
+
+.chart-reading-guide-grid {
+  margin-top: 1rem;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.chart-reading-guide-card {
+  display: grid;
+  min-height: 100%;
+  gap: 0.55rem;
+  border: 1px solid #ffedd5;
+  border-radius: 0.9rem;
+  background: rgb(255 255 255 / 0.88);
+  padding: 0.95rem;
+  color: #1f2937;
+  text-decoration: none;
+  transition: border-color 180ms ease, transform 180ms ease, box-shadow 180ms ease;
+}
+
+.chart-reading-guide-card:hover,
+.chart-reading-guide-card:focus-visible {
+  border-color: #fdba74;
+  box-shadow: 0 14px 34px rgb(120 53 15 / 0.08);
+  transform: translateY(-2px);
+}
+
+.chart-reading-guide-card > span {
+  display: inline-grid;
+  width: 2.6rem;
+  height: 2.6rem;
+  place-items: center;
+  border-radius: 0.8rem;
+  background: #fff7ed;
+  color: #c2410c;
+}
+
+.chart-reading-guide-card strong {
+  color: #111827;
+  font-size: 1.02rem;
+  font-weight: 900;
+  line-height: 1.35;
+}
+
+.chart-reading-guide-card p {
+  color: #57534e;
+  font-size: 0.96rem;
+  line-height: 1.65;
+}
+
+.chart-reading-guide-card em {
+  color: #c2410c;
+  font-size: 0.9rem;
+  font-style: normal;
+  font-weight: 900;
+}
+
+@media (min-width: 768px) {
+  .chart-reading-guide {
+    padding: 1.15rem;
+  }
+
+  .chart-reading-guide-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .chart-reading-guide {
+    border-radius: 1rem;
+    padding: 0.9rem;
+  }
+
+  .chart-reading-guide-head {
+    display: grid;
+  }
+
+  .chart-reading-guide-head .btn {
+    min-height: 2.9rem;
+    width: 100%;
+  }
 }
 
 .mobile-chart-summary {
