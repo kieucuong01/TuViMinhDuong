@@ -3,7 +3,12 @@ import { describe, expect, it, vi } from "vitest";
 import { generateStaticParams } from "@/app/[slug]/page";
 import { lifetimeCards } from "@/app/xem-tu-vi-tron-doi/page";
 import { seedArticles } from "@/lib/content";
-import { historicalLifetimeAgeArticleInputs, historicalLifetimeArticleSlugs } from "@/lib/lifetime-age-data";
+import {
+  adultExpansionLifetimeAgeArticleInputs,
+  adultExpansionLifetimeArticleSlugs,
+  historicalLifetimeAgeArticleInputs,
+  historicalLifetimeArticleSlugs,
+} from "@/lib/lifetime-age-data";
 
 vi.mock("server-only", () => ({}));
 
@@ -23,6 +28,7 @@ const lifetimeArticleSlugs = [
   "tu-vi-tron-doi-tuoi-at-mao-1975-nu-mang",
   "tu-vi-tron-doi-tuoi-giap-ty-1984-nam-mang",
   "tu-vi-tron-doi-tuoi-giap-ty-1984-nu-mang",
+  ...adultExpansionLifetimeArticleSlugs,
   ...historicalLifetimeArticleSlugs,
 ];
 
@@ -49,9 +55,25 @@ describe("lifetime Tu vi SEO article cluster", () => {
     }
   });
 
+  it("adds the next 5 adult lifetime age intents without duplicating live coverage", () => {
+    expect(adultExpansionLifetimeArticleSlugs).toEqual([
+      "tu-vi-tron-doi-tuoi-nham-tuat-1982-nam-mang",
+      "tu-vi-tron-doi-tuoi-nham-tuat-1982-nu-mang",
+      "tu-vi-tron-doi-tuoi-quy-hoi-1983-nam-mang",
+      "tu-vi-tron-doi-tuoi-quy-hoi-1983-nu-mang",
+      "tu-vi-tron-doi-tuoi-canh-ngo-1990-nam-mang",
+    ]);
+    expect(new Set(adultExpansionLifetimeArticleSlugs).size).toBe(5);
+    expect(adultExpansionLifetimeAgeArticleInputs.at(-1)?.siblingLink).toBeUndefined();
+  });
+
   it("exposes the historical lifetime articles through root static params", async () => {
     const params = await generateStaticParams();
     const rootSlugs = params.map((item) => item.slug);
+
+    for (const slug of adultExpansionLifetimeArticleSlugs) {
+      expect(rootSlugs).toContain(slug);
+    }
 
     for (const slug of historicalLifetimeArticleSlugs) {
       expect(rootSlugs).toContain(slug);

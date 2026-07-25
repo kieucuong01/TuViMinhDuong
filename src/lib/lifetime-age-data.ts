@@ -212,3 +212,32 @@ export const historicalLifetimeCards: HistoricalLifetimeCard[] = historicalLifet
   family: item.family,
   caution: `${item.health} ${item.riskAges}`,
 }));
+
+const adultExpansionRows: YearRow[] = [
+  { year: 1982, canChi: "Nhâm Tuất", slugCanChi: "nham-tuat", napAm: "Đại Hải Thủy", element: "Thủy", can: "Nhâm", chi: "Tuất" },
+  { year: 1983, canChi: "Quý Hợi", slugCanChi: "quy-hoi", napAm: "Đại Hải Thủy", element: "Thủy", can: "Quý", chi: "Hợi" },
+  { year: 1990, canChi: "Canh Ngọ", slugCanChi: "canh-ngo", napAm: "Lộ Bàng Thổ", element: "Thổ", can: "Canh", chi: "Ngọ" },
+];
+
+export const adultExpansionLifetimeAgeArticleInputs: HistoricalLifetimeArticleInput[] = [
+  buildArticle(adultExpansionRows[0], "nam mạng"),
+  buildArticle(adultExpansionRows[0], "nữ mạng"),
+  buildArticle(adultExpansionRows[1], "nam mạng"),
+  buildArticle(adultExpansionRows[1], "nữ mạng"),
+  { ...buildArticle(adultExpansionRows[2], "nam mạng"), siblingLink: undefined },
+];
+
+export const adultExpansionLifetimeArticleSlugs = adultExpansionLifetimeAgeArticleInputs.map((item) => item.slug);
+
+export const adultExpansionLifetimeCards: HistoricalLifetimeCard[] = adultExpansionLifetimeAgeArticleInputs.map((item) => ({
+  id: item.slug.replace("tu-vi-tron-doi-tuoi-", "tu-vi-tron-doi-"),
+  detailsPath: `/${item.slug}`,
+  title: item.title,
+  year: item.year,
+  canChi: item.canChi,
+  gender: item.gender === "nam mạng" ? "Nam mạng" : "Nữ mạng",
+  overview: item.summary,
+  work: item.work,
+  family: item.family,
+  caution: `${item.health} ${item.riskAges}`,
+}));

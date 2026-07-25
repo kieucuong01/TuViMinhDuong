@@ -1,4 +1,4 @@
-import { historicalLifetimeAgeArticleInputs } from "@/lib/lifetime-age-data";
+import { adultExpansionLifetimeAgeArticleInputs, historicalLifetimeAgeArticleInputs } from "@/lib/lifetime-age-data";
 import { scoreArticleSeo } from "@/lib/seo";
 
 export type ArticleView = {
@@ -1025,6 +1025,7 @@ const lifetimeAgeArticles = [
       label: "Tử vi trọn đời tuổi Giáp Tý 1984 nam mạng",
     },
   }),
+  ...adultExpansionLifetimeAgeArticleInputs.map((input) => lifetimeAgeArticle(input)),
   ...historicalLifetimeAgeArticleInputs.map((input) => lifetimeAgeArticle(input)),
 ] satisfies ArticleView[];
 
