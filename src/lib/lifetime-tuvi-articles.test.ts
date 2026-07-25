@@ -118,8 +118,8 @@ describe("lifetime Tu vi SEO article cluster", () => {
   it("serves lifetime articles under /xem-tu-vi-tron-doi and keeps them out of /kien-thuc-tu-vi", () => {
     expect(lifetimeArticleRouteSource).toContain("sectionName=\"Tử vi trọn đời\"");
     expect(lifetimeArticleRouteSource).toContain("lifetimeTuViArticlePath");
-    expect(rootArticleRouteSource).toContain("redirect(lifetimeTuViArticlePath(slug))");
-    expect(knowledgeArticleRouteSource).toContain("redirect(canonicalPath)");
+    expect(rootArticleRouteSource).toContain("permanentRedirect(lifetimeTuViArticlePath(slug))");
+    expect(knowledgeArticleRouteSource).toContain("permanentRedirect(canonicalPath)");
     expect(knowledgePageSource).toContain("!isLifetimeTuViSlug(article.slug)");
     expect(sitemapSource).toContain("articlePath(article)");
   });});

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { notFound, redirect } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import { APP_URL } from "@/lib/env";
 import { getArticleBySlug, listArticles } from "@/lib/data";
 import { isLifetimeTuViSlug, lifetimeTuViArticlePath } from "@/lib/article-path";
@@ -46,5 +46,5 @@ export default async function LegacyLifetimeArticlePage({ params }: { params: Pr
   if (!isLifetimeTuViSlug(slug)) notFound();
   const article = await getArticleBySlug(slug);
   if (!article) notFound();
-  redirect(lifetimeTuViArticlePath(slug));
+  permanentRedirect(lifetimeTuViArticlePath(slug));
 }

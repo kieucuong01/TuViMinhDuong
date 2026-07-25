@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { notFound, redirect } from "next/navigation";
+import { notFound, permanentRedirect, redirect } from "next/navigation";
 import { APP_URL } from "@/lib/env";
 import { getArticleBySlug, listArticles } from "@/lib/data";
 import { articlePath, isLifetimeTuViSlug } from "@/lib/article-path";
@@ -46,7 +46,10 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
   const [article, articles] = await Promise.all([getArticleBySlug(slug), listArticles()]);
   if (!article) notFound();
   const canonicalPath = articlePath(article);
-  if (canonicalPath !== `/kien-thuc-tu-vi/${slug}`) redirect(canonicalPath);
+  if (canonicalPath !== `/kien-thuc-tu-vi/${slug}`) {
+    if (isLifetimeTuViSlug(slug)) permanentRedirect(canonicalPath);
+    redirect(canonicalPath);
+  }
 
   return <ArticlePageContent article={article} articles={articles} sectionName="Kiến thức tử vi" sectionHref="/kien-thuc-tu-vi" />;
 }
