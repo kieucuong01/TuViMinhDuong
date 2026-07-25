@@ -79,10 +79,10 @@ URL public hoặc log ứng dụng.
 
 Guest checkout dùng `createPayOSCustomCheckout` và settlement FULL hiện có.
 
-Return URL guest mang token ngẫu nhiên. Route return:
+Return URL guest mang token ngẫu nhiên dùng một lần. Route return:
 
 1. Kiểm tra định dạng `orderCode` và token.
-2. Khôi phục đúng user nội bộ từ token.
+2. Tiêu thụ token và khôi phục đúng user nội bộ; token đã dùng không thể dùng lại.
 3. Kiểm tra PaymentOrder thuộc user đó và metadata trỏ đúng lá số FULL.
 4. Hỏi lại PayOS; không tin query `status=success`.
 5. Chỉ settle khi PayOS xác nhận đủ số tiền hoặc đơn đã được webhook đánh dấu
