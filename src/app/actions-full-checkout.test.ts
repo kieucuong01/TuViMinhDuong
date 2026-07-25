@@ -19,17 +19,21 @@ describe("direct FULL checkout action contract", () => {
     expect(checkout).not.toContain('formData.get("price');
   });
 
-  it("creates a zero-coin directReading order without a magic token", () => {
+  it("creates a zero-coin directReading order with a guest-only magic token", () => {
     expect(checkout).toContain("coins: 0");
     expect(checkout).toContain("directReading:");
     expect(checkout).toContain('type: "FULL"');
     expect(checkout).toContain('scopeKey: "all"');
-    expect(checkout).not.toContain("createMagicSession");
-    expect(checkout).not.toContain("token,");
+    expect(checkout).toContain("const returnToken = requiresCheckoutEmail");
+    expect(checkout).toContain("? await createMagicSession(user)");
+    expect(checkout).toContain("...(returnToken ? { token: returnToken } : {})");
   });
 
   it("uses PayOS return verification and creates only a pending reading in demo mode", () => {
-    expect(checkout).toContain('returnPath: "/api/payments/payos/full-return"');
+    expect(checkout).toContain("const returnPath = returnToken");
+    expect(checkout).toContain("? `/api/payments/payos/full-return?token=${encodeURIComponent(returnToken)}`");
+    expect(checkout).toContain(': "/api/payments/payos/full-return"');
+    expect(checkout).toContain("returnPath,");
     expect(checkout).toContain("completePaidReadingOrder");
     expect(checkout).toContain("createPendingReading");
     expect(checkout).not.toContain("generateReading(");
