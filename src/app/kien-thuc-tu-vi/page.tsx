@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { KnowledgeArticleList } from "@/components/knowledge-article-list";
 import { KNOWLEDGE_PAGE_SIZE, paginateArticles, toKnowledgeArticleListItem } from "@/lib/article-pagination";
+import { articlePath, isLifetimeTuViSlug } from "@/lib/article-path";
 import { listArticleCategories, listArticles } from "@/lib/data";
 import { routeMetadata } from "@/lib/metadata";
 import { itemListJsonLd, webPageJsonLd } from "@/lib/seo";
@@ -19,7 +20,8 @@ export default async function KnowledgePage({
 }: {
   searchParams: Promise<{ category?: string; page?: string }>;
 }) {
-  const [{ category, page }, articles, categories] = await Promise.all([searchParams, listArticles(), listArticleCategories()]);
+  const [{ category, page }, allArticles, categories] = await Promise.all([searchParams, listArticles(), listArticleCategories()]);
+  const articles = allArticles.filter((article) => !isLifetimeTuViSlug(article.slug));
   const pagination = paginateArticles(articles, { category, page, pageSize: KNOWLEDGE_PAGE_SIZE });
   const visibleArticles = category ? articles.filter((article) => article.category?.slug === category) : articles;
   const pageLd = webPageJsonLd({
@@ -34,7 +36,7 @@ export default async function KnowledgePage({
   const itemListLd = itemListJsonLd(
     visibleArticles.slice(0, 12).map((article) => ({
       name: article.title,
-      url: `/kien-thuc-tu-vi/${article.slug}`,
+      url: articlePath(article),
     })),
   );
   const bySlug = new Map(articles.map((article) => [article.slug, article]));

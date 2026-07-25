@@ -187,7 +187,7 @@ function buildArticle(row: YearRow, gender: LifetimeGender): HistoricalLifetimeA
     ],
     advice: `Lời khuyên cho ${title} là dùng kinh nghiệm để làm đời sống nhẹ hơn, không để nó thành lý do ôm thêm việc. Việc lớn nên ghi phương án, hỏi người có chuyên môn và chỉ nhận phần hợp sức mình.`,
     siblingLink: {
-      href: `/${slugFor(row, otherGender)}`,
+      href: `/xem-tu-vi-tron-doi/${slugFor(row, otherGender)}`,
       label: `Tử vi trọn đời tuổi ${row.canChi} ${row.year} ${otherGender}`,
     },
   };
@@ -202,7 +202,7 @@ export const historicalLifetimeArticleSlugs = historicalLifetimeAgeArticleInputs
 
 export const historicalLifetimeCards: HistoricalLifetimeCard[] = historicalLifetimeAgeArticleInputs.map((item) => ({
   id: item.slug.replace("tu-vi-tron-doi-tuoi-", "tu-vi-tron-doi-"),
-  detailsPath: `/${item.slug}`,
+  detailsPath: `/xem-tu-vi-tron-doi/${item.slug}`,
   title: item.title,
   year: item.year,
   canChi: item.canChi,
@@ -231,7 +231,7 @@ export const adultExpansionLifetimeArticleSlugs = adultExpansionLifetimeAgeArtic
 
 export const adultExpansionLifetimeCards: HistoricalLifetimeCard[] = adultExpansionLifetimeAgeArticleInputs.map((item) => ({
   id: item.slug.replace("tu-vi-tron-doi-tuoi-", "tu-vi-tron-doi-"),
-  detailsPath: `/${item.slug}`,
+  detailsPath: `/xem-tu-vi-tron-doi/${item.slug}`,
   title: item.title,
   year: item.year,
   canChi: item.canChi,

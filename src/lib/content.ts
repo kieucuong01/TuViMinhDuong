@@ -623,7 +623,7 @@ function lifetimeAgeArticle(input: LifetimeAgeArticleInput): ArticleView {
     ogImage: `/articles/${input.slug}.webp`,
     metaTitle: input.title,
     metaDescription: `Xem ${input.title}: tổng quan đời sống, công việc, tiền bạc, tình cảm, sức khỏe và bảng giai đoạn để tham khảo trước khi lập lá số.`,
-    canonicalUrl: `/${input.slug}`,
+    canonicalUrl: `/xem-tu-vi-tron-doi/${input.slug}`,
     date: "2026-07-22",
     faqs: [
       {
@@ -866,7 +866,7 @@ const lifetimeAgeArticles = [
     ],
     advice: "Lời khuyên cho Ất Sửu 1985 nam mạng là đừng nhầm sức chịu đựng với chiến lược. Làm bền là lợi thế, nhưng vận trình sẽ sáng hơn khi biết chọn việc đáng làm, giữ giấy tờ rõ và bảo vệ sức khỏe như một phần của tài sản.",
     siblingLink: {
-      href: "/tu-vi-tron-doi-tuoi-at-suu-1985-nu-mang",
+      href: "/xem-tu-vi-tron-doi/tu-vi-tron-doi-tuoi-at-suu-1985-nu-mang",
       label: "Tử vi trọn đời tuổi Ất Sửu 1985 nữ mạng",
     },
   }),
@@ -897,7 +897,7 @@ const lifetimeAgeArticles = [
     ],
     advice: "Lời khuyên cho Ất Sửu 1985 nữ mạng là đừng xem chịu đựng là cách duy nhất để giữ gia đình và công việc ổn. Khi ranh giới trách nhiệm, tiền bạc và thời gian nghỉ được nói rõ, vận trình thường sáng hơn, bớt hao sức mà vẫn giữ được nền vững.",
     siblingLink: {
-      href: "/tu-vi-tron-doi-tuoi-at-suu-1985-nam-mang",
+      href: "/xem-tu-vi-tron-doi/tu-vi-tron-doi-tuoi-at-suu-1985-nam-mang",
       label: "Tử vi trọn đời tuổi Ất Sửu 1985 nam mạng",
     },
   }),
@@ -928,7 +928,7 @@ const lifetimeAgeArticles = [
     ],
     advice: "Lời khuyên cho Ất Mão 1975 nam mạng là đừng để sự mềm dẻo biến thành ôm việc âm thầm. Khi biết chọn đúng trận, đúng người và nói rõ giới hạn, tuổi này thường giữ được cả uy tín lẫn sự an ổn dài hạn.",
     siblingLink: {
-      href: "/tu-vi-tron-doi-tuoi-at-mao-1975-nu-mang",
+      href: "/xem-tu-vi-tron-doi/tu-vi-tron-doi-tuoi-at-mao-1975-nu-mang",
       label: "Tử vi trọn đời tuổi Ất Mão 1975 nữ mạng",
     },
   }),
@@ -959,7 +959,7 @@ const lifetimeAgeArticles = [
     ],
     advice: "Lời khuyên cho Ất Mão 1975 nữ mạng là đừng lấy yên cửa yên nhà làm lý do để bỏ quên bản thân. Khi biết nói rõ giới hạn, giữ quỹ riêng và chia trách nhiệm đều, tuổi này thường vừa giữ được hòa khí vừa bớt hao năng lượng.",
     siblingLink: {
-      href: "/tu-vi-tron-doi-tuoi-at-mao-1975-nam-mang",
+      href: "/xem-tu-vi-tron-doi/tu-vi-tron-doi-tuoi-at-mao-1975-nam-mang",
       label: "Tử vi trọn đời tuổi Ất Mão 1975 nam mạng",
     },
   }),
@@ -990,7 +990,7 @@ const lifetimeAgeArticles = [
     ],
     advice: "Lời khuyên cho Giáp Tý 1984 nam mạng là lấy sự linh hoạt làm công cụ, không làm tay lái. Khi có nguyên tắc nghề nghiệp, tiền bạc và nghỉ ngơi rõ, tuổi này thường đi xa hơn nhiều so với việc thắng vài cơ hội ngắn hạn.",
     siblingLink: {
-      href: "/tu-vi-tron-doi-tuoi-giap-ty-1984-nu-mang",
+      href: "/xem-tu-vi-tron-doi/tu-vi-tron-doi-tuoi-giap-ty-1984-nu-mang",
       label: "Tử vi trọn đời tuổi Giáp Tý 1984 nữ mạng",
     },
   }),
@@ -1021,7 +1021,7 @@ const lifetimeAgeArticles = [
     ],
     advice: "Lời khuyên cho Giáp Tý 1984 nữ mạng là dùng sự sắc sảo để sắp xếp cuộc sống nhẹ hơn, không để nó biến thành nguồn áp lực liên tục. Khi tiền bạc, lịch nghỉ và ranh giới trách nhiệm được đặt rõ, tuổi này thường bền và an hơn rất nhiều.",
     siblingLink: {
-      href: "/tu-vi-tron-doi-tuoi-giap-ty-1984-nam-mang",
+      href: "/xem-tu-vi-tron-doi/tu-vi-tron-doi-tuoi-giap-ty-1984-nam-mang",
       label: "Tử vi trọn đời tuổi Giáp Tý 1984 nam mạng",
     },
   }),

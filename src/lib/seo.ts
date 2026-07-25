@@ -1,5 +1,5 @@
 import { APP_NAME, APP_URL } from "@/lib/env";
-import { articlePath, isLifetimeTuViSlug } from "@/lib/article-path";
+import { articlePath } from "@/lib/article-path";
 import { slugify } from "@/lib/format";
 
 export type SeoInput = {
@@ -37,7 +37,7 @@ export function robotsAllowsIndex(robots?: string | null) {
 }
 
 export function isSelfCanonicalArticle(article: { slug: string; canonicalUrl?: string | null }) {
-  const expectedPath = isLifetimeTuViSlug(article.slug) ? `/${article.slug}` : `/kien-thuc-tu-vi/${article.slug}`;
+  const expectedPath = articlePath({ slug: article.slug });
   const expected = absoluteUrl(expectedPath);
   const canonical = article.canonicalUrl?.trim() ? absoluteUrl(article.canonicalUrl) : expected;
   return normalizedUrl(canonical) === normalizedUrl(expected);

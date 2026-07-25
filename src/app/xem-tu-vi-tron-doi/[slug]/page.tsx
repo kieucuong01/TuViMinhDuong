@@ -4,6 +4,7 @@ import { APP_URL } from "@/lib/env";
 import { getArticleBySlug, listArticles } from "@/lib/data";
 import { isLifetimeTuViSlug, lifetimeTuViArticlePath } from "@/lib/article-path";
 import { absoluteUrl } from "@/lib/seo";
+import { ArticlePageContent } from "@/components/article-page-content";
 
 export const revalidate = 300;
 export const dynamicParams = true;
@@ -41,10 +42,13 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   };
 }
 
-export default async function LegacyLifetimeArticlePage({ params }: { params: Promise<{ slug: string }> }) {
+export default async function LifetimeArticlePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   if (!isLifetimeTuViSlug(slug)) notFound();
-  const article = await getArticleBySlug(slug);
+  const [article, articles] = await Promise.all([getArticleBySlug(slug), listArticles()]);
   if (!article) notFound();
-  redirect(lifetimeTuViArticlePath(slug));
+  const canonicalPath = lifetimeTuViArticlePath(article.slug);
+  if (canonicalPath !== `/xem-tu-vi-tron-doi/${slug}`) redirect(canonicalPath);
+
+  return <ArticlePageContent article={article} articles={articles} sectionName="Tử vi trọn đời" sectionHref="/xem-tu-vi-tron-doi" />;
 }

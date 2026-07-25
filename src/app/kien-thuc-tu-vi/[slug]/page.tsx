@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 import { APP_URL } from "@/lib/env";
 import { getArticleBySlug, listArticles } from "@/lib/data";
-import { articlePath } from "@/lib/article-path";
+import { articlePath, isLifetimeTuViSlug } from "@/lib/article-path";
 import { absoluteUrl } from "@/lib/seo";
 import { ArticlePageContent } from "@/components/article-page-content";
 
@@ -11,7 +11,7 @@ export const dynamicParams = true;
 
 export async function generateStaticParams() {
   const articles = await listArticles();
-  return articles.map((article) => ({ slug: article.slug }));
+  return articles.filter((article) => !isLifetimeTuViSlug(article.slug)).map((article) => ({ slug: article.slug }));
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
