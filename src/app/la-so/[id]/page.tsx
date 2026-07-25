@@ -44,6 +44,7 @@ function checkoutNotice(checkout?: string, status?: string) {
   if (status === "cancelled") return "Thanh toán đã được hủy. Lá số của bạn vẫn được giữ nguyên và bạn có thể thử lại khi sẵn sàng.";
   if (checkout === "pending") return "PayOS chưa xác nhận giao dịch. Hệ thống chưa mở bản FULL và không trừ xu của bạn.";
   if (checkout === "disabled") return "Thanh toán bản FULL hiện đang tạm dừng. Bạn có thể quay lại lá số và thử lại sau.";
+  if (checkout === "email-invalid") return "Email chưa hợp lệ. Vui lòng mở lại bản FULL và kiểm tra email trước khi thanh toán.";
   if (checkout) return "Chưa thể mở thanh toán cho lá số này. Không có khoản xu nào bị trừ; bạn có thể tải lại trang rồi thử lại.";
   return "";
 }

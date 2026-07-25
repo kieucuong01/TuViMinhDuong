@@ -133,6 +133,8 @@ export type PaidReadingOrderMetadata = {
   chartId: string;
   type: "FULL";
   scopeKey: "all";
+  checkoutEmail?: string;
+  token?: string;
 };
 
 export type PaidReadingOrderPayload = PaidReadingOrderMetadata & {
@@ -147,7 +149,16 @@ export function paidReadingOrderPayload(rawPayload: unknown): PaidReadingOrderPa
     if (!value || typeof value !== "object") continue;
     const payload = value as Record<string, unknown>;
     if (typeof payload.chartId !== "string" || payload.type !== "FULL" || payload.scopeKey !== "all") continue;
-    return { kind, chartId: payload.chartId, type: "FULL", scopeKey: "all" };
+    const checkoutEmail = typeof payload.checkoutEmail === "string" ? payload.checkoutEmail : undefined;
+    const token = typeof payload.token === "string" ? payload.token : undefined;
+    return {
+      kind,
+      chartId: payload.chartId,
+      type: "FULL",
+      scopeKey: "all",
+      ...(checkoutEmail ? { checkoutEmail } : {}),
+      ...(token ? { token } : {}),
+    };
   }
   return null;
 }
@@ -176,11 +187,7 @@ export async function completePaidReadingOrder(
 
     const metadata = paidReadingOrderPayload(fresh.rawPayload ?? order.rawPayload);
     if (!metadata) return null;
-    const metadataValue = {
-      chartId: metadata.chartId,
-      type: metadata.type,
-      scopeKey: metadata.scopeKey,
-    };
+    const { kind, ...metadataValue } = metadata;
 
     await tx.paymentOrder.update({
       where: { id: fresh.id },
@@ -189,7 +196,7 @@ export async function completePaidReadingOrder(
         paidAt: fresh.paidAt || paidAt,
         rawPayload: {
           raw: rawPayload,
-          [metadata.kind]: metadataValue,
+          [kind]: metadataValue,
         } as Prisma.InputJsonValue,
       },
     });

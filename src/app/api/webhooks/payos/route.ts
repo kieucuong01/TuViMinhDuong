@@ -28,20 +28,16 @@ export async function POST(request: Request) {
   if (!isPaid) {
     if (order.status !== "PAID") {
       const readingMetadata = paidReadingOrderPayload(order.rawPayload);
+      let rawPayload = payload;
+      if (readingMetadata) {
+        const { kind, ...metadataValue } = readingMetadata;
+        rawPayload = { raw: payload, [kind]: metadataValue };
+      }
       await db.paymentOrder.update({
         where: { id: order.id },
         data: {
           status: "FAILED",
-          rawPayload: readingMetadata
-            ? {
-                raw: payload,
-                [readingMetadata.kind]: {
-                  chartId: readingMetadata.chartId,
-                  type: readingMetadata.type,
-                  scopeKey: readingMetadata.scopeKey,
-                },
-              }
-            : payload,
+          rawPayload,
         },
       });
     }

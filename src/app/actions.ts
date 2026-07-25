@@ -4,8 +4,8 @@ import { redirect } from "next/navigation";
 import { headers } from "next/headers";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { after } from "next/server";
-import { clearSession, createMagicSession, getCurrentUser, getOrCreateEmailUser, loginOrRegister, setSession, type SessionUser } from "@/lib/auth";
-import { ARTICLES_CACHE_TAG, FEATURE_PRICES_CACHE_TAG, OPERATION_SETTINGS_CACHE_TAG, claimGuestChartForUserFromPath, countRecentChartsForIp, generateAndStoreFreeOverview, getCachedReading, getChart, getFeaturePrice, getOperationSettings, getUserBalance, saveArticleCategoryFromForm, saveArticleFromForm, saveChart, saveReading, adjustCoins, deleteArticleBySlug, deleteUserChart, getReadingJobByScope, createPendingReading, updateOperationSettings, updateFeaturePrices, getCompletedReadingsForScopes, hasReadingBundleAccess, type ChartCreationMetadata } from "@/lib/data";
+import { clearSession, createMagicSession, getCurrentUser, getOrCreateEmailUser, isCheckoutGuestUser, loginOrRegister, normalizeCheckoutEmail, setSession, type SessionUser } from "@/lib/auth";
+import { ARTICLES_CACHE_TAG, FEATURE_PRICES_CACHE_TAG, OPERATION_SETTINGS_CACHE_TAG, claimGuestChartForCheckout, claimGuestChartForUserFromPath, countRecentChartsForIp, generateAndStoreFreeOverview, getCachedReading, getChart, getFeaturePrice, getOperationSettings, getUserBalance, saveArticleCategoryFromForm, saveArticleFromForm, saveChart, saveReading, adjustCoins, deleteArticleBySlug, deleteUserChart, getReadingJobByScope, createPendingReading, updateOperationSettings, updateFeaturePrices, getCompletedReadingsForScopes, hasReadingBundleAccess, type ChartCreationMetadata } from "@/lib/data";
 import { generateReading } from "@/lib/ai";
 import { getDb } from "@/lib/db";
 import { completePaidReadingOrder, createPayOSCheckout, createPayOSCustomCheckout, retryPaidFullReading } from "@/lib/payos";
@@ -362,16 +362,30 @@ export async function checkoutFullReadingAction(formData: FormData) {
   const nextPath = `/la-so/${chartId}`;
   if (!/^[a-zA-Z0-9_-]{1,100}$/.test(chartId)) redirect("/la-so?checkout=invalid");
 
-  const [user, operationSettings] = await Promise.all([getCurrentUser(), getOperationSettings()]);
-  if (!user) {
-    redirect(withQueryParams(nextPath, { login: "1", next: nextPath, paywall: "login" }));
-  }
+  const [currentUser, operationSettings] = await Promise.all([getCurrentUser(), getOperationSettings()]);
   if (!operationSettings.paymentsEnabled || !operationSettings.paidReadingsEnabled) {
     redirect(withQueryParams(nextPath, { checkout: "disabled" }));
   }
 
   const record = await getChart(chartId);
-  if (!record || (record.userId !== user.id && user.role !== "ADMIN")) {
+  if (!record) {
+    redirect(withQueryParams(nextPath, { checkout: "forbidden" }));
+  }
+
+  const requiresCheckoutEmail = !currentUser || isCheckoutGuestUser(currentUser);
+  const buyerEmail = requiresCheckoutEmail
+    ? normalizeCheckoutEmail(formData.get("email"))
+    : currentUser.email;
+  if (!buyerEmail) {
+    redirect(withQueryParams(nextPath, { checkout: "email-invalid" }));
+  }
+
+  let user = currentUser;
+  if (!user) {
+    user = await claimGuestChartForCheckout(chartId, record.chart.input.fullName);
+    if (!user) redirect(withQueryParams(nextPath, { checkout: "forbidden" }));
+    await setSession(user);
+  } else if (record.userId !== user.id && user.role !== "ADMIN") {
     redirect(withQueryParams(nextPath, { checkout: "forbidden" }));
   }
 
@@ -394,13 +408,19 @@ export async function checkoutFullReadingAction(formData: FormData) {
   }
 
   const amountVnd = price.priceCoins * 1000;
+  const returnToken = requiresCheckoutEmail
+    ? await createMagicSession(user)
+    : null;
+  const returnPath = returnToken
+    ? `/api/payments/payos/full-return?token=${encodeURIComponent(returnToken)}`
+    : "/api/payments/payos/full-return";
   const checkout = await createPayOSCustomCheckout({
     amountVnd,
     description: "Luan giai FULL",
     itemName: price.label,
     buyerName: user.name,
-    buyerEmail: user.email,
-    returnPath: "/api/payments/payos/full-return",
+    buyerEmail,
+    returnPath,
     cancelPath: `/la-so/${chartId}`,
   }).catch(() => redirect(withQueryParams(nextPath, { checkout: "error" })));
 
@@ -431,6 +451,8 @@ export async function checkoutFullReadingAction(formData: FormData) {
           chartId,
           type: "FULL",
           scopeKey: "all",
+          checkoutEmail: buyerEmail,
+          ...(returnToken ? { token: returnToken } : {}),
         },
       },
     },

@@ -26,7 +26,13 @@ describe("direct paid reading settlement", () => {
       status: "PENDING",
       paidAt: null,
       rawPayload: {
-        directReading: { chartId: "chart-1", type: "FULL", scopeKey: "all" },
+        directReading: {
+          chartId: "chart-1",
+          type: "FULL",
+          scopeKey: "all",
+          checkoutEmail: "reader@example.com",
+          token: "magic-1",
+        },
       },
     };
     const reading = { id: "reading-1", status: "PENDING" };
@@ -69,6 +75,21 @@ describe("direct paid reading settlement", () => {
           priceCoins: 0,
           content: null,
           promptMeta: expect.objectContaining({ source: "direct-full-checkout", paymentOrderId: "order-1" }),
+        }),
+      });
+      expect(tx.paymentOrder.update).toHaveBeenCalledWith({
+        where: { id: "order-1" },
+        data: expect.objectContaining({
+          rawPayload: {
+            raw: { webhook: 1 },
+            directReading: {
+              chartId: "chart-1",
+              type: "FULL",
+              scopeKey: "all",
+              checkoutEmail: "reader@example.com",
+              token: "magic-1",
+            },
+          },
         }),
       });
       expect(tx.user.update).not.toHaveBeenCalled();
