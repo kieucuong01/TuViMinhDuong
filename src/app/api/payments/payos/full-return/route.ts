@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getCurrentUser } from "@/lib/auth";
+import { consumeMagicSessionToken, getCurrentUser } from "@/lib/auth";
 import { getDb } from "@/lib/db";
 import { APP_URL } from "@/lib/env";
 import {
@@ -22,7 +22,10 @@ function chartRedirect(chartId: string, params: Record<string, string>) {
 export async function GET(request: Request) {
   const url = new URL(request.url);
   const orderCode = url.searchParams.get("orderCode")?.trim();
-  const user = await getCurrentUser();
+  const token = url.searchParams.get("token")?.trim();
+  const user = token
+    ? await consumeMagicSessionToken(token)
+    : await getCurrentUser();
   if (!user || !orderCode || !/^\d+$/.test(orderCode)) {
     return NextResponse.redirect(appUrl("/la-so?checkout=invalid"));
   }

@@ -12,6 +12,7 @@
 
 - Google Ads purchase conversion should be tied to verified payment state, not the PayOS return URL alone.
 - `src/app/api/payments/status/route.ts` exposes a current-user order status check for conversion verification.
+- Guests can buy a FULL reading with email + PayOS and a one-time return token; coin topup, coin checkout, and money-only policy links still require a normal signed-in account.
 - Google Ads setup and smoke instructions live in `docs/google-ads.md`; real `AW-...` IDs and labels must stay in production env, not the repo.
 - Public trust pages now include privacy, terms, contact, and an authenticated payment/refund policy page.
 - `/chinh-sach-thanh-toan-hoan-xu` is a logged-in route and is intentionally kept out of the guest footer and sitemap.

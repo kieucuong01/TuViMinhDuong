@@ -101,7 +101,8 @@ Read first:
 
 Rules:
 
-- Admin can view paid content; guests and normal users should see paywall prompts.
+- Guests may buy the FULL reading directly after entering an email; they must not be treated as an existing authenticated email account.
+- Guest return tokens are one-time bearer credentials. Consume them before settlement, never copy them into application logs or analytics, and always verify order ownership plus PayOS paid state.
 - `CoinLedger` is the truth; `User.coinBalance` is a cache updated in the same transaction.
 - PayOS webhook must be idempotent and signature checked when real env is present.
 - Do not credit coins from a return URL alone.

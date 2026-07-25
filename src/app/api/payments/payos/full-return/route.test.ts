@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
   getCurrentUser: vi.fn(),
+  consumeMagicSessionToken: vi.fn(),
   getDb: vi.fn(),
   getPayOSPaymentRequest: vi.fn(),
   isPayOSRequestPaid: vi.fn(),
@@ -14,7 +15,10 @@ vi.mock("next/server", () => ({
     redirect: (url: URL) => Response.redirect(url, 307),
   },
 }));
-vi.mock("@/lib/auth", () => ({ getCurrentUser: mocks.getCurrentUser }));
+vi.mock("@/lib/auth", () => ({
+  getCurrentUser: mocks.getCurrentUser,
+  consumeMagicSessionToken: mocks.consumeMagicSessionToken,
+}));
 vi.mock("@/lib/db", () => ({ getDb: mocks.getDb }));
 vi.mock("@/lib/env", () => ({ APP_URL: "https://lasotinhhoa.vn" }));
 vi.mock("@/lib/payos", () => ({
@@ -64,6 +68,38 @@ describe("direct FULL PayOS return", () => {
     expect(location.startsWith("https://lasotinhhoa.vn/la-so/chart-1/nang-cao")).toBe(true);
     expect(location).toContain("reading=reading-1");
     expect(location).toContain("status=success");
+  });
+
+  it("restores the guest session from the return token before settling", async () => {
+    mocks.getCurrentUser.mockResolvedValue(null);
+    mocks.consumeMagicSessionToken.mockResolvedValue({ id: "user-1" });
+
+    const { GET } = await import("./route");
+    const response = await GET(new Request(
+      "http://test.local/api/payments/payos/full-return?token=magic-1&status=success&orderCode=123",
+    ));
+
+    expect(mocks.consumeMagicSessionToken).toHaveBeenCalledWith("magic-1");
+    expect(mocks.consumeMagicSessionToken.mock.invocationCallOrder[0])
+      .toBeLessThan(mocks.getPayOSPaymentRequest.mock.invocationCallOrder[0]);
+    expect(mocks.getCurrentUser).not.toHaveBeenCalled();
+    expect(mocks.settlePaidOrder).toHaveBeenCalledTimes(1);
+    expect(response.headers.get("location")).toContain("/la-so/chart-1/nang-cao");
+  });
+
+  it("rejects an invalid token without querying the database or PayOS", async () => {
+    mocks.getCurrentUser.mockResolvedValue({ id: "user-1" });
+    mocks.consumeMagicSessionToken.mockResolvedValue(null);
+
+    const { GET } = await import("./route");
+    const response = await GET(new Request(
+      "http://test.local/api/payments/payos/full-return?token=bad&orderCode=123",
+    ));
+
+    expect(response.headers.get("location")).toContain("/la-so?checkout=invalid");
+    expect(mocks.getCurrentUser).not.toHaveBeenCalled();
+    expect(mocks.getDb).not.toHaveBeenCalled();
+    expect(mocks.getPayOSPaymentRequest).not.toHaveBeenCalled();
   });
 
   it("does not trust the success query when PayOS has not confirmed payment", async () => {
