@@ -1,4 +1,7 @@
+"use client";
+
 import { Sparkles, X } from "lucide-react";
+import type { ToggleEvent } from "react";
 import { checkoutFullReadingAction, requestReadingAction } from "@/app/actions";
 import { LoadingSubmitButton } from "@/components/loading-submit-button";
 import { premiumReadingModalId } from "@/components/premium-reading-target";
@@ -14,6 +17,13 @@ type PremiumReadingCtaProps = {
 
 function cashLabel(priceCoins: number) {
   return `${new Intl.NumberFormat("vi-VN").format(priceCoins * 1000)}đ`;
+}
+
+function focusCheckoutOnOpen(event: ToggleEvent<HTMLElement>) {
+  if (event.newState !== "open") return;
+  event.currentTarget
+    .querySelector<HTMLElement>('[name="email"], [data-testid="premium-reading-confirm-submit"]')
+    ?.focus();
 }
 
 export function PremiumReadingCta({
@@ -35,6 +45,7 @@ export function PremiumReadingCta({
       aria-labelledby="premium-confirm-title"
       popover="auto"
       data-testid="premium-reading-confirm-modal"
+      onToggle={focusCheckoutOnOpen}
     >
       <button type="button" className="premium-confirm-close" aria-label="Đóng" popoverTarget={modalId} popoverTargetAction="hide">
         <X size={18} />
@@ -68,12 +79,11 @@ export function PremiumReadingCta({
               autoComplete="email"
               placeholder="ban@email.com"
               required
-              autoFocus
             />
             <small>Dùng để đối soát và hỗ trợ khôi phục giao dịch.</small>
           </label>
         ) : null}
-        <LoadingSubmitButton className="btn btn-primary" loadingText="Đang mở PayOS..." data-testid="premium-reading-confirm-submit" autoFocus={!requiresCheckoutEmail}>
+        <LoadingSubmitButton className="btn btn-primary" loadingText="Đang mở PayOS..." data-testid="premium-reading-confirm-submit">
           Thanh toán PayOS — {cashLabel(fullPriceCoins)}
         </LoadingSubmitButton>
       </form>

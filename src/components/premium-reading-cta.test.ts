@@ -6,6 +6,7 @@ import { describe, expect, it, vi } from "vitest";
 import { PremiumReadingCta } from "@/components/premium-reading-cta";
 
 const cssSource = readFileSync(fileURLToPath(new URL("../app/globals.css", import.meta.url)), "utf8");
+const ctaSource = readFileSync(fileURLToPath(new URL("./premium-reading-cta.tsx", import.meta.url)), "utf8");
 
 vi.mock("@/app/actions", () => ({
   checkoutFullReadingAction: vi.fn(),
@@ -32,7 +33,6 @@ describe("premium reading checkout analytics", () => {
     expect(html).toContain("Thanh toán PayOS");
     expect(html).toContain("Dùng 199 xu hiện có");
     expect(html).not.toContain('name="email"');
-    expect(html).toMatch(/<button[^>]*autofocus=""[^>]*data-testid="premium-reading-confirm-submit"|<button[^>]*data-testid="premium-reading-confirm-submit"[^>]*autofocus=""/);
   });
 
   it("keeps the coin method hidden when the balance is too low", () => {
@@ -85,7 +85,15 @@ describe("premium reading checkout analytics", () => {
     expect(html).toContain("Dùng để đối soát");
     expect(html).toContain('data-ad-method="payos"');
     expect(html).not.toContain('data-ad-method="coins"');
-    expect(html).toMatch(/<input[^>]*name="email"[^>]*autofocus=""|<input[^>]*autofocus=""[^>]*name="email"/);
+  });
+
+  it("focuses the guest email or owner PayOS button when the popover opens", () => {
+    expect(ctaSource).toContain('"use client"');
+    expect(ctaSource).toContain("onToggle={focusCheckoutOnOpen}");
+    expect(ctaSource).toContain('event.newState !== "open"');
+    expect(ctaSource).toContain('[name="email"], [data-testid="premium-reading-confirm-submit"]');
+    expect(ctaSource).toContain("?.focus()");
+    expect(ctaSource).not.toContain("autoFocus");
   });
 
   it("uses non-modal popover semantics and a 44px close target", () => {
