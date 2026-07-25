@@ -19,6 +19,7 @@ describe("personalized FULL report offer", () => {
         priceCoins: 199,
         isSignedIn: false,
         canReadFullOverview: false,
+        canCheckoutFull: true,
       }),
     );
 
@@ -31,12 +32,11 @@ describe("personalized FULL report offer", () => {
     expect(html).toContain("Đọc lại không mất thêm phí");
     expect(html).toContain("Tặng 3 câu hỏi với Cố vấn AI");
     expect(html).toContain("199.000đ (199 xu)");
-    expect(html).toContain("%23personal-report-outline");
-    expect(html).toContain("Lưu lá số &amp; mở bản FULL");
-    expect(html).toContain('data-ad-click="full_offer_outline_clicked"');
+    expect(html).toContain('popoverTarget="premium-confirm-chart-1"');
+    expect(html).toContain("Mở bản FULL 9 chương");
     expect(html).toContain('data-ad-view="full_offer_viewed"');
-    expect(html).not.toContain('popoverTarget="premium-confirm-chart-1"');
-    expect(html).not.toContain('data-ad-click="full_offer_clicked"');
+    expect(html).not.toContain("/dang-nhap");
+    expect(html).not.toContain("login=1");
   });
 
   it("lets only an owner open the payment modal with the approved CTA", () => {
@@ -48,6 +48,7 @@ describe("personalized FULL report offer", () => {
         priceCoins: 199,
         isSignedIn: true,
         canReadFullOverview: true,
+        canCheckoutFull: true,
       }),
     );
 
@@ -66,6 +67,7 @@ describe("personalized FULL report offer", () => {
         priceCoins: 199,
         isSignedIn: true,
         canReadFullOverview: false,
+        canCheckoutFull: false,
       }),
     );
 
@@ -84,6 +86,7 @@ describe("personalized FULL report offer", () => {
         priceCoins: 199,
         isSignedIn: true,
         canReadFullOverview: true,
+        canCheckoutFull: true,
       }),
     );
 

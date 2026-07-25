@@ -17,6 +17,7 @@ describe("premium reading checkout analytics", () => {
         hasAdvancedReading: false,
         fullPriceCoins: 199,
         coinBalance: 250,
+        requiresCheckoutEmail: false,
       }),
     );
 
@@ -26,6 +27,7 @@ describe("premium reading checkout analytics", () => {
     expect(html.match(/data-chart-id="chart-1"/g)).toHaveLength(2);
     expect(html).toContain("Thanh toán PayOS");
     expect(html).toContain("Dùng 199 xu hiện có");
+    expect(html).not.toContain('name="email"');
   });
 
   it("keeps the coin method hidden when the balance is too low", () => {
@@ -36,6 +38,7 @@ describe("premium reading checkout analytics", () => {
         hasAdvancedReading: false,
         fullPriceCoins: 199,
         coinBalance: 198,
+        requiresCheckoutEmail: false,
       }),
     );
 
@@ -52,9 +55,30 @@ describe("premium reading checkout analytics", () => {
         hasAdvancedReading: true,
         fullPriceCoins: 199,
         coinBalance: 250,
+        requiresCheckoutEmail: false,
       }),
     );
 
     expect(html).toBe("");
+  });
+
+  it("asks a guest for email and keeps PayOS as the only payment method", () => {
+    const html = renderToStaticMarkup(
+      createElement(PremiumReadingCta, {
+        chartId: "chart-1",
+        fullName: "Nguyen Minh Anh",
+        hasAdvancedReading: false,
+        fullPriceCoins: 199,
+        coinBalance: 250,
+        requiresCheckoutEmail: true,
+      }),
+    );
+
+    expect(html).toContain('name="email"');
+    expect(html).toContain('type="email"');
+    expect(html).toContain("required");
+    expect(html).toContain("Dùng để đối soát");
+    expect(html).toContain('data-ad-method="payos"');
+    expect(html).not.toContain('data-ad-method="coins"');
   });
 });

@@ -67,7 +67,7 @@ describe("FreeOverviewLoader seed-first LLM refresh gate", () => {
     expect(chartPageSource).toContain("canReadFullOverview={canReadFullOverview}");
     expect(chartPageSource).toContain("isSignedIn={Boolean(user)}");
     expect(chartPageSource).toContain("canReadFullOverview && featurePrices ? <ReadingTabs");
-    expect(chartPageSource).toContain("canReadFullOverview && featurePrices ? <PremiumReadingCta");
+    expect(chartPageSource).toContain("canCheckoutFull && featurePrices ? <PremiumReadingCta");
     expect(loaderSource).not.toContain("detailContent");
     expect(loaderSource).not.toContain("expandedOverviewContent");
   });
@@ -91,6 +91,27 @@ describe("FreeOverviewLoader seed-first LLM refresh gate", () => {
     expect(html).toContain("%23luan-giai");
     expect(html).toContain('data-ad-click="login_gate_clicked"');
     expect(loaderSource).toContain("data-ad-view=\"login_gate_viewed\"");
+    expect(html).toContain("login=1");
+  });
+
+  it("opens the premium popover for a guest without changing the free login gate", () => {
+    const html = renderToStaticMarkup(
+      createElement(FreeOverviewLoader, {
+        chartId: "chart-1",
+        fullName: "Nguyễn Minh Anh",
+        initialOverview: {
+          ...overview,
+          content: `${overview.content}\n\n🔒 Nâng cấp Premium để xem:`,
+        },
+        isSignedIn: false,
+        canReadFullOverview: false,
+      }),
+    );
+
+    expect(html).toContain('popoverTarget="premium-confirm-chart-1"');
+    expect(html).toContain("Mở bản FULL 9 chương");
+    expect(html).not.toContain("/dang-nhap");
+    expect(html).not.toContain("login=1");
   });
 
   it("shows all four projected sections to an owner without a gate", () => {

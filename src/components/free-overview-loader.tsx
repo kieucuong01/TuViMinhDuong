@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { LockKeyhole } from "lucide-react";
 import { loginModalHref } from "@/components/login-modal-link";
+import { premiumReadingModalId } from "@/components/premium-reading-target";
 import { FreeOverviewRefreshTrigger } from "@/components/free-overview-refresh-trigger";
 import { FreeOverviewTypingReveal } from "@/components/free-overview-typing-reveal";
 
@@ -35,7 +36,6 @@ export function FreeOverviewLoader({
 
   const chartPath = `/la-so/${chartId}`;
   const nextPath = `${chartPath}#luan-giai`;
-  const premiumPath = `${chartPath}#personal-report-outline`;
   const isLlmReady = initialOverview.source === "llm";
   const shouldAttemptLlm = !isLlmReady && initialOverview.jobStatus !== "failed";
   const hasPremiumHookPreview = initialOverview.content.includes("🔒 Nâng cấp Premium để xem:");
@@ -75,15 +75,15 @@ export function FreeOverviewLoader({
             <h2 id="free-overview-premium-title">Mở khóa báo cáo cá nhân hóa của {fullName}</h2>
             <p>Bản miễn phí đã cho bạn bốn lớp chính. Báo cáo FULL đi tiếp vào 12 cung, vận năm, lộ trình 12 tháng và kế hoạch 90 ngày.</p>
           </div>
-          <Link
+          <button
+            type="button"
             className="btn btn-primary"
-            href={loginModalHref(chartPath, undefined, premiumPath)}
-            scroll={false}
+            popoverTarget={premiumReadingModalId(chartId)}
             data-ad-click="full_offer_inline_clicked"
             data-chart-id={chartId}
           >
-            Lưu lá số &amp; mở bản FULL
-          </Link>
+            Mở bản FULL 9 chương
+          </button>
         </section>
       ) : !canReadFullOverview && !isSignedIn ? (
         <section

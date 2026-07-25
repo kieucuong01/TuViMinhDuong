@@ -9,6 +9,7 @@ type PremiumReadingCtaProps = {
   hasAdvancedReading: boolean;
   fullPriceCoins: number;
   coinBalance: number;
+  requiresCheckoutEmail: boolean;
 };
 
 function cashLabel(priceCoins: number) {
@@ -21,6 +22,7 @@ export function PremiumReadingCta({
   hasAdvancedReading,
   fullPriceCoins,
   coinBalance,
+  requiresCheckoutEmail,
 }: PremiumReadingCtaProps) {
   if (hasAdvancedReading) return null;
   const modalId = premiumReadingModalId(chartId);
@@ -41,7 +43,7 @@ export function PremiumReadingCta({
       </button>
       <span className="premium-confirm-icon" aria-hidden="true"><Sparkles size={26} /></span>
       <p className="eyebrow">Bản FULL 9 chương cá nhân hóa</p>
-      <h2 id="premium-confirm-title">Chọn cách thanh toán</h2>
+      <h2 id="premium-confirm-title">{requiresCheckoutEmail ? "Nhập email để thanh toán" : "Chọn cách thanh toán"}</h2>
       <p>Lá số của <strong>{fullName}</strong> sẽ được lưu để bạn đọc lại không mất thêm phí.</p>
 
       <div className="premium-confirm-price">
@@ -59,12 +61,25 @@ export function PremiumReadingCta({
         data-loading-message="Đang mở PayOS..."
       >
         <input type="hidden" name="chartId" value={chartId} />
+        {requiresCheckoutEmail ? (
+          <label className="premium-confirm-email">
+            <span>Email đối soát giao dịch</span>
+            <input
+              name="email"
+              type="email"
+              autoComplete="email"
+              placeholder="ban@email.com"
+              required
+            />
+            <small>Dùng để đối soát và hỗ trợ khôi phục giao dịch.</small>
+          </label>
+        ) : null}
         <LoadingSubmitButton className="btn btn-primary" loadingText="Đang mở PayOS..." data-testid="premium-reading-confirm-submit">
           Thanh toán PayOS — {cashLabel(fullPriceCoins)}
         </LoadingSubmitButton>
       </form>
 
-      {hasEnoughCoins ? (
+      {!requiresCheckoutEmail && hasEnoughCoins ? (
         <form
           action={requestReadingAction}
           className="premium-confirm-actions premium-confirm-coin-action"

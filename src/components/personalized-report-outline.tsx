@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { CheckCircle2, LockKeyhole, Sparkles } from "lucide-react";
-import { loginModalHref } from "@/components/login-modal-link";
 import { premiumReadingModalId } from "@/components/premium-reading-target";
 import type { ReportOutlineItem } from "@/lib/chart-evidence";
 
@@ -32,6 +31,7 @@ export function PersonalizedReportOutline({
   priceCoins,
   isSignedIn,
   canReadFullOverview,
+  canCheckoutFull,
 }: {
   chartId: string;
   items: ReportOutlineItem[];
@@ -39,8 +39,8 @@ export function PersonalizedReportOutline({
   priceCoins: number;
   isSignedIn: boolean;
   canReadFullOverview: boolean;
+  canCheckoutFull: boolean;
 }) {
-  const chartPath = `/la-so/${chartId}`;
   const previewItems = items.slice(0, 3);
   const remainingItems = items.slice(3);
 
@@ -93,18 +93,7 @@ export function PersonalizedReportOutline({
             <li>Tặng 3 câu hỏi với Cố vấn AI</li>
             <li><strong>{cashLabel(priceCoins)} ({priceCoins} xu)</strong></li>
           </ul>
-          {!isSignedIn ? (
-            <Link
-              className="btn btn-primary personal-report-outline-cta"
-              href={loginModalHref(chartPath, undefined, `${chartPath}#personal-report-outline`)}
-              scroll={false}
-              data-ad-click="full_offer_outline_clicked"
-              data-chart-id={chartId}
-              data-testid="premium-reading-cta-bottom"
-            >
-              Lưu lá số &amp; mở bản FULL
-            </Link>
-          ) : canReadFullOverview ? (
+          {canCheckoutFull ? (
             <button
               type="button"
               className="btn btn-primary personal-report-outline-cta"

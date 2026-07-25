@@ -4,7 +4,7 @@ import { Suspense } from "react";
 import { BookOpenText, CalendarRange, Compass, Layers3, ShieldCheck } from "lucide-react";
 import { ChartBoard, MobileChartReader } from "@/components/chart-board";
 import { getAnyCompletedReading, getCachedReading, getChart, getFeaturePrices, getFreeOverviewStatus, getOperationSettings, getReadingById, getUserBalance } from "@/lib/data";
-import { getCurrentUser } from "@/lib/auth";
+import { getCurrentUser, isCheckoutGuestUser } from "@/lib/auth";
 import { FeedbackActions } from "@/components/feedback-actions";
 import { PromptChips } from "@/components/prompt-chips";
 import { ReadingTabs } from "@/components/reading-tabs";
@@ -132,6 +132,14 @@ export default async function ChartPage({
   const [user, operationSettings] = await Promise.all([getCurrentUser(), getOperationSettings()]);
   const canReadFullOverview = Boolean(user && (user.role === "ADMIN" || record.userId === user.id));
   const paidFeaturesVisible = operationSettings.paidReadingsEnabled || user?.role === "ADMIN";
+  const requiresCheckoutEmail = !user || isCheckoutGuestUser(user);
+  const canCheckoutFull = Boolean(
+    paidFeaturesVisible
+    && (
+      user?.role === "ADMIN"
+      || (record.userId ? record.userId === user?.id : !user)
+    ),
+  );
   const canUsePaidFateViews = paidFeaturesVisible && canReadFullOverview;
   const featurePrices = paidFeaturesVisible ? await getFeaturePrices() : null;
   const fateViews: FateView[] = canUsePaidFateViews ? ["la-so", "luan-cung", "dai-van", "tieu-van", "nguyet-van", "nhat-van"] : ["la-so"];
@@ -264,9 +272,10 @@ export default async function ChartPage({
               priceCoins={featurePrices?.FULL.priceCoins ?? 199}
               isSignedIn={Boolean(user)}
               canReadFullOverview={canReadFullOverview}
+              canCheckoutFull={canCheckoutFull}
             />
             {canReadFullOverview && featurePrices ? <ReadingTabs chartId={id} chart={record.chart} featurePrices={featurePrices} /> : null}
-            {canReadFullOverview && featurePrices ? <PremiumReadingCta chartId={id} fullName={record.chart.input.fullName} hasAdvancedReading={hasAdvancedReading} fullPriceCoins={featurePrices.FULL.priceCoins} coinBalance={coinBalance} /> : null}
+            {canCheckoutFull && featurePrices ? <PremiumReadingCta chartId={id} fullName={record.chart.input.fullName} hasAdvancedReading={hasAdvancedReading} fullPriceCoins={featurePrices.FULL.priceCoins} coinBalance={coinBalance} requiresCheckoutEmail={requiresCheckoutEmail} /> : null}
           </>
         ) : null}
         </>
