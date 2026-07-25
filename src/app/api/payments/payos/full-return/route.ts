@@ -22,11 +22,16 @@ function chartRedirect(chartId: string, params: Record<string, string>) {
 export async function GET(request: Request) {
   const url = new URL(request.url);
   const orderCode = url.searchParams.get("orderCode")?.trim();
-  const token = url.searchParams.get("token")?.trim();
+  const tokenParam = url.searchParams.get("token");
+  const token = tokenParam?.trim();
+  if (!orderCode || !/^\d+$/.test(orderCode) || (tokenParam !== null && !token)) {
+    return NextResponse.redirect(appUrl("/la-so?checkout=invalid"));
+  }
+
   const user = token
     ? await consumeMagicSessionToken(token)
     : await getCurrentUser();
-  if (!user || !orderCode || !/^\d+$/.test(orderCode)) {
+  if (!user) {
     return NextResponse.redirect(appUrl("/la-so?checkout=invalid"));
   }
 
@@ -47,7 +52,13 @@ export async function GET(request: Request) {
     },
   });
   const metadata = paidReadingOrderPayload(order?.rawPayload);
-  if (!order || order.userId !== user.id || !metadata || metadata.kind !== "directReading") {
+  if (
+    !order ||
+    order.userId !== user.id ||
+    !metadata ||
+    metadata.kind !== "directReading" ||
+    (token && metadata.token !== token)
+  ) {
     return NextResponse.redirect(appUrl("/la-so?checkout=forbidden"));
   }
 

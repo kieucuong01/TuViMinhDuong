@@ -73,6 +73,13 @@ describe("direct FULL PayOS return", () => {
   it("restores the guest session from the return token before settling", async () => {
     mocks.getCurrentUser.mockResolvedValue(null);
     mocks.consumeMagicSessionToken.mockResolvedValue({ id: "user-1" });
+    mocks.paidReadingOrderPayload.mockReturnValue({
+      kind: "directReading",
+      chartId: "chart-1",
+      type: "FULL",
+      scopeKey: "all",
+      token: "magic-1",
+    });
 
     const { GET } = await import("./route");
     const response = await GET(new Request(
@@ -85,6 +92,49 @@ describe("direct FULL PayOS return", () => {
     expect(mocks.getCurrentUser).not.toHaveBeenCalled();
     expect(mocks.settlePaidOrder).toHaveBeenCalledTimes(1);
     expect(response.headers.get("location")).toContain("/la-so/chart-1/nang-cao");
+  });
+
+  it("rejects a return token that does not belong to the order", async () => {
+    mocks.consumeMagicSessionToken.mockResolvedValue({ id: "user-1" });
+    mocks.paidReadingOrderPayload.mockReturnValue({
+      kind: "directReading",
+      chartId: "chart-1",
+      type: "FULL",
+      scopeKey: "all",
+      token: "magic-2",
+    });
+
+    const { GET } = await import("./route");
+    const response = await GET(new Request(
+      "http://test.local/api/payments/payos/full-return?token=magic-1&orderCode=123",
+    ));
+
+    expect(response.headers.get("location")).toContain("/la-so?checkout=forbidden");
+    expect(mocks.getPayOSPaymentRequest).not.toHaveBeenCalled();
+    expect(mocks.settlePaidOrder).not.toHaveBeenCalled();
+  });
+
+  it("rejects an invalid order code without consuming the return token", async () => {
+    const { GET } = await import("./route");
+    const response = await GET(new Request(
+      "http://test.local/api/payments/payos/full-return?token=magic-1&orderCode=invalid",
+    ));
+
+    expect(response.headers.get("location")).toContain("/la-so?checkout=invalid");
+    expect(mocks.consumeMagicSessionToken).not.toHaveBeenCalled();
+    expect(mocks.getDb).not.toHaveBeenCalled();
+  });
+
+  it("rejects an empty token without falling back to the signed-in session", async () => {
+    const { GET } = await import("./route");
+    const response = await GET(new Request(
+      "http://test.local/api/payments/payos/full-return?token=%20&orderCode=123",
+    ));
+
+    expect(response.headers.get("location")).toContain("/la-so?checkout=invalid");
+    expect(mocks.consumeMagicSessionToken).not.toHaveBeenCalled();
+    expect(mocks.getCurrentUser).not.toHaveBeenCalled();
+    expect(mocks.getDb).not.toHaveBeenCalled();
   });
 
   it("rejects an invalid token without querying the database or PayOS", async () => {
