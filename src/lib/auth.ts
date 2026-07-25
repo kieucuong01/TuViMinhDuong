@@ -21,6 +21,7 @@ export type LoginOrRegisterResult = {
 };
 
 const COOKIE_NAME = "tuvi_session";
+const CHECKOUT_GUEST_DOMAIN = "checkout.lasotinhhoa.local";
 
 function secret() {
   return process.env.AUTH_SECRET || "dev-tu-vi-secret-change-me";
@@ -98,6 +99,46 @@ export async function createMagicSession(user: SessionUser) {
     },
   });
   return token;
+}
+
+
+export function normalizeCheckoutEmail(value: unknown): string | null {
+  const email = String(value || "").trim().toLowerCase();
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ? email : null;
+}
+
+export function isCheckoutGuestUser(
+  user: Pick<SessionUser, "email"> | null | undefined,
+): boolean {
+  return Boolean(user?.email.endsWith(`@${CHECKOUT_GUEST_DOMAIN}`));
+}
+
+export async function consumeMagicSessionToken(token: string): Promise<SessionUser | null> {
+  const db = getDb();
+  if (!db || !token) return null;
+
+  const user = await db.$transaction(async (tx) => {
+    const session = await tx.session.findUnique({
+      where: { token },
+      include: { user: true },
+    });
+    if (!session || session.expiresAt < new Date()) return null;
+    const consumed = await tx.session.deleteMany({
+      where: { id: session.id, token },
+    });
+    return consumed.count === 1 ? session.user : null;
+  });
+  if (!user) return null;
+
+  const sessionUser: SessionUser = {
+    id: user.id,
+    email: user.email,
+    name: user.name || user.email.split("@")[0],
+    role: user.role,
+    coinBalance: user.coinBalance,
+  };
+  await setSession(sessionUser);
+  return sessionUser;
 }
 
 export async function signInWithMagicToken(token: string) {

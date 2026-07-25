@@ -937,6 +937,54 @@ function chartIdFromChartPath(path: string) {
   return match?.[1] ? decodeURIComponent(match[1]) : null;
 }
 
+class GuestCheckoutClaimConflict extends Error {}
+
+export async function claimGuestChartForCheckout(
+  chartId: string,
+  fullName: string,
+): Promise<SessionUser | null> {
+  const email = `guest-checkout-${randomUUID()}@checkout.lasotinhhoa.local`;
+  const name = fullName.trim() || "Khach xem la so";
+  const db = getDb();
+
+  if (!db) {
+    const chart = charts().get(chartId);
+    if (!chart || chart.userId) return null;
+    const user: SessionUser = {
+      id: `guest-checkout-${randomUUID()}`,
+      email,
+      name,
+      role: "USER",
+      coinBalance: 0,
+    };
+    charts().set(chartId, { ...chart, userId: user.id });
+    return user;
+  }
+
+  try {
+    return await db.$transaction(async (tx) => {
+      const created = await tx.user.create({
+        data: { email, name, coinBalance: 0 },
+      });
+      const claimed = await tx.chart.updateMany({
+        where: { id: chartId, userId: null },
+        data: { userId: created.id },
+      });
+      if (claimed.count !== 1) throw new GuestCheckoutClaimConflict();
+      return {
+        id: created.id,
+        email: created.email,
+        name: created.name || name,
+        role: created.role,
+        coinBalance: created.coinBalance,
+      };
+    });
+  } catch (error) {
+    if (error instanceof GuestCheckoutClaimConflict) return null;
+    throw error;
+  }
+}
+
 export async function claimGuestChartForUserFromPath(path: string, user: SessionUser) {
   const chartId = chartIdFromChartPath(path);
   if (!chartId) return false;

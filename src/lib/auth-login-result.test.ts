@@ -10,7 +10,7 @@ vi.mock("next/headers", () => ({ cookies: cookiesMock }));
 vi.mock("@/lib/db", () => ({ getDb: getDbMock }));
 vi.mock("@/lib/env", () => ({ ADMIN_EMAIL: "admin@example.com", ADMIN_PASSWORD: "" }));
 
-import { hashPassword, loginOrRegister } from "@/lib/auth";
+import { consumeMagicSessionToken, hashPassword, isCheckoutGuestUser, loginOrRegister, normalizeCheckoutEmail } from "@/lib/auth";
 
 const existingUser = {
   id: "user-existing",
@@ -71,5 +71,49 @@ describe("loginOrRegister account result", () => {
       user: { id: "demo-demo@example.com" },
       accountResult: "register",
     });
+  });
+});
+
+describe("guest checkout auth", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    cookiesMock.mockResolvedValue({ set: vi.fn() });
+  });
+
+  it("normalizes checkout email without treating it as an authenticated identity", () => {
+    expect(normalizeCheckoutEmail(" Reader@Example.COM ")).toBe("reader@example.com");
+    expect(normalizeCheckoutEmail("not-an-email")).toBeNull();
+    expect(isCheckoutGuestUser({
+      email: "guest-checkout-1@checkout.lasotinhhoa.local",
+    })).toBe(true);
+    expect(isCheckoutGuestUser({ email: "reader@example.com" })).toBe(false);
+  });
+
+  it("consumes a valid magic session token before restoring the user", async () => {
+    const setCookie = vi.fn();
+    cookiesMock.mockResolvedValue({ set: setCookie });
+    const tx = {
+      session: {
+        findUnique: vi.fn().mockResolvedValue({
+          id: "session-1",
+          expiresAt: new Date(Date.now() + 60_000),
+          user: existingUser,
+        }),
+        deleteMany: vi.fn().mockResolvedValue({ count: 1 }),
+      },
+    };
+    getDbMock.mockReturnValue({
+      $transaction: vi.fn(async (worker: (client: typeof tx) => unknown) => worker(tx)),
+    });
+
+    const user = await consumeMagicSessionToken("magic-1");
+
+    expect(tx.session.deleteMany).toHaveBeenCalledWith({
+      where: { id: "session-1", token: "magic-1" },
+    });
+    expect(tx.session.deleteMany.mock.invocationCallOrder[0]).toBeLessThan(
+      setCookie.mock.invocationCallOrder[0],
+    );
+    expect(user).toMatchObject({ id: existingUser.id });
   });
 });
