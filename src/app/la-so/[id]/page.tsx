@@ -258,6 +258,7 @@ export default async function ChartPage({
                 initialOverview={visibleFreeOverviewStatus}
                 isSignedIn={Boolean(user)}
                 canReadFullOverview={canReadFullOverview}
+                canCheckoutFull={canCheckoutFull}
               />
             </>
           )}

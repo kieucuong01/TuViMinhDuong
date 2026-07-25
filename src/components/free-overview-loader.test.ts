@@ -66,6 +66,7 @@ describe("FreeOverviewLoader seed-first LLM refresh gate", () => {
     expect(chartPageSource).toContain("fullName={record.chart.input.fullName}");
     expect(chartPageSource).toContain("canReadFullOverview={canReadFullOverview}");
     expect(chartPageSource).toContain("isSignedIn={Boolean(user)}");
+    expect(chartPageSource).toContain("canCheckoutFull={canCheckoutFull}");
     expect(chartPageSource).toContain("canReadFullOverview && featurePrices ? <ReadingTabs");
     expect(chartPageSource).toContain("canCheckoutFull && featurePrices ? <PremiumReadingCta");
     expect(loaderSource).not.toContain("detailContent");
@@ -80,6 +81,7 @@ describe("FreeOverviewLoader seed-first LLM refresh gate", () => {
         initialOverview: overview,
         isSignedIn: false,
         canReadFullOverview: false,
+        canCheckoutFull: false,
       }),
     );
 
@@ -105,6 +107,7 @@ describe("FreeOverviewLoader seed-first LLM refresh gate", () => {
         },
         isSignedIn: false,
         canReadFullOverview: false,
+        canCheckoutFull: true,
       }),
     );
 
@@ -112,6 +115,25 @@ describe("FreeOverviewLoader seed-first LLM refresh gate", () => {
     expect(html).toContain("Mở bản FULL 9 chương");
     expect(html).not.toContain("/dang-nhap");
     expect(html).not.toContain("login=1");
+  });
+
+  it("does not render a dead premium trigger for a guest viewing an owned chart", () => {
+    const html = renderToStaticMarkup(
+      createElement(FreeOverviewLoader, {
+        chartId: "chart-1",
+        fullName: "Nguyễn Minh Anh",
+        initialOverview: {
+          ...overview,
+          content: `${overview.content}\n\n🔒 Nâng cấp Premium để xem:`,
+        },
+        isSignedIn: false,
+        canReadFullOverview: false,
+        canCheckoutFull: false,
+      }),
+    );
+
+    expect(html).not.toContain('popoverTarget="premium-confirm-chart-1"');
+    expect(html).toContain("Lưu lá số &amp; đọc tiếp miễn phí");
   });
 
   it("shows all four projected sections to an owner without a gate", () => {
@@ -122,6 +144,7 @@ describe("FreeOverviewLoader seed-first LLM refresh gate", () => {
         initialOverview: overview,
         isSignedIn: true,
         canReadFullOverview: true,
+        canCheckoutFull: true,
       }),
     );
 
@@ -143,6 +166,7 @@ describe("FreeOverviewLoader seed-first LLM refresh gate", () => {
         },
         isSignedIn: true,
         canReadFullOverview: true,
+        canCheckoutFull: true,
       }),
     );
 
@@ -158,6 +182,7 @@ describe("FreeOverviewLoader seed-first LLM refresh gate", () => {
         initialOverview: overview,
         isSignedIn: true,
         canReadFullOverview: false,
+        canCheckoutFull: false,
       }),
     );
 

@@ -1,7 +1,11 @@
+import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 import { PremiumReadingCta } from "@/components/premium-reading-cta";
+
+const cssSource = readFileSync(fileURLToPath(new URL("../app/globals.css", import.meta.url)), "utf8");
 
 vi.mock("@/app/actions", () => ({
   checkoutFullReadingAction: vi.fn(),
@@ -28,6 +32,7 @@ describe("premium reading checkout analytics", () => {
     expect(html).toContain("Thanh toán PayOS");
     expect(html).toContain("Dùng 199 xu hiện có");
     expect(html).not.toContain('name="email"');
+    expect(html).toMatch(/<button[^>]*autofocus=""[^>]*data-testid="premium-reading-confirm-submit"|<button[^>]*data-testid="premium-reading-confirm-submit"[^>]*autofocus=""/);
   });
 
   it("keeps the coin method hidden when the balance is too low", () => {
@@ -80,5 +85,23 @@ describe("premium reading checkout analytics", () => {
     expect(html).toContain("Dùng để đối soát");
     expect(html).toContain('data-ad-method="payos"');
     expect(html).not.toContain('data-ad-method="coins"');
+    expect(html).toMatch(/<input[^>]*name="email"[^>]*autofocus=""|<input[^>]*autofocus=""[^>]*name="email"/);
+  });
+
+  it("uses non-modal popover semantics and a 44px close target", () => {
+    const html = renderToStaticMarkup(
+      createElement(PremiumReadingCta, {
+        chartId: "chart-1",
+        fullName: "Nguyen Minh Anh",
+        hasAdvancedReading: false,
+        fullPriceCoins: 199,
+        coinBalance: 250,
+        requiresCheckoutEmail: false,
+      }),
+    );
+
+    expect(html).not.toContain('role="dialog"');
+    expect(html).not.toContain('aria-modal="true"');
+    expect(cssSource).toMatch(/\.premium-confirm-close\s*\{[^}]*min-width:\s*44px;[^}]*min-height:\s*44px;/s);
   });
 });

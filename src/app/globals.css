@@ -4060,8 +4060,8 @@ button.is-loading:not(.icon-button)::before {
   top: 0.85rem;
   right: 0.85rem;
   display: grid;
-  width: 2.35rem;
-  height: 2.35rem;
+  min-width: 44px;
+  min-height: 44px;
   place-items: center;
   border: 1px solid #fed7aa;
   border-radius: 999px;

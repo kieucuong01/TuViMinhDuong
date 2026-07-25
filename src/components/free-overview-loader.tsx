@@ -18,12 +18,14 @@ export function FreeOverviewLoader({
   initialOverview,
   isSignedIn = false,
   canReadFullOverview = false,
+  canCheckoutFull,
 }: {
   chartId: string;
   fullName: string;
   initialOverview?: FreeOverviewPayload | null;
   isSignedIn?: boolean;
   canReadFullOverview?: boolean;
+  canCheckoutFull: boolean;
 }) {
   if (!initialOverview?.content) {
     return (
@@ -63,7 +65,7 @@ export function FreeOverviewLoader({
         </section>
       ) : null}
 
-      {!canReadFullOverview && !isSignedIn && hasPremiumHookPreview ? (
+      {!canReadFullOverview && !isSignedIn && canCheckoutFull && hasPremiumHookPreview ? (
         <section
           className="free-overview-vip-transition"
           aria-labelledby="free-overview-premium-title"

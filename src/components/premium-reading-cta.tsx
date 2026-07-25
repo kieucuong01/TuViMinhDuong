@@ -32,8 +32,6 @@ export function PremiumReadingCta({
     <section
       id={modalId}
       className="premium-confirm-modal premium-confirm-popover"
-      role="dialog"
-      aria-modal="true"
       aria-labelledby="premium-confirm-title"
       popover="auto"
       data-testid="premium-reading-confirm-modal"
@@ -70,11 +68,12 @@ export function PremiumReadingCta({
               autoComplete="email"
               placeholder="ban@email.com"
               required
+              autoFocus
             />
             <small>Dùng để đối soát và hỗ trợ khôi phục giao dịch.</small>
           </label>
         ) : null}
-        <LoadingSubmitButton className="btn btn-primary" loadingText="Đang mở PayOS..." data-testid="premium-reading-confirm-submit">
+        <LoadingSubmitButton className="btn btn-primary" loadingText="Đang mở PayOS..." data-testid="premium-reading-confirm-submit" autoFocus={!requiresCheckoutEmail}>
           Thanh toán PayOS — {cashLabel(fullPriceCoins)}
         </LoadingSubmitButton>
       </form>
