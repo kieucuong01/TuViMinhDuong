@@ -3,7 +3,20 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 vi.mock("server-only", () => ({}));
 vi.mock("@/lib/env", () => ({ APP_URL: "https://example.test", isPayOSEnabled: () => true }));
 
-import { completePaidReadingOrder, paidReadingOrderPayload, retryPaidFullReading } from "@/lib/payos";
+import {
+  completePaidReadingOrder,
+  isPayOSRequestPaid,
+  paidReadingOrderPayload,
+  retryPaidFullReading,
+} from "@/lib/payos";
+
+describe("PayOS amount verification", () => {
+  it("rejects underpayment while allowing the expected amount or more", () => {
+    expect(isPayOSRequestPaid({ status: "PAID", amountPaid: 199000 }, 199000)).toBe(true);
+    expect(isPayOSRequestPaid({ status: "PAID", amountPaid: 198000 }, 199000)).toBe(false);
+    expect(isPayOSRequestPaid({ status: "PAID", amountPaid: 200000 }, 199000)).toBe(true);
+  });
+});
 
 describe("direct paid reading settlement", () => {
   it("recognizes direct and legacy quick FULL metadata but not topups", () => {

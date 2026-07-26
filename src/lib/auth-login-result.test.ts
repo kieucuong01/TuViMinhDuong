@@ -10,7 +10,15 @@ vi.mock("next/headers", () => ({ cookies: cookiesMock }));
 vi.mock("@/lib/db", () => ({ getDb: getDbMock }));
 vi.mock("@/lib/env", () => ({ ADMIN_EMAIL: "admin@example.com", ADMIN_PASSWORD: "" }));
 
-import { consumeMagicSessionToken, hashPassword, isCheckoutGuestUser, loginOrRegister, normalizeCheckoutEmail } from "@/lib/auth";
+import {
+  consumeMagicSessionToken,
+  createMagicSession,
+  hashPassword,
+  isCheckoutGuestUser,
+  loginOrRegister,
+  normalizeCheckoutEmail,
+  signInWithMagicToken,
+} from "@/lib/auth";
 
 const existingUser = {
   id: "user-existing",
@@ -89,7 +97,38 @@ describe("guest checkout auth", () => {
     expect(isCheckoutGuestUser({ email: "reader@example.com" })).toBe(false);
   });
 
-  it("consumes a valid magic session token before restoring the user", async () => {
+  it("creates a checkout-scoped token that magic login rejects", async () => {
+    const setCookie = vi.fn();
+    cookiesMock.mockResolvedValue({ set: setCookie });
+    const sessionCreate = vi.fn();
+    const sessionFind = vi.fn().mockResolvedValue({
+      expiresAt: new Date(Date.now() + 60_000),
+      user: existingUser,
+    });
+    getDbMock.mockReturnValue({
+      session: {
+        create: sessionCreate,
+        findUnique: sessionFind,
+      },
+    });
+
+    const createCheckoutSession = createMagicSession as unknown as (
+      user: typeof existingUser,
+      purpose: "checkout",
+    ) => Promise<string>;
+    const token = await createCheckoutSession(existingUser, "checkout");
+    const user = await signInWithMagicToken(token);
+
+    expect(token).toMatch(/^checkout_/);
+    expect(sessionCreate).toHaveBeenCalledWith({
+      data: expect.objectContaining({ token }),
+    });
+    expect(user).toBeNull();
+    expect(sessionFind).not.toHaveBeenCalled();
+    expect(setCookie).not.toHaveBeenCalled();
+  });
+
+  it("does not consume a checkout token for the wrong order", async () => {
     const setCookie = vi.fn();
     cookiesMock.mockResolvedValue({ set: setCookie });
     const tx = {
@@ -101,19 +140,76 @@ describe("guest checkout auth", () => {
         }),
         deleteMany: vi.fn().mockResolvedValue({ count: 1 }),
       },
+      paymentOrder: {
+        findUnique: vi.fn().mockResolvedValue({
+          userId: existingUser.id,
+          rawPayload: {
+            directReading: { token: "checkout_different-order" },
+          },
+        }),
+      },
     };
     getDbMock.mockReturnValue({
       $transaction: vi.fn(async (worker: (client: typeof tx) => unknown) => worker(tx)),
     });
+    const consumeCheckoutSession = consumeMagicSessionToken as unknown as (
+      token: string,
+      orderCode: string,
+    ) => Promise<typeof existingUser | null>;
 
-    const user = await consumeMagicSessionToken("magic-1");
+    const user = await consumeCheckoutSession("checkout_magic-1", "999");
+
+    expect(tx.paymentOrder.findUnique).toHaveBeenCalledWith({
+      where: { orderCode: BigInt(999) },
+      select: { userId: true, rawPayload: true },
+    });
+    expect(user).toBeNull();
+    expect(tx.session.deleteMany).not.toHaveBeenCalled();
+    expect(setCookie).not.toHaveBeenCalled();
+  });
+
+  it("consumes a checkout token once before restoring the user", async () => {
+    const setCookie = vi.fn();
+    cookiesMock.mockResolvedValue({ set: setCookie });
+    const tx = {
+      session: {
+        findUnique: vi.fn().mockResolvedValue({
+          id: "session-1",
+          expiresAt: new Date(Date.now() + 60_000),
+          user: existingUser,
+        }),
+        deleteMany: vi.fn()
+          .mockResolvedValueOnce({ count: 1 })
+          .mockResolvedValueOnce({ count: 0 }),
+      },
+      paymentOrder: {
+        findUnique: vi.fn().mockResolvedValue({
+          userId: existingUser.id,
+          rawPayload: {
+            directReading: { token: "checkout_magic-1" },
+          },
+        }),
+      },
+    };
+    getDbMock.mockReturnValue({
+      $transaction: vi.fn(async (worker: (client: typeof tx) => unknown) => worker(tx)),
+    });
+    const consumeCheckoutSession = consumeMagicSessionToken as unknown as (
+      token: string,
+      orderCode: string,
+    ) => Promise<typeof existingUser | null>;
+
+    const first = await consumeCheckoutSession("checkout_magic-1", "123");
+    const second = await consumeCheckoutSession("checkout_magic-1", "123");
 
     expect(tx.session.deleteMany).toHaveBeenCalledWith({
-      where: { id: "session-1", token: "magic-1" },
+      where: { id: "session-1", token: "checkout_magic-1" },
     });
     expect(tx.session.deleteMany.mock.invocationCallOrder[0]).toBeLessThan(
       setCookie.mock.invocationCallOrder[0],
     );
-    expect(user).toMatchObject({ id: existingUser.id });
+    expect(first).toMatchObject({ id: existingUser.id });
+    expect(second).toBeNull();
+    expect(setCookie).toHaveBeenCalledTimes(1);
   });
 });

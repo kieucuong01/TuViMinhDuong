@@ -5,6 +5,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const routeSource = readFileSync(fileURLToPath(new URL("./route.ts", import.meta.url)), "utf8");
 const mocks = vi.hoisted(() => ({
   getDb: vi.fn(),
+  isPayOSRequestPaid: vi.fn(),
   paidReadingOrderPayload: vi.fn(),
   verifyPayOSWebhook: vi.fn(),
   settlePaidOrder: vi.fn(),
@@ -17,6 +18,7 @@ vi.mock("next/server", () => ({
 }));
 vi.mock("@/lib/db", () => ({ getDb: mocks.getDb }));
 vi.mock("@/lib/payos", () => ({
+  isPayOSRequestPaid: mocks.isPayOSRequestPaid,
   paidReadingOrderPayload: mocks.paidReadingOrderPayload,
   verifyPayOSWebhook: mocks.verifyPayOSWebhook,
   settlePaidOrder: mocks.settlePaidOrder,
@@ -58,6 +60,7 @@ describe("PayOS webhook", () => {
       scopeKey: "all",
     });
     mocks.verifyPayOSWebhook.mockReturnValue(true);
+    mocks.isPayOSRequestPaid.mockReturnValue(true);
     db.paymentOrder.findUnique.mockResolvedValue(order);
     mocks.settlePaidOrder.mockResolvedValue({
       status: "PAID",
@@ -94,7 +97,29 @@ describe("PayOS webhook", () => {
     expect(mocks.settlePaidOrder).toHaveBeenCalledTimes(1);
   });
 
+  it("does not settle a signed underpayment", async () => {
+    mocks.isPayOSRequestPaid.mockReturnValue(false);
+    const { POST } = await import("./route");
+    const response = await POST(request({
+      orderCode: "123",
+      status: "PAID",
+      amountPaid: 198000,
+    }));
+
+    expect(mocks.isPayOSRequestPaid).toHaveBeenCalledWith(
+      expect.objectContaining({ amountPaid: 198000 }),
+      order.amountVnd,
+    );
+    expect(mocks.settlePaidOrder).not.toHaveBeenCalled();
+    expect(db.paymentOrder.update).toHaveBeenCalledWith({
+      where: { id: order.id },
+      data: expect.objectContaining({ status: "FAILED" }),
+    });
+    expect(await response.json()).toEqual({ ok: true, paid: false });
+  });
+
   it("marks an unpaid pending callback failed but never downgrades a paid order", async () => {
+    mocks.isPayOSRequestPaid.mockReturnValue(false);
     const { POST } = await import("./route");
     await POST(request({ orderCode: "123", status: "CANCELLED" }));
     expect(db.paymentOrder.update).toHaveBeenCalledWith({
@@ -111,6 +136,7 @@ describe("PayOS webhook", () => {
     vi.clearAllMocks();
     mocks.getDb.mockReturnValue(db);
     mocks.verifyPayOSWebhook.mockReturnValue(true);
+    mocks.isPayOSRequestPaid.mockReturnValue(false);
     db.paymentOrder.findUnique.mockResolvedValue({ ...order, status: "PAID", paidAt: new Date() });
     await POST(request({ orderCode: "123", status: "CANCELLED" }));
     expect(db.paymentOrder.update).not.toHaveBeenCalled();

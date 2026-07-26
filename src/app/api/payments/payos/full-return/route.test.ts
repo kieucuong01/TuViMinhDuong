@@ -70,7 +70,7 @@ describe("direct FULL PayOS return", () => {
     expect(location).toContain("status=success");
   });
 
-  it("restores the guest session from the return token before settling", async () => {
+  it("restores the guest session from the order-bound checkout token before settling", async () => {
     mocks.getCurrentUser.mockResolvedValue(null);
     mocks.consumeMagicSessionToken.mockResolvedValue({ id: "user-1" });
     mocks.paidReadingOrderPayload.mockReturnValue({
@@ -78,15 +78,15 @@ describe("direct FULL PayOS return", () => {
       chartId: "chart-1",
       type: "FULL",
       scopeKey: "all",
-      token: "magic-1",
+      token: "checkout_magic-1",
     });
 
     const { GET } = await import("./route");
     const response = await GET(new Request(
-      "http://test.local/api/payments/payos/full-return?token=magic-1&status=success&orderCode=123",
+      "http://test.local/api/payments/payos/full-return?token=checkout_magic-1&status=success&orderCode=123",
     ));
 
-    expect(mocks.consumeMagicSessionToken).toHaveBeenCalledWith("magic-1");
+    expect(mocks.consumeMagicSessionToken).toHaveBeenCalledWith("checkout_magic-1", "123");
     expect(mocks.consumeMagicSessionToken.mock.invocationCallOrder[0])
       .toBeLessThan(mocks.getPayOSPaymentRequest.mock.invocationCallOrder[0]);
     expect(mocks.getCurrentUser).not.toHaveBeenCalled();
@@ -94,22 +94,17 @@ describe("direct FULL PayOS return", () => {
     expect(response.headers.get("location")).toContain("/la-so/chart-1/nang-cao");
   });
 
-  it("rejects a return token that does not belong to the order", async () => {
-    mocks.consumeMagicSessionToken.mockResolvedValue({ id: "user-1" });
-    mocks.paidReadingOrderPayload.mockReturnValue({
-      kind: "directReading",
-      chartId: "chart-1",
-      type: "FULL",
-      scopeKey: "all",
-      token: "magic-2",
-    });
+  it("rejects a checkout token bound to another order before querying payment data", async () => {
+    mocks.consumeMagicSessionToken.mockResolvedValue(null);
 
     const { GET } = await import("./route");
     const response = await GET(new Request(
-      "http://test.local/api/payments/payos/full-return?token=magic-1&orderCode=123",
+      "http://test.local/api/payments/payos/full-return?token=checkout_magic-1&orderCode=999",
     ));
 
-    expect(response.headers.get("location")).toContain("/la-so?checkout=forbidden");
+    expect(mocks.consumeMagicSessionToken).toHaveBeenCalledWith("checkout_magic-1", "999");
+    expect(response.headers.get("location")).toContain("/la-so?checkout=invalid");
+    expect(mocks.getDb).not.toHaveBeenCalled();
     expect(mocks.getPayOSPaymentRequest).not.toHaveBeenCalled();
     expect(mocks.settlePaidOrder).not.toHaveBeenCalled();
   });

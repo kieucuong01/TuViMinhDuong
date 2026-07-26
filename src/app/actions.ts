@@ -409,7 +409,7 @@ export async function checkoutFullReadingAction(formData: FormData) {
 
   const amountVnd = price.priceCoins * 1000;
   const returnToken = requiresCheckoutEmail
-    ? await createMagicSession(user)
+    ? await createMagicSession(user, "checkout")
     : null;
   const returnPath = returnToken
     ? `/api/payments/payos/full-return?token=${encodeURIComponent(returnToken)}`
@@ -753,6 +753,7 @@ export async function createCheckoutAction(formData: FormData) {
   if (!user) {
     redirect(`/dang-nhap?next=${encodeURIComponent(withQueryParams(returnTo, { topup: "1" }))}&paywall=login`);
   }
+  if (isCheckoutGuestUser(user)) redirect("/la-so");
   const pack = COIN_PACKAGES.find((item) => item.key === packageKey) || COIN_PACKAGES[1];
   const adsReturnTo = withQueryParams(returnTo, { adPackage: pack.key, adValue: pack.priceVnd });
   const checkout = await createPayOSCheckout(packageKey, user, adsReturnTo);

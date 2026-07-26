@@ -1,6 +1,11 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
-import { paidReadingOrderPayload, settlePaidOrder, verifyPayOSWebhook } from "@/lib/payos";
+import {
+  isPayOSRequestPaid,
+  paidReadingOrderPayload,
+  settlePaidOrder,
+  verifyPayOSWebhook,
+} from "@/lib/payos";
 
 export async function POST(request: Request) {
   const payload = await request.json().catch(() => null);
@@ -24,7 +29,17 @@ export async function POST(request: Request) {
   const order = await db.paymentOrder.findUnique({ where: { orderCode } });
   if (!order) return NextResponse.json({ ok: true, ignored: "unknown-order" });
 
-  const isPaid = payload.data.code === "00" || payload.data.desc === "success" || payload.data.status === "PAID";
+  const paidStatus =
+    payload.data.code === "00" ||
+    payload.data.desc === "success" ||
+    payload.data.status === "PAID"
+      ? "PAID"
+      : payload.data.status;
+  const isPaid = isPayOSRequestPaid({
+    status: paidStatus,
+    amountPaid: Number(payload.data.amountPaid ?? payload.data.amount ?? 0),
+    raw: payload.data,
+  }, order.amountVnd);
   if (!isPaid) {
     if (order.status !== "PAID") {
       const readingMetadata = paidReadingOrderPayload(order.rawPayload);

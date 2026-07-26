@@ -12,7 +12,7 @@ describe("FULL checkout action guest contract", () => {
     expect(source).toContain('normalizeCheckoutEmail(formData.get("email"))');
     expect(source).toContain("claimGuestChartForCheckout(chartId");
     expect(source).toContain("await setSession(user)");
-    expect(source).toContain("await createMagicSession(user)");
+    expect(source).toContain('await createMagicSession(user, "checkout")');
     expect(source).toContain("/api/payments/payos/full-return?token=");
     expect(source).toContain("buyerEmail");
     expect(source).toContain("checkoutEmail: buyerEmail");

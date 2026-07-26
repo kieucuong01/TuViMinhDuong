@@ -29,7 +29,7 @@ export async function GET(request: Request) {
   }
 
   const user = token
-    ? await consumeMagicSessionToken(token)
+    ? await consumeMagicSessionToken(token, orderCode)
     : await getCurrentUser();
   if (!user) {
     return NextResponse.redirect(appUrl("/la-so?checkout=invalid"));

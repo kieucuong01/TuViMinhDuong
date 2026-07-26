@@ -1,6 +1,7 @@
 import { Check, Coins, CreditCard, ShieldCheck } from "lucide-react";
+import { redirect } from "next/navigation";
 import { createCheckoutAction } from "@/app/actions";
-import { getCurrentUser } from "@/lib/auth";
+import { getCurrentUser, isCheckoutGuestUser } from "@/lib/auth";
 import { getOperationSettings } from "@/lib/data";
 import { COIN_PACKAGES } from "@/lib/pricing";
 import { formatCoins, formatVnd } from "@/lib/format";
@@ -18,6 +19,7 @@ export const metadata = routeMetadata({
 
 export default async function CoinsPage({ searchParams }: { searchParams: Promise<{ status?: string; need?: string; orderCode?: string }> }) {
   const user = await getCurrentUser();
+  if (isCheckoutGuestUser(user)) redirect("/la-so");
   const [params, operationSettings] = await Promise.all([searchParams, getOperationSettings()]);
   const notice = paymentReturnNotice(params.status, params.orderCode);
   const topupEnabled = operationSettings.paymentsEnabled && operationSettings.coinTopupEnabled;

@@ -7,6 +7,9 @@ const checkout = source.slice(
   source.indexOf("export async function checkoutFullReadingAction"),
   source.indexOf("export async function requestReadingAction"),
 );
+const topupCheckout = source.slice(
+  source.indexOf("export async function createCheckoutAction"),
+);
 
 describe("direct FULL checkout action contract", () => {
   it("authenticates, checks chart ownership, and takes price only from the server", () => {
@@ -19,13 +22,13 @@ describe("direct FULL checkout action contract", () => {
     expect(checkout).not.toContain('formData.get("price');
   });
 
-  it("creates a zero-coin directReading order with a guest-only magic token", () => {
+  it("creates a zero-coin directReading order with a checkout-scoped token", () => {
     expect(checkout).toContain("coins: 0");
     expect(checkout).toContain("directReading:");
     expect(checkout).toContain('type: "FULL"');
     expect(checkout).toContain('scopeKey: "all"');
     expect(checkout).toContain("const returnToken = requiresCheckoutEmail");
-    expect(checkout).toContain("? await createMagicSession(user)");
+    expect(checkout).toContain('? await createMagicSession(user, "checkout")');
     expect(checkout).toContain("...(returnToken ? { token: returnToken } : {})");
   });
 
@@ -46,5 +49,11 @@ describe("direct FULL checkout action contract", () => {
 
   it("handles forbidden unlock results before reading their payload", () => {
     expect(source.match(/result\.status === "forbidden"/g)).toHaveLength(3);
+  });
+
+  it("blocks checkout guests from the coin top-up action", () => {
+    expect(topupCheckout).toContain("isCheckoutGuestUser(user)");
+    expect(topupCheckout.indexOf("isCheckoutGuestUser(user)"))
+      .toBeLessThan(topupCheckout.indexOf("createPayOSCheckout"));
   });
 });

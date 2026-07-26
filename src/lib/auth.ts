@@ -86,9 +86,12 @@ export async function clearSession() {
   jar.delete(COOKIE_NAME);
 }
 
-export async function createMagicSession(user: SessionUser) {
+export async function createMagicSession(
+  user: SessionUser,
+  purpose: "login" | "checkout" = "login",
+) {
   const db = getDb();
-  const token = randomBytes(32).toString("base64url");
+  const token = `${purpose === "checkout" ? "checkout_" : ""}${randomBytes(32).toString("base64url")}`;
   if (!db || user.id.startsWith("demo-") || user.id.startsWith("guest-")) return token;
 
   await db.session.create({
@@ -113,9 +116,12 @@ export function isCheckoutGuestUser(
   return Boolean(user?.email.endsWith(`@${CHECKOUT_GUEST_DOMAIN}`));
 }
 
-export async function consumeMagicSessionToken(token: string): Promise<SessionUser | null> {
+export async function consumeMagicSessionToken(
+  token: string,
+  orderCode: string,
+): Promise<SessionUser | null> {
   const db = getDb();
-  if (!db || !token) return null;
+  if (!db || !token.startsWith("checkout_") || !/^\d+$/.test(orderCode)) return null;
 
   const user = await db.$transaction(async (tx) => {
     const session = await tx.session.findUnique({
@@ -123,6 +129,25 @@ export async function consumeMagicSessionToken(token: string): Promise<SessionUs
       include: { user: true },
     });
     if (!session || session.expiresAt < new Date()) return null;
+    const order = await tx.paymentOrder.findUnique({
+      where: { orderCode: BigInt(orderCode) },
+      select: { userId: true, rawPayload: true },
+    });
+    const directReading =
+      order?.rawPayload &&
+      typeof order.rawPayload === "object" &&
+      !Array.isArray(order.rawPayload) &&
+      "directReading" in order.rawPayload
+        ? order.rawPayload.directReading
+        : null;
+    const orderToken =
+      directReading &&
+      typeof directReading === "object" &&
+      !Array.isArray(directReading) &&
+      "token" in directReading
+        ? directReading.token
+        : null;
+    if (order?.userId !== session.user.id || orderToken !== token) return null;
     const consumed = await tx.session.deleteMany({
       where: { id: session.id, token },
     });
@@ -142,8 +167,9 @@ export async function consumeMagicSessionToken(token: string): Promise<SessionUs
 }
 
 export async function signInWithMagicToken(token: string) {
+  if (!token || token.startsWith("checkout_")) return null;
   const db = getDb();
-  if (!db || !token) return null;
+  if (!db) return null;
 
   const session = await db.session.findUnique({
     where: { token },
