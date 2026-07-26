@@ -3,6 +3,7 @@ import { BookOpenText, CalendarDays, Compass, Layers3, Search, ShieldCheck, Spar
 import { adultExpansionLifetimeCards, historicalLifetimeCards } from "@/lib/lifetime-age-data";
 import { routeMetadata } from "@/lib/metadata";
 import { faqJsonLd, itemListJsonLd, webPageJsonLd } from "@/lib/seo";
+import { lifetimeTuViArticlePath } from "@/lib/article-path";
 import { LifetimeCardList, type LifetimeCardListItem } from "./lifetime-card-list";
 
 export const revalidate = 300;
@@ -50,7 +51,7 @@ export const LIFETIME_CARDS_PER_PAGE = 6;
 const baseLifetimeCards: LifetimeCard[] = [
   {
     id: "tu-vi-tron-doi-ky-dau-1969-nam-mang",
-    detailsPath: "/tu-vi-tron-doi-tuoi-ky-dau-1969-nam-mang",
+    detailsPath: lifetimeTuViArticlePath("tu-vi-tron-doi-tuoi-ky-dau-1969-nam-mang"),
     title: "Tử vi trọn đời tuổi Kỷ Dậu 1969 nam mạng",
     year: "1969",
     canChi: "Kỷ Dậu",
@@ -62,7 +63,7 @@ const baseLifetimeCards: LifetimeCard[] = [
   },
   {
     id: "tu-vi-tron-doi-ky-dau-1969-nu-mang",
-    detailsPath: "/tu-vi-tron-doi-tuoi-ky-dau-1969-nu-mang",
+    detailsPath: lifetimeTuViArticlePath("tu-vi-tron-doi-tuoi-ky-dau-1969-nu-mang"),
     title: "Tử vi trọn đời tuổi Kỷ Dậu 1969 nữ mạng",
     year: "1969",
     canChi: "Kỷ Dậu",
@@ -120,7 +121,7 @@ const baseLifetimeCards: LifetimeCard[] = [
   },
   {
     id: "tu-vi-tron-doi-at-hoi-1995-nam-mang",
-    detailsPath: "/tu-vi-tron-doi-tuoi-at-hoi-1995-nam-mang",
+    detailsPath: lifetimeTuViArticlePath("tu-vi-tron-doi-tuoi-at-hoi-1995-nam-mang"),
     title: "Tử vi trọn đời tuổi Ất Hợi 1995 nam mạng",
     year: "1995",
     canChi: "Ất Hợi",
@@ -132,7 +133,7 @@ const baseLifetimeCards: LifetimeCard[] = [
   },
   {
     id: "tu-vi-tron-doi-at-hoi-1995-nu-mang",
-    detailsPath: "/tu-vi-tron-doi-tuoi-at-hoi-1995-nu-mang",
+    detailsPath: lifetimeTuViArticlePath("tu-vi-tron-doi-tuoi-at-hoi-1995-nu-mang"),
     title: "Tử vi trọn đời tuổi Ất Hợi 1995 nữ mạng",
     year: "1995",
     canChi: "Ất Hợi",
@@ -144,7 +145,7 @@ const baseLifetimeCards: LifetimeCard[] = [
   },
   {
     id: "tu-vi-tron-doi-at-suu-1985-nam-mang",
-    detailsPath: "/tu-vi-tron-doi-tuoi-at-suu-1985-nam-mang",
+    detailsPath: lifetimeTuViArticlePath("tu-vi-tron-doi-tuoi-at-suu-1985-nam-mang"),
     title: "Tử vi trọn đời tuổi Ất Sửu 1985 nam mạng",
     year: "1985",
     canChi: "Ất Sửu",
@@ -156,7 +157,7 @@ const baseLifetimeCards: LifetimeCard[] = [
   },
   {
     id: "tu-vi-tron-doi-at-suu-1985-nu-mang",
-    detailsPath: "/tu-vi-tron-doi-tuoi-at-suu-1985-nu-mang",
+    detailsPath: lifetimeTuViArticlePath("tu-vi-tron-doi-tuoi-at-suu-1985-nu-mang"),
     title: "Tử vi trọn đời tuổi Ất Sửu 1985 nữ mạng",
     year: "1985",
     canChi: "Ất Sửu",
@@ -168,7 +169,7 @@ const baseLifetimeCards: LifetimeCard[] = [
   },
   {
     id: "tu-vi-tron-doi-at-mao-1975-nam-mang",
-    detailsPath: "/tu-vi-tron-doi-tuoi-at-mao-1975-nam-mang",
+    detailsPath: lifetimeTuViArticlePath("tu-vi-tron-doi-tuoi-at-mao-1975-nam-mang"),
     title: "Tử vi trọn đời tuổi Ất Mão 1975 nam mạng",
     year: "1975",
     canChi: "Ất Mão",
@@ -180,7 +181,7 @@ const baseLifetimeCards: LifetimeCard[] = [
   },
   {
     id: "tu-vi-tron-doi-at-mao-1975-nu-mang",
-    detailsPath: "/tu-vi-tron-doi-tuoi-at-mao-1975-nu-mang",
+    detailsPath: lifetimeTuViArticlePath("tu-vi-tron-doi-tuoi-at-mao-1975-nu-mang"),
     title: "Tử vi trọn đời tuổi Ất Mão 1975 nữ mạng",
     year: "1975",
     canChi: "Ất Mão",
@@ -192,7 +193,7 @@ const baseLifetimeCards: LifetimeCard[] = [
   },
   {
     id: "tu-vi-tron-doi-giap-ty-1984-nam-mang",
-    detailsPath: "/tu-vi-tron-doi-tuoi-giap-ty-1984-nam-mang",
+    detailsPath: lifetimeTuViArticlePath("tu-vi-tron-doi-tuoi-giap-ty-1984-nam-mang"),
     title: "Tử vi trọn đời tuổi Giáp Tý 1984 nam mạng",
     year: "1984",
     canChi: "Giáp Tý",
@@ -204,7 +205,7 @@ const baseLifetimeCards: LifetimeCard[] = [
   },
   {
     id: "tu-vi-tron-doi-giap-ty-1984-nu-mang",
-    detailsPath: "/tu-vi-tron-doi-tuoi-giap-ty-1984-nu-mang",
+    detailsPath: lifetimeTuViArticlePath("tu-vi-tron-doi-tuoi-giap-ty-1984-nu-mang"),
     title: "Tử vi trọn đời tuổi Giáp Tý 1984 nữ mạng",
     year: "1984",
     canChi: "Giáp Tý",
@@ -216,23 +217,17 @@ const baseLifetimeCards: LifetimeCard[] = [
   },
 ];
 
-const lifetimeArticleByPath = new Map(
-  baseLifetimeCards
-    .filter((item) => item.detailsPath)
-    .map((item) => [
-      item.detailsPath as string,
-      {
-        coverImage: `/articles/${item.detailsPath?.replace(/^\//, "")}.svg`,
-      },
-    ]),
-);
+function lifetimeSlugFromPath(detailsPath?: string) {
+  return detailsPath?.split("/").filter(Boolean).at(-1);
+}
 
 export const lifetimeCards: LifetimeCardListItem[] = baseLifetimeCards.map((item) => {
-  const articleAsset = item.detailsPath ? lifetimeArticleByPath.get(item.detailsPath) : null;
+  const detailSlug = lifetimeSlugFromPath(item.detailsPath);
 
   return {
     ...item,
-    coverImage: articleAsset?.coverImage || `/articles/${item.id}.svg`,
+    detailsPath: detailSlug ? lifetimeTuViArticlePath(detailSlug) : item.detailsPath,
+    coverImage: detailSlug ? `/articles/${detailSlug}.svg` : `/articles/${item.id}.svg`,
     coverAlt: `Minh họa ${item.title} theo năm sinh ${item.year} và ${item.gender.toLowerCase()}`,
   };
 });

@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it, vi } from "vitest";
-import { generateStaticParams } from "@/app/[slug]/page";
+import { generateStaticParams } from "@/app/xem-tu-vi-tron-doi/[slug]/page";
 import { lifetimeCards } from "@/app/xem-tu-vi-tron-doi/page";
 import { seedArticles } from "@/lib/content";
 import {
@@ -13,7 +13,9 @@ import {
 vi.mock("server-only", () => ({}));
 
 const contentSource = readFileSync("src/lib/content.ts", "utf8");
+const lifetimeArticleRouteSource = readFileSync("src/app/xem-tu-vi-tron-doi/[slug]/page.tsx", "utf8");
 const rootArticleRouteSource = readFileSync("src/app/[slug]/page.tsx", "utf8");
+const knowledgePageSource = readFileSync("src/app/kien-thuc-tu-vi/page.tsx", "utf8");
 const knowledgeArticleRouteSource = readFileSync("src/app/kien-thuc-tu-vi/[slug]/page.tsx", "utf8");
 const sitemapSource = readFileSync("src/app/sitemap.ts", "utf8");
 
@@ -38,10 +40,10 @@ describe("lifetime Tu vi SEO article cluster", () => {
 
     for (const slug of lifetimeArticleSlugs) {
       expect(seedArticles.some((item) => item.slug === slug)).toBe(true);
-      expect(hubDetailPaths).toContain(`/${slug}`);
+      expect(hubDetailPaths).toContain(`/xem-tu-vi-tron-doi/${slug}`);
     }
 
-    expect(contentSource).toContain("canonicalUrl: `/${input.slug}`");
+    expect(contentSource).toContain("canonicalUrl: `/xem-tu-vi-tron-doi/${input.slug}`");
   });
 
   it("covers every year from 1940 through 1960 for both genders", () => {
@@ -67,16 +69,16 @@ describe("lifetime Tu vi SEO article cluster", () => {
     expect(adultExpansionLifetimeAgeArticleInputs.at(-1)?.siblingLink).toBeUndefined();
   });
 
-  it("exposes the historical lifetime articles through root static params", async () => {
+  it("exposes the historical lifetime articles through lifetime section static params", async () => {
     const params = await generateStaticParams();
-    const rootSlugs = params.map((item) => item.slug);
+    const lifetimeSlugs = params.map((item) => item.slug);
 
     for (const slug of adultExpansionLifetimeArticleSlugs) {
-      expect(rootSlugs).toContain(slug);
+      expect(lifetimeSlugs).toContain(slug);
     }
 
     for (const slug of historicalLifetimeArticleSlugs) {
-      expect(rootSlugs).toContain(slug);
+      expect(lifetimeSlugs).toContain(slug);
     }
   });
 
@@ -100,7 +102,7 @@ describe("lifetime Tu vi SEO article cluster", () => {
       const article = seedArticles.find((item) => item.slug === slug);
       expect(article).toBeTruthy();
       expect(article?.categoryId).toBe("cat-van-han");
-      expect(article?.canonicalUrl).toBe(`/${slug}`);
+      expect(article?.canonicalUrl).toBe(`/xem-tu-vi-tron-doi/${slug}`);
       expect(article?.faqs).toHaveLength(3);
 
       const content = article?.content || "";
@@ -113,10 +115,11 @@ describe("lifetime Tu vi SEO article cluster", () => {
     }
   });
 
-  it("serves lifetime articles from root slugs and redirects old knowledge URLs", () => {
-    expect(rootArticleRouteSource).toContain("isLifetimeTuViSlug");
-    expect(rootArticleRouteSource).toContain("sectionName=\"Tử vi trọn đời\"");
-    expect(knowledgeArticleRouteSource).toContain("redirect(canonicalPath)");
+  it("serves lifetime articles under /xem-tu-vi-tron-doi and keeps them out of /kien-thuc-tu-vi", () => {
+    expect(lifetimeArticleRouteSource).toContain("sectionName=\"Tử vi trọn đời\"");
+    expect(lifetimeArticleRouteSource).toContain("lifetimeTuViArticlePath");
+    expect(rootArticleRouteSource).toContain("permanentRedirect(lifetimeTuViArticlePath(slug))");
+    expect(knowledgeArticleRouteSource).toContain("permanentRedirect(canonicalPath)");
+    expect(knowledgePageSource).toContain("!isLifetimeTuViSlug(article.slug)");
     expect(sitemapSource).toContain("articlePath(article)");
-  });
-});
+  });});

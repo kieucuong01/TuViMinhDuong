@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
-import { notFound, redirect } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import { APP_URL } from "@/lib/env";
 import { getArticleBySlug, listArticles } from "@/lib/data";
-import { articlePath, isLifetimeTuViSlug } from "@/lib/article-path";
+import { isLifetimeTuViSlug, lifetimeTuViArticlePath } from "@/lib/article-path";
 import { absoluteUrl } from "@/lib/seo";
-import { ArticlePageContent } from "@/components/article-page-content";
 
 export const revalidate = 300;
 export const dynamicParams = true;
@@ -19,7 +18,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   if (!isLifetimeTuViSlug(slug)) return {};
   const article = await getArticleBySlug(slug);
   if (!article) return {};
-  const canonicalPath = articlePath(article);
+  const canonicalPath = lifetimeTuViArticlePath(article.slug);
   const ogImage = article.ogImage || `/api/og?title=${encodeURIComponent(article.ogTitle || article.metaTitle || article.title)}&subtitle=${encodeURIComponent(article.ogDescription || article.metaDescription || article.excerpt)}`;
   return {
     title: article.metaTitle || article.title,
@@ -42,13 +41,10 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   };
 }
 
-export default async function LifetimeArticlePage({ params }: { params: Promise<{ slug: string }> }) {
+export default async function LegacyLifetimeArticlePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   if (!isLifetimeTuViSlug(slug)) notFound();
-  const [article, articles] = await Promise.all([getArticleBySlug(slug), listArticles()]);
+  const article = await getArticleBySlug(slug);
   if (!article) notFound();
-  const canonicalPath = articlePath(article);
-  if (canonicalPath !== `/${slug}`) redirect(canonicalPath);
-
-  return <ArticlePageContent article={article} articles={articles} sectionName="Tử vi trọn đời" sectionHref="/xem-tu-vi-tron-doi" />;
+  permanentRedirect(lifetimeTuViArticlePath(slug));
 }
