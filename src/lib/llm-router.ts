@@ -11,6 +11,10 @@ type GenerateOptions = {
   temperature?: number;
   maxTokens?: number;
   providerOrder?: LlmProvider[];
+  thinking?: "enabled" | "disabled";
+  attemptsPerProvider?: number;
+  timeoutMs?: number;
+  accept?: (result: LlmResult) => boolean;
 };
 
 class ProviderRateLimitError extends Error {}
@@ -40,9 +44,9 @@ function hashPrompt(value: string) {
   return hash;
 }
 
-function selectKey(keys: string[], prompt: string) {
+function selectKey(keys: string[], prompt: string, attempt = 0) {
   if (!keys.length) return null;
-  return keys[hashPrompt(prompt) % keys.length];
+  return keys[(hashPrompt(prompt) + attempt) % keys.length];
 }
 
 async function parseError(response: Response) {
@@ -61,6 +65,10 @@ function assertText(text: unknown, provider: LlmProvider) {
   return text.trim();
 }
 
+function requestSignal(timeoutMs?: number) {
+  return AbortSignal.timeout(Math.max(1_000, Math.min(120_000, timeoutMs ?? 60_000)));
+}
+
 async function callGroq(options: GenerateOptions, key: string): Promise<LlmResult> {
   const model = process.env.GROQ_MODEL || "llama-3.1-8b-instant";
   const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
@@ -75,6 +83,7 @@ async function callGroq(options: GenerateOptions, key: string): Promise<LlmResul
       temperature: options.temperature ?? 0.55,
       max_tokens: options.maxTokens ?? 1200,
     }),
+    signal: requestSignal(options.timeoutMs),
   });
 
   if (response.status === 429) throw new ProviderRateLimitError("Groq rate limited");
@@ -98,7 +107,9 @@ async function callDeepSeek(options: GenerateOptions, key: string): Promise<LlmR
       messages: [{ role: "user", content: options.prompt }],
       temperature: options.temperature ?? 0.55,
       max_tokens: options.maxTokens ?? 1200,
+      ...(options.thinking ? { thinking: { type: options.thinking } } : {}),
     }),
+    signal: requestSignal(options.timeoutMs),
   });
 
   if (response.status === 429) throw new ProviderRateLimitError("DeepSeek rate limited");
@@ -120,18 +131,22 @@ export async function generateWithLlmRouter(options: GenerateOptions): Promise<L
   const deepSeekKeys = keysFromEnv("DEEPSEEK_API_KEY", "DEEPSEEK_API_KEYS");
   const groqKeys = keysFromEnv("GROQ_API_KEY", "GROQ_API_KEYS");
   const errors: string[] = [];
+  const attemptsPerProvider = Math.max(1, Math.min(3, Math.floor(options.attemptsPerProvider ?? 1)));
 
   for (const provider of providerOrder(options.providerOrder)) {
     const keys = provider === "deepseek" ? deepSeekKeys : groqKeys;
-    const key = selectKey(keys, options.prompt);
-    if (!key) continue;
+    if (!keys.length) continue;
 
-    try {
-      if (provider === "deepseek") return await callDeepSeek(options, key);
-      return await callGroq(options, key);
-    } catch (error) {
-      errors.push(error instanceof Error ? error.message : String(error));
-      if (error instanceof ProviderRateLimitError) continue;
+    for (let attempt = 0; attempt < attemptsPerProvider; attempt += 1) {
+      const key = selectKey(keys, options.prompt, attempt);
+      if (!key) continue;
+      try {
+        const result = provider === "deepseek" ? await callDeepSeek(options, key) : await callGroq(options, key);
+        if (!options.accept || options.accept(result)) return result;
+        errors.push(`${provider} returned a response rejected by the caller validator`);
+      } catch (error) {
+        errors.push(error instanceof Error ? error.message : String(error));
+      }
     }
   }
 

@@ -70,6 +70,51 @@ describe("LLM router", () => {
     );
   });
 
+  it("can disable DeepSeek thinking so reasoning tokens cannot consume the answer budget", async () => {
+    process.env.DEEPSEEK_API_KEY = "deepseek-test-key";
+    vi.spyOn(globalThis, "fetch").mockResolvedValue(providerResponse("Bản luận giải hoàn chỉnh"));
+
+    await generateWithLlmRouter({ prompt: "Luận giải lá số", thinking: "disabled" });
+
+    const init = vi.mocked(fetch).mock.calls[0][1];
+    const body = JSON.parse(String(init?.body));
+    expect(body.thinking).toEqual({ type: "disabled" });
+  });
+
+  it("retries an empty DeepSeek answer before giving up or changing provider", async () => {
+    process.env.DEEPSEEK_API_KEY = "deepseek-test-key";
+    vi.spyOn(globalThis, "fetch")
+      .mockResolvedValueOnce(providerResponse(""))
+      .mockResolvedValueOnce(providerResponse("Bản luận giải ở lần thử thứ hai"));
+
+    const result = await generateWithLlmRouter({
+      prompt: "Luận giải lá số",
+      attemptsPerProvider: 2,
+    });
+
+    expect(result?.provider).toBe("deepseek");
+    expect(result?.text).toBe("Bản luận giải ở lần thử thứ hai");
+    expect(fetch).toHaveBeenCalledTimes(2);
+  });
+
+  it("continues to Groq when a non-empty DeepSeek answer fails the caller validator", async () => {
+    process.env.DEEPSEEK_API_KEY = "deepseek-test-key";
+    process.env.GROQ_API_KEY = "groq-test-key";
+    vi.spyOn(globalThis, "fetch")
+      .mockResolvedValueOnce(providerResponse("DeepSeek invalid"))
+      .mockResolvedValueOnce(providerResponse("Groq valid"));
+
+    const result = await generateWithLlmRouter({
+      prompt: "Luận giải lá số",
+      providerOrder: ["deepseek", "groq"],
+      accept: (candidate) => candidate.text.endsWith("valid") && candidate.provider === "groq",
+    });
+
+    expect(result?.provider).toBe("groq");
+    expect(result?.text).toBe("Groq valid");
+    expect(fetch).toHaveBeenCalledTimes(2);
+  });
+
   it("falls back from a DeepSeek rate limit to Groq", async () => {
     process.env.DEEPSEEK_API_KEY = "deepseek-test-key";
     process.env.GROQ_API_KEY = "groq-test-key";

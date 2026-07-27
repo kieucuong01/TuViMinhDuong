@@ -30,6 +30,7 @@ describe("free overview status", () => {
     expect(source).toContain("generateFreeOverview(record.chart)");
     expect(source).not.toContain("generateFreeOverviewPreview");
     expect(source).not.toContain("fullOverviewPromise");
+    expect(source).toContain("const FREE_OVERVIEW_PROCESSING_TTL_MS = 5 * 60 * 1000");
   });
 
   it("returns a fast 520-950 visible-word block preview while the LLM overview is missing", async () => {
@@ -39,7 +40,7 @@ describe("free overview status", () => {
 
     expect(status.status).toBe("fallback");
     expect(status.source).toBe("seed-rules");
-    expect(FREE_OVERVIEW_VERSION).toBe("free-block-preview-v2");
+    expect(FREE_OVERVIEW_VERSION).toBe("free-block-preview-v3");
     expect(status.jobStatus).toBe("idle");
     expect(status.content).toContain("# Luận giải miễn phí dành cho");
     expect(status.content).toContain("## 4. Vận hạn năm");

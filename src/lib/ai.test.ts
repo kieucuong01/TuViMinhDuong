@@ -250,7 +250,7 @@ describe("AI reading format", () => {
 
     expect(FREE_OVERVIEW_MIN_WORDS).toBe(520);
     expect(FREE_OVERVIEW_MAX_WORDS).toBe(950);
-    expect(FREE_OVERVIEW_VERSION).toBe("free-block-preview-v2");
+    expect(FREE_OVERVIEW_VERSION).toBe("free-block-preview-v3");
     expect(result.model).toBe("deepseek/deepseek-v4-flash");
     expect(result).not.toHaveProperty("prompt");
     expect(isCompleteFreeOverview(result.content)).toBe(true);
@@ -264,8 +264,10 @@ describe("AI reading format", () => {
     expect(llmRouterMocks.generateWithLlmRouter).toHaveBeenCalledWith(
       expect.objectContaining({
         temperature: 0.45,
-        maxTokens: 3200,
-        providerOrder: ["deepseek"],
+        maxTokens: 2200,
+        providerOrder: ["deepseek", "groq"],
+        thinking: "disabled",
+        attemptsPerProvider: 1,
       }),
     );
     expect(String(llmRouterMocks.generateWithLlmRouter.mock.calls[0][0].prompt)).toContain("520-950 từ");
@@ -284,6 +286,30 @@ describe("AI reading format", () => {
 
     expect(result.model).toBe("interpretation-rules-v2");
     expect(isCompleteFreeOverview(result.content)).toBe(true);
+  });
+
+  it("retries a structurally invalid free overview before using the instant seed", async () => {
+    clearProviderEnv();
+    llmRouterMocks.hasExternalLlmProvider.mockReturnValue(true);
+    const validContent = buildInstantFreeOverview(sampleChart());
+    llmRouterMocks.generateWithLlmRouter
+      .mockResolvedValueOnce({
+        text: "Nội dung quá ngắn",
+        model: "deepseek/deepseek-v4-flash",
+        provider: "deepseek",
+      })
+      .mockResolvedValueOnce({
+        text: validContent,
+        model: "deepseek/deepseek-v4-flash",
+        provider: "deepseek",
+      });
+
+    const result = await generateFreeOverview(sampleChart());
+
+    expect(result.model).toBe("deepseek/deepseek-v4-flash");
+    expect(result.content).toBe(validContent);
+    expect(llmRouterMocks.generateWithLlmRouter).toHaveBeenCalledTimes(2);
+    expect(String(llmRouterMocks.generateWithLlmRouter.mock.calls[1][0].prompt)).toContain("Lần thử trước chưa đạt cấu trúc");
   });
 
   it("accepts a structured free LLM overview that is slightly outside the strict seed word budget", async () => {

@@ -4,7 +4,7 @@ import { createPerfTimer } from "@/lib/perf";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-export const maxDuration = 10;
+export const maxDuration = 180;
 
 export async function POST(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   const timer = createPerfTimer();

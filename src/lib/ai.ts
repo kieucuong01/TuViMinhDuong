@@ -10,10 +10,12 @@ export const FREE_OVERVIEW_MAX_WORDS = 950;
 export const FREE_OVERVIEW_TEMPLATE_MIN_WORDS = FREE_OVERVIEW_MIN_WORDS;
 export const FREE_OVERVIEW_TEMPLATE_MAX_WORDS = FREE_OVERVIEW_MAX_WORDS;
 export const PAID_READING_CHAPTER_MAX_TOKENS = 7000;
-export const FREE_OVERVIEW_VERSION = "free-block-preview-v2";
+export const FREE_OVERVIEW_VERSION = "free-block-preview-v3";
 export const PAID_READING_VERSION = "paid-personal-dossier-v6";
 export const PAID_FULL_WORD_TARGET = "5.000-7.000 từ";
 export const READING_PROVIDER_ORDER = ["deepseek"] as const;
+const FREE_OVERVIEW_PROVIDER_ORDER = ["deepseek", "groq"] as const;
+const FREE_OVERVIEW_LLM_GENERATION_ATTEMPTS = 2;
 
 const IMPORTANT_PALACES = ["Mệnh", "Thân", "Quan Lộc", "Tài Bạch", "Phu Thê", "Tật Ách", "Thiên Di"];
 const GOOD_STAR_HINTS = ["Lộc", "Khoa", "Quyền", "Tả", "Hữu", "Xương", "Khúc", "Khôi", "Việt", "Thiên Mã", "Long Trì", "Phượng"];
@@ -826,15 +828,29 @@ export async function generateFreeOverview(chart: TuViChart) {
   const fallback = { content: buildInstantFreeOverview(chart), model: "interpretation-rules-v2" };
   if (isLlmDisabledForSmoke() || !hasExternalLlmProvider()) return fallback;
 
-  const routed = await generateWithLlmRouter({
-    prompt: buildFreeOverviewPrompt(chart),
-    temperature: 0.45,
-    maxTokens: 3200,
-    providerOrder: [...READING_PROVIDER_ORDER],
-  });
+  const basePrompt = buildFreeOverviewPrompt(chart);
+  for (let attempt = 0; attempt < FREE_OVERVIEW_LLM_GENERATION_ATTEMPTS; attempt += 1) {
+    const retryInstruction =
+      attempt === 0
+        ? ""
+        : "\n\nLần thử trước chưa đạt cấu trúc bắt buộc. Hãy tự kiểm tra đủ 4 mục, đúng các nhãn, 4 premium hook và độ dài trước khi trả về Markdown hoàn chỉnh.";
+    const routed = await generateWithLlmRouter({
+      prompt: `${basePrompt}${retryInstruction}`,
+      temperature: 0.45,
+      maxTokens: 2200,
+      providerOrder: [...FREE_OVERVIEW_PROVIDER_ORDER],
+      thinking: "disabled",
+      attemptsPerProvider: 1,
+      timeoutMs: 30_000,
+      accept: (candidate) => isDisplayableFreeOverview(candidate.text),
+    });
 
-  if (!routed || !isDisplayableFreeOverview(routed.text)) return fallback;
-  return { content: routed.text, model: routed.model };
+    if (routed && isDisplayableFreeOverview(routed.text)) {
+      return { content: routed.text, model: routed.model };
+    }
+  }
+
+  return fallback;
 }
 
 export function paidReadingChapters(chart: TuViChart, type: ReadingKey): PaidReadingChapter[] {

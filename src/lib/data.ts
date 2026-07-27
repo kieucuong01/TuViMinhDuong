@@ -1037,7 +1037,7 @@ export async function getChart(id: string) {
   return upgraded;
 }
 
-const FREE_OVERVIEW_PROCESSING_TTL_MS = 2 * 60 * 1000;
+const FREE_OVERVIEW_PROCESSING_TTL_MS = 5 * 60 * 1000;
 
 function storedFreeOverview(chart: TuViChart) {
   return chart.freeOverview || null;
