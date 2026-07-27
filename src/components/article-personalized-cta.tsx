@@ -11,6 +11,8 @@ type ArticlePersonalizedCtaProps = {
 export function ArticlePersonalizedCta({ articleSlug, articleTitle, categoryName, variant = "inline" }: ArticlePersonalizedCtaProps) {
   const topic = categoryName || articleTitle;
   const isFinal = variant === "final";
+  const ctaLocation = isFinal ? "article_final" : "article_inline";
+  const chartHref = `/?source=seo_article&source_slug=${encodeURIComponent(articleSlug)}&entry_article=${encodeURIComponent(articleSlug)}&cta_location=${ctaLocation}#lap-la-so`;
 
   return (
     <aside className={`article-personalized-cta article-personalized-cta-${variant}`} aria-label="Cá nhân hóa bài viết này">
@@ -25,10 +27,12 @@ export function ArticlePersonalizedCta({ articleSlug, articleTitle, categoryName
       </div>
       <div className="article-personalized-actions">
         <Link
-          href="/?source=seo_article#lap-la-so"
+          href={chartHref}
           className="btn btn-primary"
           data-ad-click="article_chart_cta_click"
           data-ad-placement={articleSlug}
+          data-source-slug={articleSlug}
+          data-cta-location={ctaLocation}
         >
           <Sparkles size={18} />
           Lập lá số miễn phí

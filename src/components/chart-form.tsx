@@ -14,9 +14,12 @@ function descendingYears(start: number, end: number) {
 type ChartFormProps = {
   compact?: boolean;
   adSource?: string;
+  sourceSlug?: string;
+  entryArticle?: string;
+  ctaLocation?: string;
 };
 
-export function ChartForm({ compact = false, adSource = "chart_form" }: ChartFormProps) {
+export function ChartForm({ compact = false, adSource = "chart_form", sourceSlug, entryArticle, ctaLocation }: ChartFormProps) {
   const now = new Date();
   const currentYear = now.getFullYear();
   const birthYears = descendingYears(1900, currentYear);
@@ -33,7 +36,7 @@ export function ChartForm({ compact = false, adSource = "chart_form" }: ChartFor
       data-loading-label="Đang lập lá số..."
     >
       <input type="hidden" name="adSource" value={adSource} />
-      <ChartAttributionFields />
+      <ChartAttributionFields sourceSlug={sourceSlug} entryArticle={entryArticle} ctaLocation={ctaLocation} />
       <div className="form-grid">
         <label className="chart-name-field md:col-span-2">
           <span className="chart-field-label">Họ và tên</span>

@@ -40,7 +40,7 @@ describe("free overview status", () => {
 
     expect(status.status).toBe("fallback");
     expect(status.source).toBe("seed-rules");
-    expect(FREE_OVERVIEW_VERSION).toBe("free-block-preview-v6");
+    expect(FREE_OVERVIEW_VERSION).toBe("free-block-preview-v8");
     expect(status.jobStatus).toBe("idle");
     expect(status.content).toContain("# Luận giải miễn phí dành cho");
     expect(status.content).toContain("## 4. Vận hạn năm");
@@ -71,6 +71,36 @@ describe("free overview status", () => {
     expect(status.model).toBe("deepseek/deepseek-v4-flash");
     expect(status.content).toBe(content);
     expect(status.jobStatus).toBe("completed");
+  });
+
+
+  it("marks deterministic fallback blocks completed without mislabeling them as LLM output", async () => {
+    const { FREE_OVERVIEW_BLOCK_KEYS, FREE_OVERVIEW_VERSION, buildInstantFreeOverview, splitFreeOverviewBlocks } = await import("@/lib/ai");
+    const { getFreeOverviewStatus } = await import("@/lib/data");
+    const chart = chartFixture();
+    const fallbackContent = buildInstantFreeOverview(chart);
+    const blocks = splitFreeOverviewBlocks(fallbackContent).blocks;
+    const completedBlocks = Object.fromEntries(FREE_OVERVIEW_BLOCK_KEYS.map((key) => [key, {
+      status: "completed",
+      content: blocks[key],
+      model: "interpretation-rules-v2",
+      generatedAt: "2026-07-27T00:00:00.000Z",
+    }]));
+    const status = getFreeOverviewStatus({
+      ...chart,
+      freeOverview: {
+        version: FREE_OVERVIEW_VERSION,
+        jobStatus: "completed",
+        generatedAt: "2026-07-27T00:00:00.000Z",
+        blocks: completedBlocks,
+      },
+    } as TuViChart);
+
+    expect(status.status).toBe("ready");
+    expect(status.source).toBe("seed-rules");
+    expect(status.jobStatus).toBe("completed");
+    expect(status.completedBlocks).toBe(5);
+    expect(status.blocks?.every((block) => block.source === "seed-rules")).toBe(true);
   });
 
   it("does not serve legacy provider-generated free content", async () => {

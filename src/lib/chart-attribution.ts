@@ -21,6 +21,9 @@ export type ChartAttribution = {
   referrerHost?: string;
   landingPath?: string;
   placement?: string;
+  sourceSlug?: string;
+  entryArticle?: string;
+  ctaLocation?: string;
 };
 
 export type ChartAttributionInput = {
@@ -33,6 +36,9 @@ export type ChartAttributionInput = {
   referrer?: string | null;
   landingPath?: string | null;
   placement?: string | null;
+  sourceSlug?: string | null;
+  entryArticle?: string | null;
+  ctaLocation?: string | null;
 };
 
 const PAID_MEDIUMS = new Set(["cpc", "paid", "ppc", "paid_search", "paid-social", "paid_social"]);
@@ -109,6 +115,9 @@ function detail(base: Omit<ChartAttribution, "utm" | "referrerHost" | "landingPa
     ...(referrerHost(input.referrer) ? { referrerHost: referrerHost(input.referrer) } : {}),
     ...(clean(input.landingPath, 220) ? { landingPath: clean(input.landingPath, 220) } : {}),
     ...(clean(input.placement, 120) ? { placement: clean(input.placement, 120) } : {}),
+    ...(clean(input.sourceSlug, 160) ? { sourceSlug: clean(input.sourceSlug, 160) } : {}),
+    ...(clean(input.entryArticle, 160) ? { entryArticle: clean(input.entryArticle, 160) } : {}),
+    ...(clean(input.ctaLocation, 120) ? { ctaLocation: clean(input.ctaLocation, 120) } : {}),
   };
 }
 

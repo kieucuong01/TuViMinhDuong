@@ -70,6 +70,7 @@ export function FreeOverviewRefreshTrigger({ chartId, shouldRefresh }: { chartId
         const completed = payload?.completedBlocks ?? 0;
         const total = payload?.totalBlocks ?? 5;
         const nextBlock = payload?.nextBlockKey || "intro";
+        if ((payload?.jobStatus === "failed" || payload?.jobStatus === "stale") && nextBlock) postedBlocks.delete(nextBlock);
         const label = FREE_OVERVIEW_BLOCK_LABELS[nextBlock] || "phần tiếp theo";
         setStatusText(completed > 0
           ? `AI đã viết ${completed}/${total} phần, đang viết tiếp ${label}...`

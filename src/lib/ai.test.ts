@@ -253,8 +253,8 @@ describe("AI reading format", () => {
     const result = await generateFreeOverview(chart);
 
     expect(FREE_OVERVIEW_MIN_WORDS).toBe(800);
-    expect(FREE_OVERVIEW_MAX_WORDS).toBe(1200);
-    expect(FREE_OVERVIEW_VERSION).toBe("free-block-preview-v6");
+    expect(FREE_OVERVIEW_MAX_WORDS).toBe(1400);
+    expect(FREE_OVERVIEW_VERSION).toBe("free-block-preview-v8");
     expect(result.model).toBe("deepseek/deepseek-v4-flash");
     expect(result).not.toHaveProperty("prompt");
     expect(isCompleteFreeOverview(result.content)).toBe(true);

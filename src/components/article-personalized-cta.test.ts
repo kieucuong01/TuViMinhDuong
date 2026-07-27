@@ -11,9 +11,13 @@ describe("ArticlePersonalizedCta", () => {
   it("invites article readers to personalize the topic early", () => {
     expect(ctaSource).toContain("article-personalized-cta");
     expect(ctaSource).toContain("theo lá số của bạn");
-    expect(ctaSource).toContain("/?source=seo_article#lap-la-so");
+    expect(ctaSource).toContain("source_slug=${encodeURIComponent(articleSlug)}");
+    expect(ctaSource).toContain("entry_article=${encodeURIComponent(articleSlug)}");
+    expect(ctaSource).toContain("cta_location=${ctaLocation}");
     expect(ctaSource).toContain('data-ad-click="article_chart_cta_click"');
     expect(ctaSource).toContain("data-ad-placement={articleSlug}");
+    expect(ctaSource).toContain("data-source-slug={articleSlug}");
+    expect(ctaSource).toContain("data-cta-location={ctaLocation}");
     expect(ctaSource).toContain("/xem-ngay");
   });
 

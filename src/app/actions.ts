@@ -143,6 +143,9 @@ function chartAttributionFromForm(formData: FormData, adSource: string) {
     referrer: textField(formData, "referrer"),
     landingPath: textField(formData, "landing_path"),
     placement: adSource,
+    sourceSlug: textField(formData, "source_slug"),
+    entryArticle: textField(formData, "entry_article"),
+    ctaLocation: textField(formData, "cta_location"),
   });
 }
 

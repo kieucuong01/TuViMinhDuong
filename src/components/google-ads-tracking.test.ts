@@ -78,6 +78,9 @@ describe("Google Ads tracking markers", () => {
     expect(reporterSource).toContain('"checkout_failed"');
     expect(reporterSource).toContain('new Set(["error", "unavailable", "invalid", "forbidden", "disabled"])');
     expect(reporterSource).toContain("method: form.dataset.adMethod");
+    expect(reporterSource).toContain('source_slug: formFieldValue(form, "source_slug")');
+    expect(reporterSource).toContain("source_slug: element.dataset.sourceSlug");
+    expect(reporterSource).toContain("link_text: cleanText(element.textContent)");
     expect(reporterSource).not.toContain("email:");
     expect(reporterSource).not.toContain("full_name:");
     expect(reporterSource).not.toContain("birth_date:");
@@ -112,6 +115,7 @@ describe("Google Ads tracking markers", () => {
 
   it("marks chart and checkout forms with explicit ads events", () => {
     expect(chartFormSource).toContain('name="adSource"');
+    expect(chartFormSource).toContain("<ChartAttributionFields sourceSlug={sourceSlug} entryArticle={entryArticle} ctaLocation={ctaLocation} />");
     expect(chartFormSource).toContain('data-ad-event="create_chart_submit"');
     expect(coinTopupSource).toContain('data-ad-event="begin_checkout"');
     expect(topupPageSource).toContain('data-ad-event="begin_checkout"');

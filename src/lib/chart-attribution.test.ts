@@ -68,12 +68,18 @@ describe("normalizeChartAttribution", () => {
   it("classifies same-site referrers and known internal source parameters", () => {
     expect(normalizeChartAttribution({
       sourceParam: "seo_article",
-      landingPath: "/",
+      landingPath: "/?source=seo_article&source_slug=dai-van-la-gi&entry_article=dai-van-la-gi&cta_location=article_inline",
+      sourceSlug: "dai-van-la-gi",
+      entryArticle: "dai-van-la-gi",
+      ctaLocation: "article_inline",
     })).toMatchObject({
       source: "internal",
       label: "Nội bộ",
       confidence: "high",
       placement: "seo_article",
+      sourceSlug: "dai-van-la-gi",
+      entryArticle: "dai-van-la-gi",
+      ctaLocation: "article_inline",
     });
 
     expect(normalizeChartAttribution({

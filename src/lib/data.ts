@@ -18,6 +18,7 @@ import {
   isCompleteFreeOverview,
   isCompleteFreeOverviewBlock,
   isDisplayableFreeOverview,
+  splitFreeOverviewBlocks,
   type FreeOverviewBlockKey,
 } from "@/lib/ai";
 import { countVisibleMarkdownWords } from "@/lib/free-overview-presentation";
@@ -1078,7 +1079,7 @@ function freeOverviewBlockProgress(chart: TuViChart): FreeOverviewBlockProgress[
     return {
       key,
       status: completed ? "completed" : block?.status === "processing" ? "processing" : block?.status === "failed" ? "failed" : "idle",
-      source: completed ? "llm" : "seed-rules",
+      source: completed && block?.model !== "interpretation-rules-v2" ? "llm" : "seed-rules",
       ...(block?.model ? { model: block.model } : {}),
       ...(block?.generatedAt ? { generatedAt: block.generatedAt } : {}),
     };
@@ -1147,10 +1148,13 @@ function cachedFreeOverviewStatus(chart: TuViChart): Extract<FreeOverviewStatus,
     return null;
   }
 
+  const modelParts = model.split("+").filter(Boolean);
+  const source = modelParts.length > 0 && modelParts.every((item) => item === "interpretation-rules-v2") ? "seed-rules" : "llm";
+
   return {
     status: "ready",
     content,
-    source: model === "interpretation-rules-v2" ? "seed-rules" : "llm",
+    source,
     model,
     generatedAt,
     wordCount: countVisibleMarkdownWords(content),
@@ -1319,33 +1323,27 @@ export async function generateAndStoreFreeOverviewBlock(chartId: string, key: Fr
 
   try {
     const generated = await generateFreeOverviewBlock(record.chart, key);
-    if (generated.model === "interpretation-rules-v2") {
-      const latest = await getChart(chartId);
-      const failedChart = await updateChartFreeOverviewBlock(chartId, latest?.chart || record.chart, key, {
-        status: "failed",
-        generatedAt: new Date().toISOString(),
-        error: "FREE_OVERVIEW_BLOCK_LLM_UNAVAILABLE_OR_INVALID",
-      });
-      return getFreeOverviewStatus(failedChart);
-    }
-
     const latest = await getChart(chartId);
     const nextChart = await updateChartFreeOverviewBlock(chartId, latest?.chart || record.chart, key, {
       content: generated.content,
       model: generated.model,
       status: "completed",
       generatedAt: new Date().toISOString(),
+      ...(generated.model === "interpretation-rules-v2" ? { error: "FREE_OVERVIEW_BLOCK_LLM_UNAVAILABLE_OR_INVALID" } : {}),
     });
     return getFreeOverviewStatus(nextChart);
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     const latest = await getChart(chartId);
-    const failedChart = await updateChartFreeOverviewBlock(chartId, latest?.chart || record.chart, key, {
-      status: "failed",
+    const fallbackBlock = splitFreeOverviewBlocks(buildInstantFreeOverview(latest?.chart || record.chart)).blocks[key];
+    const fallbackChart = await updateChartFreeOverviewBlock(chartId, latest?.chart || record.chart, key, {
+      content: fallbackBlock,
+      model: "interpretation-rules-v2",
+      status: "completed",
       generatedAt: new Date().toISOString(),
       error: message,
     });
-    return getFreeOverviewStatus(failedChart);
+    return getFreeOverviewStatus(fallbackChart);
   }
 }
 

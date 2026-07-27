@@ -56,6 +56,15 @@ function numberFromUnknown(value: unknown) {
   return Number.isFinite(parsed) && parsed > 0 ? parsed : undefined;
 }
 
+function formFieldValue(form: HTMLFormElement, name: string) {
+  const value = new FormData(form).get(name);
+  return typeof value === "string" && value.trim() ? value.trim().slice(0, 160) : undefined;
+}
+
+function cleanText(value: string | null | undefined, max = 120) {
+  return String(value || "").replace(/\s+/g, " ").trim().slice(0, max) || undefined;
+}
+
 function markTrackedOnce(key: string) {
   const storageKey = `${DEDUPE_PREFIX}:${key}`;
   if (trackedEvents.has(storageKey)) return false;
@@ -220,6 +229,9 @@ export function GoogleAdsEventReporter() {
         value: numberFrom(form.dataset.adValue),
         package_key: form.dataset.adPackage,
         chart_id: form.dataset.chartId || (pathname.startsWith("/la-so/") ? pathname.split("/")[2] : undefined),
+        source_slug: formFieldValue(form, "source_slug"),
+        entry_article: formFieldValue(form, "entry_article"),
+        cta_location: formFieldValue(form, "cta_location"),
       });
     }
 
@@ -232,6 +244,9 @@ export function GoogleAdsEventReporter() {
         placement: element.dataset.adPlacement,
         href: element instanceof HTMLAnchorElement ? element.href : undefined,
         chart_id: element.dataset.chartId || (pathname.startsWith("/la-so/") ? pathname.split("/")[2] : undefined),
+        source_slug: element.dataset.sourceSlug,
+        cta_location: element.dataset.ctaLocation,
+        link_text: cleanText(element.textContent),
       });
     }
 

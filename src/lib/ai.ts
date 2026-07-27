@@ -6,11 +6,11 @@ import { generateWithLlmRouter, hasExternalLlmProvider } from "@/lib/llm-router"
 import { FEATURE_PRICES, type ReadingKey } from "@/lib/pricing";
 
 export const FREE_OVERVIEW_MIN_WORDS = 800;
-export const FREE_OVERVIEW_MAX_WORDS = 1200;
+export const FREE_OVERVIEW_MAX_WORDS = 1400;
 export const FREE_OVERVIEW_TEMPLATE_MIN_WORDS = FREE_OVERVIEW_MIN_WORDS;
-export const FREE_OVERVIEW_TEMPLATE_MAX_WORDS = FREE_OVERVIEW_MAX_WORDS;
+export const FREE_OVERVIEW_TEMPLATE_MAX_WORDS = 1200;
 export const PAID_READING_CHAPTER_MAX_TOKENS = 7000;
-export const FREE_OVERVIEW_VERSION = "free-block-preview-v6";
+export const FREE_OVERVIEW_VERSION = "free-block-preview-v8";
 export const PAID_READING_VERSION = "paid-personal-dossier-v6";
 export const PAID_FULL_WORD_TARGET = "5.000-7.000 từ";
 export const READING_PROVIDER_ORDER = ["deepseek"] as const;

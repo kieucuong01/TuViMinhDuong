@@ -38,7 +38,7 @@ export function PseoArticleFunnel({ page, sameStar, samePalace }: PseoArticleFun
         <h2 id="pseo-form-heading">Xem {page.title.toLowerCase()} ảnh hưởng thế nào đến riêng bạn</h2>
         <span>Nhập thông tin sinh để lập lá số và xem bản luận giải chi tiết năm {year}.</span>
       </div>
-      <ChartForm compact adSource="pseo_inline" />
+      <ChartForm compact adSource="pseo_inline" sourceSlug={page.slug} ctaLocation="pseo_inline_form" />
     </section>
   );
 

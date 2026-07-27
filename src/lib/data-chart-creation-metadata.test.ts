@@ -56,6 +56,8 @@ describe("chart creation metadata", () => {
         utm: { source: "google", medium: "cpc", campaign: "brand" },
         landingPath: "/lap-la-so",
         placement: "google_ads_landing",
+        sourceSlug: "lap-la-so-ad",
+        ctaLocation: "ads_form",
       },
     });
 
@@ -67,6 +69,8 @@ describe("chart creation metadata", () => {
         creationAttribution: expect.objectContaining({
           label: "Ads",
           utm: expect.objectContaining({ source: "google", medium: "cpc" }),
+          sourceSlug: "lap-la-so-ad",
+          ctaLocation: "ads_form",
         }),
       }),
     }));
