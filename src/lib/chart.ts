@@ -78,6 +78,13 @@ export type TuViChart = {
     version?: string;
     jobStatus?: "processing" | "completed" | "failed";
     error?: string;
+    blocks?: Record<string, {
+      content?: string;
+      model?: string;
+      status?: "processing" | "completed" | "failed";
+      generatedAt?: string;
+      error?: string;
+    }>;
   };
 };
 

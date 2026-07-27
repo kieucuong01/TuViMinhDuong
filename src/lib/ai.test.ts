@@ -22,6 +22,7 @@ import {
   paidReadingChapters,
   paidReadingMaxTokens,
   runReadingChapterTasks,
+  splitFreeOverviewBlocks,
 } from "@/lib/ai";
 import { generateTuViChart } from "@/lib/chart";
 import { countVisibleMarkdownWords } from "@/lib/free-overview-presentation";
@@ -232,51 +233,54 @@ describe("AI reading format", () => {
     expect(promptMeta).not.toHaveProperty("modelPolicy");
   });
 
-  it("generates the free overview with a lightweight LLM when a provider is available", async () => {
+  it("generates the free overview block-by-block with lightweight LLM polishing", async () => {
     clearProviderEnv();
     llmRouterMocks.hasExternalLlmProvider.mockReturnValue(true);
-    const llmContent = buildInstantFreeOverview(sampleChart());
-    llmRouterMocks.generateWithLlmRouter.mockResolvedValue({
-      text: "Nội dung từ provider không được sử dụng",
-      model: "deepseek/deepseek-chat",
-      provider: "deepseek",
-    });
-    llmRouterMocks.generateWithLlmRouter.mockResolvedValue({
-      text: llmContent,
-      model: "deepseek/deepseek-v4-flash",
-      provider: "deepseek",
+    const chart = sampleChart();
+    const llmContent = buildInstantFreeOverview(chart);
+    const blocks = splitFreeOverviewBlocks(llmContent).blocks;
+
+    llmRouterMocks.generateWithLlmRouter.mockImplementation(async (options: { prompt: string }) => {
+      const key = Object.keys(blocks).find((blockKey) => options.prompt.includes(`BLOCK CẦN VIẾT: ${blockKey}`));
+      if (!key) throw new Error("Unknown free overview block prompt");
+      return {
+        text: blocks[key as keyof typeof blocks],
+        model: "deepseek/deepseek-v4-flash",
+        provider: "deepseek",
+      };
     });
 
-    const result = await generateFreeOverview(sampleChart());
+    const result = await generateFreeOverview(chart);
 
     expect(FREE_OVERVIEW_MIN_WORDS).toBe(800);
     expect(FREE_OVERVIEW_MAX_WORDS).toBe(1200);
-    expect(FREE_OVERVIEW_VERSION).toBe("free-block-preview-v5");
+    expect(FREE_OVERVIEW_VERSION).toBe("free-block-preview-v6");
     expect(result.model).toBe("deepseek/deepseek-v4-flash");
     expect(result).not.toHaveProperty("prompt");
     expect(isCompleteFreeOverview(result.content)).toBe(true);
-    expect(llmRouterMocks.generateWithLlmRouter).toHaveBeenCalledTimes(1);
-    const prompt = String(llmRouterMocks.generateWithLlmRouter.mock.calls[0][0].prompt);
-    expect(prompt.length).toBeLessThan(7000);
-    expect(prompt).not.toContain(llmContent.slice(0, 120));
-    expect(prompt).toContain("Praise → Tease → Cliffhanger → CTA Clear Value");
-    expect(prompt).toContain("Bản FULL 9 chương");
-    expect(prompt).toContain("3 câu hỏi với Cố vấn AI");
-    expect(prompt).not.toContain("Trong mỗi mục, viết đúng năm nhãn");
-    expect(prompt).not.toContain("# Bài mẫu luận giải miễn phí");
+    expect(result.content).toBe(llmContent);
+    expect(llmRouterMocks.generateWithLlmRouter).toHaveBeenCalledTimes(5);
+    const prompts = llmRouterMocks.generateWithLlmRouter.mock.calls.map(([options]) => String((options as { prompt: string }).prompt));
+    expect(prompts.every((prompt) => prompt.length < 7000)).toBe(true);
+    expect(prompts[0]).toContain("MỀM và HAY hơn một block");
+    expect(prompts[0]).toContain("BLOCK CẦN VIẾT: intro");
+    expect(prompts[1]).toContain("BLOCK CẦN VIẾT: section_1");
+    expect(prompts[0]).toContain("BẢN NHÁP HỢP LỆ ĐANG HIỂN THỊ NHANH");
+    expect(prompts[0]).toContain("Praise → Tease → Cliffhanger → CTA");
+    expect(prompts.join("\n")).toContain("Bản FULL 9 chương");
+    expect(prompts.join("\n")).toContain("3 câu hỏi với Cố vấn AI");
+    expect(prompts.join("\n")).not.toContain("Trong mỗi mục, viết đúng năm nhãn");
     expect(llmRouterMocks.generateWithLlmRouter).toHaveBeenCalledWith(
       expect.objectContaining({
-        temperature: 0.45,
-        maxTokens: 3000,
+        temperature: 0.42,
         providerOrder: ["deepseek", "groq"],
         thinking: "disabled",
         attemptsPerProvider: 1,
       }),
     );
-    expect(String(llmRouterMocks.generateWithLlmRouter.mock.calls[0][0].prompt)).toContain("800-1200 từ");
   });
 
-  it("falls back to the instant seed overview when the free LLM is unavailable or invalid", async () => {
+  it("falls back to the instant seed overview when the first free LLM block is unavailable or invalid", async () => {
     clearProviderEnv();
     llmRouterMocks.hasExternalLlmProvider.mockReturnValue(true);
     llmRouterMocks.generateWithLlmRouter.mockResolvedValue({
@@ -289,52 +293,50 @@ describe("AI reading format", () => {
 
     expect(result.model).toBe("interpretation-rules-v2");
     expect(isCompleteFreeOverview(result.content)).toBe(true);
+    expect(llmRouterMocks.generateWithLlmRouter).toHaveBeenCalledTimes(1);
   });
 
-  it("retries a structurally invalid free overview before using the instant seed", async () => {
+  it("does not keep asking later blocks after a structurally invalid free overview block", async () => {
     clearProviderEnv();
     llmRouterMocks.hasExternalLlmProvider.mockReturnValue(true);
-    const validContent = buildInstantFreeOverview(sampleChart());
+    const chart = sampleChart();
+    const blocks = splitFreeOverviewBlocks(buildInstantFreeOverview(chart)).blocks;
     llmRouterMocks.generateWithLlmRouter
       .mockResolvedValueOnce({
-        text: "Nội dung quá ngắn",
+        text: blocks.intro,
         model: "deepseek/deepseek-v4-flash",
         provider: "deepseek",
       })
       .mockResolvedValueOnce({
-        text: validContent,
+        text: "## 1. Năng lực thiên phú (Cung Mệnh)\n\nNội dung quá ngắn",
         model: "deepseek/deepseek-v4-flash",
         provider: "deepseek",
       });
 
-    const result = await generateFreeOverview(sampleChart());
-
-    expect(result.model).toBe("deepseek/deepseek-v4-flash");
-    expect(result.content).toBe(validContent);
-    expect(llmRouterMocks.generateWithLlmRouter).toHaveBeenCalledTimes(2);
-    expect(String(llmRouterMocks.generateWithLlmRouter.mock.calls[1][0].prompt)).toContain("Lần thử trước chưa đạt contract");
-  });
-
-  it("rejects a structured free LLM overview outside the strict 800-1200 word budget", async () => {
-    clearProviderEnv();
-    llmRouterMocks.hasExternalLlmProvider.mockReturnValue(true);
-    const extra = Array.from(
-      { length: 12 },
-      () => "Ghi chú thêm: cung Mệnh và đại vận hiện tại cần được đọc cùng nhịp sống thực tế của bạn để tránh quyết định quá vội.",
-    ).join(" ");
-    const content = `${buildInstantFreeOverview(sampleChart())}\n\n${extra}`;
-    expect(isCompleteFreeOverview(content)).toBe(false);
-    llmRouterMocks.generateWithLlmRouter.mockResolvedValue({
-      text: content,
-      model: "deepseek/deepseek-v4-flash",
-      provider: "deepseek",
-    });
-
-    const result = await generateFreeOverview(sampleChart());
+    const result = await generateFreeOverview(chart);
 
     expect(result.model).toBe("interpretation-rules-v2");
     expect(isCompleteFreeOverview(result.content)).toBe(true);
     expect(llmRouterMocks.generateWithLlmRouter).toHaveBeenCalledTimes(2);
+  });
+
+  it("rejects a structured free LLM block outside the strict per-block budget", async () => {
+    clearProviderEnv();
+    llmRouterMocks.hasExternalLlmProvider.mockReturnValue(true);
+    const chart = sampleChart();
+    const blocks = splitFreeOverviewBlocks(buildInstantFreeOverview(chart)).blocks;
+    const longIntro = `${blocks.intro}\n\n${Array.from({ length: 40 }, () => "Đoạn thêm làm phần mở đầu vượt quá giới hạn cần thiết.").join(" ")}`;
+    llmRouterMocks.generateWithLlmRouter.mockResolvedValue({
+      text: longIntro,
+      model: "deepseek/deepseek-v4-flash",
+      provider: "deepseek",
+    });
+
+    const result = await generateFreeOverview(chart);
+
+    expect(result.model).toBe("interpretation-rules-v2");
+    expect(isCompleteFreeOverview(result.content)).toBe(true);
+    expect(llmRouterMocks.generateWithLlmRouter).toHaveBeenCalledTimes(1);
   });
 
   it("renders the four assembled free preview blocks within the approved length", () => {

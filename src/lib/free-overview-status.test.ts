@@ -27,10 +27,10 @@ describe("free overview status", () => {
   it("keeps the page status synchronous and delegates LLM work to the process path", () => {
     const source = readFileSync(fileURLToPath(new URL("./data.ts", import.meta.url)), "utf8");
 
-    expect(source).toContain("generateFreeOverview(record.chart)");
+    expect(source).toContain("generateAndStoreFreeOverviewBlock(chartId, nextBlockKey)");
     expect(source).not.toContain("generateFreeOverviewPreview");
     expect(source).not.toContain("fullOverviewPromise");
-    expect(source).toContain("const FREE_OVERVIEW_PROCESSING_TTL_MS = 5 * 60 * 1000");
+    expect(source).toContain("const FREE_OVERVIEW_PROCESSING_TTL_MS = 2 * 60 * 1000");
   });
 
   it("returns a fast 800-1200 visible-word block preview while the LLM overview is missing", async () => {
@@ -40,7 +40,7 @@ describe("free overview status", () => {
 
     expect(status.status).toBe("fallback");
     expect(status.source).toBe("seed-rules");
-    expect(FREE_OVERVIEW_VERSION).toBe("free-block-preview-v5");
+    expect(FREE_OVERVIEW_VERSION).toBe("free-block-preview-v6");
     expect(status.jobStatus).toBe("idle");
     expect(status.content).toContain("# Luận giải miễn phí dành cho");
     expect(status.content).toContain("## 4. Vận hạn năm");

@@ -69,7 +69,7 @@ describe("FreeOverviewLoader seed-first LLM refresh gate", () => {
     expect(refreshSource).toContain("/free-overview/process");
     expect(refreshSource).toContain("void pollUntilReady();");
     expect(refreshSource).toContain("router.refresh()");
-    expect(refreshSource).toContain("attempt >= 30");
+    expect(refreshSource).toContain("attempt >= 45");
   });
 
   it("turns the long report into a 30-second summary, sticky navigation and four readable sections", () => {

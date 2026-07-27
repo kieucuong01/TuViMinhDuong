@@ -4,7 +4,9 @@ const mocks = vi.hoisted(() => ({
   getChart: vi.fn(),
   getFreeOverviewStatus: vi.fn(),
   claimFreeOverviewGeneration: vi.fn(),
+  claimFreeOverviewBlockGeneration: vi.fn(),
   generateAndStoreFreeOverview: vi.fn(),
+  generateAndStoreFreeOverviewBlock: vi.fn(),
   after: vi.fn((callback: () => void) => callback()),
 }));
 
@@ -17,15 +19,18 @@ vi.mock("next/server", () => ({
 
 vi.mock("@/lib/data", () => ({
   claimFreeOverviewGeneration: mocks.claimFreeOverviewGeneration,
+  claimFreeOverviewBlockGeneration: mocks.claimFreeOverviewBlockGeneration,
   getChart: mocks.getChart,
   getFreeOverviewStatus: mocks.getFreeOverviewStatus,
   generateAndStoreFreeOverview: mocks.generateAndStoreFreeOverview,
+  generateAndStoreFreeOverviewBlock: mocks.generateAndStoreFreeOverviewBlock,
 }));
 
-async function postProcess(chartId = "chart-1") {
+async function postProcess(chartId = "chart-1", block?: string) {
   vi.resetModules();
   const { POST } = await import("./route");
-  return POST(new Request(`http://test.local/api/charts/${chartId}/free-overview/process`, { method: "POST" }), {
+  const query = block ? `?block=${encodeURIComponent(block)}` : "";
+  return POST(new Request(`http://test.local/api/charts/${chartId}/free-overview/process${query}`, { method: "POST" }), {
     params: Promise.resolve({ id: chartId }),
   });
 }
@@ -42,6 +47,8 @@ describe("free overview process compatibility route", () => {
       jobStatus: "idle",
     });
     mocks.claimFreeOverviewGeneration.mockResolvedValue({ status: "claimed" });
+    mocks.claimFreeOverviewBlockGeneration.mockResolvedValue({ status: "claimed" });
+    mocks.generateAndStoreFreeOverviewBlock.mockResolvedValue({ status: "fallback" });
     mocks.generateAndStoreFreeOverview.mockResolvedValue({
       status: "ready",
       content: "Bản LLM",
@@ -62,6 +69,25 @@ describe("free overview process compatibility route", () => {
     expect(mocks.claimFreeOverviewGeneration).toHaveBeenCalledWith("chart-1", { input: { fullName: "Test" } });
     expect(mocks.after).toHaveBeenCalledTimes(1);
     expect(mocks.generateAndStoreFreeOverview).toHaveBeenCalledWith("chart-1", { force: true });
+  });
+
+  it("schedules only the requested block when block query is present", async () => {
+    const response = await postProcess("chart-1", "intro");
+
+    expect(response.status).toBe(202);
+    expect(await response.json()).toEqual({ status: "processing", chartId: "chart-1", block: "intro" });
+    expect(mocks.claimFreeOverviewBlockGeneration).toHaveBeenCalledWith("chart-1", { input: { fullName: "Test" } }, "intro");
+    expect(mocks.generateAndStoreFreeOverviewBlock).toHaveBeenCalledWith("chart-1", "intro");
+    expect(mocks.generateAndStoreFreeOverview).not.toHaveBeenCalled();
+  });
+
+  it("rejects invalid block query instead of falling back to full generation", async () => {
+    const response = await postProcess("chart-1", "bad-block");
+
+    expect(response.status).toBe(400);
+    expect(await response.json()).toEqual({ error: "Block luận giải không hợp lệ." });
+    expect(mocks.getChart).not.toHaveBeenCalled();
+    expect(mocks.claimFreeOverviewGeneration).not.toHaveBeenCalled();
   });
 
   it("returns 404 for a missing chart", async () => {

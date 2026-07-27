@@ -30,6 +30,10 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
         source: overview.source,
         jobStatus: overview.jobStatus,
         ...(overview.status === "ready" ? { model: overview.model, generatedAt: overview.generatedAt } : {}),
+        ...(overview.blocks ? { blocks: overview.blocks } : {}),
+        ...(typeof overview.completedBlocks === "number" ? { completedBlocks: overview.completedBlocks } : {}),
+        ...(typeof overview.totalBlocks === "number" ? { totalBlocks: overview.totalBlocks } : {}),
+        ...(overview.nextBlockKey ? { nextBlockKey: overview.nextBlockKey } : {}),
         content: visibleContent,
         wordCount: countVisibleMarkdownWords(visibleContent),
       };

@@ -9,7 +9,17 @@ import { articleWithScore, seedArticles, type ArticleCategoryView, type ArticleV
 import { getDb } from "@/lib/db";
 import { FEATURE_PRICE_KEYS, FEATURE_PRICES, COIN_PACKAGES, type FeaturePriceMap, type ReadingKey } from "@/lib/pricing";
 import { isReadingBundleKey, readingBundleScopeKey } from "@/lib/reading-bundles";
-import { FREE_OVERVIEW_VERSION, buildInstantFreeOverview, generateFreeOverview, isDisplayableFreeOverview } from "@/lib/ai";
+import {
+  FREE_OVERVIEW_BLOCK_KEYS,
+  FREE_OVERVIEW_VERSION,
+  assembleFreeOverviewContent,
+  buildInstantFreeOverview,
+  generateFreeOverviewBlock,
+  isCompleteFreeOverview,
+  isCompleteFreeOverviewBlock,
+  isDisplayableFreeOverview,
+  type FreeOverviewBlockKey,
+} from "@/lib/ai";
 import { countVisibleMarkdownWords } from "@/lib/free-overview-presentation";
 import { scoreArticleSeo } from "@/lib/seo";
 import { slugify } from "@/lib/format";
@@ -292,6 +302,14 @@ export type AdminChartSubmission = {
   creationAttribution: ChartAttribution | null;
 };
 
+export type FreeOverviewBlockProgress = {
+  key: FreeOverviewBlockKey;
+  status: "idle" | "processing" | "completed" | "failed";
+  source: "llm" | "seed-rules";
+  model?: string;
+  generatedAt?: string;
+};
+
 export type FreeOverviewStatus =
   | {
       status: "ready";
@@ -301,6 +319,10 @@ export type FreeOverviewStatus =
       generatedAt: string;
       wordCount: number;
       jobStatus: "completed";
+      blocks?: FreeOverviewBlockProgress[];
+      completedBlocks?: number;
+      totalBlocks?: number;
+      nextBlockKey?: FreeOverviewBlockKey;
     }
   | {
       status: "fallback";
@@ -309,6 +331,10 @@ export type FreeOverviewStatus =
       wordCount: number;
       jobStatus: "idle" | "processing" | "stale" | "failed";
       error?: string;
+      blocks?: FreeOverviewBlockProgress[];
+      completedBlocks?: number;
+      totalBlocks?: number;
+      nextBlockKey?: FreeOverviewBlockKey;
     };
 
 export type FreeOverviewGenerationClaim =
@@ -1037,10 +1063,44 @@ export async function getChart(id: string) {
   return upgraded;
 }
 
-const FREE_OVERVIEW_PROCESSING_TTL_MS = 5 * 60 * 1000;
+const FREE_OVERVIEW_PROCESSING_TTL_MS = 2 * 60 * 1000;
 
 function storedFreeOverview(chart: TuViChart) {
   return chart.freeOverview || null;
+}
+
+function freeOverviewBlockProgress(chart: TuViChart): FreeOverviewBlockProgress[] {
+  const overview = storedFreeOverview(chart);
+  const blocks = overview?.version === FREE_OVERVIEW_VERSION ? overview.blocks || {} : {};
+  return FREE_OVERVIEW_BLOCK_KEYS.map((key) => {
+    const block = blocks[key];
+    const completed = block?.status === "completed" && Boolean(block.content) && Boolean(block.model);
+    return {
+      key,
+      status: completed ? "completed" : block?.status === "processing" ? "processing" : block?.status === "failed" ? "failed" : "idle",
+      source: completed ? "llm" : "seed-rules",
+      ...(block?.model ? { model: block.model } : {}),
+      ...(block?.generatedAt ? { generatedAt: block.generatedAt } : {}),
+    };
+  });
+}
+
+function completedFreeOverviewBlocks(chart: TuViChart) {
+  const overview = storedFreeOverview(chart);
+  if (overview?.version !== FREE_OVERVIEW_VERSION) return {} as Partial<Record<FreeOverviewBlockKey, string>>;
+  return Object.fromEntries(
+    FREE_OVERVIEW_BLOCK_KEYS.flatMap((key) => {
+      const block = overview.blocks?.[key];
+      return block?.status === "completed" && block.content && block.model ? [[key, block.content]] : [];
+    }),
+  ) as Partial<Record<FreeOverviewBlockKey, string>>;
+}
+
+function freeOverviewMeta(chart: TuViChart) {
+  const blocks = freeOverviewBlockProgress(chart);
+  const completedBlocks = blocks.filter((block) => block.status === "completed").length;
+  const nextBlockKey = blocks.find((block) => block.status !== "completed")?.key;
+  return { blocks, completedBlocks, totalBlocks: FREE_OVERVIEW_BLOCK_KEYS.length, ...(nextBlockKey ? { nextBlockKey } : {}) };
 }
 
 function freeOverviewFallback(
@@ -1048,47 +1108,72 @@ function freeOverviewFallback(
   jobStatus: Extract<FreeOverviewStatus, { status: "fallback" }>["jobStatus"] = "idle",
   error?: string,
 ): Extract<FreeOverviewStatus, { status: "fallback" }> {
-  const content = buildInstantFreeOverview(chart);
+  const fallbackContent = buildInstantFreeOverview(chart);
+  const content = assembleFreeOverviewContent(fallbackContent, completedFreeOverviewBlocks(chart));
   return {
     status: "fallback",
     content,
     source: "seed-rules",
     wordCount: countVisibleMarkdownWords(content),
     jobStatus,
+    ...freeOverviewMeta(chart),
     ...(error ? { error } : {}),
   };
 }
 
 function cachedFreeOverviewStatus(chart: TuViChart): Extract<FreeOverviewStatus, { status: "ready" }> | null {
   const overview = storedFreeOverview(chart);
+  const meta = freeOverviewMeta(chart);
+  const allBlocksCompleted = meta.completedBlocks === meta.totalBlocks;
+  const blockContent = allBlocksCompleted
+    ? assembleFreeOverviewContent(buildInstantFreeOverview(chart), completedFreeOverviewBlocks(chart))
+    : null;
+  const content = blockContent || overview?.content;
+  const model = blockContent
+    ? Array.from(new Set(FREE_OVERVIEW_BLOCK_KEYS.map((key) => overview?.blocks?.[key]?.model).filter(Boolean))).join("+")
+    : overview?.model;
+  const generatedAt = blockContent
+    ? FREE_OVERVIEW_BLOCK_KEYS.map((key) => overview?.blocks?.[key]?.generatedAt).filter(Boolean).sort().at(-1)
+    : overview?.generatedAt;
+
   if (
     overview?.version !== FREE_OVERVIEW_VERSION ||
-    overview.jobStatus !== "completed" ||
-    !overview.content ||
-    !overview.model ||
-    !overview.generatedAt ||
-    !isDisplayableFreeOverview(overview.content)
+    overview.jobStatus !== "completed" && !allBlocksCompleted ||
+    !content ||
+    !model ||
+    !generatedAt ||
+    !isDisplayableFreeOverview(content)
   ) {
     return null;
   }
 
   return {
     status: "ready",
-    content: overview.content,
-    source: overview.model === "interpretation-rules-v2" ? "seed-rules" : "llm",
-    model: overview.model,
-    generatedAt: overview.generatedAt,
-    wordCount: countVisibleMarkdownWords(overview.content),
+    content,
+    source: model === "interpretation-rules-v2" ? "seed-rules" : "llm",
+    model,
+    generatedAt,
+    wordCount: countVisibleMarkdownWords(content),
     jobStatus: "completed",
+    ...meta,
   };
 }
 
 function freeOverviewJobStatus(chart: TuViChart): Extract<FreeOverviewStatus, { status: "fallback" }>["jobStatus"] {
   const overview = storedFreeOverview(chart);
   if (overview?.version !== FREE_OVERVIEW_VERSION) return "idle";
-  if (overview.jobStatus === "failed") return "failed";
-  if (overview.jobStatus !== "processing" || !overview.generatedAt) return "stale";
-  return Date.now() - new Date(overview.generatedAt).getTime() <= FREE_OVERVIEW_PROCESSING_TTL_MS ? "processing" : "stale";
+  const blocks = freeOverviewBlockProgress(chart);
+  const hasRecentProcessing = blocks.some((block) => {
+    if (block.status !== "processing" || !block.generatedAt) return false;
+    return Date.now() - new Date(block.generatedAt).getTime() <= FREE_OVERVIEW_PROCESSING_TTL_MS;
+  });
+  if (hasRecentProcessing) return "processing";
+  if (blocks.some((block) => block.status === "completed")) return "stale";
+  if (overview.jobStatus === "failed" || blocks.some((block) => block.status === "failed")) return "failed";
+  if (overview.jobStatus === "processing" && overview.generatedAt) {
+    return Date.now() - new Date(overview.generatedAt).getTime() <= FREE_OVERVIEW_PROCESSING_TTL_MS ? "processing" : "stale";
+  }
+  return "idle";
 }
 
 export function getFreeOverviewStatus(chart: TuViChart): FreeOverviewStatus {
@@ -1115,6 +1200,64 @@ async function updateChartFreeOverview(chartId: string, chart: TuViChart, freeOv
   return nextChart;
 }
 
+async function updateChartFreeOverviewBlock(
+  chartId: string,
+  chart: TuViChart,
+  key: FreeOverviewBlockKey,
+  block: NonNullable<NonNullable<TuViChart["freeOverview"]>["blocks"]>[string],
+) {
+  const latestRecord = await getChart(chartId);
+  const latestChart = latestRecord?.chart || chart;
+  const base = latestChart.freeOverview?.version === FREE_OVERVIEW_VERSION ? latestChart.freeOverview : { version: FREE_OVERVIEW_VERSION };
+  if (base.jobStatus === "completed" && base.content && base.model && isCompleteFreeOverview(base.content)) {
+    return latestChart;
+  }
+  const existingBlock = base.blocks?.[key];
+  if (existingBlock?.status === "completed" && block.status !== "completed") {
+    return latestChart;
+  }
+  const incomingBlock = block.status === "completed" && !isCompleteFreeOverviewBlock(key, latestChart, block.content || "")
+    ? { status: "failed" as const, generatedAt: block.generatedAt || new Date().toISOString(), error: "FREE_OVERVIEW_BLOCK_INVALID" }
+    : block;
+
+  const nextBlocks = { ...(base.blocks || {}), [key]: incomingBlock };
+  let allCompleted = FREE_OVERVIEW_BLOCK_KEYS.every((item) => {
+    const current = nextBlocks[item];
+    return current?.status === "completed" && current.content && current.model;
+  });
+
+  const generatedAt = incomingBlock.generatedAt || new Date().toISOString();
+  const freeOverview: NonNullable<TuViChart["freeOverview"]> = {
+    version: FREE_OVERVIEW_VERSION,
+    jobStatus: allCompleted ? "completed" : incomingBlock.status === "failed" ? "failed" : "processing",
+    generatedAt,
+    blocks: nextBlocks,
+  };
+
+  if (allCompleted) {
+    const content = assembleFreeOverviewContent(
+      buildInstantFreeOverview(latestChart),
+      Object.fromEntries(FREE_OVERVIEW_BLOCK_KEYS.map((item) => [item, nextBlocks[item]?.content || ""])) as Partial<Record<FreeOverviewBlockKey, string>>,
+    );
+    if (isCompleteFreeOverview(content)) {
+      freeOverview.content = content;
+      freeOverview.model = Array.from(new Set(FREE_OVERVIEW_BLOCK_KEYS.map((item) => nextBlocks[item]?.model).filter(Boolean))).join("+");
+    } else {
+      nextBlocks[key] = {
+        status: "failed",
+        generatedAt,
+        error: "FREE_OVERVIEW_ASSEMBLY_INVALID",
+      };
+      allCompleted = false;
+      freeOverview.jobStatus = "failed";
+      freeOverview.error = "FREE_OVERVIEW_ASSEMBLY_INVALID";
+      freeOverview.blocks = nextBlocks;
+    }
+  }
+
+  return updateChartFreeOverview(chartId, latestChart, freeOverview);
+}
+
 export async function claimFreeOverviewGeneration(chartId: string, chart: TuViChart): Promise<FreeOverviewGenerationClaim> {
   const status = getFreeOverviewStatus(chart);
   if (status.status === "ready" && status.source === "llm") return { status: "ready", overview: status };
@@ -1128,16 +1271,82 @@ export async function claimFreeOverviewGeneration(chartId: string, chart: TuViCh
   return { status: "claimed" };
 }
 
+export async function claimFreeOverviewBlockGeneration(
+  chartId: string,
+  chart: TuViChart,
+  key: FreeOverviewBlockKey,
+): Promise<FreeOverviewGenerationClaim> {
+  const latest = await getChart(chartId);
+  const latestChart = latest?.chart || chart;
+  const status = getFreeOverviewStatus(latestChart);
+  if (status.status === "ready" && status.source === "llm") return { status: "ready", overview: status };
+  const block = status.blocks?.find((item) => item.key === key);
+  if (block?.status === "completed") return { status: "ready", overview: status as Extract<FreeOverviewStatus, { status: "ready" }> };
+  if (block?.status === "processing" && block.generatedAt && Date.now() - new Date(block.generatedAt).getTime() <= FREE_OVERVIEW_PROCESSING_TTL_MS) {
+    return { status: "processing", overview: status as Extract<FreeOverviewStatus, { status: "fallback" }> };
+  }
+
+  await updateChartFreeOverviewBlock(chartId, latestChart, key, {
+    status: "processing",
+    generatedAt: new Date().toISOString(),
+  });
+  return { status: "claimed" };
+}
+
 export async function failFreeOverviewGeneration(chartId: string, error: string) {
   const record = await getChart(chartId);
   if (!record) return null;
+  const status = getFreeOverviewStatus(record.chart);
+  if (status.status === "ready" && status.source === "llm") return status;
   const nextChart = await updateChartFreeOverview(chartId, record.chart, {
     version: FREE_OVERVIEW_VERSION,
     jobStatus: "failed",
     generatedAt: new Date().toISOString(),
     error,
+    ...(record.chart.freeOverview?.version === FREE_OVERVIEW_VERSION ? { blocks: record.chart.freeOverview.blocks } : {}),
   });
   return getFreeOverviewStatus(nextChart);
+}
+
+export async function generateAndStoreFreeOverviewBlock(chartId: string, key: FreeOverviewBlockKey) {
+  const record = await getChart(chartId);
+  if (!record) throw new Error("Không tìm thấy lá số.");
+
+  await updateChartFreeOverviewBlock(chartId, record.chart, key, {
+    status: "processing",
+    generatedAt: new Date().toISOString(),
+  });
+
+  try {
+    const generated = await generateFreeOverviewBlock(record.chart, key);
+    if (generated.model === "interpretation-rules-v2") {
+      const latest = await getChart(chartId);
+      const failedChart = await updateChartFreeOverviewBlock(chartId, latest?.chart || record.chart, key, {
+        status: "failed",
+        generatedAt: new Date().toISOString(),
+        error: "FREE_OVERVIEW_BLOCK_LLM_UNAVAILABLE_OR_INVALID",
+      });
+      return getFreeOverviewStatus(failedChart);
+    }
+
+    const latest = await getChart(chartId);
+    const nextChart = await updateChartFreeOverviewBlock(chartId, latest?.chart || record.chart, key, {
+      content: generated.content,
+      model: generated.model,
+      status: "completed",
+      generatedAt: new Date().toISOString(),
+    });
+    return getFreeOverviewStatus(nextChart);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    const latest = await getChart(chartId);
+    const failedChart = await updateChartFreeOverviewBlock(chartId, latest?.chart || record.chart, key, {
+      status: "failed",
+      generatedAt: new Date().toISOString(),
+      error: message,
+    });
+    return getFreeOverviewStatus(failedChart);
+  }
 }
 
 export async function generateAndStoreFreeOverview(chartId: string, options: { force?: boolean } = {}) {
@@ -1147,30 +1356,8 @@ export async function generateAndStoreFreeOverview(chartId: string, options: { f
   if (status.status === "ready" && status.source === "llm") return status;
   if (!options.force && status.status === "fallback" && status.jobStatus === "processing") return status;
 
-  await updateChartFreeOverview(chartId, record.chart, {
-    version: FREE_OVERVIEW_VERSION,
-    jobStatus: "processing",
-    generatedAt: new Date().toISOString(),
-  });
-
-  try {
-    const generated = await generateFreeOverview(record.chart);
-    if (generated.model === "interpretation-rules-v2" || !isDisplayableFreeOverview(generated.content)) {
-      return failFreeOverviewGeneration(chartId, "FREE_OVERVIEW_LLM_UNAVAILABLE_OR_INVALID");
-    }
-
-    const nextChart = await updateChartFreeOverview(chartId, record.chart, {
-      content: generated.content,
-      model: generated.model,
-      generatedAt: new Date().toISOString(),
-      version: FREE_OVERVIEW_VERSION,
-      jobStatus: "completed",
-    });
-    return getFreeOverviewStatus(nextChart);
-  } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
-    return failFreeOverviewGeneration(chartId, message);
-  }
+  const nextBlockKey = status.nextBlockKey || FREE_OVERVIEW_BLOCK_KEYS[0];
+  return generateAndStoreFreeOverviewBlock(chartId, nextBlockKey);
 }
 
 export async function getOrCreateFreeOverview(_chartId: string, chart: TuViChart) {

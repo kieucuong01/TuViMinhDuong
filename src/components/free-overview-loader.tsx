@@ -8,6 +8,9 @@ type FreeOverviewPayload = {
   content: string;
   source?: "llm" | "seed-rules";
   jobStatus?: "completed" | "idle" | "processing" | "stale" | "failed";
+  completedBlocks?: number;
+  totalBlocks?: number;
+  nextBlockKey?: string;
 };
 
 export function FreeOverviewLoader({
@@ -39,7 +42,7 @@ export function FreeOverviewLoader({
   const chartPath = `/la-so/${chartId}`;
   const nextPath = `${chartPath}#luan-giai`;
   const isLlmReady = initialOverview.source === "llm";
-  const shouldAttemptLlm = !isLlmReady && initialOverview.jobStatus !== "failed";
+  const shouldAttemptLlm = !isLlmReady && (initialOverview.jobStatus !== "failed" || Boolean(initialOverview.nextBlockKey)) && (initialOverview.completedBlocks || 0) < (initialOverview.totalBlocks || 5);
   const hasPremiumHookPreview = initialOverview.content.includes("🔒 Nâng cấp Premium để xem:");
 
   return (
@@ -62,8 +65,8 @@ export function FreeOverviewLoader({
         <section className="free-overview-personalizing" role="status" aria-live="polite" data-ad-view="free_overview_loading" data-chart-id={chartId}>
           <FreeOverviewRefreshTrigger chartId={chartId} shouldRefresh />
           <div>
-            <strong>AI đang cá nhân hóa phần phân tích chi tiết...</strong>
-            <span>Ba kết luận chính đã sẵn sàng. Nội dung từng phần sẽ tự cập nhật mà không làm bạn mất vị trí đang đọc.</span>
+            <strong>AI đang cá nhân hóa phần phân tích chi tiết theo từng phần...</strong>
+            <span>Bản đọc nhanh đã hiện trước. Khi từng block LLM xong, nội dung sẽ tự cập nhật mà không làm bạn mất vị trí đang đọc.</span>
           </div>
           <div className="free-overview-personalizing-dots" aria-hidden="true"><i /><i /><i /></div>
         </section>
