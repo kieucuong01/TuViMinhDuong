@@ -48,7 +48,22 @@ export type FreeReadingSection = FreeReadingSignalSection & {
   evidenceText: string;
   practicalTip: string;
   premiumHook: string;
+  riskSignals: string[];
+  premiumBenefits: string[];
 };
+
+const CAUTION_STAR_HINTS = [
+  "Hóa Kỵ",
+  "Kình Dương",
+  "Đà La",
+  "Địa Không",
+  "Địa Kiếp",
+  "Thiên Không",
+  "Hỏa Tinh",
+  "Linh Tinh",
+  "Tuần",
+  "Triệt",
+];
 
 function chartAge(chart: TuViChart) {
   return chart.input.viewYear - chart.solar.year;
@@ -77,11 +92,11 @@ function starsWithStates(palace: Palace | undefined, stars: string[], fallback: 
 }
 
 function palaceEvidenceText(palace: Palace | undefined, fallbackName: string) {
-  if (!palace) return `Dữ kiện cung ${fallbackName} chưa đủ trong lá số đã tính, nên phần này chỉ giữ ở mức định hướng chung.`;
-  const mainStars = starsWithStates(palace, palace.mainStars, "vô chính diệu", 4);
-  const supportStars = starsWithStates(palace, palace.supportStars, "không có phụ tinh nổi bật", 5);
-  const yearlyStars = starsWithStates(palace, palace.yearlyStars, "không có sao lưu năm nổi bật", 4);
-  return `Dữ kiện: cung ${palace.name} tại ${palace.branch}; chính tinh ${mainStars}; phụ tinh ${supportStars}; sao lưu ${yearlyStars}; vòng ${palace.lifecycle}.`;
+  if (!palace) return `Dữ kiện cung ${fallbackName} trong lá số hiện chưa đủ để kết luận sâu, vì vậy nhận định này chỉ nên dùng như một hướng tự đối chiếu.`;
+  const mainStars = starsWithStates(palace, palace.mainStars, "vô chính diệu", 2);
+  const supportStars = starsWithStates(palace, palace.supportStars, "không có phụ tinh nổi bật", 2);
+  const yearlyStars = palace.yearlyStars.length ? `; sao lưu ${starsWithStates(palace, palace.yearlyStars, "", 2)}` : "";
+  return `Căn cứ trực tiếp là cung ${palace.name} tại ${palace.branch}: chính tinh ${mainStars}; phụ tinh ${supportStars}${yearlyStars}; vòng ${palace.lifecycle}.`;
 }
 
 function hasStar(palace: Palace | undefined, starName: string) {
@@ -249,17 +264,68 @@ function practicalTipForSection(signal: FreeReadingSignalSection) {
 }
 
 function shortPremiumHook(signal: FreeReadingSignalSection, block: FreeReadingBlock) {
-  if (signal.key === "menh") return "Điểm mù nào khiến năng lực Mệnh bị dùng sai chỗ?";
-  if (signal.key === "tai_bach") return "Mốc nào trong năm nên giữ tiền hoặc xoay vốn?";
-  if (signal.key === "quan_loc") return "Môi trường nghề nào giúp bạn có quyền hạn rõ hơn?";
-  if (signal.key === "van_han") return "Tháng nào nên tiến, tháng nào cần chậm lại?";
+  if (signal.key === "menh") return "Điểm mù nào khiến năng lực Mệnh bị dùng sai chỗ, và vai trò nào giúp bạn phát huy mà không phải gồng quá lâu?";
+  if (signal.key === "tai_bach") return "Mốc nào trong 12 tháng tới nên giữ tiền, xoay vốn hoặc dừng một cam kết trước khi thành áp lực?";
+  if (signal.key === "quan_loc") return "Môi trường nghề nào giúp bạn có quyền hạn rõ hơn, và dấu hiệu nào báo rằng trách nhiệm đang vượt khỏi phần được giao?";
+  if (signal.key === "van_han") return "Tháng nào nên tiến, tháng nào cần chậm lại, và việc gì phải kiểm tra trước khi quyết định?";
   return block.premium_hook;
+}
+
+function relevantPalaceForSignal(chart: TuViChart, signal: FreeReadingSignalSection) {
+  if (signal.key === "menh") return palaceByName(chart, "Mệnh");
+  if (signal.key === "tai_bach") return palaceByName(chart, "Tài Bạch");
+  if (signal.key === "quan_loc") return palaceByName(chart, "Quan Lộc");
+  const decade = currentDecade(chart);
+  return decade ? palaceByName(chart, decade.palace) : undefined;
+}
+
+function cautionSignals(palace: Palace | undefined) {
+  if (!palace) return [];
+  const stars = [...palace.mainStars, ...palace.supportStars, ...palace.yearlyStars];
+  return stars
+    .filter((star, index, values) => values.indexOf(star) === index)
+    .filter((star) => CAUTION_STAR_HINTS.some((hint) => star.includes(hint)))
+    .slice(0, 2);
+}
+
+function premiumBenefitsForSection(signal: FreeReadingSignalSection) {
+  if (signal.key === "menh") {
+    return ["Nối Mệnh - Thân - Cục với 12 cung để xác định cách dùng đúng năng lực cốt lõi."];
+  }
+  if (signal.key === "tai_bach") {
+    return ["Lập lộ trình 12 tháng cho các mốc nên giữ tiền, thử nhỏ, xoay vốn hoặc kiểm tra lại cam kết."];
+  }
+  if (signal.key === "quan_loc") {
+    return ["Chuyển tín hiệu nghề nghiệp thành kế hoạch 30/90 ngày, với vai trò và thứ tự ưu tiên rõ ràng."];
+  }
+  return ["Xem đủ 12 tháng, các điểm cần chậm lại, việc nên tận dụng và 3 câu hỏi riêng với Cố vấn AI."];
+}
+
+function riskContext(key: FreeReadingSignalSection["key"]) {
+  if (key === "menh") return "cách phản ứng dễ căng hơn bình thường khi bạn bị thúc ép hoặc phải quyết định quá nhanh";
+  if (key === "tai_bach") return "tiền bạc, giấy tờ hoặc một cam kết hợp tác cần được kiểm tra kỹ hơn trước khi xuống quyết định";
+  if (key === "quan_loc") return "ranh giới quyền hạn dễ mờ đi, khiến công sức bỏ ra nhiều nhưng phần ghi nhận không tương xứng";
+  return "nhịp năm có đoạn nên chậm lại để rà tiền bạc, giấy tờ, sức lực và các mối quan hệ quan trọng";
+}
+
+function cliffhangerForSection(key: FreeReadingSignalSection["key"]) {
+  if (key === "menh") return "Phần còn bỏ ngỏ là ranh giới giữa một vai trò giúp bạn phát huy và một môi trường khiến chính thế mạnh ấy trở thành gánh nặng.";
+  if (key === "tai_bach") return "Nút thắt nằm ở thời điểm: lúc nào nên giữ, lúc nào được phép xoay và cam kết nào cần dừng trước khi bào mòn tích lũy?";
+  if (key === "quan_loc") return "Điều chưa thể kết luận ở đây là môi trường nào trao đúng quyền hạn, thay vì chỉ giao thêm trách nhiệm và áp lực.";
+  return "Điểm cần dừng đúng lúc nằm ở vài tháng cụ thể: tiến sớm dễ phân tán, nhưng chậm quá lại có thể bỏ lỡ nhịp thuận.";
+}
+
+function openingPraise(chart: TuViChart) {
+  const anchors = ["Điền Trạch", "Quan Lộc", "Tài Bạch"].map((name) => {
+    const palace = palaceByName(chart, name);
+    return `${name} có ${firstUsefulMainStar(palace)}${palace ? ` tại ${palace.branch}` : ""}`;
+  });
+  return `Điểm đáng ghi nhận nằm ở ba trục: ${anchors.join("; ")}. Đây là chất liệu để xây nền, tạo vị thế và quản trị nguồn lực. Phần dưới chỉ ra cách dùng cùng hai điểm dễ lệch.`;
 }
 
 export function buildFreeReadingSections(chart: TuViChart): FreeReadingSection[] {
   const signals = extractFreeReadingSignals(chart);
-
-  return signals.sections.map((signal) => {
+  const drafts = signals.sections.map((signal) => {
     const block = blockForSignal(signal);
     return {
       ...signal,
@@ -270,27 +336,60 @@ export function buildFreeReadingSections(chart: TuViChart): FreeReadingSection[]
       evidenceText: evidenceForSection(chart, signal),
       practicalTip: practicalTipForSection(signal),
       premiumHook: shortPremiumHook(signal, block),
+      riskSignals: cautionSignals(relevantPalaceForSignal(chart, signal)),
+      premiumBenefits: premiumBenefitsForSection(signal),
     };
   });
+  const featuredRisks = new Set(
+    drafts
+      .filter((section) => section.riskSignals.length > 0)
+      .slice(0, 2)
+      .map((section) => section.key),
+  );
+
+  return drafts.map((section) => ({
+    ...section,
+    riskSignals: featuredRisks.has(section.key) ? section.riskSignals : [],
+  }));
+}
+
+function praiseLead(section: FreeReadingSection) {
+  if (section.key === "menh") return "Ở Cung Mệnh, điểm sáng nằm ở cách bạn giữ nhịp.";
+  if (section.key === "tai_bach") return "Với tiền bạc, bạn có chất liệu để tạo và giữ nguồn lực.";
+  if (section.key === "quan_loc") return "Trong công việc, lợi thế rõ khi vai trò được đặt đúng chỗ.";
+  return "Với vận năm, bạn vẫn có khoảng chủ động để chọn nhịp.";
+}
+
+function firstSentence(text: string) {
+  return text.match(/^.*?[.!?](?:\s|$)/u)?.[0].trim() || text.trim();
+}
+
+function teaseParagraph(section: FreeReadingSection, block: FreeReadingBlock) {
+  if (section.riskSignals.length > 0) {
+    return `Tuy vậy, ${section.riskSignals.join(" đi cùng ")} khiến phần này cần đọc chậm: ${riskContext(section.key)}. ${firstSentence(block.rao_can)} Mốc thời gian và cách giảm rủi ro riêng chưa được mở ở bản miễn phí.`;
+  }
+  return `Mặt trái xuất hiện khi thế mạnh này bị dùng quá mức. ${firstSentence(block.rao_can)} Đây là xu hướng để tự đối chiếu, không phải lời phán cố định.`;
 }
 
 function renderSection(section: FreeReadingSection, index: number) {
+  const block = blockForSignal(section);
+  const premiumBullets = [section.premiumHook, ...section.premiumBenefits].map((item) => `- ${item}`).join("\n");
+
   return `## ${index + 1}. ${section.title}
 
-[Block Nội dung - ${section.blockLabel}]:
-**Đọc nhanh:** ${section.quickTake}
+${praiseLead(section)} ${firstSentence(block.loi_the)}
 
-**Lợi thế nổi bật:** ${blockForSignal(section).loi_the}
+${teaseParagraph(section, block)}
 
-**Điểm dễ vướng:** ${blockForSignal(section).rao_can}
+${section.evidenceText}
 
-**Vì sao có nhận định này:** ${section.evidenceText}
+${section.practicalTip}
 
-**Gợi ý thực tế:** ${section.practicalTip}
+${cliffhangerForSection(section.key)}
 
 🔒 Nâng cấp Premium để xem:
 
-- ${section.premiumHook}`;
+${premiumBullets}`;
 }
 
 export function buildFreeOverviewFromInterpretationRules(chart: TuViChart) {
@@ -304,13 +403,19 @@ Hồ sơ: ${signals.profileName} (${signals.lifeYearLabel})
 Tuổi xem: ${age} tuổi trong năm ${signals.viewYear}
 Bản Mệnh: ${signals.destinyLine}
 
-Đây không phải đoạn luận chung. Bốn tín hiệu dưới đây được chọn từ cung Mệnh, Tài Bạch, Quan Lộc và vận năm trong chính lá số của bạn. Mỗi mục có đọc nhanh, lợi thế, điểm dễ vướng, bằng chứng đã dùng và một gợi ý thực tế để bạn tự đối chiếu ngay.
+${openingPraise(chart)} Đây là hướng tự soi, không phải bản án; hãy đối chiếu cảnh báo với hoàn cảnh thật.
 
 ${sections.map(renderSection).join("\n\n")}
 
 ## KHAI MỞ BẢN ĐỒ ĐỘC BẢN CỦA RIÊNG BẠN
 
-Bản FULL Premium nối 12 cung, vận năm, lộ trình 12 tháng và kế hoạch 90 ngày để làm rõ lợi thế nên dùng, rủi ro cần chặn và thời điểm đáng ưu tiên.
+Bốn phần miễn phí đã chỉ ra hướng chính. Bản FULL mở đúng các giá trị sau:
+
+- Bản FULL 9 chương: Mệnh - Thân và 12 cung trọng yếu.
+- Lộ trình 12 tháng: tháng tiến, tháng chậm, việc cần kiểm tra.
+- Kế hoạch 30/90 ngày theo thứ tự hành động.
+- 3 câu hỏi với Cố vấn AI.
+- Mua một lần, đọc lại không phí.
 
 [ MỞ KHÓA BÁO CÁO FULL PREMIUM NGAY ]`;
 }

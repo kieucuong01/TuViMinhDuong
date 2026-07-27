@@ -251,16 +251,18 @@ describe("AI reading format", () => {
 
     expect(FREE_OVERVIEW_MIN_WORDS).toBe(800);
     expect(FREE_OVERVIEW_MAX_WORDS).toBe(1200);
-    expect(FREE_OVERVIEW_VERSION).toBe("free-block-preview-v4");
+    expect(FREE_OVERVIEW_VERSION).toBe("free-block-preview-v5");
     expect(result.model).toBe("deepseek/deepseek-v4-flash");
     expect(result).not.toHaveProperty("prompt");
     expect(isCompleteFreeOverview(result.content)).toBe(true);
     expect(llmRouterMocks.generateWithLlmRouter).toHaveBeenCalledTimes(1);
     const prompt = String(llmRouterMocks.generateWithLlmRouter.mock.calls[0][0].prompt);
-    expect(prompt.length).toBeLessThan(5800);
+    expect(prompt.length).toBeLessThan(7000);
     expect(prompt).not.toContain(llmContent.slice(0, 120));
-    expect(prompt).toContain("Lợi thế nổi bật");
-    expect(prompt).toContain("Điểm dễ vướng");
+    expect(prompt).toContain("Praise → Tease → Cliffhanger → CTA Clear Value");
+    expect(prompt).toContain("Bản FULL 9 chương");
+    expect(prompt).toContain("3 câu hỏi với Cố vấn AI");
+    expect(prompt).not.toContain("Trong mỗi mục, viết đúng năm nhãn");
     expect(prompt).not.toContain("# Bài mẫu luận giải miễn phí");
     expect(llmRouterMocks.generateWithLlmRouter).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -310,14 +312,14 @@ describe("AI reading format", () => {
     expect(result.model).toBe("deepseek/deepseek-v4-flash");
     expect(result.content).toBe(validContent);
     expect(llmRouterMocks.generateWithLlmRouter).toHaveBeenCalledTimes(2);
-    expect(String(llmRouterMocks.generateWithLlmRouter.mock.calls[1][0].prompt)).toContain("Lần thử trước chưa đạt cấu trúc");
+    expect(String(llmRouterMocks.generateWithLlmRouter.mock.calls[1][0].prompt)).toContain("Lần thử trước chưa đạt contract");
   });
 
   it("rejects a structured free LLM overview outside the strict 800-1200 word budget", async () => {
     clearProviderEnv();
     llmRouterMocks.hasExternalLlmProvider.mockReturnValue(true);
     const extra = Array.from(
-      { length: 3 },
+      { length: 12 },
       () => "Ghi chú thêm: cung Mệnh và đại vận hiện tại cần được đọc cùng nhịp sống thực tế của bạn để tránh quyết định quá vội.",
     ).join(" ");
     const content = `${buildInstantFreeOverview(sampleChart())}\n\n${extra}`;
@@ -344,16 +346,22 @@ describe("AI reading format", () => {
     expect(countVisibleMarkdownWords(content)).toBeGreaterThanOrEqual(FREE_OVERVIEW_TEMPLATE_MIN_WORDS);
     expect(countVisibleMarkdownWords(content)).toBeLessThanOrEqual(FREE_OVERVIEW_TEMPLATE_MAX_WORDS);
     expect(content).toContain(`# Luận giải miễn phí dành cho ${chart.input.fullName}`);
-    expect(content.match(/\*\*Lợi thế nổi bật:\*\*/gu)).toHaveLength(4);
-    expect(content.match(/\*\*Điểm dễ vướng:\*\*/gu)).toHaveLength(4);
-    expect(content.match(/\*\*Đọc nhanh:\*\*/gu)).toHaveLength(4);
-    expect(content.match(/\*\*Vì sao có nhận định này:\*\*/gu)).toHaveLength(4);
-    expect(content.match(/\*\*Gợi ý thực tế:\*\*/gu)).toHaveLength(4);
     expect(content).toContain("## 1. Năng lực thiên phú (Cung Mệnh)");
     expect(content).toContain("## 2. Phong cách kiếm tiền (Cung Tài Bạch)");
     expect(content).toContain("## 3. Môi trường làm việc lý tưởng (Cung Quan Lộc)");
     expect(content).toContain(`## 4. Vận hạn năm ${chart.input.viewYear}`);
     expect(content.match(/🔒 Nâng cấp Premium để xem:/gu)).toHaveLength(4);
+    expect(content.match(/^[-*]\s+\S/gmu)?.length).toBeGreaterThanOrEqual(12);
+    expect(content).not.toContain("**Đọc nhanh:**");
+    expect(content).not.toContain("**Lợi thế nổi bật:**");
+    expect(content).not.toContain("**Điểm dễ vướng:**");
+    expect(content).not.toContain("**Vì sao có nhận định này:**");
+    expect(content).not.toContain("**Gợi ý thực tế:**");
+    expect(content).not.toContain("[Block Nội dung -");
+    expect(content).toContain("Bản FULL 9 chương");
+    expect(content).toContain("lộ trình 12 tháng");
+    expect(content).toContain("kế hoạch 30/90 ngày");
+    expect(content).toContain("3 câu hỏi với Cố vấn AI");
     expect(content).toContain("MỞ KHÓA BÁO CÁO FULL PREMIUM NGAY");
     expect(content).toContain(chart.input.fullName);
     expect(content).toMatch(/\bbạn\b/iu);
@@ -367,11 +375,12 @@ describe("AI reading format", () => {
 
     expect(isCompleteFreeOverview(content)).toBe(true);
     expect(isCompleteFreeOverview(content.replace("## 2. Phong cách kiếm tiền (Cung Tài Bạch)", "## Ghi chú"))).toBe(false);
-    expect(isCompleteFreeOverview(content.replace("**Đọc nhanh:**", "**Tóm tắt:**"))).toBe(false);
-    expect(isCompleteFreeOverview(content.replace("**Lợi thế nổi bật:**", "**Điểm mạnh:**"))).toBe(false);
-    expect(isCompleteFreeOverview(content.replace("**Điểm dễ vướng:**", "**Lưu ý:**"))).toBe(false);
-    expect(isCompleteFreeOverview(content.replace("**Vì sao có nhận định này:**", "**Cơ sở:**"))).toBe(false);
-    expect(isCompleteFreeOverview(content.replace("**Gợi ý thực tế:**", "**Gợi ý:**"))).toBe(false);
+    expect(isCompleteFreeOverview(content.replace("🔒 Nâng cấp Premium để xem:", "Phần còn lại"))).toBe(false);
+    expect(isCompleteFreeOverview(content.replace(/Bản FULL 9 chương/giu, "Bản FULL"))).toBe(false);
+    expect(isCompleteFreeOverview(content.replace(/lộ trình 12 tháng/giu, "lộ trình năm"))).toBe(false);
+    expect(isCompleteFreeOverview(content.replace(/kế hoạch 30\/90 ngày/giu, "kế hoạch hành động"))).toBe(false);
+    expect(isCompleteFreeOverview(content.replace(/3 câu hỏi với Cố vấn AI/giu, "hỏi đáp thêm"))).toBe(false);
+    expect(isCompleteFreeOverview(content.replace("## 1. Năng lực thiên phú (Cung Mệnh)", "## 1. Năng lực thiên phú (Cung Mệnh)\n\n**Đọc nhanh:** nhãn cũ"))).toBe(false);
     expect(isCompleteFreeOverview(content.split("## 3. Môi trường làm việc lý tưởng (Cung Quan Lộc)")[0])).toBe(false);
     expect(isDisplayableFreeOverview(content.replace(/^## 4\. Vận hạn năm .+$/mu, "## Ghi chú vận hạn"))).toBe(false);
     expect(isCompleteFreeOverview(`${content} ${"thêm ".repeat(300)}`)).toBe(false);

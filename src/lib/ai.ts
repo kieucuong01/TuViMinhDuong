@@ -10,7 +10,7 @@ export const FREE_OVERVIEW_MAX_WORDS = 1200;
 export const FREE_OVERVIEW_TEMPLATE_MIN_WORDS = FREE_OVERVIEW_MIN_WORDS;
 export const FREE_OVERVIEW_TEMPLATE_MAX_WORDS = FREE_OVERVIEW_MAX_WORDS;
 export const PAID_READING_CHAPTER_MAX_TOKENS = 7000;
-export const FREE_OVERVIEW_VERSION = "free-block-preview-v4";
+export const FREE_OVERVIEW_VERSION = "free-block-preview-v5";
 export const PAID_READING_VERSION = "paid-personal-dossier-v6";
 export const PAID_FULL_WORD_TARGET = "5.000-7.000 từ";
 export const READING_PROVIDER_ORDER = ["deepseek"] as const;
@@ -112,12 +112,33 @@ export function isCompleteFreeOverview(content: string) {
       typeof heading === "string" ? h2Headings[index] === heading : heading.test(h2Headings[index] || ""),
     );
   const premiumHooks = content.match(/🔒\s*Nâng cấp Premium để xem:/gu)?.length || 0;
-  const blockLabels = content.match(/\[Block Nội dung - .+\]:/gu)?.length || 0;
-  const quickLabels = content.match(/\*\*Đọc nhanh:\*\*/gu)?.length || 0;
-  const strengthLabels = content.match(/\*\*Lợi thế nổi bật:\*\*/gu)?.length || 0;
-  const cautionLabels = content.match(/\*\*Điểm dễ vướng:\*\*/gu)?.length || 0;
-  const evidenceLabels = content.match(/\*\*Vì sao có nhận định này:\*\*/gu)?.length || 0;
-  const actionLabels = content.match(/\*\*Gợi ý thực tế:\*\*/gu)?.length || 0;
+  const allH2Headings = Array.from(content.matchAll(/^##\s+.+$/gmu));
+  const numberedSections = allH2Headings
+    .filter((match) => /^##\s+\d+\./u.test(match[0]))
+    .map((match) => {
+      const start = (match.index || 0) + match[0].length;
+      const nextHeading = allH2Headings.find((candidate) => (candidate.index || 0) > (match.index || 0));
+      return content.slice(start, nextHeading?.index ?? content.length).trim();
+    });
+  const sectionsHaveNarrativeArc =
+    numberedSections.length === 4 &&
+    numberedSections.every((section) => {
+      const [freeBody = "", premiumBody = ""] = section.split(/🔒\s*Nâng cấp Premium để xem:/u);
+      const paragraphs = freeBody.split(/\n\s*\n/u).filter((paragraph) => paragraph.trim().length > 0);
+      const premiumBullets = premiumBody.match(/^\s*[-*]\s+\S/gmu)?.length || 0;
+      return (
+        countVisibleMarkdownWords(freeBody) >= 140 &&
+        paragraphs.length >= 4 &&
+        /(cung|mệnh|thân|sao|đại vận|tuần|triệt)/iu.test(freeBody) &&
+        premiumBullets >= 2
+      );
+    });
+  const usesRigidTemplateLabels = /(\[Block Nội dung -|\*\*(?:Đọc nhanh|Lợi thế nổi bật|Điểm dễ vướng|Vì sao có nhận định này|Gợi ý thực tế):\*\*)/u.test(content);
+  const hasClearPremiumValue =
+    /Bản FULL 9 chương/iu.test(content) &&
+    /lộ trình 12 tháng/iu.test(content) &&
+    /kế hoạch 30\/90 ngày/iu.test(content) &&
+    /3 câu hỏi với Cố vấn AI/iu.test(content);
 
   return (
     wordCount >= FREE_OVERVIEW_MIN_WORDS &&
@@ -125,12 +146,9 @@ export function isCompleteFreeOverview(content: string) {
     hasChartEvidence &&
     headingsMatch &&
     premiumHooks === 4 &&
-    blockLabels === 4 &&
-    quickLabels === 4 &&
-    strengthLabels === 4 &&
-    cautionLabels === 4 &&
-    evidenceLabels === 4 &&
-    actionLabels === 4 &&
+    sectionsHaveNarrativeArc &&
+    !usesRigidTemplateLabels &&
+    hasClearPremiumValue &&
     /^# Luận giải miễn phí dành cho .+$/mu.test(content) &&
     content.includes("KHAI MỞ BẢN ĐỒ ĐỘC BẢN CỦA RIÊNG BẠN") &&
     content.includes("MỞ KHÓA BÁO CÁO FULL PREMIUM NGAY")
@@ -781,72 +799,74 @@ export function buildInstantFreeOverview(chart: TuViChart) {
 function buildFreeOverviewPrompt(chart: TuViChart) {
   const evidence = formatChartEvidence(buildChartEvidenceProfile(chart));
 
-  return `Bạn là chuyên gia luận giải tử vi cho website Lá số tinh hoa.
+  return `Bạn là chuyên gia luận giải tử vi cho website Lá Số Tinh Hoa.
 
-Mục tiêu: viết bản luận giải miễn phí 800-1200 từ cho người đọc Việt Nam 30-60 tuổi. Văn phong phải tự nhiên, rõ lợi ích, có 4 mồi mở Premium ngắn ở cuối từng mục, không hù dọa, không khẳng định định mệnh tuyệt đối.
+Mục tiêu: viết bản luận giải miễn phí ${FREE_OVERVIEW_MIN_WORDS}-${FREE_OVERVIEW_MAX_WORDS} từ cho người Việt 30-60 tuổi. Bài phải đọc như một chuyên gia đang nói riêng với một người, không như biểu mẫu ghép dữ kiện. Nhịp thuyết phục bắt buộc là: Praise → Tease → Cliffhanger → CTA Clear Value.
 
-Quy tắc bắt buộc:
-- Chỉ diễn giải từ dữ liệu bằng chứng dưới đây; không tự tính lại lá số, không bịa sao/cung không có trong dữ liệu.
-- Viết bằng tiếng Việt, xưng hô trực tiếp với người đọc là "bạn".
+BỐN NHỊP NỘI DUNG:
+1. Praise: mở bài bằng 2-3 điểm đáng ghi nhận nhất từ Điền Trạch, Quan Lộc, Tài Bạch hoặc Mệnh. Khen bằng dữ kiện cụ thể, không dùng câu chung kiểu “bạn rất đặc biệt”.
+2. Tease: trong toàn bài chỉ chọn 1-2 tổ hợp cần lưu ý như Hóa Kỵ, Kình Dương, Đà La, Không Kiếp, Tuần/Triệt nếu chúng thật sự có trong dữ liệu. Nêu mâu thuẫn hoặc rủi ro bằng ngôn ngữ xác suất; không hù dọa, không biến nó thành biến cố chắc chắn.
+3. Cliffhanger: dừng ở câu hỏi quan trọng nhất về thời điểm, giới hạn tiền, ranh giới hợp tác hoặc nhịp nên tiến/chậm. Bản miễn phí được phép cho một bước tự kiểm chứng an toàn, nhưng giữ lại mốc thời gian và cách giảm rủi ro cá nhân hóa cho bản FULL.
+4. CTA Clear Value: không nói chung chung “xem tiếp”. Nói đúng sản phẩm thật gồm Bản FULL 9 chương, lộ trình 12 tháng, kế hoạch 30/90 ngày, 3 câu hỏi với Cố vấn AI và quyền đọc lại không mất thêm phí.
+
+QUY TẮC BẮT BUỘC:
+- Chỉ diễn giải từ dữ liệu bằng chứng dưới đây; không tự tính lại lá số, không bịa sao, cung hay trạng thái sao.
+- Viết tiếng Việt bình dân, xưng hô là “bạn”, câu dài ngắn đan xen, có nhịp trò chuyện tự nhiên.
 - Tổng độ dài phải nằm trong ${FREE_OVERVIEW_MIN_WORDS}-${FREE_OVERVIEW_MAX_WORDS} từ hiển thị.
-- Giữ đúng cấu trúc Markdown và đúng thứ tự heading như mẫu. Không thêm heading khác.
-- Trong mỗi mục, nêu rõ ít nhất một bằng chứng tử vi: cung, sao, Mệnh/Thân/Cục, đại vận, Tuần hoặc Triệt nếu phù hợp.
-- Trong mỗi mục, viết đúng năm nhãn theo thứ tự: "**Đọc nhanh:**", "**Lợi thế nổi bật:**", "**Điểm dễ vướng:**", "**Vì sao có nhận định này:**", "**Gợi ý thực tế:**".
-- "Đọc nhanh" phải là 1 câu chắt lọc; "Vì sao có nhận định này" phải gọi đúng cung/sao/trạng thái sao đã có trong dữ liệu; "Gợi ý thực tế" phải là việc đời thường có thể làm ngay.
-- Không biến phần miễn phí thành rỗng: mỗi mục cần 150-230 từ, đủ hữu ích trước dòng khóa Premium.
-- Mỗi mục phải có đúng một dòng "🔒 Nâng cấp Premium để xem:" và một bullet premium_hook ngay sau đó.
-- premium_hook phải là một câu hỏi cụ thể, kết thúc bằng dấu hỏi, khiến người đọc muốn biết phần còn thiếu nhưng không hù dọa hay hứa hẹn chắc chắn.
-- Không nhắc giá, không dùng lời lẽ giật gân. Cầu nối FULL phải tự nhiên: bản miễn phí giúp nhận diện hướng chính, bản FULL mở rộng thành kế hoạch chi tiết.
-- Nhấn mạnh các điểm quan trọng bằng **in đậm** vừa phải.
+- Giữ đúng 4 heading đánh số và heading CTA như khung. Không thêm heading cấp 2 khác.
+- Mỗi mục dài 150-230 từ, gồm ít nhất 4 đoạn ngắn và có ít nhất một bằng chứng đúng từ cung, sao, Mệnh/Thân/Cục, đại vận, Tuần hoặc Triệt.
+- Tuyệt đối không dùng các nhãn máy móc: “Đọc nhanh”, “Lợi thế nổi bật”, “Điểm dễ vướng”, “Vì sao có nhận định này”, “Gợi ý thực tế”, “[Block Nội dung]”.
+- Không mở cả 4 mục bằng cùng một cấu trúc. Không dùng quá 2 lần các cụm “cho thấy”, “điểm cần lưu ý”, “bản FULL sẽ giúp bạn”.
+- Không phán tuyệt đối, không dùng “chắc chắn”, “không thể tránh”, “đời bạn sẽ”, không gieo sợ hãi về bệnh tật, tai nạn, pháp lý hay mất tiền.
+- Mỗi mục có đúng một dòng “🔒 Nâng cấp Premium để xem:” và ít nhất 2 bullet ngay sau đó: một câu hỏi cliffhanger cụ thể và một giá trị FULL cụ thể.
+- Nhấn mạnh bằng **in đậm** vừa phải, tối đa 1-2 cụm trong mỗi mục.
 
 Dữ liệu bằng chứng:
 ${evidence}
 
-Mẫu cấu trúc cần giữ, chỉ dùng như khung và nguồn tham chiếu giọng điệu; hãy viết lại tự nhiên hơn, không sao chép máy móc:
-Cấu trúc Markdown bắt buộc:
+CẤU TRÚC MARKDOWN BẮT BUỘC:
 # Luận giải miễn phí dành cho [Tên]
 Hồ sơ: [Tên] ([Can chi năm sinh] [Năm sinh])
+Tuổi xem: [tuổi] tuổi trong năm [năm xem]
 Bản Mệnh: [Mệnh] | Cục: [Cục]
+
+[Đoạn mở 80-110 từ: khen 2-3 điểm sáng thật từ lá số, tạo cảm giác được hiểu đúng; nói rõ đây không phải bản án định mệnh.]
+
 ## 1. Năng lực thiên phú (Cung Mệnh)
-[Block Nội dung - ...]:
-**Đọc nhanh:** ...
-**Lợi thế nổi bật:** ...
-**Điểm dễ vướng:** ...
-**Vì sao có nhận định này:** ...
-**Gợi ý thực tế:** ...
+[4-5 đoạn tự nhiên: điểm sáng cụ thể → mặt trái khi dùng quá mức → bằng chứng → một bước tự kiểm chứng → câu bỏ ngỏ.]
 🔒 Nâng cấp Premium để xem:
-- ...
+- [Câu hỏi cụ thể về điểm mù hoặc vai trò phù hợp?]
+- [Giá trị cụ thể khi nối Mệnh - Thân - Cục với 12 cung.]
+
 ## 2. Phong cách kiếm tiền (Cung Tài Bạch)
-[Block Nội dung - ...]:
-**Đọc nhanh:** ...
-**Lợi thế nổi bật:** ...
-**Điểm dễ vướng:** ...
-**Vì sao có nhận định này:** ...
-**Gợi ý thực tế:** ...
+[4-5 đoạn tự nhiên; nếu có tổ hợp xấu phù hợp thì tease về giới hạn tiền/cam kết, không phán mất tiền.]
 🔒 Nâng cấp Premium để xem:
-- ...
+- [Câu hỏi cụ thể về mốc giữ tiền, xoay vốn hoặc dừng cam kết?]
+- [Giá trị cụ thể của lộ trình 12 tháng.]
+
 ## 3. Môi trường làm việc lý tưởng (Cung Quan Lộc)
-[Block Nội dung - ...]:
-**Đọc nhanh:** ...
-**Lợi thế nổi bật:** ...
-**Điểm dễ vướng:** ...
-**Vì sao có nhận định này:** ...
-**Gợi ý thực tế:** ...
+[4-5 đoạn tự nhiên; làm rõ vai trò, quyền hạn, điểm dễ hao sức và bằng chứng sao/cung.]
 🔒 Nâng cấp Premium để xem:
-- ...
+- [Câu hỏi cụ thể về môi trường nghề hoặc ranh giới hợp tác?]
+- [Giá trị cụ thể của kế hoạch 30/90 ngày.]
+
 ## 4. Vận hạn năm ${chart.input.viewYear} (Năm ${chart.input.viewYear === 2026 ? "Bính Ngọ" : chart.input.viewYear})
-[Block Nội dung - ...]:
-**Đọc nhanh:** ...
-**Lợi thế nổi bật:** ...
-**Điểm dễ vướng:** ...
-**Vì sao có nhận định này:** ...
-**Gợi ý thực tế:** ...
+[4-5 đoạn tự nhiên; đọc vận như lịch điều phối, dẫn tới cliffhanger về tháng nên tiến/chậm.]
 🔒 Nâng cấp Premium để xem:
-- ...
+- [Câu hỏi cụ thể về tháng và việc phải kiểm tra?]
+- [Giá trị cụ thể của đủ 12 tháng và 3 câu hỏi riêng với Cố vấn AI.]
+
 ## KHAI MỞ BẢN ĐỒ ĐỘC BẢN CỦA RIÊNG BẠN
+Bốn phần miễn phí đã giúp bạn nhận ra hướng chính. Bản FULL mở đúng các giá trị sau:
+- Bản FULL 9 chương cá nhân hóa, đọc sâu Mệnh - Thân và đủ 12 cung trọng yếu.
+- Lộ trình 12 tháng, chỉ rõ tháng nên tiến, tháng cần chậm và việc phải kiểm tra.
+- Kế hoạch 30/90 ngày để chuyển nhận định thành thứ tự hành động cụ thể.
+- 3 câu hỏi với Cố vấn AI theo chính lá số sau khi mở FULL.
+- Mua một lần và đọc lại không mất thêm phí.
+
 [ MỞ KHÓA BÁO CÁO FULL PREMIUM NGAY ]
 
-Trả về duy nhất nội dung Markdown hoàn chỉnh.`;
+Trước khi trả lời, tự kiểm tra: đủ 4 mục, không còn nhãn máy móc, chỉ 1-2 tổ hợp rủi ro thật, 4 premium hook, mỗi hook có ít nhất 2 bullet, đủ CTA giá trị và đúng ${FREE_OVERVIEW_MIN_WORDS}-${FREE_OVERVIEW_MAX_WORDS} từ. Trả về duy nhất Markdown hoàn chỉnh.`;
 }
 
 export async function generateFreeOverview(chart: TuViChart) {
@@ -858,7 +878,7 @@ export async function generateFreeOverview(chart: TuViChart) {
     const retryInstruction =
       attempt === 0
         ? ""
-        : "\n\nLần thử trước chưa đạt cấu trúc bắt buộc. Hãy tự kiểm tra đủ 4 mục, đúng 5 nhãn trong từng mục, 4 premium hook và độ dài 800-1200 từ trước khi trả về Markdown hoàn chỉnh.";
+        : "\n\nLần thử trước chưa đạt contract. Hãy tự kiểm tra đủ 4 mục tự nhiên, không có 5 nhãn máy móc, mỗi mục ít nhất 4 đoạn và 140 từ trước Premium, có 4 premium hook với ít nhất 2 bullet/hook, CTA nêu đủ Bản FULL 9 chương - lộ trình 12 tháng - kế hoạch 30/90 ngày - 3 câu hỏi với Cố vấn AI, và tổng độ dài 800-1200 từ.";
     const routed = await generateWithLlmRouter({
       prompt: `${basePrompt}${retryInstruction}`,
       temperature: 0.45,

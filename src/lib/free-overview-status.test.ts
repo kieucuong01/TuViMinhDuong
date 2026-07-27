@@ -40,7 +40,7 @@ describe("free overview status", () => {
 
     expect(status.status).toBe("fallback");
     expect(status.source).toBe("seed-rules");
-    expect(FREE_OVERVIEW_VERSION).toBe("free-block-preview-v4");
+    expect(FREE_OVERVIEW_VERSION).toBe("free-block-preview-v5");
     expect(status.jobStatus).toBe("idle");
     expect(status.content).toContain("# Luận giải miễn phí dành cho");
     expect(status.content).toContain("## 4. Vận hạn năm");
