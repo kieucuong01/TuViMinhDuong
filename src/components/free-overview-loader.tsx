@@ -1,9 +1,7 @@
 import Link from "next/link";
-import { LockKeyhole } from "lucide-react";
 import { loginModalHref } from "@/components/login-modal-link";
-import { premiumReadingModalId } from "@/components/premium-reading-target";
+import { FreeOverviewReadingExperience } from "@/components/free-overview-reading-experience";
 import { FreeOverviewRefreshTrigger } from "@/components/free-overview-refresh-trigger";
-import { FreeOverviewTypingReveal } from "@/components/free-overview-typing-reveal";
 
 type FreeOverviewPayload = {
   status: "ready" | "fallback";
@@ -19,6 +17,7 @@ export function FreeOverviewLoader({
   isSignedIn = false,
   canReadFullOverview = false,
   canCheckoutFull,
+  priceCoins = 199,
 }: {
   chartId: string;
   fullName: string;
@@ -26,6 +25,7 @@ export function FreeOverviewLoader({
   isSignedIn?: boolean;
   canReadFullOverview?: boolean;
   canCheckoutFull: boolean;
+  priceCoins?: number;
 }) {
   if (!initialOverview?.content) {
     return (
@@ -49,45 +49,27 @@ export function FreeOverviewLoader({
       data-ad-depth={canReadFullOverview || hasPremiumHookPreview ? "4" : "2"}
       data-chart-id={chartId}
     >
-      <FreeOverviewTypingReveal content={initialOverview.content} enabled={shouldAttemptLlm} />
+      <FreeOverviewReadingExperience
+        content={initialOverview.content}
+        fullName={fullName}
+        chartId={chartId}
+        canCheckoutFull={canCheckoutFull}
+        isSignedIn={isSignedIn}
+        priceCoins={priceCoins}
+      />
 
       {shouldAttemptLlm ? (
-        <section className="free-overview-loading" role="status" aria-live="polite" data-ad-view="free_overview_loading" data-chart-id={chartId}>
+        <section className="free-overview-personalizing" role="status" aria-live="polite" data-ad-view="free_overview_loading" data-chart-id={chartId}>
           <FreeOverviewRefreshTrigger chartId={chartId} shouldRefresh />
           <div>
-            <strong>Đang viết tiếp bản luận giải AI cá nhân hóa...</strong>
-            <span>Bản đọc nhanh phía trên hiển thị trước để bạn không phải chờ. Khi bản AI xong, hệ thống sẽ tự thay thế nội dung này.</span>
+            <strong>AI đang cá nhân hóa phần phân tích chi tiết...</strong>
+            <span>Ba kết luận chính đã sẵn sàng. Nội dung từng phần sẽ tự cập nhật mà không làm bạn mất vị trí đang đọc.</span>
           </div>
-          <i />
-          <i />
-          <i />
-          <i />
+          <div className="free-overview-personalizing-dots" aria-hidden="true"><i /><i /><i /></div>
         </section>
       ) : null}
 
-      {!canReadFullOverview && !isSignedIn && canCheckoutFull && hasPremiumHookPreview ? (
-        <section
-          className="free-overview-vip-transition"
-          aria-labelledby="free-overview-premium-title"
-          data-ad-view="full_offer_inline_viewed"
-          data-chart-id={chartId}
-        >
-          <div>
-            <p className="eyebrow">Bản FULL Premium</p>
-            <h2 id="free-overview-premium-title">Mở khóa báo cáo cá nhân hóa của {fullName}</h2>
-            <p>Bản miễn phí đã cho bạn bốn lớp chính. Báo cáo FULL đi tiếp vào 12 cung, vận năm, lộ trình 12 tháng và kế hoạch 90 ngày.</p>
-          </div>
-          <button
-            type="button"
-            className="btn btn-primary"
-            popoverTarget={premiumReadingModalId(chartId)}
-            data-ad-click="full_offer_inline_clicked"
-            data-chart-id={chartId}
-          >
-            Mở bản FULL 9 chương
-          </button>
-        </section>
-      ) : !canReadFullOverview && !isSignedIn ? (
+      {!canReadFullOverview && !isSignedIn && !canCheckoutFull ? (
         <section
           className="free-overview-guest-gate"
           aria-labelledby="free-overview-login-title"
@@ -95,19 +77,9 @@ export function FreeOverviewLoader({
           data-chart-id={chartId}
         >
           <div>
-            <p className="eyebrow">Bạn đã đọc 2/4 phần miễn phí</p>
-            <h2 id="free-overview-login-title">Lưu lá số của {fullName} để đọc tiếp miễn phí</h2>
+            <p className="eyebrow">Bạn đã đọc đủ 4 phần miễn phí</p>
+            <h2 id="free-overview-login-title">Đăng nhập để lưu lá số của {fullName}</h2>
             <p className="free-overview-login-copy">Email mới tự tạo tài khoản • Tặng 30 xu • Có thể dùng Google • Chưa mất phí</p>
-          </div>
-          <div className="free-overview-locked-sections" aria-label="Hai phần mở sau đăng nhập">
-            <div className="free-overview-locked-row">
-              <LockKeyhole size={16} aria-hidden="true" />
-              <strong>Quan hệ và nhịp sống</strong>
-            </div>
-            <div className="free-overview-locked-row">
-              <LockKeyhole size={16} aria-hidden="true" />
-              <strong>Vận hiện tại</strong>
-            </div>
           </div>
           <Link
             className="btn btn-primary"
@@ -116,16 +88,16 @@ export function FreeOverviewLoader({
             data-ad-click="login_gate_clicked"
             data-chart-id={chartId}
           >
-            Lưu lá số &amp; đọc tiếp miễn phí
+            Đăng nhập để lưu lá số
           </Link>
         </section>
-      ) : !canReadFullOverview ? (
+      ) : !canReadFullOverview && !canCheckoutFull ? (
         <section className="free-overview-guest-gate" aria-labelledby="free-overview-access-title" role="status">
           <div>
             <p className="eyebrow">Quyền riêng tư của lá số</p>
             <h2 id="free-overview-access-title">Lá số này không thuộc tài khoản của bạn</h2>
             <p className="free-overview-login-copy">
-              Bạn vẫn có thể đọc 2 phần tổng quan được chia sẻ. Hãy lập lá số của riêng bạn để lưu và mở nội dung cá nhân hóa.
+              Bạn vẫn có thể đọc phần tổng quan miễn phí được chia sẻ. Hãy lập lá số của riêng bạn để lưu và mở nội dung cá nhân hóa.
             </p>
           </div>
           <Link className="btn btn-primary" href="/lap-la-so">

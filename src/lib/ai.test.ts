@@ -16,6 +16,7 @@ import {
   generateReadingWithProgress,
   getDeepReadingSummary,
   isCompleteFreeOverview,
+  isDisplayableFreeOverview,
   isCompletePaidChapter,
   paidReadingChapterPrompt,
   paidReadingChapters,
@@ -364,6 +365,7 @@ describe("AI reading format", () => {
     expect(isCompleteFreeOverview(content.replace("**Lợi thế nổi bật:**", "**Điểm mạnh:**"))).toBe(false);
     expect(isCompleteFreeOverview(content.replace("**Điểm dễ vướng:**", "**Lưu ý:**"))).toBe(false);
     expect(isCompleteFreeOverview(content.split("## 3. Môi trường làm việc lý tưởng (Cung Quan Lộc)")[0])).toBe(false);
+    expect(isDisplayableFreeOverview(content.replace(/^## 4\. Vận hạn năm .+$/mu, "## Ghi chú vận hạn"))).toBe(false);
     expect(isCompleteFreeOverview(`${content} ${"thêm ".repeat(300)}`)).toBe(false);
   });
 

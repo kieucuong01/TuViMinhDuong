@@ -6,6 +6,7 @@ import { loginModalHref } from "@/components/login-modal-link";
 const ctaUrl = new URL("./reading-detail-cta.tsx", import.meta.url);
 const ctaPath = fileURLToPath(ctaUrl);
 const loaderSource = readFileSync(fileURLToPath(new URL("./free-overview-loader.tsx", import.meta.url)), "utf8");
+const readingExperienceSource = readFileSync(fileURLToPath(new URL("./free-overview-reading-experience.tsx", import.meta.url)), "utf8");
 const chartPageSource = readFileSync(fileURLToPath(new URL("../app/la-so/[id]/page.tsx", import.meta.url)), "utf8");
 const premiumSource = readFileSync(fileURLToPath(new URL("./premium-reading-cta.tsx", import.meta.url)), "utf8");
 
@@ -43,17 +44,18 @@ describe("reading detail CTA flow", () => {
     expect(ctaSource).toContain('"wheel"');
   });
 
-  it("opens the guest premium hook as a popover while the 2/4 gate still requires login", () => {
+  it("opens guest premium hooks without login while keeping the save prompt separate", () => {
     expect(loaderSource).toContain('const nextPath = `${chartPath}#luan-giai`');
     expect(loaderSource).toContain("hasPremiumHookPreview");
-    expect(loaderSource).toContain("!canReadFullOverview && !isSignedIn && canCheckoutFull && hasPremiumHookPreview");
-    expect(loaderSource).toContain("full_offer_inline_viewed");
-    expect(loaderSource).toContain("Mở khóa báo cáo cá nhân hóa của {fullName}");
-    expect(loaderSource).toContain("popoverTarget={premiumReadingModalId(chartId)}");
-    expect(loaderSource).toContain("Mở bản FULL 9 chương");
+    expect(loaderSource).toContain("canCheckoutFull={canCheckoutFull}");
+    expect(readingExperienceSource).toContain("full_offer_context_clicked");
+    expect(readingExperienceSource).toContain("Bản FULL sẽ trả lời");
+    expect(readingExperienceSource).toContain("popoverTarget={premiumReadingModalId(chartId)}");
+    expect(readingExperienceSource).toContain("Không cần đăng nhập");
     expect(loaderSource).toContain("loginModalHref(chartPath, undefined, nextPath)");
-    expect(loaderSource).toContain("Lưu lá số của {fullName} để đọc tiếp miễn phí");
-    expect(loaderSource).toContain("Lưu lá số &amp; đọc tiếp miễn phí");
+    expect(loaderSource).toContain("Bạn đã đọc đủ 4 phần miễn phí");
+    expect(loaderSource).toContain("Đăng nhập để lưu lá số của {fullName}");
+    expect(loaderSource).toContain("Đăng nhập để lưu lá số");
     expect(loaderSource).toContain("Email mới tự tạo tài khoản • Tặng 30 xu • Có thể dùng Google • Chưa mất phí");
   });
 

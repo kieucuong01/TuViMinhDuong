@@ -4,21 +4,62 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { FreeOverviewLoader } from "@/components/free-overview-loader";
-import { FreeOverviewTypingReveal } from "@/components/free-overview-typing-reveal";
 
 const loaderSource = readFileSync(fileURLToPath(new URL("./free-overview-loader.tsx", import.meta.url)), "utf8");
 const refreshSource = readFileSync(fileURLToPath(new URL("./free-overview-refresh-trigger.tsx", import.meta.url)), "utf8");
-const typingSource = readFileSync(fileURLToPath(new URL("./free-overview-typing-reveal.tsx", import.meta.url)), "utf8");
 const chartPageSource = readFileSync(fileURLToPath(new URL("../app/la-so/[id]/page.tsx", import.meta.url)), "utf8");
 const normalizedChartPageSource = chartPageSource.replace(/\s+/g, " ");
 const overview = { status: "ready" as const, source: "llm" as const, content: "## 1. Khí chất\n\nNội dung đã chiếu từ server." };
+const structuredOverview = {
+  status: "ready" as const,
+  source: "llm" as const,
+  content: `# Luận giải miễn phí
+
+## 1. Năng lực thiên phú (Cung Mệnh)
+
+Mệnh sáng và biết dung hòa.
+
+**Lợi thế nổi bật:** Bạn nhìn được nhiều góc độ trước khi quyết định.
+
+**Điểm dễ vướng:** Dễ cân nhắc quá lâu.
+
+🔒 Nâng cấp Premium để xem:
+- Điểm mạnh nào tạo lợi thế rõ nhất.
+
+## 2. Phong cách kiếm tiền (Cung Tài Bạch)
+
+Bạn tạo giá trị nhờ chuyên môn.
+
+**Lợi thế nổi bật:** Thu nhập bền khi làm việc có hệ thống.
+
+🔒 Nâng cấp Premium để xem:
+- Dòng tiền 12 tháng.
+
+## 3. Môi trường làm việc lý tưởng (Cung Quan Lộc)
+
+Bạn hợp môi trường có quyền chủ động.
+
+**Lợi thế nổi bật:** Có khả năng dẫn dắt nhóm nhỏ.
+
+🔒 Nâng cấp Premium để xem:
+- Thời điểm phát triển công việc.
+
+## 4. Vận hạn năm 2026 (Năm Bính Ngọ)
+
+Đây là năm cần tái cấu trúc.
+
+**Lợi thế nổi bật:** Cơ hội rõ hơn vào nửa cuối năm.
+
+🔒 Nâng cấp Premium để xem:
+- Lộ trình vận hạn 12 tháng.`,
+};
 
 describe("FreeOverviewLoader seed-first LLM refresh gate", () => {
-  it("renders seed content first and shows a loading handoff until the LLM replaces it", () => {
+  it("renders seed content immediately and keeps the background LLM refresh non-blocking", () => {
     expect(loaderSource).toContain('const isLlmReady = initialOverview.source === "llm"');
-    expect(loaderSource).toContain("Đang viết tiếp bản luận giải AI cá nhân hóa");
-    expect(loaderSource).toContain("Bản đọc nhanh phía trên hiển thị trước");
-    expect(loaderSource).toContain("<FreeOverviewTypingReveal content={initialOverview.content} enabled={shouldAttemptLlm} />");
+    expect(loaderSource).toContain("AI đang cá nhân hóa phần phân tích chi tiết");
+    expect(loaderSource).toContain("<FreeOverviewReadingExperience");
+    expect(loaderSource).not.toContain("FreeOverviewTypingReveal");
     expect(loaderSource).toContain("FreeOverviewRefreshTrigger");
     expect(loaderSource).not.toContain("useEffect");
     expect(loaderSource).not.toContain("fetch(");
@@ -27,32 +68,33 @@ describe("FreeOverviewLoader seed-first LLM refresh gate", () => {
     expect(refreshSource).toContain("void pollUntilReady();");
     expect(refreshSource).toContain("router.refresh()");
     expect(refreshSource).toContain("attempt >= 30");
-    expect(refreshSource).not.toContain(".finally(() =>");
-    expect(refreshSource).toContain("Đang gọi AI");
-    expect(refreshSource).toContain("AI đang luận giải");
-    expect(loaderSource).not.toContain("schedulePoll");
   });
 
-  it("types the seed reading while waiting for the LLM without blocking the background refresh", () => {
-    expect(loaderSource).toContain("FreeOverviewTypingReveal");
-    expect(typingSource).toContain("\"use client\"");
-    expect(typingSource).toContain("setInterval");
-    expect(typingSource).toContain("visibleLength");
-    expect(typingSource).toContain("MarkdownContent");
-    expect(typingSource).toContain("free-overview-typing-cursor");
-    expect(typingSource).not.toContain("fetch(");
-  });
+  it("turns the long report into a 30-second summary, sticky navigation and four readable cards", () => {
+    const html = renderToStaticMarkup(
+      createElement(FreeOverviewLoader, {
+        chartId: "chart-1",
+        fullName: "Nguyễn Minh Anh",
+        initialOverview: structuredOverview,
+        isSignedIn: false,
+        canReadFullOverview: false,
+        canCheckoutFull: true,
+        priceCoins: 199,
+      }),
+    );
 
-  it("renders only the opening slice while typing and full content when typing is off", () => {
-    const longContent = `# Mở đầu\n\n${"đoạn mở ".repeat(90)}\n\nTAIL_MARKER`;
-
-    const typingHtml = renderToStaticMarkup(createElement(FreeOverviewTypingReveal, { content: longContent, enabled: true }));
-    const fullHtml = renderToStaticMarkup(createElement(FreeOverviewTypingReveal, { content: longContent, enabled: false }));
-
-    expect(typingHtml).not.toContain("TAIL_MARKER");
-    expect(typingHtml).toContain("free-overview-typing-cursor");
-    expect(fullHtml).toContain("TAIL_MARKER");
-    expect(fullHtml).not.toContain("free-overview-typing-cursor");
+    expect(html).toContain("Lá số của Nguyễn Minh Anh trong 30 giây");
+    expect(html).toContain("Thế mạnh cốt lõi");
+    expect(html).toContain("Cách tạo giá trị");
+    expect(html).toContain("Trọng tâm năm 2026");
+    expect(html).toContain('aria-label="Điều hướng luận giải miễn phí"');
+    expect(html).toContain('href="#free-insight-1"');
+    expect(html.match(/data-reading-section=/gu)).toHaveLength(4);
+    expect(html).toContain("Đọc phần này");
+    expect(html).toContain("Bản FULL sẽ trả lời");
+    expect(html).toContain("Xem dòng tiền 12 tháng — 199.000đ");
+    expect(html).toContain("Không cần đăng nhập");
+    expect(html).not.toContain("free-overview-typing-cursor");
   });
 
   it("keeps insight three and four server-side for guests and signed-in non-owners", () => {
@@ -67,29 +109,33 @@ describe("FreeOverviewLoader seed-first LLM refresh gate", () => {
     expect(chartPageSource).toContain("canReadFullOverview={canReadFullOverview}");
     expect(chartPageSource).toContain("isSignedIn={Boolean(user)}");
     expect(chartPageSource).toContain("canCheckoutFull={canCheckoutFull}");
+    expect(chartPageSource).toContain("priceCoins={featurePrices?.FULL.priceCoins ?? 199}");
     expect(chartPageSource).toContain("canReadFullOverview && featurePrices ? <ReadingTabs");
     expect(chartPageSource).toContain("canCheckoutFull && featurePrices ? <PremiumReadingCta");
     expect(loaderSource).not.toContain("detailContent");
     expect(loaderSource).not.toContain("expandedOverviewContent");
   });
 
-  it("uses the approved login gate copy and tracks the 2/4 funnel depth", () => {
+  it("keeps all four free sections visible and offers login only to save the chart", () => {
     const html = renderToStaticMarkup(
       createElement(FreeOverviewLoader, {
         chartId: "chart-1",
         fullName: "Nguyễn Minh Anh",
-        initialOverview: overview,
+        initialOverview: structuredOverview,
         isSignedIn: false,
         canReadFullOverview: false,
         canCheckoutFull: false,
       }),
     );
 
-    expect(html).toContain("Lưu lá số của Nguyễn Minh Anh để đọc tiếp miễn phí");
-    expect(html).toContain("Lưu lá số &amp; đọc tiếp miễn phí");
+    expect(html).toContain("Bạn đã đọc đủ 4 phần miễn phí");
+    expect(html).toContain("Đăng nhập để lưu lá số của Nguyễn Minh Anh");
+    expect(html).toContain("Đăng nhập để lưu lá số");
     expect(html).toContain("Email mới tự tạo tài khoản • Tặng 30 xu • Có thể dùng Google • Chưa mất phí");
     expect(html).toContain('data-ad-view="free_overview_viewed"');
-    expect(html).toContain('data-ad-depth="2"');
+    expect(html).toContain('data-ad-depth="4"');
+    expect(html).not.toContain("2/4 phần");
+    expect(html).not.toContain("free-overview-locked-sections");
     expect(html).toContain("%23luan-giai");
     expect(html).toContain('data-ad-click="login_gate_clicked"');
     expect(loaderSource).toContain("data-ad-view=\"login_gate_viewed\"");
@@ -101,18 +147,17 @@ describe("FreeOverviewLoader seed-first LLM refresh gate", () => {
       createElement(FreeOverviewLoader, {
         chartId: "chart-1",
         fullName: "Nguyễn Minh Anh",
-        initialOverview: {
-          ...overview,
-          content: `${overview.content}\n\n🔒 Nâng cấp Premium để xem:`,
-        },
+        initialOverview: structuredOverview,
         isSignedIn: false,
         canReadFullOverview: false,
         canCheckoutFull: true,
+        priceCoins: 199,
       }),
     );
 
     expect(html).toContain('popoverTarget="premium-confirm-chart-1"');
-    expect(html).toContain("Mở bản FULL 9 chương");
+    expect(html).toContain("Xem dòng tiền 12 tháng — 199.000đ");
+    expect(html).toContain("Không cần đăng nhập");
     expect(html).not.toContain("/dang-nhap");
     expect(html).not.toContain("login=1");
   });
@@ -122,18 +167,16 @@ describe("FreeOverviewLoader seed-first LLM refresh gate", () => {
       createElement(FreeOverviewLoader, {
         chartId: "chart-1",
         fullName: "Nguyễn Minh Anh",
-        initialOverview: {
-          ...overview,
-          content: `${overview.content}\n\n🔒 Nâng cấp Premium để xem:`,
-        },
+        initialOverview: structuredOverview,
         isSignedIn: false,
         canReadFullOverview: false,
         canCheckoutFull: false,
+        priceCoins: 199,
       }),
     );
 
     expect(html).not.toContain('popoverTarget="premium-confirm-chart-1"');
-    expect(html).toContain("Lưu lá số &amp; đọc tiếp miễn phí");
+    expect(html).toContain("Đăng nhập để lưu lá số");
   });
 
   it("shows all four projected sections to an owner without a gate", () => {
@@ -141,14 +184,17 @@ describe("FreeOverviewLoader seed-first LLM refresh gate", () => {
       createElement(FreeOverviewLoader, {
         chartId: "chart-1",
         fullName: "Nguyễn Minh Anh",
-        initialOverview: overview,
+        initialOverview: structuredOverview,
         isSignedIn: true,
         canReadFullOverview: true,
         canCheckoutFull: true,
+        priceCoins: 199,
       }),
     );
 
     expect(html).toContain('data-ad-depth="4"');
+    expect(html).toContain("Thanh toán PayOS hoặc dùng xu nếu đủ");
+    expect(html).not.toContain("Không cần đăng nhập");
     expect(html).not.toContain("login_gate_clicked");
     expect(html).not.toContain("/lap-la-so");
   });

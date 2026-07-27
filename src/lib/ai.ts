@@ -140,7 +140,11 @@ export function isDisplayableFreeOverview(content: string) {
   ];
   const wordCount = countVisibleMarkdownWords(content);
   const hasChartEvidence = /(cung|mệnh|thân|sao|đại vận|tuần|triệt)/iu.test(content);
-  const headingIndexes = requiredHeadings.map((heading) => content.indexOf(heading));
+  const fourthHeading = /^## 4\. Vận hạn năm \d{4} \(Năm .+\)$/mu.exec(content);
+  const headingIndexes = [
+    ...requiredHeadings.map((heading) => content.indexOf(heading)),
+    fourthHeading?.index ?? -1,
+  ];
   return (
     wordCount >= 500 &&
     wordCount <= 1100 &&

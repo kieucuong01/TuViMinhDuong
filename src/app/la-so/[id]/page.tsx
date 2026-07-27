@@ -259,6 +259,7 @@ export default async function ChartPage({
                 isSignedIn={Boolean(user)}
                 canReadFullOverview={canReadFullOverview}
                 canCheckoutFull={canCheckoutFull}
+                priceCoins={featurePrices?.FULL.priceCoins ?? 199}
               />
             </>
           )}

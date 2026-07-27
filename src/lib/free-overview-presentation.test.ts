@@ -64,20 +64,15 @@ Nội dung miễn phí.
 - Lộ trình 12 tháng.`;
 
 describe("free overview guest presentation", () => {
-  it("returns the introduction and exactly the first two insights", () => {
+  it("returns all four free insights without requiring login", () => {
     const teaser = buildFreeOverviewTeaser(report);
 
-    expect(FREE_OVERVIEW_GUEST_INSIGHT_DEPTH).toBe(2);
+    expect(FREE_OVERVIEW_GUEST_INSIGHT_DEPTH).toBe(4);
     expect(teaser).toContain("Phần mở đầu riêng cho bạn");
-    expect(teaser).toContain("## 1. Khí chất và cách ra quyết định");
     expect(teaser).toContain("INSIGHT_MỘT");
-    expect(teaser).toContain("## 2. Công việc và nguồn lực");
     expect(teaser).toContain("INSIGHT_HAI");
-    expect(teaser).toContain("Câu hỏi tự đối chiếu");
-    expect(teaser).toContain("Bản FULL 9 chương");
-    expect(teaser).not.toContain("## 3.");
-    expect(teaser).not.toContain("NỘI_DUNG_KHÔNG_ĐƯỢC_GỬI");
-    expect(teaser).not.toContain("## 4.");
+    expect(teaser).toContain("NỘI_DUNG_KHÔNG_ĐƯỢC_GỬI");
+    expect(teaser).toContain("## 4. Vận hiện tại");
   });
 
   it("counts only words visible after Markdown formatting", () => {
@@ -86,8 +81,8 @@ describe("free overview guest presentation", () => {
     expect(countVisibleMarkdownWords(content)).toBe(8);
   });
 
-  it("fails closed when the expected third insight boundary is missing", () => {
-    expect(buildFreeOverviewTeaser("# Báo cáo cũ\n\nNội dung không rõ cấu trúc")).toBe("");
+  it("keeps readable legacy content instead of blanking the free experience", () => {
+    expect(buildFreeOverviewTeaser("# Báo cáo cũ\n\nNội dung không rõ cấu trúc")).toContain("Nội dung không rõ cấu trúc");
   });
 
   it("keeps all four sections when the free preview already injects premium hooks", () => {

@@ -1,4 +1,4 @@
-export const FREE_OVERVIEW_GUEST_INSIGHT_DEPTH = 2;
+export const FREE_OVERVIEW_GUEST_INSIGHT_DEPTH = 4;
 
 export function countVisibleMarkdownWords(content: string) {
   const visibleText = content
@@ -10,12 +10,5 @@ export function countVisibleMarkdownWords(content: string) {
 }
 
 export function buildFreeOverviewTeaser(content: string) {
-  const premiumHookCount = content.match(/🔒\s*Nâng cấp Premium để xem:/gu)?.length || 0;
-  if (premiumHookCount >= 4) {
-    return content.trim();
-  }
-
-  const thirdInsight = content.search(/^##\s+3\.\s+/mu);
-  if (thirdInsight < 0) return "";
-  return content.slice(0, thirdInsight).trim();
+  return content.trim().replace(/\n{3,}/gu, "\n\n");
 }

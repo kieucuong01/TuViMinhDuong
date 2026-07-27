@@ -65,15 +65,15 @@ describe("free overview GET route", () => {
     });
   });
 
-  it("returns only the first two insights to a guest", async () => {
+  it("returns all four free insights to a guest", async () => {
     const response = await getOverview();
     const body = await response.json();
 
     expect(response.status).toBe(200);
     expect(body.content).toContain("INSIGHT_MỘT");
     expect(body.content).toContain("INSIGHT_HAI");
-    expect(body.content).not.toContain("SECRET_INSIGHT_BA");
-    expect(body.content).not.toContain("SECRET_INSIGHT_BỐN");
+    expect(body.content).toContain("SECRET_INSIGHT_BA");
+    expect(body.content).toContain("SECRET_INSIGHT_BỐN");
     expect(body.source).toBe("seed-rules");
     expect(body.jobStatus).toBe("completed");
     expect(Object.keys(body).sort()).toEqual(["content", "generatedAt", "jobStatus", "model", "source", "status", "wordCount"]);
@@ -114,14 +114,15 @@ describe("free overview GET route", () => {
     expect(body.content).toContain("SECRET_INSIGHT_BỐN");
   });
 
-  it("keeps a signed-in non-owner at the first two insights", async () => {
+  it("keeps all four free insights visible to a signed-in non-owner", async () => {
     mocks.getCurrentUser.mockResolvedValue({ id: "user-1", role: "USER" });
 
     const response = await getOverview();
     const body = await response.json();
 
     expect(body.content).toContain("INSIGHT_HAI");
-    expect(body.content).not.toContain("SECRET_");
+    expect(body.content).toContain("SECRET_INSIGHT_BA");
+    expect(body.content).toContain("SECRET_INSIGHT_BỐN");
   });
 
   it("returns all four insights to an admin even when the chart has another owner", async () => {
@@ -135,7 +136,7 @@ describe("free overview GET route", () => {
     expect(body.content).toContain("SECRET_");
   });
 
-  it("fails closed for a guest when the seed structure is malformed", async () => {
+  it("keeps readable legacy content visible when old section markers are missing", async () => {
     mocks.getFreeOverviewStatus.mockReturnValue({
       status: "ready",
       content: "NỘI_DUNG_KHÔNG_CÓ_RANH_GIỚI",
@@ -149,7 +150,7 @@ describe("free overview GET route", () => {
     const response = await getOverview();
     const body = await response.json();
 
-    expect(body.content).toBe("");
+    expect(body.content).toBe("NỘI_DUNG_KHÔNG_CÓ_RANH_GIỚI");
   });
 
   it("returns 404 when the chart does not exist", async () => {
