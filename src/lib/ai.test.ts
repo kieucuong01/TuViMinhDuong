@@ -249,15 +249,15 @@ describe("AI reading format", () => {
 
     const result = await generateFreeOverview(sampleChart());
 
-    expect(FREE_OVERVIEW_MIN_WORDS).toBe(520);
-    expect(FREE_OVERVIEW_MAX_WORDS).toBe(950);
-    expect(FREE_OVERVIEW_VERSION).toBe("free-block-preview-v3");
+    expect(FREE_OVERVIEW_MIN_WORDS).toBe(800);
+    expect(FREE_OVERVIEW_MAX_WORDS).toBe(1200);
+    expect(FREE_OVERVIEW_VERSION).toBe("free-block-preview-v4");
     expect(result.model).toBe("deepseek/deepseek-v4-flash");
     expect(result).not.toHaveProperty("prompt");
     expect(isCompleteFreeOverview(result.content)).toBe(true);
     expect(llmRouterMocks.generateWithLlmRouter).toHaveBeenCalledTimes(1);
     const prompt = String(llmRouterMocks.generateWithLlmRouter.mock.calls[0][0].prompt);
-    expect(prompt.length).toBeLessThan(5200);
+    expect(prompt.length).toBeLessThan(5800);
     expect(prompt).not.toContain(llmContent.slice(0, 120));
     expect(prompt).toContain("Lợi thế nổi bật");
     expect(prompt).toContain("Điểm dễ vướng");
@@ -265,13 +265,13 @@ describe("AI reading format", () => {
     expect(llmRouterMocks.generateWithLlmRouter).toHaveBeenCalledWith(
       expect.objectContaining({
         temperature: 0.45,
-        maxTokens: 2200,
+        maxTokens: 3000,
         providerOrder: ["deepseek", "groq"],
         thinking: "disabled",
         attemptsPerProvider: 1,
       }),
     );
-    expect(String(llmRouterMocks.generateWithLlmRouter.mock.calls[0][0].prompt)).toContain("520-950 từ");
+    expect(String(llmRouterMocks.generateWithLlmRouter.mock.calls[0][0].prompt)).toContain("800-1200 từ");
   });
 
   it("falls back to the instant seed overview when the free LLM is unavailable or invalid", async () => {
@@ -313,11 +313,11 @@ describe("AI reading format", () => {
     expect(String(llmRouterMocks.generateWithLlmRouter.mock.calls[1][0].prompt)).toContain("Lần thử trước chưa đạt cấu trúc");
   });
 
-  it("accepts a structured free LLM overview that is slightly outside the strict seed word budget", async () => {
+  it("rejects a structured free LLM overview outside the strict 800-1200 word budget", async () => {
     clearProviderEnv();
     llmRouterMocks.hasExternalLlmProvider.mockReturnValue(true);
     const extra = Array.from(
-      { length: 8 },
+      { length: 3 },
       () => "Ghi chú thêm: cung Mệnh và đại vận hiện tại cần được đọc cùng nhịp sống thực tế của bạn để tránh quyết định quá vội.",
     ).join(" ");
     const content = `${buildInstantFreeOverview(sampleChart())}\n\n${extra}`;
@@ -330,20 +330,25 @@ describe("AI reading format", () => {
 
     const result = await generateFreeOverview(sampleChart());
 
-    expect(result.model).toBe("deepseek/deepseek-v4-flash");
+    expect(result.model).toBe("interpretation-rules-v2");
+    expect(isCompleteFreeOverview(result.content)).toBe(true);
+    expect(llmRouterMocks.generateWithLlmRouter).toHaveBeenCalledTimes(2);
   });
 
   it("renders the four assembled free preview blocks within the approved length", () => {
     const chart = youngSampleChart();
     const content = buildInstantFreeOverview(chart);
 
-    expect(FREE_OVERVIEW_TEMPLATE_MIN_WORDS).toBe(520);
-    expect(FREE_OVERVIEW_TEMPLATE_MAX_WORDS).toBe(950);
+    expect(FREE_OVERVIEW_TEMPLATE_MIN_WORDS).toBe(800);
+    expect(FREE_OVERVIEW_TEMPLATE_MAX_WORDS).toBe(1200);
     expect(countVisibleMarkdownWords(content)).toBeGreaterThanOrEqual(FREE_OVERVIEW_TEMPLATE_MIN_WORDS);
     expect(countVisibleMarkdownWords(content)).toBeLessThanOrEqual(FREE_OVERVIEW_TEMPLATE_MAX_WORDS);
     expect(content).toContain(`# Luận giải miễn phí dành cho ${chart.input.fullName}`);
     expect(content.match(/\*\*Lợi thế nổi bật:\*\*/gu)).toHaveLength(4);
     expect(content.match(/\*\*Điểm dễ vướng:\*\*/gu)).toHaveLength(4);
+    expect(content.match(/\*\*Đọc nhanh:\*\*/gu)).toHaveLength(4);
+    expect(content.match(/\*\*Vì sao có nhận định này:\*\*/gu)).toHaveLength(4);
+    expect(content.match(/\*\*Gợi ý thực tế:\*\*/gu)).toHaveLength(4);
     expect(content).toContain("## 1. Năng lực thiên phú (Cung Mệnh)");
     expect(content).toContain("## 2. Phong cách kiếm tiền (Cung Tài Bạch)");
     expect(content).toContain("## 3. Môi trường làm việc lý tưởng (Cung Quan Lộc)");
@@ -362,8 +367,11 @@ describe("AI reading format", () => {
 
     expect(isCompleteFreeOverview(content)).toBe(true);
     expect(isCompleteFreeOverview(content.replace("## 2. Phong cách kiếm tiền (Cung Tài Bạch)", "## Ghi chú"))).toBe(false);
+    expect(isCompleteFreeOverview(content.replace("**Đọc nhanh:**", "**Tóm tắt:**"))).toBe(false);
     expect(isCompleteFreeOverview(content.replace("**Lợi thế nổi bật:**", "**Điểm mạnh:**"))).toBe(false);
     expect(isCompleteFreeOverview(content.replace("**Điểm dễ vướng:**", "**Lưu ý:**"))).toBe(false);
+    expect(isCompleteFreeOverview(content.replace("**Vì sao có nhận định này:**", "**Cơ sở:**"))).toBe(false);
+    expect(isCompleteFreeOverview(content.replace("**Gợi ý thực tế:**", "**Gợi ý:**"))).toBe(false);
     expect(isCompleteFreeOverview(content.split("## 3. Môi trường làm việc lý tưởng (Cung Quan Lộc)")[0])).toBe(false);
     expect(isDisplayableFreeOverview(content.replace(/^## 4\. Vận hạn năm .+$/mu, "## Ghi chú vận hạn"))).toBe(false);
     expect(isCompleteFreeOverview(`${content} ${"thêm ".repeat(300)}`)).toBe(false);

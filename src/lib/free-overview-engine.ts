@@ -44,6 +44,9 @@ export type FreeReadingSection = FreeReadingSignalSection & {
   title: string;
   blockLabel: string;
   freeText: string;
+  quickTake: string;
+  evidenceText: string;
+  practicalTip: string;
   premiumHook: string;
 };
 
@@ -58,6 +61,27 @@ function palaceByName(chart: TuViChart, name: string) {
 
 function firstUsefulMainStar(palace?: Palace) {
   return palace?.mainStars.find((star) => star !== "Vô chính diệu") || palace?.supportStars[0] || "Tổng hợp";
+}
+
+function starsWithStates(palace: Palace | undefined, stars: string[], fallback: string, limit = 5) {
+  if (!palace) return fallback;
+  const visible = stars
+    .filter(Boolean)
+    .filter((star, index, values) => values.indexOf(star) === index)
+    .slice(0, limit)
+    .map((star) => {
+      const state = palace.starStates?.[star];
+      return state ? `${star} (${state})` : star;
+    });
+  return visible.length ? visible.join(", ") : fallback;
+}
+
+function palaceEvidenceText(palace: Palace | undefined, fallbackName: string) {
+  if (!palace) return `Dữ kiện cung ${fallbackName} chưa đủ trong lá số đã tính, nên phần này chỉ giữ ở mức định hướng chung.`;
+  const mainStars = starsWithStates(palace, palace.mainStars, "vô chính diệu", 4);
+  const supportStars = starsWithStates(palace, palace.supportStars, "không có phụ tinh nổi bật", 5);
+  const yearlyStars = starsWithStates(palace, palace.yearlyStars, "không có sao lưu năm nổi bật", 4);
+  return `Dữ kiện: cung ${palace.name} tại ${palace.branch}; chính tinh ${mainStars}; phụ tinh ${supportStars}; sao lưu ${yearlyStars}; vòng ${palace.lifecycle}.`;
 }
 
 function hasStar(palace: Palace | undefined, starName: string) {
@@ -89,6 +113,14 @@ function currentDecade(chart: TuViChart) {
   );
 }
 
+function currentDecadeEvidenceText(chart: TuViChart) {
+  const decade = currentDecade(chart);
+  const decadePalace = decade ? palaceByName(chart, decade.palace) : undefined;
+  const age = chartAge(chart);
+  const palaceText = decadePalace ? palaceEvidenceText(decadePalace, decade.palace) : "Dữ kiện cung đại vận hiện tại chưa đủ trong lá số đã tính.";
+  return `Năm ${chart.input.viewYear} đặt trên tuổi ${age}, đại vận ${decade?.range || "chưa xác định"} tại cung ${decade?.palace || "chưa xác định"}. ${palaceText}`;
+}
+
 function yearCanChi(chart: TuViChart) {
   return chart.canChi?.year || String(chart.solar.year);
 }
@@ -112,6 +144,14 @@ function careerMatchKey(quanLoc?: Palace) {
 
 function yearMatchKey(chart: TuViChart) {
   return chart.input.viewYear === 2026 ? "binh_ngo_2026" : "default";
+}
+
+function yearSignalLabel(chart: TuViChart) {
+  const decade = currentDecade(chart);
+  const decadePalace = decade ? palaceByName(chart, decade.palace) : undefined;
+  const yearlySignal = decadePalace?.yearlyStars[0];
+  if (yearlySignal) return `${yearlySignal} trong đại vận ${decade?.range || ""}`.trim();
+  return `Đại vận ${decade?.range || "hiện tại"}`.trim();
 }
 
 export function extractFreeReadingSignals(chart: TuViChart): FreeReadingSignals {
@@ -149,7 +189,7 @@ export function extractFreeReadingSignals(chart: TuViChart): FreeReadingSignals 
       {
         key: "van_han",
         palace: decade?.palace || "Đại vận",
-        signalLabel: chart.input.viewYear === 2026 ? "Lưu Thái Tuế và nhịp Bính Ngọ" : `Đại vận ${decade?.range || ""}`.trim(),
+        signalLabel: yearSignalLabel(chart),
         matchKey: yearMatchKey(chart),
       },
     ],
@@ -170,6 +210,52 @@ function blockForSignal(signal: FreeReadingSignalSection) {
   return blockOrDefault(FREE_READING_CONTENT_BLOCKS.van_han.nam, signal.matchKey);
 }
 
+function quickTakeForSection(chart: TuViChart, signal: FreeReadingSignalSection) {
+  if (signal.key === "menh") {
+    return `Cung Mệnh nhấn vào kiểu ra quyết định của bạn: ${signal.signalLabel} cho thấy nên dùng quan sát, bền bỉ và tự điều chỉnh trước bước lớn.`;
+  }
+  if (signal.key === "tai_bach") {
+    return "Cung Tài Bạch cho thấy tiền nên đến từ cách tạo giá trị đều hơn là quyết định nóng; trọng tâm là giữ nhịp, kiểm tra và dừng đúng lúc.";
+  }
+  if (signal.key === "quan_loc") {
+    return "Cung Quan Lộc gợi ý môi trường hợp với bạn cần vai trò rõ, tiêu chuẩn rõ và đủ khoảng trống để năng lực thật được nhìn thấy.";
+  }
+  return `Ở tuổi ${chartAge(chart)} trong năm ${chart.input.viewYear}, vận năm nên đọc như lịch điều phối: việc nào tiến, việc nào chậm và mốc nào cần tự kiểm tra.`;
+}
+
+function evidenceForSection(chart: TuViChart, signal: FreeReadingSignalSection) {
+  if (signal.key === "menh") {
+    const menh = palaceByName(chart, "Mệnh");
+    const than = palaceByName(chart, "Thân");
+    const thanText = than ? ` Thân cư tại cung ${than.name} bổ sung bối cảnh hành động thực tế.` : "";
+    return `${palaceEvidenceText(menh, "Mệnh")} Mệnh/Thân/Cục: ${chart.menh} / ${chart.than} / ${chart.cuc}.${thanText}`;
+  }
+  if (signal.key === "tai_bach") return palaceEvidenceText(palaceByName(chart, "Tài Bạch"), "Tài Bạch");
+  if (signal.key === "quan_loc") return palaceEvidenceText(palaceByName(chart, "Quan Lộc"), "Quan Lộc");
+  return currentDecadeEvidenceText(chart);
+}
+
+function practicalTipForSection(signal: FreeReadingSignalSection) {
+  if (signal.key === "menh") {
+    return "Trong 7 ngày tới, chọn một quyết định đang treo, viết 2 phương án thực tế, rồi thử bước nhỏ nhất thay vì chờ dữ kiện hoàn hảo.";
+  }
+  if (signal.key === "tai_bach") {
+    return "Tách tiền bắt buộc, tiền linh hoạt và tiền thử nghiệm; khoản chi hoặc hợp tác mới cần giới hạn vốn, thời gian và tiêu chí dừng.";
+  }
+  if (signal.key === "quan_loc") {
+    return "Khi nhận việc hoặc đổi vai trò, hỏi rõ quyền hạn, người quyết định và thước đo kết quả; môi trường mơ hồ dễ làm bạn hao sức.";
+  }
+  return "Chọn một trọng tâm mỗi quý, rà soát hàng tháng và không mở cam kết lớn khi sức khỏe, giấy tờ hoặc dòng tiền chưa được kiểm tra.";
+}
+
+function shortPremiumHook(signal: FreeReadingSignalSection, block: FreeReadingBlock) {
+  if (signal.key === "menh") return "Điểm mù nào khiến năng lực Mệnh bị dùng sai chỗ?";
+  if (signal.key === "tai_bach") return "Mốc nào trong năm nên giữ tiền hoặc xoay vốn?";
+  if (signal.key === "quan_loc") return "Môi trường nghề nào giúp bạn có quyền hạn rõ hơn?";
+  if (signal.key === "van_han") return "Tháng nào nên tiến, tháng nào cần chậm lại?";
+  return block.premium_hook;
+}
+
 export function buildFreeReadingSections(chart: TuViChart): FreeReadingSection[] {
   const signals = extractFreeReadingSignals(chart);
 
@@ -180,7 +266,10 @@ export function buildFreeReadingSections(chart: TuViChart): FreeReadingSection[]
       title: sectionTitle(signal, signals.viewYear, signals.viewYearCanChi),
       blockLabel: signal.signalLabel,
       freeText: `${block.loi_the} ${block.rao_can}`,
-      premiumHook: block.premium_hook,
+      quickTake: quickTakeForSection(chart, signal),
+      evidenceText: evidenceForSection(chart, signal),
+      practicalTip: practicalTipForSection(signal),
+      premiumHook: shortPremiumHook(signal, block),
     };
   });
 }
@@ -189,9 +278,15 @@ function renderSection(section: FreeReadingSection, index: number) {
   return `## ${index + 1}. ${section.title}
 
 [Block Nội dung - ${section.blockLabel}]:
+**Đọc nhanh:** ${section.quickTake}
+
 **Lợi thế nổi bật:** ${blockForSignal(section).loi_the}
 
 **Điểm dễ vướng:** ${blockForSignal(section).rao_can}
+
+**Vì sao có nhận định này:** ${section.evidenceText}
+
+**Gợi ý thực tế:** ${section.practicalTip}
 
 🔒 Nâng cấp Premium để xem:
 
@@ -209,13 +304,13 @@ Hồ sơ: ${signals.profileName} (${signals.lifeYearLabel})
 Tuổi xem: ${age} tuổi trong năm ${signals.viewYear}
 Bản Mệnh: ${signals.destinyLine}
 
-Đây không phải một đoạn luận chung cho mọi người. Bốn tín hiệu dưới đây được chọn trực tiếp từ cung Mệnh, Tài Bạch, Quan Lộc và vận năm trong chính lá số của bạn. Mỗi mục chỉ ra một lợi thế có thể tận dụng, một điểm dễ vướng thường khó tự nhận ra, cùng câu hỏi quan trọng cần ghép thêm 12 cung và đại vận mới có thể trả lời trọn vẹn.
+Đây không phải đoạn luận chung. Bốn tín hiệu dưới đây được chọn từ cung Mệnh, Tài Bạch, Quan Lộc và vận năm trong chính lá số của bạn. Mỗi mục có đọc nhanh, lợi thế, điểm dễ vướng, bằng chứng đã dùng và một gợi ý thực tế để bạn tự đối chiếu ngay.
 
 ${sections.map(renderSection).join("\n\n")}
 
 ## KHAI MỞ BẢN ĐỒ ĐỘC BẢN CỦA RIÊNG BẠN
 
-Bản miễn phí đã chỉ ra bốn tín hiệu nổi bật, nhưng từng tín hiệu vẫn có thể đổi chiều khi ghép với Mệnh - Thân, tam hợp, xung chiếu và đại vận. Báo cáo FULL Premium nối toàn bộ 12 cung với vận năm, lộ trình 12 tháng và kế hoạch hành động 90 ngày để làm rõ: lợi thế nào nên dùng ngay, rủi ro nào cần chặn trước và thời điểm nào đáng ưu tiên.
+Bản FULL Premium nối 12 cung, vận năm, lộ trình 12 tháng và kế hoạch 90 ngày để làm rõ lợi thế nên dùng, rủi ro cần chặn và thời điểm đáng ưu tiên.
 
 [ MỞ KHÓA BÁO CÁO FULL PREMIUM NGAY ]`;
 }

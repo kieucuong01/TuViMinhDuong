@@ -33,14 +33,14 @@ describe("free overview status", () => {
     expect(source).toContain("const FREE_OVERVIEW_PROCESSING_TTL_MS = 5 * 60 * 1000");
   });
 
-  it("returns a fast 520-950 visible-word block preview while the LLM overview is missing", async () => {
+  it("returns a fast 800-1200 visible-word block preview while the LLM overview is missing", async () => {
     const { FREE_OVERVIEW_MAX_WORDS, FREE_OVERVIEW_MIN_WORDS, FREE_OVERVIEW_VERSION } = await import("@/lib/ai");
     const { getFreeOverviewStatus } = await import("@/lib/data");
     const status = getFreeOverviewStatus(chartFixture());
 
     expect(status.status).toBe("fallback");
     expect(status.source).toBe("seed-rules");
-    expect(FREE_OVERVIEW_VERSION).toBe("free-block-preview-v3");
+    expect(FREE_OVERVIEW_VERSION).toBe("free-block-preview-v4");
     expect(status.jobStatus).toBe("idle");
     expect(status.content).toContain("# Luận giải miễn phí dành cho");
     expect(status.content).toContain("## 4. Vận hạn năm");

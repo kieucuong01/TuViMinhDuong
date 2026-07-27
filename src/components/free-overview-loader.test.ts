@@ -17,6 +17,8 @@ const structuredOverview = {
 
 ## 1. Năng lực thiên phú (Cung Mệnh)
 
+[Block Nội dung - Tử Vi]:
+
 Mệnh sáng và biết dung hòa.
 
 **Lợi thế nổi bật:** Bạn nhìn được nhiều góc độ trước khi quyết định.
@@ -70,7 +72,7 @@ describe("FreeOverviewLoader seed-first LLM refresh gate", () => {
     expect(refreshSource).toContain("attempt >= 30");
   });
 
-  it("turns the long report into a 30-second summary, sticky navigation and four readable cards", () => {
+  it("turns the long report into a 30-second summary, sticky navigation and four readable sections", () => {
     const html = renderToStaticMarkup(
       createElement(FreeOverviewLoader, {
         chartId: "chart-1",
@@ -90,7 +92,11 @@ describe("FreeOverviewLoader seed-first LLM refresh gate", () => {
     expect(html).toContain('aria-label="Điều hướng luận giải miễn phí"');
     expect(html).toContain('href="#free-insight-1"');
     expect(html.match(/data-reading-section=/gu)).toHaveLength(4);
-    expect(html).toContain("Đọc phần này");
+    expect(html).toContain("4/4 phần miễn phí");
+    expect(html).toContain("free-overview-chapter-list");
+    expect(html).not.toContain("<details");
+    expect(html).not.toContain("[Block Nội dung");
+    expect(html).not.toContain('href="#personal-report-outline"');
     expect(html).toContain("Bản FULL sẽ trả lời");
     expect(html).toContain("Xem dòng tiền 12 tháng — 199.000đ");
     expect(html).toContain("Không cần đăng nhập");
@@ -176,6 +182,7 @@ describe("FreeOverviewLoader seed-first LLM refresh gate", () => {
     );
 
     expect(html).not.toContain('popoverTarget="premium-confirm-chart-1"');
+    expect(html).not.toContain("Bản FULL sẽ trả lời");
     expect(html).toContain("Đăng nhập để lưu lá số");
   });
 

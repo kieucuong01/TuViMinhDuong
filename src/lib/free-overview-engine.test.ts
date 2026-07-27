@@ -77,11 +77,14 @@ describe("free reading block builder", () => {
     expect(sections).toHaveLength(4);
     for (const section of sections) {
       expect(section.freeText.length).toBeGreaterThan(120);
+      expect(section.quickTake).toMatch(/cung|tuổi|năm/iu);
+      expect(section.evidenceText).toMatch(/cung|Mệnh\/Thân\/Cục|đại vận/iu);
+      expect(section.practicalTip.length).toBeGreaterThan(80);
       expect(section.premiumHook).toMatch(/\?$/u);
     }
   });
 
-  it("assembles the final free report as a paid-conversion preview, not the old long report", () => {
+  it("assembles the final free report as a deeper evidence-based paid-conversion preview", () => {
     const overview = buildFreeOverviewFromInterpretationRules(sampleChart);
 
     expect(overview).toContain("# Luận giải miễn phí dành cho Kiều Tấn Cường");
@@ -93,13 +96,17 @@ describe("free reading block builder", () => {
     expect(overview).toContain("## 4. Vận hạn năm 2026 (Năm Bính Ngọ)");
     expect(overview.match(/\*\*Lợi thế nổi bật:\*\*/gu)).toHaveLength(4);
     expect(overview.match(/\*\*Điểm dễ vướng:\*\*/gu)).toHaveLength(4);
+    expect(overview.match(/\*\*Đọc nhanh:\*\*/gu)).toHaveLength(4);
+    expect(overview.match(/\*\*Vì sao có nhận định này:\*\*/gu)).toHaveLength(4);
+    expect(overview.match(/\*\*Gợi ý thực tế:\*\*/gu)).toHaveLength(4);
     expect(overview.match(/🔒 Nâng cấp Premium để xem:/gu)).toHaveLength(4);
     expect(overview).toContain("KHAI MỞ BẢN ĐỒ ĐỘC BẢN CỦA RIÊNG BẠN");
     expect(overview).toContain("MỞ KHÓA BÁO CÁO FULL PREMIUM NGAY");
     expect(overview).not.toContain("### Điểm nổi bật");
-    expect(overview).not.toContain("### Vì sao có nhận định này");
+    expect(overview).toContain("**Vì sao có nhận định này:**");
+    expect(overview).toContain(sampleChart.palaces.find((palace) => palace.name === "Mệnh")?.branch);
     expect(overview).not.toContain("lắp ghép các khối nội dung");
-    expect(countVisibleMarkdownWords(overview)).toBeGreaterThanOrEqual(520);
-    expect(countVisibleMarkdownWords(overview)).toBeLessThanOrEqual(950);
+    expect(countVisibleMarkdownWords(overview)).toBeGreaterThanOrEqual(800);
+    expect(countVisibleMarkdownWords(overview)).toBeLessThanOrEqual(1200);
   });
 });

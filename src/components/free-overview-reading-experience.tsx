@@ -3,8 +3,6 @@ import {
   BadgeCheck,
   BriefcaseBusiness,
   CalendarRange,
-  ChevronDown,
-  LockKeyhole,
   Sparkles,
   WalletCards,
 } from "lucide-react";
@@ -41,7 +39,7 @@ function cleanMarkdownText(content: string) {
 
 function conciseSentence(content: string) {
   const clean = cleanMarkdownText(content);
-  if (!clean) return "Mở phần này để xem nhận định cá nhân hóa theo chính lá số của bạn.";
+  if (!clean) return "Tiếp tục đọc để xem nhận định cá nhân hóa theo chính lá số của bạn.";
   const firstSentence = clean.split(/(?<=[.!?])\s+/u)[0] || clean;
   if (firstSentence.length <= 180) return firstSentence;
   const shortened = firstSentence.slice(0, 177).replace(/\s+\S*$/u, "").trim();
@@ -72,7 +70,9 @@ export function parseFreeOverviewSections(content: string): FreeOverviewSection[
     if (trailingSalesHeading >= 0) sectionContent = sectionContent.slice(0, trailingSalesHeading).trim();
 
     const premiumMarker = sectionContent.search(/^🔒\s*Nâng cấp Premium để xem:\s*$/mu);
-    const body = (premiumMarker >= 0 ? sectionContent.slice(0, premiumMarker) : sectionContent).trim();
+    const body = (premiumMarker >= 0 ? sectionContent.slice(0, premiumMarker) : sectionContent)
+      .replace(/^\[Block Nội dung - .+\]:\s*$/gmu, "")
+      .trim();
     const premiumPreview = (premiumMarker >= 0
       ? sectionContent.slice(premiumMarker).replace(/^🔒\s*Nâng cấp Premium để xem:\s*/u, "")
       : ""
@@ -149,45 +149,53 @@ export function FreeOverviewReadingExperience({
       </section>
 
       <nav className="free-overview-section-nav" aria-label="Điều hướng luận giải miễn phí">
-        <span>Đọc theo chủ đề</span>
-        <div>
+        <div className="free-overview-nav-copy">
+          <span>Đọc theo chủ đề</span>
+          <strong>{sections.length}/4 phần miễn phí</strong>
+        </div>
+        <ol>
           {sections.map((section) => (
-            <a key={section.id} href={`#${section.id}`}>{section.navTitle}</a>
+            <li key={section.id}>
+              <a href={`#${section.id}`}>
+                <span className="free-overview-nav-index">{section.number}</span>
+                <span>{section.navTitle}</span>
+              </a>
+            </li>
           ))}
-          <a href="#personal-report-outline">Bản FULL</a>
+        </ol>
+        <div className="free-overview-progress" aria-hidden="true">
+          <span style={{ width: `${Math.min(sections.length, 4) * 25}%` }} />
         </div>
       </nav>
 
-      <div className="free-overview-card-list">
-        {sections.map((section, index) => {
-          const showContextualCta = canCheckoutFull && (section.number === 2 || section.number === 4);
+      <div className="free-overview-chapter-list">
+        {sections.map((section) => {
+          const showPremiumPreview = canCheckoutFull && Boolean(section.premiumPreview);
+          const showContextualCta = showPremiumPreview && (section.number === 2 || section.number === 4);
+          const headingId = `${section.id}-title`;
+
           return (
-            <details
+            <section
               key={section.id}
               id={section.id}
               className={`free-overview-insight-card is-${section.tone}`}
               data-reading-section={section.number}
-              open={index === 0}
+              aria-labelledby={headingId}
             >
-              <summary>
+              <header className="free-overview-card-header">
                 <span className="free-overview-card-icon">{sectionIcon(section.number)}</span>
-                <span className="free-overview-card-title">
+                <div className="free-overview-card-title">
                   <small>Phần {section.number}/4</small>
-                  <strong>{section.title}</strong>
-                  <em>{section.takeaway}</em>
-                </span>
-                <span className="free-overview-card-state">
-                  <span className="is-closed">Đọc phần này</span>
-                  <span className="is-open">Thu gọn</span>
-                  <ChevronDown size={18} aria-hidden="true" />
-                </span>
-              </summary>
+                  <h2 id={headingId}>{section.title}</h2>
+                  <p>{section.takeaway}</p>
+                </div>
+              </header>
               <div className="free-overview-card-body">
                 <MarkdownContent content={section.body} />
-                {section.premiumPreview ? (
-                  <aside className="free-overview-locked-preview">
-                    <div className="free-overview-locked-heading">
-                      <span><LockKeyhole size={17} aria-hidden="true" /></span>
+                {showPremiumPreview ? (
+                  <aside className="free-overview-premium-preview" aria-label={`Gợi ý nội dung bản FULL cho ${section.navTitle}`}>
+                    <div className="free-overview-premium-heading">
+                      <span><Sparkles size={17} aria-hidden="true" /></span>
                       <div>
                         <strong>Bản FULL sẽ trả lời</strong>
                         <p>Phần chuyên sâu nối trực tiếp với nhận định bạn vừa đọc.</p>
@@ -198,7 +206,7 @@ export function FreeOverviewReadingExperience({
                       <div className="free-overview-contextual-offer">
                         <button
                           type="button"
-                          className="btn btn-primary"
+                          className="btn btn-primary free-overview-secondary-cta"
                           popoverTarget={premiumReadingModalId(chartId)}
                           data-ad-click="full_offer_context_clicked"
                           data-chart-id={chartId}
@@ -216,7 +224,7 @@ export function FreeOverviewReadingExperience({
                   </aside>
                 ) : null}
               </div>
-            </details>
+            </section>
           );
         })}
       </div>
