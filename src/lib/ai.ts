@@ -906,6 +906,35 @@ ${draftBlock}
 Hãy viết lại block trên tự nhiên hơn, có cảm giác chuyên gia đang nói riêng với người xem. Giữ nguyên ý chính và offer Premium thật. Trả về duy nhất Markdown của block này.`;
 }
 
+function normalizeFreeOverviewBlockOutput(key: FreeOverviewBlockKey, chart: TuViChart, content: string, draftBlock: string) {
+  let normalized = content.trim().replace(/\n{3,}/gu, "\n\n");
+  const expectedHeading = freeOverviewSectionHeading(key, chart);
+
+  if (key === "intro") {
+    const draftHeader = draftBlock.split(/\n\s*\n/u)[0]?.trim() || expectedHeading;
+    normalized = normalized.replace(/^##\s+.+$/gmu, "").trim();
+    if (!normalized.includes(expectedHeading)) normalized = `${draftHeader}\n\n${normalized}`.trim();
+    return normalized;
+  }
+
+  const firstH2 = normalized.match(/^##\s+.+$/mu)?.[0];
+  if (firstH2) normalized = normalized.replace(firstH2, expectedHeading);
+  else normalized = `${expectedHeading}\n\n${normalized}`;
+
+  const draftPremiumIndex = draftBlock.search(/^🔒\s*Nâng cấp Premium để xem:\s*$/mu);
+  const draftPremium = draftPremiumIndex >= 0 ? draftBlock.slice(draftPremiumIndex).trim() : "";
+  const premiumIndex = normalized.search(/^🔒\s*Nâng cấp Premium để xem:\s*$/mu);
+  if (draftPremium && premiumIndex < 0) {
+    normalized = `${normalized}\n\n${draftPremium}`;
+  } else if (draftPremium) {
+    const premiumTail = normalized.slice(premiumIndex);
+    const bulletCount = premiumTail.match(/^[-*]\s+.+$/gmu)?.length || 0;
+    if (bulletCount < 2) normalized = `${normalized.slice(0, premiumIndex).trim()}\n\n${draftPremium}`;
+  }
+
+  return normalized.trim().replace(/\n{3,}/gu, "\n\n");
+}
+
 export async function generateFreeOverviewBlock(chart: TuViChart, key: FreeOverviewBlockKey) {
   const fallbackContent = buildInstantFreeOverview(chart);
   const draftBlock = splitFreeOverviewBlocks(fallbackContent).blocks[key];
@@ -920,11 +949,12 @@ export async function generateFreeOverviewBlock(chart: TuViChart, key: FreeOverv
     thinking: "disabled",
     attemptsPerProvider: 1,
     timeoutMs: key === "intro" ? 14_000 : 18_000,
-    accept: (candidate) => isCompleteFreeOverviewBlock(key, chart, candidate.text),
+    accept: (candidate) => isCompleteFreeOverviewBlock(key, chart, normalizeFreeOverviewBlockOutput(key, chart, candidate.text, draftBlock)),
   });
 
-  if (routed && isCompleteFreeOverviewBlock(key, chart, routed.text)) {
-    return { content: routed.text, model: routed.model };
+  if (routed) {
+    const normalized = normalizeFreeOverviewBlockOutput(key, chart, routed.text, draftBlock);
+    if (isCompleteFreeOverviewBlock(key, chart, normalized)) return { content: normalized, model: routed.model };
   }
   return fallback;
 }
