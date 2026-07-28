@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { BookOpenText, CalendarDays, Compass, Layers3, Search, ShieldCheck, Sparkles, UserRound } from "lucide-react";
+import { BookOpenText, CalendarDays, Compass, Layers3, Search, Sparkles, UserRound } from "lucide-react";
 import { adultExpansionLifetimeCards, historicalLifetimeCards } from "@/lib/lifetime-age-data";
 import { routeMetadata } from "@/lib/metadata";
 import { faqJsonLd, itemListJsonLd, webPageJsonLd } from "@/lib/seo";
@@ -239,7 +239,34 @@ const relatedLinks = [
   ["/kien-thuc-tu-vi/dai-van-la-gi", "Đại vận là gì?", "Cách nhìn các chặng vận dài hạn mà không phán tuyệt đối."],
 ] as const;
 
-const futureTools = ["Xem Tử vi 2026", "Tử vi tài lộc & Đầu tư", "Tương hợp lá số"];
+
+
+
+type LifetimeQuickIndexGroup = {
+  decade: string;
+  items: LifetimeCardListItem[];
+};
+
+function decadeLabel(year: string) {
+  const numericYear = Number(year);
+  if (!Number.isFinite(numericYear)) return "Khác";
+  const decadeStart = Math.floor(numericYear / 10) * 10;
+  return `${decadeStart}-${decadeStart + 9}`;
+}
+
+export const lifetimeQuickIndexGroups: LifetimeQuickIndexGroup[] = Object.values(
+  lifetimeCards
+    .filter((item) => Boolean(item.detailsPath))
+    .sort((a, b) => Number(b.year) - Number(a.year) || a.gender.localeCompare(b.gender, "vi"))
+    .reduce<Record<string, LifetimeCardListItem[]>>((groups, item) => {
+      const decade = decadeLabel(item.year);
+      groups[decade] = [...(groups[decade] || []), item];
+      return groups;
+    }, {}),
+).map((items) => ({ decade: decadeLabel(items[0]?.year || ""), items }));
+
+const lifetimeHubCtaHref = "/?source=tool&source_slug=xem-tu-vi-tron-doi&entry_article=xem-tu-vi-tron-doi&cta_location=lifetime_hub_hero#lap-la-so";
+const lifetimeHubDeepCtaHref = "/?source=tool&source_slug=xem-tu-vi-tron-doi&entry_article=xem-tu-vi-tron-doi&cta_location=lifetime_hub_deep#lap-la-so";
 
 const faqs = [
   {
@@ -294,6 +321,9 @@ export default function LifetimeTuViPage() {
               <Link href="#doc-sau-hon" className="btn btn-ghost btn-large">
                 <Sparkles size={20} /> Đọc sâu hơn
               </Link>
+              <Link href={lifetimeHubCtaHref} className="btn btn-ghost btn-large">
+                <UserRound size={20} /> Lập lá số đối chiếu
+              </Link>
             </div>
           </div>
 
@@ -329,42 +359,39 @@ export default function LifetimeTuViPage() {
               Mỗi tuổi có phần đọc ngay: tổng quan, công việc - tiền bạc, tình cảm - gia đạo và lưu ý vận hạn. Nội dung dùng để tham khảo, không thay thế quyết định cá nhân.
             </p>
           </div>
+          <section className="mb-8 rounded-3xl border border-orange-100 bg-orange-50/50 p-5 sm:p-6" aria-labelledby="lifetime-quick-index-heading">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <p className="eyebrow">Tra nhanh theo năm sinh</p>
+                <h3 id="lifetime-quick-index-heading" className="text-2xl font-black text-stone-950">
+                  Danh mục đầy đủ các tuổi đã có bài chi tiết
+                </h3>
+                <p className="mt-2 text-sm leading-6 text-stone-600">
+                  Các liên kết bên dưới được render sẵn trong HTML để Google và AI crawler đọc được toàn bộ cụm Tử vi trọn đời, không phụ thuộc vào phân trang tương tác.
+                </p>
+              </div>
+              <Link href={lifetimeHubCtaHref} className="btn btn-primary">
+                <UserRound size={18} /> Lập lá số đối chiếu
+              </Link>
+            </div>
+            <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+              {lifetimeQuickIndexGroups.map((group, index) => (
+                <details key={group.decade} open={index < 2} className="rounded-2xl border border-orange-100 bg-white p-4">
+                  <summary className="cursor-pointer text-base font-black text-stone-950">
+                    Tuổi sinh giai đoạn {group.decade}
+                  </summary>
+                  <div className="mt-3 grid gap-2">
+                    {group.items.map((item) => (
+                      <Link key={item.detailsPath} href={item.detailsPath || "/xem-tu-vi-tron-doi"} className="rounded-xl bg-stone-50 px-3 py-2 text-sm font-semibold text-stone-700 transition hover:bg-orange-100 hover:text-orange-800">
+                        {item.title}
+                      </Link>
+                    ))}
+                  </div>
+                </details>
+              ))}
+            </div>
+          </section>
           <LifetimeCardList cards={lifetimeCards} itemsPerPage={LIFETIME_CARDS_PER_PAGE} />
-          {false ? <div className="grid gap-5">
-            {lifetimeCards.map((item) => (
-              <article id={item.id} key={item.id} className="scroll-mt-24 rounded-2xl border border-orange-100 bg-white p-5 shadow-sm">
-                <div className="flex flex-wrap items-center gap-3">
-                  <span className="rounded-full bg-orange-100 px-3 py-1 text-sm font-black text-orange-700">{item.year}</span>
-                  <span className="rounded-full bg-stone-100 px-3 py-1 text-sm font-black text-stone-700">{item.canChi}</span>
-                  <span className="rounded-full bg-emerald-50 px-3 py-1 text-sm font-black text-emerald-700">{item.gender}</span>
-                </div>
-                <h3 className="mt-4 text-2xl font-black text-stone-950">{item.title}</h3>
-                <div className="mt-4 grid gap-4 lg:grid-cols-2">
-                  <div className="rounded-2xl bg-orange-50/70 p-4">
-                    <h4 className="font-black text-stone-950">Tổng quan trọn đời</h4>
-                    <p className="mt-2 leading-7 text-stone-700">{item.overview}</p>
-                  </div>
-                  <div className="rounded-2xl bg-stone-50 p-4">
-                    <h4 className="font-black text-stone-950">Công việc và tiền bạc</h4>
-                    <p className="mt-2 leading-7 text-stone-700">{item.work}</p>
-                  </div>
-                  <div className="rounded-2xl bg-stone-50 p-4">
-                    <h4 className="font-black text-stone-950">Tình cảm và gia đạo</h4>
-                    <p className="mt-2 leading-7 text-stone-700">{item.family}</p>
-                  </div>
-                  <div className="rounded-2xl bg-amber-50 p-4">
-                    <h4 className="font-black text-stone-950">Lưu ý vận hạn</h4>
-                    <p className="mt-2 leading-7 text-stone-700">{item.caution}</p>
-                  </div>
-                </div>
-                {item.detailsPath ? (
-                  <Link href={item.detailsPath} className="btn btn-primary mt-5">
-                    <BookOpenText size={18} /> Đọc bài chi tiết
-                  </Link>
-                ) : null}
-              </article>
-            ))}
-          </div> : null}
         </div>
       </section>
 
@@ -377,7 +404,7 @@ export default function LifetimeTuViPage() {
               <p className="mt-4 text-lg leading-8 text-stone-600">
                 Nếu chỉ cần tra nhanh, các phần trên là đủ để đọc tổng quan. Khi cần xem kỹ vì sao cùng tuổi nhưng đời sống khác nhau, hãy đối chiếu thêm giờ sinh, cung Mệnh, cung Thân, đại vận và các sao trong 12 cung.
               </p>
-              <Link href="/lap-la-so" className="btn btn-ghost mt-6">
+              <Link href={lifetimeHubDeepCtaHref} className="btn btn-ghost mt-6">
                 <UserRound size={18} /> Lập lá số cá nhân khi cần
               </Link>
             </div>
@@ -416,27 +443,6 @@ export default function LifetimeTuViPage() {
         </div>
       </section>
 
-      <section className="section bg-white/70">
-        <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
-          <div className="rounded-3xl border border-stone-200 bg-white p-5 sm:p-7">
-            <div className="flex items-start gap-3">
-              <ShieldCheck className="mt-1 shrink-0 text-emerald-600" size={24} />
-              <div>
-                <p className="eyebrow">Làm sau</p>
-                <h2 className="text-2xl font-black text-stone-950">Các mục còn lại đã đặt trong tab Tử vi, nhưng chưa mở route riêng</h2>
-                <p className="mt-2 text-stone-600">Giữ trạng thái sắp làm để không sinh công cụ chưa có logic thật.</p>
-              </div>
-            </div>
-            <div className="mt-5 grid gap-3 sm:grid-cols-3">
-              {futureTools.map((tool) => (
-                <span key={tool} className="rounded-2xl bg-stone-50 p-4 font-black text-stone-600">
-                  {tool}
-                </span>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
 
       <section className="section pt-0">
         <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
