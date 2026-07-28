@@ -74,18 +74,20 @@ describe("site header featured nav effects", () => {
     expect(headerSource).not.toContain("<details className=\"site-lookup-menu\"");
     expect(globalsCss).toContain(".site-nav.is-closing .site-date-panel");
     expect(globalsCss).toMatch(/\.site-date-panel\s*{[\s\S]*opacity:\s*0;[\s\S]*pointer-events:\s*none;[\s\S]*visibility:\s*hidden;/);
-    expect(globalsCss).toMatch(/\.site-date-menu:hover \.site-date-panel,\s*\n\.site-date-menu:focus-within \.site-date-panel\s*{[\s\S]*opacity:\s*1;[\s\S]*pointer-events:\s*auto;/);
-    expect(globalsCss).toMatch(/\.site-tuvi-menu:hover \.site-tuvi-panel,\s*\n\.site-tuvi-menu:focus-within \.site-tuvi-panel\s*{[\s\S]*opacity:\s*1;[\s\S]*pointer-events:\s*auto;/);
-    expect(globalsCss).toMatch(/\.site-lookup-menu:hover \.site-lookup-panel,\s*\n\.site-lookup-menu:focus-within \.site-lookup-panel\s*{[\s\S]*opacity:\s*1;[\s\S]*pointer-events:\s*auto;/);
+    expect(globalsCss).toMatch(/\.site-nav:not\(\.is-closing\) \.site-date-menu:hover \.site-date-panel,\s*\n\.site-nav:not\(\.is-closing\) \.site-date-menu:focus-within \.site-date-panel\s*{[\s\S]*opacity:\s*1;[\s\S]*pointer-events:\s*auto;/);
+    expect(globalsCss).toMatch(/\.site-nav:not\(\.is-closing\) \.site-tuvi-menu:hover \.site-tuvi-panel,\s*\n\.site-nav:not\(\.is-closing\) \.site-tuvi-menu:focus-within \.site-tuvi-panel\s*{[\s\S]*opacity:\s*1;[\s\S]*pointer-events:\s*auto;/);
+    expect(globalsCss).toMatch(/\.site-nav:not\(\.is-closing\) \.site-lookup-menu:hover \.site-lookup-panel,\s*\n\.site-nav:not\(\.is-closing\) \.site-lookup-menu:focus-within \.site-lookup-panel\s*{[\s\S]*opacity:\s*1;[\s\S]*pointer-events:\s*auto;/);
   });
 
-  it("closes an open desktop dropdown before a submenu link starts navigating", () => {
+  it("keeps desktop dropdowns closed after clicking submenu links until the pointer leaves", () => {
     expect(navShellSource).toContain("onPointerDownCapture");
+    expect(navShellSource).toContain("sessionStorage");
+    expect(navShellSource).toContain("onMouseLeave");
     expect(navShellSource).toContain('closest("a")');
   });
 
   it("keeps desktop header navigation visible through stable CSS instead of Tailwind-only display classes", () => {
-    expect(navShellSource).not.toContain("hidden");
+    expect(navShellSource).not.toMatch(/className=[^\n]*(?:hidden|lg:flex)/);
     expect(navShellSource).not.toContain("lg:flex");
     expect(globalsCss).toMatch(/\.site-nav\s*{[\s\S]*display:\s*none;[\s\S]*align-items:\s*center;/);
     expect(globalsCss).toMatch(/@media \(min-width:\s*1024px\)\s*{[\s\S]*\.site-nav\s*{[\s\S]*display:\s*flex;/);

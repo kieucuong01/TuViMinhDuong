@@ -1025,8 +1025,8 @@ button.is-loading:not(.icon-button)::before {
   color: #9a3412;
 }
 
-.site-date-menu:hover .site-date-panel,
-.site-date-menu:focus-within .site-date-panel {
+.site-nav:not(.is-closing) .site-date-menu:hover .site-date-panel,
+.site-nav:not(.is-closing) .site-date-menu:focus-within .site-date-panel {
   opacity: 1;
   pointer-events: auto;
   transform: translateX(-50%) translateY(0);
@@ -1076,8 +1076,8 @@ button.is-loading:not(.icon-button)::before {
   transform: translateY(-1px);
 }
 
-.site-age-menu:hover .site-age-panel,
-.site-age-menu:focus-within .site-age-panel {
+.site-nav:not(.is-closing) .site-age-menu:hover .site-age-panel,
+.site-nav:not(.is-closing) .site-age-menu:focus-within .site-age-panel {
   opacity: 1;
   pointer-events: auto;
   transform: translateX(-50%) translateY(0);
@@ -1106,8 +1106,8 @@ button.is-loading:not(.icon-button)::before {
   transform: translateY(-1px);
 }
 
-.site-tuvi-menu:hover .site-tuvi-panel,
-.site-tuvi-menu:focus-within .site-tuvi-panel {
+.site-nav:not(.is-closing) .site-tuvi-menu:hover .site-tuvi-panel,
+.site-nav:not(.is-closing) .site-tuvi-menu:focus-within .site-tuvi-panel {
   opacity: 1;
   pointer-events: auto;
   transform: translateX(-50%) translateY(0);
@@ -13211,8 +13211,8 @@ button.is-loading:not(.icon-button)::before {
   color: #c2410c;
 }
 
-.site-lookup-menu:hover .site-lookup-panel,
-.site-lookup-menu:focus-within .site-lookup-panel {
+.site-nav:not(.is-closing) .site-lookup-menu:hover .site-lookup-panel,
+.site-nav:not(.is-closing) .site-lookup-menu:focus-within .site-lookup-panel {
   opacity: 1;
   pointer-events: auto;
   transform: translateY(0);
