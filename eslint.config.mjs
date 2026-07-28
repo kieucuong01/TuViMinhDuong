@@ -10,6 +10,7 @@ const eslintConfig = defineConfig([
     // Default ignores of eslint-config-next:
     ".git/**",
     ".next/**",
+    ".worktrees/**",
     "node_modules/**",
     "out/**",
     "build/**",
