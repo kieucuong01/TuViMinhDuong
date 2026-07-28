@@ -44,10 +44,9 @@ export function buildLifetimeSearchUrl(
   page: number,
 ) {
   const params = new URLSearchParams(currentSearchParams.toString());
-  const trimmedQuery = query.trim();
 
-  if (trimmedQuery) {
-    params.set("q", trimmedQuery);
+  if (query.trim()) {
+    params.set("q", query);
   } else {
     params.delete("q");
   }

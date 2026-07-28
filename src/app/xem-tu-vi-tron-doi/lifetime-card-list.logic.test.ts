@@ -57,6 +57,17 @@ describe("lifetime card list logic", () => {
     ).toBe("/xem-tu-vi-tron-doi#tim-tuoi");
   });
 
+  it("preserves meaningful trailing spaces while the user is still typing", () => {
+    expect(
+      buildLifetimeSearchUrl(
+        "/xem-tu-vi-tron-doi",
+        new URLSearchParams(),
+        "1995 ",
+        1,
+      ),
+    ).toBe("/xem-tu-vi-tron-doi?q=1995+#tim-tuoi");
+  });
+
   it("returns compact pagination tokens for long page ranges", () => {
     expect(getLifetimePaginationTokens(1, 14)).toEqual([1, 2, 3, "ellipsis-end", 14]);
     expect(getLifetimePaginationTokens(7, 14)).toEqual([
