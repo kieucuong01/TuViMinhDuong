@@ -69,7 +69,7 @@ export const AGE_TOOL_PAGES: AgeToolPage[] = [
       { question: "Cùng con giáp có được tính là Tam Hợp không?", answer: "Không. Cùng một Địa Chi được ghi là đồng chi. Tam Hợp chỉ áp dụng khi hai Chi khác nhau cùng thuộc một nhóm Tam Hợp." },
     ],
     related: ["ket-hon", "sinh-con"],
-    cta: { href: "/?source=xem_tuoi_vo_chong#lap-la-so", label: "Lập hai lá số", description: "Xem sâu hơn tính cách và các cung liên quan trên từng lá số." },
+    cta: { href: "/?source=tool&source_slug=xem-tuoi-vo-chong&entry_article=xem-tuoi-vo-chong&cta_location=age_tool_result#lap-la-so", label: "Lập hai lá số", description: "Xem sâu hơn tính cách và các cung liên quan trên từng lá số." },
   },
   {
     slug: "sinh-con",
@@ -96,7 +96,7 @@ export const AGE_TOOL_PAGES: AgeToolPage[] = [
       { question: "Kết quả này có thay cho tư vấn sinh sản không?", answer: "Không. Công cụ chỉ trình bày quan niệm tuổi truyền thống và không đưa ra dự báo hay chỉ dẫn y khoa." },
     ],
     related: ["vo-chong", "ket-hon"],
-    cta: { href: "/?source=xem_tuoi_sinh_con#lap-la-so", label: "Lập lá số cha mẹ", description: "Xem bối cảnh gia đình trên từng lá số thay vì chỉ xét năm sinh." },
+    cta: { href: "/?source=tool&source_slug=xem-tuoi-sinh-con&entry_article=xem-tuoi-sinh-con&cta_location=age_tool_result#lap-la-so", label: "Lập lá số cha mẹ", description: "Xem bối cảnh gia đình trên từng lá số thay vì chỉ xét năm sinh." },
   },
   {
     slug: "ket-hon",
