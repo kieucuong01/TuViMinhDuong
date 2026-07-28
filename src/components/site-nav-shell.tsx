@@ -62,7 +62,11 @@ export function SiteNavShell({ children }: { children: ReactNode }) {
     };
 
     window.addEventListener("pointermove", clearWhenPointerLeavesNav);
-    return () => window.removeEventListener("pointermove", clearWhenPointerLeavesNav);
+    window.addEventListener("pointerdown", clearWhenPointerLeavesNav);
+    return () => {
+      window.removeEventListener("pointermove", clearWhenPointerLeavesNav);
+      window.removeEventListener("pointerdown", clearWhenPointerLeavesNav);
+    };
   }, [isClosing]);
 
   const rememberPointerLinkTarget = (target: EventTarget | null) => {
@@ -77,8 +81,8 @@ export function SiteNavShell({ children }: { children: ReactNode }) {
     setIsClosing(true);
   };
 
-  const clearClosing = (nextTarget: EventTarget | null = null) => {
-    if (shouldKeepFlyoutsClosed() && (!nextTarget || isInsideSiteNav(nextTarget))) return;
+  const clearClosing = () => {
+    if (shouldKeepFlyoutsClosed()) return;
 
     setKeepFlyoutsClosed(false);
     setIsClosing(false);
@@ -99,7 +103,7 @@ export function SiteNavShell({ children }: { children: ReactNode }) {
       onMouseEnter={() => {
         if (!shouldKeepFlyoutsClosed()) setIsClosing(false);
       }}
-      onMouseLeave={(event) => clearClosing(event.relatedTarget)}
+      onMouseLeave={clearClosing}
     >
       {children}
     </nav>
