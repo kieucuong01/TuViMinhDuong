@@ -41,6 +41,7 @@ const setFlyoutPanelsClosed = (nav: HTMLElement, closed: boolean) => {
 
 const getLinkFromTarget = (target: EventTarget | null) => (target as HTMLElement | null)?.closest("a") ?? null;
 const isFlyoutPanelLink = (link: HTMLElement) => Boolean(link.closest(FLYOUT_PANEL_SELECTOR));
+const isInsideSiteNav = (target: EventTarget | null) => target instanceof Element && Boolean(target.closest(".site-nav"));
 
 export function SiteNavShell({ children }: { children: ReactNode }) {
   const navRef = useRef<HTMLElement>(null);
@@ -49,6 +50,19 @@ export function SiteNavShell({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!navRef.current) return;
     setFlyoutPanelsClosed(navRef.current, isClosing);
+  }, [isClosing]);
+
+  useEffect(() => {
+    if (!isClosing && !shouldKeepFlyoutsClosed()) return;
+
+    const clearWhenPointerLeavesNav = (event: PointerEvent) => {
+      if (isInsideSiteNav(event.target)) return;
+      setKeepFlyoutsClosed(false);
+      setIsClosing(false);
+    };
+
+    window.addEventListener("pointermove", clearWhenPointerLeavesNav);
+    return () => window.removeEventListener("pointermove", clearWhenPointerLeavesNav);
   }, [isClosing]);
 
   const rememberPointerLinkTarget = (target: EventTarget | null) => {
@@ -63,7 +77,9 @@ export function SiteNavShell({ children }: { children: ReactNode }) {
     setIsClosing(true);
   };
 
-  const clearClosing = () => {
+  const clearClosing = (nextTarget: EventTarget | null = null) => {
+    if (shouldKeepFlyoutsClosed() && (!nextTarget || isInsideSiteNav(nextTarget))) return;
+
     setKeepFlyoutsClosed(false);
     setIsClosing(false);
   };
@@ -83,7 +99,7 @@ export function SiteNavShell({ children }: { children: ReactNode }) {
       onMouseEnter={() => {
         if (!shouldKeepFlyoutsClosed()) setIsClosing(false);
       }}
-      onMouseLeave={clearClosing}
+      onMouseLeave={(event) => clearClosing(event.relatedTarget)}
     >
       {children}
     </nav>
