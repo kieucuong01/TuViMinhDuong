@@ -36,9 +36,13 @@ describe("lifetime Tu vi landing page", () => {
     expect(sitemapSource).not.toContain("/tu-vi-tai-loc-dau-tu");
     expect(sitemapSource).not.toContain("/tuong-hop-la-so");
   });
-  it("keeps pagination client-side and a thumbnail on every card", () => {
+  it("keeps pagination client-side with filter controls and a thumbnail on every card", () => {
     expect(cardListSource).toContain('"use client"');
     expect(cardListSource).toContain("useState(1)");
+    expect(cardListSource).toContain("filteredCards");
+    expect(cardListSource).toContain("Tìm tuổi theo năm sinh");
+    expect(cardListSource).toContain("Nhập năm sinh, can chi hoặc nam/nữ");
+    expect(cardListSource).toContain("Không tìm thấy tuổi phù hợp");
     expect(cardListSource).toContain("<Image");
     expect(cardListSource).toContain("Phân trang tử vi trọn đời");
     expect(lifetimeCards.length).toBeGreaterThan(LIFETIME_CARDS_PER_PAGE);
@@ -52,6 +56,7 @@ describe("lifetime Tu vi landing page", () => {
     expect(indexedCards).toHaveLength(detailedCards.length);
     expect(indexedCards.length).toBeGreaterThan(50);
     expect(pageSource).toContain("Danh mục đầy đủ các tuổi đã có bài chi tiết");
+    expect(pageSource).toContain("Tuổi đang được đọc nhiều");
     expect(pageSource).toContain("source_slug=xem-tu-vi-tron-doi");
     expect(pageSource).not.toContain("Làm sau");
     expect(llmsSource).toContain("## Cụm Tử vi trọn đời theo tuổi");

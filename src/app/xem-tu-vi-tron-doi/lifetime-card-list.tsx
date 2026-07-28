@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { BookOpenText, ChevronLeft, ChevronRight } from "lucide-react";
+import { BookOpenText, ChevronLeft, ChevronRight, Search, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 export type LifetimeCardListItem = {
@@ -84,11 +84,26 @@ function LifetimeCard({ item }: { item: LifetimeCardListItem }) {
   );
 }
 
+function normalizeFilter(value: string) {
+  return value
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/đ/g, "d");
+}
+
 export function LifetimeCardList({ cards, itemsPerPage }: LifetimeCardListProps) {
-  const totalPages = Math.max(1, Math.ceil(cards.length / itemsPerPage));
   const [page, setPage] = useState(1);
+  const [query, setQuery] = useState("");
   const listRef = useRef<HTMLDivElement>(null);
   const firstRenderRef = useRef(true);
+  const normalizedQuery = normalizeFilter(query.trim());
+  const filteredCards = normalizedQuery
+    ? cards.filter((item) =>
+        normalizeFilter(`${item.title} ${item.year} ${item.canChi} ${item.gender}`).includes(normalizedQuery),
+      )
+    : cards;
+  const totalPages = Math.max(1, Math.ceil(filteredCards.length / itemsPerPage));
 
   useEffect(() => {
     if (firstRenderRef.current) {
@@ -97,22 +112,60 @@ export function LifetimeCardList({ cards, itemsPerPage }: LifetimeCardListProps)
     }
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     listRef.current?.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "start" });
-  }, [page]);
+  }, [page, normalizedQuery]);
 
   const start = (page - 1) * itemsPerPage;
-  const visibleCards = cards.slice(start, start + itemsPerPage);
+  const visibleCards = filteredCards.slice(start, start + itemsPerPage);
 
   function goToPage(nextPage: number) {
     setPage(Math.min(totalPages, Math.max(1, nextPage)));
   }
 
+  function handleQueryChange(value: string) {
+    setQuery(value);
+    setPage(1);
+  }
+
   return (
     <>
+      <div className="mb-5 rounded-2xl border border-orange-100 bg-white p-4 shadow-sm">
+        <label htmlFor="lifetime-age-filter" className="text-sm font-black uppercase tracking-[0.18em] text-orange-700">
+          Tìm tuổi theo năm sinh
+        </label>
+        <div className="mt-3 flex flex-col gap-3 sm:flex-row">
+          <div className="relative flex-1">
+            <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-stone-400" size={18} />
+            <input
+              id="lifetime-age-filter"
+              type="search"
+              value={query}
+              onChange={(event) => handleQueryChange(event.target.value)}
+              placeholder="Nhập năm sinh, can chi hoặc nam/nữ"
+              className="w-full rounded-2xl border border-stone-200 bg-stone-50 py-3 pl-10 pr-4 text-sm font-semibold text-stone-800 outline-none transition focus:border-orange-300 focus:bg-white focus:ring-4 focus:ring-orange-100"
+            />
+          </div>
+          {query ? (
+            <button type="button" className="btn btn-ghost" onClick={() => handleQueryChange("")}>
+              <X size={18} /> Xóa lọc
+            </button>
+          ) : null}
+        </div>
+        <p className="mt-2 text-sm text-stone-500">
+          Đang hiển thị {filteredCards.length}/{cards.length} mục tử vi trọn đời.
+        </p>
+      </div>
+
       <div ref={listRef} className="grid gap-5">
         {visibleCards.map((item) => (
           <LifetimeCard key={item.id} item={item} />
         ))}
       </div>
+
+      {visibleCards.length === 0 ? (
+        <div className="rounded-2xl border border-dashed border-stone-300 bg-stone-50 p-6 text-center text-stone-600">
+          Không tìm thấy tuổi phù hợp. Anh thử nhập năm sinh, can chi như “Kỷ Dậu”, hoặc “nam mạng/nữ mạng”.
+        </div>
+      ) : null}
 
       {totalPages > 1 ? (
         <nav className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between" aria-label="Phân trang tử vi trọn đời">

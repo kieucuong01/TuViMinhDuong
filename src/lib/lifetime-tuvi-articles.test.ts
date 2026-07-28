@@ -57,16 +57,20 @@ describe("lifetime Tu vi SEO article cluster", () => {
     }
   });
 
-  it("adds the next 5 adult lifetime age intents without duplicating live coverage", () => {
-    expect(adultExpansionLifetimeArticleSlugs).toEqual([
-      "tu-vi-tron-doi-tuoi-nham-tuat-1982-nam-mang",
-      "tu-vi-tron-doi-tuoi-nham-tuat-1982-nu-mang",
-      "tu-vi-tron-doi-tuoi-quy-hoi-1983-nam-mang",
-      "tu-vi-tron-doi-tuoi-quy-hoi-1983-nu-mang",
-      "tu-vi-tron-doi-tuoi-canh-ngo-1990-nam-mang",
-    ]);
-    expect(new Set(adultExpansionLifetimeArticleSlugs).size).toBe(5);
-    expect(adultExpansionLifetimeAgeArticleInputs.at(-1)?.siblingLink).toBeUndefined();
+  it("expands the priority adult lifetime age intents without duplicating live coverage", () => {
+    expect(adultExpansionLifetimeArticleSlugs).toContain("tu-vi-tron-doi-tuoi-canh-tuat-1970-nam-mang");
+    expect(adultExpansionLifetimeArticleSlugs).toContain("tu-vi-tron-doi-tuoi-tan-hoi-1971-nu-mang");
+    expect(adultExpansionLifetimeArticleSlugs).toContain("tu-vi-tron-doi-tuoi-tan-dau-1981-nu-mang");
+    expect(adultExpansionLifetimeArticleSlugs).toContain("tu-vi-tron-doi-tuoi-canh-ngo-1990-nam-mang");
+    expect(new Set(adultExpansionLifetimeArticleSlugs).size).toBe(adultExpansionLifetimeArticleSlugs.length);
+    expect(adultExpansionLifetimeAgeArticleInputs.find((item) => item.slug === "tu-vi-tron-doi-tuoi-canh-tuat-1970-nam-mang")?.siblingLink?.href).toBe("/xem-tu-vi-tron-doi/tu-vi-tron-doi-tuoi-canh-tuat-1970-nu-mang");
+  });
+
+  it("covers every priority year from 1970 through 1981 for both genders", () => {
+    for (let year = 1970; year <= 1981; year += 1) {
+      const inputsForYear = seedArticles.filter((item) => item.slug.startsWith("tu-vi-tron-doi-tuoi-") && item.slug.includes(`-${year}-`));
+      expect(inputsForYear.map((item) => item.slug.endsWith("nam-mang") ? "nam mạng" : "nữ mạng").sort()).toEqual(["nam mạng", "nữ mạng"]);
+    }
   });
 
   it("exposes the historical lifetime articles through lifetime section static params", async () => {
@@ -85,6 +89,7 @@ describe("lifetime Tu vi SEO article cluster", () => {
   it("keeps the article template useful for SEO readers", () => {
     expect(contentSource).toContain("categoryId: \"cat-van-han\"");
     expect(contentSource).toContain("## Tóm tắt nhanh");
+    expect(contentSource).toContain("## Bảng trả lời nhanh cho AI");
     expect(contentSource).toContain("## Cơ sở tử vi dùng trong bài");
     expect(contentSource).toContain("## Công việc và đường sự nghiệp");
     expect(contentSource).toContain("## Tiền bạc, tích lũy và đầu tư");

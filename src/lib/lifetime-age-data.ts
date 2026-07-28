@@ -214,18 +214,26 @@ export const historicalLifetimeCards: HistoricalLifetimeCard[] = historicalLifet
 }));
 
 const adultExpansionRows: YearRow[] = [
+  { year: 1970, canChi: "Canh Tuất", slugCanChi: "canh-tuat", napAm: "Thoa Xuyến Kim", element: "Kim", can: "Canh", chi: "Tuất" },
+  { year: 1971, canChi: "Tân Hợi", slugCanChi: "tan-hoi", napAm: "Thoa Xuyến Kim", element: "Kim", can: "Tân", chi: "Hợi" },
+  { year: 1972, canChi: "Nhâm Tý", slugCanChi: "nham-ty", napAm: "Tang Đố Mộc", element: "Mộc", can: "Nhâm", chi: "Tý" },
+  { year: 1973, canChi: "Quý Sửu", slugCanChi: "quy-suu", napAm: "Tang Đố Mộc", element: "Mộc", can: "Quý", chi: "Sửu" },
+  { year: 1974, canChi: "Giáp Dần", slugCanChi: "giap-dan", napAm: "Đại Khê Thủy", element: "Thủy", can: "Giáp", chi: "Dần" },
+  { year: 1976, canChi: "Bính Thìn", slugCanChi: "binh-thin", napAm: "Sa Trung Thổ", element: "Thổ", can: "Bính", chi: "Thìn" },
+  { year: 1977, canChi: "Đinh Tỵ", slugCanChi: "dinh-ty", napAm: "Sa Trung Thổ", element: "Thổ", can: "Đinh", chi: "Tỵ" },
+  { year: 1978, canChi: "Mậu Ngọ", slugCanChi: "mau-ngo", napAm: "Thiên Thượng Hỏa", element: "Hỏa", can: "Mậu", chi: "Ngọ" },
+  { year: 1979, canChi: "Kỷ Mùi", slugCanChi: "ky-mui", napAm: "Thiên Thượng Hỏa", element: "Hỏa", can: "Kỷ", chi: "Mùi" },
+  { year: 1980, canChi: "Canh Thân", slugCanChi: "canh-than", napAm: "Thạch Lựu Mộc", element: "Mộc", can: "Canh", chi: "Thân" },
+  { year: 1981, canChi: "Tân Dậu", slugCanChi: "tan-dau", napAm: "Thạch Lựu Mộc", element: "Mộc", can: "Tân", chi: "Dậu" },
   { year: 1982, canChi: "Nhâm Tuất", slugCanChi: "nham-tuat", napAm: "Đại Hải Thủy", element: "Thủy", can: "Nhâm", chi: "Tuất" },
   { year: 1983, canChi: "Quý Hợi", slugCanChi: "quy-hoi", napAm: "Đại Hải Thủy", element: "Thủy", can: "Quý", chi: "Hợi" },
   { year: 1990, canChi: "Canh Ngọ", slugCanChi: "canh-ngo", napAm: "Lộ Bàng Thổ", element: "Thổ", can: "Canh", chi: "Ngọ" },
 ];
 
-export const adultExpansionLifetimeAgeArticleInputs: HistoricalLifetimeArticleInput[] = [
-  buildArticle(adultExpansionRows[0], "nam mạng"),
-  buildArticle(adultExpansionRows[0], "nữ mạng"),
-  buildArticle(adultExpansionRows[1], "nam mạng"),
-  buildArticle(adultExpansionRows[1], "nữ mạng"),
-  { ...buildArticle(adultExpansionRows[2], "nam mạng"), siblingLink: undefined },
-];
+export const adultExpansionLifetimeAgeArticleInputs: HistoricalLifetimeArticleInput[] = adultExpansionRows.flatMap((row) => [
+  buildArticle(row, "nam mạng"),
+  buildArticle(row, "nữ mạng"),
+]);
 
 export const adultExpansionLifetimeArticleSlugs = adultExpansionLifetimeAgeArticleInputs.map((item) => item.slug);
 

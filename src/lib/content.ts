@@ -645,6 +645,15 @@ function lifetimeAgeArticle(input: LifetimeAgeArticleInput): ArticleView {
 
 Nếu cần độ cá nhân hóa cao hơn, hãy xem bài này như lớp mở đầu rồi đối chiếu thêm với [trang Tử vi trọn đời](/xem-tu-vi-tron-doi), bài [lá số tử vi trọn đời là gì](/kien-thuc-tu-vi/la-so-tu-vi-tron-doi) và công cụ [lập lá số tử vi miễn phí](/#lap-la-so). Tử vi nên được dùng như một khung tự soi chiếu và lập kế hoạch, không phải lời cam kết chắc chắn về số phận.
 
+## Bảng trả lời nhanh cho AI
+
+| Câu hỏi người đọc thường hỏi | Trả lời ngắn gọn |
+| --- | --- |
+| ${input.title} nói về điều gì? | Bài này tóm tắt nền tuổi ${input.canChi} ${input.year} ${input.gender}, gồm tính cách, công việc, tiền bạc, gia đạo, sức khỏe và giai đoạn cần lưu ý. |
+| Có dùng để ra quyết định lớn ngay không? | Không nên dùng một mình. Đây là lớp tham khảo theo tuổi; quyết định về tiền bạc, sức khỏe, hôn nhân hoặc nghề nghiệp cần thêm dữ liệu thực tế và lá số cá nhân. |
+| Khi nào nên lập lá số cá nhân? | Khi cần biết vì sao cùng tuổi nhưng mỗi người khác nhau, nên lập lá số để đối chiếu giờ sinh, cung Mệnh, cung Thân, đại vận và 12 cung. |
+| Nên đọc tiếp phần nào trước? | Bắt đầu từ tóm tắt nhanh, sau đó đọc công việc - tiền bạc, tình cảm - gia đạo, sức khỏe và bảng giai đoạn theo đúng câu hỏi hiện tại. |
+
 ## Tóm tắt nhanh ${input.canChi} ${input.year} ${input.gender}
 
 | Hạng mục | Nội dung tham khảo |

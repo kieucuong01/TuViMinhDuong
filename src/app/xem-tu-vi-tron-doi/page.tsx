@@ -268,6 +268,19 @@ export const lifetimeQuickIndexGroups: LifetimeQuickIndexGroup[] = Object.values
 const lifetimeHubCtaHref = "/?source=tool&source_slug=xem-tu-vi-tron-doi&entry_article=xem-tu-vi-tron-doi&cta_location=lifetime_hub_hero#lap-la-so";
 const lifetimeHubDeepCtaHref = "/?source=tool&source_slug=xem-tu-vi-tron-doi&entry_article=xem-tu-vi-tron-doi&cta_location=lifetime_hub_deep#lap-la-so";
 
+const popularLifetimeSlugs = [
+  "tu-vi-tron-doi-tuoi-quy-hoi-1983-nam-mang",
+  "tu-vi-tron-doi-tuoi-ky-dau-1969-nam-mang",
+  "tu-vi-tron-doi-tuoi-ky-dau-1969-nu-mang",
+  "tu-vi-tron-doi-tuoi-nham-tuat-1982-nu-mang",
+  "tu-vi-tron-doi-tuoi-nham-tuat-1982-nam-mang",
+  "tu-vi-tron-doi-tuoi-quy-hoi-1983-nu-mang",
+];
+
+export const popularLifetimeCards = popularLifetimeSlugs
+  .map((slug) => lifetimeCards.find((item) => item.detailsPath === lifetimeTuViArticlePath(slug)))
+  .filter((item): item is LifetimeCardListItem => Boolean(item));
+
 const faqs = [
   {
     question: "Có cần lập lá số mới xem được tử vi trọn đời không?",
@@ -359,6 +372,25 @@ export default function LifetimeTuViPage() {
               Mỗi tuổi có phần đọc ngay: tổng quan, công việc - tiền bạc, tình cảm - gia đạo và lưu ý vận hạn. Nội dung dùng để tham khảo, không thay thế quyết định cá nhân.
             </p>
           </div>
+          <section className="mb-8 rounded-3xl border border-amber-100 bg-white p-5 shadow-sm sm:p-6" aria-labelledby="lifetime-popular-heading">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <p className="eyebrow">Tín hiệu người đọc</p>
+                <h3 id="lifetime-popular-heading" className="text-2xl font-black text-stone-950">Tuổi đang được đọc nhiều</h3>
+                <p className="mt-2 text-sm leading-6 text-stone-600">Các tuổi này có tín hiệu truy cập gần đây, nên được đặt nổi bật để người mới vào trang có đường đọc nhanh hơn.</p>
+              </div>
+            </div>
+            <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+              {popularLifetimeCards.map((item) => (
+                <Link key={item.detailsPath} href={item.detailsPath || "/xem-tu-vi-tron-doi"} className="rounded-2xl border border-amber-100 bg-amber-50/60 p-4 transition hover:border-orange-200 hover:bg-orange-50">
+                  <span className="text-xs font-black uppercase tracking-[0.18em] text-orange-700">{item.year} · {item.gender}</span>
+                  <strong className="mt-1 block text-base text-stone-950">{item.title}</strong>
+                  <small className="mt-1 block text-stone-600">Đọc nhanh tổng quan, tiền bạc, gia đạo và giai đoạn cần lưu ý.</small>
+                </Link>
+              ))}
+            </div>
+          </section>
+
           <section className="mb-8 rounded-3xl border border-orange-100 bg-orange-50/50 p-5 sm:p-6" aria-labelledby="lifetime-quick-index-heading">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
               <div>
