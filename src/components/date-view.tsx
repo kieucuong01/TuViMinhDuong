@@ -493,7 +493,7 @@ export function DateView({
             <h2 className="text-2xl font-black">Muốn ghép ngày này với lá số riêng?</h2>
             <p className="mt-2 max-w-2xl text-stone-300">Lập lá số để đối chiếu Mệnh, Thân, đại vận và nhật vận cá nhân trước khi quyết định việc quan trọng.</p>
           </div>
-          <Link href="/#lap-la-so" className="btn btn-primary">
+          <Link href="/?source=tool&source_slug=xem-ngay&entry_article=xem-ngay&cta_location=xem_ngay_result#lap-la-so" className="btn btn-primary">
             <TriangleAlert size={18} /> Lập lá số để đối chiếu
           </Link>
         </div>

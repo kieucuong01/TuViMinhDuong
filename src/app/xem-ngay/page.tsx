@@ -1,10 +1,11 @@
+import Link from "next/link";
 import { DateView } from "@/components/date-view";
 import { routeMetadata } from "@/lib/metadata";
 import { faqJsonLd, webPageJsonLd } from "@/lib/seo";
 
 export const metadata = routeMetadata({
   title: "Xem ngày tốt xấu theo tuổi",
-  description: "Xem ngày tốt xấu theo âm lịch, can chi, 12 trực, hoàng đạo, sao tốt xấu và việc nên làm trong ngày.",
+  description: "Xem ngày tốt xấu theo tuổi, âm lịch, can chi, 12 trực, hoàng đạo và từng việc như cưới hỏi, khai trương, động thổ.",
   path: "/xem-ngay",
   imageSubtitle: "Âm lịch, can chi, hoàng đạo, việc nên làm và nên tránh",
 });
@@ -39,7 +40,7 @@ export default async function DateViewPage({
   const query = await searchParams;
   const pageLd = webPageJsonLd({
     name: "Xem ngày tốt xấu theo tuổi",
-    description: "Xem ngày tốt xấu theo âm lịch, can chi, 12 trực, hoàng đạo, sao tốt xấu và việc nên làm trong ngày.",
+    description: "Xem ngày tốt xấu theo tuổi, âm lịch, can chi, 12 trực, hoàng đạo và từng việc như cưới hỏi, khai trương, động thổ.",
     url: "/xem-ngay",
     breadcrumb: [
       { name: "Trang chủ", url: "/" },
@@ -61,6 +62,65 @@ export default async function DateViewPage({
           initialFinderFrom={query.from}
           initialFinderTo={query.to}
         />
+        <section className="date-guide-panel panel mt-8">
+          <p className="eyebrow">Xem ngày tốt xấu theo mục đích</p>
+          <h2 className="text-2xl font-black text-stone-950">Chọn đúng công cụ xem ngày trước khi quyết định việc quan trọng</h2>
+          <p className="mt-3 max-w-4xl text-base leading-8 text-stone-700">
+            Xem ngày tốt xấu theo tuổi nên bắt đầu từ mục đích cụ thể: cưới hỏi, khai trương, động thổ, xuất hành hay ký kết. Cùng một ngày có thể thuận cho việc nhẹ nhưng chưa chắc phù hợp cho việc lớn, vì mỗi nhóm việc chịu tác động khác nhau từ can chi, trực, sao tốt xấu và tuổi của người thực hiện.
+          </p>
+          <div className="mt-5 grid gap-4 md:grid-cols-3">
+            <Link className="date-guide-card block" href="/xem-ngay/cuoi-hoi" prefetch={false}>
+              <h3 className="font-black text-stone-950">Xem ngày cưới hỏi</h3>
+              <p>Ưu tiên ngày hài hòa cho nghi lễ, gia đình hai bên và tuổi của cặp đôi.</p>
+            </Link>
+            <Link className="date-guide-card block" href="/xem-ngay/khai-truong" prefetch={false}>
+              <h3 className="font-black text-stone-950">Xem ngày khai trương</h3>
+              <p>Đọc ngày mở bán, ra mắt, bắt đầu dự án theo hướng thuận khí và thực tế.</p>
+            </Link>
+            <Link className="date-guide-card block" href="/xem-ngay/dong-tho" prefetch={false}>
+              <h3 className="font-black text-stone-950">Xem ngày động thổ</h3>
+              <p>Đối chiếu ngày làm nhà, sửa nhà với tuổi, trực ngày và tiêu chí an toàn.</p>
+            </Link>
+          </div>
+          <div className="mt-6 overflow-hidden rounded-2xl border border-orange-100 bg-white">
+            <table className="w-full text-left text-sm text-stone-700">
+              <thead className="bg-orange-50 text-stone-950">
+                <tr>
+                  <th className="px-4 py-3 font-black">Nhu cầu</th>
+                  <th className="px-4 py-3 font-black">Nên xem gì trước</th>
+                  <th className="px-4 py-3 font-black">Cách dùng an toàn</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-orange-50">
+                <tr>
+                  <td className="px-4 py-3 font-semibold">Chọn ngày làm việc lớn</td>
+                  <td className="px-4 py-3">Điểm theo việc cần làm + tuổi người đứng việc</td>
+                  <td className="px-4 py-3">Chọn ngày thuận, rồi kiểm tra lịch gia đình, pháp lý và sức khỏe.</td>
+                </tr>
+                <tr>
+                  <td className="px-4 py-3 font-semibold">Tìm ngày trong một khoảng</td>
+                  <td className="px-4 py-3">Bộ lọc khoảng ngày theo cưới hỏi, khai trương, ký kết</td>
+                  <td className="px-4 py-3">Lấy 3-5 ngày tốt để đối chiếu thêm giờ hoàng đạo và điều kiện thực tế.</td>
+                </tr>
+                <tr>
+                  <td className="px-4 py-3 font-semibold">Muốn cá nhân hóa sâu hơn</td>
+                  <td className="px-4 py-3">Lập lá số để xem Mệnh, Thân, đại vận và nhật vận</td>
+                  <td className="px-4 py-3">Dùng tử vi như lớp tham khảo, không xem là kết luận tuyệt đối.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div className="mt-6 flex flex-col gap-3 rounded-3xl bg-stone-950 p-5 text-white md:flex-row md:items-center md:justify-between">
+            <div>
+              <p className="eyebrow text-orange-300">Cá nhân hóa theo lá số</p>
+              <h3 className="text-xl font-black">Muốn biết ngày này hợp riêng với mình không?</h3>
+              <p className="mt-1 text-sm text-stone-300">Lập lá số miễn phí để đối chiếu ngày đang xem với Mệnh, Thân, đại vận và câu hỏi hiện tại.</p>
+            </div>
+            <Link className="btn btn-primary" href="/?source=tool&source_slug=xem-ngay&entry_article=xem-ngay&cta_location=xem_ngay_hub#lap-la-so" prefetch={false}>
+              Lập lá số để đối chiếu
+            </Link>
+          </div>
+        </section>
         <section className="date-guide-panel panel mt-8">
           <p className="eyebrow">Hướng dẫn đọc kết quả</p>
           <h2 className="text-2xl font-black text-stone-950">Xem ngày tốt xấu nên dùng như bản tham khảo có điều kiện</h2>

@@ -29,6 +29,13 @@
 - [Xem tuổi làm nhà](https://lasotinhhoa.vn/xem-tuoi/lam-nha): Đối chiếu Kim Lâu, Hoang Ốc, Tam Tai và tiêu chí chọn năm làm nhà.
 - [Xem tuổi xông đất](https://lasotinhhoa.vn/xem-tuoi/xong-dat): Chọn tuổi xông đất/xông nhà theo tiêu chí mềm, không hù dọa.
 
+## Cụm xem ngày tốt xấu
+
+- [Xem ngày tốt xấu theo tuổi](https://lasotinhhoa.vn/xem-ngay): Hub chính để chọn ngày, nhập năm sinh, xem điểm theo từng việc và đọc giờ hoàng đạo.
+- [Xem ngày cưới hỏi](https://lasotinhhoa.vn/xem-ngay/cuoi-hoi): Dành cho câu hỏi chọn ngày cưới hỏi, lễ gia tiên, đăng ký kết hôn.
+- [Xem ngày khai trương](https://lasotinhhoa.vn/xem-ngay/khai-truong): Dành cho mở bán, khai trương, ra mắt dự án hoặc bắt đầu công việc mới.
+- [Xem ngày động thổ](https://lasotinhhoa.vn/xem-ngay/dong-tho): Dành cho làm nhà, sửa nhà, động thổ; luôn kèm lưu ý kiểm tra pháp lý và an toàn thực tế.
+
 ## Cụm nội dung nền tảng nên trích dẫn
 
 - [Lá số tử vi là gì?](https://lasotinhhoa.vn/kien-thuc-tu-vi/la-so-tu-vi-la-gi): Định nghĩa lá số tử vi và cách hiểu đúng trước khi đọc luận giải.
@@ -99,4 +106,4 @@
 - [Sitemap index](https://lasotinhhoa.vn/sitemap-index.xml)
 - [Robots](https://lasotinhhoa.vn/robots.txt)
 
-_Cập nhật: 21/07/2026 — nguồn dành cho AI crawlers, search engines và trợ lý trả lời câu hỏi._
+_Cập nhật: 28/07/2026 — nguồn dành cho AI crawlers, search engines và trợ lý trả lời câu hỏi._
