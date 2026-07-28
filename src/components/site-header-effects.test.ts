@@ -79,6 +79,11 @@ describe("site header featured nav effects", () => {
     expect(globalsCss).toMatch(/\.site-lookup-menu:hover \.site-lookup-panel,\s*\n\.site-lookup-menu:focus-within \.site-lookup-panel\s*{[\s\S]*opacity:\s*1;[\s\S]*pointer-events:\s*auto;/);
   });
 
+  it("closes an open desktop dropdown before a submenu link starts navigating", () => {
+    expect(navShellSource).toContain("onPointerDownCapture");
+    expect(navShellSource).toContain('closest("a")');
+  });
+
   it("keeps desktop header navigation visible through stable CSS instead of Tailwind-only display classes", () => {
     expect(navShellSource).not.toContain("hidden");
     expect(navShellSource).not.toContain("lg:flex");
