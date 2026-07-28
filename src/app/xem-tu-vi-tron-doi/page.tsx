@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { BookOpenText, CalendarDays, Compass, Layers3, Search, Sparkles, UserRound } from "lucide-react";
+import { Suspense } from "react";
 import { adultExpansionLifetimeCards, historicalLifetimeCards } from "@/lib/lifetime-age-data";
 import { routeMetadata } from "@/lib/metadata";
 import { faqJsonLd, itemListJsonLd, webPageJsonLd } from "@/lib/seo";
@@ -268,7 +269,7 @@ export const lifetimeQuickIndexGroups: LifetimeQuickIndexGroup[] = Object.values
 const lifetimeHubCtaHref = "/?source=tool&source_slug=xem-tu-vi-tron-doi&entry_article=xem-tu-vi-tron-doi&cta_location=lifetime_hub_hero#lap-la-so";
 const lifetimeHubDeepCtaHref = "/?source=tool&source_slug=xem-tu-vi-tron-doi&entry_article=xem-tu-vi-tron-doi&cta_location=lifetime_hub_deep#lap-la-so";
 
-const popularLifetimeSlugs = [
+const suggestedLifetimeSlugs = [
   "tu-vi-tron-doi-tuoi-quy-hoi-1983-nam-mang",
   "tu-vi-tron-doi-tuoi-ky-dau-1969-nam-mang",
   "tu-vi-tron-doi-tuoi-ky-dau-1969-nu-mang",
@@ -277,7 +278,7 @@ const popularLifetimeSlugs = [
   "tu-vi-tron-doi-tuoi-quy-hoi-1983-nu-mang",
 ];
 
-export const popularLifetimeCards = popularLifetimeSlugs
+export const suggestedLifetimeCards = suggestedLifetimeSlugs
   .map((slug) => lifetimeCards.find((item) => item.detailsPath === lifetimeTuViArticlePath(slug)))
   .filter((item): item is LifetimeCardListItem => Boolean(item));
 
@@ -298,6 +299,16 @@ const faqs = [
       "Cùng năm sinh có chung can chi và nạp âm, nhưng cách nhìn cung mệnh, vai trò gia đình, nhịp đời sống và trọng tâm quyết định thường khác nhau nên cần tách nam mạng và nữ mạng.",
   },
 ];
+
+function LifetimeCardListFallback() {
+  return (
+    <div id="tim-tuoi" className="scroll-mt-24 rounded-2xl border border-orange-100 bg-white p-4 shadow-sm">
+      <p className="text-sm font-black uppercase tracking-[0.18em] text-orange-700">Tìm tuổi theo năm sinh</p>
+      <div className="mt-3 h-14 animate-pulse rounded-2xl bg-stone-100" aria-hidden="true" />
+      <p className="mt-2 text-sm text-stone-500">Đang chuẩn bị danh sách tuổi…</p>
+    </div>
+  );
+}
 
 export default function LifetimeTuViPage() {
   const pageLd = webPageJsonLd({
@@ -328,9 +339,9 @@ export default function LifetimeTuViPage() {
             </p>
             <p className="mt-3 text-sm font-semibold text-stone-500">Cập nhật nội dung: {updatedAt}</p>
             <div className="mt-6 flex flex-wrap gap-3">
-              <Link href="#danh-sach-tuoi" className="btn btn-primary btn-large">
+              <a href="#tim-tuoi" className="btn btn-primary btn-large">
                 <Search size={20} /> Xem từng tuổi
-              </Link>
+              </a>
               <Link href="#doc-sau-hon" className="btn btn-ghost btn-large">
                 <Sparkles size={20} /> Đọc sâu hơn
               </Link>
@@ -372,16 +383,26 @@ export default function LifetimeTuViPage() {
               Mỗi tuổi có phần đọc ngay: tổng quan, công việc - tiền bạc, tình cảm - gia đạo và lưu ý vận hạn. Nội dung dùng để tham khảo, không thay thế quyết định cá nhân.
             </p>
           </div>
-          <section className="mb-8 rounded-3xl border border-amber-100 bg-white p-5 shadow-sm sm:p-6" aria-labelledby="lifetime-popular-heading">
+          <Suspense fallback={<LifetimeCardListFallback />}>
+            <LifetimeCardList
+              cards={lifetimeCards}
+              itemsPerPage={LIFETIME_CARDS_PER_PAGE}
+              chartHref={lifetimeHubCtaHref}
+            />
+          </Suspense>
+
+          <section className="mt-12 rounded-3xl border border-amber-100 bg-white p-5 shadow-sm sm:p-6" aria-labelledby="lifetime-suggested-heading">
             <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
               <div>
-                <p className="eyebrow">Tín hiệu người đọc</p>
-                <h3 id="lifetime-popular-heading" className="text-2xl font-black text-stone-950">Tuổi đang được đọc nhiều</h3>
-                <p className="mt-2 text-sm leading-6 text-stone-600">Các tuổi này có tín hiệu truy cập gần đây, nên được đặt nổi bật để người mới vào trang có đường đọc nhanh hơn.</p>
+                <p className="eyebrow">Có thể bạn muốn xem</p>
+                <h3 id="lifetime-suggested-heading" className="text-2xl font-black text-stone-950">Gợi ý xem nhanh</h3>
+                <p className="mt-2 text-sm leading-6 text-stone-600">
+                  Một số tuổi tiêu biểu để bạn tham khảo cách trình bày trước khi tìm đúng năm sinh của mình.
+                </p>
               </div>
             </div>
             <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-              {popularLifetimeCards.map((item) => (
+              {suggestedLifetimeCards.map((item) => (
                 <Link key={item.detailsPath} href={item.detailsPath || "/xem-tu-vi-tron-doi"} className="rounded-2xl border border-amber-100 bg-amber-50/60 p-4 transition hover:border-orange-200 hover:bg-orange-50">
                   <span className="text-xs font-black uppercase tracking-[0.18em] text-orange-700">{item.year} · {item.gender}</span>
                   <strong className="mt-1 block text-base text-stone-950">{item.title}</strong>
@@ -391,7 +412,7 @@ export default function LifetimeTuViPage() {
             </div>
           </section>
 
-          <section className="mb-8 rounded-3xl border border-orange-100 bg-orange-50/50 p-5 sm:p-6" aria-labelledby="lifetime-quick-index-heading">
+          <section className="mt-8 rounded-3xl border border-orange-100 bg-orange-50/50 p-5 sm:p-6" aria-labelledby="lifetime-quick-index-heading">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
               <div>
                 <p className="eyebrow">Tra nhanh theo năm sinh</p>
@@ -399,7 +420,7 @@ export default function LifetimeTuViPage() {
                   Danh mục đầy đủ các tuổi đã có bài chi tiết
                 </h3>
                 <p className="mt-2 text-sm leading-6 text-stone-600">
-                  Các liên kết bên dưới được render sẵn trong HTML để Google và AI crawler đọc được toàn bộ cụm Tử vi trọn đời, không phụ thuộc vào phân trang tương tác.
+                  Mở từng giai đoạn để xem các năm sinh đã có bài chi tiết. Danh mục đang tiếp tục được bổ sung.
                 </p>
               </div>
               <Link href={lifetimeHubCtaHref} className="btn btn-primary">
@@ -407,9 +428,9 @@ export default function LifetimeTuViPage() {
               </Link>
             </div>
             <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-              {lifetimeQuickIndexGroups.map((group, index) => (
-                <details key={group.decade} open={index < 2} className="rounded-2xl border border-orange-100 bg-white p-4">
-                  <summary className="cursor-pointer text-base font-black text-stone-950">
+              {lifetimeQuickIndexGroups.map((group) => (
+                <details key={group.decade} className="rounded-2xl border border-orange-100 bg-white p-4">
+                  <summary className="min-h-12 cursor-pointer text-base font-black text-stone-950">
                     Tuổi sinh giai đoạn {group.decade}
                   </summary>
                   <div className="mt-3 grid gap-2">
@@ -423,7 +444,6 @@ export default function LifetimeTuViPage() {
               ))}
             </div>
           </section>
-          <LifetimeCardList cards={lifetimeCards} itemsPerPage={LIFETIME_CARDS_PER_PAGE} />
         </div>
       </section>
 

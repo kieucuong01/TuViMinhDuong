@@ -2,8 +2,15 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { BookOpenText, ChevronLeft, ChevronRight, Search, X } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { usePathname, useSearchParams } from "next/navigation";
+import { BookOpenText, ChevronDown, ChevronLeft, ChevronRight, Search, UserRound, X } from "lucide-react";
+import { useEffect, useRef } from "react";
+import {
+  buildLifetimeSearchUrl,
+  filterLifetimeCards,
+  getLifetimePaginationTokens,
+  parseLifetimePage,
+} from "./lifetime-card-list.logic";
 
 export type LifetimeCardListItem = {
   id: string;
@@ -23,6 +30,7 @@ export type LifetimeCardListItem = {
 type LifetimeCardListProps = {
   cards: LifetimeCardListItem[];
   itemsPerPage: number;
+  chartHref: string;
 };
 
 function LifetimeCard({ item }: { item: LifetimeCardListItem }) {
@@ -50,24 +58,31 @@ function LifetimeCard({ item }: { item: LifetimeCardListItem }) {
 
           <h3 className="mt-4 text-2xl font-black text-stone-950">{item.title}</h3>
 
-          <div className="mt-4 grid gap-4 lg:grid-cols-2">
-            <div className="rounded-2xl bg-orange-50/70 p-4">
-              <h4 className="font-black text-stone-950">Tổng quan trọn đời</h4>
-              <p className="mt-2 leading-7 text-stone-700">{item.overview}</p>
-            </div>
-            <div className="rounded-2xl bg-stone-50 p-4">
-              <h4 className="font-black text-stone-950">Công việc và tiền bạc</h4>
-              <p className="mt-2 leading-7 text-stone-700">{item.work}</p>
-            </div>
-            <div className="rounded-2xl bg-stone-50 p-4">
-              <h4 className="font-black text-stone-950">Tình cảm và gia đạo</h4>
-              <p className="mt-2 leading-7 text-stone-700">{item.family}</p>
-            </div>
-            <div className="rounded-2xl bg-amber-50 p-4">
-              <h4 className="font-black text-stone-950">Lưu ý vận hạn</h4>
-              <p className="mt-2 leading-7 text-stone-700">{item.caution}</p>
-            </div>
+          <div className="mt-4 rounded-2xl bg-orange-50/70 p-4">
+            <h4 className="font-black text-stone-950">Tổng quan trọn đời</h4>
+            <p className="mt-2 leading-7 text-stone-700">{item.overview}</p>
           </div>
+
+          <details className="group mt-4 rounded-2xl border border-stone-200 bg-stone-50/70">
+            <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 font-black text-stone-900">
+              Xem công việc, tình cảm và lưu ý
+              <ChevronDown className="shrink-0 transition-transform group-open:rotate-180" size={20} />
+            </summary>
+            <div className="grid gap-4 border-t border-stone-200 p-4 lg:grid-cols-3">
+              <div className="rounded-2xl bg-white p-4">
+                <h4 className="font-black text-stone-950">Công việc và tiền bạc</h4>
+                <p className="mt-2 leading-7 text-stone-700">{item.work}</p>
+              </div>
+              <div className="rounded-2xl bg-white p-4">
+                <h4 className="font-black text-stone-950">Tình cảm và gia đạo</h4>
+                <p className="mt-2 leading-7 text-stone-700">{item.family}</p>
+              </div>
+              <div className="rounded-2xl bg-amber-50 p-4">
+                <h4 className="font-black text-stone-950">Lưu ý vận hạn</h4>
+                <p className="mt-2 leading-7 text-stone-700">{item.caution}</p>
+              </div>
+            </div>
+          </details>
 
           {item.detailsPath ? (
             <Link href={item.detailsPath} className="btn btn-primary mt-5">
@@ -84,50 +99,60 @@ function LifetimeCard({ item }: { item: LifetimeCardListItem }) {
   );
 }
 
-function normalizeFilter(value: string) {
-  return value
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/đ/g, "d");
-}
-
-export function LifetimeCardList({ cards, itemsPerPage }: LifetimeCardListProps) {
-  const [page, setPage] = useState(1);
-  const [query, setQuery] = useState("");
-  const listRef = useRef<HTMLDivElement>(null);
-  const firstRenderRef = useRef(true);
-  const normalizedQuery = normalizeFilter(query.trim());
-  const filteredCards = normalizedQuery
-    ? cards.filter((item) =>
-        normalizeFilter(`${item.title} ${item.year} ${item.canChi} ${item.gender}`).includes(normalizedQuery),
-      )
-    : cards;
+export function LifetimeCardList({ cards, itemsPerPage, chartHref }: LifetimeCardListProps) {
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const query = searchParams.get("q") || "";
+  const filteredCards = filterLifetimeCards(cards, query);
   const totalPages = Math.max(1, Math.ceil(filteredCards.length / itemsPerPage));
+  const page = parseLifetimePage(searchParams.get("page"), totalPages);
+  const paginationTokens = getLifetimePaginationTokens(page, totalPages);
+  const listRef = useRef<HTMLDivElement>(null);
+  const previousStateRef = useRef({ page, query });
+  const availableDetailedYears = new Set(
+    cards.filter((item) => item.detailsPath).map((item) => item.year),
+  ).size;
 
   useEffect(() => {
-    if (firstRenderRef.current) {
-      firstRenderRef.current = false;
-      return;
-    }
+    const previousState = previousStateRef.current;
+    previousStateRef.current = { page, query };
+
+    if (previousState.page === page || previousState.query !== query) return;
+
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     listRef.current?.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "start" });
-  }, [page, normalizedQuery]);
+  }, [page, query]);
 
   const start = (page - 1) * itemsPerPage;
   const visibleCards = filteredCards.slice(start, start + itemsPerPage);
 
+  function updateHistory(nextQuery: string, nextPage: number, mode: "push" | "replace") {
+    const nextUrl = buildLifetimeSearchUrl(
+      pathname,
+      new URLSearchParams(searchParams.toString()),
+      nextQuery,
+      nextPage,
+    );
+
+    if (mode === "push") {
+      window.history.pushState(null, "", nextUrl);
+    } else {
+      window.history.replaceState(null, "", nextUrl);
+    }
+  }
+
   function goToPage(nextPage: number) {
-    setPage(Math.min(totalPages, Math.max(1, nextPage)));
+    const boundedPage = Math.min(totalPages, Math.max(1, nextPage));
+    if (boundedPage === page) return;
+    updateHistory(query, boundedPage, "push");
   }
 
   function handleQueryChange(value: string) {
-    setQuery(value);
-    setPage(1);
+    updateHistory(value, 1, "replace");
   }
 
   return (
-    <>
+    <div id="tim-tuoi" className="scroll-mt-24">
       <div className="mb-5 rounded-2xl border border-orange-100 bg-white p-4 shadow-sm">
         <label htmlFor="lifetime-age-filter" className="text-sm font-black uppercase tracking-[0.18em] text-orange-700">
           Tìm tuổi theo năm sinh
@@ -138,32 +163,49 @@ export function LifetimeCardList({ cards, itemsPerPage }: LifetimeCardListProps)
             <input
               id="lifetime-age-filter"
               type="search"
+              inputMode="search"
+              autoComplete="off"
               value={query}
               onChange={(event) => handleQueryChange(event.target.value)}
               placeholder="Nhập năm sinh, can chi hoặc nam/nữ"
-              className="w-full rounded-2xl border border-stone-200 bg-stone-50 py-3 pl-10 pr-4 text-sm font-semibold text-stone-800 outline-none transition focus:border-orange-300 focus:bg-white focus:ring-4 focus:ring-orange-100"
+              aria-describedby="lifetime-filter-help lifetime-filter-status"
+              className="w-full rounded-2xl border border-stone-200 bg-stone-50 py-3 pl-10 pr-4 text-base font-semibold text-stone-800 outline-none transition focus:border-orange-300 focus:bg-white focus:ring-4 focus:ring-orange-100"
             />
           </div>
           {query ? (
             <button type="button" className="btn btn-ghost" onClick={() => handleQueryChange("")}>
-              <X size={18} /> Xóa lọc
+              <X size={18} /> Xóa tìm kiếm
             </button>
           ) : null}
         </div>
-        <p className="mt-2 text-sm text-stone-500">
+        <p id="lifetime-filter-help" className="mt-2 text-sm leading-6 text-stone-500">
+          Có {availableDetailedYears} năm sinh đã có bài chi tiết; một số năm vẫn đang được bổ sung.
+        </p>
+        <p id="lifetime-filter-status" className="mt-1 text-sm font-semibold text-stone-600" role="status" aria-live="polite">
           Đang hiển thị {filteredCards.length}/{cards.length} mục tử vi trọn đời.
         </p>
       </div>
 
-      <div ref={listRef} className="grid gap-5">
+      <div ref={listRef} className="grid scroll-mt-24 gap-5">
         {visibleCards.map((item) => (
           <LifetimeCard key={item.id} item={item} />
         ))}
       </div>
 
       {visibleCards.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-stone-300 bg-stone-50 p-6 text-center text-stone-600">
-          Không tìm thấy tuổi phù hợp. Anh thử nhập năm sinh, can chi như “Kỷ Dậu”, hoặc “nam mạng/nữ mạng”.
+        <div className="rounded-2xl border border-dashed border-orange-200 bg-orange-50/60 p-6 text-center">
+          <h3 className="text-xl font-black text-stone-950">Chưa có bài trọn đời phù hợp với “{query.trim()}”</h3>
+          <p className="mx-auto mt-2 max-w-2xl leading-7 text-stone-600">
+            Kho nội dung chưa phủ liên tục mọi năm sinh. Bạn có thể xóa tìm kiếm để xem các tuổi đã có, hoặc lập lá số theo ngày và giờ sinh để nhận phần đối chiếu cá nhân.
+          </p>
+          <div className="mt-5 flex flex-col justify-center gap-3 sm:flex-row">
+            <button type="button" className="btn btn-ghost" onClick={() => handleQueryChange("")}>
+              <X size={18} /> Xóa tìm kiếm
+            </button>
+            <Link href={chartHref} className="btn btn-primary">
+              <UserRound size={18} /> Lập lá số cá nhân
+            </Link>
+          </div>
         </div>
       ) : null}
 
@@ -183,17 +225,24 @@ export function LifetimeCardList({ cards, itemsPerPage }: LifetimeCardListProps)
               <ChevronLeft size={18} /> Trang trước
             </button>
 
-            {Array.from({ length: totalPages }, (_, index) => index + 1).map((pageNumber) => (
-              <button
-                key={pageNumber}
-                type="button"
-                className={pageNumber === page ? "btn btn-primary" : "btn btn-ghost"}
-                onClick={() => goToPage(pageNumber)}
-                aria-current={pageNumber === page ? "page" : undefined}
-              >
-                {pageNumber}
-              </button>
-            ))}
+            {paginationTokens.map((token) =>
+              typeof token === "number" ? (
+                <button
+                  key={token}
+                  type="button"
+                  className={token === page ? "btn btn-primary" : "btn btn-ghost"}
+                  onClick={() => goToPage(token)}
+                  aria-label={`Trang ${token}`}
+                  aria-current={token === page ? "page" : undefined}
+                >
+                  {token}
+                </button>
+              ) : (
+                <span key={token} className="px-1 text-stone-400" aria-hidden="true">
+                  …
+                </span>
+              ),
+            )}
 
             <button
               type="button"
@@ -206,6 +255,6 @@ export function LifetimeCardList({ cards, itemsPerPage }: LifetimeCardListProps)
           </div>
         </nav>
       ) : null}
-    </>
+    </div>
   );
 }

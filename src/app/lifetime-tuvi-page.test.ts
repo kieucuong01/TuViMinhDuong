@@ -38,15 +38,28 @@ describe("lifetime Tu vi landing page", () => {
   });
   it("keeps pagination client-side with filter controls and a thumbnail on every card", () => {
     expect(cardListSource).toContain('"use client"');
-    expect(cardListSource).toContain("useState(1)");
     expect(cardListSource).toContain("filteredCards");
     expect(cardListSource).toContain("Tìm tuổi theo năm sinh");
     expect(cardListSource).toContain("Nhập năm sinh, can chi hoặc nam/nữ");
-    expect(cardListSource).toContain("Không tìm thấy tuổi phù hợp");
+    expect(cardListSource).toContain("Chưa có bài trọn đời phù hợp");
     expect(cardListSource).toContain("<Image");
     expect(cardListSource).toContain("Phân trang tử vi trọn đời");
     expect(lifetimeCards.length).toBeGreaterThan(LIFETIME_CARDS_PER_PAGE);
     expect(lifetimeCards.every((item) => Boolean(item.coverImage && item.coverAlt))).toBe(true);
+  });
+
+  it("puts the URL-persistent and accessible search before editorial discovery blocks", () => {
+    expect(pageSource).toContain('<a href="#tim-tuoi"');
+    expect(pageSource).toContain("<Suspense");
+    expect(pageSource.indexOf("<LifetimeCardList")).toBeLessThan(pageSource.indexOf("lifetime-suggested-heading"));
+    expect(pageSource).toContain("Gợi ý xem nhanh");
+    expect(pageSource).not.toContain("Tín hiệu người đọc");
+    expect(pageSource).not.toContain("Google và AI crawler");
+    expect(cardListSource).toContain('aria-live="polite"');
+    expect(cardListSource).toContain("window.history.replaceState");
+    expect(cardListSource).toContain("window.history.pushState");
+    expect(cardListSource).toContain("<details");
+    expect(cardListSource).not.toContain("Anh thử nhập");
   });
 
   it("exposes the full lifetime cluster to crawlers and AI discovery files", () => {
@@ -56,7 +69,7 @@ describe("lifetime Tu vi landing page", () => {
     expect(indexedCards).toHaveLength(detailedCards.length);
     expect(indexedCards.length).toBeGreaterThan(50);
     expect(pageSource).toContain("Danh mục đầy đủ các tuổi đã có bài chi tiết");
-    expect(pageSource).toContain("Tuổi đang được đọc nhiều");
+    expect(pageSource).toContain("Gợi ý xem nhanh");
     expect(pageSource).toContain("source_slug=xem-tu-vi-tron-doi");
     expect(pageSource).not.toContain("Làm sau");
     expect(llmsSource).toContain("## Cụm Tử vi trọn đời theo tuổi");
