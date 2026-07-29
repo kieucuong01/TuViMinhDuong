@@ -144,7 +144,7 @@ export type AdminTrendGroups = Record<AdminTrendPeriod, AdminTrendPoint[]>;
 const ADMIN_TREND_PERIODS = new Set<AdminTrendPeriod>(["day", "week", "month"]);
 const ADMIN_TREND_PERIOD_LIST: AdminTrendPeriod[] = ["day", "week", "month"];
 const CORE_SITEMAP_URLS = 7;
-const TRUST_SITEMAP_URLS = 7;
+const TRUST_SITEMAP_URLS = 8;
 
 export function normalizeAdminTrendPeriod(value?: string | null): AdminTrendPeriod {
   return ADMIN_TREND_PERIODS.has(value as AdminTrendPeriod) ? (value as AdminTrendPeriod) : "day";

@@ -6,7 +6,6 @@ import { absoluteUrl } from "@/lib/seo";
 
 const description =
   "Thông tin về định hướng biên tập của Lá số tinh hoa: giải thích tử vi bằng tiếng Việt rõ ràng, có giới hạn và không hù dọa người đọc.";
-const updatedAt = "21/07/2026";
 
 export const metadata = routeMetadata({
   title: "Tác giả và đội ngũ biên tập",
@@ -21,7 +20,7 @@ const jsonLd = {
   description,
   url: absoluteUrl("/tac-gia"),
   inLanguage: "vi-VN",
-  dateModified: "2026-07-21",
+  dateModified: "2026-07-29",
   isPartOf: { "@type": "WebSite", name: APP_NAME, url: APP_URL },
   mainEntity: {
     "@type": "Organization",
@@ -45,10 +44,24 @@ export default function TacGiaPage() {
             <p className="text-lg leading-8 text-stone-700">
               Các bài viết công khai tập trung vào định nghĩa, cách đọc, ví dụ và điểm cần thận trọng. Khi nội dung có tính dự đoán, trang luôn đặt trong bối cảnh tham khảo thay vì xem như kết luận bắt buộc.
             </p>
+            <p className="text-lg leading-8 text-stone-700">
+              Mỗi nội dung đi qua các bước xác định mục đích tìm kiếm, đối chiếu nguồn, kiểm tra cách dùng thuật ngữ, rà lại giới hạn tham khảo và cập nhật khi có phản hồi hợp lý. Chi tiết được công khai trong{" "}
+              <Link className="font-semibold text-orange-700 underline underline-offset-4" href="/chinh-sach-bien-tap">
+                chính sách biên tập
+              </Link>.
+            </p>
+            <p className="text-lg leading-8 text-stone-700">
+              Nếu phát hiện thông tin cần sửa, người đọc có thể gửi URL và đoạn cần kiểm tra qua{" "}
+              <Link className="font-semibold text-orange-700 underline underline-offset-4" href="/lien-he">
+                trang liên hệ
+              </Link>. Đội ngũ sẽ đối chiếu, đính chính nội dung công khai và cập nhật ngày sửa khi cần.
+            </p>
             <p className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm font-semibold leading-6 text-amber-900">
               Nội dung chỉ mang tính tham khảo, không cam kết vận mệnh, sức khỏe, tài chính hoặc hôn nhân.
             </p>
-            <p className="text-sm text-stone-500">Cập nhật lần cuối: {updatedAt}</p>
+            <p className="text-sm text-stone-500">
+              <time dateTime="2026-07-29">Cập nhật lần cuối: 29/07/2026</time>
+            </p>
           </div>
 
           <nav className="mt-8 flex flex-wrap gap-3" aria-label="Liên kết nội bộ">

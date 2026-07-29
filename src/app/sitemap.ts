@@ -13,6 +13,7 @@ const TRUST_ROUTES = [
   { path: "/gioi-thieu", changeFrequency: "monthly" as const, priority: 0.62 },
   { path: "/phuong-phap-luan", changeFrequency: "monthly" as const, priority: 0.6 },
   { path: "/tac-gia", changeFrequency: "monthly" as const, priority: 0.58 },
+  { path: "/chinh-sach-bien-tap", changeFrequency: "monthly" as const, priority: 0.58 },
   { path: "/pricing", changeFrequency: "weekly" as const, priority: 0.6 },
   { path: "/chinh-sach-bao-mat", changeFrequency: "yearly" as const, priority: 0.4 },
   { path: "/dieu-khoan-su-dung", changeFrequency: "yearly" as const, priority: 0.4 },

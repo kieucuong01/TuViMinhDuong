@@ -6,7 +6,6 @@ import { absoluteUrl } from "@/lib/seo";
 
 const description =
   "Phương pháp luận của Lá số tinh hoa khi trình bày tử vi: đọc theo bối cảnh cung sao, tránh kết luận tuyệt đối và luôn nêu giới hạn tham khảo.";
-const updatedAt = "21/07/2026";
 
 export const metadata = routeMetadata({
   title: "Phương pháp luận giải tử vi",
@@ -21,7 +20,7 @@ const jsonLd = {
   description,
   url: absoluteUrl("/phuong-phap-luan"),
   inLanguage: "vi-VN",
-  dateModified: "2026-07-21",
+  dateModified: "2026-07-29",
   isPartOf: { "@type": "WebSite", name: APP_NAME, url: APP_URL },
   about: [
     "Lập lá số tử vi",
@@ -47,10 +46,21 @@ export default function PhuongPhapLuanPage() {
             <p className="text-lg leading-8 text-stone-700">
               Các phần tra cứu và bài viết được viết theo hướng giải thích nguyên lý trước, ví dụ sau, rồi nhắc người đọc quay lại dữ liệu lá số cá nhân để tự đối chiếu.
             </p>
+            <p className="text-lg leading-8 text-stone-700">
+              Nguồn tham khảo được chọn theo chủ đề, ưu tiên tài liệu giải thích được thuật ngữ và hệ thống luận giải. Đội ngũ đối chiếu nguồn với cấu trúc dữ liệu của sản phẩm, rà lại ngôn ngữ trước khi xuất bản và sửa nội dung khi phát hiện điểm thiếu chính xác.
+            </p>
+            <p className="text-lg leading-8 text-stone-700">
+              Quy trình lựa chọn nguồn, kiểm tra, cập nhật và tiếp nhận đính chính được công khai tại{" "}
+              <Link className="font-semibold text-orange-700 underline underline-offset-4" href="/chinh-sach-bien-tap">
+                chính sách biên tập
+              </Link>.
+            </p>
             <p className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm font-semibold leading-6 text-amber-900">
               Nội dung chỉ mang tính tham khảo, không cam kết vận mệnh, sức khỏe, tài chính hoặc hôn nhân.
             </p>
-            <p className="text-sm text-stone-500">Cập nhật lần cuối: {updatedAt}</p>
+            <p className="text-sm text-stone-500">
+              <time dateTime="2026-07-29">Cập nhật lần cuối: 29/07/2026</time>
+            </p>
           </div>
 
           <nav className="mt-8 flex flex-wrap gap-3" aria-label="Liên kết nội bộ">

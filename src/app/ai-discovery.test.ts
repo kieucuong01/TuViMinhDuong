@@ -26,7 +26,7 @@ describe("AI discovery", () => {
   });
 
   it("publishes lightweight AI visibility pages with extractable answers", () => {
-    for (const path of ["gioi-thieu", "phuong-phap-luan", "tac-gia"]) {
+    for (const path of ["gioi-thieu", "phuong-phap-luan", "tac-gia", "chinh-sach-bien-tap"]) {
       const source = pageSource(path);
       const answer = source.match(/data-answer-block="true">([^<]+)</)?.[1] || "";
 
@@ -44,8 +44,21 @@ describe("AI discovery", () => {
     }
   });
 
+  it("makes editorial accountability visible to readers and agents", () => {
+    for (const path of ["phuong-phap-luan", "tac-gia", "chinh-sach-bien-tap"]) {
+      expect(pageSource(path)).toContain('<time dateTime="2026-07-29">');
+    }
+
+    const policy = pageSource("chinh-sach-bien-tap");
+    expect(policy).toContain('href="/lien-he"');
+    expect(policy).toContain('href="/chinh-sach-bao-mat"');
+    expect(policy).toContain("độc lập với");
+    expect(policy).toContain("nguồn tham khảo");
+    expect(policy).toContain("đính chính");
+  });
+
   it("includes AI visibility pages in the sitemap source", () => {
-    for (const path of ["/gioi-thieu", "/phuong-phap-luan", "/tac-gia"]) {
+    for (const path of ["/gioi-thieu", "/phuong-phap-luan", "/tac-gia", "/chinh-sach-bien-tap"]) {
       expect(sitemapSource).toContain(path);
     }
   });
