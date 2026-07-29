@@ -199,4 +199,48 @@
 - [Sitemap index](https://lasotinhhoa.vn/sitemap-index.xml)
 - [Robots](https://lasotinhhoa.vn/robots.txt)
 
-_Cập nhật: 28/07/2026 — nguồn dành cho AI crawlers, search engines và trợ lý trả lời câu hỏi._
+## Danh tính, phương pháp và tài nguyên cho agent
+
+- [Giới thiệu Lá số tinh hoa](https://lasotinhhoa.vn/gioi-thieu): Phạm vi sản phẩm, đối tượng sử dụng và giới hạn nội dung.
+- [Phương pháp luận](https://lasotinhhoa.vn/phuong-phap-luan): Cách đối chiếu cung, sao, vận và bối cảnh cá nhân.
+- [Tác giả và đội ngũ biên tập](https://lasotinhhoa.vn/tac-gia): Trách nhiệm biên tập và cách gửi yêu cầu kiểm tra.
+- [Chính sách biên tập](https://lasotinhhoa.vn/chinh-sach-bien-tap): Quy trình chọn nguồn, kiểm tra, cập nhật và đính chính.
+- [Bảng giá công khai](https://lasotinhhoa.vn/pricing): Giá và trạng thái thương mại cần được kiểm tra trước khi thanh toán.
+- [Thông tin website dạng JSON](https://lasotinhhoa.vn/agent/site.json): Danh tính, nguồn khám phá, chủ đề chính và hướng dẫn trích dẫn.
+- [Bảng giá dạng JSON](https://lasotinhhoa.vn/agent/pricing.json): Giá luận giải, gói xu và trạng thái thương mại hiện hành.
+- [Chính sách bảo mật](https://lasotinhhoa.vn/chinh-sach-bao-mat)
+- [Điều khoản sử dụng](https://lasotinhhoa.vn/dieu-khoan-su-dung)
+- [Liên hệ](https://lasotinhhoa.vn/lien-he)
+
+## Nội dung công khai bổ sung
+
+- [Tra cứu sao Tuần](https://lasotinhhoa.vn/tra-cuu/phu-tinh/tuan)
+- [Tra cứu sao Triệt](https://lasotinhhoa.vn/tra-cuu/phu-tinh/triet)
+- [Bình giải lá số tử vi](https://lasotinhhoa.vn/kien-thuc-tu-vi/binh-giai-la-so-tu-vi)
+- [Các sao trong lá số tử vi](https://lasotinhhoa.vn/kien-thuc-tu-vi/cac-sao-trong-la-so-tu-vi)
+- [Chiêm tinh, lá số và tử vi](https://lasotinhhoa.vn/kien-thuc-tu-vi/chiem-tinh-la-so-va-tu-vi)
+- [Hóa Khoa trong tử vi](https://lasotinhhoa.vn/kien-thuc-tu-vi/hoa-khoa-trong-tu-vi)
+- [Hóa Kỵ trong tử vi](https://lasotinhhoa.vn/kien-thuc-tu-vi/hoa-ky-trong-tu-vi)
+- [Hỏa Tinh, Linh Tinh trong tử vi](https://lasotinhhoa.vn/kien-thuc-tu-vi/hoa-tinh-linh-tinh-trong-tu-vi)
+- [Kình Dương, Đà La trong tử vi](https://lasotinhhoa.vn/kien-thuc-tu-vi/kinh-duong-da-la-trong-tu-vi)
+- [Lập lá số Bát Tự](https://lasotinhhoa.vn/kien-thuc-tu-vi/lap-la-so-bat-tu)
+- [Lập lá số tử vi cần gì](https://lasotinhhoa.vn/kien-thuc-tu-vi/lap-la-so-tu-vi-can-gi)
+- [Lá số Bát Tự và tử vi](https://lasotinhhoa.vn/kien-thuc-tu-vi/la-so-bat-tu-va-tu-vi)
+- [Lá số tử vi có thay đổi không](https://lasotinhhoa.vn/kien-thuc-tu-vi/la-so-tu-vi-co-thay-doi-khong)
+- [Lá số tử vi miễn phí](https://lasotinhhoa.vn/kien-thuc-tu-vi/la-so-tu-vi-mien-phi)
+- [Lá số tử vi online](https://lasotinhhoa.vn/kien-thuc-tu-vi/la-so-tu-vi-online)
+- [Lá số tử vi theo ngày tháng năm sinh](https://lasotinhhoa.vn/kien-thuc-tu-vi/la-so-tu-vi-theo-ngay-thang-nam-sinh)
+- [Lá số tử vi trọn đời](https://lasotinhhoa.vn/kien-thuc-tu-vi/la-so-tu-vi-tron-doi)
+- [Lá số tử vi Việt Nam](https://lasotinhhoa.vn/kien-thuc-tu-vi/la-so-tu-vi-viet-nam)
+- [Mệnh Tham Lang là gì](https://lasotinhhoa.vn/kien-thuc-tu-vi/menh-tham-lang-la-gi)
+- [Mệnh Vô Chính Diệu](https://lasotinhhoa.vn/kien-thuc-tu-vi/menh-vo-chinh-dieu)
+- [Sát Phá Liêm Tham trong tử vi](https://lasotinhhoa.vn/kien-thuc-tu-vi/sat-pha-liem-tham-trong-tu-vi)
+- [Thiên Khôi, Thiên Việt trong tử vi](https://lasotinhhoa.vn/kien-thuc-tu-vi/thien-khoi-thien-viet-trong-tu-vi)
+- [Tiểu vận là gì](https://lasotinhhoa.vn/kien-thuc-tu-vi/tieu-van-la-gi)
+- [Tử vi hằng ngày và cách đọc vận khí](https://lasotinhhoa.vn/kien-thuc-tu-vi/tu-vi-hang-ngay-cach-doc-van-khi)
+- [Tử vi tháng 6/2026](https://lasotinhhoa.vn/kien-thuc-tu-vi/tu-vi-thang-6-2026)
+- [Văn Xương, Văn Khúc trong tử vi](https://lasotinhhoa.vn/kien-thuc-tu-vi/van-xuong-van-khuc-trong-tu-vi)
+- [Xem ngày tốt tháng 6/2026](https://lasotinhhoa.vn/kien-thuc-tu-vi/xem-ngay-tot-thang-6-2026)
+- [Xem ngày tốt xấu theo tuổi](https://lasotinhhoa.vn/kien-thuc-tu-vi/xem-ngay-tot-xau-theo-tuoi)
+
+_Cập nhật: 29/07/2026 — nguồn dành cho AI crawlers, search engines và trợ lý trả lời câu hỏi._

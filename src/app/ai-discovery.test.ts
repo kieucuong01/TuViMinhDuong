@@ -2,6 +2,8 @@ import { existsSync, readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 
+import protectedLlmsUrls from "./llms-protected-urls.json";
+
 const appRoot = fileURLToPath(new URL("./", import.meta.url));
 const sitemapSource = readFileSync(fileURLToPath(new URL("./sitemap.ts", import.meta.url)), "utf8");
 
@@ -41,6 +43,31 @@ describe("AI discovery", () => {
       for (const href of ['href="/"', 'href="/kien-thuc-tu-vi"', 'href="/tra-cuu"', 'href="/xem-ngay"', 'href="/xem-tuoi"']) {
         expect(source).toContain(href);
       }
+    }
+  });
+
+  it("preserves every previously published llms resource", () => {
+    const source = readFileSync("public/llms.txt", "utf8");
+
+    expect(protectedLlmsUrls.urls).toHaveLength(148);
+    for (const url of protectedLlmsUrls.urls) {
+      expect(source).toContain(url);
+    }
+  });
+
+  it("advertises editorial and machine-readable agent resources", () => {
+    const source = readFileSync("public/llms.txt", "utf8");
+
+    for (const route of [
+      "/gioi-thieu",
+      "/phuong-phap-luan",
+      "/tac-gia",
+      "/chinh-sach-bien-tap",
+      "/pricing",
+      "/agent/site.json",
+      "/agent/pricing.json",
+    ]) {
+      expect(source).toContain(`https://lasotinhhoa.vn${route}`);
     }
   });
 
