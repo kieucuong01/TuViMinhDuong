@@ -640,6 +640,7 @@ Create `src/lib/agent-resources.test.ts`:
 ```ts
 import { describe, expect, it } from "vitest";
 import { COIN_PACKAGES, FEATURE_PRICES } from "@/lib/pricing";
+import { APP_URL } from "@/lib/env";
 import {
   buildAgentPricingResource,
   buildAgentSiteResource,
@@ -651,7 +652,7 @@ describe("public agent resources", () => {
     expect(resource).toMatchObject({
       schemaVersion: "1.0",
       language: "vi-VN",
-      site: { name: "Lá số tinh hoa", url: expect.stringMatching(/^https:\/\//) },
+      site: { name: "Lá số tinh hoa", url: APP_URL },
       discovery: {
         llms: expect.stringMatching(/\/llms\.txt$/),
         sitemap: expect.stringMatching(/\/sitemap\.xml$/),
