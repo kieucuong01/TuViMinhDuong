@@ -98,6 +98,20 @@ describe("Structured data", () => {
     expect(jsonLd.publisher.logo.url).toContain("/favicon-96x96.png");
   });
 
+  it("identifies the visible editorial organization as article author", () => {
+    const jsonLd = articleJsonLd({
+      title: "Cách đọc cung Mệnh tử vi",
+      slug: "cach-doc-cung-menh-tu-vi",
+      excerpt: "Hướng dẫn đọc cung Mệnh tử vi dễ hiểu.",
+    });
+
+    expect(jsonLd.author).toMatchObject({
+      "@type": "Organization",
+      name: "Đội ngũ biên tập Lá số tinh hoa",
+      url: expect.stringMatching(/\/tac-gia$/),
+    });
+  });
+
   it("describes visible pricing offers with an OfferCatalog", () => {
     const catalog = offerCatalogJsonLd({
       name: "Bảng giá luận giải tử vi",

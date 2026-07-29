@@ -1,5 +1,6 @@
 import { APP_NAME, APP_URL } from "@/lib/env";
 import { articlePath } from "@/lib/article-path";
+import { EDITORIAL_ORGANIZATION } from "@/lib/editorial-identity";
 import { slugify } from "@/lib/format";
 
 export type SeoInput = {
@@ -170,7 +171,12 @@ export function articleJsonLd(article: {
     image: image ? [image] : undefined,
     datePublished: article.publishedAt || undefined,
     dateModified: article.updatedAt || article.publishedAt || undefined,
-    author: { "@type": "Organization", name: APP_NAME },
+    author: {
+      "@type": "Organization",
+      "@id": EDITORIAL_ORGANIZATION.url,
+      name: EDITORIAL_ORGANIZATION.name,
+      url: EDITORIAL_ORGANIZATION.url,
+    },
     publisher: {
       "@type": "Organization",
       name: APP_NAME,

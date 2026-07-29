@@ -6,6 +6,7 @@ import { articlePath } from "@/lib/article-path";
 import { articleJsonLd, breadcrumbJsonLd, faqJsonLd } from "@/lib/seo";
 import { extractMarkdownHeadings, MarkdownContent } from "@/components/markdown-content";
 import { ArticlePersonalizedCta } from "@/components/article-personalized-cta";
+import { EDITORIAL_ORGANIZATION } from "@/lib/editorial-identity";
 
 export function ArticlePageContent({
   article,
@@ -50,11 +51,29 @@ export function ArticlePageContent({
         </nav>
         <p className="eyebrow">{sectionName}</p>
         <h1 className="text-balance text-4xl font-black leading-tight text-stone-950 sm:text-5xl">{article.title}</h1>
-        <p className="mt-4 text-pretty text-lg leading-8 text-stone-700">{article.excerpt}</p>
-        {displayDate ? (
+        <p
+          className="mt-4 text-pretty text-lg leading-8 text-stone-700"
+          data-answer-block="true"
+        >
+          {article.excerpt}
+        </p>
+        <p className="mt-4 text-sm leading-6 text-stone-600">
+          Biên tập bởi{" "}
+          <Link href="/tac-gia" className="font-bold text-orange-700">
+            {EDITORIAL_ORGANIZATION.name}
+          </Link>
+          {displayDate ? (
+            <>
+              {" · "}
+              <time dateTime={new Date(displayDate).toISOString()}>
+                Cập nhật {new Date(displayDate).toLocaleDateString("vi-VN")}
+              </time>
+            </>
+          ) : null}
+        </p>
+        {article.category ? (
           <div className="mt-5 flex flex-wrap gap-2">
-            {article.category ? <Link href={`/kien-thuc-tu-vi?category=${article.category.slug}`} className="tag tag-soft">{article.category.name}</Link> : null}
-            <span className="tag tag-soft">Cập nhật {new Date(displayDate).toLocaleDateString("vi-VN")}</span>
+            <Link href={`/kien-thuc-tu-vi?category=${article.category.slug}`} className="tag tag-soft">{article.category.name}</Link>
           </div>
         ) : null}
         {tableOfContents.length ? (

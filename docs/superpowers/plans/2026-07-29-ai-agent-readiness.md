@@ -337,7 +337,7 @@ git commit -m "fix: preserve article traffic signals"
 - Modify: `src/lib/seo.ts`
 - Modify: `src/lib/seo.test.ts`
 - Modify: `src/components/article-page-content.tsx`
-- Modify: `src/components/seo-page-markup.test.ts`
+- Create: `src/components/article-page-content.test.tsx`
 
 **Interfaces:**
 - Produces: `EDITORIAL_ORGANIZATION = { name: string; url: string }`.
@@ -363,14 +363,14 @@ it("identifies the visible editorial organization as article author", () => {
 });
 ```
 
-Add source assertions to `src/components/seo-page-markup.test.ts`:
+Create `src/components/article-page-content.test.tsx` and render the real `ArticlePageContent` with a literal `ArticleView` fixture. Assert:
 
 ```ts
-expect(articlePageSource).toContain('data-answer-block="true"');
-expect(articlePageSource).toContain('href="/tac-gia"');
-expect(articlePageSource).toContain("<time");
-expect(articlePageSource).toContain("dateTime=");
-expect(articlePageSource).toContain("EDITORIAL_ORGANIZATION.name");
+expect(html).toContain('data-answer-block="true"');
+expect(html).toContain('href="/tac-gia"');
+expect(html).toContain("Đội ngũ biên tập Lá số tinh hoa");
+expect(html).toContain("<time");
+expect(html).toContain('dateTime="2026-07-28T17:00:00.000Z"');
 ```
 
 - [ ] **Step 2: Run focused tests and observe RED**
@@ -378,7 +378,7 @@ expect(articlePageSource).toContain("EDITORIAL_ORGANIZATION.name");
 Run:
 
 ```powershell
-npm test -- src/lib/seo.test.ts src/components/seo-page-markup.test.ts
+npm test -- src/lib/seo.test.ts src/components/article-page-content.test.tsx
 ```
 
 Expected: FAIL on the missing author URL, answer-block marker, author link, and semantic time.
@@ -445,7 +445,7 @@ Keep the category tag but remove the old duplicate date tag.
 Run:
 
 ```powershell
-npm test -- src/lib/seo.test.ts src/components/seo-page-markup.test.ts src/components/article-personalized-cta.test.ts
+npm test -- src/lib/seo.test.ts src/components/article-page-content.test.tsx src/components/seo-page-markup.test.ts src/components/article-personalized-cta.test.ts
 ```
 
 Expected: all selected tests pass.
@@ -453,7 +453,7 @@ Expected: all selected tests pass.
 - [ ] **Step 6: Commit article trust alignment**
 
 ```powershell
-git add -- src/lib/editorial-identity.ts src/lib/seo.ts src/lib/seo.test.ts src/components/article-page-content.tsx src/components/seo-page-markup.test.ts
+git add -- src/lib/editorial-identity.ts src/lib/seo.ts src/lib/seo.test.ts src/components/article-page-content.tsx src/components/article-page-content.test.tsx docs/superpowers/plans/2026-07-29-ai-agent-readiness.md
 git commit -m "feat: expose article editorial trust signals"
 ```
 
