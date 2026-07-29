@@ -10,6 +10,7 @@ import {
   websiteJsonLd,
   webApplicationJsonLd,
 } from "@/lib/seo";
+import { normalizeArticleMetadataTitle } from "@/lib/article-metadata";
 
 describe("SEO scoring", () => {
   it("rewards complete article metadata and structure", () => {
@@ -142,6 +143,16 @@ describe("Structured data", () => {
 });
 
 describe("SEO URL guards", () => {
+  it("lets the root layout add the site brand exactly once", () => {
+    expect(normalizeArticleMetadataTitle("Cách đọc lá số")).toBe("Cách đọc lá số");
+    expect(normalizeArticleMetadataTitle("Cách đọc lá số | Lá số tinh hoa")).toBe("Cách đọc lá số");
+    expect(
+      normalizeArticleMetadataTitle(
+        "Cách đọc lá số | Lá số tinh hoa | Lá số tinh hoa",
+      ),
+    ).toBe("Cách đọc lá số");
+  });
+
   it("normalizes relative URLs against the public app URL", () => {
     expect(absoluteUrl("/kien-thuc-tu-vi")).toMatch(/^https?:\/\/.+\/kien-thuc-tu-vi$/);
     expect(absoluteUrl("https://example.com/custom")).toBe("https://example.com/custom");

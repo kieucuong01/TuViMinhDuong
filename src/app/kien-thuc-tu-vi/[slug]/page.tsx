@@ -5,6 +5,7 @@ import { getArticleBySlug, listArticles } from "@/lib/data";
 import { articlePath, isLifetimeTuViSlug } from "@/lib/article-path";
 import { absoluteUrl } from "@/lib/seo";
 import { ArticlePageContent } from "@/components/article-page-content";
+import { normalizeArticleMetadataTitle } from "@/lib/article-metadata";
 
 export const revalidate = 300;
 export const dynamicParams = true;
@@ -21,7 +22,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const canonicalPath = articlePath(article);
   const ogImage = article.ogImage || `/api/og?title=${encodeURIComponent(article.ogTitle || article.metaTitle || article.title)}&subtitle=${encodeURIComponent(article.ogDescription || article.metaDescription || article.excerpt)}`;
   return {
-    title: article.metaTitle || article.title,
+    title: normalizeArticleMetadataTitle(article.metaTitle || article.title),
     description: article.metaDescription || article.excerpt,
     alternates: { canonical: absoluteUrl(canonicalPath) },
     robots: article.robots || "index,follow",

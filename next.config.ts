@@ -1,8 +1,12 @@
 import type { NextConfig } from "next";
+import { LEGACY_ARTICLE_REDIRECTS } from "./src/lib/legacy-article-redirects";
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
   allowedDevOrigins: ["127.0.0.1"],
+  async redirects() {
+    return [...LEGACY_ARTICLE_REDIRECTS];
+  },
   async headers() {
     const publicSeoCacheHeader = {
       key: "Cache-Control",
