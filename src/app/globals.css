@@ -13317,7 +13317,7 @@ button.is-loading:not(.icon-button)::before {
   padding: 2rem 1.5rem 4rem;
 }
 
-.pseo-article-shell > main {
+.pseo-article-main {
   min-width: 0;
   border: 1px solid #ffedd5;
   border-radius: 1.5rem;
@@ -14153,7 +14153,7 @@ button.is-loading:not(.icon-button)::before {
     padding: 0.9rem 0.75rem 2.5rem;
   }
 
-  .pseo-article-shell > main {
+  .pseo-article-main {
     border-radius: 1rem;
     padding: 1rem;
   }
@@ -14218,7 +14218,7 @@ button.is-loading:not(.icon-button)::before {
   width: min(100%, 76rem);
 }
 
-.pseo-article-shell > main {
+.pseo-article-main {
   border-color: var(--pseo-line);
   background: var(--pseo-paper);
   box-shadow: 0 20px 54px rgb(33 26 23 / 0.06);

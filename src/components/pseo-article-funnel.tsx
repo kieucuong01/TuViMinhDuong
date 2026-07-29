@@ -49,7 +49,7 @@ export function PseoArticleFunnel({ page, sameStar, samePalace }: PseoArticleFun
         <a href="#lap-la-so-ca-nhan">Lập lá số miễn phí ngay</a>
       </div>
       <article className="pseo-article-shell">
-        <main>
+        <div className="pseo-article-main">
           <nav className="article-breadcrumb" aria-label="Breadcrumb">
             <Link href="/">Trang chủ</Link>
             <span>/</span>
@@ -59,7 +59,7 @@ export function PseoArticleFunnel({ page, sameStar, samePalace }: PseoArticleFun
           </nav>
           <header className="pseo-hero">
             <h1>{page.title}</h1>
-            <p>{page.excerpt}</p>
+            <p data-answer-block="true">{page.excerpt}</p>
           </header>
           <dl className="pseo-data-strip">
             <div>
@@ -91,7 +91,7 @@ export function PseoArticleFunnel({ page, sameStar, samePalace }: PseoArticleFun
               <RelatedList title="Cùng cung, khác sao" pages={samePalace} />
             </section>
           ) : null}
-        </main>
+        </div>
         <aside className="pseo-vip-sidebar">
           <Sparkles aria-hidden="true" size={28} />
           <h2>Luận giải VIP theo lá số riêng</h2>

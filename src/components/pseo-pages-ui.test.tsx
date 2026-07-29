@@ -94,6 +94,9 @@ describe("pSEO page family UI", () => {
     );
 
     expect(withRelatedHtml).toContain('class="pseo-data-strip"');
+    expect(withRelatedHtml).not.toContain("<main");
+    expect(withRelatedHtml).toContain('data-answer-block="true"');
+    expect(withRelatedHtml.match(/<h1/g)).toHaveLength(1);
     expect(withRelatedHtml).toContain("Cùng sao, khác cung");
     expect(withRelatedHtml).not.toContain("Cùng cung, khác sao");
     expect(withoutRelatedHtml).not.toContain("pseo-related-group");
