@@ -1,10 +1,6 @@
 #!/usr/bin/env node
 import { pathToFileURL } from "node:url";
-import {
-  extractPageSeo,
-  extractSitemapUrls,
-  summarizeSeoSnapshot,
-} from "./seo-autopilot-core.mjs";
+import { buildSnapshot } from "./seo-autopilot-snapshot-runner.mjs";
 
 if (isCli()) {
   const args = parseArgs(process.argv.slice(2));
@@ -21,67 +17,6 @@ if (isCli()) {
   } catch (error) {
     console.error(`SEO Autopilot snapshot failed: ${error.message}`);
     process.exitCode = 1;
-  }
-}
-
-export async function buildSnapshot({ baseUrl, sampleSize }) {
-  const [robotsText, sitemapXml] = await Promise.all([
-    fetchText(`${baseUrl}/robots.txt`),
-    fetchText(`${baseUrl}/sitemap.xml`),
-  ]);
-  const sitemapUrls = extractSitemapUrls(sitemapXml);
-  const sampleUrls = chooseSampleUrls(baseUrl, sitemapUrls, sampleSize);
-  const pages = await Promise.all(sampleUrls.map(async (url) => {
-    try {
-      const html = await fetchText(url);
-      return extractPageSeo(url, html);
-    } catch (error) {
-      return {
-        url,
-        title: "",
-        metaDescription: "",
-        canonical: "",
-        h1: [],
-        jsonLdCount: 0,
-        htmlLength: 0,
-        error: error.message,
-      };
-    }
-  }));
-
-  return {
-    generatedAt: new Date().toISOString(),
-    ...summarizeSeoSnapshot({ baseUrl, robotsText, sitemapUrls, pages }),
-    pages,
-  };
-}
-
-function chooseSampleUrls(baseUrl, sitemapUrls, sampleSize) {
-  const priorityPaths = [
-    baseUrl,
-    `${baseUrl}/kien-thuc-tu-vi`,
-    `${baseUrl}/xem-ngay`,
-  ];
-  const ordered = [...priorityPaths, ...sitemapUrls];
-  return [...new Set(ordered)].slice(0, Math.max(1, sampleSize));
-}
-
-async function fetchText(url) {
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 8_000);
-  try {
-    const response = await fetch(url, {
-      headers: {
-        "user-agent": "LaSoTinhHoa-SEO-Autopilot/1.0",
-      },
-      signal: controller.signal,
-    });
-    if (!response.ok) {
-      throw new Error(`${response.status} ${response.statusText}`.trim());
-    }
-    return await response.text();
-  } finally {
-    clearTimeout(timeout);
   }
 }
 

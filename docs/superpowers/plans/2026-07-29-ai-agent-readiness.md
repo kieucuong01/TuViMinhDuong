@@ -26,7 +26,8 @@
 ### Task 1: Make the whole-site snapshot reliable
 
 **Files:**
-- Create: `scripts/seo/seo-autopilot-snapshot.test.ts`
+- Create: `src/lib/seo-autopilot-snapshot-script.test.ts`
+- Create: `scripts/seo/seo-autopilot-snapshot-runner.mjs`
 - Modify: `scripts/seo/seo-autopilot-snapshot.mjs`
 
 **Interfaces:**
@@ -53,7 +54,7 @@ Confirm `git status --short` shows no lockfile change because this release adds 
 
 - [ ] **Step 3: Write failing audit tests**
 
-Create `scripts/seo/seo-autopilot-snapshot.test.ts` with real fake `Response` objects:
+Create `src/lib/seo-autopilot-snapshot-script.test.ts` with real fake `Response` objects:
 
 ```ts
 import { describe, expect, it } from "vitest";
@@ -61,7 +62,7 @@ import {
   buildSnapshot,
   fetchText,
   mapWithConcurrency,
-} from "./seo-autopilot-snapshot.mjs";
+} from "../../scripts/seo/seo-autopilot-snapshot-runner.mjs";
 
 describe("SEO snapshot networking", () => {
   it("never exceeds the configured page concurrency", async () => {
@@ -127,14 +128,14 @@ describe("SEO snapshot networking", () => {
 Run:
 
 ```powershell
-npm test -- scripts/seo/seo-autopilot-snapshot.test.ts
+npm test -- src/lib/seo-autopilot-snapshot-script.test.ts
 ```
 
 Expected: FAIL because `fetchText` and `mapWithConcurrency` are not exported and `buildSnapshot` does not accept injected networking controls.
 
 - [ ] **Step 5: Implement bounded concurrency, retry, and error separation**
 
-In `scripts/seo/seo-autopilot-snapshot.mjs`:
+In `scripts/seo/seo-autopilot-snapshot-runner.mjs`:
 
 ```js
 export async function mapWithConcurrency(items, concurrency, task) {
@@ -155,7 +156,7 @@ export async function mapWithConcurrency(items, concurrency, task) {
 }
 ```
 
-Change `buildSnapshot` to default to `concurrency = 8`, `maxAttempts = 2`, and `timeoutMs = 8_000`; fetch pages through `mapWithConcurrency`. Store failed page records in `fetchErrors`, pass only successful pages to `summarizeSeoSnapshot`, and add one explicit warning such as `2 page fetch errors remain after retry.` without emitting missing-field warnings for those URLs.
+Move `buildSnapshot`, `chooseSampleUrls`, and `fetchText` from the CLI file into the runner module. Change `buildSnapshot` to default to `concurrency = 8`, `maxAttempts = 2`, and `timeoutMs = 8_000`; fetch pages through `mapWithConcurrency`. Store failed page records in `fetchErrors`, pass only successful pages to `summarizeSeoSnapshot`, and add one explicit warning such as `2 page fetch errors remain after retry.` without emitting missing-field warnings for those URLs. Import `buildSnapshot` back into the CLI file so its command contract stays unchanged.
 
 Change `fetchText` to:
 
@@ -191,7 +192,7 @@ export async function fetchText(url, {
 Run:
 
 ```powershell
-npm test -- scripts/seo/seo-autopilot-snapshot.test.ts scripts/seo/seo-autopilot-core.test.ts
+npm test -- src/lib/seo-autopilot-snapshot-script.test.ts src/lib/seo-autopilot-core.test.ts
 ```
 
 Expected: all selected tests pass with zero failures.
@@ -199,7 +200,7 @@ Expected: all selected tests pass with zero failures.
 - [ ] **Step 7: Commit the audit guard**
 
 ```powershell
-git add -- scripts/seo/seo-autopilot-snapshot.mjs scripts/seo/seo-autopilot-snapshot.test.ts
+git add -- scripts/seo/seo-autopilot-snapshot.mjs scripts/seo/seo-autopilot-snapshot-runner.mjs src/lib/seo-autopilot-snapshot-script.test.ts docs/superpowers/plans/2026-07-29-ai-agent-readiness.md
 git commit -m "fix: make whole-site SEO snapshots reliable"
 ```
 
