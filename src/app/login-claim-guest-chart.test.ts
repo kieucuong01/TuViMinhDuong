@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 
 const actionsSource = readFileSync(fileURLToPath(new URL("./actions.ts", import.meta.url)), "utf8");
 const googleCallbackSource = readFileSync(fileURLToPath(new URL("./api/oauth/google/callback/route.ts", import.meta.url)), "utf8");
+const loginPageSource = readFileSync(fileURLToPath(new URL("./dang-nhap/page.tsx", import.meta.url)), "utf8");
 const loginActionSource = actionsSource.slice(
   actionsSource.indexOf("export async function loginAction"),
   actionsSource.indexOf("export async function logoutAction"),
@@ -20,6 +21,14 @@ describe("login chart ownership handoff", () => {
     const authFailureBranch = loginActionSource.indexOf("if (!loginResult)");
     expect(authFailureBranch).toBeGreaterThan(0);
     expect(loginActionSource.slice(0, authFailureBranch)).not.toContain("redirect(");
+  });
+
+  it("keeps passwordless account errors user-facing without promising password takeover", () => {
+    expect(loginActionSource).toContain('const normalizedMessage = rawMessage.toLocaleLowerCase("vi-VN");');
+    expect(loginActionSource).toContain('normalizedMessage.includes("mật khẩu")');
+    expect(loginActionSource).toContain('rawMessage.includes("Tài khoản này")');
+    expect(loginPageSource).toContain("nếu từng mua nhanh nhưng chưa đặt mật khẩu");
+    expect(loginPageSource).toContain("hãy dùng Google hoặc link truy cập đã gửi");
   });
 
   it("claims the chart from the OAuth next path after Google login succeeds", () => {

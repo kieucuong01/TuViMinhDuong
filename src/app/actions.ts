@@ -21,6 +21,7 @@ import { ActionTimeoutError, withActionTimeout } from "@/lib/action-timeout";
 import { savePseoPageFromForm } from "@/lib/pseo-data";
 import { chartCreationRateLimitExceeded, chartCreationRateLimitWindowStart, normalizeRequestIp, normalizeUserAgent, validateChartFullName } from "@/lib/chart-submission-guard";
 import { normalizeChartAttribution } from "@/lib/chart-attribution";
+import { AUTH_RATE_LIMIT_WINDOW_MS, LOGIN_RATE_LIMIT, checkRateLimit, rateLimitKeyFromHeaders } from "@/lib/rate-limit";
 
 function createChartTimeoutMs(value = process.env.CREATE_CHART_ACTION_TIMEOUT_MS) {
   const parsed = Number(value);
@@ -45,14 +46,25 @@ export async function loginAction(formData: FormData) {
   let authError = "";
 
   try {
+    const headerList = await headers();
+    const rateLimit = checkRateLimit(rateLimitKeyFromHeaders("login", headerList), {
+      limit: LOGIN_RATE_LIMIT,
+      windowMs: AUTH_RATE_LIMIT_WINDOW_MS,
+    });
+    if (rateLimit.rateLimited) {
+      throw new Error("Bạn thử đăng nhập quá nhiều lần. Vui lòng chờ ít phút rồi thử lại.");
+    }
     loginResult = await loginOrRegister(email, password);
   } catch (error) {
     const rawMessage = error instanceof Error ? error.message : "";
+    const normalizedMessage = rawMessage.toLocaleLowerCase("vi-VN");
     const isExpectedAuthError =
       rawMessage.includes("Email") ||
-      rawMessage.includes("Mật khẩu") ||
-      rawMessage.includes("mat khau") ||
-      rawMessage.includes("password");
+      normalizedMessage.includes("mật khẩu") ||
+      normalizedMessage.includes("mat khau") ||
+      normalizedMessage.includes("password") ||
+      normalizedMessage.includes("quá nhiều") ||
+      rawMessage.includes("Tài khoản này");
     authError = isExpectedAuthError
       ? rawMessage
       : "Chưa đăng nhập được. Bạn kiểm tra lại email, mật khẩu rồi thử lần nữa nhé.";

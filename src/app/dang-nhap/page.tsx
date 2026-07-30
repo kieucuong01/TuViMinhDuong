@@ -23,7 +23,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
         <section className="auth-card">
           <p className="eyebrow">Tài khoản</p>
           <h1>Đăng nhập hoặc tạo tài khoản</h1>
-          <p className="text-sm text-stone-600">Dùng email và mật khẩu để tiếp tục. Nếu email chưa tồn tại hoặc từng mua nhanh chưa đặt mật khẩu, hệ thống sẽ tự tạo quyền truy cập cho bạn.</p>
+          <p className="text-sm text-stone-600">Dùng email và mật khẩu để tiếp tục. Email mới sẽ được tạo tài khoản; nếu từng mua nhanh nhưng chưa đặt mật khẩu, hãy dùng Google hoặc link truy cập đã gửi.</p>
           {params.error ? <p className="alert">{params.error}</p> : null}
           <form action={loginAction} className="mt-6 grid gap-4" data-testid="login-form" data-loading-message="Đang đăng nhập..." data-loading-label="Đang xử lý...">
             <input type="hidden" name="next" value={params.next || "/"} />

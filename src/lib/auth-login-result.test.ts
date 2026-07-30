@@ -70,6 +70,26 @@ describe("loginOrRegister account result", () => {
     });
   });
 
+  it("rejects password login for an existing passwordless account without setting a password", async () => {
+    const update = vi.fn();
+    getDbMock.mockReturnValue({
+      user: {
+        findUnique: vi.fn().mockResolvedValue({
+          ...existingUser,
+          passwordHash: null,
+        }),
+        update,
+        create: vi.fn(),
+      },
+    });
+
+    await expect(loginOrRegister("existing@example.com", "attacker-secret")).rejects.toThrow(
+      "Tài khoản này chưa có mật khẩu",
+    );
+
+    expect(update).not.toHaveBeenCalled();
+  });
+
   it("reports register for the database-free demo account", async () => {
     getDbMock.mockReturnValue(null);
 
@@ -126,6 +146,39 @@ describe("guest checkout auth", () => {
     expect(user).toBeNull();
     expect(sessionFind).not.toHaveBeenCalled();
     expect(setCookie).not.toHaveBeenCalled();
+  });
+
+  it("consumes a login magic token once before restoring the user", async () => {
+    const setCookie = vi.fn();
+    cookiesMock.mockResolvedValue({ set: setCookie });
+    const tx = {
+      session: {
+        findUnique: vi.fn().mockResolvedValue({
+          id: "login-session-1",
+          expiresAt: new Date(Date.now() + 60_000),
+          user: existingUser,
+        }),
+        deleteMany: vi.fn()
+          .mockResolvedValueOnce({ count: 1 })
+          .mockResolvedValueOnce({ count: 0 }),
+      },
+    };
+    getDbMock.mockReturnValue({
+      $transaction: vi.fn(async (worker: (client: typeof tx) => unknown) => worker(tx)),
+    });
+
+    const first = await signInWithMagicToken("login_magic-1");
+    const second = await signInWithMagicToken("login_magic-1");
+
+    expect(tx.session.deleteMany).toHaveBeenCalledWith({
+      where: { id: "login-session-1", token: "login_magic-1" },
+    });
+    expect(tx.session.deleteMany.mock.invocationCallOrder[0]).toBeLessThan(
+      setCookie.mock.invocationCallOrder[0],
+    );
+    expect(first).toMatchObject({ id: existingUser.id });
+    expect(second).toBeNull();
+    expect(setCookie).toHaveBeenCalledTimes(1);
   });
 
   it("does not consume a checkout token for the wrong order", async () => {

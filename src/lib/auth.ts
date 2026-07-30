@@ -171,18 +171,26 @@ export async function signInWithMagicToken(token: string) {
   const db = getDb();
   if (!db) return null;
 
-  const session = await db.session.findUnique({
-    where: { token },
-    include: { user: true },
+  const sessionUser = await db.$transaction(async (tx) => {
+    const session = await tx.session.findUnique({
+      where: { token },
+      include: { user: true },
+    });
+    if (!session || session.expiresAt < new Date()) return null;
+
+    const consumed = await tx.session.deleteMany({
+      where: { id: session.id, token },
+    });
+    return consumed.count === 1 ? session.user : null;
   });
-  if (!session || session.expiresAt < new Date()) return null;
+  if (!sessionUser) return null;
 
   const user: SessionUser = {
-    id: session.user.id,
-    email: session.user.email,
-    name: session.user.name || session.user.email.split("@")[0],
-    role: session.user.role,
-    coinBalance: session.user.coinBalance,
+    id: sessionUser.id,
+    email: sessionUser.email,
+    name: sessionUser.name || sessionUser.email.split("@")[0],
+    role: sessionUser.role,
+    coinBalance: sessionUser.coinBalance,
   };
   await setSession(user);
   return user;
@@ -275,22 +283,7 @@ export async function loginOrRegister(email: string, password: string, name?: st
   const existing = await db.user.findUnique({ where: { email: normalizedEmail } });
   if (existing) {
     if (!existing.passwordHash && !isConfiguredAdminLogin) {
-      const synced = await db.user.update({
-        where: { id: existing.id },
-        data: {
-          passwordHash: hashPassword(password),
-          name: name?.trim() || existing.name || normalizedEmail.split("@")[0],
-        },
-      });
-      const user: SessionUser = {
-        id: synced.id,
-        email: synced.email,
-        name: synced.name || synced.email.split("@")[0],
-        role: synced.role,
-        coinBalance: synced.coinBalance,
-      };
-      await setSession(user);
-      return { user, accountResult: "login" };
+      throw new Error("Tài khoản này chưa có mật khẩu. Vui lòng đăng nhập bằng Google hoặc link truy cập đã được gửi.");
     }
     const passwordMatches = verifyPassword(password, existing.passwordHash);
     if (!passwordMatches && !isConfiguredAdminLogin) {

@@ -16,6 +16,8 @@ const eslintConfig = defineConfig([
     "build/**",
     "coverage/**",
     "dist/**",
+    ".npm-cache/**",
+    ".tmp-npm-cache/**",
     ".codex/tools*/**",
     "deploy-tmp/**",
     "scripts/**",
