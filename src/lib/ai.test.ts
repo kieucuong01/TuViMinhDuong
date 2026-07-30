@@ -252,8 +252,8 @@ describe("AI reading format", () => {
 
     const result = await generateFreeOverview(chart);
 
-    expect(FREE_OVERVIEW_MIN_WORDS).toBe(800);
-    expect(FREE_OVERVIEW_MAX_WORDS).toBe(1400);
+    expect(FREE_OVERVIEW_MIN_WORDS).toBe(950);
+    expect(FREE_OVERVIEW_MAX_WORDS).toBe(1650);
     expect(FREE_OVERVIEW_VERSION).toBe("free-block-preview-v8");
     expect(result.model).toBe("deepseek/deepseek-v4-flash");
     expect(result).not.toHaveProperty("prompt");
@@ -343,8 +343,8 @@ describe("AI reading format", () => {
     const chart = youngSampleChart();
     const content = buildInstantFreeOverview(chart);
 
-    expect(FREE_OVERVIEW_TEMPLATE_MIN_WORDS).toBe(800);
-    expect(FREE_OVERVIEW_TEMPLATE_MAX_WORDS).toBe(1200);
+    expect(FREE_OVERVIEW_TEMPLATE_MIN_WORDS).toBe(950);
+    expect(FREE_OVERVIEW_TEMPLATE_MAX_WORDS).toBe(1550);
     expect(countVisibleMarkdownWords(content)).toBeGreaterThanOrEqual(FREE_OVERVIEW_TEMPLATE_MIN_WORDS);
     expect(countVisibleMarkdownWords(content)).toBeLessThanOrEqual(FREE_OVERVIEW_TEMPLATE_MAX_WORDS);
     expect(content).toContain(`# Luận giải miễn phí dành cho ${chart.input.fullName}`);
