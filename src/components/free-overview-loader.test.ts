@@ -23,6 +23,8 @@ Mệnh sáng và biết dung hòa.
 
 **Lợi thế nổi bật:** Bạn nhìn được nhiều góc độ trước khi quyết định.
 
+Để tự đối chiếu, hãy nhìn lại ba việc gần đây bạn làm tốt nhất và việc nào khiến bạn phải gồng quá lâu.
+
 **Điểm dễ vướng:** Dễ cân nhắc quá lâu.
 
 🔒 Nâng cấp Premium để xem:
@@ -91,13 +93,17 @@ describe("FreeOverviewLoader seed-first LLM refresh gate", () => {
     expect(html).toContain("Trọng tâm năm 2026");
     expect(html).toContain('aria-label="Điều hướng luận giải miễn phí"');
     expect(html).toContain('href="#free-insight-1"');
-    expect(html.match(/data-reading-section=/gu)).toHaveLength(4);
+    expect(html.match(/<details/gu)).toHaveLength(4);
     expect(html).toContain("4/4 phần miễn phí");
     expect(html).toContain("phút đọc thật");
     expect(html).toContain("4 phần có bằng chứng cung/sao");
     expect(html).toContain("Gợi ý thực tế, không phán hù dọa");
     expect(html).toContain("free-overview-chapter-list");
-    expect(html).not.toContain("<details");
+    expect(html.match(/<details/gu)).toHaveLength(4);
+    expect(html).toContain("free-overview-self-check");
+    expect(html).toContain("Tự kiểm tra nhanh");
+    expect(html).toContain('data-ad-view="free_overview_section_viewed"');
+    expect(html).toContain('data-ad-click="free_overview_section_toggle"');
     expect(html).not.toContain("[Block Nội dung");
     expect(html).not.toContain('href="#personal-report-outline"');
     expect(html).toContain("Bản FULL sẽ trả lời");
@@ -207,7 +213,7 @@ describe("FreeOverviewLoader seed-first LLM refresh gate", () => {
 
     expect(html).toContain('data-ad-depth="4"');
     expect(html).toContain("Thanh toán PayOS hoặc dùng xu nếu đủ");
-    expect(html).not.toContain("Không cần đăng nhập");
+    expect(html).not.toContain("không cần đăng nhập trước");
     expect(html).not.toContain("login_gate_clicked");
     expect(html).not.toContain("/lap-la-so");
   });

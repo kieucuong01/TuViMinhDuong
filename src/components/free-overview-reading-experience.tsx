@@ -112,6 +112,22 @@ function estimatedReadMinutes(content: string) {
   return Math.max(5, Math.min(9, Math.ceil(words / 190)));
 }
 
+function splitSelfCheck(body: string) {
+  const paragraphs = body.split(/\n{2,}/u).map((part) => part.trim()).filter(Boolean);
+  const selfCheckIndex = paragraphs.findIndex((part) => /^(Để tự đối chiếu|Tự kiểm tra|Bạn có thể tự kiểm tra)/iu.test(cleanMarkdownText(part)));
+  if (selfCheckIndex < 0) return { body, selfCheck: "" };
+  const selfCheck = paragraphs[selfCheckIndex];
+  const bodyWithoutSelfCheck = paragraphs.filter((_, index) => index !== selfCheckIndex).join("\n\n");
+  return { body: bodyWithoutSelfCheck, selfCheck };
+}
+
+function defaultSelfCheck(section: FreeOverviewSection) {
+  if (section.tone === "finance") return "Hãy tự hỏi: khoản tiền nào đến nhờ năng lực thật của bạn, khoản nào đến rồi đi vì cảm xúc hoặc thiếu kế hoạch? Nếu hai vế này lệch nhau, phần Tài Bạch cần được đọc cùng Mệnh và Quan Lộc.";
+  if (section.tone === "career") return "Hãy tự hỏi: bạn phát triển tốt hơn khi được trao quyền chủ động, hay khi có khuôn mẫu rõ để làm theo? Câu trả lời này giúp kiểm tra nhận định về cung Quan Lộc trong thực tế.";
+  if (section.tone === "timing") return "Hãy tự hỏi: việc nào trong năm nay nên tiến, việc nào nên giữ lại thêm một nhịp? Nếu câu trả lời chưa rõ, bản FULL cần soi kỹ hơn theo từng tháng.";
+  return "Hãy tự hỏi: điểm mạnh này đang giúp bạn tiến lên ở đâu, và đang khiến bạn phải gồng ở đâu? Một lá số tốt nên giúp bạn nhận ra cả lợi thế lẫn điểm cần tiết chế.";
+}
+
 export function FreeOverviewReadingExperience({
   content,
   fullName,
@@ -187,25 +203,39 @@ export function FreeOverviewReadingExperience({
           const showPremiumPreview = canCheckoutFull && Boolean(section.premiumPreview);
           const showContextualCta = showPremiumPreview && (section.number === 2 || section.number === 4);
           const headingId = `${section.id}-title`;
+          const { body, selfCheck } = splitSelfCheck(section.body);
+          const selfCheckCopy = selfCheck ? cleanMarkdownText(selfCheck) : defaultSelfCheck(section);
 
           return (
-            <section
+            <details
               key={section.id}
               id={section.id}
               className={`free-overview-insight-card is-${section.tone}`}
+              open={section.number === 1}
+              data-ad-view="free_overview_section_viewed"
               data-reading-section={section.number}
+              data-offer-context={section.tone}
               aria-labelledby={headingId}
             >
-              <header className="free-overview-card-header">
+              <summary
+                className="free-overview-card-header"
+                data-ad-click="free_overview_section_toggle"
+                data-reading-section={section.number}
+                data-offer-context={section.tone}
+              >
                 <span className="free-overview-card-icon">{sectionIcon(section.number)}</span>
                 <div className="free-overview-card-title">
                   <small>Phần {section.number}/4</small>
                   <h2 id={headingId}>{section.title}</h2>
                   <p>{section.takeaway}</p>
                 </div>
-              </header>
+              </summary>
               <div className="free-overview-card-body">
-                <MarkdownContent content={section.body} />
+                <MarkdownContent content={body} />
+                <aside className="free-overview-self-check" aria-label={`Tự đối chiếu phần ${section.number}`}>
+                  <strong>Tự kiểm tra nhanh</strong>
+                  <p>{selfCheckCopy}</p>
+                </aside>
                 {showPremiumPreview ? (
                   <aside className="free-overview-premium-preview" aria-label={`Gợi ý nội dung bản FULL cho ${section.navTitle}`}>
                     <div className="free-overview-premium-heading">
@@ -238,7 +268,7 @@ export function FreeOverviewReadingExperience({
                   </aside>
                 ) : null}
               </div>
-            </section>
+            </details>
           );
         })}
       </div>
@@ -254,7 +284,7 @@ export function FreeOverviewReadingExperience({
           </div>
           <ul>
             <li><BadgeCheck size={16} aria-hidden="true" /> Xem lại không mất phí sau khi mua</li>
-            <li><BadgeCheck size={16} aria-hidden="true" /> Thanh toán PayOS, không cần đăng nhập trước</li>
+            <li><BadgeCheck size={16} aria-hidden="true" /> {isSignedIn ? "Thanh toán PayOS hoặc dùng xu nếu đủ" : "Thanh toán PayOS, không cần đăng nhập trước"}</li>
             <li><BadgeCheck size={16} aria-hidden="true" /> Nối Mệnh - Tài - Quan - Vận thành kế hoạch dễ làm</li>
           </ul>
           <button

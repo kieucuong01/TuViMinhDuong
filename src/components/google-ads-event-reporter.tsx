@@ -246,6 +246,9 @@ export function GoogleAdsEventReporter() {
         chart_id: element.dataset.chartId || (pathname.startsWith("/la-so/") ? pathname.split("/")[2] : undefined),
         source_slug: element.dataset.sourceSlug,
         cta_location: element.dataset.ctaLocation,
+        reading_section: element.dataset.readingSection,
+        offer_context: element.dataset.offerContext,
+        depth: numberFromUnknown(element.dataset.adDepth),
         link_text: cleanText(element.textContent),
       });
     }
@@ -268,10 +271,14 @@ export function GoogleAdsEventReporter() {
       const chartId = element.dataset.chartId || (pathname.startsWith("/la-so/") ? pathname.split("/")[2] : "");
       const readingId = element.dataset.readingId;
       const depth = numberFromUnknown(element.dataset.adDepth);
-      sendOnce(`${pathname}:${chartId}:${readingId || ""}:${depth || ""}`, eventName, {
+      sendOnce(`${pathname}:${chartId}:${readingId || ""}:${eventName}:${element.dataset.readingSection || ""}:${depth || ""}`, eventName, {
         chart_id: chartId || undefined,
         reading_id: readingId || undefined,
         depth,
+        placement: element.dataset.adPlacement,
+        cta_location: element.dataset.ctaLocation,
+        reading_section: element.dataset.readingSection,
+        offer_context: element.dataset.offerContext,
       });
     };
 

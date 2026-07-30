@@ -80,6 +80,8 @@ describe("Google Ads tracking markers", () => {
     expect(reporterSource).toContain("method: form.dataset.adMethod");
     expect(reporterSource).toContain('source_slug: formFieldValue(form, "source_slug")');
     expect(reporterSource).toContain("source_slug: element.dataset.sourceSlug");
+    expect(reporterSource).toContain("reading_section: element.dataset.readingSection");
+    expect(reporterSource).toContain("offer_context: element.dataset.offerContext");
     expect(reporterSource).toContain("link_text: cleanText(element.textContent)");
     expect(reporterSource).not.toContain("email:");
     expect(reporterSource).not.toContain("full_name:");
@@ -127,6 +129,7 @@ describe("Google Ads tracking markers", () => {
     expect(advancedReadingSource).toContain("data-reading-id={fullReading!.id}");
     expect(reporterSource).toContain("const readingId = element.dataset.readingId");
     expect(reporterSource).toContain("reading_id: readingId || undefined");
+    expect(reporterSource).toContain('eventName}:${element.dataset.readingSection || ""}');
   });
 
   it("re-scans completed-reading markers after a same-path query and RSC refresh", () => {
