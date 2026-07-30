@@ -14829,6 +14829,32 @@ button.is-loading:not(.icon-button)::before {
   line-height: 1.55;
 }
 
+.free-overview-trust-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  margin-top: 1rem;
+}
+
+.free-overview-trust-strip span {
+  display: inline-flex;
+  min-height: 2.2rem;
+  align-items: center;
+  gap: 0.4rem;
+  border: 1px solid #fed7aa;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.9);
+  color: #7c2d12;
+  font-size: 0.84rem;
+  font-weight: 800;
+  padding: 0.4rem 0.68rem;
+}
+
+.free-overview-trust-strip svg {
+  color: #ea580c;
+  flex: 0 0 auto;
+}
+
 .free-overview-section-nav {
   position: sticky;
   z-index: 12;
@@ -15115,6 +15141,63 @@ button.is-loading:not(.icon-button)::before {
   line-height: 1.35;
 }
 
+.free-overview-final-offer {
+  display: grid;
+  gap: 1rem;
+  border: 1px solid #fdba74;
+  border-radius: 1.15rem;
+  background:
+    radial-gradient(circle at 16% 0%, rgb(251 146 60 / 0.16), transparent 18rem),
+    linear-gradient(135deg, #fff7ed, #fffdf7 58%, #ecfdf5);
+  padding: clamp(1rem, 3vw, 1.4rem);
+  box-shadow: 0 18px 48px rgb(124 45 18 / 0.1);
+}
+
+.free-overview-final-offer h2 {
+  margin: 0.75rem 0 0;
+  color: #292524;
+  font-size: clamp(1.32rem, 3.2vw, 1.85rem);
+  line-height: 1.18;
+}
+
+.free-overview-final-offer p {
+  max-width: 58rem;
+  margin: 0.45rem 0 0;
+  color: #57534e;
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+.free-overview-final-offer ul {
+  display: grid;
+  gap: 0.55rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.free-overview-final-offer li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.45rem;
+  color: #3f3a36;
+  font-size: 0.94rem;
+  line-height: 1.55;
+}
+
+.free-overview-final-offer li svg {
+  flex: 0 0 auto;
+  margin-top: 0.15rem;
+  color: #16a34a;
+}
+
+.free-overview-final-cta {
+  gap: 0.55rem;
+  justify-self: start;
+  min-height: 3rem;
+  box-shadow: 0 14px 30px rgb(234 88 12 / 0.18);
+}
+
 .free-overview-personalizing {
   display: flex;
   align-items: center;
@@ -15207,11 +15290,13 @@ button.is-loading:not(.icon-button)::before {
   }
 
   .free-overview-contextual-offer,
-  .free-overview-contextual-offer .btn {
+  .free-overview-contextual-offer .btn,
+  .free-overview-final-cta {
     width: 100%;
   }
 
-  .free-overview-contextual-offer .btn {
+  .free-overview-contextual-offer .btn,
+  .free-overview-final-cta {
     justify-content: center;
     white-space: normal;
   }

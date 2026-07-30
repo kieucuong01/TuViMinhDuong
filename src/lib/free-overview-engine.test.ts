@@ -111,7 +111,7 @@ describe("free reading block builder", () => {
     expect(overview).not.toContain("[Block Nội dung -");
     expect(overview).toContain(sampleChart.palaces.find((palace) => palace.name === "Mệnh")?.branch);
     expect(overview).not.toContain("lắp ghép các khối nội dung");
-    expect(countVisibleMarkdownWords(overview)).toBeGreaterThanOrEqual(800);
-    expect(countVisibleMarkdownWords(overview)).toBeLessThanOrEqual(1200);
+    expect(countVisibleMarkdownWords(overview)).toBeGreaterThanOrEqual(950);
+    expect(countVisibleMarkdownWords(overview)).toBeLessThanOrEqual(1550);
   });
 });

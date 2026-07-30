@@ -1,8 +1,11 @@
 import {
   ArrowRight,
   BadgeCheck,
+  BookOpenText,
   BriefcaseBusiness,
   CalendarRange,
+  Clock3,
+  ShieldCheck,
   Sparkles,
   WalletCards,
 } from "lucide-react";
@@ -104,6 +107,11 @@ function sectionIcon(number: number) {
   return <Sparkles size={20} aria-hidden="true" />;
 }
 
+function estimatedReadMinutes(content: string) {
+  const words = cleanMarkdownText(content).split(/\s+/u).filter(Boolean).length;
+  return Math.max(5, Math.min(9, Math.ceil(words / 190)));
+}
+
 export function FreeOverviewReadingExperience({
   content,
   fullName,
@@ -126,6 +134,7 @@ export function FreeOverviewReadingExperience({
   const quickYear = sections[3]?.title.match(/\b20\d{2}\b/u)?.[0];
   const quickLabels = ["Thế mạnh cốt lõi", "Cách tạo giá trị", quickYear ? `Trọng tâm năm ${quickYear}` : "Trọng tâm hiện tại"];
   const formattedPrice = cashLabel(priceCoins);
+  const readMinutes = estimatedReadMinutes(content);
 
   return (
     <div className="free-overview-reading-experience">
@@ -146,6 +155,11 @@ export function FreeOverviewReadingExperience({
             </li>
           ))}
         </ol>
+        <div className="free-overview-trust-strip" aria-label="Cam kết chất lượng bản miễn phí">
+          <span><Clock3 size={16} aria-hidden="true" /> {readMinutes} phút đọc thật</span>
+          <span><BookOpenText size={16} aria-hidden="true" /> 4 phần có bằng chứng cung/sao</span>
+          <span><ShieldCheck size={16} aria-hidden="true" /> Gợi ý thực tế, không phán hù dọa</span>
+        </div>
       </section>
 
       <nav className="free-overview-section-nav" aria-label="Điều hướng luận giải miễn phí">
@@ -228,6 +242,34 @@ export function FreeOverviewReadingExperience({
           );
         })}
       </div>
+
+      {canCheckoutFull ? (
+        <section className="free-overview-final-offer" aria-labelledby="free-overview-final-offer-title" data-ad-view="full_offer_bottom_viewed" data-chart-id={chartId}>
+          <div>
+            <span className="free-overview-ai-badge"><BadgeCheck size={15} aria-hidden="true" /> Sau khi đọc 4 phần miễn phí</span>
+            <h2 id="free-overview-final-offer-title">Muốn biết tháng nào nên tiến, tháng nào nên giữ?</h2>
+            <p>
+              Bản FULL không chỉ “xem tiếp”; nó mở 9 chương cá nhân hóa, lộ trình 12 tháng, kế hoạch 30/90 ngày và 3 câu hỏi riêng với Cố vấn AI.
+            </p>
+          </div>
+          <ul>
+            <li><BadgeCheck size={16} aria-hidden="true" /> Xem lại không mất phí sau khi mua</li>
+            <li><BadgeCheck size={16} aria-hidden="true" /> Thanh toán PayOS, không cần đăng nhập trước</li>
+            <li><BadgeCheck size={16} aria-hidden="true" /> Nối Mệnh - Tài - Quan - Vận thành kế hoạch dễ làm</li>
+          </ul>
+          <button
+            type="button"
+            className="btn btn-primary btn-large free-overview-final-cta"
+            popoverTarget={premiumReadingModalId(chartId)}
+            data-ad-click="full_offer_bottom_clicked"
+            data-chart-id={chartId}
+            data-cta-location="free_overview_bottom"
+          >
+            Mở bản FULL — {formattedPrice}
+            <ArrowRight size={18} aria-hidden="true" />
+          </button>
+        </section>
+      ) : null}
     </div>
   );
 }

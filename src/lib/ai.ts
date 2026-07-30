@@ -5,10 +5,10 @@ import { countVisibleMarkdownWords } from "@/lib/free-overview-presentation";
 import { generateWithLlmRouter, hasExternalLlmProvider } from "@/lib/llm-router";
 import { FEATURE_PRICES, type ReadingKey } from "@/lib/pricing";
 
-export const FREE_OVERVIEW_MIN_WORDS = 800;
-export const FREE_OVERVIEW_MAX_WORDS = 1400;
+export const FREE_OVERVIEW_MIN_WORDS = 950;
+export const FREE_OVERVIEW_MAX_WORDS = 1650;
 export const FREE_OVERVIEW_TEMPLATE_MIN_WORDS = FREE_OVERVIEW_MIN_WORDS;
-export const FREE_OVERVIEW_TEMPLATE_MAX_WORDS = 1200;
+export const FREE_OVERVIEW_TEMPLATE_MAX_WORDS = 1550;
 export const PAID_READING_CHAPTER_MAX_TOKENS = 7000;
 export const FREE_OVERVIEW_VERSION = "free-block-preview-v8";
 export const PAID_READING_VERSION = "paid-personal-dossier-v6";
@@ -128,8 +128,8 @@ export function isCompleteFreeOverview(content: string) {
       const paragraphs = freeBody.split(/\n\s*\n/u).filter((paragraph) => paragraph.trim().length > 0);
       const premiumBullets = premiumBody.match(/^\s*[-*]\s+\S/gmu)?.length || 0;
       return (
-        countVisibleMarkdownWords(freeBody) >= 140 &&
-        paragraphs.length >= 4 &&
+        countVisibleMarkdownWords(freeBody) >= 170 &&
+        paragraphs.length >= 5 &&
         /(cung|mệnh|thân|sao|đại vận|tuần|triệt)/iu.test(freeBody) &&
         premiumBullets >= 2
       );
@@ -869,9 +869,9 @@ export function isCompleteFreeOverviewBlock(key: FreeOverviewBlockKey, chart: Tu
     && h2Matches.length === 1
     && premiumMatches.length === 1
     && premiumBullets >= 2
-    && paragraphCount >= 4
-    && bodyWords >= 140
-    && wordCount <= 320;
+    && paragraphCount >= 5
+    && bodyWords >= 170
+    && wordCount <= 420;
 }
 
 function blockStyleBrief() {
@@ -880,7 +880,7 @@ function blockStyleBrief() {
 
 function buildFreeOverviewBlockPrompt(chart: TuViChart, key: FreeOverviewBlockKey, draftBlock: string) {
   const evidence = formatChartEvidence(buildChartEvidenceProfile(chart));
-  const target = key === "intro" ? "70-180 từ" : "120-280 từ";
+  const target = key === "intro" ? "90-190 từ" : "170-360 từ";
   const heading = freeOverviewSectionHeading(key, chart);
   const sectionRule = key === "intro"
     ? "Chỉ viết phần mở đầu. Không viết heading cấp 2, không viết premium hook. Giữ đúng tiêu đề H1 và các dòng hồ sơ nếu có trong bản nháp."
@@ -944,7 +944,7 @@ export async function generateFreeOverviewBlock(chart: TuViChart, key: FreeOverv
   const routed = await generateWithLlmRouter({
     prompt: buildFreeOverviewBlockPrompt(chart, key, draftBlock),
     temperature: 0.42,
-    maxTokens: key === "intro" ? 650 : 950,
+    maxTokens: key === "intro" ? 700 : 1200,
     providerOrder: [...FREE_OVERVIEW_PROVIDER_ORDER],
     thinking: "disabled",
     attemptsPerProvider: 1,

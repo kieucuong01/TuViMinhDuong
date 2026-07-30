@@ -93,6 +93,9 @@ describe("FreeOverviewLoader seed-first LLM refresh gate", () => {
     expect(html).toContain('href="#free-insight-1"');
     expect(html.match(/data-reading-section=/gu)).toHaveLength(4);
     expect(html).toContain("4/4 phần miễn phí");
+    expect(html).toContain("phút đọc thật");
+    expect(html).toContain("4 phần có bằng chứng cung/sao");
+    expect(html).toContain("Gợi ý thực tế, không phán hù dọa");
     expect(html).toContain("free-overview-chapter-list");
     expect(html).not.toContain("<details");
     expect(html).not.toContain("[Block Nội dung");
@@ -100,6 +103,9 @@ describe("FreeOverviewLoader seed-first LLM refresh gate", () => {
     expect(html).toContain("Bản FULL sẽ trả lời");
     expect(html).toContain("Xem dòng tiền 12 tháng — 199.000đ");
     expect(html).toContain("Không cần đăng nhập");
+    expect(html).toContain("Muốn biết tháng nào nên tiến, tháng nào nên giữ?");
+    expect(html).toContain("Mở bản FULL — 199.000đ");
+    expect(html).toContain('data-ad-click="full_offer_bottom_clicked"');
     expect(html).not.toContain("free-overview-typing-cursor");
   });
 

@@ -315,6 +315,19 @@ function cliffhangerForSection(key: FreeReadingSignalSection["key"]) {
   return "Điểm cần dừng đúng lúc nằm ở vài tháng cụ thể: tiến sớm dễ phân tán, nhưng chậm quá lại có thể bỏ lỡ nhịp thuận.";
 }
 
+function selfCheckForSection(section: FreeReadingSection) {
+  if (section.key === "menh") {
+    return "Để tự đối chiếu, hãy nhìn lại ba việc gần đây bạn làm tốt nhất: việc nào đến từ khả năng quan sát, việc nào đến từ sự bền bỉ, và việc nào khiến bạn phải gồng quá lâu. Nếu cùng một thế mạnh vừa giúp bạn tiến lên vừa làm bạn mệt, đó là tín hiệu bản FULL cần nối thêm Mệnh - Thân - Cục và các cung còn lại.";
+  }
+  if (section.key === "tai_bach") {
+    return "Với tiền bạc, đừng chỉ hỏi có kiếm được không; hãy hỏi tiền đến theo nhịp nào, có giữ được không, và cam kết nào đang lấy mất sự chủ động. Một lá số tốt về nguồn lực vẫn cần lịch kiểm tra dòng tiền, vì sai thời điểm thường nguy hiểm hơn sai ý tưởng.";
+  }
+  if (section.key === "quan_loc") {
+    return "Trong công việc, hãy soi vào môi trường chứ không chỉ soi chức danh. Nếu bạn thường được giao trách nhiệm nhưng thiếu quyền quyết định, hoặc làm nhiều mà tiêu chuẩn ghi nhận không rõ, đây là điểm cần đọc kỹ trước khi đổi việc, nhận dự án hoặc mở hợp tác.";
+  }
+  return "Với vận năm, phần miễn phí chỉ cho biết hướng khí chính. Điều đáng theo dõi là tháng nào nên tiến, tháng nào nên giữ, và việc gì cần kiểm tra trước khi ký, chi tiền hoặc nhận thêm trách nhiệm. Đây là lý do lộ trình 12 tháng quan trọng hơn một lời phán chung chung.";
+}
+
 function openingPraise(chart: TuViChart) {
   const anchors = ["Điền Trạch", "Quan Lộc", "Tài Bạch"].map((name) => {
     const palace = palaceByName(chart, name);
@@ -382,6 +395,8 @@ ${praiseLead(section)} ${firstSentence(block.loi_the)}
 ${teaseParagraph(section, block)}
 
 ${section.evidenceText}
+
+${selfCheckForSection(section)}
 
 ${section.practicalTip}
 
