@@ -2,10 +2,9 @@
 
 ## Search Console Phase
 
-- Dự án đang trong giai đoạn khởi động nên tập trung **content SEO** trong 2 tháng đầu.
-- Trong giai đoạn này, workflow tự động **skip Search Console** và chỉ tối ưu nội dung, sitemap, metadata và luồng nội bộ sang `/#lap-la-so`.
-- Mặc định: `SEO_GSC_LAUNCH_DATE=2026-06-14` và `SEO_GSC_GRACE_DAYS=60`.
-- Trước khi ra mắt chính thức vượt qua giai đoạn này, có thể giữ/điều chỉnh bằng `SEO_GSC_SKIP_UNTIL` (ví dụ `2026-08-14`).
+- Search Console là nguồn đo lường mặc định từ ngày 2026-07-30. Workflow phải thử lấy dữ liệu 28 ngày, kết thúc ở D-3, trước khi đề xuất sửa title, metadata hoặc nội dung của URL đang có traffic.
+- Không còn warm-up window mặc định. Chỉ skip khi người vận hành truyền `--skip-search-console`, đặt `SEO_GSC_SKIP_UNTIL`, hoặc cấu hình cả `SEO_GSC_LAUNCH_DATE` và `SEO_GSC_GRACE_DAYS` cho một đợt khởi động có chủ đích.
+- Khi OAuth/API không hoạt động, báo rõ blocker. Không thay đổi URL, canonical, title/meta hoặc refresh trang đang index dựa trên phỏng đoán; tác vụ content mới chỉ được tiếp tục khi live snapshot, sitemap và nguồn keyword khác vẫn đủ bằng chứng.
 
 This workflow lets Codex Automation operate as the SEO Growth Agent for `https://lasotinhhoa.vn`.
 
@@ -71,15 +70,13 @@ If live network access is blocked, continue with repo-local checks and say that 
 
 Search Console defaults:
 
-- Tạm thời: đặt mặc định theo chế độ khởi động
-  - `SEO_GSC_LAUNCH_DATE=2026-06-14`
-  - `SEO_GSC_GRACE_DAYS=60`
-  - `SEO_GSC_SKIP_UNTIL=2026-08-14` nếu cần khóa cứng theo ngày.
-
+- Search Console được truy vấn mặc định; không cần biến môi trường để bật.
 - OAuth client path: `SEO_GSC_CLIENT_PATH`, then `%USERPROFILE%\.codex\secrets\lasotinhhoa-gsc-oauth-client.json`, then `%USERPROFILE%\.codex\secrets\bandothanso-gsc-oauth-client.json`
 - OAuth token path: `SEO_GSC_TOKEN_PATH`, then `%USERPROFILE%\.codex\secrets\lasotinhhoa-gsc-token.json`, then `%USERPROFILE%\.codex\secrets\bandothanso-gsc-token.json`
 - Site property: `SEO_GSC_SITE_URL`, otherwise `https://lasotinhhoa.vn/`
-- Skip GSC when needed: `node scripts/seo/seo-autopilot-plan.mjs --skip-search-console`
+- Skip có chủ đích: `node scripts/seo/seo-autopilot-plan.mjs --skip-search-console` hoặc `SEO_GSC_SKIP_UNTIL`.
+- `SEO_GSC_LAUNCH_DATE` và `SEO_GSC_GRACE_DAYS` chỉ có hiệu lực khi cả hai được cấu hình; chúng không còn có giá trị mặc định.
+- Kiểm tra báo cáo GenAI trong giao diện Search Console khi property được Google rollout. Không giả định báo cáo hoặc API đó tồn tại nếu giao diện chưa hiển thị.
 
 Trusted external tooling:
 
@@ -147,7 +144,7 @@ Then:
 1. Ensure the repo is on `master` and inspect the dirty state before editing.
 2. Read `docs/seo-autopilot/state.json` first. Use the newest Sunday weekly handoff if present, then run `npm run seo:autopilot:publisher` for daily runs or `npm run seo:autopilot:execute` only for the Sunday strategy batch.
 3. Inspect only the generated draft/report, `docs/seo-autopilot/state.json`, and the repo SEO/content files needed for the selected task.
-4. During the launch warm-up window, do not block daily decisions on Search Console. If GSC is skipped, continue with SEMrush, sitemap, live snapshot, and content-inventory evidence and report that GSC was skipped.
+4. Query Search Console by default. If GSC is unavailable, report the credential/API blocker and do not make traffic-sensitive changes to existing indexed URLs, title/meta, canonical, or redirects. A distinct new article may continue only when SEMrush, sitemap, live snapshot, and content inventory still provide sufficient evidence.
 4a. Because SEO content can also be published by the VPS-side AI agent, treat live sitemap `/kien-thuc-tu-vi/*` slugs as part of the exclusion inventory even when they are not present in `src/lib/content.ts`. If the live slug or its reader intent overlaps the selected candidate, reject it and move to the next distinct SEMrush-backed topic.
 5. Scheduled publisher runs ship exactly one selected new article under `/kien-thuc-tu-vi/[slug]`. If the selected slug already exists or the draft quality is not release-ready, the automation must continue to the next distinct CSV-backed topic instead of refreshing the old slug. A one-time cluster of 2-5 articles is allowed only when the user explicitly authorizes it and the run uses `npm run seo:autopilot:cluster`.
 6. Treat the draft as input, not as finished output. If the selected article is thin, weakly linked, generic, or missing data blocks, record every failing gate condition, repair all content/metadata/link/data/cover issues in production files during the same run, and rerun the gate. Allow at most 3 substantive repair passes for one candidate without lowering thresholds; after that, reject the candidate and continue to the next distinct SEMrush-backed topic. Never publish a failed draft as a warning or placeholder.
@@ -259,7 +256,7 @@ Use this workflow for autonomous SEO operations:
 5. Production writing: write useful Vietnamese copy for adults 30-60, add contextual internal links, visible FAQ only when useful, at least one natural conversion path to `/#lap-la-so`, and a matching local cover asset that feels like a real scene or realistic editorial illustration for the topic.
 6. Verification: run targeted tests plus `npm test` and `npm run build` before commit/deploy, including article cover asset checks when the image changed.
 7. Release: commit, push `master`, deploy the VPS production release over `ssh tuvi-vps`, verify PM2 is running from the new release, and smoke test the live home, hub, and changed article URL.
-8. Measurement: in the first 2 months, theo dõi live snapshot + nội dung + hành vi nội bộ; sau khi mở Search Console sẽ bổ sung đo tiếp bằng impressions/clicks/CTR/average position và indexed status.
+8. Measurement: theo dõi Search Console impressions/clicks/CTR/average position và indexed status cùng live snapshot, nội dung và hành vi nội bộ. Nếu GSC lỗi, ghi blocker thay vì thay thế số liệu bằng ước đoán.
 
 This workflow is intentionally not fully hands-off when verification fails. A failed test/build/deploy is a hard stop, not permission to force a production release.
 

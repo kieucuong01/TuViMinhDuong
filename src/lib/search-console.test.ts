@@ -1,3 +1,4 @@
+import { execFileSync } from "node:child_process";
 import { describe, expect, it, vi } from "vitest";
 import {
   deriveSearchConsoleOpportunities,
@@ -5,7 +6,34 @@ import {
   refreshAccessToken,
 } from "../../scripts/seo/search-console.mjs";
 
+function defaultSearchConsoleSkip({ explicitSkip = false } = {}) {
+  const output = execFileSync(
+    process.execPath,
+    [
+      "--input-type=module",
+      "-e",
+      `import('./scripts/seo/search-console-policy.mjs').then(({ shouldSkipSearchConsole }) => console.log(shouldSkipSearchConsole({ explicitSkip: ${explicitSkip}, now: new Date('2026-07-30T00:00:00+07:00') })))`,
+    ],
+    {
+      cwd: process.cwd(),
+      encoding: "utf8",
+      env: {
+        ...process.env,
+        SEO_GSC_LAUNCH_DATE: "",
+        SEO_GSC_GRACE_DAYS: "",
+        SEO_GSC_SKIP_UNTIL: "",
+      },
+    },
+  );
+  return output.trim() === "true";
+}
+
 describe("Search Console integration", () => {
+  it("uses Search Console by default unless a skip is explicitly configured", () => {
+    expect(defaultSearchConsoleSkip()).toBe(false);
+    expect(defaultSearchConsoleSkip({ explicitSkip: true })).toBe(true);
+  });
+
   it("refreshes an OAuth access token without exposing credentials", async () => {
     const fetchImpl = vi.fn(async () => ({
       ok: true,

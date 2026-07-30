@@ -73,6 +73,9 @@ export default async function KnowledgePage({
         <div className="section-heading">
           <p className="eyebrow">Kiến thức tử vi</p>
           <h1>Bài viết dễ đọc cho người mới bắt đầu</h1>
+          <p data-answer-block="true" className="mx-auto mt-3 max-w-3xl text-base leading-7 text-stone-600 sm:text-lg">
+            Thư viện Kiến thức tử vi giúp bạn hiểu cách lập và đọc lá số, ý nghĩa 12 cung, chính tinh, phụ tinh và vận hạn bằng ngôn ngữ dễ theo dõi. Nội dung dùng để học và đối chiếu theo từng lá số, chỉ mang tính tham khảo, không thay thế quyết định thực tế.
+          </p>
         </div>
         <section className="mb-8 grid gap-4 lg:grid-cols-[1.25fr_0.75fr]" aria-label="Cụm bài nên đọc">
           <div className="knowledge-path-panel rounded-[1.5rem] border border-orange-100 bg-white/90 p-5 shadow-sm sm:p-6">

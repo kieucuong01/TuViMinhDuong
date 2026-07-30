@@ -7,17 +7,26 @@ import { SUPPORT_STARS } from "@/lib/pseo-registry";
 import { articlePath } from "@/lib/article-path";
 import { isSelfCanonicalArticle, robotsAllowsIndex } from "@/lib/seo";
 
-const STATIC_LAST_MODIFIED = new Date("2026-05-21T00:00:00+07:00");
+const LAST_MODIFIED = {
+  home: new Date("2026-07-16T00:00:00+07:00"),
+  lifetime: new Date("2026-07-28T00:00:00+07:00"),
+  knowledge: new Date("2026-07-30T00:00:00+07:00"),
+  dateTools: new Date("2026-07-28T00:00:00+07:00"),
+  ageTools: new Date("2026-07-28T00:00:00+07:00"),
+  lookupHubs: new Date("2026-07-12T00:00:00+07:00"),
+  supportStars: new Date("2026-07-13T00:00:00+07:00"),
+  articleFallback: new Date("2026-05-21T00:00:00+07:00"),
+} as const;
 
 const TRUST_ROUTES = [
-  { path: "/gioi-thieu", changeFrequency: "monthly" as const, priority: 0.62 },
-  { path: "/phuong-phap-luan", changeFrequency: "monthly" as const, priority: 0.6 },
-  { path: "/tac-gia", changeFrequency: "monthly" as const, priority: 0.58 },
-  { path: "/chinh-sach-bien-tap", changeFrequency: "monthly" as const, priority: 0.58 },
-  { path: "/pricing", changeFrequency: "weekly" as const, priority: 0.6 },
-  { path: "/chinh-sach-bao-mat", changeFrequency: "yearly" as const, priority: 0.4 },
-  { path: "/dieu-khoan-su-dung", changeFrequency: "yearly" as const, priority: 0.4 },
-  { path: "/lien-he", changeFrequency: "monthly" as const, priority: 0.5 },
+  { path: "/gioi-thieu", lastModified: new Date("2026-07-21T00:00:00+07:00"), changeFrequency: "monthly" as const, priority: 0.62 },
+  { path: "/phuong-phap-luan", lastModified: new Date("2026-07-29T00:00:00+07:00"), changeFrequency: "monthly" as const, priority: 0.6 },
+  { path: "/tac-gia", lastModified: new Date("2026-07-29T00:00:00+07:00"), changeFrequency: "monthly" as const, priority: 0.58 },
+  { path: "/chinh-sach-bien-tap", lastModified: new Date("2026-07-29T00:00:00+07:00"), changeFrequency: "monthly" as const, priority: 0.58 },
+  { path: "/pricing", lastModified: new Date("2026-06-12T00:00:00+07:00"), changeFrequency: "weekly" as const, priority: 0.6 },
+  { path: "/chinh-sach-bao-mat", lastModified: new Date("2026-06-12T00:00:00+07:00"), changeFrequency: "yearly" as const, priority: 0.4 },
+  { path: "/dieu-khoan-su-dung", lastModified: new Date("2026-06-12T00:00:00+07:00"), changeFrequency: "yearly" as const, priority: 0.4 },
+  { path: "/lien-he", lastModified: new Date("2026-06-25T00:00:00+07:00"), changeFrequency: "monthly" as const, priority: 0.5 },
 ];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -26,32 +35,32 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     (article) => robotsAllowsIndex(article.robots) && isSelfCanonicalArticle(article),
   );
   return [
-    { url: APP_URL, lastModified: STATIC_LAST_MODIFIED, changeFrequency: "daily", priority: 1 },
-    { url: `${APP_URL}/xem-tu-vi-tron-doi`, lastModified: STATIC_LAST_MODIFIED, changeFrequency: "weekly", priority: 0.86 },
-    { url: `${APP_URL}/kien-thuc-tu-vi`, lastModified: STATIC_LAST_MODIFIED, changeFrequency: "daily", priority: 0.8 },
-    { url: `${APP_URL}/xem-ngay`, lastModified: STATIC_LAST_MODIFIED, changeFrequency: "daily", priority: 0.8 },
+    { url: APP_URL, lastModified: LAST_MODIFIED.home, changeFrequency: "daily", priority: 1 },
+    { url: `${APP_URL}/xem-tu-vi-tron-doi`, lastModified: LAST_MODIFIED.lifetime, changeFrequency: "weekly", priority: 0.86 },
+    { url: `${APP_URL}/kien-thuc-tu-vi`, lastModified: LAST_MODIFIED.knowledge, changeFrequency: "daily", priority: 0.8 },
+    { url: `${APP_URL}/xem-ngay`, lastModified: LAST_MODIFIED.dateTools, changeFrequency: "daily", priority: 0.8 },
     ...DATE_PURPOSE_PAGES.map((page) => ({
       url: `${APP_URL}/xem-ngay/${page.slug}`,
-      lastModified: STATIC_LAST_MODIFIED,
+      lastModified: LAST_MODIFIED.dateTools,
       changeFrequency: "weekly" as const,
       priority: 0.72,
     })),
-    { url: `${APP_URL}/xem-tuoi`, lastModified: STATIC_LAST_MODIFIED, changeFrequency: "weekly", priority: 0.82 },
+    { url: `${APP_URL}/xem-tuoi`, lastModified: LAST_MODIFIED.ageTools, changeFrequency: "weekly", priority: 0.82 },
     ...AGE_TOOL_PAGES.map((page) => ({
       url: `${APP_URL}/xem-tuoi/${page.slug}`,
-      lastModified: STATIC_LAST_MODIFIED,
+      lastModified: LAST_MODIFIED.ageTools,
       changeFrequency: "weekly" as const,
       priority: 0.74,
     })),
-    { url: `${APP_URL}/tra-cuu`, lastModified: STATIC_LAST_MODIFIED, changeFrequency: "weekly", priority: 0.85 },
-    { url: `${APP_URL}/tra-cuu/y-nghia-14-chinh-tinh`, lastModified: STATIC_LAST_MODIFIED, changeFrequency: "weekly", priority: 0.8 },
-    { url: `${APP_URL}/tra-cuu/y-nghia-12-cung`, lastModified: STATIC_LAST_MODIFIED, changeFrequency: "weekly", priority: 0.8 },
-    { url: `${APP_URL}/tra-cuu/phu-tinh`, lastModified: STATIC_LAST_MODIFIED, changeFrequency: "weekly", priority: 0.75 },
+    { url: `${APP_URL}/tra-cuu`, lastModified: LAST_MODIFIED.lookupHubs, changeFrequency: "weekly", priority: 0.85 },
+    { url: `${APP_URL}/tra-cuu/y-nghia-14-chinh-tinh`, lastModified: LAST_MODIFIED.lookupHubs, changeFrequency: "weekly", priority: 0.8 },
+    { url: `${APP_URL}/tra-cuu/y-nghia-12-cung`, lastModified: LAST_MODIFIED.lookupHubs, changeFrequency: "weekly", priority: 0.8 },
+    { url: `${APP_URL}/tra-cuu/phu-tinh`, lastModified: LAST_MODIFIED.lookupHubs, changeFrequency: "weekly", priority: 0.75 },
     ...SUPPORT_STARS.flatMap((entity) =>
       entity.canonicalPath
         ? [{
           url: `${APP_URL}${entity.canonicalPath}`,
-          lastModified: STATIC_LAST_MODIFIED,
+          lastModified: LAST_MODIFIED.supportStars,
           changeFrequency: "monthly" as const,
           priority: 0.62,
         }]
@@ -59,13 +68,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ),
     ...TRUST_ROUTES.map((route) => ({
       url: `${APP_URL}${route.path}`,
-      lastModified: STATIC_LAST_MODIFIED,
+      lastModified: route.lastModified,
       changeFrequency: route.changeFrequency,
       priority: route.priority,
     })),
     ...indexableArticles.map((article) => ({
       url: `${APP_URL}${articlePath(article)}`,
-      lastModified: article.updatedAt || article.publishedAt || STATIC_LAST_MODIFIED,
+      lastModified: article.updatedAt || article.publishedAt || LAST_MODIFIED.articleFallback,
       changeFrequency: "weekly" as const,
       priority: 0.7,
     })),
