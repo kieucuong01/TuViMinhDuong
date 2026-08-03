@@ -14537,6 +14537,237 @@ button.is-loading:not(.icon-button)::before {
   overflow-wrap: anywhere;
 }
 
+/* Wealth fortune report */
+.wealth-report {
+  display: grid;
+  gap: 1.5rem;
+  width: 100%;
+  max-width: 74rem;
+  margin: 1.5rem auto;
+  color: #44403c;
+  overflow-wrap: anywhere;
+}
+
+.wealth-report-hero,
+.wealth-trend-section,
+.wealth-evidence-section,
+.wealth-action-section {
+  border: 1px solid #fed7aa;
+  border-radius: 1.25rem;
+  background: linear-gradient(135deg, #fffaf4, #fff 58%, #fffbeb);
+  box-shadow: 0 1rem 2.5rem rgb(120 53 15 / 0.07);
+  padding: 1rem;
+}
+
+.wealth-report h1,
+.wealth-report h2,
+.wealth-report h3,
+.wealth-report p {
+  margin: 0;
+}
+
+.wealth-report h1,
+.wealth-report h2,
+.wealth-report h3 {
+  color: #1c1917;
+  line-height: 1.2;
+}
+
+.wealth-report h1 {
+  font-size: clamp(1.55rem, 5vw, 2.35rem);
+}
+
+.wealth-report h2 {
+  font-size: clamp(1.18rem, 3.5vw, 1.55rem);
+}
+
+.wealth-report h3 {
+  font-size: 1.06rem;
+}
+
+.wealth-report-hero > p:not(.eyebrow),
+.wealth-section-heading > p:not(.eyebrow) {
+  margin-top: 0.65rem;
+  max-width: 68ch;
+  color: #57534e;
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+.wealth-pillar-grid,
+.wealth-evidence-grid {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.wealth-pillar-card,
+.wealth-evidence-card,
+.wealth-action-list li {
+  border: 1px solid #fed7aa;
+  border-radius: 1rem;
+  background: #fff;
+  padding: 1rem;
+}
+
+.wealth-pillar-card strong {
+  display: block;
+  margin-top: 0.6rem;
+  color: #c2410c;
+  font-size: 1.65rem;
+  line-height: 1;
+}
+
+.wealth-pillar-card p,
+.wealth-evidence-card p,
+.wealth-action-list p {
+  margin-top: 0.55rem;
+  color: #57534e;
+  font-size: 0.96rem;
+  line-height: 1.65;
+}
+
+.wealth-trend-figure {
+  margin: 1rem 0 0;
+  padding: 0.75rem;
+  border-radius: 1rem;
+  background: #fff;
+}
+
+.wealth-trend-chart {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.wealth-trend-grid {
+  stroke: #fed7aa;
+  stroke-width: 1;
+}
+
+.wealth-trend-line {
+  fill: none;
+  stroke: #ea580c;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 4;
+}
+
+.wealth-trend-point {
+  fill: #fff7ed;
+  stroke: #c2410c;
+  stroke-width: 3;
+}
+
+.wealth-trend-score,
+.wealth-trend-year {
+  fill: #44403c;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.wealth-trend-figure figcaption {
+  margin-top: 0.65rem;
+  color: #57534e;
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+
+.wealth-trend-table-wrap {
+  margin-top: 1rem;
+  overflow-x: auto;
+  border: 1px solid #fed7aa;
+  border-radius: 1rem;
+  background: #fff;
+}
+
+.wealth-trend-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+}
+
+.wealth-trend-table caption {
+  padding: 0.9rem 1rem;
+  color: #7c2d12;
+  font-weight: 800;
+  text-align: left;
+}
+
+.wealth-trend-table th,
+.wealth-trend-table td {
+  padding: 0.8rem;
+  border-top: 1px solid #ffedd5;
+  text-align: left;
+  vertical-align: top;
+}
+
+.wealth-trend-table thead th {
+  background: #fff7ed;
+  color: #7c2d12;
+}
+
+.wealth-evidence-section,
+.wealth-action-section {
+  display: grid;
+  gap: 1rem;
+}
+
+.wealth-evidence-branch {
+  color: #9a3412 !important;
+  font-weight: 700;
+}
+
+.wealth-action-list {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: wealth-action;
+}
+
+.wealth-action-list li {
+  counter-increment: wealth-action;
+}
+
+.wealth-action-list strong::before {
+  content: counter(wealth-action, decimal-leading-zero) " ";
+  color: #c2410c;
+}
+
+.wealth-disclaimer {
+  border-left: 0.25rem solid #f59e0b;
+  border-radius: 0 0.7rem 0.7rem 0;
+  background: #fffbeb;
+  padding: 0.85rem 1rem;
+  color: #57534e;
+  font-size: 0.92rem;
+  line-height: 1.6;
+}
+
+@media (min-width: 768px) {
+  .wealth-report {
+    gap: 2rem;
+    margin-block: 2rem;
+  }
+
+  .wealth-report-hero,
+  .wealth-trend-section,
+  .wealth-evidence-section,
+  .wealth-action-section {
+    border-radius: 1.5rem;
+    padding: 1.5rem;
+  }
+
+  .wealth-pillar-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .wealth-evidence-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
 .pseo-inline-form .chart-form,
 .pseo-inline-form .form-grid,
 .pseo-inline-form .birth-date-group,
