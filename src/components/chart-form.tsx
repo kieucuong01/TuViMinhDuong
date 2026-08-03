@@ -17,9 +17,21 @@ type ChartFormProps = {
   sourceSlug?: string;
   entryArticle?: string;
   ctaLocation?: string;
+  experience?: "default" | "wealth";
+  submitLabel?: string;
+  defaultViewYear?: number;
 };
 
-export function ChartForm({ compact = false, adSource = "chart_form", sourceSlug, entryArticle, ctaLocation }: ChartFormProps) {
+export function ChartForm({
+  compact = false,
+  adSource = "chart_form",
+  sourceSlug,
+  entryArticle,
+  ctaLocation,
+  experience = "default",
+  submitLabel = "An Lá Số Tử Vi",
+  defaultViewYear = DEFAULT_VIEW_YEAR,
+}: ChartFormProps) {
   const now = new Date();
   const currentYear = now.getFullYear();
   const birthYears = descendingYears(1900, currentYear);
@@ -36,6 +48,7 @@ export function ChartForm({ compact = false, adSource = "chart_form", sourceSlug
       data-loading-label="Đang lập lá số..."
     >
       <input type="hidden" name="adSource" value={adSource} />
+      <input type="hidden" name="chartExperience" value={experience} />
       <ChartAttributionFields sourceSlug={sourceSlug} entryArticle={entryArticle} ctaLocation={ctaLocation} />
       <div className="form-grid">
         <label className="chart-name-field md:col-span-2">
@@ -114,7 +127,7 @@ export function ChartForm({ compact = false, adSource = "chart_form", sourceSlug
 
         <label>
           <span>Năm xem</span>
-          <select name="viewYear" defaultValue={DEFAULT_VIEW_YEAR} required data-testid="chart-view-year">
+          <select name="viewYear" defaultValue={defaultViewYear} required data-testid="chart-view-year">
             {viewYears.map((year) => (
               <option key={year} value={year}>Năm xem {year}</option>
             ))}
@@ -123,7 +136,7 @@ export function ChartForm({ compact = false, adSource = "chart_form", sourceSlug
       </div>
 
       <LoadingSubmitButton className="btn btn-primary btn-large w-full" loadingText="Đang lập lá số...">
-        <Sparkles size={19} /> An Lá Số Tử Vi
+        <Sparkles size={19} /> {submitLabel}
       </LoadingSubmitButton>
       <p className="text-center text-sm leading-6 text-stone-500">
         Chỉ cần chọn đúng khung giờ sinh. Nếu không chắc, hãy chọn khung giờ gần nhất.

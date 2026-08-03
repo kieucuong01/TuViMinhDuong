@@ -30,7 +30,8 @@ describe("chart form compact picker UI", () => {
     expect(chartFormSource).toMatch(/<select name="birthHour"[\s\S]*defaultValue=""/);
     expect(chartFormSource).toMatch(/<select name="calendarType"[\s\S]*defaultValue="solar"/);
     expect(chartFormSource).toMatch(/<select name="gender"[\s\S]*defaultValue="male"/);
-    expect(chartFormSource).toMatch(/<select name="viewYear"[\s\S]*defaultValue=\{DEFAULT_VIEW_YEAR\}/);
+    expect(chartFormSource).toContain("defaultViewYear = DEFAULT_VIEW_YEAR");
+    expect(chartFormSource).toMatch(/<select name="viewYear"[\s\S]*defaultValue=\{defaultViewYear\}/);
     expect(chartFormSource).not.toContain("defaultValue={currentYear}");
   });
 
@@ -45,6 +46,13 @@ describe("chart form compact picker UI", () => {
   it("keeps birth-hour labels short enough for compact controls", () => {
     expect(chartFormSource).toContain("Dần: 3h - 5h");
     expect(chartFormSource).not.toContain("03h - 04h59");
+  });
+
+  it("supports a focused chart experience without accepting a redirect URL", () => {
+    expect(chartFormSource).toContain('name="chartExperience"');
+    expect(chartFormSource).toContain("submitLabel");
+    expect(chartFormSource).toContain("defaultViewYear");
+    expect(chartFormSource).not.toContain("redirectUrl");
   });
 
   it("styles the hero form as a compact choice surface", () => {

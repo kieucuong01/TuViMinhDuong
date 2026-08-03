@@ -114,6 +114,20 @@ function safeNextPath(value: FormDataEntryValue | null, fallback: string) {
   return next.startsWith("/") && !next.startsWith("//") ? next : fallback;
 }
 
+function safeChartExperience(value: FormDataEntryValue | null): "default" | "wealth" {
+  return value === "wealth" ? "wealth" : "default";
+}
+
+function chartCreationPaths(experience: "default" | "wealth", chartId?: string) {
+  if (experience === "wealth") {
+    return {
+      error: "/tu-vi-tai-loc-dau-tu#lap-la-so-tai-loc",
+      success: chartId ? `/la-so/${chartId}?view=tai-loc` : "/tu-vi-tai-loc-dau-tu",
+    };
+  }
+  return { error: "/#lap-la-so", success: chartId ? `/la-so/${chartId}` : "/" };
+}
+
 function withReadingParam(path: string, readingId: string) {
   const [withoutHash, hash] = path.split("#");
   const separator = withoutHash.includes("?") ? "&" : "?";
@@ -211,6 +225,8 @@ export async function createChartAction(formData: FormData) {
   const timer = createPerfTimer();
   const input = chartInputFromForm(formData);
   const adSource = safeAdSource(formData.get("adSource"));
+  const experience = safeChartExperience(formData.get("chartExperience"));
+  const paths = chartCreationPaths(experience);
   let result: { user: SessionUser | null; chart: Awaited<ReturnType<typeof saveChart>> };
 
   try {
@@ -230,7 +246,7 @@ export async function createChartAction(formData: FormData) {
       error: error instanceof Error ? error.message : String(error),
       timings: timer.timings(),
     });
-    redirect(withQueryParams("/#lap-la-so", { chartError, adSource }));
+    redirect(withQueryParams(paths.error, { chartError, adSource }));
   }
 
   logPerfEvent("create_chart_action_timing", timer.total(), {
@@ -245,7 +261,7 @@ export async function createChartAction(formData: FormData) {
       console.error("free_overview_early_generation_failed", error);
     });
   });
-  redirect(withQueryParams(`/la-so/${result.chart.id}`, { created: "1", adSource }));
+  redirect(withQueryParams(chartCreationPaths(experience, result.chart.id).success, { created: "1", adSource }));
 }
 
 export async function quickReadingCheckoutAction(formData: FormData) {

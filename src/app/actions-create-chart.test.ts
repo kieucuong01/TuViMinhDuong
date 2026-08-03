@@ -21,13 +21,20 @@ describe("createChartAction timeout guard", () => {
     expect(homeSource).toContain("chart-form-error");
   });
 
+  it("allowlists the focused chart experience without accepting a client redirect", () => {
+    expect(actionsSource).toContain("function safeChartExperience");
+    expect(actionsSource).toContain('experience === "wealth"');
+    expect(actionsSource).not.toContain('formData.get("redirectUrl")');
+    expect(actionsSource).not.toContain('safeNextPath(formData.get("chartExperience")');
+  });
+
   it("starts free LLM generation before redirecting to the chart page", () => {
     expect(actionsSource).toContain('import { after } from "next/server"');
     expect(actionsSource).toContain("generateAndStoreFreeOverview");
     expect(actionsSource).toContain("after(() => {");
     expect(actionsSource).toContain("generateAndStoreFreeOverview(result.chart.id)");
     expect(actionsSource.indexOf("generateAndStoreFreeOverview(result.chart.id)")).toBeLessThan(
-      actionsSource.indexOf("redirect(withQueryParams(`/la-so/${result.chart.id}`"),
+      actionsSource.indexOf("redirect(withQueryParams(chartCreationPaths(experience, result.chart.id).success"),
     );
   });
 });
