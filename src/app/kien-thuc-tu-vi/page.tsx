@@ -143,6 +143,21 @@ export default async function KnowledgePage({
             </Link>
           </div>
         </section>
+        <aside className="mt-5 flex flex-col gap-4 rounded-[1.5rem] border border-stone-200 bg-white/70 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6" aria-label="Công cụ tham khảo thêm">
+          <div className="max-w-3xl">
+            <p className="eyebrow">Khám phá thêm</p>
+            <h2 className="mt-2 text-xl font-black text-stone-950">Một góc nhìn khác từ tên và ngày sinh</h2>
+            <p className="mt-2 text-sm leading-6 text-stone-600">Nếu đã đọc tử vi và muốn tự đối chiếu thêm, Bản Đồ Thần Số có công cụ miễn phí theo tên và ngày sinh. Hai phương pháp độc lập, chỉ nên dùng để tham khảo và tự quan sát.</p>
+          </div>
+          <a
+            className="btn btn-ghost shrink-0 justify-center"
+            href="https://bandothanso.vn/cong-cu/tinh-than-so-hoc?utm_source=lasotinhhoa&utm_medium=referral&utm_campaign=cross_promo&utm_content=knowledge_hub"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Thử Bản Đồ Thần Số
+          </a>
+        </aside>
       </div>
     </main>
   );
