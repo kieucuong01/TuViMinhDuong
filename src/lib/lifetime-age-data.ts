@@ -219,6 +219,14 @@ export const historicalLifetimeCards: HistoricalLifetimeCard[] = historicalLifet
 }));
 
 const adultExpansionRows: YearRow[] = [
+  { year: 1961, canChi: "Tân Sửu", slugCanChi: "tan-suu", napAm: "Bích Thượng Thổ", element: "Thổ", can: "Tân", chi: "Sửu", contentDate: "2026-08-03" },
+  { year: 1962, canChi: "Nhâm Dần", slugCanChi: "nham-dan", napAm: "Kim Bạch Kim", element: "Kim", can: "Nhâm", chi: "Dần", contentDate: "2026-08-03" },
+  { year: 1963, canChi: "Quý Mão", slugCanChi: "quy-mao", napAm: "Kim Bạch Kim", element: "Kim", can: "Quý", chi: "Mão", contentDate: "2026-08-03" },
+  { year: 1964, canChi: "Giáp Thìn", slugCanChi: "giap-thin", napAm: "Phú Đăng Hỏa", element: "Hỏa", can: "Giáp", chi: "Thìn", contentDate: "2026-08-03" },
+  { year: 1965, canChi: "Ất Tỵ", slugCanChi: "at-ty", napAm: "Phú Đăng Hỏa", element: "Hỏa", can: "Ất", chi: "Tỵ", contentDate: "2026-08-03" },
+  { year: 1966, canChi: "Bính Ngọ", slugCanChi: "binh-ngo", napAm: "Thiên Hà Thủy", element: "Thủy", can: "Bính", chi: "Ngọ", contentDate: "2026-08-03" },
+  { year: 1967, canChi: "Đinh Mùi", slugCanChi: "dinh-mui", napAm: "Thiên Hà Thủy", element: "Thủy", can: "Đinh", chi: "Mùi", contentDate: "2026-08-03" },
+  { year: 1968, canChi: "Mậu Thân", slugCanChi: "mau-than", napAm: "Đại Trạch Thổ", element: "Thổ", can: "Mậu", chi: "Thân", contentDate: "2026-08-03" },
   { year: 1970, canChi: "Canh Tuất", slugCanChi: "canh-tuat", napAm: "Thoa Xuyến Kim", element: "Kim", can: "Canh", chi: "Tuất" },
   { year: 1971, canChi: "Tân Hợi", slugCanChi: "tan-hoi", napAm: "Thoa Xuyến Kim", element: "Kim", can: "Tân", chi: "Hợi" },
   { year: 1972, canChi: "Nhâm Tý", slugCanChi: "nham-ty", napAm: "Tang Đố Mộc", element: "Mộc", can: "Nhâm", chi: "Tý" },
@@ -237,6 +245,10 @@ const adultExpansionRows: YearRow[] = [
   { year: 1988, canChi: "Mậu Thìn", slugCanChi: "mau-thin", napAm: "Đại Lâm Mộc", element: "Mộc", can: "Mậu", chi: "Thìn", contentDate: "2026-08-03" },
   { year: 1989, canChi: "Kỷ Tỵ", slugCanChi: "ky-ty", napAm: "Đại Lâm Mộc", element: "Mộc", can: "Kỷ", chi: "Tỵ", contentDate: "2026-08-03" },
   { year: 1990, canChi: "Canh Ngọ", slugCanChi: "canh-ngo", napAm: "Lộ Bàng Thổ", element: "Thổ", can: "Canh", chi: "Ngọ" },
+  { year: 1991, canChi: "Tân Mùi", slugCanChi: "tan-mui", napAm: "Lộ Bàng Thổ", element: "Thổ", can: "Tân", chi: "Mùi", contentDate: "2026-08-03" },
+  { year: 1992, canChi: "Nhâm Thân", slugCanChi: "nham-than", napAm: "Kiếm Phong Kim", element: "Kim", can: "Nhâm", chi: "Thân", contentDate: "2026-08-03" },
+  { year: 1993, canChi: "Quý Dậu", slugCanChi: "quy-dau", napAm: "Kiếm Phong Kim", element: "Kim", can: "Quý", chi: "Dậu", contentDate: "2026-08-03" },
+  { year: 1994, canChi: "Giáp Tuất", slugCanChi: "giap-tuat", napAm: "Sơn Đầu Hỏa", element: "Hỏa", can: "Giáp", chi: "Tuất", contentDate: "2026-08-03" },
 ];
 
 export const adultExpansionLifetimeAgeArticleInputs: HistoricalLifetimeArticleInput[] = adultExpansionRows.flatMap((row) => [

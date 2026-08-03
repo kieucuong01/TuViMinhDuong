@@ -88,6 +88,48 @@ describe("lifetime Tu vi SEO article cluster", () => {
     expect(lifetimeContentUpdatedAt).toBe("2026-08-03");
   });
 
+  it("publishes complete 1961-1968 and 1991-1994 coverage for both genders", () => {
+    const expectedYears = [
+      { year: 1961, canChi: "Tân Sửu", napAm: "Bích Thượng Thổ", slugCanChi: "tan-suu" },
+      { year: 1962, canChi: "Nhâm Dần", napAm: "Kim Bạch Kim", slugCanChi: "nham-dan" },
+      { year: 1963, canChi: "Quý Mão", napAm: "Kim Bạch Kim", slugCanChi: "quy-mao" },
+      { year: 1964, canChi: "Giáp Thìn", napAm: "Phú Đăng Hỏa", slugCanChi: "giap-thin" },
+      { year: 1965, canChi: "Ất Tỵ", napAm: "Phú Đăng Hỏa", slugCanChi: "at-ty" },
+      { year: 1966, canChi: "Bính Ngọ", napAm: "Thiên Hà Thủy", slugCanChi: "binh-ngo" },
+      { year: 1967, canChi: "Đinh Mùi", napAm: "Thiên Hà Thủy", slugCanChi: "dinh-mui" },
+      { year: 1968, canChi: "Mậu Thân", napAm: "Đại Trạch Thổ", slugCanChi: "mau-than" },
+      { year: 1991, canChi: "Tân Mùi", napAm: "Lộ Bàng Thổ", slugCanChi: "tan-mui" },
+      { year: 1992, canChi: "Nhâm Thân", napAm: "Kiếm Phong Kim", slugCanChi: "nham-than" },
+      { year: 1993, canChi: "Quý Dậu", napAm: "Kiếm Phong Kim", slugCanChi: "quy-dau" },
+      { year: 1994, canChi: "Giáp Tuất", napAm: "Sơn Đầu Hỏa", slugCanChi: "giap-tuat" },
+    ];
+    const expectedSlugs = expectedYears.flatMap(({ year, slugCanChi }) => [
+      `tu-vi-tron-doi-tuoi-${slugCanChi}-${year}-nam-mang`,
+      `tu-vi-tron-doi-tuoi-${slugCanChi}-${year}-nu-mang`,
+    ]);
+
+    expect(new Set(expectedSlugs).size).toBe(24);
+
+    for (const expected of expectedYears) {
+      const inputsForYear = adultExpansionLifetimeAgeArticleInputs.filter(
+        (item) => item.year === String(expected.year),
+      );
+
+      expect(inputsForYear.map((item) => item.gender).sort()).toEqual(["nam mạng", "nữ mạng"]);
+      expect(inputsForYear.every((item) => item.canChi === expected.canChi)).toBe(true);
+      expect(inputsForYear.every((item) => item.napAm === expected.napAm)).toBe(true);
+      expect(inputsForYear.every((item) => item.contentDate === "2026-08-03")).toBe(true);
+      expect(inputsForYear.every((item) => item.siblingLink?.href.includes(`-${expected.year}-`))).toBe(true);
+    }
+
+    for (const slug of expectedSlugs) {
+      expect(adultExpansionLifetimeArticleSlugs).toContain(slug);
+      expect(seedArticles.some((item) => item.slug === slug)).toBe(true);
+    }
+
+    expect(lifetimeContentUpdatedAt).toBe("2026-08-03");
+  });
+
   it("uses the real WebP article cover on new lifetime hub cards", () => {
     const card1986 = lifetimeCards.find(
       (item) => item.detailsPath?.endsWith("tu-vi-tron-doi-tuoi-binh-dan-1986-nam-mang"),
