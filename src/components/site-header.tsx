@@ -40,7 +40,7 @@ const baseNav = [
 const tuViLinks = [
   { href: "/xem-tu-vi-tron-doi", label: "Xem Tử vi trọn đời", description: "Lập lá số, đọc tổng quan và mở bản FULL 9 chương.", icon: "spark" },
   { label: "Xem Tử vi 2026", description: "Sẽ làm sau.", icon: "calendar" },
-  { label: "Tử vi tài lộc & Đầu tư", description: "Chấm Tài - Quan - Di và biểu đồ 5 năm tới.", icon: "trend" },
+  { href: "/tu-vi-tai-loc-dau-tu", label: "Tử vi tài lộc & Đầu tư", description: "Chấm Tài - Quan - Di và biểu đồ 5 năm tới.", icon: "trend" },
   { label: "Tương hợp lá số", description: "So 2 lá số theo sao cụ thể.", icon: "users" },
 ];
 

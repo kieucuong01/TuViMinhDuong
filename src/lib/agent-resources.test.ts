@@ -23,6 +23,13 @@ describe("public agent resources", () => {
     expect(JSON.stringify(resource)).not.toMatch(/secret|token|password|userId|database/i);
   });
 
+  it("lists the canonical wealth and investment tool as a primary topic", () => {
+    expect(buildAgentSiteResource().primaryTopics).toContainEqual({
+      name: "Tử vi tài lộc & Đầu tư",
+      url: `${APP_URL}/tu-vi-tai-loc-dau-tu`,
+    });
+  });
+
   it("derives current public pricing from supplied application data", () => {
     const resource = buildAgentPricingResource({
       featurePrices: FEATURE_PRICES,

@@ -25,6 +25,8 @@ describe("AI discovery", () => {
     for (const route of ["/", "/xem-ngay", "/xem-tuoi", "/tra-cuu", "/kien-thuc-tu-vi"]) {
       expect(source).toContain(`https://lasotinhhoa.vn${route}`);
     }
+
+    expect(source).toContain("https://lasotinhhoa.vn/tu-vi-tai-loc-dau-tu");
   });
 
   it("publishes lightweight AI visibility pages with extractable answers", () => {
@@ -88,5 +90,7 @@ describe("AI discovery", () => {
     for (const path of ["/gioi-thieu", "/phuong-phap-luan", "/tac-gia", "/chinh-sach-bien-tap"]) {
       expect(sitemapSource).toContain(path);
     }
+
+    expect(sitemapSource).toContain("/tu-vi-tai-loc-dau-tu");
   });
 });

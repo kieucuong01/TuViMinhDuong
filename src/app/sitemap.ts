@@ -11,6 +11,7 @@ import { lifetimeContentUpdatedAtDate } from "@/lib/lifetime-age-data";
 const LAST_MODIFIED = {
   home: new Date("2026-07-16T00:00:00+07:00"),
   lifetime: lifetimeContentUpdatedAtDate,
+  wealth: new Date("2026-08-03T00:00:00+07:00"),
   knowledge: new Date("2026-07-30T00:00:00+07:00"),
   dateTools: new Date("2026-07-28T00:00:00+07:00"),
   ageTools: new Date("2026-07-28T00:00:00+07:00"),
@@ -38,6 +39,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   return [
     { url: APP_URL, lastModified: LAST_MODIFIED.home, changeFrequency: "daily", priority: 1 },
     { url: `${APP_URL}/xem-tu-vi-tron-doi`, lastModified: LAST_MODIFIED.lifetime, changeFrequency: "weekly", priority: 0.86 },
+    { url: `${APP_URL}/tu-vi-tai-loc-dau-tu`, lastModified: LAST_MODIFIED.wealth, changeFrequency: "weekly", priority: 0.84 },
     { url: `${APP_URL}/kien-thuc-tu-vi`, lastModified: LAST_MODIFIED.knowledge, changeFrequency: "daily", priority: 0.8 },
     { url: `${APP_URL}/xem-ngay`, lastModified: LAST_MODIFIED.dateTools, changeFrequency: "daily", priority: 0.8 },
     ...DATE_PURPOSE_PAGES.map((page) => ({

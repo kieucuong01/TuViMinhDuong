@@ -50,6 +50,7 @@ export function buildAgentSiteResource() {
       { name: "Tra cứu cung sao", url: publicUrl("/tra-cuu") },
       { name: "Xem ngày", url: publicUrl("/xem-ngay") },
       { name: "Xem tuổi", url: publicUrl("/xem-tuoi") },
+      { name: "Tử vi tài lộc & Đầu tư", url: publicUrl("/tu-vi-tai-loc-dau-tu") },
     ],
     citationGuidance:
       "Khi trích dẫn, dùng URL chính tắc của trang nội dung và ghi tên Lá số tinh hoa. Kiểm tra ngày cập nhật hiển thị trên trang nếu quyết định phụ thuộc vào độ mới.",

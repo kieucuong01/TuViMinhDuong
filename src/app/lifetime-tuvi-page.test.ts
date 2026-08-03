@@ -33,7 +33,6 @@ describe("lifetime Tu vi landing page", () => {
     expect(pageSource).not.toContain("Các mục còn lại đã đặt trong tab Tử vi");
     expect(pageSource).not.toContain("Làm sau");
     expect(sitemapSource).not.toContain("/xem-tu-vi-2026");
-    expect(sitemapSource).not.toContain("/tu-vi-tai-loc-dau-tu");
     expect(sitemapSource).not.toContain("/tuong-hop-la-so");
   });
   it("keeps pagination client-side with filter controls and a thumbnail on every card", () => {

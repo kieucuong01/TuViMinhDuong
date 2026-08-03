@@ -28,12 +28,13 @@ describe("site header featured nav effects", () => {
     expect(headerSource).toContain('href: "/kien-thuc-tu-vi"');
   });
 
-  it("adds a Tu vi dropdown with only lifetime reading linked for now", () => {
+  it("links the lifetime and wealth tools in the Tu vi dropdown", () => {
     expect(headerSource).toContain('tone: "tuvi"');
     expect(headerSource).toContain("site-nav-flyout site-tuvi-menu");
     expect(headerSource).toContain("site-tuvi-panel");
     expect(headerSource).toContain("Xem Tử vi trọn đời");
     expect(headerSource).toContain("/xem-tu-vi-tron-doi");
+    expect(headerSource).toContain('href: "/tu-vi-tai-loc-dau-tu"');
     expect(headerSource).toContain("Xem Tử vi 2026");
     expect(headerSource).toContain("Tử vi tài lộc & Đầu tư");
     expect(headerSource).toContain("Tương hợp lá số");
