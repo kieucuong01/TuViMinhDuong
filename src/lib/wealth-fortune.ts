@@ -16,6 +16,7 @@ export type WealthYearPoint = {
 };
 
 export type WealthPalaceEvidence = {
+  available: boolean;
   palace: string;
   branch: string;
   mainStars: string[];
@@ -188,6 +189,7 @@ function buildPalaceEvidence(chart: TuViChart): WealthPalaceEvidence[] {
     const palace = findPalace(chart, name);
     if (!palace) {
       return {
+        available: false,
         palace: name,
         branch: "Chưa có dữ liệu",
         mainStars: ["Chưa có dữ liệu"],
@@ -197,9 +199,13 @@ function buildPalaceEvidence(chart: TuViChart): WealthPalaceEvidence[] {
     }
     const accompanyingStars = [...palace.supportStars, ...palace.yearlyStars];
     return {
+      available: true,
       palace: palace.name,
       branch: palace.branch,
-      mainStars: palace.mainStars.map((star) => `${star} (${palace.starStates[star] || "B"})`),
+      mainStars: palace.mainStars.map((star) => {
+        const state = palace.starStates[star];
+        return state ? `${star} (${state})` : star;
+      }),
       supportStars: accompanyingStars.filter((star) => SUPPORT_STAR_PATTERN.test(star)),
       cautionStars: accompanyingStars.filter((star) => CAUTION_STAR_PATTERN.test(star)),
     };
@@ -212,16 +218,16 @@ function buildActionPlan(pillars: WealthPillar[]): WealthActionStep[] {
 
   return [
     {
-      title: "Sửa trụ yếu",
-      body: `Rà soát ${weakest.label.toLowerCase()} bằng một việc cụ thể có thể kiểm tra trong tuần, thay vì mở rộng ràng buộc khi nền chưa rõ.`,
+      title: "30 ngày — Sửa trụ yếu",
+      body: `Trong 30 ngày đầu, ghi lại một dấu hiệu cụ thể của ${weakest.label.toLowerCase()} và xem lại mỗi tuần để hiểu nền hiện tại trước khi mở rộng ràng buộc.`,
     },
     {
-      title: "Dùng trụ mạnh",
-      body: `Dựa vào ${strongest.label.toLowerCase()} để chọn việc phù hợp với năng lực và thông tin đã xác thực.`,
+      title: "60 ngày — Dùng trụ mạnh",
+      body: `Từ ngày 31 đến 60, dùng ${strongest.label.toLowerCase()} cho một thử nghiệm nhỏ, có thể điều chỉnh; đối chiếu kết quả ở giữa và cuối giai đoạn bằng thông tin đã xác thực.`,
     },
     {
-      title: "Đặt cổng kiểm chứng",
-      body: "Trước quyết định tài chính, ghi rõ dữ kiện, giới hạn chịu đựng rủi ro và người cần tham vấn độc lập.",
+      title: "90 ngày — Đặt cổng kiểm chứng",
+      body: "Đến ngày 90, tổng hợp dữ kiện để chọn tiếp tục, điều chỉnh hoặc dừng; với quyết định tài chính, ghi rõ giới hạn rủi ro và người cần tham vấn độc lập.",
     },
   ];
 }

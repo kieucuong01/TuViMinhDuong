@@ -125,8 +125,8 @@ export function WealthFortuneView({ chartId, chart }: WealthFortuneViewProps) {
         <p className="eyebrow">Tử vi tài lộc &amp; Đầu tư</p>
         <h1 id="wealth-report-title">Bản đồ Tài - Quan - Di của {chart.input.fullName} · {chart.input.viewYear}</h1>
         <p>{report.postureSummary}</p>
-        <div className="wealth-overall" aria-label={`Chỉ số tổng hợp ${report.overallScore} trên 100, ${report.postureLabel}`}>
-          <span className="wealth-overall-label">Chỉ số tổng hợp</span>
+        <div className="wealth-overall" aria-label={`Chỉ số định hướng tổng hợp ${report.overallScore} trên 100, ${report.postureLabel}`}>
+          <span className="wealth-overall-label">Chỉ số định hướng tổng hợp</span>
           <strong>{report.overallScore}/100</strong>
           <span className="wealth-posture-label">{report.postureLabel}</span>
         </div>
@@ -160,8 +160,12 @@ export function WealthFortuneView({ chartId, chart }: WealthFortuneViewProps) {
               <h3>{evidence.palace}</h3>
               <p className="wealth-evidence-branch">Địa chi {evidence.branch}</p>
               <p><strong>Chính tinh:</strong> {evidence.mainStars.join(", ")}</p>
-              {evidence.supportStars.length ? <p><strong>Sao hỗ trợ:</strong> {evidence.supportStars.join(", ")}</p> : null}
-              {evidence.cautionStars.length ? <p><strong>Điểm cần lưu ý:</strong> {evidence.cautionStars.join(", ")}</p> : null}
+              <p><strong>Sao hỗ trợ:</strong> {evidence.supportStars.length
+                ? evidence.supportStars.join(", ")
+                : evidence.available ? "Không ghi nhận sao hỗ trợ trong nhóm theo dõi" : "Chưa có dữ liệu"}</p>
+              <p><strong>Điểm cần lưu ý:</strong> {evidence.cautionStars.length
+                ? evidence.cautionStars.join(", ")
+                : evidence.available ? "Không ghi nhận điểm cần lưu ý trong nhóm theo dõi" : "Chưa có dữ liệu"}</p>
               <a className="wealth-evidence-link" href={EVIDENCE_LINKS[evidence.palace]}>Đọc sâu về cung {evidence.palace}</a>
             </article>
           ))}

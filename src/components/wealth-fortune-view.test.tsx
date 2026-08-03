@@ -49,7 +49,9 @@ describe("WealthFortuneView", () => {
 
     const html = renderToStaticMarkup(createElement(WealthFortuneView, { chartId: "chart-1", chart }));
 
-    expect(html).toContain("Chỉ số tổng hợp");
+    expect(html).toContain('class="wealth-overall-label">Chỉ số định hướng tổng hợp</span>');
+    expect(html).toMatch(/aria-label="Chỉ số định hướng tổng hợp \d+ trên 100,/);
+    expect(html).not.toContain("Chỉ số tổng hợp");
     expect([
       "Tăng trưởng từ nghề",
       "Quản trị dòng tiền",
@@ -80,8 +82,36 @@ describe("WealthFortuneView", () => {
     const html = renderToStaticMarkup(createElement(WealthFortuneView, { chartId: "chart-1", chart }));
 
     expect(html).toContain("Kế hoạch hành động 90 ngày");
+    expect(html).toContain("30 ngày — Sửa trụ yếu");
+    expect(html).toContain("60 ngày — Dùng trụ mạnh");
+    expect(html).toContain("90 ngày — Đặt cổng kiểm chứng");
     expect(html).toContain("Bộ lọc 6 câu trước quyết định lớn");
     expect((html.match(/class="wealth-decision-question"/g) ?? [])).toHaveLength(6);
+  });
+
+  it("renders distinct neutral and unavailable evidence fallbacks", async () => {
+    const { WealthFortuneView } = await import("./wealth-fortune-view");
+    const chart = generateTuViChart(CHART_FIXTURES[0].input);
+    const chartWithEmptyRecognizedCategories = {
+      ...chart,
+      palaces: chart.palaces.map((palace) => palace.name === "Tài Bạch" ? {
+        ...palace,
+        supportStars: [],
+        yearlyStars: [],
+      } : palace),
+    };
+    const chartWithoutTaiBach = {
+      ...chart,
+      palaces: chart.palaces.filter((palace) => palace.name !== "Tài Bạch"),
+    };
+
+    const neutralHtml = renderToStaticMarkup(createElement(WealthFortuneView, { chartId: "chart-neutral", chart: chartWithEmptyRecognizedCategories }));
+    const unavailableHtml = renderToStaticMarkup(createElement(WealthFortuneView, { chartId: "chart-unavailable", chart: chartWithoutTaiBach }));
+
+    expect(neutralHtml).toContain("Sao hỗ trợ:</strong> Không ghi nhận sao hỗ trợ trong nhóm theo dõi");
+    expect(neutralHtml).toContain("Điểm cần lưu ý:</strong> Không ghi nhận điểm cần lưu ý trong nhóm theo dõi");
+    expect(unavailableHtml).toContain("Sao hỗ trợ:</strong> Chưa có dữ liệu");
+    expect(unavailableHtml).toContain("Điểm cần lưu ý:</strong> Chưa có dữ liệu");
   });
 
   it("keeps mobile report explanations and safety text at 16px or larger", () => {

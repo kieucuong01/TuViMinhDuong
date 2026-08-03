@@ -13,11 +13,22 @@ function withPalaceProfile(
 ) {
   return {
     ...chart,
-    palaces: chart.palaces.map((palace) => palace.name === palaceName ? {
+    palaces: chart.palaces.map((palace) => (palaceName === "Thân" ? palace.isThan : palace.name === palaceName) ? {
       ...palace,
       starStates: Object.fromEntries(palace.mainStars.map((star) => [star, state])),
       supportStars,
     } : palace),
+  };
+}
+
+function withoutPalaceSignals(chart: TuViChart) {
+  return {
+    ...chart,
+    palaces: chart.palaces.map((palace) => ({
+      ...palace,
+      starStates: {},
+      supportStars: [],
+    })),
   };
 }
 
@@ -65,42 +76,48 @@ describe("wealth fortune report", () => {
 
     expect(report.palaceEvidence.map((item) => item.palace)).toEqual(["Tài Bạch", "Quan Lộc", "Thiên Di"]);
     expect(report.palaceEvidence.every((item) => item.mainStars.length > 0)).toBe(true);
-    expect(report.palaceEvidence.every((item) => item.mainStars.every((star) => / \([MVĐBH]\)$/.test(star)))).toBe(true);
     expect(report.palaceEvidence.every((item) => Array.isArray(item.supportStars) && Array.isArray(item.cautionStars))).toBe(true);
     expect(report.actionPlan.map((step) => step.title)).toEqual([
-      "Sửa trụ yếu",
-      "Dùng trụ mạnh",
-      "Đặt cổng kiểm chứng",
+      "30 ngày — Sửa trụ yếu",
+      "60 ngày — Dùng trụ mạnh",
+      "90 ngày — Đặt cổng kiểm chứng",
     ]);
     expect(JSON.stringify(report)).not.toMatch(/chắc chắn|cam kết|phát tài|mua ngay|bán ngay/i);
     expect(report.disclaimer).toContain("không thay thế tư vấn tài chính");
   });
 
-  it("returns one approved posture label for the composite score", () => {
-    const chart = generateTuViChart(FIXTURE_INPUT);
-    const report = buildWealthFortuneReport(chart);
-
-    expect([
-      "Tăng trưởng từ nghề",
-      "Quản trị dòng tiền",
-      "Mở rộng có kiểm chứng",
-      "Tích lũy bền",
-      "Phòng thủ và sửa nền",
-    ]).toContain(report.postureLabel);
-  });
-
-  it("builds each pillar from all palaces required by the design", () => {
+  it.each([
+    ["cashflow", "Tài Bạch"],
+    ["cashflow", "Phúc Đức"],
+    ["cashflow", "Điền Trạch"],
+    ["career", "Quan Lộc"],
+    ["career", "Mệnh"],
+    ["career", "Thân"],
+    ["mobility", "Thiên Di"],
+    ["mobility", "Quan Lộc"],
+    ["mobility", "Nô Bộc"],
+    ["foundation", "Phúc Đức"],
+    ["foundation", "Điền Trạch"],
+    ["foundation", "Tài Bạch"],
+  ] as const)("uses %s source %s in its composite", (pillarKey, palaceName) => {
     const chart = generateTuViChart(FIXTURE_INPUT);
     const score = (candidate: TuViChart, key: string) => buildWealthFortuneReport(candidate).pillars.find((pillar) => pillar.key === key)?.score;
 
-    expect(score(withPalaceProfile(chart, "Phúc Đức", "M"), "cashflow"))
-      .toBeGreaterThan(score(withPalaceProfile(chart, "Phúc Đức", "H"), "cashflow") || 0);
-    expect(score(withPalaceProfile(chart, "Mệnh", "M"), "career"))
-      .toBeGreaterThan(score(withPalaceProfile(chart, "Mệnh", "H"), "career") || 0);
-    expect(score(withPalaceProfile(chart, "Nô Bộc", "M"), "mobility"))
-      .toBeGreaterThan(score(withPalaceProfile(chart, "Nô Bộc", "H"), "mobility") || 0);
-    expect(score(withPalaceProfile(chart, "Điền Trạch", "M"), "foundation"))
-      .toBeGreaterThan(score(withPalaceProfile(chart, "Điền Trạch", "H"), "foundation") || 0);
+    expect(score(withPalaceProfile(chart, palaceName, "M"), pillarKey))
+      .toBeGreaterThan(score(withPalaceProfile(chart, palaceName, "H"), pillarKey) || 0);
+  });
+
+  it("contributes an exact neutral 60 when a composite source palace is missing", () => {
+    const neutralChart = withoutPalaceSignals(generateTuViChart(FIXTURE_INPUT));
+    const taiBachCautioned = withPalaceProfile(neutralChart, "Tài Bạch", "H");
+    const missingSecondarySources = {
+      ...taiBachCautioned,
+      palaces: taiBachCautioned.palaces.filter((palace) => !["Phúc Đức", "Điền Trạch"].includes(palace.name)),
+    };
+
+    const cashflow = buildWealthFortuneReport(missingSecondarySources).pillars.find((pillar) => pillar.key === "cashflow");
+
+    expect(cashflow?.score).toBe(56);
   });
 
   it("includes base support and caution stars in pillar scores", () => {
@@ -119,18 +136,39 @@ describe("wealth fortune report", () => {
     const report = buildWealthFortuneReport(chartWithoutTaiBach);
     const evidence = report.palaceEvidence.find((item) => item.palace === "Tài Bạch");
 
-    expect(evidence).toMatchObject({ branch: "Chưa có dữ liệu", mainStars: ["Chưa có dữ liệu"] });
+    expect(evidence).toMatchObject({ available: false, branch: "Chưa có dữ liệu", mainStars: ["Chưa có dữ liệu"] });
     expect(report.pillars.every((pillar) => pillar.score >= 35 && pillar.score <= 92)).toBe(true);
   });
 
-  it("uses the conservative threshold and stable pillar-order tie break for posture", () => {
+  it("preserves an absent main-star brightness instead of fabricating Bình", () => {
     const chart = generateTuViChart(FIXTURE_INPUT);
-    const defensive = buildWealthFortuneReport(withEveryPalaceState(chart, "H"));
-    const tied = buildWealthFortuneReport(withEveryPalaceState(chart, "B"));
+    const chartWithAbsentBrightness = {
+      ...chart,
+      palaces: chart.palaces.map((palace) => palace.name === "Tài Bạch" ? {
+        ...palace,
+        mainStars: ["Vô chính diệu"],
+        starStates: {},
+      } : palace),
+    };
 
-    expect(defensive.overallScore).toBeLessThan(55);
-    expect(defensive.postureLabel).toBe("Phòng thủ và sửa nền");
-    expect(new Set(tied.pillars.map((pillar) => pillar.score))).toHaveLength(1);
-    expect(tied.postureLabel).toBe("Quản trị dòng tiền");
+    const evidence = buildWealthFortuneReport(chartWithAbsentBrightness).palaceEvidence.find((item) => item.palace === "Tài Bạch");
+
+    expect(evidence).toMatchObject({ available: true, mainStars: ["Vô chính diệu"] });
+  });
+
+  it.each([
+    ["Phòng thủ và sửa nền", ["all-cautioned"]],
+    ["Quản trị dòng tiền", ["Tài Bạch"]],
+    ["Tăng trưởng từ nghề", ["Quan Lộc"]],
+    ["Mở rộng có kiểm chứng", ["Thiên Di"]],
+    ["Tích lũy bền", ["Phúc Đức", "Điền Trạch"]],
+  ] as const)("returns posture label %s for its defining profile", (expectedLabel, dominantPalaces) => {
+    const chart = generateTuViChart(FIXTURE_INPUT);
+    const baseline = dominantPalaces[0] === "all-cautioned"
+      ? withEveryPalaceState(chart, "H")
+      : dominantPalaces.reduce((candidate, palaceName) => withPalaceProfile(candidate, palaceName, "M"), withEveryPalaceState(chart, "B"));
+    const report = buildWealthFortuneReport(baseline);
+
+    expect(report.postureLabel).toBe(expectedLabel);
   });
 });
