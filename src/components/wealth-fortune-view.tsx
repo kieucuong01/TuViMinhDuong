@@ -6,6 +6,21 @@ type WealthFortuneViewProps = {
   chart: TuViChart;
 };
 
+const DECISION_FILTER_QUESTIONS = [
+  "Dữ kiện nào đã được xác minh, và dữ kiện nào vẫn chỉ là giả định?",
+  "Nếu giả định chính sai, mức tổn thất tối đa bạn có thể chấp nhận là bao nhiêu?",
+  "Quyết định này có làm suy yếu quỹ dự phòng hoặc dòng tiền thiết yếu không?",
+  "Bạn có đang phụ thuộc vào vay nợ hoặc đòn bẩy vượt quá khả năng kiểm soát không?",
+  "Ai có chuyên môn phù hợp và độc lập để giúp bạn kiểm tra lại quyết định?",
+  "Mốc dữ kiện nào sẽ khiến bạn dừng lại, điều chỉnh hoặc đánh giá lại?",
+];
+
+const EVIDENCE_LINKS: Record<string, string> = {
+  "Tài Bạch": "/tra-cuu/cung-tai-bach",
+  "Quan Lộc": "/tra-cuu/cung-quan-loc",
+  "Thiên Di": "/tra-cuu/cung-thien-di",
+};
+
 function trendCoordinates(points: WealthYearPoint[]) {
   const width = 560;
   const left = 40;
@@ -20,7 +35,15 @@ function trendCoordinates(points: WealthYearPoint[]) {
   }));
 }
 
-function WealthTrendFigure({ points }: { points: WealthYearPoint[] }) {
+function WealthTrendFigure({
+  cautionYear,
+  points,
+  strongestYear,
+}: {
+  cautionYear: WealthYearPoint;
+  points: WealthYearPoint[];
+  strongestYear: WealthYearPoint;
+}) {
   const coordinates = trendCoordinates(points);
   const polyline = coordinates.map(({ x, y }) => `${x},${y}`).join(" ");
 
@@ -55,6 +78,19 @@ function WealthTrendFigure({ points }: { points: WealthYearPoint[] }) {
         <figcaption>Điểm cao hoặc thấp chỉ dùng để gợi ý thứ tự rà soát; hãy đối chiếu với dữ kiện thực tế của bạn.</figcaption>
       </figure>
 
+      <div className="wealth-year-highlight-grid" aria-label="Hai mốc năm cần đối chiếu">
+        <article>
+          <h3>Năm thuận hơn để kiểm chứng</h3>
+          <strong>{strongestYear.year} · {strongestYear.score}/100</strong>
+          <p>Ưu tiên thử từng bước nhỏ và tiếp tục đối chiếu với dữ kiện thực tế.</p>
+        </article>
+        <article>
+          <h3>Năm cần kiểm chứng nhiều hơn</h3>
+          <strong>{cautionYear.year} · {cautionYear.score}/100</strong>
+          <p>Rà soát giả định, giới hạn rủi ro và phương án dự phòng trước khi cam kết.</p>
+        </article>
+      </div>
+
       <div className="wealth-trend-table-wrap">
         <table className="wealth-trend-table">
           <caption>Bảng chỉ số định hướng 5 năm</caption>
@@ -87,8 +123,13 @@ export function WealthFortuneView({ chartId, chart }: WealthFortuneViewProps) {
     <section className="wealth-report" aria-labelledby="wealth-report-title" data-chart-id={chartId}>
       <header className="wealth-report-hero">
         <p className="eyebrow">Tử vi tài lộc &amp; Đầu tư</p>
-        <h1 id="wealth-report-title">Bản đồ Tài - Quan - Di của {chart.input.fullName}</h1>
+        <h1 id="wealth-report-title">Bản đồ Tài - Quan - Di của {chart.input.fullName} · {chart.input.viewYear}</h1>
         <p>{report.postureSummary}</p>
+        <div className="wealth-overall" aria-label={`Chỉ số tổng hợp ${report.overallScore} trên 100, ${report.postureLabel}`}>
+          <span className="wealth-overall-label">Chỉ số tổng hợp</span>
+          <strong>{report.overallScore}/100</strong>
+          <span className="wealth-posture-label">{report.postureLabel}</span>
+        </div>
       </header>
 
       <div className="wealth-pillar-grid">
@@ -102,7 +143,11 @@ export function WealthFortuneView({ chartId, chart }: WealthFortuneViewProps) {
         ))}
       </div>
 
-      <WealthTrendFigure points={report.fiveYearTrend} />
+      <WealthTrendFigure
+        cautionYear={report.cautionYear}
+        points={report.fiveYearTrend}
+        strongestYear={report.strongestYear}
+      />
 
       <section className="wealth-evidence-section" aria-labelledby="wealth-evidence-title">
         <div className="wealth-section-heading">
@@ -117,6 +162,7 @@ export function WealthFortuneView({ chartId, chart }: WealthFortuneViewProps) {
               <p><strong>Chính tinh:</strong> {evidence.mainStars.join(", ")}</p>
               {evidence.supportStars.length ? <p><strong>Sao hỗ trợ:</strong> {evidence.supportStars.join(", ")}</p> : null}
               {evidence.cautionStars.length ? <p><strong>Điểm cần lưu ý:</strong> {evidence.cautionStars.join(", ")}</p> : null}
+              <a className="wealth-evidence-link" href={EVIDENCE_LINKS[evidence.palace]}>Đọc sâu về cung {evidence.palace}</a>
             </article>
           ))}
         </div>
@@ -125,7 +171,8 @@ export function WealthFortuneView({ chartId, chart }: WealthFortuneViewProps) {
       <section className="wealth-action-section" aria-labelledby="wealth-action-title">
         <div className="wealth-section-heading">
           <p className="eyebrow">Gợi ý tự rà soát</p>
-          <h2 id="wealth-action-title">Ba bước theo dõi có kiểm chứng</h2>
+          <h2 id="wealth-action-title">Kế hoạch hành động 90 ngày</h2>
+          <p>Ba bước theo dõi có kiểm chứng để chia mục tiêu thành việc nhỏ, có mốc xem lại.</p>
         </div>
         <ol className="wealth-action-list">
           {report.actionPlan.map((step) => (
@@ -133,6 +180,19 @@ export function WealthFortuneView({ chartId, chart }: WealthFortuneViewProps) {
               <strong>{step.title}</strong>
               <p>{step.body}</p>
             </li>
+          ))}
+        </ol>
+      </section>
+
+      <section className="wealth-decision-section" aria-labelledby="wealth-decision-title">
+        <div className="wealth-section-heading">
+          <p className="eyebrow">Trước quyết định lớn</p>
+          <h2 id="wealth-decision-title">Bộ lọc 6 câu trước quyết định lớn</h2>
+          <p>Trả lời bằng dữ kiện của bạn; nếu chưa rõ, hãy trì hoãn cam kết và tìm tư vấn chuyên môn độc lập.</p>
+        </div>
+        <ol className="wealth-decision-list">
+          {DECISION_FILTER_QUESTIONS.map((question) => (
+            <li className="wealth-decision-question" key={question}>{question}</li>
           ))}
         </ol>
       </section>

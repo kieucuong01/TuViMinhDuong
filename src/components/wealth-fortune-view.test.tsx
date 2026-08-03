@@ -39,6 +39,49 @@ describe("WealthFortuneView", () => {
     const html = renderToStaticMarkup(createElement(WealthFortuneView, { chartId: "chart-1", chart }));
 
     expect((html.match(/class="wealth-pillar-score-label">Chỉ số định hướng/g) ?? [])).toHaveLength(4);
+    expect(["Dòng tiền", "Năng lực tạo giá trị", "Mở rộng môi trường", "Nền tích lũy"]
+      .every((label) => html.includes(`<h2>${label}</h2>`))).toBe(true);
+  });
+
+  it("renders the composite posture and the strongest and caution years", async () => {
+    const { WealthFortuneView } = await import("./wealth-fortune-view");
+    const chart = generateTuViChart(CHART_FIXTURES[0].input);
+
+    const html = renderToStaticMarkup(createElement(WealthFortuneView, { chartId: "chart-1", chart }));
+
+    expect(html).toContain("Chỉ số tổng hợp");
+    expect([
+      "Tăng trưởng từ nghề",
+      "Quản trị dòng tiền",
+      "Mở rộng có kiểm chứng",
+      "Tích lũy bền",
+      "Phòng thủ và sửa nền",
+    ].some((label) => html.includes(label))).toBe(true);
+    expect(html).toContain("Năm thuận hơn để kiểm chứng");
+    expect(html).toContain("Năm cần kiểm chứng nhiều hơn");
+    expect(html).toContain(`Bản đồ Tài - Quan - Di của ${chart.input.fullName} · ${chart.input.viewYear}`);
+  });
+
+  it("links the evidence cards to the three public deep-reading routes", async () => {
+    const { WealthFortuneView } = await import("./wealth-fortune-view");
+    const chart = generateTuViChart(CHART_FIXTURES[0].input);
+
+    const html = renderToStaticMarkup(createElement(WealthFortuneView, { chartId: "chart-1", chart }));
+
+    expect(html).toContain('href="/tra-cuu/cung-tai-bach"');
+    expect(html).toContain('href="/tra-cuu/cung-quan-loc"');
+    expect(html).toContain('href="/tra-cuu/cung-thien-di"');
+  });
+
+  it("renders the 90-day plan and all six pre-decision questions", async () => {
+    const { WealthFortuneView } = await import("./wealth-fortune-view");
+    const chart = generateTuViChart(CHART_FIXTURES[0].input);
+
+    const html = renderToStaticMarkup(createElement(WealthFortuneView, { chartId: "chart-1", chart }));
+
+    expect(html).toContain("Kế hoạch hành động 90 ngày");
+    expect(html).toContain("Bộ lọc 6 câu trước quyết định lớn");
+    expect((html.match(/class="wealth-decision-question"/g) ?? [])).toHaveLength(6);
   });
 
   it("keeps mobile report explanations and safety text at 16px or larger", () => {
@@ -46,5 +89,6 @@ describe("WealthFortuneView", () => {
     expect(wealthStyles).toMatch(/\.wealth-trend-figure figcaption \{[^}]*font-size: 1rem;/);
     expect(wealthStyles).toMatch(/\.wealth-trend-table \{[^}]*font-size: 1rem;/);
     expect(wealthStyles).toMatch(/\.wealth-disclaimer \{[^}]*font-size: 1rem;/);
+    expect(wealthStyles).toMatch(/\.wealth-decision-list \{[^}]*font-size: 1rem;/);
   });
 });

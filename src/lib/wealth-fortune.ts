@@ -30,6 +30,7 @@ export type WealthActionStep = {
 
 export type WealthFortuneReport = {
   overallScore: number;
+  postureLabel: string;
   pillars: WealthPillar[];
   fiveYearTrend: WealthYearPoint[];
   strongestYear: WealthYearPoint;
@@ -61,41 +62,86 @@ const YEARLY_CAUTION_WEIGHTS: Record<string, number> = {
 const SUPPORT_STAR_PATTERN = /Lộc Tồn|Hóa Lộc|Hóa Quyền|Hóa Khoa|Tả Phù|Hữu Bật|Văn Xương|Văn Khúc|Thiên Khôi|Thiên Việt|Thiên Mã|Long Trì|Phượng Các|Ân Quang|Thiên Quý/;
 const CAUTION_STAR_PATTERN = /Kình Dương|Đà La|Hỏa Tinh|Linh Tinh|Địa Không|Địa Kiếp|Hóa Kỵ|Tuần|Triệt|Thiên Hư|Thiên Khốc|Tang Môn|Bạch Hổ|Thái Tuế/;
 
-const PILLAR_CONFIG: { key: WealthPillarKey; label: string; palace: string; summary: string }[] = [
-  { key: "cashflow", label: "Dòng tiền", palace: "Tài Bạch", summary: "Theo dõi nhịp thu chi và ưu tiên dữ kiện rõ ràng." },
-  { key: "career", label: "Công việc", palace: "Quan Lộc", summary: "Củng cố năng lực, vai trò và quy trình làm việc bền vững." },
-  { key: "mobility", label: "Mở rộng", palace: "Thiên Di", summary: "Chọn cơ hội hợp tác có thông tin và giới hạn rõ ràng." },
-  { key: "foundation", label: "Nền tảng", palace: "Mệnh", summary: "Giữ nhịp sức bền và thói quen trước các quyết định quan trọng." },
+const PILLAR_CONFIG: {
+  key: WealthPillarKey;
+  label: string;
+  sources: { palace: string; weight: number }[];
+  summary: string;
+}[] = [
+  {
+    key: "cashflow",
+    label: "Dòng tiền",
+    sources: [
+      { palace: "Tài Bạch", weight: 0.6 },
+      { palace: "Phúc Đức", weight: 0.2 },
+      { palace: "Điền Trạch", weight: 0.2 },
+    ],
+    summary: "Theo dõi nhịp thu chi và ưu tiên dữ kiện rõ ràng.",
+  },
+  {
+    key: "career",
+    label: "Năng lực tạo giá trị",
+    sources: [
+      { palace: "Quan Lộc", weight: 0.6 },
+      { palace: "Mệnh", weight: 0.25 },
+      { palace: "Thân", weight: 0.15 },
+    ],
+    summary: "Củng cố năng lực, vai trò và quy trình làm việc bền vững.",
+  },
+  {
+    key: "mobility",
+    label: "Mở rộng môi trường",
+    sources: [
+      { palace: "Thiên Di", weight: 0.6 },
+      { palace: "Quan Lộc", weight: 0.25 },
+      { palace: "Nô Bộc", weight: 0.15 },
+    ],
+    summary: "Chọn cơ hội hợp tác có thông tin và giới hạn rõ ràng.",
+  },
+  {
+    key: "foundation",
+    label: "Nền tích lũy",
+    sources: [
+      { palace: "Phúc Đức", weight: 0.4 },
+      { palace: "Điền Trạch", weight: 0.35 },
+      { palace: "Tài Bạch", weight: 0.25 },
+    ],
+    summary: "Giữ nhịp sức bền và thói quen trước các quyết định quan trọng.",
+  },
 ];
 
 function clampScore(value: number) {
   return Math.max(MIN_SCORE, Math.min(MAX_SCORE, Math.round(value)));
 }
 
-function findPalace(chart: TuViChart, name: string): Palace {
-  const palace = chart.palaces.find((item) => item.name === name);
-  if (!palace) {
-    throw new Error(`Missing required palace: ${name}`);
-  }
-  return palace;
+function findPalace(chart: TuViChart, name: string): Palace | undefined {
+  return chart.palaces.find((item) => name === "Thân" ? item.isThan : item.name === name);
 }
 
-function scorePalace(palace: Palace) {
+function scorePalace(palace: Palace | undefined) {
+  if (!palace) {
+    return 60;
+  }
+
   const states = palace.mainStars
     .map((star) => palace.starStates[star])
-    .filter((state): state is keyof typeof STATE_WEIGHT => state in STATE_WEIGHT);
+    .filter((state): state is keyof typeof STATE_WEIGHT => Boolean(state) && state in STATE_WEIGHT);
   const stateScore = states.length === 0
     ? 0
     : states.reduce((total, state) => total + STATE_WEIGHT[state], 0) / states.length;
+  const supportScore = palace.supportStars.filter((star) => SUPPORT_STAR_PATTERN.test(star)).length * 2;
+  const cautionScore = palace.supportStars.filter((star) => CAUTION_STAR_PATTERN.test(star)).length * -2;
 
-  return clampScore(60 + stateScore);
+  return clampScore(60 + stateScore + supportScore + cautionScore);
 }
 
 function buildPillars(chart: TuViChart): WealthPillar[] {
-  return PILLAR_CONFIG.map(({ key, label, palace, summary }) => ({
+  return PILLAR_CONFIG.map(({ key, label, sources, summary }) => ({
     key,
     label,
-    score: scorePalace(findPalace(chart, palace)),
+    score: clampScore(sources.reduce((total, source) => (
+      total + scorePalace(findPalace(chart, source.palace)) * source.weight
+    ), 0)),
     summary,
   }));
 }
@@ -105,7 +151,7 @@ function weightedAverage(pillars: WealthPillar[], weights: Record<WealthPillarKe
 }
 
 function scoreYearlySignals(chart: TuViChart) {
-  const yearlyStars = YEARLY_PALACE_NAMES.flatMap((name) => findPalace(chart, name).yearlyStars);
+  const yearlyStars = YEARLY_PALACE_NAMES.flatMap((name) => findPalace(chart, name)?.yearlyStars || []);
   const adjustment = yearlyStars.reduce((total, star) => (
     total + (YEARLY_SUPPORT_WEIGHTS[star] || 0) + (YEARLY_CAUTION_WEIGHTS[star] || 0)
   ), 0);
@@ -140,6 +186,15 @@ function buildFiveYearTrend(chart: TuViChart) {
 function buildPalaceEvidence(chart: TuViChart): WealthPalaceEvidence[] {
   return YEARLY_PALACE_NAMES.map((name) => {
     const palace = findPalace(chart, name);
+    if (!palace) {
+      return {
+        palace: name,
+        branch: "Chưa có dữ liệu",
+        mainStars: ["Chưa có dữ liệu"],
+        supportStars: [],
+        cautionStars: [],
+      };
+    }
     const accompanyingStars = [...palace.supportStars, ...palace.yearlyStars];
     return {
       palace: palace.name,
@@ -177,6 +232,20 @@ function buildPostureSummary(pillars: WealthPillar[]) {
   return `Chỉ số định hướng cho thấy nên củng cố ${weakest.label.toLowerCase()} và phát huy ${strongest.label.toLowerCase()} theo từng bước có kiểm chứng.`;
 }
 
+function buildPostureLabel(pillars: WealthPillar[], overallScore: number) {
+  if (overallScore < 55) {
+    return "Phòng thủ và sửa nền";
+  }
+
+  const strongest = pillars.reduce((selected, pillar) => pillar.score > selected.score ? pillar : selected);
+  return {
+    cashflow: "Quản trị dòng tiền",
+    career: "Tăng trưởng từ nghề",
+    mobility: "Mở rộng có kiểm chứng",
+    foundation: "Tích lũy bền",
+  }[strongest.key];
+}
+
 export function buildWealthFortuneReport(chart: TuViChart): WealthFortuneReport {
   const pillars = buildPillars(chart);
   const overallScore = weightedAverage(pillars, {
@@ -191,6 +260,7 @@ export function buildWealthFortuneReport(chart: TuViChart): WealthFortuneReport 
 
   return {
     overallScore,
+    postureLabel: buildPostureLabel(pillars, overallScore),
     pillars,
     fiveYearTrend,
     strongestYear,

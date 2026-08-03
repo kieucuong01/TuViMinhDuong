@@ -14551,7 +14551,8 @@ button.is-loading:not(.icon-button)::before {
 .wealth-report-hero,
 .wealth-trend-section,
 .wealth-evidence-section,
-.wealth-action-section {
+.wealth-action-section,
+.wealth-decision-section {
   border: 1px solid #fed7aa;
   border-radius: 1.25rem;
   background: linear-gradient(135deg, #fffaf4, #fff 58%, #fffbeb);
@@ -14592,6 +14593,40 @@ button.is-loading:not(.icon-button)::before {
   color: #57534e;
   font-size: 1rem;
   line-height: 1.7;
+}
+
+.wealth-overall {
+  display: grid;
+  width: fit-content;
+  margin-top: 1rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid #fdba74;
+  border-radius: 1rem;
+  background: #fff;
+  gap: 0.2rem 0.85rem;
+  grid-template-columns: auto auto;
+  align-items: end;
+}
+
+.wealth-overall-label {
+  color: #9a3412;
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.wealth-overall strong {
+  color: #c2410c;
+  font-size: 1.8rem;
+  line-height: 1;
+}
+
+.wealth-posture-label {
+  color: #44403c;
+  font-size: 1rem;
+  font-weight: 800;
+  grid-column: 1 / -1;
 }
 
 .wealth-pillar-grid,
@@ -14682,6 +14717,33 @@ button.is-loading:not(.icon-button)::before {
   line-height: 1.55;
 }
 
+.wealth-year-highlight-grid {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.wealth-year-highlight-grid article {
+  border: 1px solid #fed7aa;
+  border-radius: 1rem;
+  background: #fff;
+  padding: 1rem;
+}
+
+.wealth-year-highlight-grid strong {
+  display: block;
+  margin-top: 0.45rem;
+  color: #c2410c;
+  font-size: 1.15rem;
+}
+
+.wealth-year-highlight-grid p {
+  margin-top: 0.45rem;
+  color: #57534e;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
 .wealth-trend-table-wrap {
   margin-top: 1rem;
   overflow-x: auto;
@@ -14717,7 +14779,8 @@ button.is-loading:not(.icon-button)::before {
 }
 
 .wealth-evidence-section,
-.wealth-action-section {
+.wealth-action-section,
+.wealth-decision-section {
   display: grid;
   gap: 1rem;
 }
@@ -14725,6 +14788,17 @@ button.is-loading:not(.icon-button)::before {
 .wealth-evidence-branch {
   color: #9a3412 !important;
   font-weight: 700;
+}
+
+.wealth-evidence-link {
+  display: inline-flex;
+  min-height: 44px;
+  margin-top: 0.75rem;
+  color: #9a3412;
+  font-weight: 800;
+  line-height: 1.4;
+  align-items: center;
+  text-underline-offset: 0.2rem;
 }
 
 .wealth-action-list {
@@ -14743,6 +14817,28 @@ button.is-loading:not(.icon-button)::before {
 .wealth-action-list strong::before {
   content: counter(wealth-action, decimal-leading-zero) " ";
   color: #c2410c;
+}
+
+.wealth-decision-list {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0;
+  padding-left: 1.5rem;
+  color: #44403c;
+  font-size: 1rem;
+  line-height: 1.65;
+}
+
+.wealth-decision-question {
+  padding: 0.85rem 1rem;
+  border: 1px solid #fed7aa;
+  border-radius: 1rem;
+  background: #fff;
+}
+
+.wealth-decision-question::marker {
+  color: #c2410c;
+  font-weight: 800;
 }
 
 .wealth-disclaimer {
@@ -14764,7 +14860,8 @@ button.is-loading:not(.icon-button)::before {
   .wealth-report-hero,
   .wealth-trend-section,
   .wealth-evidence-section,
-  .wealth-action-section {
+  .wealth-action-section,
+  .wealth-decision-section {
     border-radius: 1.5rem;
     padding: 1.5rem;
   }
@@ -14775,6 +14872,11 @@ button.is-loading:not(.icon-button)::before {
 
   .wealth-evidence-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .wealth-year-highlight-grid,
+  .wealth-decision-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
@@ -16089,5 +16191,9 @@ button.is-loading:not(.icon-button)::before {
 
   .wealth-landing-final .btn {
     width: 100%;
+  }
+
+  .wealth-landing-form .chart-birth-field .birth-date-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }

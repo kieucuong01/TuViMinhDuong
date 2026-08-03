@@ -5,6 +5,7 @@ import { describe, expect, it } from "vitest";
 const pagePath = fileURLToPath(new URL("./page.tsx", import.meta.url));
 const source = existsSync(pagePath) ? readFileSync(pagePath, "utf8") : "";
 const actionsSource = readFileSync(fileURLToPath(new URL("../actions.ts", import.meta.url)), "utf8");
+const styles = readFileSync(fileURLToPath(new URL("../globals.css", import.meta.url)), "utf8");
 
 function answerWordCount() {
   const answer = source.match(/data-answer-block="true"[^>]*>([\s\S]*?)<\/p>/)?.[1] ?? "";
@@ -42,5 +43,15 @@ describe("wealth fortune landing page", () => {
     expect((source.match(/href="\//g) ?? []).length).toBeGreaterThanOrEqual(6);
     expect(source).toContain("Tài–Quan–Di đọc gì?");
     expect(source).toContain("Cách dùng biểu đồ");
+  });
+
+  it("stacks the four birth-date controls into two columns on narrow wealth landing viewports", () => {
+    expect(styles).toMatch(/@media \(max-width: 520px\) \{[\s\S]*?\.wealth-landing-form \.chart-birth-field \.birth-date-grid \{[^}]*grid-template-columns: repeat\(2, minmax\(0, 1fr\)\);/);
+  });
+
+  it("shows the update date, author, and editorial policy required by the content contract", () => {
+    expect(source).toContain('<time dateTime="2026-08-03">');
+    expect(source).toContain('href="/tac-gia"');
+    expect(source).toContain('href="/chinh-sach-bien-tap"');
   });
 });
