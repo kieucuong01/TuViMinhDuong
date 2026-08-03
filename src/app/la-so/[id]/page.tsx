@@ -12,6 +12,7 @@ import { DeferredAssistantWidget } from "@/components/deferred-assistant-widget"
 import { FateTabs, type FateView } from "@/components/fate-tabs";
 import { DailyFateView, MajorFateView, MinorFateView, MonthlyFateView } from "@/components/fate-views";
 import { PalaceFateView } from "@/components/palace-fate-view";
+import { WealthFortuneView } from "@/components/wealth-fortune-view";
 import { PremiumReadingCta } from "@/components/premium-reading-cta";
 import { DeferredChartActionPanel } from "@/components/deferred-chart-action-panel";
 import { ChartRetentionPanel } from "@/components/chart-retention-panel";
@@ -142,9 +143,11 @@ export default async function ChartPage({
   );
   const canUsePaidFateViews = paidFeaturesVisible && canReadFullOverview;
   const featurePrices = paidFeaturesVisible ? await getFeaturePrices() : null;
-  const fateViews: FateView[] = canUsePaidFateViews ? ["la-so", "luan-cung", "dai-van", "tieu-van", "nguyet-van", "nhat-van"] : ["la-so"];
-  const activeView: FateView = fateViews.includes(query.view as FateView) ? (query.view as FateView) : "la-so";
-  const isScopedReadingView = ["luan-cung", "dai-van", "tieu-van", "nguyet-van", "nhat-van"].includes(activeView);
+  const visibleViews: FateView[] = canUsePaidFateViews
+    ? ["la-so", "tai-loc", "luan-cung", "dai-van", "tieu-van", "nguyet-van", "nhat-van"]
+    : ["la-so", "tai-loc"];
+  const activeView: FateView = visibleViews.includes(query.view as FateView) ? (query.view as FateView) : "la-so";
+  const isScopedReadingView = ["tai-loc", "luan-cung", "dai-van", "tieu-van", "nguyet-van", "nhat-van"].includes(activeView);
 
   const selectedReadingCandidate = canReadFullOverview && user && query.reading && !isScopedReadingView
     ? await getReadingById(user.id, query.reading)
@@ -187,7 +190,7 @@ export default async function ChartPage({
   return (
     <main className="chart-page" data-testid="chart-page">
       <ReadingHashScrollRestorer />
-      {canUsePaidFateViews ? <FateTabs chartId={id} active={activeView} /> : null}
+      <FateTabs chartId={id} active={activeView} visibleViews={visibleViews} />
 
       <div className="mx-auto max-w-6xl px-3 pb-10 sm:px-6 lg:px-8">
         {activeView === "dai-van" && featurePrices ? <MajorFateView chartId={id} chart={record.chart} user={user} activeReadingId={query.reading} featurePrices={featurePrices} /> : null}
@@ -195,6 +198,7 @@ export default async function ChartPage({
         {activeView === "tieu-van" && featurePrices ? <MinorFateView chartId={id} chart={record.chart} user={user} activeReadingId={query.reading} featurePrices={featurePrices} /> : null}
         {activeView === "nguyet-van" && featurePrices ? <MonthlyFateView chartId={id} chart={record.chart} user={user} activeReadingId={query.reading} featurePrices={featurePrices} /> : null}
         {activeView === "nhat-van" && featurePrices ? <DailyFateView chartId={id} chart={record.chart} user={user} activeReadingId={query.reading} featurePrices={featurePrices} /> : null}
+        {activeView === "tai-loc" ? <WealthFortuneView chartId={id} chart={record.chart} /> : null}
         {isScopedReadingView ? null : (
         <>
         <div className="chart-titlebar">

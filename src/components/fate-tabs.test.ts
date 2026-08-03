@@ -19,8 +19,16 @@ describe("fate tabs", () => {
 
   it("only exposes chart-specific fate views to the chart owner or an admin", () => {
     expect(chartPageSource).toContain("const canUsePaidFateViews = paidFeaturesVisible && canReadFullOverview;");
-    expect(chartPageSource).toContain("const fateViews: FateView[] = canUsePaidFateViews");
-    expect(chartPageSource).toContain("{canUsePaidFateViews ? <FateTabs chartId={id} active={activeView} /> : null}");
+    expect(chartPageSource).toContain("const visibleViews: FateView[] = canUsePaidFateViews");
+    expect(chartPageSource).toContain('<FateTabs chartId={id} active={activeView} visibleViews={visibleViews} />');
+  });
+
+  it("keeps the wealth report visible without granting access to paid fate views", () => {
+    expect(fateTabsSource).toContain('"tai-loc"');
+    expect(fateTabsSource).toContain('label: "Tài lộc"');
+    expect(fateTabsSource).toContain("visibleViews.includes(tab.key)");
+    expect(chartPageSource).toContain('["la-so", "tai-loc"]');
+    expect(chartPageSource).toContain('activeView === "tai-loc"');
   });
 
   it("binds a requested advanced reading to the chart in the current route", () => {
