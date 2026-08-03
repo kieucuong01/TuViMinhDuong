@@ -84,7 +84,7 @@ export default async function WealthFortuneLandingPage({ searchParams }: { searc
             </ul>
           </div>
 
-          <aside className="wealth-landing-form" id="wealth-chart-form" aria-labelledby="wealth-form-title">
+          <aside className="wealth-landing-form" id="lap-la-so-tai-loc" aria-labelledby="wealth-form-title">
             <div className="wealth-landing-form-heading">
               <Sparkles size={22} aria-hidden="true" />
               <div><p>Lập lá số miễn phí</p><h2 id="wealth-form-title">Xem bản đồ của riêng bạn</h2></div>
@@ -117,7 +117,7 @@ export default async function WealthFortuneLandingPage({ searchParams }: { searc
 
         <section className="wealth-landing-section wealth-landing-faq" aria-labelledby="wealth-faq-title"><div className="wealth-landing-section-heading"><p>Giải đáp ngắn</p><h2 id="wealth-faq-title">Câu hỏi thường gặp</h2></div><div>{faqs.map((faq) => <details key={faq.question}><summary>{faq.question}</summary><p>{faq.answer}</p></details>)}</div></section>
 
-        <section className="wealth-landing-final" aria-labelledby="wealth-final-title"><div><p>Bắt đầu từ dữ liệu lá số của bạn</p><h2 id="wealth-final-title">Xem bản đồ Tài Quan Di với giới hạn rõ ràng</h2><span>Đi từ cung sao đến việc chuẩn bị, rồi tự đối chiếu cùng điều kiện thực tế.</span></div><a href="#wealth-chart-form" className="btn btn-primary btn-large"><Sparkles size={20} aria-hidden="true" /> Lập lá số và xem bản đồ</a></section>
+        <section className="wealth-landing-final" aria-labelledby="wealth-final-title"><div><p>Bắt đầu từ dữ liệu lá số của bạn</p><h2 id="wealth-final-title">Xem bản đồ Tài Quan Di với giới hạn rõ ràng</h2><span>Đi từ cung sao đến việc chuẩn bị, rồi tự đối chiếu cùng điều kiện thực tế.</span></div><a href="#lap-la-so-tai-loc" className="btn btn-primary btn-large"><Sparkles size={20} aria-hidden="true" /> Lập lá số và xem bản đồ</a></section>
       </div>
     </main>
   );

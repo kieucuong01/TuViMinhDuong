@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 
 const pagePath = fileURLToPath(new URL("./page.tsx", import.meta.url));
 const source = existsSync(pagePath) ? readFileSync(pagePath, "utf8") : "";
+const actionsSource = readFileSync(fileURLToPath(new URL("../actions.ts", import.meta.url)), "utf8");
 
 function answerWordCount() {
   const answer = source.match(/data-answer-block="true"[^>]*>([\s\S]*?)<\/p>/)?.[1] ?? "";
@@ -26,6 +27,12 @@ describe("wealth fortune landing page", () => {
     expect(source).toContain('defaultViewYear={2026}');
     expect(source).toContain('role="alert"');
     expect(source).toContain("chartFormErrorMessage");
+  });
+
+  it("matches the wealth chart error redirect anchor", () => {
+    expect(actionsSource).toContain('error: "/tu-vi-tai-loc-dau-tu#lap-la-so-tai-loc"');
+    expect(source).toContain('id="lap-la-so-tai-loc"');
+    expect(source).toContain('href="#lap-la-so-tai-loc"');
   });
 
   it("keeps advisory copy, visible matching FAQs, and a useful internal-link cluster", () => {
