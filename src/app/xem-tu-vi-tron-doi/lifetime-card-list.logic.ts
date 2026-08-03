@@ -23,11 +23,12 @@ export function filterLifetimeCards<T extends LifetimeFilterableCard>(cards: T[]
   const normalizedQuery = normalizeLifetimeFilter(query);
   if (!normalizedQuery) return cards;
 
-  return cards.filter((item) =>
-    normalizeLifetimeFilter(`${item.title} ${item.year} ${item.canChi} ${item.gender}`).includes(
-      normalizedQuery,
-    ),
-  );
+  const queryTerms = normalizedQuery.split(/\s+/).filter(Boolean);
+
+  return cards.filter((item) => {
+    const searchableText = normalizeLifetimeFilter(`${item.title} ${item.year} ${item.canChi} ${item.gender}`);
+    return queryTerms.every((term) => searchableText.includes(term));
+  });
 }
 
 export function parseLifetimePage(value: string | null, totalPages: number) {

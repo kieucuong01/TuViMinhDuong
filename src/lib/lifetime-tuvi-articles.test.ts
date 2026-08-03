@@ -8,11 +8,13 @@ import {
   adultExpansionLifetimeArticleSlugs,
   historicalLifetimeAgeArticleInputs,
   historicalLifetimeArticleSlugs,
+  lifetimeContentUpdatedAt,
 } from "@/lib/lifetime-age-data";
 
 vi.mock("server-only", () => ({}));
 
 const contentSource = readFileSync("src/lib/content.ts", "utf8");
+const lifetimeHubSource = readFileSync("src/app/xem-tu-vi-tron-doi/page.tsx", "utf8");
 const lifetimeArticleRouteSource = readFileSync("src/app/xem-tu-vi-tron-doi/[slug]/page.tsx", "utf8");
 const rootArticleRouteSource = readFileSync("src/app/[slug]/page.tsx", "utf8");
 const knowledgePageSource = readFileSync("src/app/kien-thuc-tu-vi/page.tsx", "utf8");
@@ -71,6 +73,44 @@ describe("lifetime Tu vi SEO article cluster", () => {
       const inputsForYear = seedArticles.filter((item) => item.slug.startsWith("tu-vi-tron-doi-tuoi-") && item.slug.includes(`-${year}-`));
       expect(inputsForYear.map((item) => item.slug.endsWith("nam-mang") ? "nam mạng" : "nữ mạng").sort()).toEqual(["nam mạng", "nữ mạng"]);
     }
+  });
+
+  it("publishes complete 1986-1989 coverage with the release content date", () => {
+    for (let year = 1986; year <= 1989; year += 1) {
+      const inputsForYear = adultExpansionLifetimeAgeArticleInputs.filter((item) => item.year === String(year));
+
+      expect(inputsForYear.map((item) => item.gender).sort()).toEqual(["nam mạng", "nữ mạng"]);
+      expect(inputsForYear.every((item) => item.contentDate === "2026-08-03")).toBe(true);
+      expect(inputsForYear.every((item) => item.siblingLink?.href.includes(`-${year}-`))).toBe(true);
+      expect(inputsForYear.every((input) => seedArticles.some((articleItem) => articleItem.slug === input.slug))).toBe(true);
+    }
+
+    expect(lifetimeContentUpdatedAt).toBe("2026-08-03");
+  });
+
+  it("uses the real WebP article cover on new lifetime hub cards", () => {
+    const card1986 = lifetimeCards.find(
+      (item) => item.detailsPath?.endsWith("tu-vi-tron-doi-tuoi-binh-dan-1986-nam-mang"),
+    );
+
+    expect(card1986?.coverImage).toBe(
+      "/articles/tu-vi-tron-doi-tuoi-binh-dan-1986-nam-mang.webp",
+    );
+  });
+
+  it("uses each generated lifetime input date as the article publication date", () => {
+    const article1988 = seedArticles.find(
+      (item) => item.slug === "tu-vi-tron-doi-tuoi-mau-thin-1988-nam-mang",
+    );
+
+    expect(article1988?.publishedAt?.toISOString()).toBe("2026-08-02T17:00:00.000Z");
+    expect(article1988?.updatedAt?.toISOString()).toBe("2026-08-02T17:00:00.000Z");
+  });
+
+  it("keeps the hub label and sitemap synchronized with lifetime content data", () => {
+    expect(lifetimeHubSource).toContain(".format(lifetimeContentUpdatedAtDate)");
+    expect(lifetimeHubSource).not.toContain('const updatedAt = "23/07/2026"');
+    expect(sitemapSource).toContain("lifetime: lifetimeContentUpdatedAtDate");
   });
 
   it("exposes the historical lifetime articles through lifetime section static params", async () => {

@@ -6,10 +6,11 @@ import { AGE_TOOL_PAGES } from "@/lib/age-tools";
 import { SUPPORT_STARS } from "@/lib/pseo-registry";
 import { articlePath } from "@/lib/article-path";
 import { isSelfCanonicalArticle, robotsAllowsIndex } from "@/lib/seo";
+import { lifetimeContentUpdatedAtDate } from "@/lib/lifetime-age-data";
 
 const LAST_MODIFIED = {
   home: new Date("2026-07-16T00:00:00+07:00"),
-  lifetime: new Date("2026-07-28T00:00:00+07:00"),
+  lifetime: lifetimeContentUpdatedAtDate,
   knowledge: new Date("2026-07-30T00:00:00+07:00"),
   dateTools: new Date("2026-07-28T00:00:00+07:00"),
   ageTools: new Date("2026-07-28T00:00:00+07:00"),

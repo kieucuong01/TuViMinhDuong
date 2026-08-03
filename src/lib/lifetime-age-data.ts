@@ -23,6 +23,7 @@ export type HistoricalLifetimeArticleInput = {
   stages: [string, string][];
   advice: string;
   siblingLink?: { href: string; label: string };
+  contentDate: string;
 };
 
 export type HistoricalLifetimeCard = {
@@ -46,7 +47,10 @@ type YearRow = {
   element: ElementName;
   can: string;
   chi: string;
+  contentDate?: string;
 };
+
+const INITIAL_LIFETIME_CONTENT_DATE = "2026-07-22";
 
 const years: YearRow[] = [
   { year: 1940, canChi: "Canh Thìn", slugCanChi: "canh-thin", napAm: "Bạch Lạp Kim", element: "Kim", can: "Canh", chi: "Thìn" },
@@ -190,6 +194,7 @@ function buildArticle(row: YearRow, gender: LifetimeGender): HistoricalLifetimeA
       href: `/xem-tu-vi-tron-doi/${slugFor(row, otherGender)}`,
       label: `Tử vi trọn đời tuổi ${row.canChi} ${row.year} ${otherGender}`,
     },
+    contentDate: row.contentDate || INITIAL_LIFETIME_CONTENT_DATE,
   };
 }
 
@@ -227,6 +232,10 @@ const adultExpansionRows: YearRow[] = [
   { year: 1981, canChi: "Tân Dậu", slugCanChi: "tan-dau", napAm: "Thạch Lựu Mộc", element: "Mộc", can: "Tân", chi: "Dậu" },
   { year: 1982, canChi: "Nhâm Tuất", slugCanChi: "nham-tuat", napAm: "Đại Hải Thủy", element: "Thủy", can: "Nhâm", chi: "Tuất" },
   { year: 1983, canChi: "Quý Hợi", slugCanChi: "quy-hoi", napAm: "Đại Hải Thủy", element: "Thủy", can: "Quý", chi: "Hợi" },
+  { year: 1986, canChi: "Bính Dần", slugCanChi: "binh-dan", napAm: "Lư Trung Hỏa", element: "Hỏa", can: "Bính", chi: "Dần", contentDate: "2026-08-03" },
+  { year: 1987, canChi: "Đinh Mão", slugCanChi: "dinh-mao", napAm: "Lư Trung Hỏa", element: "Hỏa", can: "Đinh", chi: "Mão", contentDate: "2026-08-03" },
+  { year: 1988, canChi: "Mậu Thìn", slugCanChi: "mau-thin", napAm: "Đại Lâm Mộc", element: "Mộc", can: "Mậu", chi: "Thìn", contentDate: "2026-08-03" },
+  { year: 1989, canChi: "Kỷ Tỵ", slugCanChi: "ky-ty", napAm: "Đại Lâm Mộc", element: "Mộc", can: "Kỷ", chi: "Tỵ", contentDate: "2026-08-03" },
   { year: 1990, canChi: "Canh Ngọ", slugCanChi: "canh-ngo", napAm: "Lộ Bàng Thổ", element: "Thổ", can: "Canh", chi: "Ngọ" },
 ];
 
@@ -249,3 +258,13 @@ export const adultExpansionLifetimeCards: HistoricalLifetimeCard[] = adultExpans
   family: item.family,
   caution: `${item.health} ${item.riskAges}`,
 }));
+
+export const lifetimeContentUpdatedAt = [
+  ...historicalLifetimeAgeArticleInputs,
+  ...adultExpansionLifetimeAgeArticleInputs,
+].reduce(
+  (latestDate, item) => item.contentDate > latestDate ? item.contentDate : latestDate,
+  INITIAL_LIFETIME_CONTENT_DATE,
+);
+
+export const lifetimeContentUpdatedAtDate = new Date(`${lifetimeContentUpdatedAt}T00:00:00+07:00`);

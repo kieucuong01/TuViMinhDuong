@@ -1,7 +1,11 @@
 import Link from "next/link";
 import { BookOpenText, CalendarDays, Compass, Layers3, Search, Sparkles, UserRound } from "lucide-react";
 import { Suspense } from "react";
-import { adultExpansionLifetimeCards, historicalLifetimeCards } from "@/lib/lifetime-age-data";
+import {
+  adultExpansionLifetimeCards,
+  historicalLifetimeCards,
+  lifetimeContentUpdatedAtDate,
+} from "@/lib/lifetime-age-data";
 import { routeMetadata } from "@/lib/metadata";
 import { faqJsonLd, itemListJsonLd, webPageJsonLd } from "@/lib/seo";
 import { lifetimeTuViArticlePath } from "@/lib/article-path";
@@ -17,7 +21,12 @@ export const metadata = routeMetadata({
   imageSubtitle: "Tử vi trọn đời cho nam nữ theo từng tuổi, năm sinh, can chi và vận hạn",
 });
 
-const updatedAt = "23/07/2026";
+const updatedAt = new Intl.DateTimeFormat("vi-VN", {
+  day: "2-digit",
+  month: "2-digit",
+  year: "numeric",
+  timeZone: "Asia/Ho_Chi_Minh",
+}).format(lifetimeContentUpdatedAtDate);
 
 const readingLayers = [
   {
@@ -228,7 +237,7 @@ export const lifetimeCards: LifetimeCardListItem[] = baseLifetimeCards.map((item
   return {
     ...item,
     detailsPath: detailSlug ? lifetimeTuViArticlePath(detailSlug) : item.detailsPath,
-    coverImage: detailSlug ? `/articles/${detailSlug}.svg` : `/articles/${item.id}.svg`,
+    coverImage: detailSlug ? `/articles/${detailSlug}.webp` : `/articles/${item.id}.svg`,
     coverAlt: `Minh họa ${item.title} theo năm sinh ${item.year} và ${item.gender.toLowerCase()}`,
   };
 });

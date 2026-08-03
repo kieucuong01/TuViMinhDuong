@@ -29,6 +29,13 @@ describe("lifetime card list logic", () => {
     expect(filterLifetimeCards(cards, "   ")).toEqual(cards);
   });
 
+  it("matches all search terms regardless of their order or repeated whitespace", () => {
+    expect(filterLifetimeCards(cards, "nữ 1995")).toEqual([cards[1]]);
+    expect(filterLifetimeCards(cards, "  nữ   1995  ")).toEqual([cards[1]]);
+    expect(filterLifetimeCards(cards, "nam 1969 dậu")).toEqual([cards[0]]);
+    expect(filterLifetimeCards(cards, "nữ 1969")).toEqual([]);
+  });
+
   it("parses and clamps URL page state", () => {
     expect(parseLifetimePage(null, 14)).toBe(1);
     expect(parseLifetimePage("-3", 14)).toBe(1);

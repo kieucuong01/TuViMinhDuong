@@ -608,6 +608,7 @@ type LifetimeAgeArticleInput = {
   stages: [string, string][];
   advice: string;
   siblingLink?: { href: string; label: string };
+  contentDate?: string;
 };
 
 function lifetimeAgeArticle(input: LifetimeAgeArticleInput): ArticleView {
@@ -624,7 +625,7 @@ function lifetimeAgeArticle(input: LifetimeAgeArticleInput): ArticleView {
     metaTitle: input.title,
     metaDescription: `Xem ${input.title}: tổng quan đời sống, công việc, tiền bạc, tình cảm, sức khỏe và bảng giai đoạn để tham khảo trước khi lập lá số.`,
     canonicalUrl: `/xem-tu-vi-tron-doi/${input.slug}`,
-    date: "2026-07-22",
+    date: input.contentDate || "2026-07-22",
     faqs: [
       {
         question: `${input.title} có cần giờ sinh không?`,
