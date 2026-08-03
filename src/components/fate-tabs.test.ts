@@ -1,5 +1,7 @@
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
+import { createElement } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 
 const fateTabsSource = readFileSync(fileURLToPath(new URL("./fate-tabs.tsx", import.meta.url)), "utf8");
@@ -29,6 +31,19 @@ describe("fate tabs", () => {
     expect(fateTabsSource).toContain("visibleViews.includes(tab.key)");
     expect(chartPageSource).toContain('["la-so", "tai-loc"]');
     expect(chartPageSource).toContain('activeView === "tai-loc"');
+  });
+
+  it("exposes the active fate tab as the current page", async () => {
+    const { FateTabs } = await import("./fate-tabs");
+
+    const html = renderToStaticMarkup(createElement(FateTabs, {
+      chartId: "chart-1",
+      active: "tai-loc",
+      visibleViews: ["la-so", "tai-loc"],
+    }));
+
+    expect((html.match(/aria-current="page"/g) ?? [])).toHaveLength(1);
+    expect(html).toMatch(/<a(?=[^>]*href="\/la-so\/chart-1\?view=tai-loc")(?=[^>]*aria-current="page")[^>]*>Tài lộc<\/a>/);
   });
 
   it("binds a requested advanced reading to the chart in the current route", () => {

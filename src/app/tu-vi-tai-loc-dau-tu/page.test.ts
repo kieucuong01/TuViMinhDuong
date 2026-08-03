@@ -49,6 +49,15 @@ describe("wealth fortune landing page", () => {
     expect(styles).toMatch(/@media \(max-width: 520px\) \{[\s\S]*?\.wealth-landing-form \.chart-birth-field \.birth-date-grid \{[^}]*grid-template-columns: repeat\(2, minmax\(0, 1fr\)\);/);
   });
 
+  it("keeps the wealth form helper readable without changing shared chart forms", () => {
+    expect(styles).toMatch(/\.wealth-landing-form \.chart-form > p\.text-sm \{[^}]*font-size: 1rem;/);
+  });
+
+  it("describes the implemented yearly signal layer without claiming broad fortune-cycle scoring", () => {
+    expect(source).toContain("lưu tinh theo năm tại Tài–Quan–Di");
+    expect(source).not.toContain("vận hạn");
+  });
+
   it("shows the update date, author, and editorial policy required by the content contract", () => {
     expect(source).toContain('<time dateTime="2026-08-03">');
     expect(source).toContain('href="/tac-gia"');

@@ -104,7 +104,7 @@ export default async function WealthFortuneLandingPage({ searchParams }: { searc
         </section>
 
         <section className="wealth-landing-section wealth-landing-method" aria-labelledby="wealth-method-title">
-          <div className="wealth-landing-section-heading"><p>Phương pháp chấm</p><h2 id="wealth-method-title">Biểu đồ tổng hợp tín hiệu, không thay việc tự quyết</h2><span>Mỗi năm được đọc từ nền cung sao, vận hạn và mối liên hệ giữa Tài–Quan–Di để làm rõ trọng tâm chuẩn bị.</span></div>
+          <div className="wealth-landing-section-heading"><p>Phương pháp chấm</p><h2 id="wealth-method-title">Biểu đồ tổng hợp tín hiệu, không thay việc tự quyết</h2><span>Mỗi năm được đọc từ nền cung sao, lưu tinh theo năm tại Tài–Quan–Di và mối liên hệ giữa ba cung để làm rõ trọng tâm chuẩn bị.</span></div>
           <div className="wealth-landing-table-wrap"><table><thead><tr><th scope="col">Lớp đọc</th><th scope="col">Bạn nhận được</th><th scope="col">Cách dùng an toàn</th></tr></thead><tbody><tr><th scope="row">Tài Bạch</th><td>Điểm cần ưu tiên khi tạo và quản trị nguồn lực</td><td>Đặt cạnh thu nhập, chi tiêu và mục tiêu thật của bạn</td></tr><tr><th scope="row">Quan Lộc</th><td>Gợi ý về công việc, trách nhiệm và năng lực cần bồi dưỡng</td><td>Chia thành kế hoạch học hỏi hoặc hoàn thiện quy trình</td></tr><tr><th scope="row">Thiên Di</th><td>Bối cảnh hợp tác, môi trường và thay đổi bên ngoài</td><td>Kiểm chứng bằng thông tin thực tế trước mọi cam kết</td></tr></tbody></table></div>
         </section>
 

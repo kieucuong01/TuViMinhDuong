@@ -14710,6 +14710,13 @@ button.is-loading:not(.icon-button)::before {
   font-weight: 700;
 }
 
+@media (max-width: 520px) {
+  .wealth-trend-score,
+  .wealth-trend-year {
+    font-size: 28px;
+  }
+}
+
 .wealth-trend-figure figcaption {
   margin-top: 0.65rem;
   color: #57534e;
@@ -15859,6 +15866,10 @@ button.is-loading:not(.icon-button)::before {
 
 .wealth-landing-form .chart-form {
   gap: 1rem;
+}
+
+.wealth-landing-form .chart-form > p.text-sm {
+  font-size: 1rem;
 }
 
 .wealth-landing-form .chart-form .btn {

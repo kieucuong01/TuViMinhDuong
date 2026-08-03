@@ -121,4 +121,8 @@ describe("WealthFortuneView", () => {
     expect(wealthStyles).toMatch(/\.wealth-disclaimer \{[^}]*font-size: 1rem;/);
     expect(wealthStyles).toMatch(/\.wealth-decision-list \{[^}]*font-size: 1rem;/);
   });
+
+  it("scales SVG score and year labels for a readable mobile rendered size", () => {
+    expect(wealthStyles).toMatch(/@media \(max-width: 520px\) \{[\s\S]*?\.wealth-trend-score,[\s\S]*?\.wealth-trend-year \{[^}]*font-size: 28px;/);
+  });
 });
