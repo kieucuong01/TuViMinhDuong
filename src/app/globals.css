@@ -14611,10 +14611,20 @@ button.is-loading:not(.icon-button)::before {
 
 .wealth-pillar-card strong {
   display: block;
-  margin-top: 0.6rem;
+  margin-top: 0.3rem;
   color: #c2410c;
   font-size: 1.65rem;
   line-height: 1;
+}
+
+.wealth-pillar-score-label {
+  display: block;
+  margin-top: 0.7rem;
+  color: #9a3412;
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
 .wealth-pillar-card p,
@@ -14622,7 +14632,7 @@ button.is-loading:not(.icon-button)::before {
 .wealth-action-list p {
   margin-top: 0.55rem;
   color: #57534e;
-  font-size: 0.96rem;
+  font-size: 1rem;
   line-height: 1.65;
 }
 
@@ -14668,7 +14678,7 @@ button.is-loading:not(.icon-button)::before {
 .wealth-trend-figure figcaption {
   margin-top: 0.65rem;
   color: #57534e;
-  font-size: 0.9rem;
+  font-size: 1rem;
   line-height: 1.55;
 }
 
@@ -14683,7 +14693,7 @@ button.is-loading:not(.icon-button)::before {
 .wealth-trend-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.92rem;
+  font-size: 1rem;
 }
 
 .wealth-trend-table caption {
@@ -14741,7 +14751,7 @@ button.is-loading:not(.icon-button)::before {
   background: #fffbeb;
   padding: 0.85rem 1rem;
   color: #57534e;
-  font-size: 0.92rem;
+  font-size: 1rem;
   line-height: 1.6;
 }
 

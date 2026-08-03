@@ -95,6 +95,7 @@ export function WealthFortuneView({ chartId, chart }: WealthFortuneViewProps) {
         {report.pillars.map((pillar) => (
           <article className="wealth-pillar-card" key={pillar.key}>
             <h2>{pillar.label}</h2>
+            <span className="wealth-pillar-score-label">Chỉ số định hướng</span>
             <strong>{pillar.score}/100</strong>
             <p>{pillar.summary}</p>
           </article>
