@@ -40,12 +40,14 @@ export function selectStableVariant<T>(variants: NarrativeVariant<T>[], seed: st
 export class NarrativeLedger {
   readonly openingFamilies = new Set<string>();
   readonly transitions = new Set<string>();
+  readonly closingFamilies = new Set<string>();
   readonly normalizedSentences = new Set<string>();
   readonly profileTraitsByPerson = new Map<string, Set<NarrativeTrait>>();
   readonly profileTraitTheme = new Map<NarrativeTrait, CompatibilityNarrativeThemeKey>();
 }
 
 export type ThemeNarrative = {
+  prose: string;
   summary: string;
   whyItMatters: string;
   possibleExpression: string;
@@ -64,6 +66,12 @@ export type NarrativeUniquenessAudit = {
 };
 
 type NarrativeWriter = (context: NarrativeContext) => string;
+
+type ProseComposerInput = Pick<ThemeNarrative, "summary" | "whyItMatters" | "possibleExpression" | "actions" | "questions"> & {
+  context: NarrativeContext;
+};
+
+type ProseClosingWriter = (input: ProseComposerInput, question: string) => string;
 
 type ThemeNarrativeStrategy = {
   openings: Record<InteractionKind, NarrativeVariant<NarrativeWriter>[]>;
@@ -297,6 +305,97 @@ const THEME_STRATEGIES: Record<CompatibilityNarrativeThemeKey, ThemeNarrativeStr
   },
 };
 
+const PROSE_CLOSINGS: Record<CompatibilityNarrativeThemeKey, NarrativeVariant<ProseClosingWriter>[]> = {
+  temperament: [
+    {
+      family: "temperament-gentle-experiment",
+      value: ({ actions }, question) => `Nếu phần này gần với trải nghiệm của hai người, điều đáng thử trước không cần quá lớn: ${actionAsClause(actions[0])}; đồng thời ${actionAsClause(actions[1])}. Có lẽ câu hỏi nên được giữ lại sau cùng là: ${question}`,
+    },
+    {
+      family: "temperament-own-rhythm",
+      value: ({ actions }, question) => `Thay vì buộc nhau phản ứng giống nhau, hai người có thể bắt đầu bằng việc ${actionAsClause(actions[0])}; rồi ${actionAsClause(actions[1])}. Khi đã bình tĩnh hơn, hãy cùng tự hỏi: ${question}`,
+    },
+  ],
+  communication: [
+    {
+      family: "communication-next-conversation",
+      value: ({ actions }, question) => `Trước cuộc trò chuyện kế tiếp, có lẽ hữu ích hơn cả là ${actionAsClause(actions[0])}; sau đó ${actionAsClause(actions[1])}. Thay vì cố tìm người nói đúng hơn, hai người có thể cùng nghĩ về câu hỏi này: ${question}`,
+    },
+    {
+      family: "communication-more-air",
+      value: ({ actions }, question) => `Một thay đổi nhỏ trong cách nói có thể mở ra nhiều khoảng thở: ${actionAsClause(actions[0])}; và ${actionAsClause(actions[1])}. Điều đáng hỏi nhau trước khi khép lại câu chuyện là: ${question}`,
+    },
+  ],
+  commitment: [
+    {
+      family: "commitment-felt-care",
+      value: ({ actions }, question) => `Để sự quan tâm trở thành điều người kia thật sự cảm nhận được, hai người có thể ${actionAsClause(actions[0])}; rồi ${actionAsClause(actions[1])}. Sau cùng, điều đáng ngồi lại với nhau là: ${question}`,
+    },
+    {
+      family: "commitment-small-proof",
+      value: ({ actions }, question) => `Hai người không cần chứng minh bằng một lời hứa lớn; có thể thử ${actionAsClause(actions[0])}; đồng thời ${actionAsClause(actions[1])}. Rồi cùng nhìn lại: ${question}`,
+    },
+  ],
+  finance: [
+    {
+      family: "finance-safe-next-step",
+      value: ({ actions }, question) => `Với tiền bạc, bước an toàn và thực tế nhất lúc này là ${actionAsClause(actions[0])}; kế đến ${actionAsClause(actions[1])}. Trước khi chốt một quyết định chung, hãy cùng trả lời: ${question}`,
+    },
+    {
+      family: "finance-real-numbers",
+      value: ({ actions }, question) => `Không cần giải quyết mọi khác biệt trong một lần; trước hết ${actionAsClause(actions[0])}; tiếp đó ${actionAsClause(actions[1])}. Câu hỏi cần có những con số thật để trả lời là: ${question}`,
+    },
+  ],
+  work: [
+    {
+      family: "work-lighter-handoff",
+      value: ({ actions }, question) => `Nếu muốn phối hợp nhẹ hơn, hai người có thể ${actionAsClause(actions[0])}; và ${actionAsClause(actions[1])}. Trước đầu việc kế tiếp, nên thống nhất câu trả lời cho: ${question}`,
+    },
+    {
+      family: "work-different-strengths",
+      value: ({ actions }, question) => `Điều đáng thử không phải là làm giống nhau, mà là ${actionAsClause(actions[0])}; rồi ${actionAsClause(actions[1])}. Sau một vòng công việc, hãy cùng nhìn lại: ${question}`,
+    },
+  ],
+  family: [
+    {
+      family: "family-visible-care",
+      value: ({ actions }, question) => `Để đời sống chung bớt dựa vào sự tự hiểu, hai người có thể ${actionAsClause(actions[0])}; đồng thời ${actionAsClause(actions[1])}. Trước một mốc mới, nên cùng tự hỏi: ${question}`,
+    },
+    {
+      family: "family-concrete-home",
+      value: ({ actions }, question) => `Một mái nhà dễ chịu thường bắt đầu từ những việc rất cụ thể: ${actionAsClause(actions[0])}; và ${actionAsClause(actions[1])}. Điều đáng bàn khi cả hai còn bình tĩnh là: ${question}`,
+    },
+  ],
+};
+
+function actionAsClause(value: string) {
+  const trimmed = value.trim().replace(/[.!?]+$/u, "");
+  if (!trimmed) return trimmed;
+  return `${trimmed[0].toLocaleLowerCase("vi")}${trimmed.slice(1)}`;
+}
+
+function withQuestionMark(value: string) {
+  const trimmed = value.trim();
+  return trimmed.endsWith("?") ? trimmed : `${trimmed.replace(/[.!]+$/u, "")}?`;
+}
+
+function composeThemeProse(input: ProseComposerInput, ledger: NarrativeLedger) {
+  const { context } = input;
+  const questionIndex = stableHash(`${context.seed}:${context.key}:question`) % input.questions.length;
+  const question = withQuestionMark(input.questions[questionIndex]);
+  const closing = selectStableVariant(
+    PROSE_CLOSINGS[context.key],
+    `${context.seed}:${context.key}:closing`,
+    ledger.closingFamilies,
+  );
+  ledger.closingFamilies.add(closing.family);
+
+  return [input.summary, input.whyItMatters, input.possibleExpression, closing.value(input, question)]
+    .join(" ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
 function baseForContrast(first: NarrativeProfile, second: NarrativeProfile): NarrativeContext {
   return {
     key: "communication",
@@ -385,13 +484,27 @@ export function buildThemeNarrative(context: NarrativeContext, ledger: Narrative
   const strategy = THEME_STRATEGIES[context.key];
   const opening = chooseWriter(strategy.openings[context.interaction], `${context.seed}:${context.key}:opening`, ledger.openingFamilies, context);
   const scene = chooseWriter(strategy.scenes[context.level], `${context.seed}:${context.key}:scene`, ledger.transitions, context);
+  const summary = `${opening.text} ${strategy.summaryBridge(context)}`;
+  const whyItMatters = strategy.whyItMatters(context);
+  const possibleExpression = scene.text;
+  const actions = strategy.actions[context.level].map((writer) => writer(context)).slice(0, 2);
+  const questions = strategy.questions[context.level].map((writer) => writer(context)).slice(0, 2);
+  const prose = composeThemeProse({
+    context,
+    summary,
+    whyItMatters,
+    possibleExpression,
+    actions,
+    questions,
+  }, ledger);
 
   return {
-    summary: `${opening.text} ${strategy.summaryBridge(context)}`,
-    whyItMatters: strategy.whyItMatters(context),
-    possibleExpression: scene.text,
-    actions: strategy.actions[context.level].map((writer) => writer(context)).slice(0, 2),
-    questions: strategy.questions[context.level].map((writer) => writer(context)).slice(0, 2),
+    prose,
+    summary,
+    whyItMatters,
+    possibleExpression,
+    actions,
+    questions,
     openingFamily: opening.family,
     sceneFamily: scene.family,
   };

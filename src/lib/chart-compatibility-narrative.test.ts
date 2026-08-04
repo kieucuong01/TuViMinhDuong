@@ -83,6 +83,24 @@ describe("topic-specific compatibility narratives", () => {
     expect(result.actions).toHaveLength(2);
     expect(result.questions).toHaveLength(2);
   });
+
+  it("composes one complete prose reading with guidance and a reflective close", () => {
+    const result = buildThemeNarrative(makeContext("communication"), new NarrativeLedger());
+
+    expect(result.prose.length).toBeGreaterThan(700);
+    expect(result.prose.length).toBeLessThan(1_800);
+    expect(result.prose).toContain("Minh");
+    expect(result.prose).toContain("An");
+    expect(result.prose).toMatch(/\?$/);
+    expect(result.prose).not.toMatch(/Góc nhìn chính|Khi đi vào đời sống|Việc hai người có thể thử|Câu hỏi nên trao đổi/);
+  });
+
+  it("keeps prose stable for identical chart context", () => {
+    const first = buildThemeNarrative(makeContext("finance"), new NarrativeLedger()).prose;
+    const second = buildThemeNarrative(makeContext("finance"), new NarrativeLedger()).prose;
+
+    expect(second).toBe(first);
+  });
 });
 
 describe("report-wide narrative uniqueness", () => {
