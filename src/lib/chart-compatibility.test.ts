@@ -21,6 +21,7 @@ describe("two-chart compatibility report", () => {
     ]);
     expect(report.themes.every((theme) => theme.summary.length > 120)).toBe(true);
     expect(report.themes.every((theme) => theme.possibleExpression.length > 100)).toBe(true);
+    expect(report.themes.every((theme) => theme.prose.length > 700 && theme.prose.length < 1_800)).toBe(true);
     expect(report.themes.every((theme) => theme.actions.length >= 2)).toBe(true);
     expect(report.themes.every((theme) => theme.questions.length >= 2)).toBe(true);
   });
@@ -90,6 +91,7 @@ describe("two-chart compatibility report", () => {
     });
     expect(report.themes.every((theme) => theme.summary.length >= 120)).toBe(true);
     expect(report.themes.every((theme) => theme.possibleExpression.length >= 100)).toBe(true);
+    expect(report.themes.every((theme) => theme.prose.length > 700 && theme.prose.length < 1_800)).toBe(true);
     expect(buildChartCompatibilityReport(firstInput, secondInput)).toEqual(report);
   });
 

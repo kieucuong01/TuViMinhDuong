@@ -16604,8 +16604,6 @@ button.is-loading:not(.icon-button)::before {
 }
 
 .compatibility-overview > p,
-.compatibility-theme-summary,
-.compatibility-reading-layer p,
 .compatibility-next-conversation li,
 .compatibility-method-note p {
   color: #57534e;
@@ -16614,24 +16612,19 @@ button.is-loading:not(.icon-button)::before {
 }
 
 .compatibility-overview-columns,
-.compatibility-guidance-grid,
 .compatibility-method-note {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0.9rem;
 }
 
-.compatibility-overview-columns > div,
-.compatibility-guidance-grid > div,
-.compatibility-reading-layer {
+.compatibility-overview-columns > div {
   border-radius: 1rem;
   background: rgba(255, 255, 255, 0.78);
   padding: 0.9rem 1rem;
 }
 
 .compatibility-overview-columns h4,
-.compatibility-reading-layer h5,
-.compatibility-guidance-grid h5,
 .compatibility-evidence h5 {
   margin: 0 0 0.45rem;
   color: #44403c;
@@ -16639,7 +16632,6 @@ button.is-loading:not(.icon-button)::before {
 }
 
 .compatibility-overview-columns ul,
-.compatibility-guidance-grid ul,
 .compatibility-evidence ul,
 .compatibility-next-conversation ol {
   margin: 0;
@@ -16680,13 +16672,15 @@ button.is-loading:not(.icon-button)::before {
 }
 
 .compatibility-theme-level { margin: 0; }
-.compatibility-reading-layer { margin-top: 0.75rem; background: #fafaf9; }
-.compatibility-reading-layer.is-primary { border-left: 3px solid #d6a15b; }
-.compatibility-reading-layer.is-scene { border-left: 3px solid #8ca58a; background: #f7faf7; }
-.compatibility-reading-layer p { margin: 0; }
-.compatibility-guidance-grid { margin-top: 0.75rem; }
-.compatibility-guidance-grid > div:first-child { background: #f0fdf4; }
-.compatibility-guidance-grid > div:last-child { background: #fff7ed; }
+
+.compatibility-theme-prose {
+  max-width: 72ch;
+  margin: 1rem 0 0;
+  color: #3f3a35;
+  font-size: 1.02rem;
+  line-height: 1.78;
+  text-wrap: pretty;
+}
 
 .compatibility-evidence {
   margin-top: 0.9rem;
@@ -16753,7 +16747,6 @@ button.is-loading:not(.icon-button)::before {
   .compatibility-report-heading,
   .compatibility-report-cta { align-items: stretch; flex-direction: column; }
   .compatibility-overview-columns,
-  .compatibility-guidance-grid,
   .compatibility-method-note,
   .compatibility-evidence > div { grid-template-columns: 1fr; }
   .compatibility-report-cta .btn { width: 100%; }

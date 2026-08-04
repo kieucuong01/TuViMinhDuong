@@ -18,19 +18,22 @@ describe("two-chart compatibility tool", () => {
   it("renders a useful report hierarchy instead of a single compatibility score", () => {
     expect(toolSource).toContain("Bức tranh chung");
     expect(toolSource).toContain("Sáu chủ đề cần đối chiếu");
-    expect(toolSource).toContain("Góc nhìn chính");
-    expect(toolSource).toContain("Khi đi vào đời sống");
-    expect(toolSource).toContain("Việc hai người có thể thử");
-    expect(toolSource).toContain("Câu hỏi nên trao đổi");
     expect(toolSource).toContain("Căn cứ từ hai lá số");
+    expect(toolSource).toContain('className="compatibility-theme-prose"');
+    expect(toolSource).toContain("{theme.prose}");
+    expect(toolSource).not.toContain("Góc nhìn chính");
+    expect(toolSource).not.toContain("Khi đi vào đời sống");
+    expect(toolSource).not.toContain("Việc hai người có thể thử");
+    expect(toolSource).not.toContain("Câu hỏi nên trao đổi");
     expect(toolSource).not.toMatch(/\/\s*100|điểm tương hợp/i);
   });
 
   it("uses plain editorial labels instead of mechanical explanation prompts", () => {
     expect(toolSource).not.toContain("Vì sao có nhận định này?");
     expect(toolSource).not.toContain("Biểu hiện có thể gặp");
-    expect(toolSource).toContain("compatibility-reading-layer is-primary");
-    expect(toolSource).toContain("compatibility-reading-layer is-scene");
+    expect(toolSource).not.toContain("compatibility-reading-layer");
+    expect(toolSource).not.toContain("compatibility-guidance-grid");
+    expect(globalsCss).toMatch(/\.compatibility-theme-prose\s*{[\s\S]*max-width:\s*72ch[\s\S]*font-size:\s*1\.02rem[\s\S]*line-height:\s*1\.78/);
   });
 
   it("announces errors and moves focus to the generated result", () => {

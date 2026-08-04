@@ -21,6 +21,7 @@ export type ChartCompatibilityTheme = {
   title: string;
   level: CompatibilityLevel;
   levelLabel: string;
+  prose: string;
   summary: string;
   whyItMatters: string;
   possibleExpression: string;
@@ -440,6 +441,7 @@ function themeReport(
     title: config.title,
     level,
     levelLabel: LEVEL_LABELS[level],
+    prose: narrative.prose,
     summary: narrative.summary,
     whyItMatters: narrative.whyItMatters,
     possibleExpression: narrative.possibleExpression,

@@ -133,19 +133,13 @@ function CompatibilityReportView({ report, onEdit }: { report: ChartCompatibilit
         <div className="compatibility-section-title"><p>Luận giải theo từng lớp</p><h3 id="compatibility-themes-title">Sáu chủ đề cần đối chiếu</h3><span>Đọc phần gần với câu hỏi thật của hai người trước, rồi mở căn cứ cung sao khi muốn kiểm tra sâu hơn.</span></div>
         <div className="compatibility-theme-list">
           {report.themes.map((theme, index) => (
-            <article key={theme.key} className={`compatibility-theme level-${theme.level}`}>
-              <header><span>{String(index + 1).padStart(2, "0")}</span><div><h4>{theme.title}</h4><p className="compatibility-theme-level">{levelIcon(theme.level)} {theme.levelLabel}</p></div></header>
-              <p className="compatibility-theme-summary">{theme.summary}</p>
-              <div className="compatibility-reading-layer is-primary"><h5>Góc nhìn chính</h5><p>{theme.whyItMatters}</p></div>
-              <div className="compatibility-reading-layer is-scene"><h5>Khi đi vào đời sống</h5><p>{theme.possibleExpression}</p></div>
-              <div className="compatibility-guidance-grid">
-                <div><h5>Việc hai người có thể thử</h5><ul>{theme.actions.map((action) => <li key={action}>{action}</li>)}</ul></div>
-                <div><h5>Câu hỏi nên trao đổi</h5><ul>{theme.questions.map((question) => <li key={question}>{question}</li>)}</ul></div>
-              </div>
-              <details className="compatibility-evidence">
-                <summary>Căn cứ từ hai lá số</summary>
-                <div>{theme.evidence.map((evidence) => <section key={evidence.personName}><h5>{evidence.personName}</h5><ul>{evidence.details.map((detail) => <li key={detail}>{detail}</li>)}</ul></section>)}</div>
-              </details>
+              <article key={theme.key} className={`compatibility-theme level-${theme.level}`}>
+                <header><span>{String(index + 1).padStart(2, "0")}</span><div><h4>{theme.title}</h4><p className="compatibility-theme-level">{levelIcon(theme.level)} {theme.levelLabel}</p></div></header>
+                <p className="compatibility-theme-prose">{theme.prose}</p>
+                <details className="compatibility-evidence">
+                  <summary>Căn cứ từ hai lá số</summary>
+                  <div>{theme.evidence.map((evidence) => <section key={evidence.personName}><h5>{evidence.personName}</h5><ul>{evidence.details.map((detail) => <li key={detail}>{detail}</li>)}</ul></section>)}</div>
+                </details>
             </article>
           ))}
         </div>

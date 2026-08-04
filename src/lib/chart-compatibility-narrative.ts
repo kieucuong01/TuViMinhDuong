@@ -57,7 +57,7 @@ export type ThemeNarrative = {
   sceneFamily: string;
 };
 
-export type NarrativeTextBlock = Pick<ThemeNarrative, "summary" | "whyItMatters" | "possibleExpression">;
+export type NarrativeTextBlock = Pick<ThemeNarrative, "prose">;
 
 export type NarrativeUniquenessAudit = {
   duplicateSentences: string[];
@@ -309,68 +309,70 @@ const PROSE_CLOSINGS: Record<CompatibilityNarrativeThemeKey, NarrativeVariant<Pr
   temperament: [
     {
       family: "temperament-gentle-experiment",
-      value: ({ actions }, question) => `Nếu phần này gần với trải nghiệm của hai người, điều đáng thử trước không cần quá lớn: ${actionAsClause(actions[0])}; đồng thời ${actionAsClause(actions[1])}. Có lẽ câu hỏi nên được giữ lại sau cùng là: ${question}`,
+      value: ({ actions, context }, question) => `Nếu phần này gần với trải nghiệm của hai người, điều đáng thử trước không cần quá lớn: ${actionAsClause(actions[0], context)}; đồng thời ${actionAsClause(actions[1], context)}. Có lẽ câu hỏi nên được giữ lại sau cùng là: ${question}`,
     },
     {
       family: "temperament-own-rhythm",
-      value: ({ actions }, question) => `Thay vì buộc nhau phản ứng giống nhau, hai người có thể bắt đầu bằng việc ${actionAsClause(actions[0])}; rồi ${actionAsClause(actions[1])}. Khi đã bình tĩnh hơn, hãy cùng tự hỏi: ${question}`,
+      value: ({ actions, context }, question) => `Thay vì buộc nhau phản ứng giống nhau, hai người có thể bắt đầu bằng việc ${actionAsClause(actions[0], context)}; rồi ${actionAsClause(actions[1], context)}. Khi đã bình tĩnh hơn, hãy cùng tự hỏi: ${question}`,
     },
   ],
   communication: [
     {
       family: "communication-next-conversation",
-      value: ({ actions }, question) => `Trước cuộc trò chuyện kế tiếp, có lẽ hữu ích hơn cả là ${actionAsClause(actions[0])}; sau đó ${actionAsClause(actions[1])}. Thay vì cố tìm người nói đúng hơn, hai người có thể cùng nghĩ về câu hỏi này: ${question}`,
+      value: ({ actions, context }, question) => `Trước cuộc trò chuyện kế tiếp, có lẽ hữu ích hơn cả là ${actionAsClause(actions[0], context)}; sau đó ${actionAsClause(actions[1], context)}. Thay vì cố tìm người nói đúng hơn, hai người có thể cùng nghĩ về câu hỏi này: ${question}`,
     },
     {
       family: "communication-more-air",
-      value: ({ actions }, question) => `Một thay đổi nhỏ trong cách nói có thể mở ra nhiều khoảng thở: ${actionAsClause(actions[0])}; và ${actionAsClause(actions[1])}. Điều đáng hỏi nhau trước khi khép lại câu chuyện là: ${question}`,
+      value: ({ actions, context }, question) => `Một thay đổi nhỏ trong cách nói có thể mở ra nhiều khoảng thở: ${actionAsClause(actions[0], context)}; và ${actionAsClause(actions[1], context)}. Điều đáng hỏi nhau trước khi khép lại câu chuyện là: ${question}`,
     },
   ],
   commitment: [
     {
       family: "commitment-felt-care",
-      value: ({ actions }, question) => `Để sự quan tâm trở thành điều người kia thật sự cảm nhận được, hai người có thể ${actionAsClause(actions[0])}; rồi ${actionAsClause(actions[1])}. Sau cùng, điều đáng ngồi lại với nhau là: ${question}`,
+      value: ({ actions, context }, question) => `Để sự quan tâm trở thành điều người kia thật sự cảm nhận được, hai người có thể ${actionAsClause(actions[0], context)}; rồi ${actionAsClause(actions[1], context)}. Sau cùng, điều đáng ngồi lại với nhau là: ${question}`,
     },
     {
       family: "commitment-small-proof",
-      value: ({ actions }, question) => `Hai người không cần chứng minh bằng một lời hứa lớn; có thể thử ${actionAsClause(actions[0])}; đồng thời ${actionAsClause(actions[1])}. Rồi cùng nhìn lại: ${question}`,
+      value: ({ actions, context }, question) => `Hai người không cần chứng minh bằng một lời hứa lớn; có thể thử ${actionAsClause(actions[0], context)}; đồng thời ${actionAsClause(actions[1], context)}. Rồi cùng nhìn lại: ${question}`,
     },
   ],
   finance: [
     {
       family: "finance-safe-next-step",
-      value: ({ actions }, question) => `Với tiền bạc, bước an toàn và thực tế nhất lúc này là ${actionAsClause(actions[0])}; kế đến ${actionAsClause(actions[1])}. Trước khi chốt một quyết định chung, hãy cùng trả lời: ${question}`,
+      value: ({ actions, context }, question) => `Với tiền bạc, bước an toàn và thực tế nhất lúc này là ${actionAsClause(actions[0], context)}; kế đến ${actionAsClause(actions[1], context)}. Trước khi chốt một quyết định chung, hãy cùng trả lời: ${question}`,
     },
     {
       family: "finance-real-numbers",
-      value: ({ actions }, question) => `Không cần giải quyết mọi khác biệt trong một lần; trước hết ${actionAsClause(actions[0])}; tiếp đó ${actionAsClause(actions[1])}. Câu hỏi cần có những con số thật để trả lời là: ${question}`,
+      value: ({ actions, context }, question) => `Không cần giải quyết mọi khác biệt trong một lần; trước hết ${actionAsClause(actions[0], context)}; tiếp đó ${actionAsClause(actions[1], context)}. Câu hỏi cần có những con số thật để trả lời là: ${question}`,
     },
   ],
   work: [
     {
       family: "work-lighter-handoff",
-      value: ({ actions }, question) => `Nếu muốn phối hợp nhẹ hơn, hai người có thể ${actionAsClause(actions[0])}; và ${actionAsClause(actions[1])}. Trước đầu việc kế tiếp, nên thống nhất câu trả lời cho: ${question}`,
+      value: ({ actions, context }, question) => `Nếu muốn phối hợp nhẹ hơn, hai người có thể ${actionAsClause(actions[0], context)}; và ${actionAsClause(actions[1], context)}. Trước đầu việc kế tiếp, nên thống nhất câu trả lời cho: ${question}`,
     },
     {
       family: "work-different-strengths",
-      value: ({ actions }, question) => `Điều đáng thử không phải là làm giống nhau, mà là ${actionAsClause(actions[0])}; rồi ${actionAsClause(actions[1])}. Sau một vòng công việc, hãy cùng nhìn lại: ${question}`,
+      value: ({ actions, context }, question) => `Điều đáng thử không phải là làm giống nhau, mà là ${actionAsClause(actions[0], context)}; rồi ${actionAsClause(actions[1], context)}. Sau một vòng công việc, hãy cùng nhìn lại: ${question}`,
     },
   ],
   family: [
     {
       family: "family-visible-care",
-      value: ({ actions }, question) => `Để đời sống chung bớt dựa vào sự tự hiểu, hai người có thể ${actionAsClause(actions[0])}; đồng thời ${actionAsClause(actions[1])}. Trước một mốc mới, nên cùng tự hỏi: ${question}`,
+      value: ({ actions, context }, question) => `Để đời sống chung bớt dựa vào sự tự hiểu, hai người có thể ${actionAsClause(actions[0], context)}; đồng thời ${actionAsClause(actions[1], context)}. Trước một mốc mới, nên cùng tự hỏi: ${question}`,
     },
     {
       family: "family-concrete-home",
-      value: ({ actions }, question) => `Một mái nhà dễ chịu thường bắt đầu từ những việc rất cụ thể: ${actionAsClause(actions[0])}; và ${actionAsClause(actions[1])}. Điều đáng bàn khi cả hai còn bình tĩnh là: ${question}`,
+      value: ({ actions, context }, question) => `Một mái nhà dễ chịu thường bắt đầu từ những việc rất cụ thể: ${actionAsClause(actions[0], context)}; và ${actionAsClause(actions[1], context)}. Điều đáng bàn khi cả hai còn bình tĩnh là: ${question}`,
     },
   ],
 };
 
-function actionAsClause(value: string) {
+function actionAsClause(value: string, context: NarrativeContext) {
   const trimmed = value.trim().replace(/[.!?]+$/u, "");
   if (!trimmed) return trimmed;
+  const startsWithName = [context.first.name, context.second.name].some((name) => trimmed.startsWith(`${name} `));
+  if (startsWithName) return trimmed;
   return `${trimmed[0].toLocaleLowerCase("vi")}${trimmed.slice(1)}`;
 }
 
@@ -453,14 +455,14 @@ export function auditNarrativeUniqueness(themes: NarrativeTextBlock[]): Narrativ
   const ngramThemes = new Map<string, Set<number>>();
 
   themes.forEach((theme, themeIndex) => {
-    const blocks = [theme.summary, theme.whyItMatters, theme.possibleExpression];
+    const blocks = [theme.prose];
     blocks.flatMap(sentencesOf).forEach((sentence) => {
       const indexes = sentenceThemes.get(sentence) || new Set<number>();
       indexes.add(themeIndex);
       sentenceThemes.set(sentence, indexes);
     });
 
-    const opening = normalizeNarrativeText(theme.summary).split(" ").slice(0, 3).join(" ");
+    const opening = normalizeNarrativeText(theme.prose).split(" ").slice(0, 3).join(" ");
     const openingIndexes = openingThemes.get(opening) || new Set<number>();
     openingIndexes.add(themeIndex);
     openingThemes.set(opening, openingIndexes);

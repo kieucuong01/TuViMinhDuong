@@ -101,15 +101,18 @@ describe("topic-specific compatibility narratives", () => {
 
     expect(second).toBe(first);
   });
+
+  it("preserves personal names when an action becomes a clause", () => {
+    const result = buildThemeNarrative(makeContext("temperament"), new NarrativeLedger());
+
+    expect(result.prose).toContain("Minh nói rõ điều giúp mình bình tĩnh");
+    expect(result.prose).not.toContain("minh nói rõ điều giúp mình bình tĩnh");
+  });
 });
 
 describe("report-wide narrative uniqueness", () => {
   it("detects normalized duplicate sentences and long repeated phrases", () => {
-    const makeTheme = (summary: string) => ({
-      summary,
-      whyItMatters: "Một góc nhìn riêng không trùng với phần còn lại.",
-      possibleExpression: "Một tình huống riêng không trùng với phần còn lại.",
-    });
+    const makeTheme = (prose: string) => ({ prose });
     const audit = auditNarrativeUniqueness([
       makeTheme("Minh cần một khoảng lặng trước khi nói tiếp. Hai người nên hẹn giờ quay lại."),
       makeTheme("Minh cần một khoảng lặng trước khi nói tiếp! Hai người có thể thử hẹn giờ quay lại."),
