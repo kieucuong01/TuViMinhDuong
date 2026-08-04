@@ -43,6 +43,20 @@ describe("WealthFortuneView", () => {
       .every((label) => html.includes(`<h2>${label}</h2>`))).toBe(true);
   });
 
+  it("renders a plain-language explanation layer before detailed evidence", async () => {
+    const { WealthFortuneView } = await import("./wealth-fortune-view");
+    const chart = generateTuViChart(CHART_FIXTURES[0].input);
+
+    const html = renderToStaticMarkup(createElement(WealthFortuneView, { chartId: "chart-1", chart }));
+
+    expect(html).toContain("Luận giải dễ hiểu");
+    expect(html).toContain("Cách hiểu nhanh");
+    expect(html).toContain("Điểm sáng nên dùng");
+    expect(html).toContain("Điểm cần canh chừng");
+    expect(html.indexOf("Luận giải dễ hiểu")).toBeLessThan(html.indexOf("Dữ kiện lá số"));
+    expect(html).not.toMatch(/chắc chắn|cam kết|phát tài|mua ngay|bán ngay/i);
+  });
+
   it("renders the composite posture and the strongest and caution years", async () => {
     const { WealthFortuneView } = await import("./wealth-fortune-view");
     const chart = generateTuViChart(CHART_FIXTURES[0].input);

@@ -87,7 +87,7 @@ function WealthTrendFigure({
         <article>
           <h3>Năm cần kiểm chứng nhiều hơn</h3>
           <strong>{cautionYear.year} · {cautionYear.score}/100</strong>
-          <p>Rà soát giả định, giới hạn rủi ro và phương án dự phòng trước khi cam kết.</p>
+          <p>Rà soát giả định, giới hạn rủi ro và phương án dự phòng trước khi tăng ràng buộc.</p>
         </article>
       </div>
 
@@ -143,6 +143,29 @@ export function WealthFortuneView({ chartId, chart }: WealthFortuneViewProps) {
         ))}
       </div>
 
+      <section className="wealth-explanation-section" aria-labelledby="wealth-explanation-title">
+        <div className="wealth-section-heading">
+          <p className="eyebrow">Luận giải đời thường</p>
+          <h2 id="wealth-explanation-title">{report.readerExplanation.heading}</h2>
+          <p>{report.readerExplanation.lead}</p>
+        </div>
+        <div className="wealth-explanation-grid">
+          <article className="wealth-explanation-card">
+            <h3>Cách hiểu nhanh</h3>
+            <p>{report.postureSummary}</p>
+            <p>{report.readerExplanation.nextStep}</p>
+          </article>
+          <article className="wealth-explanation-card">
+            <h3>Điểm sáng nên dùng</h3>
+            <p>{report.readerExplanation.strength}</p>
+          </article>
+          <article className="wealth-explanation-card">
+            <h3>Điểm cần canh chừng</h3>
+            <p>{report.readerExplanation.caution}</p>
+          </article>
+        </div>
+      </section>
+
       <WealthTrendFigure
         cautionYear={report.cautionYear}
         points={report.fiveYearTrend}
@@ -192,7 +215,7 @@ export function WealthFortuneView({ chartId, chart }: WealthFortuneViewProps) {
         <div className="wealth-section-heading">
           <p className="eyebrow">Trước quyết định lớn</p>
           <h2 id="wealth-decision-title">Bộ lọc 6 câu trước quyết định lớn</h2>
-          <p>Trả lời bằng dữ kiện của bạn; nếu chưa rõ, hãy trì hoãn cam kết và tìm tư vấn chuyên môn độc lập.</p>
+          <p>Trả lời bằng dữ kiện của bạn; nếu chưa rõ, hãy trì hoãn quyết định và tìm tư vấn chuyên môn độc lập.</p>
         </div>
         <ol className="wealth-decision-list">
           {DECISION_FILTER_QUESTIONS.map((question) => (

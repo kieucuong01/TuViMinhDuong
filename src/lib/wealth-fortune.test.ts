@@ -86,6 +86,20 @@ describe("wealth fortune report", () => {
     expect(report.disclaimer).toContain("không thay thế tư vấn tài chính");
   });
 
+  it("adds a plain-language reading layer that connects score, strength, caution, and next step", () => {
+    const chart = generateTuViChart(FIXTURE_INPUT);
+    const report = buildWealthFortuneReport(chart);
+
+    expect(report.readerExplanation.heading).toBe("Luận giải dễ hiểu");
+    expect(report.readerExplanation.lead).toContain(report.postureLabel);
+    expect(report.readerExplanation.strength).toMatch(/điểm sáng|trụ mạnh/i);
+    expect(report.readerExplanation.strength).toContain("nên dùng");
+    expect(report.readerExplanation.caution).toMatch(/điểm cần canh|trụ yếu/i);
+    expect(report.readerExplanation.caution).toContain("không nên");
+    expect(report.readerExplanation.nextStep).toContain("30 ngày");
+    expect(JSON.stringify(report.readerExplanation)).not.toMatch(/chắc chắn|cam kết|phát tài|mua ngay|bán ngay/i);
+  });
+
   it.each([
     ["cashflow", "Tài Bạch"],
     ["cashflow", "Phúc Đức"],

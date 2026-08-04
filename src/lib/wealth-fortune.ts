@@ -29,6 +29,14 @@ export type WealthActionStep = {
   body: string;
 };
 
+export type WealthReaderExplanation = {
+  heading: string;
+  lead: string;
+  strength: string;
+  caution: string;
+  nextStep: string;
+};
+
 export type WealthFortuneReport = {
   overallScore: number;
   postureLabel: string;
@@ -38,6 +46,7 @@ export type WealthFortuneReport = {
   cautionYear: WealthYearPoint;
   palaceEvidence: WealthPalaceEvidence[];
   postureSummary: string;
+  readerExplanation: WealthReaderExplanation;
   actionPlan: WealthActionStep[];
   disclaimer: string;
 };
@@ -252,6 +261,19 @@ function buildPostureLabel(pillars: WealthPillar[], overallScore: number) {
   }[strongest.key];
 }
 
+function buildReaderExplanation(pillars: WealthPillar[], postureLabel: string): WealthReaderExplanation {
+  const weakest = pillars.reduce((selected, pillar) => pillar.score < selected.score ? pillar : selected);
+  const strongest = pillars.reduce((selected, pillar) => pillar.score > selected.score ? pillar : selected);
+
+  return {
+    heading: "Luận giải dễ hiểu",
+    lead: `Thế tài lộc hiện nghiêng về "${postureLabel}". Hiểu đơn giản: lá số không nói bạn sẽ giàu nghèo ra sao, mà gợi ý cách nên quản trị tiền, nghề và môi trường để quyết định chậm, rõ và có số liệu hơn.`,
+    strength: `Điểm sáng là ${strongest.label.toLowerCase()} (${strongest.score}/100): đây là trụ mạnh nên dùng cho một cơ hội nhỏ, đo được, có thời hạn xem lại, thay vì dàn trải nhiều hướng cùng lúc.`,
+    caution: `Điểm cần canh chừng là ${weakest.label.toLowerCase()} (${weakest.score}/100): không nên tăng ràng buộc khi phần này chưa có dữ kiện, giới hạn rủi ro và phương án dừng rõ ràng.`,
+    nextStep: `Trong 30 ngày tới, hãy chọn một việc thật liên quan đến ${weakest.label.toLowerCase()} để ghi chép mỗi tuần; khi phần yếu ổn hơn, mới dùng ${strongest.label.toLowerCase()} để thử bước tiếp theo.`,
+  };
+}
+
 export function buildWealthFortuneReport(chart: TuViChart): WealthFortuneReport {
   const pillars = buildPillars(chart);
   const overallScore = weightedAverage(pillars, {
@@ -263,16 +285,18 @@ export function buildWealthFortuneReport(chart: TuViChart): WealthFortuneReport 
   const fiveYearTrend = buildFiveYearTrend(chart);
   const strongestYear = fiveYearTrend.reduce((strongest, point) => point.score > strongest.score ? point : strongest);
   const cautionYear = fiveYearTrend.reduce((caution, point) => point.score < caution.score ? point : caution);
+  const postureLabel = buildPostureLabel(pillars, overallScore);
 
   return {
     overallScore,
-    postureLabel: buildPostureLabel(pillars, overallScore),
+    postureLabel,
     pillars,
     fiveYearTrend,
     strongestYear,
     cautionYear,
     palaceEvidence: buildPalaceEvidence(chart),
     postureSummary: buildPostureSummary(pillars),
+    readerExplanation: buildReaderExplanation(pillars, postureLabel),
     actionPlan: buildActionPlan(pillars),
     disclaimer: "Nội dung chỉ mang tính tham khảo, không thay thế tư vấn tài chính.",
   };

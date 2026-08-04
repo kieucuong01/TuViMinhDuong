@@ -14549,6 +14549,7 @@ button.is-loading:not(.icon-button)::before {
 }
 
 .wealth-report-hero,
+.wealth-explanation-section,
 .wealth-trend-section,
 .wealth-evidence-section,
 .wealth-action-section,
@@ -14636,6 +14637,7 @@ button.is-loading:not(.icon-button)::before {
 }
 
 .wealth-pillar-card,
+.wealth-explanation-card,
 .wealth-evidence-card,
 .wealth-action-list li {
   border: 1px solid #fed7aa;
@@ -14663,12 +14665,31 @@ button.is-loading:not(.icon-button)::before {
 }
 
 .wealth-pillar-card p,
+.wealth-explanation-card p,
 .wealth-evidence-card p,
 .wealth-action-list p {
   margin-top: 0.55rem;
   color: #57534e;
   font-size: 1rem;
   line-height: 1.65;
+}
+
+.wealth-explanation-section {
+  display: grid;
+  gap: 1rem;
+}
+
+.wealth-explanation-grid {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.wealth-explanation-card h3 {
+  color: #7c2d12;
+}
+
+.wealth-explanation-card:first-child {
+  background: #fffbeb;
 }
 
 .wealth-trend-figure {
@@ -14865,6 +14886,7 @@ button.is-loading:not(.icon-button)::before {
   }
 
   .wealth-report-hero,
+  .wealth-explanation-section,
   .wealth-trend-section,
   .wealth-evidence-section,
   .wealth-action-section,
@@ -14879,6 +14901,10 @@ button.is-loading:not(.icon-button)::before {
 
   .wealth-evidence-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .wealth-explanation-grid {
+    grid-template-columns: 1.2fr 1fr 1fr;
   }
 
   .wealth-year-highlight-grid,
