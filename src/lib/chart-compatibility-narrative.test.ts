@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  auditNarrativeUniqueness,
   buildThemeNarrative,
   NarrativeLedger,
   selectStableVariant,
@@ -81,5 +82,22 @@ describe("topic-specific compatibility narratives", () => {
     expect(result.possibleExpression.length).toBeGreaterThan(100);
     expect(result.actions).toHaveLength(2);
     expect(result.questions).toHaveLength(2);
+  });
+});
+
+describe("report-wide narrative uniqueness", () => {
+  it("detects normalized duplicate sentences and long repeated phrases", () => {
+    const makeTheme = (summary: string) => ({
+      summary,
+      whyItMatters: "Một góc nhìn riêng không trùng với phần còn lại.",
+      possibleExpression: "Một tình huống riêng không trùng với phần còn lại.",
+    });
+    const audit = auditNarrativeUniqueness([
+      makeTheme("Minh cần một khoảng lặng trước khi nói tiếp. Hai người nên hẹn giờ quay lại."),
+      makeTheme("Minh cần một khoảng lặng trước khi nói tiếp! Hai người có thể thử hẹn giờ quay lại."),
+    ]);
+
+    expect(audit.duplicateSentences).toContain("minh cần một khoảng lặng trước khi nói tiếp");
+    expect(audit.repeatedNgrams.length).toBeGreaterThan(0);
   });
 });

@@ -41,6 +41,8 @@ export class NarrativeLedger {
   readonly openingFamilies = new Set<string>();
   readonly transitions = new Set<string>();
   readonly normalizedSentences = new Set<string>();
+  readonly profileTraitsByPerson = new Map<string, Set<NarrativeTrait>>();
+  readonly profileTraitTheme = new Map<NarrativeTrait, CompatibilityNarrativeThemeKey>();
 }
 
 export type ThemeNarrative = {
@@ -53,10 +55,19 @@ export type ThemeNarrative = {
   sceneFamily: string;
 };
 
+export type NarrativeTextBlock = Pick<ThemeNarrative, "summary" | "whyItMatters" | "possibleExpression">;
+
+export type NarrativeUniquenessAudit = {
+  duplicateSentences: string[];
+  repeatedOpenings: string[];
+  repeatedNgrams: string[];
+};
+
 type NarrativeWriter = (context: NarrativeContext) => string;
 
 type ThemeNarrativeStrategy = {
   openings: Record<InteractionKind, NarrativeVariant<NarrativeWriter>[]>;
+  summaryBridge: NarrativeWriter;
   whyItMatters: NarrativeWriter;
   scenes: Record<CompatibilityNarrativeLevel, NarrativeVariant<NarrativeWriter>[]>;
   actions: Record<CompatibilityNarrativeLevel, NarrativeWriter[]>;
@@ -89,6 +100,9 @@ const THEME_STRATEGIES: Record<CompatibilityNarrativeThemeKey, ThemeNarrativeStr
         { family: "recovery-style", value: ({ first, second }) => `${first.name} và ${second.name} không lấy lại cân bằng theo cùng một cách; điều làm người này dịu xuống đôi khi lại khiến người kia thấy bị thúc ép.` },
       ],
     },
+    summaryBridge: ({ first, second, interaction }) => interaction === "shared"
+      ? `Nhờ vậy, ${first.name} có thể nhận ra lúc ${second.name} cần chậm lại mà không vội xem đó là lạnh nhạt. Điểm cần giữ là khoảng thở riêng, bởi cùng một nhịp cũng có thể khiến cả hai khuếch đại cảm xúc vào lúc mệt.`
+      : `Điểm mạnh nằm ở việc một người giúp tình huống có thêm độ sâu, người kia đưa lại chuyển động. Muốn sự bổ sung này phát huy, hai bên cần báo trước mình đang cần khoảng lặng, lời trấn an hay một quyết định cụ thể.`,
     whyItMatters: ({ first, second }) => `Lớp này không cố gắn nhãn ai mạnh hay ai khó chiều. Điều đáng đọc là cách ${first.name} tìm sự an tâm qua việc ${first.reassurance}, còn ${second.name} thường ổn định hơn khi ${second.reassurance}. Hiểu đúng nhu cầu phía sau phản ứng sẽ giúp hai người bớt xem khác biệt là thái độ chống đối.`,
     scenes: {
       flow: [{ family: "temperament-everyday", value: (context) => `Khi nhịp sống bị xáo trộn, hai người thường bắt được tín hiệu của nhau trước khi căng thẳng thành lời. ${contrastLine(context)} Điểm thuận này đáng giữ bằng việc báo trước nhu cầu, thay vì mặc định rằng đối phương lúc nào cũng hiểu.` }],
@@ -109,18 +123,21 @@ const THEME_STRATEGIES: Record<CompatibilityNarrativeThemeKey, ThemeNarrativeStr
   communication: {
     openings: {
       shared: [
-        { family: "shared-language", value: ({ first, second }) => `${first.name} và ${second.name} có một vùng ngôn ngữ chung: cách đặt vấn đề của người này thường không quá xa cách tiếp nhận của người kia.` },
+        { family: "shared-language", value: ({ first, second }) => `Trong cách trò chuyện, ${first.name} và ${second.name} có một vùng ngôn ngữ chung: cách đặt vấn đề của người này thường không quá xa cách tiếp nhận của người kia.` },
         { family: "listening-door", value: ({ first, second }) => `Cuộc trò chuyện giữa ${first.name} và ${second.name} dễ mở ra khi cả hai cảm thấy mình được nghe trước khi bị yêu cầu thay đổi.` },
       ],
       complementary: [
-        { family: "message-receiver", value: ({ first, second }) => `Trong giao tiếp, ${first.name} thường đóng góp bằng việc ${first.contribution}; ${second.name} lại giúp cuộc nói chuyện tiến về phía trước nhờ ${second.contribution}.` },
+        { family: "message-receiver", value: ({ first, second }) => `Qua lời nói hằng ngày, ${first.name} thường đóng góp bằng việc ${first.contribution}; ${second.name} lại giúp cuộc nói chuyện tiến về phía trước nhờ ${second.contribution}.` },
         { family: "content-tone", value: ({ first, second }) => `${first.name} và ${second.name} có thể cùng nói về một việc nhưng chú ý tới hai tầng khác nhau: một bên nghe nội dung, bên còn lại cảm nhận cả thái độ và thời điểm.` },
       ],
       contrast: [
-        { family: "missed-message", value: ({ first, second }) => `Vấn đề giữa ${first.name} và ${second.name} đôi khi không nằm ở ý định, mà ở chỗ thông điệp được gửi theo một cách người kia khó tiếp nhận.` },
+        { family: "missed-message", value: ({ first, second }) => `Ở đầu gửi và nhận, vấn đề giữa ${first.name} và ${second.name} đôi khi không nằm ở ý định, mà ở chỗ thông điệp đi theo một cách người kia khó tiếp nhận.` },
         { family: "defensive-loop", value: ({ first, second }) => `Một câu nói ngắn của ${first.name} có thể làm ${second.name} nghe thành sự thúc ép; phản ứng tiếp theo lại khiến người nói ban đầu cảm thấy không được hiểu.` },
       ],
     },
+    summaryBridge: ({ first, second, interaction }) => interaction === "shared"
+      ? `Sự dễ hiểu nhau là lợi thế, nhưng cũng làm hai người có lúc bỏ qua bước xác nhận. Chỉ cần ${first.name} nhắc lại điều vừa nghe và ${second.name} sửa phần chưa đúng, nhiều hiểu nhầm nhỏ sẽ không phải đi xa hơn.`
+      : `Mấu chốt không phải ai nói hay hơn, mà là nội dung có đến được với người nghe hay không. Khi một bên được nói trọn ý và bên kia có thời gian phản hồi, cuộc trao đổi sẽ bớt xoay quanh giọng điệu.`,
     whyItMatters: ({ first, second }) => `Giao tiếp của cặp này nên được đọc ở cả hai đầu: ${first.name} cần gì để nói rõ mà không phòng thủ, và ${second.name} cần gì để nghe mà không vội diễn giải. ${contrastLine({ ...baseForContrast(first, second), key: "communication" })}`,
     scenes: {
       flow: [{ family: "communication-check", value: ({ first, second }) => `Trong một cuộc trao đổi quan trọng, ${first.name} và ${second.name} thường sớm tìm được ý chính. Sự ăn ý sẽ bền hơn nếu một người nhắc lại điều mình vừa hiểu, để người kia có cơ hội sửa trước khi hai bên đi tiếp.` }],
@@ -141,18 +158,21 @@ const THEME_STRATEGIES: Record<CompatibilityNarrativeThemeKey, ThemeNarrativeStr
   commitment: {
     openings: {
       shared: [
-        { family: "commitment-proof", value: ({ first, second }) => `Giữa ${first.name} và ${second.name}, sự gắn bó có cơ hội được cảm nhận qua những việc nhỏ nhưng đều đặn hơn là lời hứa thật lớn.` },
-        { family: "closeness-language", value: ({ first, second }) => `${first.name} và ${second.name} có một phần cách hiểu gần nhau về việc ở bên ai đó có trách nhiệm và có mặt.` },
+        { family: "commitment-proof", value: ({ first, second }) => `Ở chiều gắn bó, ${first.name} và ${second.name} có cơ hội cảm nhận tình cảm qua những việc nhỏ nhưng đều đặn hơn là lời hứa thật lớn.` },
+        { family: "closeness-language", value: ({ first, second }) => `Sự gần gũi giữa ${first.name} và ${second.name} có một phần ngôn ngữ chung: ở bên ai đó nghĩa là có trách nhiệm và có mặt.` },
       ],
       complementary: [
-        { family: "care-forms", value: ({ first, second }) => `${first.name} và ${second.name} không nhất thiết biểu lộ tình cảm cùng một kiểu; người này cho đi bằng ${first.contribution}, người kia đáp lại qua ${second.contribution}.` },
+        { family: "care-forms", value: ({ first, second }) => `Trong cách trao tình cảm, ${first.name} và ${second.name} không nhất thiết dùng cùng một kiểu; người này cho đi bằng ${first.contribution}, người kia đáp lại qua ${second.contribution}.` },
         { family: "distance-closeness", value: ({ first, second }) => `Cách ${first.name} tìm sự gần gũi và cách ${second.name} giữ cảm giác an toàn có thể bổ sung, miễn là cả hai gọi đúng tên điều mình mong đợi.` },
       ],
       contrast: [
-        { family: "commitment-fear", value: ({ first, second }) => `Khi nói về cam kết, ${first.name} và ${second.name} dễ chạm vào hai nỗi lo khác nhau: bị bó buộc hoặc bị bỏ lại phía sau.` },
+        { family: "commitment-fear", value: ({ first, second }) => `Chạm tới chuyện cam kết, ${first.name} và ${second.name} dễ gặp hai nỗi lo khác nhau: bị bó buộc hoặc bị bỏ lại phía sau.` },
         { family: "care-mismatch", value: ({ first, second }) => `Điều ${first.name} xem là đã quan tâm đôi khi chưa phải điều khiến ${second.name} cảm thấy được chọn và được đồng hành.` },
       ],
     },
+    summaryBridge: ({ first, second, interaction }) => interaction === "shared"
+      ? `Điều đáng quý là cả hai dễ nhận ra giá trị của sự có mặt và trách nhiệm. Để điểm thuận thành nền bền, ${first.name} với ${second.name} vẫn cần gọi tên kỳ vọng thay vì thử lòng hoặc chờ đối phương tự chứng minh.`
+      : `Sự quan tâm có thể đang tồn tại nhưng đi qua hai con đường khác nhau. Khi mỗi người chỉ dùng cách mình quen cho đi, người còn lại dễ nhận chưa đủ; dịch nhu cầu thành hành động cụ thể sẽ làm khoảng cách ngắn lại.`,
     whyItMatters: ({ first, second }) => `Lớp tình cảm không chỉ hỏi hai người có cảm xúc hay không, mà xem cảm xúc ấy được chuyển thành thời gian, trách nhiệm và cách sửa sai thế nào. ${first.name} thường cần ${first.primaryNeed}; ${second.name} lại đón nhận sự gắn bó rõ hơn khi ${second.reassurance}.`,
     scenes: {
       flow: [{ family: "commitment-presence", value: ({ first, second }) => `Cảm giác được đồng hành dễ lớn lên khi ${first.name} và ${second.name} cùng giữ những lời hứa vừa sức. Một lần có mặt đúng lúc, chủ động báo thay đổi hoặc nhận phần trách nhiệm của mình sẽ có giá trị hơn việc chỉ nói rằng cả hai vốn rất hợp.` }],
@@ -173,18 +193,21 @@ const THEME_STRATEGIES: Record<CompatibilityNarrativeThemeKey, ThemeNarrativeStr
   finance: {
     openings: {
       shared: [
-        { family: "money-priority", value: ({ first, second }) => `${first.name} và ${second.name} có một vùng ưu tiên tài chính tương đối gần nhau, nhờ vậy việc đặt mục tiêu chung không phải bắt đầu từ con số không.` },
+        { family: "money-priority", value: () => "Với chuyện tiền bạc, cặp đôi này có một vùng ưu tiên tương đối gần nhau, nhờ vậy việc đặt mục tiêu chung không phải bắt đầu từ con số không." },
         { family: "resource-view", value: ({ first, second }) => `Cách ${first.name} và ${second.name} nhìn nguồn lực có điểm gặp: tiền cần phục vụ một nền sống rõ ràng, không chỉ là chuyện chi nhiều hay ít.` },
       ],
       complementary: [
-        { family: "money-roles", value: ({ first, second }) => `Trong chuyện tiền bạc, ${first.name} có thể giữ vai trò ${first.contribution}, còn ${second.name} tạo thêm độ linh hoạt nhờ ${second.contribution}.` },
+        { family: "money-roles", value: ({ first, second }) => `Khi quản lý nguồn lực, ${first.name} có thể giữ vai trò ${first.contribution}, còn ${second.name} tạo thêm độ linh hoạt nhờ ${second.contribution}.` },
         { family: "safety-opportunity", value: ({ first, second }) => `Một bên giúp cặp này nhìn thấy điều cần bảo toàn, bên kia nhạy hơn với cơ hội; lợi thế nằm ở quy tắc chung chứ không ở việc bên nào thắng.` },
       ],
       contrast: [
-        { family: "money-power", value: ({ first, second }) => `Khác biệt tài chính giữa ${first.name} và ${second.name} dễ trở thành khác biệt về quyền quyết định nếu thu nhập, khoản nợ và nghĩa vụ gia đình không được nói rõ.` },
+        { family: "money-power", value: ({ first, second }) => `Ở các quyết định tiền bạc, khác biệt giữa ${first.name} và ${second.name} dễ thành khác biệt về quyền lực nếu thu nhập, khoản nợ và nghĩa vụ gia đình không được nói rõ.` },
         { family: "risk-threshold", value: ({ first, second }) => `Ngưỡng thấy an toàn của ${first.name} và ${second.name} không hoàn toàn giống nhau; cùng một con số có thể là cơ hội với người này nhưng là áp lực với người kia.` },
       ],
     },
+    summaryBridge: ({ first, second, interaction }) => interaction === "shared"
+      ? `Nền chung giúp ${first.name} và ${second.name} dễ thống nhất mục tiêu, song cảm giác đồng thuận không thay được ngân sách. Con số, giới hạn tự chủ và ngưỡng phải hỏi nhau là ba thứ biến thiện chí thành một kế hoạch dùng được.`
+      : `Một người có thể nhìn thấy phần cần bảo toàn, người kia nhạy hơn với cơ hội. Cặp góc nhìn này hữu ích khi quyền chốt, mức rủi ro và cách rút lui được thỏa thuận trước lúc tiền thật đi ra.`,
     whyItMatters: ({ first, second }) => `Tiền chạm đồng thời vào cảm giác an toàn, quyền tự chủ và trách nhiệm. ${first.name} dễ đưa ra quyết định tốt hơn khi ${first.reassurance}; ${second.name} cần ${second.reassurance}. Vì vậy, sự minh bạch về con số quan trọng hơn cảm giác rằng hai người hiểu ý nhau.`,
     scenes: {
       flow: [{ family: "finance-budget", value: ({ first, second }) => `Trước một khoản chi đáng kể, ${first.name} và ${second.name} thường tìm được tiêu chí chung khá nhanh. Dù vậy, nên chốt bằng ba con số: số tiền tối đa, phần dự phòng còn lại và ai chịu trách nhiệm theo dõi sau quyết định.` }],
@@ -209,14 +232,17 @@ const THEME_STRATEGIES: Record<CompatibilityNarrativeThemeKey, ThemeNarrativeStr
         { family: "work-standard", value: ({ first, second }) => `${first.name} và ${second.name} có một vùng tiêu chuẩn chung; đây là nền tốt để phối hợp nếu quyền quyết định cũng rõ như trách nhiệm.` },
       ],
       complementary: [
-        { family: "work-handoff", value: ({ first, second }) => `${first.name} đem tới khả năng ${first.contribution}; ${second.name} nối tiếp bằng việc ${second.contribution}. Cặp vai này có giá trị khi điểm bàn giao được nói rõ.` },
+        { family: "work-handoff", value: ({ first, second }) => `Qua một lần bàn giao, ${first.name} đem tới khả năng ${first.contribution}; ${second.name} nối tiếp bằng việc ${second.contribution}. Cặp vai này có giá trị khi điểm chuyển việc được nói rõ.` },
         { family: "builder-checker", value: ({ first, second }) => `Một người hợp mở đường, người kia giúp kiểm tra và hoàn thiện; ${first.name} với ${second.name} có thể tạo thành nhịp làm việc như vậy thay vì cố làm giống nhau.` },
       ],
       contrast: [
-        { family: "work-authority", value: ({ first, second }) => `Điểm dễ vướng khi ${first.name} và ${second.name} làm chung là trách nhiệm được chia nhưng quyền chốt lại không thuộc rõ về ai.` },
+        { family: "work-authority", value: ({ first, second }) => `Trong phần việc chung, điểm dễ vướng của ${first.name} và ${second.name} là trách nhiệm được chia nhưng quyền chốt lại không thuộc rõ về ai.` },
         { family: "work-speed", value: ({ first, second }) => `Tốc độ làm việc của ${first.name} và tiêu chuẩn hoàn tất của ${second.name} có thể kéo hai người về hai hướng nếu không có mốc kiểm tra giữa đường.` },
       ],
     },
+    summaryBridge: ({ first, second, interaction }) => interaction === "shared"
+      ? `Nhịp đồng thuận giúp công việc chạy nhanh, nhưng cũng dễ làm ranh giới vai trò mờ đi. ${first.name} và ${second.name} sẽ phối hợp tốt hơn khi mỗi đầu việc có một người chốt, một mốc kiểm tra và tiêu chuẩn hoàn thành nhìn thấy được.`
+      : `Hai phong cách khác nhau có thể tạo thành một đường chuyền tốt thay vì cạnh tranh. Muốn vậy, phần mở việc, phần kiểm tra và quyền quyết định cuối phải thuộc về những người đã được gọi tên từ đầu.`,
     whyItMatters: ({ first, second }) => `Hợp tác tốt không đòi hỏi hai người cùng một phong cách. Cần nhìn xem phần ${first.name} làm tốt nhất — ${first.contribution} — có đi tiếp được vào phần ${second.name} mạnh — ${second.contribution} — hay bị mắc ở quyền hạn, thời hạn và tiêu chuẩn hoàn thành.`,
     scenes: {
       flow: [{ family: "work-checkpoint", value: ({ first, second }) => `Với một việc chung, ${first.name} và ${second.name} có thể vào guồng nhanh nếu mỗi người giữ đúng phần mạnh của mình. Một mốc kiểm tra giữa đường sẽ ngăn người làm nhanh vô tình gánh luôn quyền quyết định và phần sửa cuối.` }],
@@ -237,18 +263,21 @@ const THEME_STRATEGIES: Record<CompatibilityNarrativeThemeKey, ThemeNarrativeStr
   family: {
     openings: {
       shared: [
-        { family: "family-foundation", value: ({ first, second }) => `${first.name} và ${second.name} có một phần hình dung gần nhau về việc xây nền sống: ổn định không chỉ là nơi ở mà còn là cách gánh trách nhiệm.` },
+        { family: "family-foundation", value: ({ first, second }) => `Khi nghĩ về mái nhà, ${first.name} và ${second.name} có một phần hình dung gần nhau: ổn định không chỉ là nơi ở mà còn là cách gánh trách nhiệm.` },
         { family: "home-rhythm", value: ({ first, second }) => `Đời sống chung của ${first.name} và ${second.name} có cơ hội hình thành một nhịp dễ chịu khi các việc nhỏ được coi là trách nhiệm hữu hình, không phải sự giúp đỡ tùy hứng.` },
       ],
       complementary: [
-        { family: "family-strengths", value: ({ first, second }) => `${first.name} có thể giữ nền bằng khả năng ${first.contribution}; ${second.name} bổ sung cho không khí gia đình nhờ ${second.contribution}.` },
+        { family: "family-strengths", value: ({ first, second }) => `Trong đời sống chung, ${first.name} có thể giữ nền bằng khả năng ${first.contribution}; ${second.name} bổ sung cho không khí gia đình nhờ ${second.contribution}.` },
         { family: "roots-future", value: ({ first, second }) => `Hai người mang theo hai nền gia đình khác nhau, nhưng chính khác biệt ấy có thể giúp ${first.name} và ${second.name} chọn lọc điều muốn giữ cho mái nhà tương lai.` },
       ],
       contrast: [
-        { family: "family-expectation", value: ({ first, second }) => `Kỳ vọng từ gia đình hai bên có thể làm ${first.name} và ${second.name} tưởng rằng mình đang bất đồng với nhau, trong khi mỗi người thực ra đang bảo vệ một nền nếp đã quen.` },
+        { family: "family-expectation", value: ({ first, second }) => `Dưới kỳ vọng của người thân, ${first.name} và ${second.name} có thể tưởng rằng mình đang bất đồng với nhau, trong khi mỗi người thực ra đang bảo vệ một nền nếp đã quen.` },
         { family: "care-burden", value: ({ first, second }) => `Trách nhiệm chăm sóc dễ lệch về một phía nếu ${first.name} và ${second.name} không gọi rõ việc nào là tự nguyện, việc nào là nghĩa vụ và giới hạn ở đâu.` },
       ],
     },
+    summaryBridge: ({ first, second, interaction }) => interaction === "shared"
+      ? `Điểm gặp giúp hai người dễ nói về nền sống mong muốn, nhưng việc nhà và trách nhiệm chăm sóc vẫn cần được nhìn thấy. Một lịch phân chia rõ sẽ bảo vệ cả ${first.name}, ${second.name} lẫn phần riêng của mối quan hệ.`
+      : `Hai nền gia đình khác nhau không buộc cặp đôi phải chọn một bỏ một. Giá trị nằm ở việc cùng lọc điều muốn giữ, bỏ thói quen không còn phù hợp và dựng nguyên tắc mới cho từng giai đoạn sống.`,
     whyItMatters: ({ first, second }) => `Gia đình là nơi các ưu tiên trừu tượng trở thành lịch sống, tiền bạc và phần việc cụ thể. ${first.name} cần ${first.primaryNeed}; ${second.name} lại thấy yên hơn khi ${second.reassurance}. Nếu không bàn theo từng giai đoạn, kỳ vọng của người thân rất dễ nói thay tiếng nói của hai người.`,
     scenes: {
       flow: [{ family: "family-routine", value: ({ first, second }) => `Nếp sống chung dễ ổn định khi ${first.name} và ${second.name} biến thiện ý thành lịch và phần việc rõ. Điểm thuận không có nghĩa một người tự biết phải làm gì; nó cho phép hai người thống nhất nhanh hơn rồi cùng điều chỉnh khi hoàn cảnh đổi.` }],
@@ -290,13 +319,75 @@ function chooseWriter(
   return { family: selected.family, text: selected.value(context) };
 }
 
+function normalizeNarrativeText(value: string) {
+  return value
+    .toLocaleLowerCase("vi")
+    .replace(/[“”"'‘’—–:;,()[\]{}]/g, " ")
+    .replace(/[^\p{L}\p{N}\s]/gu, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function sentencesOf(value: string) {
+  return value.split(/[.!?]+/).map(normalizeNarrativeText).filter(Boolean);
+}
+
+function ngramsOf(value: string, size = 6) {
+  const words = normalizeNarrativeText(value).split(" ").filter(Boolean);
+  const ngrams = new Set<string>();
+  for (let index = 0; index <= words.length - size; index += 1) {
+    ngrams.add(words.slice(index, index + size).join(" "));
+  }
+  return ngrams;
+}
+
+function repeatedAcrossThemes(values: Map<string, Set<number>>) {
+  return [...values.entries()]
+    .filter(([, themeIndexes]) => themeIndexes.size > 1)
+    .map(([value]) => value)
+    .sort((left, right) => left.localeCompare(right, "vi"));
+}
+
+export function auditNarrativeUniqueness(themes: NarrativeTextBlock[]): NarrativeUniquenessAudit {
+  const sentenceThemes = new Map<string, Set<number>>();
+  const openingThemes = new Map<string, Set<number>>();
+  const ngramThemes = new Map<string, Set<number>>();
+
+  themes.forEach((theme, themeIndex) => {
+    const blocks = [theme.summary, theme.whyItMatters, theme.possibleExpression];
+    blocks.flatMap(sentencesOf).forEach((sentence) => {
+      const indexes = sentenceThemes.get(sentence) || new Set<number>();
+      indexes.add(themeIndex);
+      sentenceThemes.set(sentence, indexes);
+    });
+
+    const opening = normalizeNarrativeText(theme.summary).split(" ").slice(0, 3).join(" ");
+    const openingIndexes = openingThemes.get(opening) || new Set<number>();
+    openingIndexes.add(themeIndex);
+    openingThemes.set(opening, openingIndexes);
+
+    const themeNgrams = new Set(blocks.flatMap((block) => [...ngramsOf(block)]));
+    themeNgrams.forEach((ngram) => {
+      const indexes = ngramThemes.get(ngram) || new Set<number>();
+      indexes.add(themeIndex);
+      ngramThemes.set(ngram, indexes);
+    });
+  });
+
+  return {
+    duplicateSentences: repeatedAcrossThemes(sentenceThemes),
+    repeatedOpenings: repeatedAcrossThemes(openingThemes),
+    repeatedNgrams: repeatedAcrossThemes(ngramThemes),
+  };
+}
+
 export function buildThemeNarrative(context: NarrativeContext, ledger: NarrativeLedger): ThemeNarrative {
   const strategy = THEME_STRATEGIES[context.key];
   const opening = chooseWriter(strategy.openings[context.interaction], `${context.seed}:${context.key}:opening`, ledger.openingFamilies, context);
   const scene = chooseWriter(strategy.scenes[context.level], `${context.seed}:${context.key}:scene`, ledger.transitions, context);
 
   return {
-    summary: `${opening.text} ${contrastLine(context)} Điều đáng giữ lại không phải một nhãn tính cách, mà là cách hai người biến thế mạnh riêng thành một nhịp phối hợp có thể quan sát trong đời sống thật.`,
+    summary: `${opening.text} ${strategy.summaryBridge(context)}`,
     whyItMatters: strategy.whyItMatters(context),
     possibleExpression: scene.text,
     actions: strategy.actions[context.level].map((writer) => writer(context)).slice(0, 2),

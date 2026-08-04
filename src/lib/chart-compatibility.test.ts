@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { CHART_FIXTURES } from "@/lib/chart.fixtures";
 import { buildChartCompatibilityReport } from "@/lib/chart-compatibility";
+import { auditNarrativeUniqueness } from "@/lib/chart-compatibility-narrative";
 
 const first = { ...CHART_FIXTURES[0].input, fullName: "Minh" };
 const second = { ...CHART_FIXTURES[1].input, fullName: "An" };
@@ -61,6 +62,16 @@ describe("two-chart compatibility report", () => {
     expect(secondPair.themes.map((theme) => theme.summary)).not.toEqual(
       firstPair.themes.map((theme) => theme.summary),
     );
+  });
+
+  it("ships six layers without duplicate sentences, openings, or long phrases", () => {
+    const report = buildChartCompatibilityReport(first, second);
+
+    expect(auditNarrativeUniqueness(report.themes)).toEqual({
+      duplicateSentences: [],
+      repeatedOpenings: [],
+      repeatedNgrams: [],
+    });
   });
 
   it("uses guidance bands and explicit interpretation limits instead of a fate verdict", () => {

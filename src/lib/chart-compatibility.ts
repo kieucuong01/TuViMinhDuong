@@ -155,6 +155,45 @@ const DEFAULT_NARRATIVE_DETAIL: NarrativeTraitDetail = {
   friction: "khó diễn đạt hết điều mình cần khi đang chịu áp lực",
 };
 
+const THEME_FALLBACK_DETAILS: Record<CompatibilityThemeKey, NarrativeTraitDetail> = {
+  temperament: {
+    primaryNeed: "được hiểu đúng trạng thái trước khi bị đánh giá",
+    reassurance: "có một khoảng dừng vừa đủ để lấy lại cân bằng",
+    contribution: "nhìn tình huống qua một nhịp phản ứng riêng",
+    friction: "khó nói đúng nhu cầu khi cảm xúc đang dâng cao",
+  },
+  communication: {
+    primaryNeed: "có đủ lượt để nói trọn điều quan trọng",
+    reassurance: "người nghe xác nhận điều mình vừa tiếp nhận",
+    contribution: "đưa thêm một góc nhìn cho cuộc trao đổi",
+    friction: "dễ phòng thủ khi thông điệp bị hiểu lệch",
+  },
+  commitment: {
+    primaryNeed: "nhìn thấy sự có mặt qua hành động đều đặn",
+    reassurance: "kỳ vọng gắn bó được gọi thành lời",
+    contribution: "thể hiện trách nhiệm theo cách riêng",
+    friction: "khép lại khi cảm thấy nỗ lực của mình không được nhận ra",
+  },
+  finance: {
+    primaryNeed: "thấy rõ con số và giới hạn trách nhiệm",
+    reassurance: "quyền tự chủ được bảo vệ trong thỏa thuận chung",
+    contribution: "đem một tiêu chí riêng vào quyết định nguồn lực",
+    friction: "chần chừ khi rủi ro và quyền chốt còn mơ hồ",
+  },
+  work: {
+    primaryNeed: "biết phần việc và tiêu chuẩn hoàn thành của mình",
+    reassurance: "quyền hạn đi cùng trách nhiệm đã nhận",
+    contribution: "giữ một mắt xích cần thiết trong quy trình",
+    friction: "mất đà khi điểm bàn giao không rõ",
+  },
+  family: {
+    primaryNeed: "hiểu giới hạn giữa nghĩa vụ và lựa chọn riêng",
+    reassurance: "việc chăm sóc được phân chia thành phần cụ thể",
+    contribution: "mang một nền nếp riêng vào đời sống chung",
+    friction: "gồng lên khi kỳ vọng của người thân lấn át thỏa thuận đôi bên",
+  },
+};
+
 const THEME_CONFIGS: ThemeConfig[] = [
   {
     key: "temperament",
@@ -333,11 +372,33 @@ function evidenceFor(chart: TuViChart, config: ThemeConfig): CompatibilityEviden
   };
 }
 
-function narrativeProfile(chart: TuViChart, traits: ReadingTrait[]): NarrativeProfile {
-  const detail = traits[0] ? TRAIT_NARRATIVE_DETAILS[traits[0]] : DEFAULT_NARRATIVE_DETAIL;
+function narrativeProfile(
+  chart: TuViChart,
+  traits: ReadingTrait[],
+  ledger: NarrativeLedger,
+  themeKey: CompatibilityThemeKey,
+): NarrativeProfile {
+  const personKey = `${chart.input.fullName}:${chart.canChi.year}`;
+  const usedTraits = ledger.profileTraitsByPerson.get(personKey) || new Set<ReadingTrait>();
+  const freshTrait = traits.find((trait) => {
+    const themeUsingTrait = ledger.profileTraitTheme.get(trait);
+    return !usedTraits.has(trait) && (!themeUsingTrait || themeUsingTrait === themeKey);
+  });
+  const leadTrait = freshTrait || traits[0];
+  if (freshTrait) {
+    usedTraits.add(freshTrait);
+    if (!ledger.profileTraitTheme.has(freshTrait)) ledger.profileTraitTheme.set(freshTrait, themeKey);
+  }
+  ledger.profileTraitsByPerson.set(personKey, usedTraits);
+  const orderedTraits = leadTrait ? [leadTrait, ...traits.filter((trait) => trait !== leadTrait)] : traits;
+  const detail = freshTrait
+    ? TRAIT_NARRATIVE_DETAILS[freshTrait]
+    : traits.length
+      ? THEME_FALLBACK_DETAILS[themeKey]
+      : DEFAULT_NARRATIVE_DETAIL;
   return {
     name: chart.input.fullName,
-    traits,
+    traits: orderedTraits,
     ...detail,
   };
 }
@@ -370,8 +431,8 @@ function themeReport(
     level,
     interaction,
     seed: `${narrativeSeed(first, config, firstTraits)}::${narrativeSeed(second, config, secondTraits)}`,
-    first: narrativeProfile(first, firstTraits),
-    second: narrativeProfile(second, secondTraits),
+    first: narrativeProfile(first, firstTraits, ledger, config.key),
+    second: narrativeProfile(second, secondTraits, ledger, config.key),
   }, ledger);
 
   return {
