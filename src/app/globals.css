@@ -16681,6 +16681,8 @@ button.is-loading:not(.icon-button)::before {
 
 .compatibility-theme-level { margin: 0; }
 .compatibility-reading-layer { margin-top: 0.75rem; background: #fafaf9; }
+.compatibility-reading-layer.is-primary { border-left: 3px solid #d6a15b; }
+.compatibility-reading-layer.is-scene { border-left: 3px solid #8ca58a; background: #f7faf7; }
 .compatibility-reading-layer p { margin: 0; }
 .compatibility-guidance-grid { margin-top: 0.75rem; }
 .compatibility-guidance-grid > div:first-child { background: #f0fdf4; }

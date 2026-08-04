@@ -136,8 +136,8 @@ function CompatibilityReportView({ report, onEdit }: { report: ChartCompatibilit
             <article key={theme.key} className={`compatibility-theme level-${theme.level}`}>
               <header><span>{String(index + 1).padStart(2, "0")}</span><div><h4>{theme.title}</h4><p className="compatibility-theme-level">{levelIcon(theme.level)} {theme.levelLabel}</p></div></header>
               <p className="compatibility-theme-summary">{theme.summary}</p>
-              <div className="compatibility-reading-layer"><h5>Vì sao có nhận định này?</h5><p>{theme.whyItMatters}</p></div>
-              <div className="compatibility-reading-layer"><h5>Biểu hiện có thể gặp</h5><p>{theme.possibleExpression}</p></div>
+              <div className="compatibility-reading-layer is-primary"><h5>Góc nhìn chính</h5><p>{theme.whyItMatters}</p></div>
+              <div className="compatibility-reading-layer is-scene"><h5>Khi đi vào đời sống</h5><p>{theme.possibleExpression}</p></div>
               <div className="compatibility-guidance-grid">
                 <div><h5>Việc hai người có thể thử</h5><ul>{theme.actions.map((action) => <li key={action}>{action}</li>)}</ul></div>
                 <div><h5>Câu hỏi nên trao đổi</h5><ul>{theme.questions.map((question) => <li key={question}>{question}</li>)}</ul></div>

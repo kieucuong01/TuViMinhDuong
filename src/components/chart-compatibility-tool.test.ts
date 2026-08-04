@@ -18,12 +18,19 @@ describe("two-chart compatibility tool", () => {
   it("renders a useful report hierarchy instead of a single compatibility score", () => {
     expect(toolSource).toContain("Bức tranh chung");
     expect(toolSource).toContain("Sáu chủ đề cần đối chiếu");
-    expect(toolSource).toContain("Vì sao có nhận định này?");
-    expect(toolSource).toContain("Biểu hiện có thể gặp");
+    expect(toolSource).toContain("Góc nhìn chính");
+    expect(toolSource).toContain("Khi đi vào đời sống");
     expect(toolSource).toContain("Việc hai người có thể thử");
     expect(toolSource).toContain("Câu hỏi nên trao đổi");
     expect(toolSource).toContain("Căn cứ từ hai lá số");
     expect(toolSource).not.toMatch(/\/\s*100|điểm tương hợp/i);
+  });
+
+  it("uses plain editorial labels instead of mechanical explanation prompts", () => {
+    expect(toolSource).not.toContain("Vì sao có nhận định này?");
+    expect(toolSource).not.toContain("Biểu hiện có thể gặp");
+    expect(toolSource).toContain("compatibility-reading-layer is-primary");
+    expect(toolSource).toContain("compatibility-reading-layer is-scene");
   });
 
   it("announces errors and moves focus to the generated result", () => {
