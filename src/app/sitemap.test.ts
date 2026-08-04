@@ -45,6 +45,7 @@ describe("sitemap freshness", () => {
     );
     expect(entryFor(entries, "/xem-ngay").lastModified).toEqual(new Date("2026-07-28T00:00:00+07:00"));
     expect(entryFor(entries, "/xem-tuoi").lastModified).toEqual(new Date("2026-07-28T00:00:00+07:00"));
+    expect(entryFor(entries, "/tuong-hop-la-so").lastModified).toEqual(new Date("2026-08-04T00:00:00+07:00"));
     expect(entryFor(entries, "/tra-cuu").lastModified).toEqual(new Date("2026-07-12T00:00:00+07:00"));
     expect(entryFor(entries, "/chinh-sach-bien-tap").lastModified).toEqual(
       new Date("2026-07-29T00:00:00+07:00"),

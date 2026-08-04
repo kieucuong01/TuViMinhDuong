@@ -37,10 +37,12 @@ describe("site header featured nav effects", () => {
     expect(headerSource).toContain('href: "/tu-vi-tai-loc-dau-tu"');
     expect(headerSource).toContain("Xem Tử vi 2026");
     expect(headerSource).toContain("Tử vi tài lộc & Đầu tư");
-    expect(headerSource).toContain("Tương hợp lá số");
+    expect(headerSource).toContain("Tương hợp 2 lá số");
+    expect(headerSource).toContain('href: "/tuong-hop-la-so"');
     expect(headerSource).toContain('className="site-date-panel-link disabled"');
     expect(mobileMenuSource).toContain("mobile-tuvi-group");
     expect(mobileMenuSource).toContain("mobile-menu-disabled");
+    expect(mobileMenuSource).toContain("tuViLinks.map");
   });
 
   it("moves knowledge and lookup links under the Bai Viet dropdown without changing SEO URLs", () => {
