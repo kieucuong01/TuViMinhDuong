@@ -198,7 +198,7 @@ const THEME_STRATEGIES: Record<CompatibilityNarrativeThemeKey, ThemeNarrativeStr
       ],
       complementary: [
         { family: "money-roles", value: ({ first, second }) => `Khi quản lý nguồn lực, ${first.name} có thể giữ vai trò ${first.contribution}, còn ${second.name} tạo thêm độ linh hoạt nhờ ${second.contribution}.` },
-        { family: "safety-opportunity", value: ({ first, second }) => `Một bên giúp cặp này nhìn thấy điều cần bảo toàn, bên kia nhạy hơn với cơ hội; lợi thế nằm ở quy tắc chung chứ không ở việc bên nào thắng.` },
+        { family: "safety-opportunity", value: () => "Một bên giúp cặp này nhìn thấy điều cần bảo toàn, bên kia nhạy hơn với cơ hội; lợi thế nằm ở quy tắc chung chứ không ở việc bên nào thắng." },
       ],
       contrast: [
         { family: "money-power", value: ({ first, second }) => `Ở các quyết định tiền bạc, khác biệt giữa ${first.name} và ${second.name} dễ thành khác biệt về quyền lực nếu thu nhập, khoản nợ và nghĩa vụ gia đình không được nói rõ.` },
@@ -263,8 +263,8 @@ const THEME_STRATEGIES: Record<CompatibilityNarrativeThemeKey, ThemeNarrativeStr
   family: {
     openings: {
       shared: [
-        { family: "family-foundation", value: ({ first, second }) => `Khi nghĩ về mái nhà, ${first.name} và ${second.name} có một phần hình dung gần nhau: ổn định không chỉ là nơi ở mà còn là cách gánh trách nhiệm.` },
-        { family: "home-rhythm", value: ({ first, second }) => `Đời sống chung của ${first.name} và ${second.name} có cơ hội hình thành một nhịp dễ chịu khi các việc nhỏ được coi là trách nhiệm hữu hình, không phải sự giúp đỡ tùy hứng.` },
+        { family: "family-foundation", value: ({ first, second }) => `Khi nghĩ về mái nhà, ${first.name} và ${second.name} cùng hình dung khá gần nhau: ổn định không chỉ là nơi ở mà còn là cách gánh trách nhiệm.` },
+        { family: "home-rhythm", value: ({ first, second }) => `Đời sống chung của ${first.name} và ${second.name} sẽ dễ thành một nhịp thoải mái hơn khi các việc nhỏ được coi là trách nhiệm hữu hình, không phải sự giúp đỡ tùy hứng.` },
       ],
       complementary: [
         { family: "family-strengths", value: ({ first, second }) => `Trong đời sống chung, ${first.name} có thể giữ nền bằng khả năng ${first.contribution}; ${second.name} bổ sung cho không khí gia đình nhờ ${second.contribution}.` },

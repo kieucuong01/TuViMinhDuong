@@ -74,6 +74,25 @@ describe("two-chart compatibility report", () => {
     });
   });
 
+  it.each([
+    [0, 1, "Minh", "An"],
+    [2, 3, "Hà", "Nam"],
+    [0, 3, "Linh", "Quân"],
+  ] as const)("keeps a full, unique narrative for fixture pair %i-%i", (firstIndex, secondIndex, firstName, secondName) => {
+    const firstInput = { ...CHART_FIXTURES[firstIndex].input, fullName: firstName };
+    const secondInput = { ...CHART_FIXTURES[secondIndex].input, fullName: secondName };
+    const report = buildChartCompatibilityReport(firstInput, secondInput);
+
+    expect(auditNarrativeUniqueness(report.themes)).toEqual({
+      duplicateSentences: [],
+      repeatedOpenings: [],
+      repeatedNgrams: [],
+    });
+    expect(report.themes.every((theme) => theme.summary.length >= 120)).toBe(true);
+    expect(report.themes.every((theme) => theme.possibleExpression.length >= 100)).toBe(true);
+    expect(buildChartCompatibilityReport(firstInput, secondInput)).toEqual(report);
+  });
+
   it("uses guidance bands and explicit interpretation limits instead of a fate verdict", () => {
     const report = buildChartCompatibilityReport(first, second);
     const serialized = JSON.stringify(report);
