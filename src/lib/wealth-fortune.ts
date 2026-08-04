@@ -29,12 +29,20 @@ export type WealthActionStep = {
   body: string;
 };
 
+export type WealthPillarReading = {
+  key: WealthPillarKey;
+  title: string;
+  body: string;
+};
+
 export type WealthReaderExplanation = {
   heading: string;
   lead: string;
+  context: string;
   strength: string;
   caution: string;
   nextStep: string;
+  pillarReadings: WealthPillarReading[];
 };
 
 export type WealthFortuneReport = {
@@ -261,16 +269,48 @@ function buildPostureLabel(pillars: WealthPillar[], overallScore: number) {
   }[strongest.key];
 }
 
+function describePillarLevel(score: number) {
+  if (score >= 70) {
+    return "đang là điểm thuận hơn trong bức tranh chung";
+  }
+  if (score >= 58) {
+    return "ở mức có thể dùng được nhưng cần dữ kiện thật để xác nhận";
+  }
+  return "cần được xem như vùng phải sửa nền trước khi mở rộng";
+}
+
+function buildPillarReadings(pillars: WealthPillar[]): WealthPillarReading[] {
+  return pillars.map((pillar) => {
+    const level = describePillarLevel(pillar.score);
+    const title = `${pillar.label} · ${pillar.score}/100`;
+
+    const body = {
+      cashflow: `Dòng tiền ${level}. Khi đọc trụ này, đừng chỉ hỏi có kiếm được nhiều hay không; hãy nhìn cách tiền vào, tiền ra, khoản phải giữ và khoản có thể thử. Người đọc nên tách quỹ dự phòng, tiền sinh hoạt và tiền cho cơ hội mới trước khi quyết định vay, góp vốn hoặc hỗ trợ người khác.`,
+      career: `Năng lực tạo giá trị ${level}. Trụ này nói về khả năng biến kinh nghiệm, vai trò và uy tín thành nguồn thu bền hơn, không chỉ là may mắn nhất thời. Nếu trụ nghề sáng, nên đầu tư vào kỹ năng, quy trình và quan hệ nghề nghiệp; nếu trụ này yếu, hãy sửa năng lực tạo giá trị trước khi kỳ vọng dòng tiền tăng.`,
+      mobility: `Mở rộng môi trường ${level}. Đây là phần cho biết cơ hội thường đến qua nơi mới, người mới, dự án mới hoặc cách làm mới đến đâu. Khi trụ này nổi bật, hãy thử bằng bước nhỏ có tiêu chí rõ; khi trụ này căng, nên chậm lại để kiểm tra người rủ, điều kiện hợp tác, pháp lý và khả năng rút lui.`,
+      foundation: `Nền tích lũy ${level}. Trụ này giữ vai trò neo lại toàn bộ câu chuyện tài lộc: sức bền gia đình, tài sản nền, nơi ở, thói quen giữ tiền và mức ổn định dài hạn. Nếu nền chưa vững, ưu tiên giảm phân tán, dọn nợ, rõ giấy tờ và giữ nhịp sống ổn trước khi nghĩ đến tăng trưởng nhanh.`,
+    } satisfies Record<WealthPillarKey, string>;
+
+    return {
+      key: pillar.key,
+      title,
+      body: body[pillar.key],
+    };
+  });
+}
+
 function buildReaderExplanation(pillars: WealthPillar[], postureLabel: string): WealthReaderExplanation {
   const weakest = pillars.reduce((selected, pillar) => pillar.score < selected.score ? pillar : selected);
   const strongest = pillars.reduce((selected, pillar) => pillar.score > selected.score ? pillar : selected);
 
   return {
     heading: "Luận giải dễ hiểu",
-    lead: `Thế tài lộc hiện nghiêng về "${postureLabel}". Hiểu đơn giản: lá số không nói bạn sẽ giàu nghèo ra sao, mà gợi ý cách nên quản trị tiền, nghề và môi trường để quyết định chậm, rõ và có số liệu hơn.`,
-    strength: `Điểm sáng là ${strongest.label.toLowerCase()} (${strongest.score}/100): đây là trụ mạnh nên dùng cho một cơ hội nhỏ, đo được, có thời hạn xem lại, thay vì dàn trải nhiều hướng cùng lúc.`,
-    caution: `Điểm cần canh chừng là ${weakest.label.toLowerCase()} (${weakest.score}/100): không nên tăng ràng buộc khi phần này chưa có dữ kiện, giới hạn rủi ro và phương án dừng rõ ràng.`,
-    nextStep: `Trong 30 ngày tới, hãy chọn một việc thật liên quan đến ${weakest.label.toLowerCase()} để ghi chép mỗi tuần; khi phần yếu ổn hơn, mới dùng ${strongest.label.toLowerCase()} để thử bước tiếp theo.`,
+    lead: `Thế tài lộc hiện nghiêng về "${postureLabel}". Nên đọc phần này như một bản đồ hành vi tài chính cá nhân: lá số gợi ý vùng nào dễ tạo lực, vùng nào dễ hao sức, rồi người đọc đem đối chiếu với thu nhập, chi tiêu, công việc và các ràng buộc gia đình đang có.`,
+    context: "Lớp luận giải này không dùng để phán giàu nghèo hay thay cho kế hoạch tài chính. Giá trị thực tế của nó là giúp bạn đặt câu hỏi đúng hơn: tiền đến từ đâu, điểm yếu nằm ở thói quen hay môi trường, và quyết định lớn cần thêm dữ kiện nào trước khi làm.",
+    strength: `Điểm sáng là ${strongest.label.toLowerCase()} (${strongest.score}/100). Đây là trụ mạnh nên dùng như lực đẩy chính: chọn một cơ hội nhỏ, có giới hạn thời gian, có cách đo kết quả và có người phản biện độc lập. Khi trụ mạnh được dùng đúng, nó giúp bạn đi tiếp có trọng tâm thay vì dàn trải vì nôn nóng.`,
+    caution: `Điểm cần canh chừng là ${weakest.label.toLowerCase()} (${weakest.score}/100): không nên tăng ràng buộc khi phần này chưa có dữ kiện, giới hạn rủi ro và phương án dừng rõ ràng. Nếu bỏ qua trụ yếu, một cơ hội nhìn rất hợp vẫn có thể làm mệt dòng tiền, công việc hoặc nền tích lũy.`,
+    nextStep: `Trong 30 ngày tới, hãy chọn một việc thật liên quan đến ${weakest.label.toLowerCase()} để ghi chép mỗi tuần: dấu hiệu tốt, dấu hiệu hao, khoản chi phát sinh và điều kiện khiến bạn phải dừng. Khi phần yếu ổn hơn, mới dùng ${strongest.label.toLowerCase()} để thử bước tiếp theo.`,
+    pillarReadings: buildPillarReadings(pillars),
   };
 }
 

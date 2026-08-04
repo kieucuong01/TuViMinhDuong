@@ -53,6 +53,10 @@ describe("WealthFortuneView", () => {
     expect(html).toContain("Cách hiểu nhanh");
     expect(html).toContain("Điểm sáng nên dùng");
     expect(html).toContain("Điểm cần canh chừng");
+    expect(html).toContain("Cách đọc 4 trụ");
+    expect((html.match(/class="wealth-pillar-reading"/g) ?? [])).toHaveLength(4);
+    expect(html).toContain("quỹ dự phòng");
+    expect(html).toContain("năng lực tạo giá trị");
     expect(html.indexOf("Luận giải dễ hiểu")).toBeLessThan(html.indexOf("Dữ kiện lá số"));
     expect(html).not.toMatch(/chắc chắn|cam kết|phát tài|mua ngay|bán ngay/i);
   });

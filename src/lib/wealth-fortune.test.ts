@@ -92,11 +92,23 @@ describe("wealth fortune report", () => {
 
     expect(report.readerExplanation.heading).toBe("Luận giải dễ hiểu");
     expect(report.readerExplanation.lead).toContain(report.postureLabel);
+    expect(report.readerExplanation.lead.length).toBeGreaterThan(180);
+    expect(report.readerExplanation.context).toContain("không dùng để phán giàu nghèo");
     expect(report.readerExplanation.strength).toMatch(/điểm sáng|trụ mạnh/i);
     expect(report.readerExplanation.strength).toContain("nên dùng");
     expect(report.readerExplanation.caution).toMatch(/điểm cần canh|trụ yếu/i);
     expect(report.readerExplanation.caution).toContain("không nên");
     expect(report.readerExplanation.nextStep).toContain("30 ngày");
+    expect(report.readerExplanation.pillarReadings).toHaveLength(4);
+    expect(report.readerExplanation.pillarReadings.map((item) => item.key)).toEqual([
+      "cashflow",
+      "career",
+      "mobility",
+      "foundation",
+    ]);
+    expect(report.readerExplanation.pillarReadings.every((item) => item.body.length > 170)).toBe(true);
+    expect(report.readerExplanation.pillarReadings.some((item) => item.body.includes("quỹ dự phòng"))).toBe(true);
+    expect(report.readerExplanation.pillarReadings.some((item) => item.body.includes("năng lực tạo giá trị"))).toBe(true);
     expect(JSON.stringify(report.readerExplanation)).not.toMatch(/chắc chắn|cam kết|phát tài|mua ngay|bán ngay/i);
   });
 

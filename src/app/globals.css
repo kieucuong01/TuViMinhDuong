@@ -14564,13 +14564,15 @@ button.is-loading:not(.icon-button)::before {
 .wealth-report h1,
 .wealth-report h2,
 .wealth-report h3,
+.wealth-report h4,
 .wealth-report p {
   margin: 0;
 }
 
 .wealth-report h1,
 .wealth-report h2,
-.wealth-report h3 {
+.wealth-report h3,
+.wealth-report h4 {
   color: #1c1917;
   line-height: 1.2;
 }
@@ -14585,6 +14587,10 @@ button.is-loading:not(.icon-button)::before {
 
 .wealth-report h3 {
   font-size: 1.06rem;
+}
+
+.wealth-report h4 {
+  font-size: 1rem;
 }
 
 .wealth-report-hero > p:not(.eyebrow),
@@ -14638,6 +14644,7 @@ button.is-loading:not(.icon-button)::before {
 
 .wealth-pillar-card,
 .wealth-explanation-card,
+.wealth-pillar-reading,
 .wealth-evidence-card,
 .wealth-action-list li {
   border: 1px solid #fed7aa;
@@ -14666,6 +14673,7 @@ button.is-loading:not(.icon-button)::before {
 
 .wealth-pillar-card p,
 .wealth-explanation-card p,
+.wealth-pillar-reading p,
 .wealth-evidence-card p,
 .wealth-action-list p {
   margin-top: 0.55rem;
@@ -14690,6 +14698,20 @@ button.is-loading:not(.icon-button)::before {
 
 .wealth-explanation-card:first-child {
   background: #fffbeb;
+}
+
+.wealth-pillar-reading-section {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.wealth-pillar-reading-grid {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.wealth-pillar-reading h4 {
+  color: #7c2d12;
 }
 
 .wealth-trend-figure {
@@ -14905,6 +14927,10 @@ button.is-loading:not(.icon-button)::before {
 
   .wealth-explanation-grid {
     grid-template-columns: 1.2fr 1fr 1fr;
+  }
+
+  .wealth-pillar-reading-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .wealth-year-highlight-grid,

@@ -148,6 +148,7 @@ export function WealthFortuneView({ chartId, chart }: WealthFortuneViewProps) {
           <p className="eyebrow">Luận giải đời thường</p>
           <h2 id="wealth-explanation-title">{report.readerExplanation.heading}</h2>
           <p>{report.readerExplanation.lead}</p>
+          <p>{report.readerExplanation.context}</p>
         </div>
         <div className="wealth-explanation-grid">
           <article className="wealth-explanation-card">
@@ -163,6 +164,20 @@ export function WealthFortuneView({ chartId, chart }: WealthFortuneViewProps) {
             <h3>Điểm cần canh chừng</h3>
             <p>{report.readerExplanation.caution}</p>
           </article>
+        </div>
+        <div className="wealth-pillar-reading-section" aria-labelledby="wealth-pillar-reading-title">
+          <div className="wealth-section-heading">
+            <h3 id="wealth-pillar-reading-title">Cách đọc 4 trụ</h3>
+            <p>Mỗi trụ dưới đây giúp tách câu chuyện tài lộc thành phần có thể quan sát trong đời sống thật, thay vì gom mọi thứ thành một kết luận chung chung.</p>
+          </div>
+          <div className="wealth-pillar-reading-grid">
+            {report.readerExplanation.pillarReadings.map((reading) => (
+              <article className="wealth-pillar-reading" key={reading.key}>
+                <h4>{reading.title}</h4>
+                <p>{reading.body}</p>
+              </article>
+            ))}
+          </div>
         </div>
       </section>
 
