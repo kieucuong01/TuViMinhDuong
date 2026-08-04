@@ -1,9 +1,14 @@
 import { generateTuViChart, type ChartInput, type Palace, type TuViChart } from "@/lib/chart";
+import {
+  buildThemeNarrative,
+  NarrativeLedger,
+  type InteractionKind,
+  type NarrativeProfile,
+  type NarrativeTrait as ReadingTrait,
+} from "@/lib/chart-compatibility-narrative";
 
 export type CompatibilityLevel = "flow" | "coordinate" | "discuss";
 export type CompatibilityThemeKey = "temperament" | "communication" | "commitment" | "finance" | "work" | "family";
-
-type ReadingTrait = "leadership" | "analysis" | "action" | "expression" | "emotion" | "stability" | "change";
 
 export type CompatibilityEvidence = {
   personName: string;
@@ -64,16 +69,6 @@ const LEVEL_LABELS: Record<CompatibilityLevel, string> = {
   discuss: "Nên trao đổi rõ",
 };
 
-const TRAIT_LABELS: Record<ReadingTrait, string> = {
-  leadership: "thiên về tổ chức, giữ vai trò và tạo trật tự",
-  analysis: "hay quan sát, cân nhắc và cần hiểu rõ trước khi chốt",
-  action: "ưu tiên hành động, hiệu quả và phản ứng khá nhanh",
-  expression: "có nhu cầu trao đổi, thể hiện quan điểm và được lắng nghe",
-  emotion: "nhạy với bầu không khí, sự quan tâm và cảm giác an toàn",
-  stability: "coi trọng nền nếp, trách nhiệm và nhịp sống có thể dự đoán",
-  change: "có xu hướng đổi cách làm khi bối cảnh không còn phù hợp",
-};
-
 const STAR_TRAITS: Partial<Record<string, ReadingTrait[]>> = {
   "Tử Vi": ["leadership", "stability"],
   "Thiên Cơ": ["analysis", "change"],
@@ -100,6 +95,65 @@ const COMPLEMENTARY_TRAITS: [ReadingTrait, ReadingTrait][] = [
 
 const SUPPORT_STAR_HINTS = ["Tả Phù", "Hữu Bật", "Thiên Khôi", "Thiên Việt", "Văn Xương", "Văn Khúc", "Hóa Lộc", "Hóa Khoa", "Hóa Quyền", "Thiên Giải", "Địa Giải", "Thiên Phúc"];
 const CAUTION_STAR_HINTS = ["Kình Dương", "Đà La", "Hỏa Tinh", "Linh Tinh", "Địa Không", "Địa Kiếp", "Hóa Kỵ", "Tang Môn", "Thiên Hư", "Thiên Khốc", "Tuần", "Triệt"];
+
+type NarrativeTraitDetail = {
+  primaryNeed: string;
+  reassurance: string;
+  contribution: string;
+  friction: string;
+};
+
+const TRAIT_NARRATIVE_DETAILS: Record<ReadingTrait, NarrativeTraitDetail> = {
+  leadership: {
+    primaryNeed: "biết rõ vai trò và hướng đi",
+    reassurance: "được chủ động trong phần trách nhiệm của mình",
+    contribution: "đặt hướng, quy tụ và giữ trục cho việc chung",
+    friction: "ôm quyền quyết định khi cảm thấy mọi thứ thiếu trật tự",
+  },
+  analysis: {
+    primaryNeed: "có đủ dữ kiện trước khi chốt",
+    reassurance: "được dành thời gian để hiểu kỹ vấn đề",
+    contribution: "nhìn ra chi tiết và những điểm còn bỏ ngỏ",
+    friction: "chậm chốt khi thông tin chưa đủ rõ",
+  },
+  action: {
+    primaryNeed: "thấy sự việc thật sự tiến lên",
+    reassurance: "có một bước tiếp theo cụ thể",
+    contribution: "biến ý tưởng thành hành động và giữ đà tiến",
+    friction: "sốt ruột khi phải chờ quá lâu",
+  },
+  expression: {
+    primaryNeed: "được nói rõ quan điểm và nhận phản hồi",
+    reassurance: "biết rằng lời mình nói đã được tiếp nhận",
+    contribution: "gọi tên vấn đề và đưa điều khó nói ra ánh sáng",
+    friction: "nói nhiều hơn khi cảm thấy mình chưa được nghe",
+  },
+  emotion: {
+    primaryNeed: "cảm thấy an toàn trong bầu không khí giữa hai người",
+    reassurance: "nhận được sự quan tâm qua thái độ và những việc nhỏ",
+    contribution: "nhận ra cảm xúc và giữ sự kết nối",
+    friction: "thu mình khi bầu không khí trở nên lạnh hoặc căng",
+  },
+  stability: {
+    primaryNeed: "có một nhịp sống và nguyên tắc đủ ổn định",
+    reassurance: "thấy lời hứa được chuyển thành việc làm đều đặn",
+    contribution: "giữ nền nếp, trách nhiệm và tính liên tục",
+    friction: "khó đổi cách làm khi sự thay đổi đến quá đột ngột",
+  },
+  change: {
+    primaryNeed: "có khoảng linh hoạt để điều chỉnh cách làm",
+    reassurance: "được thử một hướng mới mà vẫn có đường lui",
+    contribution: "mở phương án và thích nghi khi bối cảnh đổi",
+    friction: "đổi hướng nhanh khi thấy cách cũ không còn hiệu quả",
+  },
+};
+
+const DEFAULT_NARRATIVE_DETAIL: NarrativeTraitDetail = {
+  primaryNeed: "được hiểu trong đúng hoàn cảnh",
+  reassurance: "hai bên nói rõ kỳ vọng trước khi kết luận",
+  contribution: "quan sát tình huống theo một góc riêng",
+  friction: "khó diễn đạt hết điều mình cần khi đang chịu áp lực",
+};
 
 const THEME_CONFIGS: ThemeConfig[] = [
   {
@@ -260,11 +314,6 @@ function compatibilityLevel(score: number): CompatibilityLevel {
   return "discuss";
 }
 
-function traitText(traits: ReadingTrait[]) {
-  const chosen = traits.slice(0, 2).map((trait) => TRAIT_LABELS[trait]);
-  return chosen.length ? chosen.join("; đồng thời ") : "cần đọc theo toàn bộ tổ hợp cung sao thay vì gắn một nhãn tính cách";
-}
-
 function starList(palace: Palace, stars: string[], fallback: string, limit: number) {
   const visible = stars.slice(0, limit).map((star) => {
     const state = palace.starStates?.[star];
@@ -284,7 +333,30 @@ function evidenceFor(chart: TuViChart, config: ThemeConfig): CompatibilityEviden
   };
 }
 
-function themeReport(first: TuViChart, second: TuViChart, config: ThemeConfig, elementScore: number): ChartCompatibilityTheme {
+function narrativeProfile(chart: TuViChart, traits: ReadingTrait[]): NarrativeProfile {
+  const detail = traits[0] ? TRAIT_NARRATIVE_DETAILS[traits[0]] : DEFAULT_NARRATIVE_DETAIL;
+  return {
+    name: chart.input.fullName,
+    traits,
+    ...detail,
+  };
+}
+
+function narrativeSeed(chart: TuViChart, config: ThemeConfig, traits: ReadingTrait[]) {
+  const palaceSignals = config.palaces.map((name) => {
+    const palace = palaceByName(chart, name);
+    return palace ? `${name}:${palace.branch}:${palace.mainStars.join(",")}:${palace.supportStars.slice(0, 4).join(",")}` : name;
+  });
+  return [chart.canChi.year, ...traits, ...palaceSignals].join("|");
+}
+
+function themeReport(
+  first: TuViChart,
+  second: TuViChart,
+  config: ThemeConfig,
+  elementScore: number,
+  ledger: NarrativeLedger,
+): ChartCompatibilityTheme {
   const firstTraits = traitsForPalaces(first, config.palaces);
   const secondTraits = traitsForPalaces(second, config.palaces);
   const sharedTraits = firstTraits.filter((trait) => secondTraits.includes(trait));
@@ -292,22 +364,26 @@ function themeReport(first: TuViChart, second: TuViChart, config: ThemeConfig, e
   const elementWeight = ["temperament", "commitment", "family"].includes(config.key) ? elementScore : 0;
   const score = Math.min(4, sharedTraits.length * 2) + (complement ? 1 : 0) + elementWeight + signalBalance(first, config.palaces) + signalBalance(second, config.palaces);
   const level = compatibilityLevel(score);
-  const sharedText = sharedTraits.length
-    ? `Hai người cùng có nét ${sharedTraits.slice(0, 2).map((trait) => TRAIT_LABELS[trait]).join(" và ")}.`
-    : complement
-      ? "Hai nhịp không giống nhau hoàn toàn nhưng có khả năng bổ sung nếu vai trò và kỳ vọng được nói rõ."
-      : "Hai người tiếp cận chủ đề này theo những nhịp khác nhau, vì vậy sự rõ ràng quan trọng hơn việc đoán ý.";
+  const interaction: InteractionKind = sharedTraits.length ? "shared" : complement ? "complementary" : "contrast";
+  const narrative = buildThemeNarrative({
+    key: config.key,
+    level,
+    interaction,
+    seed: `${narrativeSeed(first, config, firstTraits)}::${narrativeSeed(second, config, secondTraits)}`,
+    first: narrativeProfile(first, firstTraits),
+    second: narrativeProfile(second, secondTraits),
+  }, ledger);
 
   return {
     key: config.key,
     title: config.title,
     level,
     levelLabel: LEVEL_LABELS[level],
-    summary: `${sharedText} ${first.input.fullName} nổi bật ở xu hướng ${traitText(firstTraits)}; ${second.input.fullName} nổi bật ở xu hướng ${traitText(secondTraits)}. Đây là mô tả cách hai lá số đặt cạnh nhau, không phải nhãn cố định cho tính cách hay chất lượng quan hệ.`,
-    whyItMatters: config.focus,
-    possibleExpression: config.expressions[level],
-    actions: config.actions,
-    questions: config.questions,
+    summary: narrative.summary,
+    whyItMatters: narrative.whyItMatters,
+    possibleExpression: narrative.possibleExpression,
+    actions: narrative.actions,
+    questions: narrative.questions,
     evidence: [evidenceFor(first, config), evidenceFor(second, config)],
   };
 }
@@ -329,7 +405,8 @@ export function buildChartCompatibilityReport(firstInput: ChartInput, secondInpu
   const first = generateTuViChart({ ...firstInput, fullName: firstInput.fullName.trim(), timezone: firstInput.timezone || "Asia/Bangkok" });
   const second = generateTuViChart({ ...secondInput, fullName: secondInput.fullName.trim(), timezone: secondInput.timezone || "Asia/Bangkok" });
   const elements = elementRelation(first, second);
-  const themes = THEME_CONFIGS.map((config) => themeReport(first, second, config, elements.score));
+  const ledger = new NarrativeLedger();
+  const themes = THEME_CONFIGS.map((config) => themeReport(first, second, config, elements.score, ledger));
   const flowCount = themes.filter((theme) => theme.level === "flow").length;
   const discussCount = themes.filter((theme) => theme.level === "discuss").length;
   const overviewLevel: CompatibilityLevel = flowCount >= 4 && discussCount === 0 ? "flow" : discussCount >= 3 ? "discuss" : "coordinate";

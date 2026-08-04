@@ -89,7 +89,7 @@ const THEME_STRATEGIES: Record<CompatibilityNarrativeThemeKey, ThemeNarrativeStr
         { family: "recovery-style", value: ({ first, second }) => `${first.name} và ${second.name} không lấy lại cân bằng theo cùng một cách; điều làm người này dịu xuống đôi khi lại khiến người kia thấy bị thúc ép.` },
       ],
     },
-    whyItMatters: ({ first, second }) => `Lớp này không cố gắn nhãn ai mạnh hay ai khó chiều. Điều đáng đọc là cách ${first.name} tìm sự chắc chắn qua việc ${first.reassurance}, còn ${second.name} thường ổn định hơn khi ${second.reassurance}. Hiểu đúng nhu cầu phía sau phản ứng sẽ giúp hai người bớt xem khác biệt là thái độ chống đối.`,
+    whyItMatters: ({ first, second }) => `Lớp này không cố gắn nhãn ai mạnh hay ai khó chiều. Điều đáng đọc là cách ${first.name} tìm sự an tâm qua việc ${first.reassurance}, còn ${second.name} thường ổn định hơn khi ${second.reassurance}. Hiểu đúng nhu cầu phía sau phản ứng sẽ giúp hai người bớt xem khác biệt là thái độ chống đối.`,
     scenes: {
       flow: [{ family: "temperament-everyday", value: (context) => `Khi nhịp sống bị xáo trộn, hai người thường bắt được tín hiệu của nhau trước khi căng thẳng thành lời. ${contrastLine(context)} Điểm thuận này đáng giữ bằng việc báo trước nhu cầu, thay vì mặc định rằng đối phương lúc nào cũng hiểu.` }],
       coordinate: [{ family: "temperament-pause", value: ({ first, second }) => `Khi nhịp sống bị xáo trộn, ${first.name} có thể ${first.friction}, đúng lúc ${second.name} lại ${second.friction}. Nếu thống nhất một khoảng dừng có thời hạn, hai người sẽ không phải chọn giữa thúc ép và im lặng kéo dài.` }],

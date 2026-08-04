@@ -45,6 +45,24 @@ describe("two-chart compatibility report", () => {
     }
   });
 
+  it("does not repeat the former summary skeleton across six layers", () => {
+    const report = buildChartCompatibilityReport(first, second);
+    const openings = report.themes.map((theme) => theme.summary.split(/[.!?]/, 1)[0].trim());
+
+    expect(report.themes.filter((theme) => theme.summary.includes("nổi bật ở xu hướng"))).toHaveLength(0);
+    expect(new Set(openings).size).toBe(6);
+  });
+
+  it("changes the narrative when chart data changes even if the display names stay the same", () => {
+    const firstPair = buildChartCompatibilityReport(first, second);
+    const differentSecond = { ...CHART_FIXTURES[2].input, fullName: "An" };
+    const secondPair = buildChartCompatibilityReport(first, differentSecond);
+
+    expect(secondPair.themes.map((theme) => theme.summary)).not.toEqual(
+      firstPair.themes.map((theme) => theme.summary),
+    );
+  });
+
   it("uses guidance bands and explicit interpretation limits instead of a fate verdict", () => {
     const report = buildChartCompatibilityReport(first, second);
     const serialized = JSON.stringify(report);
