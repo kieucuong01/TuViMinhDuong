@@ -2,7 +2,11 @@ import { describe, expect, it } from "vitest";
 import { AGE_TOOL_PAGES } from "@/lib/age-tools";
 import {
   analyzeKetHon,
+  analyzeLamAn,
   analyzeLamNha,
+  analyzeSinhCon,
+  analyzeVoChong,
+  analyzeXongDat,
   comparePeople,
   profileFromLunarYear,
   profileFromSolarDate,
@@ -115,5 +119,47 @@ describe("age tool registry", () => {
     ]);
     expect(new Set(AGE_TOOL_PAGES.map((page) => page.title)).size).toBe(6);
     expect(AGE_TOOL_PAGES.every((page) => page.faqs.length >= 3)).toBe(true);
+  });
+});
+
+describe("age tool interpretation layer", () => {
+  const forbiddenClaims = ["chắc chắn", "bảo đảm", "đổi đời", "phán quyết", "làm giàu nhanh", "cam kết kết quả"];
+
+  function expectDetailedInterpretation(summary: ReturnType<typeof analyzeVoChong>["summary"]) {
+    expect(summary?.interpretation?.headline.length).toBeGreaterThan(10);
+    expect(summary?.interpretation?.plainLanguage.length).toBeGreaterThan(80);
+    expect(summary?.interpretation?.strengths.length).toBeGreaterThanOrEqual(1);
+    expect(summary?.interpretation?.cautions.length).toBeGreaterThanOrEqual(1);
+    expect(summary?.interpretation?.nextSteps.length).toBeGreaterThanOrEqual(2);
+    expect(summary?.interpretation?.guardrail).toContain("tham khảo");
+
+    const combined = [
+      summary?.interpretation?.headline,
+      summary?.interpretation?.plainLanguage,
+      ...(summary?.interpretation?.strengths ?? []),
+      ...(summary?.interpretation?.cautions ?? []),
+      ...(summary?.interpretation?.nextSteps ?? []),
+      summary?.interpretation?.guardrail,
+    ].join(" ").toLowerCase();
+    for (const claim of forbiddenClaims) {
+      expect(combined).not.toContain(claim);
+    }
+  }
+
+  it("explains two-person tools in practical Vietnamese, not only criteria labels", () => {
+    expectDetailedInterpretation(analyzeVoChong("1990-06-01", "male", "1995-08-12", "female").summary);
+    expectDetailedInterpretation(analyzeLamAn("1988-03-20", "1992-11-05").summary);
+  });
+
+  it("explains ranked-year tools for the recommended years", () => {
+    for (const result of [
+      analyzeXongDat("1984-04-10", 2027).years[0],
+      analyzeSinhCon("1988-03-20", "1992-11-05", 2027, 2030).years[0],
+      analyzeKetHon("1998-05-01", "female", 2027, 2030).years[0],
+      analyzeLamNha("1988-03-20", "male", 2027, 2030).years[0],
+    ]) {
+      expectDetailedInterpretation(result.summary);
+      expect(result.summary.interpretation?.headline).toContain(String(result.year));
+    }
   });
 });

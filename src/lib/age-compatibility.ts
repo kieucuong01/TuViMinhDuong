@@ -32,11 +32,21 @@ export type LunarYearProfile = {
 
 export type AnalysisBand = "favorable" | "mixed" | "caution";
 
+export type AnalysisInterpretation = {
+  headline: string;
+  plainLanguage: string;
+  strengths: string[];
+  cautions: string[];
+  nextSteps: string[];
+  guardrail: string;
+};
+
 export type AnalysisSummary = {
   band: AnalysisBand;
   label: string;
   criteria: Criterion[];
   counts: { favorable: number; neutral: number; caution: number };
+  interpretation: AnalysisInterpretation;
 };
 
 export type RankedYearResult<TDetails = Record<string, unknown>> = {
@@ -291,7 +301,142 @@ function cungPhiCriterion(left: LunarYearProfile, right: LunarYearProfile): Crit
   };
 }
 
-function summarize(criteria: Criterion[]): AnalysisSummary {
+type InterpretationContext = {
+  tool?: "vo-chong" | "lam-an" | "xong-dat" | "sinh-con" | "ket-hon" | "lam-nha";
+  year?: number;
+};
+
+const TOOL_CONTEXT: Record<NonNullable<InterpretationContext["tool"]>, {
+  subject: string;
+  relation: string;
+  favorableFocus: string;
+  cautionFocus: string;
+  nextSteps: string[];
+  guardrail: string;
+}> = {
+  "vo-chong": {
+    subject: "mối quan hệ vợ chồng",
+    relation: "nhịp sống, cách giao tiếp và trách nhiệm giữa hai người",
+    favorableFocus: "các lớp tuổi đang tạo nền dễ đồng cảm hơn khi bàn chuyện gia đình, tiền bạc và kế hoạch dài hạn",
+    cautionFocus: "một số lớp tuổi có thể tạo cảm giác lệch nhịp, nên cần nói rõ kỳ vọng và cách xử lý mâu thuẫn",
+    nextSteps: [
+      "Đọc lại từng tiêu chí cùng nhau, tách phần thuận và phần cần rèn trong giao tiếp hằng ngày.",
+      "Nếu đang tính chuyện cưới hỏi, xem thêm năm cưới và ngày cưới như lớp thời điểm, không thay cho sự đồng thuận của hai người.",
+    ],
+    guardrail: "Kết quả chỉ là tham khảo theo Can Chi và Cung Phi; chất lượng hôn nhân còn phụ thuộc vào sự tự nguyện, trách nhiệm và cách hai người sống với nhau.",
+  },
+  "lam-an": {
+    subject: "việc hợp tác làm ăn",
+    relation: "cách phối hợp, mức độ tin cậy và nhịp ra quyết định trong công việc",
+    favorableFocus: "các tín hiệu thuận có thể hỗ trợ sự ăn ý khi chia vai trò, bàn kế hoạch và giữ nhịp hợp tác",
+    cautionFocus: "các tín hiệu xung khắc nên được chuyển thành checklist về hợp đồng, quyền hạn và cơ chế xử lý tranh chấp",
+    nextSteps: [
+      "Xác định rõ người phụ trách tiền, vận hành, pháp lý và kênh ra quyết định trước khi bắt đầu.",
+      "Kiểm tra năng lực, dòng tiền và điều khoản hợp đồng; không dùng kết quả tuổi để thay thế thẩm định thực tế.",
+    ],
+    guardrail: "Kết quả chỉ là tham khảo văn hóa; công cụ không dự báo doanh thu, lợi nhuận hay rủi ro thị trường.",
+  },
+  "xong-dat": {
+    subject: "việc chọn người xông đất",
+    relation: "khí đầu năm, sự hòa hợp với gia chủ và tương quan với năm mới",
+    favorableFocus: "những tuổi được xếp cao thường có ít cảnh báo chính và tạo cảm giác thuận hòa hơn khi mở đầu năm",
+    cautionFocus: "tuổi hợp vẫn cần xét sức khỏe, tâm trạng, quan hệ với gia đình và hoàn cảnh đến nhà đầu năm",
+    nextSteps: [
+      "Ưu tiên người vui vẻ, khỏe mạnh, có quan hệ tốt với gia đình và đến nhà trong khung giờ phù hợp phong tục.",
+      "Nếu nhiều tuổi cùng thuận, chọn người có hoàn cảnh thực tế hài hòa hơn thay vì chỉ nhìn thứ hạng.",
+    ],
+    guardrail: "Kết quả chỉ là tham khảo phong tục đầu năm; không nên dùng để kỳ vọng tài lộc hoặc vận hạn của cả năm.",
+  },
+  "sinh-con": {
+    subject: "kế hoạch sinh con",
+    relation: "sự hài hòa tuổi con với cả cha và mẹ",
+    favorableFocus: "năm được gợi ý thường giữ được nhiều tín hiệu thuận với cả hai phía, giúp gia đình dễ đọc bối cảnh hơn",
+    cautionFocus: "năm có cảnh báo với một phía nên được hiểu là điểm cần chuẩn bị thêm về nhịp sống và sự hỗ trợ trong gia đình",
+    nextSteps: [
+      "Đặt sức khỏe, tuổi sinh sản, điều kiện chăm sóc và tư vấn chuyên môn lên trước yếu tố hợp tuổi.",
+      "Nếu đang so nhiều năm, chọn khoảng thời gian thực tế với gia đình rồi dùng kết quả tuổi như lớp đối chiếu bổ sung.",
+    ],
+    guardrail: "Kết quả chỉ là tham khảo theo tuổi truyền thống; không phải lời khuyên y khoa hoặc chỉ dẫn sinh sản.",
+  },
+  "ket-hon": {
+    subject: "việc chọn năm kết hôn",
+    relation: "tuổi mụ, Kim Lâu, Tam Tai và quan hệ với năm dự kiến",
+    favorableFocus: "năm ít cảnh báo giúp hai gia đình dễ yên tâm hơn khi bàn lịch cưới và các nghi thức liên quan",
+    cautionFocus: "năm có cảnh báo không nên bị hiểu là phải dừng việc cưới, mà là tín hiệu để chuẩn bị kỹ hơn",
+    nextSteps: [
+      "Đối chiếu năm cưới với pháp lý, sức khỏe, tài chính, lịch hai gia đình và mức độ sẵn sàng của hai người.",
+      "Sau khi chọn được khoảng năm phù hợp, xem tiếp ngày cưới hỏi thay vì chỉ chốt bằng năm.",
+    ],
+    guardrail: "Kết quả chỉ là tham khảo theo quan niệm dân gian; quyết định kết hôn cần dựa trên sự đồng thuận và trách nhiệm thực tế.",
+  },
+  "lam-nha": {
+    subject: "kế hoạch làm nhà",
+    relation: "Tam Tai, Kim Lâu, Hoang Ốc và tuổi mụ của gia chủ",
+    favorableFocus: "năm ít cảnh báo giúp gia chủ dễ yên tâm hơn khi chuẩn bị động thổ, sửa chữa hoặc xây dựng",
+    cautionFocus: "năm có cảnh báo nên được xem như lời nhắc kiểm tra kỹ pháp lý, ngân sách, tiến độ và an toàn thi công",
+    nextSteps: [
+      "Hoàn tất pháp lý đất, thiết kế, dự toán, nhà thầu và phương án an toàn trước khi chốt thời điểm.",
+      "Nếu vẫn muốn làm trong năm có cảnh báo, hãy bàn rõ với gia đình và người tư vấn phong tục địa phương.",
+    ],
+    guardrail: "Kết quả chỉ là tham khảo phong tục; công cụ không đề xuất mua vật phẩm, cúng giải hay thay thế quyết định kỹ thuật.",
+  },
+};
+
+function summarizeSignal(criteria: Criterion[], status: CriterionStatus) {
+  return criteria
+    .filter((criterion) => criterion.status === status)
+    .map((criterion) => criterion.label)
+    .slice(0, 3);
+}
+
+function buildInterpretation(criteria: Criterion[], band: AnalysisBand, label: string, context: InterpretationContext = {}): AnalysisInterpretation {
+  const tool = context.tool ? TOOL_CONTEXT[context.tool] : undefined;
+  const subject = tool?.subject ?? "kết quả xem tuổi";
+  const relation = tool?.relation ?? "các lớp Can Chi, Nạp âm và Địa Chi";
+  const favorableSignals = summarizeSignal(criteria, "favorable");
+  const cautionSignals = summarizeSignal(criteria, "caution");
+  const neutralSignals = summarizeSignal(criteria, "neutral");
+  const target = context.year ? `Năm ${context.year}` : "Kết quả này";
+  const headline = `${target}: ${label.toLowerCase()} cho ${subject}`;
+
+  const plainLanguage = band === "favorable"
+    ? `${target} đang có nhiều tín hiệu thuận khi đối chiếu ${relation}. Nên hiểu đây là nền tham khảo khá dễ dùng: các điểm thuận giúp người xem yên tâm hơn, nhưng vẫn cần đặt vào hoàn cảnh gia đình, công việc và điều kiện thực tế.`
+    : band === "caution"
+      ? `${target} có nhiều điểm cần cân nhắc khi đối chiếu ${relation}. Điều quan trọng là không đọc kết quả như một lời cấm đoán, mà xem đây là danh sách những phần nên kiểm tra kỹ hơn trước khi quyết định.`
+      : `${target} có cả tín hiệu thuận và tín hiệu cần cân nhắc khi đối chiếu ${relation}. Cách đọc phù hợp là giữ lại điểm hỗ trợ, đồng thời biến điểm xung khắc thành việc cần chuẩn bị rõ ràng hơn trong đời sống thực tế.`;
+
+  const strengths = favorableSignals.length
+    ? [
+      `Điểm thuận nổi bật nằm ở ${favorableSignals.join(", ")}, cho thấy ${tool?.favorableFocus ?? "có vài lớp hỗ trợ để người xem tham khảo thêm"}.`,
+      neutralSignals.length ? `Các tiêu chí trung tính như ${neutralSignals.join(", ")} không tạo cảnh báo lớn, nhưng cũng không nên dùng làm căn cứ duy nhất.` : "Khi nhiều tiêu chí cùng thuận, người xem vẫn nên đọc từng lý do thay vì chỉ nhìn nhãn tổng quan.",
+    ]
+    : [
+      "Kết quả không có nhiều điểm thuận rõ rệt, vì vậy giá trị chính nằm ở việc chỉ ra phần nào cần chuẩn bị kỹ hơn.",
+    ];
+
+  const cautions = cautionSignals.length
+    ? [
+      `Điểm cần cân nhắc nằm ở ${cautionSignals.join(", ")}; ${tool?.cautionFocus ?? "nên xem đây là tín hiệu để kiểm tra lại bối cảnh thực tế"}.`,
+      "Một tiêu chí xung khắc không đủ để phủ định toàn bộ việc đang xem; hãy đọc nó cùng các tiêu chí còn lại.",
+    ]
+    : [
+      "Không có cảnh báo chính nổi bật, nhưng kết quả vẫn chỉ phản ánh phần tuổi, chưa bao gồm sức khỏe, pháp lý, tài chính, tính cách và hoàn cảnh từng người.",
+    ];
+
+  return {
+    headline,
+    plainLanguage,
+    strengths,
+    cautions,
+    nextSteps: tool?.nextSteps ?? [
+      "Đọc từng tiêu chí trước khi đưa ra quyết định.",
+      "Đối chiếu kết quả với hoàn cảnh thực tế và các điều kiện quan trọng khác.",
+    ],
+    guardrail: tool?.guardrail ?? "Kết quả chỉ là tham khảo theo tuổi truyền thống và không thay thế quyết định thực tế.",
+  };
+}
+
+function summarize(criteria: Criterion[], context?: InterpretationContext): AnalysisSummary {
   const counts = criteria.reduce(
     (result, criterion) => ({ ...result, [criterion.status]: result[criterion.status] + 1 }),
     { favorable: 0, neutral: 0, caution: 0 },
@@ -307,18 +452,19 @@ function summarize(criteria: Criterion[]): AnalysisSummary {
     : band === "caution"
       ? "Nên cân nhắc kỹ"
       : "Có thuận lợi và điểm cần cân nhắc";
-  return { band, label, criteria, counts };
+  return { band, label, criteria, counts, interpretation: buildInterpretation(criteria, band, label, context) };
 }
 
 export function comparePeople(
   left: LunarYearProfile,
   right: LunarYearProfile,
   includeCungPhi = false,
+  context?: InterpretationContext,
 ): AnalysisSummary {
   const criteria = [napAmCriterion(left, right), stemCriterion(left, right), branchCriterion(left, right)];
   const cungPhi = includeCungPhi ? cungPhiCriterion(left, right) : undefined;
   if (cungPhi) criteria.push(cungPhi);
-  return summarize(criteria);
+  return summarize(criteria, context);
 }
 
 function validateYearRange(startYear: number, endYear: number) {
@@ -394,7 +540,7 @@ export function analyzeVoChong(leftDate: string, leftGender: Gender, rightDate: 
   return {
     title: "Đối chiếu tuổi vợ chồng",
     profiles: [{ label: "Người thứ nhất", profile: left }, { label: "Người thứ hai", profile: right }],
-    summary: comparePeople(left, right, true),
+    summary: comparePeople(left, right, true, { tool: "vo-chong" }),
   } satisfies AgeToolAnalysis;
 }
 
@@ -404,7 +550,7 @@ export function analyzeLamAn(leftDate: string, rightDate: string) {
   return {
     title: "Đối chiếu tuổi làm ăn",
     profiles: [{ label: "Người thứ nhất", profile: left }, { label: "Người thứ hai", profile: right }],
-    summary: comparePeople(left, right),
+    summary: comparePeople(left, right, false, { tool: "lam-an" }),
   } satisfies AgeToolAnalysis;
 }
 
@@ -417,7 +563,7 @@ export function analyzeXongDat(ownerDate: string, targetYear: number) {
       ...mergeComparison(comparePeople(profile, owner), "gia-chu", "Với gia chủ"),
       ...mergeComparison(comparePeople(profile, yearProfile), "nam", `Với năm ${targetYear}`, "supporting"),
     ];
-    return { year: candidateYear, profile, summary: summarize(criteria), details: {} };
+    return { year: candidateYear, profile, summary: summarize(criteria, { tool: "xong-dat", year: candidateYear }), details: {} };
   });
   return {
     title: `Gợi ý tuổi xông đất năm ${targetYear}`,
@@ -435,7 +581,7 @@ export function analyzeSinhCon(fatherDate: string, motherDate: string, startYear
       ...mergeComparison(comparePeople(profile, father), "cha", "Với cha"),
       ...mergeComparison(comparePeople(profile, mother), "me", "Với mẹ"),
     ];
-    return { year, profile, summary: summarize(criteria), details: {} };
+    return { year, profile, summary: summarize(criteria, { tool: "sinh-con", year }), details: {} };
   });
   return {
     title: "Gợi ý năm sinh con",
@@ -469,7 +615,7 @@ export function analyzeKetHon(date: string, gender: Gender, startYear: number, e
       { key: "tam-tai", label: "Tam Tai", status: tamTai.active ? "caution" : "favorable", role: "primary", explanation: tamTai.active ? `Năm ${profile.branch} thuộc nhóm Tam Tai ${tamTai.years.join("–")}.` : `Năm ${profile.branch} không thuộc nhóm Tam Tai ${tamTai.years.join("–")}.` },
       { key: "thai-tue", label: "Thái Tuế", status: thaiTue.type === "none" ? "neutral" : "caution", role: "supporting", explanation: thaiTue.label + "." },
     ];
-    return { year, profile, summary: summarize(criteria), details: { ageMu, kimLau, tamTai, thaiTue } };
+    return { year, profile, summary: summarize(criteria, { tool: "ket-hon", year }), details: { ageMu, kimLau, tamTai, thaiTue } };
   });
   return {
     title: "Gợi ý năm kết hôn",
@@ -498,7 +644,7 @@ export function analyzeLamNha(date: string, gender: Gender, startYear: number, e
       { key: "kim-lau", label: "Kim Lâu", status: kimLau.active ? "caution" : "favorable", role: "primary", explanation: `Tuổi mụ ${ageMu}, chia 9 dư ${kimLau.remainder}: ${kimLau.name}.` },
       { key: "hoang-oc", label: "Hoang Ốc", status: hoangOc.status, role: "primary", explanation: `Tuổi mụ ${ageMu} vào cung ${hoangOc.name}.` },
     ];
-    return { year, profile, summary: summarize(criteria), details: { ageMu, kimLau, tamTai, hoangOc } };
+    return { year, profile, summary: summarize(criteria, { tool: "lam-nha", year }), details: { ageMu, kimLau, tamTai, hoangOc } };
   });
   return {
     title: "Gợi ý năm làm nhà",

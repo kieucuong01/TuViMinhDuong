@@ -33,7 +33,7 @@ export const AGE_TOOL_PAGES: AgeToolPage[] = [
     readingTips: [
       "Ưu tiên người khỏe mạnh, vui vẻ, gia đạo ổn định và có quan hệ tốt với gia đình.",
       "Danh sách hiển thị năm sinh gợi ý; gia chủ vẫn nên xét hoàn cảnh thực tế và giờ đến nhà.",
-      "Không có tuổi nào bảo đảm tài lộc hoặc thay đổi vận hạn của cả năm.",
+      "Không nên kỳ vọng một tuổi xông đất có thể quyết định tài lộc hoặc vận hạn của cả năm.",
     ],
     example: "Ví dụ: gia chủ nhập ngày sinh, chọn năm mới cần xem. Công cụ sẽ nêu rõ tuổi nào lục hợp hoặc tam hợp với gia chủ, tuổi nào có quan hệ xung, hại hay phá cần cân nhắc.",
     faqs: [
@@ -49,7 +49,7 @@ export const AGE_TOOL_PAGES: AgeToolPage[] = [
     label: "Xem tuổi vợ chồng",
     shortDescription: "Đối chiếu hai người theo Nạp âm, Can Chi và Cung Phi.",
     title: "Xem tuổi vợ chồng theo Can Chi, Cung Phi",
-    description: "Xem tuổi vợ chồng theo Nạp âm Ngũ hành, Thiên Can, Địa Chi và Cung Phi; giải thích từng lớp hợp khắc, không phán định hôn nhân.",
+    description: "Xem tuổi vợ chồng theo Nạp âm Ngũ hành, Thiên Can, Địa Chi và Cung Phi; giải thích từng lớp hợp khắc, không thay thế quyết định hôn nhân.",
     heading: "Xem tuổi vợ chồng có hợp nhau không",
     intro: "Đây là phép đối chiếu các lớp tuổi truyền thống của hai người. Công cụ tách rõ tiêu chí chính và Cung Phi bổ trợ, không dùng một con số để kết luận chất lượng hay tương lai hôn nhân.",
     method: [
@@ -132,7 +132,7 @@ export const AGE_TOOL_PAGES: AgeToolPage[] = [
     title: "Xem tuổi làm ăn, hợp tác kinh doanh",
     description: "Xem tuổi làm ăn giữa hai người theo Nạp âm Ngũ hành, Thiên Can và Địa Chi; kết quả tham khảo, không dự báo lợi nhuận.",
     heading: "Xem tuổi hợp tác làm ăn",
-    intro: "Công cụ đối chiếu ba lớp tuổi truyền thống giữa hai người dự định hợp tác. Vì hiệu quả kinh doanh phụ thuộc năng lực, pháp lý, tài chính và cách quản trị, kết quả không dự báo doanh thu hay bảo đảm thành công.",
+    intro: "Công cụ đối chiếu ba lớp tuổi truyền thống giữa hai người dự định hợp tác. Vì hiệu quả kinh doanh phụ thuộc năng lực, pháp lý, tài chính và cách quản trị, kết quả không dự báo doanh thu hay quyết định thành công.",
     method: [
       "Đổi ngày sinh của hai người sang năm âm lịch và xác định Nạp âm.",
       "Đối chiếu quan hệ sinh khắc Ngũ hành, cặp Thiên Can tương hợp và quan hệ Địa Chi.",
@@ -143,11 +143,11 @@ export const AGE_TOOL_PAGES: AgeToolPage[] = [
       "Luôn kiểm tra hợp đồng, quyền hạn, dòng tiền và cơ chế giải quyết tranh chấp.",
       "Không chuyển tiền hoặc đầu tư chỉ vì kết quả tuổi được xếp nhiều điểm thuận.",
     ],
-    example: "Ví dụ: hai tuổi có Thiên Can tương hợp nhưng Nạp âm tương khắc. Công cụ trình bày cả hai lớp và giữ kết luận ở mức cần cân nhắc, không phán chắc lời lỗ.",
+    example: "Ví dụ: hai tuổi có Thiên Can tương hợp nhưng Nạp âm tương khắc. Công cụ trình bày cả hai lớp và giữ kết luận ở mức cần cân nhắc, không kết luận lời lỗ.",
     faqs: [
       { question: "Xem tuổi làm ăn có dùng Cung Phi không?", answer: "Không trong công cụ này. Cung Phi gắn nhiều hơn với hướng và bát trạch; bài toán hợp tác chỉ dùng Nạp âm, Thiên Can và Địa Chi." },
       { question: "Tuổi không hợp có nên từ chối đối tác?", answer: "Không nên quyết định chỉ bằng tuổi. Hồ sơ pháp lý, uy tín, năng lực, vốn và điều khoản hợp đồng mới là căn cứ thực tế quan trọng." },
-      { question: "Kết quả có dự báo lợi nhuận không?", answer: "Không. Công cụ không tính doanh thu, rủi ro thị trường hoặc khả năng thực hiện và tuyệt đối không bảo đảm lợi nhuận." },
+      { question: "Kết quả có dự báo lợi nhuận không?", answer: "Không. Công cụ không tính doanh thu, rủi ro thị trường hoặc khả năng thực hiện; không nên dùng kết quả tuổi làm căn cứ lợi nhuận." },
     ],
     related: ["xong-dat", "lam-nha"],
     cta: { href: "/xem-ngay?mode=finder&task=contract#date-finder", label: "Xem ngày ký kết", description: "Tra cứu ngày phù hợp cho ký kết sau khi đã hoàn tất thẩm định thực tế." },

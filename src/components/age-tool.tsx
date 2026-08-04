@@ -47,6 +47,37 @@ function StatusIcon({ status }: { status: CriterionStatus }) {
   return <MinusCircle aria-hidden="true" />;
 }
 
+function InterpretationPanel({ summary, compact = false }: { summary: AnalysisSummary; compact?: boolean }) {
+  const interpretation = summary.interpretation;
+
+  return (
+    <section className={compact ? "age-interpretation-panel age-interpretation-panel-compact" : "age-interpretation-panel"} aria-labelledby={compact ? undefined : "age-interpretation-title"}>
+      <div className="age-interpretation-intro">
+        <span>Luận giải dễ hiểu</span>
+        {compact ? <strong>{interpretation.headline}</strong> : <h4 id="age-interpretation-title">{interpretation.headline}</h4>}
+        <p>{interpretation.plainLanguage}</p>
+      </div>
+
+      <div className="age-interpretation-grid">
+        <article>
+          <strong>Điểm thuận</strong>
+          <ul>{interpretation.strengths.map((item) => <li key={item}>{item}</li>)}</ul>
+        </article>
+        <article>
+          <strong>Điểm cần cân nhắc</strong>
+          <ul>{interpretation.cautions.map((item) => <li key={item}>{item}</li>)}</ul>
+        </article>
+        <article>
+          <strong>Việc nên làm tiếp</strong>
+          <ul>{interpretation.nextSteps.map((item) => <li key={item}>{item}</li>)}</ul>
+        </article>
+      </div>
+
+      <p className="age-interpretation-guardrail">{interpretation.guardrail}</p>
+    </section>
+  );
+}
+
 function ResultSummary({ summary }: { summary: AnalysisSummary }) {
   return (
     <section className="age-result-summary" data-band={summary.band} aria-labelledby="age-result-summary-title">
@@ -59,6 +90,7 @@ function ResultSummary({ summary }: { summary: AnalysisSummary }) {
         <div><dt>Trung tính</dt><dd>{summary.counts.neutral}</dd></div>
         <div><dt>Cân nhắc</dt><dd>{summary.counts.caution}</dd></div>
       </dl>
+      <InterpretationPanel summary={summary} />
       <div className="age-criteria-list">
         {summary.criteria.map((criterion) => (
           <article className="age-criterion" key={criterion.key} data-status={criterion.status}>
@@ -211,7 +243,7 @@ export function AgeTool({ tool }: { tool: AgeToolSlug }) {
           <div className="age-result-head">
             <span>Kết quả tra cứu</span>
             <h2>{result.title}</h2>
-            <p>Kết quả dựa trên năm âm lịch và các quy tắc được giải thích bên dưới; không phải dự báo chắc chắn.</p>
+            <p>Kết quả dựa trên năm âm lịch và các quy tắc được giải thích bên dưới; không phải lời dự báo cố định.</p>
           </div>
 
           <div className="age-profile-grid">
@@ -235,6 +267,10 @@ export function AgeTool({ tool }: { tool: AgeToolSlug }) {
                     <strong>{yearResult.summary.label}</strong>
                   </div>
                   <p>{yearResult.profile.napAm} · {yearResult.profile.napAmElement}</p>
+                  <details className="age-year-interpretation" open={index === 0}>
+                    <summary>Luận giải dễ hiểu</summary>
+                    <InterpretationPanel summary={yearResult.summary} compact />
+                  </details>
                   <details>
                     <summary>Xem {yearResult.summary.criteria.length} tiêu chí</summary>
                     <div className="age-criteria-list">

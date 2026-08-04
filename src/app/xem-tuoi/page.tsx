@@ -134,7 +134,7 @@ export default function AgeToolsHubPage() {
         </article>
         <article>
           <Scale aria-hidden="true" />
-          <div><h2>Tham khảo, không phán quyết</h2><p>Tuổi không thay thế sự đồng thuận trong hôn nhân, tư vấn y khoa, thẩm định đối tác, pháp lý đất đai hoặc an toàn thi công.</p></div>
+          <div><h2>Tham khảo, không thay thế quyết định</h2><p>Tuổi không thay thế sự đồng thuận trong hôn nhân, tư vấn y khoa, thẩm định đối tác, pháp lý đất đai hoặc an toàn thi công.</p></div>
         </article>
       </section>
     </main>

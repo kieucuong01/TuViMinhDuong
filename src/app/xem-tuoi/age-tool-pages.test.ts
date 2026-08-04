@@ -10,6 +10,7 @@ const hubSource = source("src/app/xem-tuoi/page.tsx");
 const leafSource = source("src/app/xem-tuoi/[tool]/page.tsx");
 const componentSource = source("src/components/age-tool.tsx");
 const sitemapSource = source("src/app/sitemap.ts");
+const combinedPublicSource = [hubSource, leafSource, componentSource, JSON.stringify(AGE_TOOL_PAGES)].join("\n").toLowerCase();
 
 describe("Xem Tuổi page cluster", () => {
   it("publishes six distinct canonical tool definitions", () => {
@@ -40,5 +41,17 @@ describe("Xem Tuổi page cluster", () => {
     expect(componentSource).not.toContain("URLSearchParams");
     expect(componentSource).not.toContain("localStorage");
     expect(componentSource).not.toContain("sessionStorage");
+  });
+
+  it("renders the detailed interpretation layer from computed summaries", () => {
+    expect(componentSource).toContain("summary.interpretation");
+    expect(componentSource).toContain("Luận giải dễ hiểu");
+    expect(componentSource).toContain("Việc nên làm tiếp");
+  });
+
+  it("avoids absolute claims in public age-tool copy", () => {
+    for (const phrase of ["chắc chắn", "bảo đảm", "đổi đời", "phán quyết", "làm giàu nhanh", "cam kết kết quả"]) {
+      expect(combinedPublicSource).not.toContain(phrase);
+    }
   });
 });
