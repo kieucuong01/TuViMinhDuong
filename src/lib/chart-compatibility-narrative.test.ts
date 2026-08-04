@@ -1,5 +1,35 @@
 import { describe, expect, it } from "vitest";
-import { selectStableVariant } from "@/lib/chart-compatibility-narrative";
+import {
+  buildThemeNarrative,
+  NarrativeLedger,
+  selectStableVariant,
+  type CompatibilityNarrativeThemeKey,
+  type NarrativeContext,
+} from "@/lib/chart-compatibility-narrative";
+
+const baseContext: Omit<NarrativeContext, "key"> = {
+  level: "coordinate",
+  interaction: "complementary",
+  seed: "minh:an",
+  first: {
+    name: "Minh",
+    traits: ["analysis"],
+    primaryNeed: "hiểu rõ việc đang xảy ra",
+    reassurance: "có đủ thời gian cân nhắc",
+    contribution: "kiểm tra kỹ những điểm còn bỏ ngỏ",
+    friction: "chậm chốt khi thông tin chưa đủ",
+  },
+  second: {
+    name: "An",
+    traits: ["action"],
+    primaryNeed: "thấy việc được chuyển động",
+    reassurance: "có một bước tiếp theo rõ ràng",
+    contribution: "mở việc nhanh và giữ đà hành động",
+    friction: "dễ sốt ruột khi phải chờ quá lâu",
+  },
+};
+
+const makeContext = (key: CompatibilityNarrativeThemeKey): NarrativeContext => ({ ...baseContext, key });
 
 describe("compatibility narrative selector", () => {
   it("selects the same variant for the same seed", () => {
@@ -26,5 +56,30 @@ describe("compatibility narrative selector", () => {
     );
 
     expect(result.family).toBe("contrast-first");
+  });
+});
+
+describe("topic-specific compatibility narratives", () => {
+  it.each([
+    ["temperament", "khi nhịp sống bị xáo trộn"],
+    ["communication", "một cuộc trao đổi"],
+    ["commitment", "cảm giác được đồng hành"],
+    ["finance", "một khoản chi"],
+    ["work", "một việc chung"],
+    ["family", "nếp sống chung"],
+  ] as const)("gives %s its own real-life scene", (key, expectedScene) => {
+    const result = buildThemeNarrative(makeContext(key), new NarrativeLedger());
+
+    expect(result.possibleExpression.toLowerCase()).toContain(expectedScene);
+  });
+
+  it("writes a complete reading rather than returning fragments", () => {
+    const result = buildThemeNarrative(makeContext("communication"), new NarrativeLedger());
+
+    expect(result.summary.length).toBeGreaterThan(120);
+    expect(result.whyItMatters.length).toBeGreaterThan(100);
+    expect(result.possibleExpression.length).toBeGreaterThan(100);
+    expect(result.actions).toHaveLength(2);
+    expect(result.questions).toHaveLength(2);
   });
 });
