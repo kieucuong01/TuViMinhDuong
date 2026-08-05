@@ -239,4 +239,28 @@ describe("data module boundaries", () => {
       "@/lib/data",
     ]));
   });
+
+  it("owns admin reporting and normalization in the admin domain", () => {
+    const adminPath = path.join(dataDirectory, "admin.ts");
+    const expected = [
+      "normalizeAdminTrendPeriod",
+      "getAdminBusinessDashboard",
+      "listAdminChartSubmissions",
+      "getAdminOverview",
+    ];
+
+    expect(fs.existsSync(adminPath)).toBe(true);
+    const owned = exportedDeclarations(adminPath);
+    const facadeExports = exportedDeclarations(path.join(projectRoot, "src", "lib", "data.ts"));
+    for (const name of expected) {
+      expect(owned.has(name), `${name} should be owned by admin.ts`).toBe(true);
+      expect(facadeExports.has(name), `${name} should remain exported by data.ts`).toBe(true);
+    }
+
+    expect(importSpecifiers(adminPath)).not.toEqual(expect.arrayContaining([
+      "@/lib/data",
+      "@/app/actions",
+    ]));
+    expect(importSpecifiers(path.join(dataDirectory, "settings.ts"))).not.toContain("./admin");
+  });
 });
