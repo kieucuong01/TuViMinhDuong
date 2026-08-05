@@ -465,6 +465,18 @@ export default function LifetimeTuViPage() {
               <p className="mt-4 text-lg leading-8 text-stone-600">
                 Nếu chỉ cần tra nhanh, các phần trên là đủ để đọc tổng quan. Khi cần xem kỹ vì sao cùng tuổi nhưng đời sống khác nhau, hãy đối chiếu thêm giờ sinh, cung Mệnh, cung Thân, đại vận và các sao trong 12 cung.
               </p>
+              <p className="mt-4 text-sm leading-7 text-stone-500">
+                Nếu đang cân nhắc công việc, bạn có thể đối chiếu thêm góc nhìn dựa trên họ tên và ngày sinh trong bài{` `}
+                <a
+                  href="https://bandothanso.vn/kien-thuc-than-so-hoc/than-so-hoc-nghe-nghiep?utm_source=lasotinhhoa&utm_medium=partner&utm_campaign=bdts_career_cluster&utm_content=xem_tu_vi_tron_doi_context"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-semibold text-orange-700 underline decoration-orange-300 underline-offset-4 hover:text-orange-900"
+                >
+                  thần số học nghề nghiệp
+                </a>
+                . Hai hệ chỉ nên dùng để tự quan sát; quyết định nghề vẫn cần dựa trên kỹ năng, điều kiện sống và trải nghiệm thực tế.
+              </p>
               <Link href={lifetimeHubDeepCtaHref} className="btn btn-ghost mt-6">
                 <UserRound size={18} /> Lập lá số cá nhân khi cần
               </Link>

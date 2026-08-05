@@ -61,6 +61,11 @@ describe("lifetime Tu vi landing page", () => {
     expect(cardListSource).not.toContain("Anh thử nhập");
   });
 
+  it("adds one measured contextual career comparison without turning it into a global promotion", () => {
+    expect(pageSource).toContain("https://bandothanso.vn/kien-thuc-than-so-hoc/than-so-hoc-nghe-nghiep?utm_source=lasotinhhoa&utm_medium=partner&utm_campaign=bdts_career_cluster&utm_content=xem_tu_vi_tron_doi_context");
+    expect(pageSource.match(/bandothanso\.vn/g)).toHaveLength(1);
+  });
+
   it("exposes the full lifetime cluster to crawlers and AI discovery files", () => {
     const detailedCards = lifetimeCards.filter((item) => Boolean(item.detailsPath));
     const indexedCards = lifetimeQuickIndexGroups.flatMap((group) => group.items);
