@@ -34,7 +34,9 @@ describe("GitHub Actions guardrails", () => {
     expect(e2e).toContain("PAYOS_API_KEY: \"\"");
     expect(e2e).toContain("PAYOS_CHECKSUM_KEY: \"\"");
     expect(e2e).toContain("npx playwright install --with-deps chromium");
-    expect(e2e).toContain("playwright test tests/e2e/ci-safe.spec.ts");
+    expect(e2e).toContain("PLAYWRIGHT_WEB_SERVER_COMMAND: \"npm start -- -p 4000\"");
+    expect(e2e).toContain("npm run build");
+    expect(e2e).toContain("playwright test tests/e2e/ci-safe.spec.ts tests/e2e/production-security.spec.ts");
     expect(e2e).not.toContain("PLAYWRIGHT_BASE_URL");
     expect(e2e).not.toContain("secrets.");
   });

@@ -19,7 +19,7 @@ import { ActionTimeoutError, withActionTimeout } from "@/lib/action-timeout";
 import { savePseoPageFromForm } from "@/lib/pseo-data";
 import { chartCreationRateLimitExceeded, chartCreationRateLimitWindowStart, normalizeRequestIp, normalizeUserAgent, validateChartFullName } from "@/lib/chart-submission-guard";
 import { normalizeChartAttribution } from "@/lib/chart-attribution";
-import { AUTH_RATE_LIMIT_WINDOW_MS, LOGIN_RATE_LIMIT, checkRateLimit, rateLimitKeyFromHeaders } from "@/lib/rate-limit";
+import { AUTH_RATE_LIMIT_WINDOW_MS, LOGIN_RATE_LIMIT, checkAuthRateLimit } from "@/lib/rate-limit";
 import { parseChartActionInput, parseFeaturePriceUpdates, parseOperationSettingsInput, parseReadingBundleInput, parseReadingRequestInput, safeNextPath } from "@/lib/action-input";
 import { runCoinTopupCheckout, runFullReadingCheckout, runQuickReadingCheckout } from "@/lib/reading-checkout";
 import { normalizeAnonymousFunnelSessionId, recordAttributedAccountFunnelEvent, recordChartResultFunnelEvent } from "@/lib/funnel-events";
@@ -62,7 +62,7 @@ export async function loginAction(formData: FormData) {
 
   try {
     const headerList = await headers();
-    const rateLimit = checkRateLimit(rateLimitKeyFromHeaders("login", headerList), {
+    const rateLimit = await checkAuthRateLimit("login", headerList, {
       limit: LOGIN_RATE_LIMIT,
       windowMs: AUTH_RATE_LIMIT_WINDOW_MS,
     });

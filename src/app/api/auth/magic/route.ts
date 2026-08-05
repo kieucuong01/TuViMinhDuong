@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { signInWithMagicToken } from "@/lib/auth";
-import { AUTH_RATE_LIMIT_WINDOW_MS, MAGIC_LOGIN_RATE_LIMIT, checkRateLimit, rateLimitKeyFromHeaders } from "@/lib/rate-limit";
+import { AUTH_RATE_LIMIT_WINDOW_MS, MAGIC_LOGIN_RATE_LIMIT, checkAuthRateLimit } from "@/lib/rate-limit";
 import { recordAccountFunnelEvent } from "@/lib/funnel-events";
 
 function safeNext(value: string | null) {
@@ -12,7 +12,7 @@ export async function GET(request: Request) {
   const url = new URL(request.url);
   const token = url.searchParams.get("token") || "";
   const next = safeNext(url.searchParams.get("next"));
-  const rateLimit = checkRateLimit(rateLimitKeyFromHeaders("magic", request.headers), {
+  const rateLimit = await checkAuthRateLimit("magic", request.headers, {
     limit: MAGIC_LOGIN_RATE_LIMIT,
     windowMs: AUTH_RATE_LIMIT_WINDOW_MS,
   });

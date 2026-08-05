@@ -290,6 +290,17 @@ model PaymentReconciliationRun {
   @@index([createdAt])
 }
 
+model RateLimitBucket {
+  keyHash     String
+  windowStart DateTime
+  count       Int      @default(1)
+  expiresAt   DateTime
+  updatedAt   DateTime @updatedAt
+
+  @@id([keyHash, windowStart])
+  @@index([expiresAt])
+}
+
 model FunnelEvent {
   id                 String   @id @default(cuid())
   name               String

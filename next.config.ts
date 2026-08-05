@@ -1,6 +1,8 @@
 import type { NextConfig } from "next";
 import { LEGACY_ARTICLE_REDIRECTS } from "./src/lib/legacy-article-redirects";
 
+const scriptEvalDirective = process.env.NODE_ENV === "development" ? " 'unsafe-eval'" : "";
+
 const securityHeaders = [
   {
     key: "Strict-Transport-Security",
@@ -21,7 +23,7 @@ const securityHeaders = [
       "object-src 'none'",
       "frame-ancestors 'none'",
       "form-action 'self'",
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://www.googleadservices.com https://googleads.g.doubleclick.net",
+      `script-src 'self' 'unsafe-inline'${scriptEvalDirective} https://www.googletagmanager.com https://www.google-analytics.com https://www.googleadservices.com https://googleads.g.doubleclick.net`,
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data: blob: https:",
       "font-src 'self' data:",

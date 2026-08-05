@@ -29,7 +29,7 @@ export default defineConfig({
   webServer: process.env.PLAYWRIGHT_BASE_URL
     ? undefined
     : {
-        command: "npm run dev:e2e",
+        command: process.env.PLAYWRIGHT_WEB_SERVER_COMMAND || "npm run dev:e2e",
         env: {
           ...process.env,
           PLAYWRIGHT_DISABLE_LLM: "1",
