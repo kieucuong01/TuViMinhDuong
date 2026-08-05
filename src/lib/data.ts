@@ -29,117 +29,59 @@ import type { SessionUser } from "@/lib/auth";
 import { createPerfTimer, logPerfEvent } from "@/lib/perf";
 import type { ReadingProgressInput } from "@/lib/reading-progress";
 import type { ChartAttribution } from "@/lib/chart-attribution";
+import {
+  balances,
+  charts,
+  demoArticleCategories,
+  demoArticles,
+  demoFeaturePrices,
+  demoOperationSettings,
+  readingProgressEntries,
+  readings,
+  replaceDemoFeaturePrices,
+  replaceDemoOperationSettings,
+} from "@/lib/data/demo-store";
+import type {
+  AdminBusinessDashboard,
+  AdminChartSubmission,
+  AdminPaymentSource,
+  AdminRecentPayment,
+  AdminRevenueMetrics,
+  AdminTrendGroups,
+  AdminTrendPeriod,
+  AdminTrendPoint,
+  ChartCreationMetadata,
+  ChartHistoryItem,
+  FreeOverviewBlockProgress,
+  FreeOverviewGenerationClaim,
+  FreeOverviewStatus,
+  OperationSettings,
+  ReadingScopeKey,
+  StoredChart,
+  StoredReading,
+  StoredReadingProgress,
+} from "@/lib/data/contracts";
 
-type StoredChart = {
-  id: string;
-  title: string;
-  input: ChartInput;
-  chart: TuViChart;
-  userId?: string;
-  creationIp?: string | null;
-  creationUserAgent?: string | null;
-  creationSource?: string | null;
-  creationAttribution?: ChartAttribution | null;
-  createdAt: Date;
-};
-
-export type ChartCreationMetadata = {
-  requestIp?: string;
-  userAgent?: string;
-  attribution?: ChartAttribution;
-};
-
-export type StoredReading = {
-  id: string;
-  userId: string;
-  chartId: string;
-  type: ReadingKey;
-  scopeKey: string;
-  status?: "PENDING" | "COMPLETED" | "FAILED" | "REFUNDED";
-  priceCoins: number;
-  content: string;
-  promptMeta?: unknown;
-  model?: string | null;
-  error?: string | null;
-  createdAt: Date;
-  updatedAt?: Date;
-};
-
-export type ReadingScopeKey = {
-  type: ReadingKey;
-  scopeKey: string;
-};
-
-export type OperationSettings = {
-  paymentsEnabled: boolean;
-  coinTopupEnabled: boolean;
-  paidReadingsEnabled: boolean;
-  updatedAt?: Date | null;
-};
-
-export type AdminPaymentSource = "coin_topup" | "quick_reading" | "other";
-
-export type AdminRevenueMetrics = {
-  totalPaidVnd: number;
-  currentMonthPaidVnd: number;
-  last30DaysPaidVnd: number;
-  coinTopupPaidVnd: number;
-  quickReadingPaidVnd: number;
-  otherPaidVnd: number;
-  paidOrders: number;
-  pendingOrders: number;
-  failedOrders: number;
-  cancelledOrders: number;
-  expiredOrders: number;
-};
-
-export type AdminRecentUser = {
-  id: string;
-  email: string;
-  name: string | null;
-  role: "USER" | "ADMIN";
-  coinBalance: number;
-  createdAt: Date;
-  chartsCount: number;
-  readingsCount: number;
-  paidOrdersCount: number;
-  totalPaidVnd: number;
-  lastPaymentAt: Date | null;
-};
-
-export type AdminRecentPayment = {
-  id: string;
-  email: string;
-  name: string | null;
-  orderCode: string;
-  amountVnd: number;
-  coins: number;
-  status: string;
-  source: AdminPaymentSource;
-  sourceLabel: string;
-  createdAt: Date;
-  paidAt: Date | null;
-};
-
-export type AdminBusinessDashboard = {
-  revenue: AdminRevenueMetrics;
-  recentUsers: AdminRecentUser[];
-  recentPayments: AdminRecentPayment[];
-};
-
-export type AdminTrendPeriod = "day" | "week" | "month";
-
-export type AdminTrendPoint = {
-  label: string;
-  start: Date;
-  end: Date;
-  newUsers: number;
-  charts: number;
-  cumulativeUsers: number;
-  cumulativeCharts: number;
-};
-
-export type AdminTrendGroups = Record<AdminTrendPeriod, AdminTrendPoint[]>;
+export type {
+  AdminBusinessDashboard,
+  AdminChartSubmission,
+  AdminPaymentSource,
+  AdminRecentPayment,
+  AdminRecentUser,
+  AdminRevenueMetrics,
+  AdminTrendGroups,
+  AdminTrendPeriod,
+  AdminTrendPoint,
+  ChartCreationMetadata,
+  ChartHistoryItem,
+  FreeOverviewBlockProgress,
+  FreeOverviewGenerationClaim,
+  FreeOverviewStatus,
+  OperationSettings,
+  ReadingScopeKey,
+  StoredReading,
+  StoredReadingProgress,
+} from "@/lib/data/contracts";
 
 const ADMIN_TREND_PERIODS = new Set<AdminTrendPeriod>(["day", "week", "month"]);
 const ADMIN_TREND_PERIOD_LIST: AdminTrendPeriod[] = ["day", "week", "month"];
@@ -271,78 +213,6 @@ function buildDemoAdminTrendGroups(): AdminTrendGroups {
   ) as AdminTrendGroups;
 }
 
-export type StoredReadingProgress = ReadingProgressInput & {
-  id: string;
-  userId: string;
-  readingId: string;
-  createdAt: Date;
-  updatedAt: Date;
-};
-
-export type AdminChartSubmission = {
-  id: string;
-  title: string;
-  createdAt: Date;
-  submitterType: "guest" | "user";
-  userId: string | null;
-  userEmail: string | null;
-  userName: string | null;
-  fullName: string;
-  gender: ChartInput["gender"];
-  calendarType: ChartInput["calendarType"];
-  day: number;
-  month: number;
-  year: number;
-  birthHour: number;
-  birthMinute: number;
-  viewYear: number;
-  timezone: string;
-  creationIp: string | null;
-  creationUserAgent: string | null;
-  creationSource: string | null;
-  creationAttribution: ChartAttribution | null;
-};
-
-export type FreeOverviewBlockProgress = {
-  key: FreeOverviewBlockKey;
-  status: "idle" | "processing" | "completed" | "failed";
-  source: "llm" | "seed-rules";
-  model?: string;
-  generatedAt?: string;
-};
-
-export type FreeOverviewStatus =
-  | {
-      status: "ready";
-      content: string;
-      source: "llm" | "seed-rules";
-      model: string;
-      generatedAt: string;
-      wordCount: number;
-      jobStatus: "completed";
-      blocks?: FreeOverviewBlockProgress[];
-      completedBlocks?: number;
-      totalBlocks?: number;
-      nextBlockKey?: FreeOverviewBlockKey;
-    }
-  | {
-      status: "fallback";
-      content: string;
-      source: "seed-rules";
-      wordCount: number;
-      jobStatus: "idle" | "processing" | "stale" | "failed";
-      error?: string;
-      blocks?: FreeOverviewBlockProgress[];
-      completedBlocks?: number;
-      totalBlocks?: number;
-      nextBlockKey?: FreeOverviewBlockKey;
-    };
-
-export type FreeOverviewGenerationClaim =
-  | { status: "ready"; overview: Extract<FreeOverviewStatus, { status: "ready" }> }
-  | { status: "processing"; overview: Extract<FreeOverviewStatus, { status: "fallback" }> }
-  | { status: "claimed" };
-
 type ArticleRecord = Omit<ArticleView, "faqs"> & {
   faqs?: unknown;
 };
@@ -352,22 +222,6 @@ export const OPERATION_SETTINGS_CACHE_TAG = "operation-settings";
 export const FEATURE_PRICES_CACHE_TAG = "feature-prices";
 export const ARTICLES_CACHE_TAG = "articles";
 
-export type ChartHistoryItem = StoredChart & {
-  hasAdvancedReading: boolean;
-  advancedReadingId?: string;
-};
-
-const globalStore = globalThis as unknown as {
-  demoCharts?: Map<string, StoredChart>;
-  demoReadings?: Map<string, StoredReading>;
-  demoReadingProgress?: Map<string, StoredReadingProgress>;
-  demoBalances?: Map<string, number>;
-  demoArticles?: Map<string, ArticleView>;
-  demoArticleCategories?: Map<string, ArticleCategoryView>;
-  demoOperationSettings?: OperationSettings;
-  demoFeaturePrices?: FeaturePriceMap;
-};
-
 export const DEFAULT_OPERATION_SETTINGS: OperationSettings = {
   paymentsEnabled: true,
   coinTopupEnabled: true,
@@ -375,51 +229,10 @@ export const DEFAULT_OPERATION_SETTINGS: OperationSettings = {
   updatedAt: null,
 };
 
-const seedArticleCategories: ArticleCategoryView[] = [
-  { id: "cat-nhap-mon", name: "Nhập môn tử vi", slug: "nhap-mon-tu-vi", description: "Bài nền tảng cho người mới bắt đầu đọc lá số." },
-  { id: "cat-12-cung", name: "12 cung", slug: "12-cung", description: "Kiến thức về từng cung trong lá số tử vi." },
-  { id: "cat-van-han", name: "Vận hạn", slug: "van-han", description: "Đại vận, tiểu vận, nguyệt vận và nhịp vận theo thời gian." },
-];
-
-function charts() {
-  globalStore.demoCharts ||= new Map();
-  return globalStore.demoCharts;
-}
-
-function readings() {
-  globalStore.demoReadings ||= new Map();
-  return globalStore.demoReadings;
-}
-
-function balances() {
-  globalStore.demoBalances ||= new Map();
-  return globalStore.demoBalances;
-}
-
-function demoArticles() {
-  globalStore.demoArticles ||= new Map(seedArticles.map((article) => [article.slug, articleWithScore(article)]));
-  return globalStore.demoArticles;
-}
-
-function demoArticleCategories() {
-  globalStore.demoArticleCategories ||= new Map(seedArticleCategories.map((category) => [category.id, category]));
-  return globalStore.demoArticleCategories;
-}
-
-function demoOperationSettings() {
-  globalStore.demoOperationSettings ||= { ...DEFAULT_OPERATION_SETTINGS };
-  return globalStore.demoOperationSettings;
-}
-
 function cloneDefaultFeaturePrices(): FeaturePriceMap {
   return Object.fromEntries(
     FEATURE_PRICE_KEYS.map((key) => [key, { ...FEATURE_PRICES[key] }]),
   ) as FeaturePriceMap;
-}
-
-function demoFeaturePrices() {
-  globalStore.demoFeaturePrices ||= cloneDefaultFeaturePrices();
-  return globalStore.demoFeaturePrices;
 }
 
 function normalizeFeaturePriceMap(rows: Array<{ key: string; label: string; priceCoins: number; isActive?: boolean | null }> = []): FeaturePriceMap {
@@ -485,11 +298,6 @@ function normalizeStoredAttribution(value: unknown): ChartAttribution | null {
     label,
     confidence,
   } as ChartAttribution;
-}
-
-function readingProgressEntries() {
-  globalStore.demoReadingProgress ||= new Map();
-  return globalStore.demoReadingProgress;
 }
 
 function numberFromRecord(record: Record<string, unknown>, key: string, fallback: number) {
@@ -1454,7 +1262,7 @@ function cacheServerData<T extends (...args: never[]) => Promise<unknown>>(
 
 async function readFeaturePricesFromDb(): Promise<FeaturePriceMap> {
   const db = getDb();
-  if (!db) return demoFeaturePrices();
+  if (!db) return demoFeaturePrices(cloneDefaultFeaturePrices);
   try {
     const prices = await db.featurePrice.findMany();
     return normalizeFeaturePriceMap(prices);
@@ -1469,7 +1277,7 @@ const getCachedFeaturePricesFromDb = cacheServerData(readFeaturePricesFromDb, [F
 });
 
 export async function getFeaturePrices(): Promise<FeaturePriceMap> {
-  if (!getDb()) return demoFeaturePrices();
+  if (!getDb()) return demoFeaturePrices(cloneDefaultFeaturePrices);
   return getCachedFeaturePricesFromDb();
 }
 
@@ -1478,12 +1286,11 @@ export async function updateFeaturePrices(updates: Array<{ key: string; priceCoi
   const db = getDb();
 
   if (!db) {
-    const next = { ...demoFeaturePrices() };
+    const next = { ...demoFeaturePrices(cloneDefaultFeaturePrices) };
     for (const item of normalized) {
       next[item.key] = { label: item.label, priceCoins: item.priceCoins };
     }
-    globalStore.demoFeaturePrices = next;
-    return next;
+    return replaceDemoFeaturePrices(next);
   }
 
   await db.$transaction(
@@ -1501,7 +1308,7 @@ export async function updateFeaturePrices(updates: Array<{ key: string; priceCoi
 
 async function readOperationSettingsFromDb(): Promise<OperationSettings> {
   const db = getDb();
-  if (!db) return demoOperationSettings();
+  if (!db) return demoOperationSettings(DEFAULT_OPERATION_SETTINGS);
 
   try {
     const rows = await db.$queryRaw<
@@ -1525,7 +1332,7 @@ const getCachedOperationSettingsFromDb = cacheServerData(readOperationSettingsFr
 });
 
 export async function getOperationSettings(): Promise<OperationSettings> {
-  if (!getDb()) return demoOperationSettings();
+  if (!getDb()) return demoOperationSettings(DEFAULT_OPERATION_SETTINGS);
   return getCachedOperationSettingsFromDb();
 }
 
@@ -1533,8 +1340,7 @@ export async function updateOperationSettings(settings: Omit<OperationSettings, 
   const next = normalizeOperationSettings(settings);
   const db = getDb();
   if (!db) {
-    globalStore.demoOperationSettings = { ...next, updatedAt: new Date() };
-    return globalStore.demoOperationSettings;
+    return replaceDemoOperationSettings({ ...next, updatedAt: new Date() });
   }
 
   await db.$executeRaw`
