@@ -2,7 +2,8 @@ import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 
-const dataSource = readFileSync(fileURLToPath(new URL("./data.ts", import.meta.url)), "utf8");
+const dataSource = readFileSync(fileURLToPath(new URL("./data/articles.ts", import.meta.url)), "utf8");
+const facadeSource = readFileSync(fileURLToPath(new URL("./data.ts", import.meta.url)), "utf8");
 const actionsSource = readFileSync(fileURLToPath(new URL("../app/actions.ts", import.meta.url)), "utf8");
 
 describe("public article data cache", () => {
@@ -11,6 +12,7 @@ describe("public article data cache", () => {
     expect(dataSource).toContain("getCachedArticlesFromDb = cacheServerData");
     expect(dataSource).toContain("getCachedArticleBySlugFromDb = cacheServerData");
     expect(dataSource).toContain("getCachedArticleCategoriesFromDb = cacheServerData");
+    expect(facadeSource).toContain('from "@/lib/data/articles"');
   });
 
   it("revalidates public article cache after CMS mutations", () => {

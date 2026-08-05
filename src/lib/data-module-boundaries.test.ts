@@ -207,4 +207,36 @@ describe("data module boundaries", () => {
       "@/app/actions",
     ]));
   });
+
+  it("owns article and CMS persistence in the article domain", () => {
+    const articlesPath = path.join(dataDirectory, "articles.ts");
+    const expected = [
+      "ARTICLES_CACHE_TAG",
+      "listArticles",
+      "listAdminArticles",
+      "getArticleBySlug",
+      "getAdminArticleBySlug",
+      "deleteArticleBySlug",
+      "listArticleCategories",
+      "saveArticleCategoryFromForm",
+      "saveArticleFromForm",
+    ];
+
+    expect(fs.existsSync(articlesPath)).toBe(true);
+    const owned = exportedDeclarations(articlesPath);
+    const facadeExports = exportedDeclarations(path.join(projectRoot, "src", "lib", "data.ts"));
+    for (const name of expected) {
+      expect(owned.has(name), `${name} should be owned by articles.ts`).toBe(true);
+      expect(facadeExports.has(name), `${name} should remain exported by data.ts`).toBe(true);
+    }
+
+    expect(importSpecifiers(articlesPath)).not.toEqual(expect.arrayContaining([
+      "./admin",
+      "./charts",
+      "./free-overview",
+      "./readings",
+      "./settings",
+      "@/lib/data",
+    ]));
+  });
 });
