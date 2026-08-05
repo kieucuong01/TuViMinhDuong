@@ -2,6 +2,8 @@
 import { pathToFileURL } from "node:url";
 import { buildSnapshot } from "./seo-autopilot-snapshot-runner.mjs";
 
+export { buildSnapshot };
+
 if (isCli()) {
   const args = parseArgs(process.argv.slice(2));
   const baseUrl = normalizeBaseUrl(args.baseUrl || "https://lasotinhhoa.vn");

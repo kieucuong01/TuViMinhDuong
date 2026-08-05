@@ -7,6 +7,7 @@ import {
   extractSeedArticleSlugs,
   planSeoAutopilotRun,
   readSemrushKeywordRows,
+  renderRunReport,
 } from "./seo-autopilot-core.mjs";
 import { shouldSkipSearchConsole } from "./search-console-policy.mjs";
 
@@ -50,7 +51,7 @@ try {
   if (args.json) {
     console.log(JSON.stringify(result, null, 2));
   } else {
-    console.log(formatMarkdown(result));
+    console.log(renderRunReport(result));
   }
 } catch (error) {
   console.error(`SEO Autopilot plan failed: ${error.message}`);
@@ -72,62 +73,6 @@ async function readPreviousState() {
     if (error?.code === "ENOENT") return null;
     throw error;
   }
-}
-
-function formatMarkdown(result) {
-  const { snapshot, plan } = result;
-  return [
-    "# SEO Autopilot Plan",
-    "",
-    `- Status: ${plan.status}`,
-    `- Mode: ${plan.mode}`,
-    `- Sitemap URLs: ${snapshot.sitemapUrlCount}`,
-    `- Seed articles: ${result.contentInventory.seedArticleCount}`,
-    `- Production articles: ${result.contentInventory.productionArticleCount}`,
-    `- Combined exclusion slugs: ${result.contentInventory.combinedArticleCount}`,
-    "",
-    "## Next Action",
-    `- Type: ${plan.nextAction.type}`,
-    `- Slug: ${plan.nextAction.slug}`,
-    `- Approval required: ${plan.nextAction.approvalRequired ? "yes" : "no"}`,
-    `- Reason: ${plan.nextAction.reason}`,
-    "",
-    "## Keyword Intelligence",
-    keywordSourceLine(result),
-    ...(plan.keywordIntelligence?.clusters?.slice(0, 5).map(
-      (cluster) =>
-        `- ${cluster.label}: ${cluster.keywordCount} keywords, volume ${cluster.totalVolume}, avg KD ${cluster.averageKd}, pillar \`${cluster.pillarSlug}\``,
-    ) || ["- SEMrush CSV not found; using built-in topic opportunities."]),
-    "",
-    "## Search Console",
-    searchConsoleLine(result.searchConsole),
-    ...(result.searchConsole?.opportunities?.slice(0, 5).map(formatSearchConsoleOpportunity) || []),
-    "",
-    "## Brief",
-    `- Focus keyword: ${plan.brief.focusKeyword}`,
-    `- Title: ${plan.brief.title}`,
-    `- Meta title: ${plan.brief.metaTitle}`,
-    `- Meta description: ${plan.brief.metaDescription}`,
-    `- Target characters: ${plan.brief.targetCharacterRange.min}-${plan.brief.targetCharacterRange.max}`,
-    "",
-    "## Weekly Content Batch",
-    ...plan.weeklyContentPlan.articles.map(
-      (article) =>
-        `- ${article.day}: ${article.slug} (${article.funnelStage}, ${article.brief.targetCharacterRange.min}-${article.brief.targetCharacterRange.max} chars)`,
-    ),
-    "",
-    "## Google Quality Policy",
-    ...plan.brief.googleQualityPolicy.map((item) => `- ${item}`),
-    "",
-    "## Outline",
-    ...plan.brief.outline.map((item) => `- ${item}`),
-    "",
-    "## Internal Links",
-    ...plan.brief.internalLinks.map((item) => `- ${item}`),
-    "",
-    "## Verification",
-    ...plan.verificationCommands.map((item) => `- ${item}`),
-  ].join("\n");
 }
 
 function buildContentInventory({ existingSlugs, snapshot }) {
@@ -179,24 +124,4 @@ function clampArticleCount(value) {
   const parsed = Number.parseInt(value, 10);
   if (!Number.isFinite(parsed)) return 7;
   return Math.min(Math.max(parsed, 1), 7);
-}
-
-function keywordSourceLine(result) {
-  const source = result.keywordSource;
-  if (!source?.sourcePath) return `- Source: unavailable (${source?.warning || "not configured"})`;
-  return `- Source: ${source.sourcePath} (${source.rowCount} rows)`;
-}
-
-function searchConsoleLine(searchConsole) {
-  if (!searchConsole) return "- Skipped by flag.";
-  if (searchConsole.status !== "ok") {
-    return `- Status: unavailable (${searchConsole.warnings?.[0] || "unknown"})`;
-  }
-  const totals = searchConsole.totals;
-  return `- Status: ok, range ${searchConsole.dateRange.startDate} to ${searchConsole.dateRange.endDate}, clicks ${totals.clicks}, impressions ${totals.impressions}, CTR ${(totals.ctr * 100).toFixed(2)}%, avg position ${totals.position}`;
-}
-
-function formatSearchConsoleOpportunity(item) {
-  const target = item.page || item.query || "unknown";
-  return `- ${item.type}: ${target} (${item.impressions} impressions, CTR ${(item.ctr * 100).toFixed(2)}%, position ${item.position})`;
 }

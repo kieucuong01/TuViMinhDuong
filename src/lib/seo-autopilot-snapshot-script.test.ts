@@ -1,3 +1,4 @@
+import { execFileSync } from "node:child_process";
 import { describe, expect, it } from "vitest";
 
 import {
@@ -7,6 +8,20 @@ import {
 } from "../../scripts/seo/seo-autopilot-snapshot-runner.mjs";
 
 describe("SEO snapshot networking", () => {
+  it("keeps the public snapshot wrapper importable by planner and executor", () => {
+    const exportedType = execFileSync(
+      process.execPath,
+      [
+        "--input-type=module",
+        "-e",
+        "import('./scripts/seo/seo-autopilot-snapshot.mjs').then((module) => console.log(typeof module.buildSnapshot))",
+      ],
+      { cwd: process.cwd(), encoding: "utf8" },
+    ).trim();
+
+    expect(exportedType).toBe("function");
+  });
+
   it("never exceeds the configured page concurrency", async () => {
     let active = 0;
     let peak = 0;
