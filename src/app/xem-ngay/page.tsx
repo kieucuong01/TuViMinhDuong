@@ -4,8 +4,8 @@ import { routeMetadata } from "@/lib/metadata";
 import { faqJsonLd, webPageJsonLd } from "@/lib/seo";
 
 export const metadata = routeMetadata({
-  title: "Xem ngày tốt xấu theo tuổi",
-  description: "Xem ngày tốt xấu theo tuổi, âm lịch, can chi, 12 trực, hoàng đạo và từng việc như cưới hỏi, khai trương, động thổ.",
+  title: "Xem ngày tốt theo tuổi: Lọc ngày đẹp cho từng việc",
+  description: "Xem ngày tốt theo tuổi và lọc ngày phù hợp cho cưới hỏi, khai trương, động thổ. Đối chiếu âm lịch, can chi, 12 trực, giờ hoàng đạo và tuổi.",
   path: "/xem-ngay",
   imageSubtitle: "Âm lịch, can chi, hoàng đạo, việc nên làm và nên tránh",
 });
@@ -39,8 +39,8 @@ export default async function DateViewPage({
 }) {
   const query = await searchParams;
   const pageLd = webPageJsonLd({
-    name: "Xem ngày tốt xấu theo tuổi",
-    description: "Xem ngày tốt xấu theo tuổi, âm lịch, can chi, 12 trực, hoàng đạo và từng việc như cưới hỏi, khai trương, động thổ.",
+    name: "Xem ngày tốt theo tuổi cho từng việc",
+    description: "Xem ngày tốt theo tuổi và lọc ngày phù hợp cho cưới hỏi, khai trương, động thổ. Đối chiếu âm lịch, can chi, 12 trực, giờ hoàng đạo và tuổi.",
     url: "/xem-ngay",
     breadcrumb: [
       { name: "Trang chủ", url: "/" },

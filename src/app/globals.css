@@ -10630,6 +10630,32 @@ button.is-loading:not(.icon-button)::before {
   line-height: 1.68;
 }
 
+.date-quick-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.9rem;
+}
+
+.date-quick-links a {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  border: 1px solid rgb(254 215 170 / 0.9);
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.82);
+  padding: 0.45rem 0.8rem;
+  color: #9a3412;
+  font-size: 0.82rem;
+  font-weight: 850;
+  line-height: 1.25;
+}
+
+.date-quick-links a:hover {
+  border-color: #fb923c;
+  background: #fff7ed;
+}
+
 .date-quick-status {
   display: flex;
   flex-wrap: wrap;

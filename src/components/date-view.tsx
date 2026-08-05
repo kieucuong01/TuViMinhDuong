@@ -124,8 +124,20 @@ export function DateView({
       <section className="date-quick-start">
         <div className="date-quick-copy">
           <p className="eyebrow">Xem ngày tốt xấu</p>
-          {showPageHeading ? <h1>Xem ngày tốt xấu theo tuổi</h1> : null}
-          <p>Chọn ngày, nhập năm sinh và chọn việc đang chuẩn bị. Kết quả hiện ngay để bạn biết nên làm, nên tránh và nên đọc phần nào tiếp theo.</p>
+          {showPageHeading ? (
+            <>
+              <h1>Xem ngày tốt theo tuổi cho từng việc</h1>
+              <p>Muốn chọn ngày tốt theo tuổi, hãy chọn việc cần làm trước, rồi nhập năm sinh để loại các ngày xung và đối chiếu can chi, 12 trực, giờ hoàng đạo và các sao tốt xấu. Kết quả là lớp tham khảo giúp bạn rút gọn danh sách ngày trước khi cân nhắc lịch trình và điều kiện thực tế.</p>
+              <nav className="date-quick-links" aria-label="Lối tắt xem ngày theo nhu cầu">
+                <Link href="/xem-ngay/cuoi-hoi" prefetch={false}>Cưới hỏi</Link>
+                <Link href="/xem-ngay/khai-truong" prefetch={false}>Khai trương</Link>
+                <Link href="/xem-ngay/dong-tho" prefetch={false}>Động thổ</Link>
+                <Link href="/kien-thuc-tu-vi/xem-ngay-tot-xau-theo-tuoi" prefetch={false}>Cách chọn ngày theo tuổi</Link>
+              </nav>
+            </>
+          ) : (
+            <p>Chọn khoảng ngày, nhập năm sinh và việc đang chuẩn bị để so sánh các phương án phù hợp hơn.</p>
+          )}
           <div className="date-quick-status">
             <strong>{fortune.weekday}, {fortune.solar.day}/{fortune.solar.month}/{fortune.solar.year}</strong>
             <span className={`rounded-full px-3 py-1 text-sm font-black ring-1 ${toneClass[fortune.status.tone]}`}>{fortune.status.label}</span>
