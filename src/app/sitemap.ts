@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 import { APP_URL } from "@/lib/env";
-import { listArticles } from "@/lib/data";
+import { listArticleIndex } from "@/lib/data";
 import { DATE_PURPOSE_PAGES } from "@/lib/date-purpose-pages";
 import { AGE_TOOL_PAGES } from "@/lib/age-tools";
 import { SUPPORT_STARS } from "@/lib/pseo-registry";
@@ -33,7 +33,7 @@ const TRUST_ROUTES = [
 ];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const articles = await listArticles();
+  const articles = await listArticleIndex();
   const indexableArticles = articles.filter(
     (article) => robotsAllowsIndex(article.robots) && isSelfCanonicalArticle(article),
   );

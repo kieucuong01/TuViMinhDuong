@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { APP_URL } from "@/lib/env";
 import type { ArticleView } from "@/lib/content";
+import type { ArticleIndexEntry } from "@/lib/data";
 import { articlePath } from "@/lib/article-path";
 import { articleJsonLd, breadcrumbJsonLd, faqJsonLd } from "@/lib/seo";
 import { extractMarkdownHeadings, MarkdownContent } from "@/components/markdown-content";
@@ -15,7 +16,7 @@ export function ArticlePageContent({
   sectionHref,
 }: {
   article: ArticleView;
-  articles: ArticleView[];
+  articles: ArticleIndexEntry[];
   sectionName: string;
   sectionHref: string;
 }) {

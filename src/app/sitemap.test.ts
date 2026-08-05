@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
-  listArticles: vi.fn(),
+  listArticleIndex: vi.fn(),
 }));
 
 vi.mock("@/lib/env", async (importOriginal) => ({
@@ -10,7 +10,7 @@ vi.mock("@/lib/env", async (importOriginal) => ({
 }));
 
 vi.mock("@/lib/data", () => ({
-  listArticles: mocks.listArticles,
+  listArticleIndex: mocks.listArticleIndex,
 }));
 
 import sitemap from "./sitemap";
@@ -24,8 +24,8 @@ function entryFor(entries: Awaited<ReturnType<typeof sitemap>>, path: string) {
 
 describe("sitemap freshness", () => {
   beforeEach(() => {
-    mocks.listArticles.mockReset();
-    mocks.listArticles.mockResolvedValue([
+    mocks.listArticleIndex.mockReset();
+    mocks.listArticleIndex.mockResolvedValue([
       {
         slug: "bai-viet-test",
         canonicalUrl: "/kien-thuc-tu-vi/bai-viet-test",

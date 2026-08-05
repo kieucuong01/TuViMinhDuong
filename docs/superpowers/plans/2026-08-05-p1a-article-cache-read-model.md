@@ -69,3 +69,12 @@
 5. Confirm build output has no `Failed to set Next.js data cache` payload warning.
 6. Run `git diff --check`, review exact scope, and commit P1A separately.
 
+## Execution Result
+
+- 163 seed articles serialize to 124,994 bytes in the lightweight index versus
+  2,885,164 bytes in the full corpus, a 95.7% reduction.
+- Lint passed; the full suite passed with 146 files and 782 tests.
+- The production build generated 551 pages and did not emit the previous
+  `Failed to set Next.js data cache` payload warning.
+- The remaining build warnings are the known nested-worktree root inference and
+  edge-runtime static-generation notices, neither caused by this read model.

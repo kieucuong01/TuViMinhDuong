@@ -9,13 +9,18 @@ import { slugify } from "@/lib/format";
 import { scoreArticleSeo } from "@/lib/seo";
 import { cacheServerData } from "@/lib/data/cache";
 import { demoArticleCategories, demoArticles } from "@/lib/data/demo-store";
-import type { ArticleSummary } from "@/lib/data/contracts";
+import type { ArticleIndexEntry, ArticleSummary } from "@/lib/data/contracts";
 
 type ArticleRecord = Omit<ArticleView, "faqs"> & {
   faqs?: unknown;
 };
 
 type ArticleSummaryRecord = ArticleSummary & {
+  status: string;
+  createdAt?: Date | null;
+};
+
+type ArticleIndexRecord = ArticleIndexEntry & {
   status: string;
   createdAt?: Date | null;
 };
@@ -49,6 +54,31 @@ function articleSummaryRecord(article: ArticleSummaryRecord | ArticleView): Arti
 function publicArticleSummary(article: ArticleSummaryRecord): ArticleSummary {
   const { id, slug, title, excerpt, coverImage, coverAlt, publishedAt, updatedAt } = article;
   return { id, slug, title, excerpt, coverImage, coverAlt, publishedAt, updatedAt };
+}
+
+function articleIndexRecord(article: ArticleIndexRecord | ArticleView): ArticleIndexRecord {
+  return {
+    id: article.id,
+    slug: article.slug,
+    title: article.title,
+    excerpt: article.excerpt,
+    coverImage: article.coverImage,
+    coverAlt: article.coverAlt,
+    canonicalUrl: article.canonicalUrl,
+    robots: article.robots,
+    category: article.category
+      ? { id: article.category.id, name: article.category.name, slug: article.category.slug }
+      : null,
+    publishedAt: article.publishedAt,
+    updatedAt: article.updatedAt,
+    status: article.status,
+    createdAt: "createdAt" in article ? article.createdAt : null,
+  };
+}
+
+function publicArticleIndexEntry(article: ArticleIndexRecord): ArticleIndexEntry {
+  const { id, slug, title, excerpt, coverImage, coverAlt, canonicalUrl, robots, category, publishedAt, updatedAt } = article;
+  return { id, slug, title, excerpt, coverImage, coverAlt, canonicalUrl, robots, category, publishedAt, updatedAt };
 }
 
 function articleStatusFromForm(formData: FormData) {
@@ -153,6 +183,15 @@ function fresherSeedArticle(slug: string, candidateUpdatedAt?: Date | null) {
   return seedUpdatedAt > candidateTime ? normalizedSeed : null;
 }
 
+function fresherSeedArticleIndex(slug: string, candidateUpdatedAt?: Date | null) {
+  const seed = seedArticles.find((article) => article.slug === slug);
+  if (!seed) return null;
+
+  const seedUpdatedAt = seed.updatedAt?.getTime() || seed.publishedAt?.getTime() || 0;
+  const candidateTime = candidateUpdatedAt?.getTime() || 0;
+  return seedUpdatedAt > candidateTime ? articleIndexRecord(seed) : null;
+}
+
 async function readArticlesFromDb() {
   const db = getDb();
   if (!db) return sortArticlesNewestFirst(Array.from(demoArticles().values()).filter((article) => article.status === "published").map(articleWithNormalizedRelations));
@@ -182,14 +221,66 @@ async function readArticlesFromDb() {
   return sortArticlesNewestFirst(Array.from(bySlug.values()));
 }
 
-const getCachedArticlesFromDb = cacheServerData(readArticlesFromDb, [ARTICLES_CACHE_TAG, "list"], {
+export async function listArticles() {
+  return readArticlesFromDb();
+}
+
+async function readArticleIndexFromDb(): Promise<ArticleIndexEntry[]> {
+  const db = getDb();
+  if (!db) {
+    return sortArticlesNewestFirst(
+      Array.from(demoArticles().values())
+        .filter((article) => article.status === "published")
+        .map(articleIndexRecord),
+    ).map(publicArticleIndexEntry);
+  }
+
+  let articles: ArticleIndexRecord[];
+  try {
+    articles = (await db.article.findMany({
+      where: { status: { in: ["published", DELETED_ARTICLE_STATUS] } },
+      select: {
+        id: true,
+        slug: true,
+        title: true,
+        excerpt: true,
+        coverImage: true,
+        coverAlt: true,
+        canonicalUrl: true,
+        robots: true,
+        status: true,
+        publishedAt: true,
+        updatedAt: true,
+        createdAt: true,
+        category: { select: { id: true, name: true, slug: true } },
+      },
+      orderBy: [{ publishedAt: "desc" }, { createdAt: "desc" }],
+    })) as ArticleIndexRecord[];
+  } catch {
+    return sortArticlesNewestFirst(seedArticles.map(articleIndexRecord)).map(publicArticleIndexEntry);
+  }
+
+  const bySlug = new Map(seedArticles.map((article) => [article.slug, articleIndexRecord(article)]));
+  for (const article of articles) {
+    if (article.status === DELETED_ARTICLE_STATUS) {
+      bySlug.delete(article.slug);
+      continue;
+    }
+    const fresherSeed = fresherSeedArticleIndex(article.slug, article.updatedAt || article.publishedAt);
+    bySlug.set(article.slug, fresherSeed || articleIndexRecord(article));
+  }
+
+  return sortArticlesNewestFirst(Array.from(bySlug.values())).map(publicArticleIndexEntry);
+}
+
+const getCachedArticleIndexFromDb = cacheServerData(readArticleIndexFromDb, [ARTICLES_CACHE_TAG, "index"], {
   tags: [ARTICLES_CACHE_TAG],
   revalidate: 300,
 });
 
-export async function listArticles() {
-  if (!getDb()) return readArticlesFromDb();
-  return getCachedArticlesFromDb();
+export async function listArticleIndex(): Promise<ArticleIndexEntry[]> {
+  if (!getDb()) return readArticleIndexFromDb();
+  return getCachedArticleIndexFromDb();
 }
 
 async function readArticleSummariesFromDb(limit: number): Promise<ArticleSummary[]> {

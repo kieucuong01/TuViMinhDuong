@@ -1,7 +1,7 @@
 import type { FreeOverviewBlockKey } from "@/lib/ai";
 import type { ChartAttribution } from "@/lib/chart-attribution";
 import type { ChartInput, TuViChart } from "@/lib/chart";
-import type { ArticleView } from "@/lib/content";
+import type { ArticleCategoryView, ArticleView } from "@/lib/content";
 import type { ReadingKey } from "@/lib/pricing";
 import type { ReadingProgressInput } from "@/lib/reading-progress";
 
@@ -28,6 +28,22 @@ export type ArticleSummary = Pick<
   ArticleView,
   "id" | "slug" | "title" | "excerpt" | "coverImage" | "coverAlt" | "publishedAt" | "updatedAt"
 >;
+
+export type ArticleIndexEntry = Pick<
+  ArticleView,
+  | "id"
+  | "slug"
+  | "title"
+  | "excerpt"
+  | "coverImage"
+  | "coverAlt"
+  | "canonicalUrl"
+  | "robots"
+  | "publishedAt"
+  | "updatedAt"
+> & {
+  category?: Pick<ArticleCategoryView, "id" | "name" | "slug"> | null;
+};
 
 export type StoredReading = {
   id: string;

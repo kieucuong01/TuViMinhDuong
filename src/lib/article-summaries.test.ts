@@ -54,6 +54,9 @@ type SummaryRow = {
   publishedAt: Date;
   updatedAt: Date;
   createdAt: Date;
+  canonicalUrl?: string | null;
+  robots?: string | null;
+  category?: { id: string; name: string; slug: string } | null;
 };
 
 function dbArticle(slug: string, updatedAt: string, status = "published"): SummaryRow {
@@ -69,6 +72,9 @@ function dbArticle(slug: string, updatedAt: string, status = "published"): Summa
     publishedAt: date,
     updatedAt: date,
     createdAt: date,
+    canonicalUrl: `/kien-thuc-tu-vi/${slug}`,
+    robots: "index,follow",
+    category: { id: "cat-test", name: "Test", slug: "test" },
   };
 }
 
@@ -77,6 +83,13 @@ async function listArticleSummaries(limit?: number) {
     listArticleSummaries: (requestedLimit?: number) => Promise<SummaryRow[]>;
   };
   return articleData.listArticleSummaries(limit);
+}
+
+async function listArticleIndex() {
+  const articleData = await import("@/lib/data/articles") as typeof import("@/lib/data/articles") & {
+    listArticleIndex: () => Promise<SummaryRow[]>;
+  };
+  return articleData.listArticleIndex();
 }
 
 describe("public article summaries", () => {
@@ -130,6 +143,46 @@ describe("public article summaries", () => {
       publishedAt: true,
       updatedAt: true,
       createdAt: true,
+    });
+    expect(query.select).not.toHaveProperty("content");
+    expect(query.select).not.toHaveProperty("faqs");
+    expect(query.select).not.toHaveProperty("seoChecklist");
+  });
+
+  it("builds the complete public index from card, route, and reconciliation fields only", async () => {
+    dbState.findMany.mockResolvedValue([
+      dbArticle("db-new", "2031-03-01T00:00:00.000Z"),
+      dbArticle("seed-newest", "2029-12-01T00:00:00.000Z"),
+      dbArticle("seed-middle", "2031-02-01T00:00:00.000Z", "deleted"),
+    ]);
+
+    const index = await listArticleIndex();
+
+    expect(index.map((article) => article.slug)).toEqual(["db-new", "seed-newest", "seed-oldest"]);
+    expect(index[0]).toMatchObject({
+      canonicalUrl: "/kien-thuc-tu-vi/db-new",
+      robots: "index,follow",
+      category: { id: "cat-test", name: "Test", slug: "test" },
+    });
+    expect(index[0]).not.toHaveProperty("content");
+    expect(index[0]).not.toHaveProperty("faqs");
+    expect(index[0]).not.toHaveProperty("seoChecklist");
+
+    const query = dbState.findMany.mock.calls[0]?.[0] as { select?: Record<string, unknown> };
+    expect(query.select).toEqual({
+      id: true,
+      slug: true,
+      title: true,
+      excerpt: true,
+      coverImage: true,
+      coverAlt: true,
+      canonicalUrl: true,
+      robots: true,
+      status: true,
+      publishedAt: true,
+      updatedAt: true,
+      createdAt: true,
+      category: { select: { id: true, name: true, slug: true } },
     });
     expect(query.select).not.toHaveProperty("content");
     expect(query.select).not.toHaveProperty("faqs");

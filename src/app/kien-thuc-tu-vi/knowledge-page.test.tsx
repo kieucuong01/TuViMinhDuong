@@ -2,13 +2,13 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
-  listArticles: vi.fn(),
+  listArticleIndex: vi.fn(),
   listArticleCategories: vi.fn(),
 }));
 
 vi.mock("server-only", () => ({}));
 vi.mock("@/lib/data", () => ({
-  listArticles: mocks.listArticles,
+  listArticleIndex: mocks.listArticleIndex,
   listArticleCategories: mocks.listArticleCategories,
 }));
 
@@ -20,7 +20,7 @@ function wordCount(value: string) {
 
 describe("knowledge hub answer block", () => {
   beforeEach(() => {
-    mocks.listArticles.mockReset().mockResolvedValue([]);
+    mocks.listArticleIndex.mockReset().mockResolvedValue([]);
     mocks.listArticleCategories.mockReset().mockResolvedValue([]);
   });
 

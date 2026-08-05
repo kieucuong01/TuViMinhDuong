@@ -213,6 +213,7 @@ describe("data module boundaries", () => {
     const expected = [
       "ARTICLES_CACHE_TAG",
       "listArticles",
+      "listArticleIndex",
       "listAdminArticles",
       "getArticleBySlug",
       "getAdminArticleBySlug",

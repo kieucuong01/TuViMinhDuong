@@ -1,4 +1,4 @@
-import type { ArticleView } from "@/lib/content";
+import type { ArticleIndexEntry } from "@/lib/data/contracts";
 
 export const KNOWLEDGE_PAGE_SIZE = 6;
 
@@ -47,7 +47,7 @@ export function paginateArticles<T extends CategorizedArticle>(articles: T[], op
   };
 }
 
-export function toKnowledgeArticleListItem(article: ArticleView): KnowledgeArticleListItem {
+export function toKnowledgeArticleListItem(article: ArticleIndexEntry): KnowledgeArticleListItem {
   return {
     slug: article.slug,
     title: article.title,

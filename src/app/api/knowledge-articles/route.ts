@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { KNOWLEDGE_PAGE_SIZE, paginateArticles, toKnowledgeArticleListItem } from "@/lib/article-pagination";
-import { listArticles } from "@/lib/data";
+import { listArticleIndex } from "@/lib/data";
 import { isLifetimeTuViSlug } from "@/lib/article-path";
 
 export const revalidate = 300;
@@ -11,7 +11,7 @@ export async function GET(request: Request) {
   const pageSize = Number.isInteger(requestedPageSize)
     ? Math.min(KNOWLEDGE_PAGE_SIZE, Math.max(1, requestedPageSize))
     : KNOWLEDGE_PAGE_SIZE;
-  const articles = (await listArticles()).filter((article) => !isLifetimeTuViSlug(article.slug));
+  const articles = (await listArticleIndex()).filter((article) => !isLifetimeTuViSlug(article.slug));
   const result = paginateArticles(articles, {
     category: searchParams.get("category") || undefined,
     page: searchParams.get("page") || undefined,
