@@ -470,4 +470,3 @@ export async function saveReading(
     createdAt: saved.createdAt,
   };
 }
-
