@@ -8,6 +8,7 @@ import {
   googleAdsSendTo,
   shouldTrackGoogleAdsConversion,
 } from "@/lib/google-ads";
+import { reportFirstPartyFunnelEvent } from "@/lib/first-party-funnel-client";
 
 declare global {
   interface Window {
@@ -223,6 +224,13 @@ export function GoogleAdsEventReporter() {
       const form = event.target instanceof HTMLFormElement ? event.target : null;
       const eventName = form?.dataset.adEvent;
       if (!form || !eventName) return;
+      if (eventName === "create_chart_submit") {
+        reportFirstPartyFunnelEvent("submit", {
+          tool: "chart",
+          sourceSlug: formFieldValue(form, "source_slug"),
+          placement: form.dataset.adPlacement || "chart_form",
+        });
+      }
       sendGtagEvent(eventName, {
         placement: form.dataset.adPlacement,
         method: form.dataset.adMethod,
@@ -240,6 +248,13 @@ export function GoogleAdsEventReporter() {
       const element = target?.closest<HTMLElement>("[data-ad-click]");
       const eventName = element?.dataset.adClick;
       if (!element || !eventName) return;
+      if (["article_chart_cta_click", "login_gate_clicked", "full_offer_context_clicked", "full_offer_bottom_clicked", "full_offer_clicked"].includes(eventName)) {
+        reportFirstPartyFunnelEvent("save_intent", {
+          tool: eventName.startsWith("full_offer") ? "full_reading" : "chart",
+          sourceSlug: element.dataset.sourceSlug,
+          placement: element.dataset.ctaLocation || element.dataset.adPlacement || eventName,
+        });
+      }
       sendGtagEvent(eventName, {
         placement: element.dataset.adPlacement,
         href: element instanceof HTMLAnchorElement ? element.href : undefined,

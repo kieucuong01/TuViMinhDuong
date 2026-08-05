@@ -3,11 +3,12 @@ import { Banknote, Bot, ClipboardList, Coins, Eye, FilePenLine, Globe2, Megaphon
 import { redirect } from "next/navigation";
 import { adjustUserCoinsAction, deleteUserAction, saveArticleAction, saveArticleCategoryAction, saveFeaturePricesAction, saveOperationSettingsAction } from "@/app/actions";
 import { getCurrentUser } from "@/lib/auth";
-import { getAdminArticleBySlug, getAdminBusinessDashboard, getAdminOverview, listAdminArticles, listAdminChartSubmissions, listArticleCategories, normalizeAdminTrendPeriod, type AdminChartSubmission } from "@/lib/data";
+import { getAdminArticleBySlug, getAdminBusinessDashboard, getAdminFunnelDashboard, getAdminOverview, listAdminArticles, listAdminChartSubmissions, listArticleCategories, normalizeAdminTrendPeriod, type AdminChartSubmission, type AdminFunnelWindowDays } from "@/lib/data";
 import type { ArticleView } from "@/lib/content";
 import { LoadingSubmitButton } from "@/components/loading-submit-button";
 import { AdminArticleDeleteForm } from "@/components/admin-article-delete-form";
 import { AdminTrendCharts } from "@/components/admin-trend-charts";
+import { AdminFunnelPanel } from "@/components/admin-funnel-panel";
 import { displayChartAttributionSource, type ChartAttributionSource } from "@/lib/chart-attribution";
 
 export const metadata = {
@@ -216,16 +217,18 @@ function seoChecks(article: ArticleView) {
     .filter(Boolean) as Array<{ label: string; passed: boolean; hint: string }>;
 }
 
-export default async function AdminPage({ searchParams }: { searchParams: Promise<{ tab?: string; saved?: string; edit?: string; categorySaved?: string; deleted?: string; settingsSaved?: string; userAdjusted?: string; userDeleted?: string; userError?: string; pricingSaved?: string; pricingError?: string; articleModal?: string; articlePage?: string; trend?: string }> }) {
+export default async function AdminPage({ searchParams }: { searchParams: Promise<{ tab?: string; saved?: string; edit?: string; categorySaved?: string; deleted?: string; settingsSaved?: string; userAdjusted?: string; userDeleted?: string; userError?: string; pricingSaved?: string; pricingError?: string; articleModal?: string; articlePage?: string; trend?: string; funnel?: string }> }) {
   const user = await getCurrentUser();
   if (user?.role !== "ADMIN") redirect("/dang-nhap?next=/admin");
 
   const params = await searchParams;
   const activeTab = normalizeAdminTab(params);
   const requestedTrendPeriod = normalizeAdminTrendPeriod(params.trend);
-  const [overview, business, chartSubmissions, articles, categories, editingArticle] = await Promise.all([
+  const funnelWindow: AdminFunnelWindowDays = params.funnel === "28" ? 28 : 7;
+  const [overview, business, funnelDashboard, chartSubmissions, articles, categories, editingArticle] = await Promise.all([
     getAdminOverview(requestedTrendPeriod),
     getAdminBusinessDashboard(),
+    getAdminFunnelDashboard(),
     activeTab === "charts" ? listAdminChartSubmissions() : Promise.resolve([]),
     listAdminArticles(),
     listArticleCategories(),
@@ -307,6 +310,8 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
           </div>
 
           <AdminTrendCharts initialPeriod={trendPeriod} trendGroups={overview.trendGroups} />
+
+          <AdminFunnelPanel dashboard={funnelDashboard} initialWindow={funnelWindow} />
 
           <section className="admin-business-grid admin-overview-revenue" aria-labelledby="admin-revenue-overview-title">
           <div className="panel admin-revenue-panel">

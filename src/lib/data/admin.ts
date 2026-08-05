@@ -8,9 +8,11 @@ import { MAIN_STARS, PALACES, SUPPORT_STARS, buildPseoInventory } from "@/lib/ps
 import { DELETED_ARTICLE_STATUS } from "@/lib/data/articles";
 import { balances, charts, demoArticles, readings } from "@/lib/data/demo-store";
 import { getFeaturePrices, getOperationSettings } from "@/lib/data/settings";
+import { buildAdminFunnelDashboard, type FunnelReportEvent, type FunnelReportPayment } from "@/lib/funnel-report";
 import type {
   AdminBusinessDashboard,
   AdminChartSubmission,
+  AdminFunnelDashboard,
   AdminPaymentSource,
   AdminRecentPayment,
   AdminRevenueMetrics,
@@ -23,6 +25,42 @@ const ADMIN_TREND_PERIODS = new Set<AdminTrendPeriod>(["day", "week", "month"]);
 const ADMIN_TREND_PERIOD_LIST: AdminTrendPeriod[] = ["day", "week", "month"];
 const CORE_SITEMAP_URLS = 7;
 const TRUST_SITEMAP_URLS = 8;
+
+type AdminFunnelDb = {
+  funnelEvent: {
+    findMany(args: Record<string, unknown>): Promise<FunnelReportEvent[]>;
+  };
+  paymentOrder: {
+    findMany(args: Record<string, unknown>): Promise<FunnelReportPayment[]>;
+  };
+};
+
+export async function getAdminFunnelDashboard(): Promise<AdminFunnelDashboard> {
+  const now = new Date();
+  const db = getDb() as unknown as AdminFunnelDb | null;
+  if (!db?.funnelEvent) return buildAdminFunnelDashboard({ events: [], payments: [], now });
+  const oldestWindowStart = new Date(now.getTime() - 56 * 86_400_000);
+  const [events, payments] = await Promise.all([
+    db.funnelEvent.findMany({
+      where: { createdAt: { gte: oldestWindowStart } },
+      select: {
+        id: true,
+        name: true,
+        anonymousSessionId: true,
+        userId: true,
+        source: true,
+        tool: true,
+        createdAt: true,
+      },
+      orderBy: { createdAt: "asc" },
+    }),
+    db.paymentOrder.findMany({
+      where: { status: "PENDING" },
+      select: { status: true, amountVnd: true, createdAt: true },
+    }),
+  ]);
+  return buildAdminFunnelDashboard({ events, payments, now });
+}
 
 export function normalizeAdminTrendPeriod(value?: string | null): AdminTrendPeriod {
   return ADMIN_TREND_PERIODS.has(value as AdminTrendPeriod) ? (value as AdminTrendPeriod) : "day";

@@ -210,13 +210,6 @@ export default async function ChartPage({
         </div>
         {paymentNotice ? <p className="chart-checkout-notice" role="status">{paymentNotice}</p> : null}
 
-        <ChartRetentionPanel
-          chartId={id}
-          chart={record.chart}
-          isSignedIn={Boolean(user)}
-          canUsePaidFateViews={canUsePaidFateViews}
-        />
-
         <ChartReadingGuide chartId={id} chart={record.chart} canUsePaidFateViews={canUsePaidFateViews} />
 
         <div id="chart-palaces">
@@ -272,6 +265,14 @@ export default async function ChartPage({
             </>
           )}
         </section>
+
+        <ChartRetentionPanel
+          chartId={id}
+          isSignedIn={Boolean(user)}
+          canCheckoutFull={canCheckoutFull}
+          hasAdvancedReading={hasAdvancedReading}
+          advancedReadingId={viewerFullReading?.id}
+        />
 
         {paidFeaturesVisible ? (
           <>

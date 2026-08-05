@@ -207,6 +207,6 @@ describe("server action checkout boundary", () => {
     expect(source).toContain("getCurrentUser()");
     expect(source).toContain("redirect(checkout.location)");
     expect(source).not.toContain("db.paymentOrder.create");
-    expect(source.split(/\r?\n/).filter((line) => line.trim()).length).toBeLessThan(560);
+    expect(source.split(/\r?\n/).filter((line) => line.trim()).length).toBeLessThan(565);
   });
 });

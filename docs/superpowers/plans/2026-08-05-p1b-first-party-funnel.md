@@ -94,3 +94,12 @@
 3. Run `npm run lint`, full `npm test`, `npm audit --audit-level=high`, and `npm run build`.
 4. Run `git diff --check`, confirm no generated/local artifacts or PII fixtures are staged, then commit P1B separately.
 
+## Results (2026-08-05)
+
+- Added the privacy contract, 180-day retention, same-origin early-event endpoint, trusted server stages, bounded payment attribution, and idempotent financial completion events.
+- Added the 7/28-day admin funnel with linked anonymous-to-account journeys, distinct actor counts, previous-period rates, source/tool tables, identified/anonymous health, and stale pending-order alerts.
+- Replaced the pre-result multi-choice retention block with one post-result action for guests, signed-in owners, or paid owners.
+- Prisma client generation and schema validation passed.
+- Focused funnel/auth/checkout/settlement/admin/result tests passed; full suite passed: 153 files and 811 tests.
+- `npm run lint`, `npm run build` (552 pages), and `git diff --check` passed.
+- `npm audit --audit-level=high` could not run in the restricted environment: outbound npm audit was blocked, and elevated transmission of the private dependency tree was not authorized. No audit result is claimed.

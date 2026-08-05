@@ -5,6 +5,7 @@ import { APP_URL, isPayOSEnabled } from "@/lib/env";
 import { COIN_PACKAGES } from "@/lib/pricing";
 import type { SessionUser } from "@/lib/auth";
 import type { Prisma, PrismaClient } from "@/generated/prisma/client";
+import { recordFunnelEventBestEffort, storedPaymentFunnelAttribution } from "@/lib/funnel-events";
 
 function checksumKey() {
   return process.env.PAYOS_CHECKSUM_KEY || "demo";
@@ -41,6 +42,7 @@ type TopupPaymentOrder = {
   coins: number;
   status: string;
   rawPayload?: unknown;
+  attribution?: unknown;
 };
 
 export async function getPayOSPaymentRequest(orderCode: string | number | bigint): Promise<PayOSPaymentRequestStatus | null> {
@@ -313,9 +315,24 @@ export async function settlePaidOrder(
   rawPayload: unknown,
   paidAt = new Date(),
 ) {
-  return paidReadingOrderPayload(order.rawPayload)
-    ? completePaidReadingOrder(db, order, rawPayload, paidAt)
-    : creditPaidTopupOrder(db, order, rawPayload, paidAt);
+  const readingMetadata = paidReadingOrderPayload(order.rawPayload);
+  const settlement = readingMetadata
+    ? await completePaidReadingOrder(db, order, rawPayload, paidAt)
+    : await creditPaidTopupOrder(db, order, rawPayload, paidAt);
+  if (!settlement) return null;
+
+  const attribution = storedPaymentFunnelAttribution(
+    order.attribution,
+    readingMetadata ? "full_reading" : "coin_topup",
+  );
+  await recordFunnelEventBestEffort({
+    name: "paid",
+    userId: settlement.userId,
+    chartId: "chartId" in settlement ? settlement.chartId : undefined,
+    ...attribution,
+    dedupeKey: `paid:${order.id}`,
+  });
+  return settlement;
 }
 
 function normalizeReturnPath(returnPath?: string) {

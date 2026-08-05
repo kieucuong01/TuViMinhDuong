@@ -22,6 +22,7 @@ export type ChartCreationMetadata = {
   requestIp?: string;
   userAgent?: string;
   attribution?: ChartAttribution;
+  funnelSessionId?: string;
 };
 
 export type ArticleSummary = Pick<
@@ -136,6 +137,43 @@ export type AdminTrendPoint = {
 };
 
 export type AdminTrendGroups = Record<AdminTrendPeriod, AdminTrendPoint[]>;
+
+export type AdminFunnelWindowDays = 7 | 28;
+
+export type AdminFunnelStage = {
+  name: string;
+  label: string;
+  actors: number;
+  previousActors: number;
+  conversionRate: number;
+  previousConversionRate: number;
+};
+
+export type AdminFunnelBreakdownRow = {
+  key: string;
+  label: string;
+  actors: number;
+  results: number;
+  accounts: number;
+  checkouts: number;
+  paid: number;
+};
+
+export type AdminFunnelWindow = {
+  days: AdminFunnelWindowDays;
+  stages: AdminFunnelStage[];
+  sourceBreakdown: AdminFunnelBreakdownRow[];
+  toolBreakdown: AdminFunnelBreakdownRow[];
+  identifiedActors: number;
+  anonymousActors: number;
+};
+
+export type AdminFunnelDashboard = {
+  generatedAt: Date;
+  windows: Record<AdminFunnelWindowDays, AdminFunnelWindow>;
+  stalePendingOrders: number;
+  stalePendingAmountVnd: number;
+};
 
 export type StoredReadingProgress = ReadingProgressInput & {
   id: string;

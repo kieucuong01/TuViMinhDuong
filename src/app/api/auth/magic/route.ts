@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { signInWithMagicToken } from "@/lib/auth";
 import { AUTH_RATE_LIMIT_WINDOW_MS, MAGIC_LOGIN_RATE_LIMIT, checkRateLimit, rateLimitKeyFromHeaders } from "@/lib/rate-limit";
+import { recordAccountFunnelEvent } from "@/lib/funnel-events";
 
 function safeNext(value: string | null) {
   if (!value || !value.startsWith("/") || value.startsWith("//")) return "/";
@@ -22,6 +23,8 @@ export async function GET(request: Request) {
   if (!user) {
     return NextResponse.redirect(new URL(`/dang-nhap?next=${encodeURIComponent(next)}&error=${encodeURIComponent("Link truy cập đã hết hạn hoặc không hợp lệ.")}`, url.origin));
   }
+
+  await recordAccountFunnelEvent(user.id, "magic_login");
 
   return NextResponse.redirect(new URL(next, url.origin));
 }

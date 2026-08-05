@@ -80,6 +80,7 @@ model User {
   payments     PaymentOrder[]
   auditLogs    AuditLog[]
   assistantQuestions AssistantQuestion[]
+  funnelEvents  FunnelEvent[]
 }
 
 model Account {
@@ -120,6 +121,7 @@ model Chart {
   user              User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
   readings          Reading[]
   assistantQuestions AssistantQuestion[]
+  funnelEvents      FunnelEvent[]
 
   @@index([userId, createdAt])
   @@index([creationIp, createdAt])
@@ -259,11 +261,36 @@ model PaymentOrder {
   status        PaymentStatus @default(PENDING)
   checkoutUrl   String?
   rawPayload    Json?
+  attribution   Json?
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
   paidAt        DateTime?
   user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   package       CoinPackage?  @relation(fields: [packageId], references: [id], onDelete: SetNull)
+}
+
+model FunnelEvent {
+  id                   String   @id @default(cuid())
+  name                 String
+  anonymousSessionId   String?
+  userId               String?
+  chartId              String?
+  source               String   @default("unknown")
+  landingClass         String   @default("other")
+  tool                 String   @default("other")
+  placement            String?
+  resultBand           String?
+  dedupeKey            String?  @unique
+  createdAt            DateTime @default(now())
+  user                 User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  chart                Chart?   @relation(fields: [chartId], references: [id], onDelete: SetNull)
+
+  @@index([createdAt])
+  @@index([name, createdAt])
+  @@index([source, createdAt])
+  @@index([tool, createdAt])
+  @@index([userId, createdAt])
+  @@index([chartId, createdAt])
 }
 
 model ArticleCategory {

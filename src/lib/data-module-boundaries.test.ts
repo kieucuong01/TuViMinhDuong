@@ -246,6 +246,7 @@ describe("data module boundaries", () => {
     const expected = [
       "normalizeAdminTrendPeriod",
       "getAdminBusinessDashboard",
+      "getAdminFunnelDashboard",
       "listAdminChartSubmissions",
       "getAdminOverview",
     ];

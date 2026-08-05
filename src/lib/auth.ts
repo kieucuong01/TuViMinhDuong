@@ -4,6 +4,7 @@ import { cookies } from "next/headers";
 import { createHmac, randomBytes, scryptSync, timingSafeEqual } from "node:crypto";
 import { ADMIN_EMAIL, ADMIN_PASSWORD } from "@/lib/env";
 import { getDb } from "@/lib/db";
+import { recordAccountFunnelEvent } from "@/lib/funnel-events";
 
 export type SessionUser = {
   id: string;
@@ -277,6 +278,7 @@ export async function loginOrRegister(email: string, password: string, name?: st
       coinBalance: role === "ADMIN" ? 999999 : 30,
     };
     await setSession(user);
+    await recordAccountFunnelEvent(user.id, "register");
     return { user, accountResult: "register" };
   }
 
@@ -310,6 +312,7 @@ export async function loginOrRegister(email: string, password: string, name?: st
       coinBalance: synced.coinBalance,
     };
     await setSession(user);
+    await recordAccountFunnelEvent(user.id, "login");
     return { user, accountResult: "login" };
   }
 
@@ -330,5 +333,6 @@ export async function loginOrRegister(email: string, password: string, name?: st
     coinBalance: created.coinBalance,
   };
   await setSession(user);
+  await recordAccountFunnelEvent(user.id, "register");
   return { user, accountResult: "register" };
 }

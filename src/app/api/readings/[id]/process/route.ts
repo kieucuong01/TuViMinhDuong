@@ -3,6 +3,7 @@ import { after, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { generateReadingWithProgress, type PaidReadingChapterOutput } from "@/lib/ai";
 import { adjustCoins, completeReadingJob, failReadingJob, getChart, getReadingJobById, updateReadingJobProgress } from "@/lib/data";
+import { paymentFunnelAttribution, recordFunnelEventBestEffort } from "@/lib/funnel-events";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -86,6 +87,13 @@ async function runFullReadingJob(readingId: string, user: ProcessUser, reading: 
       completedAt: new Date().toISOString(),
     };
     await completeReadingJob(readingId, result.content, preservePaymentOrderId(completedMeta, reading.promptMeta), result.model);
+    await recordFunnelEventBestEffort({
+      name: "reading_complete",
+      userId: user.id,
+      chartId: reading.chartId,
+      ...paymentFunnelAttribution(record.creationAttribution),
+      dedupeKey: `reading-complete:${readingId}`,
+    });
     revalidatePath(`/la-so/${reading.chartId}`);
     revalidatePath(`/la-so/${reading.chartId}/nang-cao`);
   } catch (error) {

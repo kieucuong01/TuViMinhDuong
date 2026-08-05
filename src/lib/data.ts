@@ -66,6 +66,7 @@ export {
 
 export {
   getAdminBusinessDashboard,
+  getAdminFunnelDashboard,
   getAdminOverview,
   listAdminChartSubmissions,
   normalizeAdminTrendPeriod,
@@ -74,6 +75,11 @@ export {
 export type {
   AdminBusinessDashboard,
   AdminChartSubmission,
+  AdminFunnelBreakdownRow,
+  AdminFunnelDashboard,
+  AdminFunnelStage,
+  AdminFunnelWindow,
+  AdminFunnelWindowDays,
   AdminPaymentSource,
   AdminRecentPayment,
   AdminRecentUser,

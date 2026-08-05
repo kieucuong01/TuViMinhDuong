@@ -14,6 +14,7 @@ type AttributionFields = {
   source_slug: string;
   entry_article: string;
   cta_location: string;
+  funnel_session_id: string;
 };
 
 type ChartAttributionFieldsProps = {
@@ -34,6 +35,7 @@ const EMPTY_FIELDS: AttributionFields = {
   source_slug: "",
   entry_article: "",
   cta_location: "",
+  funnel_session_id: "",
 };
 
 const STORAGE_KEY = "lsth-chart-attribution";
@@ -57,6 +59,7 @@ function fieldsFromLocation(defaults: ChartAttributionFieldsProps = {}) {
     source_slug: sourceSlug,
     entry_article: clean(params.get("entry_article") || defaults.entryArticle || sourceSlug, 160),
     cta_location: clean(params.get("cta_location") || defaults.ctaLocation || "", 120),
+    funnel_session_id: clean(window.sessionStorage.getItem("lsth-funnel-session"), 64),
   };
 }
 

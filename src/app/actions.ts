@@ -22,6 +22,7 @@ import { normalizeChartAttribution } from "@/lib/chart-attribution";
 import { AUTH_RATE_LIMIT_WINDOW_MS, LOGIN_RATE_LIMIT, checkRateLimit, rateLimitKeyFromHeaders } from "@/lib/rate-limit";
 import { parseChartActionInput, parseFeaturePriceUpdates, parseOperationSettingsInput, parseReadingBundleInput, parseReadingRequestInput, safeNextPath } from "@/lib/action-input";
 import { runCoinTopupCheckout, runFullReadingCheckout, runQuickReadingCheckout } from "@/lib/reading-checkout";
+import { normalizeAnonymousFunnelSessionId, recordAttributedAccountFunnelEvent, recordChartResultFunnelEvent } from "@/lib/funnel-events";
 
 function createChartTimeoutMs(value = process.env.CREATE_CHART_ACTION_TIMEOUT_MS) {
   const parsed = Number(value);
@@ -195,6 +196,7 @@ async function getChartCreationMetadata(formData: FormData, adSource: string): P
     ),
     userAgent: normalizeUserAgent(headerList.get("user-agent")),
     attribution: chartAttributionFromForm(formData, adSource),
+    funnelSessionId: normalizeAnonymousFunnelSessionId(textField(formData, "funnel_session_id")),
   };
 }
 
@@ -221,14 +223,14 @@ export async function createChartAction(formData: FormData) {
   const adSource = safeAdSource(formData.get("adSource"));
   const experience = safeChartExperience(formData.get("chartExperience"));
   const paths = chartCreationPaths(experience);
-  let result: { user: SessionUser | null; chart: Awaited<ReturnType<typeof saveChart>> };
+  let result: { user: SessionUser | null; chart: Awaited<ReturnType<typeof saveChart>>; metadata: ChartCreationMetadata };
 
   try {
     result = await withActionTimeout("createChartAction", CREATE_CHART_ACTION_TIMEOUT_MS, async () => {
       const metadata = await timer.time("guardChartSubmission", () => guardChartSubmission(input, formData, adSource));
       const user = await timer.time("getCurrentUser", () => getCurrentUser());
       const chart = await timer.time("saveChart", () => saveChart(input, user, metadata));
-      return { user, chart };
+      return { user, chart, metadata };
     });
   } catch (error) {
     const chartError = chartSubmissionErrorParam(error);
@@ -254,6 +256,7 @@ export async function createChartAction(formData: FormData) {
     void generateAndStoreFreeOverview(result.chart.id).catch((error) => {
       console.error("free_overview_early_generation_failed", error);
     });
+    void recordChartResultFunnelEvent(result.chart.id, result.user?.id, result.metadata, experience === "wealth" ? "wealth" : "chart");
   });
   redirect(withQueryParams(chartCreationPaths(experience, result.chart.id).success, { created: "1", adSource }));
 }
@@ -273,6 +276,7 @@ export async function quickReadingCheckoutAction(formData: FormData) {
   const email = String(formData.get("email") || "");
   const user = await getOrCreateEmailUser(email, input.fullName);
   await setSession(user);
+  await recordAttributedAccountFunnelEvent(user.id, metadata, "quick_checkout");
 
   const chart = await saveChart(input, user, metadata);
   const price = await getFeaturePrice("FULL");

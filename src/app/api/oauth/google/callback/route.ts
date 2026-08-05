@@ -10,6 +10,7 @@ import {
   normalizeGoogleProfile,
   parseGoogleOAuthState,
 } from "@/lib/google-oauth";
+import { recordAccountFunnelEvent } from "@/lib/funnel-events";
 
 export async function GET(request: Request) {
   const url = new URL(request.url);
@@ -117,6 +118,7 @@ export async function GET(request: Request) {
     }
 
     await setSession(user);
+    await recordAccountFunnelEvent(user.id, accountResult);
     let claimed = false;
     try {
       claimed = await claimGuestChartForUserFromPath(parsed.next, user);

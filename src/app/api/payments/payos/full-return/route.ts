@@ -49,6 +49,7 @@ export async function GET(request: Request) {
       coins: true,
       paidAt: true,
       rawPayload: true,
+      attribution: true,
     },
   });
   const metadata = paidReadingOrderPayload(order?.rawPayload);

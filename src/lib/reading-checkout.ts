@@ -2,6 +2,7 @@ import "server-only";
 
 import type { SessionUser } from "@/lib/auth";
 import type { StoredChart } from "@/lib/data/contracts";
+import { paymentFunnelAttribution, recordFunnelEventBestEffort } from "@/lib/funnel-events";
 
 type FeaturePrice = { label: string; priceCoins: number };
 type Database = ReturnType<typeof import("@/lib/db").getDb>;
@@ -99,7 +100,8 @@ export async function runCoinTopupCheckout(
         isActive: true,
       },
     });
-    await db.paymentOrder.create({
+    const attributionSnapshot = { source: "unknown", landingClass: "pricing", tool: "coin_topup" } as const;
+    const order = await db.paymentOrder.create({
       data: {
         userId: input.user.id,
         packageId: packageRecord.id,
@@ -109,8 +111,17 @@ export async function runCoinTopupCheckout(
         coins: checkout.coins,
         checkoutUrl: checkout.checkoutUrl,
         rawPayload: checkout.raw,
+        attribution: attributionSnapshot,
       },
     });
+    if (order?.id) {
+      await recordFunnelEventBestEffort({
+        name: "checkout",
+        userId: input.user.id,
+        ...attributionSnapshot,
+        dedupeKey: `checkout:${order.id}`,
+      });
+    }
   } else if (isDemoCheckout(checkout.raw)) {
     await deps.adjustCoins(input.user, checkout.coins, "Demo nạp xu", String(checkout.orderCode));
     return {
@@ -150,7 +161,8 @@ export async function runQuickReadingCheckout(
   const db = deps.getDb();
   const demoCheckout = isDemoCheckout(checkout.raw);
   if (db) {
-    await db.paymentOrder.create({
+    const attributionSnapshot = paymentFunnelAttribution(chart.creationAttribution);
+    const order = await db.paymentOrder.create({
       data: {
         userId: user.id,
         orderCode: BigInt(checkout.orderCode),
@@ -160,6 +172,7 @@ export async function runQuickReadingCheckout(
         status: demoCheckout ? "PAID" : "PENDING",
         paidAt: demoCheckout ? new Date() : undefined,
         checkoutUrl: checkout.checkoutUrl,
+        attribution: attributionSnapshot,
         rawPayload: {
           raw: checkout.raw,
           quickReading: {
@@ -172,6 +185,15 @@ export async function runQuickReadingCheckout(
         },
       },
     });
+    if (order?.id) {
+      await recordFunnelEventBestEffort({
+        name: "checkout",
+        userId: user.id,
+        chartId: chart.id,
+        ...attributionSnapshot,
+        dedupeKey: `checkout:${order.id}`,
+      });
+    }
   }
 
   if (!deps.isPayOSEnabled()) {
@@ -254,6 +276,7 @@ export async function runFullReadingCheckout(
     };
   }
 
+  const attributionSnapshot = paymentFunnelAttribution(record.creationAttribution);
   const order = await db.paymentOrder.create({
     data: {
       userId: user.id,
@@ -264,6 +287,7 @@ export async function runFullReadingCheckout(
       status: demoCheckout ? "PAID" : "PENDING",
       paidAt: demoCheckout ? new Date() : undefined,
       checkoutUrl: checkout.checkoutUrl,
+      attribution: attributionSnapshot,
       rawPayload: {
         raw: checkout.raw,
         directReading: {
@@ -275,6 +299,13 @@ export async function runFullReadingCheckout(
         },
       },
     },
+  });
+  await recordFunnelEventBestEffort({
+    name: "checkout",
+    userId: user.id,
+    chartId,
+    ...attributionSnapshot,
+    dedupeKey: `checkout:${order.id}`,
   });
 
   if (demoCheckout) {

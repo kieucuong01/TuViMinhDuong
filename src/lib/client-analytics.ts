@@ -1,5 +1,7 @@
 "use client";
 
+import { reportOrganicToolFunnelEvent } from "@/lib/first-party-funnel-client";
+
 export type OrganicToolEventName =
   | "date_finder_submitted"
   | "date_finder_result_selected"
@@ -117,6 +119,7 @@ export function organicToolClickEvents(dataset: OrganicDataset): OrganicToolEven
 
 export function trackOrganicToolEvent(name: OrganicToolEventName, params: Record<string, AnalyticsParamValue> = {}) {
   if (typeof window === "undefined") return;
+  reportOrganicToolFunnelEvent(name, params);
   ensureGtagQueue()("event", name, {
     event_category: "organic_tools",
     ...safeParams(name, params),
