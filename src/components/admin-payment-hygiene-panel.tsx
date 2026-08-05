@@ -1,5 +1,5 @@
 import { Clock3, RefreshCw, ShieldCheck } from "lucide-react";
-import type { AdminBusinessDashboard } from "@/lib/data";
+import type { AdminBusinessDashboard } from "@/lib/data/contracts";
 
 function formatInteger(value: number) {
   return new Intl.NumberFormat("vi-VN").format(value);

@@ -4,7 +4,7 @@ import type {
   AdminFunnelBreakdownRow,
   AdminFunnelDashboard,
   AdminFunnelWindowDays,
-} from "@/lib/data";
+} from "@/lib/data/contracts";
 
 function formatInteger(value: number) {
   return new Intl.NumberFormat("vi-VN").format(value);
