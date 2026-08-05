@@ -170,4 +170,41 @@ describe("data module boundaries", () => {
       "@/lib/data",
     ]));
   });
+
+  it("owns reading, balance, bundle and progress persistence in the reading domain", () => {
+    const readingsPath = path.join(dataDirectory, "readings.ts");
+    const expected = [
+      "getUserBalance",
+      "adjustCoins",
+      "getCachedReading",
+      "hasReadingBundleAccess",
+      "getAnyCompletedReading",
+      "getReadingJobByScope",
+      "getReadingJobById",
+      "getReadingProgress",
+      "saveReadingProgress",
+      "createPendingReading",
+      "updateReadingJobProgress",
+      "completeReadingJob",
+      "failReadingJob",
+      "getCompletedReadingsForScopes",
+      "getReadingById",
+      "saveReading",
+    ];
+
+    expect(fs.existsSync(readingsPath)).toBe(true);
+    const owned = exportedDeclarations(readingsPath);
+    const facadeExports = exportedDeclarations(path.join(projectRoot, "src", "lib", "data.ts"));
+    for (const name of expected) {
+      expect(owned.has(name), `${name} should be owned by readings.ts`).toBe(true);
+      expect(facadeExports.has(name), `${name} should remain exported by data.ts`).toBe(true);
+    }
+
+    expect(importSpecifiers(readingsPath)).not.toEqual(expect.arrayContaining([
+      "./admin",
+      "./articles",
+      "@/lib/data",
+      "@/app/actions",
+    ]));
+  });
 });
