@@ -72,3 +72,7 @@ export function replaceDemoFeaturePrices(next: FeaturePriceMap) {
   store.demoFeaturePrices = next;
   return store.demoFeaturePrices;
 }
+
+export function usesInMemoryUser(userId: string) {
+  return userId.startsWith("demo-") || userId.startsWith("guest-");
+}
