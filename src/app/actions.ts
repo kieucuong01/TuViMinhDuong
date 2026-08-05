@@ -20,8 +20,7 @@ import { savePseoPageFromForm } from "@/lib/pseo-data";
 import { chartCreationRateLimitExceeded, chartCreationRateLimitWindowStart, normalizeRequestIp, normalizeUserAgent, validateChartFullName } from "@/lib/chart-submission-guard";
 import { normalizeChartAttribution } from "@/lib/chart-attribution";
 import { AUTH_RATE_LIMIT_WINDOW_MS, LOGIN_RATE_LIMIT, checkRateLimit, rateLimitKeyFromHeaders } from "@/lib/rate-limit";
-import { parseChartActionInput, parseFeaturePriceUpdates, parseOperationSettingsInput, parseReadingBundleInput,
-  parseReadingRequestInput, safeNextPath } from "@/lib/action-input";
+import { parseChartActionInput, parseFeaturePriceUpdates, parseOperationSettingsInput, parseReadingBundleInput, parseReadingRequestInput, safeNextPath } from "@/lib/action-input";
 import { runCoinTopupCheckout, runFullReadingCheckout, runQuickReadingCheckout } from "@/lib/reading-checkout";
 
 function createChartTimeoutMs(value = process.env.CREATE_CHART_ACTION_TIMEOUT_MS) {
@@ -364,10 +363,11 @@ export async function checkoutFullReadingAction(formData: FormData) {
     redirect(withQueryParams(nextPath, { checkout: "email-invalid" }));
   }
 
-  let user = currentUser;
+  let user = currentUser, checkoutRecord = record;
   if (!user) {
     user = await claimGuestChartForCheckout(chartId, record.chart.input.fullName);
     if (!user) redirect(withQueryParams(nextPath, { checkout: "forbidden" }));
+    checkoutRecord = { ...record, userId: user.id };
     await setSession(user);
   } else if (record.userId !== user.id && user.role !== "ADMIN") {
     redirect(withQueryParams(nextPath, { checkout: "forbidden" }));
@@ -385,7 +385,7 @@ export async function checkoutFullReadingAction(formData: FormData) {
       completePaidReadingOrder,
     },
     {
-      record,
+      record: checkoutRecord,
       user,
       chartId,
       buyerEmail,

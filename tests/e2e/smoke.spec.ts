@@ -10,29 +10,29 @@ test.describe("core smoke flows", () => {
     await expect(page.getByTestId("premium-reading-cta-bottom")).toBeVisible();
   });
 
-  test("guest paid reading redirects to login paywall", async ({ page }) => {
-    await createSmokeChart(page, `Guest Paywall ${Date.now()}`);
+  test("guest can enter a checkout email and open the local demo reading", async ({ page }) => {
+    const { id } = await createSmokeChart(page, `Guest Checkout ${Date.now()}`);
 
     const premiumCta = page.getByTestId("premium-reading-cta-bottom");
     await expect(premiumCta).toBeVisible();
     await premiumCta.click();
 
     await expect(page.getByTestId("premium-reading-confirm-modal")).toBeVisible();
+    await page.getByTestId("premium-reading-confirm-modal").getByRole("textbox", { name: "Email đối soát giao dịch" }).fill(`guest-${Date.now()}@example.com`);
     await page.getByTestId("premium-reading-confirm-submit").click();
 
-    await expect(page).toHaveURL(/\/dang-nhap\?/);
-    await expect(page.getByTestId("login-form")).toBeVisible();
-    await expect(page.getByTestId("paywall-popup")).toBeVisible();
+    await expect(page).toHaveURL(new RegExp(`/la-so/${id}/nang-cao\\?.*status=demo-paid`));
+    await expect(page.getByTestId("advanced-reading-page")).toBeVisible();
   });
 
-  test("normal user without enough coins sees the coin topup modal", async ({ page }) => {
+  test("normal user can open the direct local demo checkout", async ({ page }) => {
     await page.goto("/dang-nhap?next=/");
     await page.getByTestId("login-email").fill(`smoke-user-${Date.now()}@example.com`);
     await page.getByTestId("login-password").fill("Viplatui1");
     await page.getByTestId("login-form").locator("button[type=submit]").click();
     await page.waitForURL((url) => url.pathname === "/", { timeout: 20_000 });
 
-    await createSmokeChart(page, `Coin Paywall ${Date.now()}`);
+    const { id } = await createSmokeChart(page, `Direct Checkout ${Date.now()}`);
 
     const premiumCta = page.getByTestId("premium-reading-cta-bottom");
     await expect(premiumCta).toBeVisible();
@@ -41,9 +41,8 @@ test.describe("core smoke flows", () => {
     await expect(page.getByTestId("premium-reading-confirm-modal")).toBeVisible();
     await page.getByTestId("premium-reading-confirm-submit").click();
 
-    await expect(page).toHaveURL(/paywall=coins/);
-    await expect(page.getByTestId("paywall-popup")).toBeVisible();
-    await expect(page.getByTestId("coin-topup-modal")).toBeVisible();
+    await expect(page).toHaveURL(new RegExp(`/la-so/${id}/nang-cao\\?.*status=demo-paid`));
+    await expect(page.getByTestId("advanced-reading-page")).toBeVisible();
   });
 
   test("date view updates date and birth year inputs", async ({ page }) => {
@@ -62,7 +61,7 @@ test.describe("core smoke flows", () => {
   test("evergreen article renders metadata scripts and FAQ content", async ({ page }) => {
     await page.goto("/kien-thuc-tu-vi/gio-sinh-trong-tu-vi");
 
-    await expect(page.getByRole("heading", { name: /Giờ sinh trong tử vi/i })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1, name: /Giờ sinh trong tử vi/i })).toBeVisible();
     await expect(page.locator("#article-jsonld")).toHaveCount(1);
     await expect(page.locator("#breadcrumb-jsonld")).toHaveCount(1);
     await expect(page.locator("#faq-jsonld")).toHaveCount(1);
