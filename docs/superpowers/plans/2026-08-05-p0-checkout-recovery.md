@@ -91,11 +91,11 @@ Run the asset test and inspect file metadata. Confirm each file is 1200x675, bel
 
 - [ ] **Step 3: Review the timeout-only test changes**
 
-Keep the explicit 30-second timeout constants because they bound only filesystem/data integration tests and do not change application behavior. Confirm no production source imports the constants.
+Run the bounded group once with the repository's 15-second default. If all five files pass within the existing limit, exclude the copied timeout-only changes from P0; a larger timeout without a reproduced timeout failure would only hide future slowness. The observed P0 run passed 62 tests without those overrides, so the timeout-only changes are excluded.
 
 - [ ] **Step 4: Classify the SVG source files**
 
-Inspect the five 1986/1987/1990 SVGs. Stage them only if all five form one complete source set with valid UTF-8 Vietnamese, 1200x675 dimensions, an article-specific `aria-label`, and no raw ampersand. Otherwise leave all untracked SVGs untouched; never stage a partial source set.
+Inspect the five 1986/1987/1990 SVGs. Stage them only if all five form one complete source set with valid UTF-8 Vietnamese, 1200x675 dimensions, an article-specific `aria-label`, and no raw ampersand. Otherwise leave all SVG changes untouched in the original checkout; never stage a partial source set. The P0 worktree excludes these SVG changes because the public articles reference the reviewed WebP assets and the SVG sources are not part of that runtime contract.
 
 ### Task 3: Prove And Commit The P0 Unit
 

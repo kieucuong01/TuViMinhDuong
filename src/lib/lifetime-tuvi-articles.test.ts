@@ -59,13 +59,21 @@ describe("lifetime Tu vi SEO article cluster", () => {
     }
   });
 
-  it("expands the priority adult lifetime age intents without duplicating live coverage", () => {
+  it("expands the priority adult lifetime age intents without duplicates", () => {
     expect(adultExpansionLifetimeArticleSlugs).toContain("tu-vi-tron-doi-tuoi-canh-tuat-1970-nam-mang");
-    expect(adultExpansionLifetimeArticleSlugs).toContain("tu-vi-tron-doi-tuoi-tan-hoi-1971-nu-mang");
-    expect(adultExpansionLifetimeArticleSlugs).toContain("tu-vi-tron-doi-tuoi-tan-dau-1981-nu-mang");
+    expect(adultExpansionLifetimeArticleSlugs).toContain("tu-vi-tron-doi-tuoi-nham-tuat-1982-nu-mang");
+    expect(adultExpansionLifetimeArticleSlugs).toContain("tu-vi-tron-doi-tuoi-binh-dan-1986-nam-mang");
+    expect(adultExpansionLifetimeArticleSlugs).toContain("tu-vi-tron-doi-tuoi-dinh-mao-1987-nu-mang");
     expect(adultExpansionLifetimeArticleSlugs).toContain("tu-vi-tron-doi-tuoi-canh-ngo-1990-nam-mang");
     expect(new Set(adultExpansionLifetimeArticleSlugs).size).toBe(adultExpansionLifetimeArticleSlugs.length);
-    expect(adultExpansionLifetimeAgeArticleInputs.find((item) => item.slug === "tu-vi-tron-doi-tuoi-canh-tuat-1970-nam-mang")?.siblingLink?.href).toBe("/xem-tu-vi-tron-doi/tu-vi-tron-doi-tuoi-canh-tuat-1970-nu-mang");
+    expect(
+      adultExpansionLifetimeAgeArticleInputs.every((input) => {
+        const siblingSlug = input.slug.endsWith("nam-mang")
+          ? input.slug.replace("nam-mang", "nu-mang")
+          : input.slug.replace("nu-mang", "nam-mang");
+        return input.siblingLink?.href === `/xem-tu-vi-tron-doi/${siblingSlug}`;
+      }),
+    ).toBe(true);
   });
 
   it("covers every priority year from 1970 through 1981 for both genders", () => {
