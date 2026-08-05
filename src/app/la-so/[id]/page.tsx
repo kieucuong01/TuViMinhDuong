@@ -4,7 +4,7 @@ import { Suspense } from "react";
 import { BookOpenText, CalendarRange, Compass, Layers3, ShieldCheck } from "lucide-react";
 import { ChartBoard, MobileChartReader } from "@/components/chart-board";
 import { getAnyCompletedReading, getCachedReading, getChart, getFeaturePrices, getFreeOverviewStatus, getOperationSettings, getReadingById, getUserBalance } from "@/lib/data";
-import { getCurrentUser, isCheckoutGuestUser } from "@/lib/auth";
+import { getCurrentUser, isCheckoutGuestUser, type SessionUser } from "@/lib/auth";
 import { FeedbackActions } from "@/components/feedback-actions";
 import { PromptChips } from "@/components/prompt-chips";
 import { ReadingTabs } from "@/components/reading-tabs";
@@ -53,6 +53,11 @@ function checkoutNotice(checkout?: string, status?: string) {
 function palaceSummary(chart: TuViChart, name: string) {
   const palace = chart.palaces.find((item) => item.name === name);
   return palace ? `${palace.name} tại ${palace.branch}` : `${name} đang cập nhật`;
+}
+
+async function getViewerFullReading(user: SessionUser, chartId: string) {
+  return (await getCachedReading(user.id, chartId, "FULL", "all"))
+    ?? (user.role === "ADMIN" ? await getAnyCompletedReading(chartId, "FULL", "all") : null);
 }
 
 function ChartReadingGuide({ chartId, chart, canUsePaidFateViews }: { chartId: string; chart: TuViChart; canUsePaidFateViews: boolean }) {
@@ -128,9 +133,12 @@ export default async function ChartPage({
 }) {
   const { id } = await params;
   const query = await searchParams;
-  const record = await getChart(id);
+  const [record, user, operationSettings] = await Promise.all([
+    getChart(id),
+    getCurrentUser(),
+    getOperationSettings(),
+  ]);
   if (!record) notFound();
-  const [user, operationSettings] = await Promise.all([getCurrentUser(), getOperationSettings()]);
   const canReadFullOverview = Boolean(user && (user.role === "ADMIN" || record.userId === user.id));
   const paidFeaturesVisible = operationSettings.paidReadingsEnabled || user?.role === "ADMIN";
   const requiresCheckoutEmail = !user || isCheckoutGuestUser(user);
@@ -142,28 +150,25 @@ export default async function ChartPage({
     ),
   );
   const canUsePaidFateViews = paidFeaturesVisible && canReadFullOverview;
-  const featurePrices = paidFeaturesVisible ? await getFeaturePrices() : null;
   const visibleViews: FateView[] = canUsePaidFateViews
     ? ["la-so", "tai-loc", "luan-cung", "dai-van", "tieu-van", "nguyet-van", "nhat-van"]
     : ["la-so", "tai-loc"];
   const activeView: FateView = visibleViews.includes(query.view as FateView) ? (query.view as FateView) : "la-so";
   const isScopedReadingView = ["tai-loc", "luan-cung", "dai-van", "tieu-van", "nguyet-van", "nhat-van"].includes(activeView);
 
-  const selectedReadingCandidate = canReadFullOverview && user && query.reading && !isScopedReadingView
-    ? await getReadingById(user.id, query.reading)
-    : null;
+  const [featurePrices, selectedReadingCandidate, viewerFullReading, coinBalance] = await Promise.all([
+    paidFeaturesVisible ? getFeaturePrices() : Promise.resolve(null),
+    canReadFullOverview && user && query.reading && !isScopedReadingView
+      ? getReadingById(user.id, query.reading)
+      : Promise.resolve(null),
+    canReadFullOverview && user ? getViewerFullReading(user, id) : Promise.resolve(null),
+    canReadFullOverview && user ? getUserBalance(user) : Promise.resolve(0),
+  ]);
   const selectedReading = selectedReadingCandidate?.chartId === id ? selectedReadingCandidate : null;
-  const fullReading = canReadFullOverview && user && !isScopedReadingView
-    ? (await getCachedReading(user.id, id, "FULL", "all")) ||
-      (user.role === "ADMIN" ? await getAnyCompletedReading(id, "FULL", "all") : null)
-    : null;
+  const fullReading = isScopedReadingView ? null : viewerFullReading;
   const activeReading = selectedReading || fullReading;
   const hasAdvancedReading = Boolean(fullReading);
-  const assistantFullReading = canReadFullOverview && user
-    ? fullReading ||
-      (await getCachedReading(user.id, id, "FULL", "all")) ||
-      (user.role === "ADMIN" ? await getAnyCompletedReading(id, "FULL", "all") : null)
-    : null;
+  const assistantFullReading = viewerFullReading;
   const assistantHistory = user && assistantFullReading ? await listAssistantQuestions(user.id, id) : [];
   const assistantRemaining = Math.max(0, 3 - assistantHistory.length);
   const assistantAccess: AssistantAccess = !user
@@ -177,7 +182,6 @@ export default async function ChartPage({
         };
   const reportOutline = buildPersonalizedReportOutline(record.chart);
   const paymentNotice = checkoutNotice(query.checkout, query.status);
-  const coinBalance = canReadFullOverview && user ? await getUserBalance(user) : 0;
   const activeLabel = activeReading ? readingLabels[activeReading.type] : "Luận giải tổng quan";
   const freeOverviewStatus = activeReading || isScopedReadingView ? null : getFreeOverviewStatus(record.chart);
   const restrictedOverviewContent = !canReadFullOverview && freeOverviewStatus?.content
