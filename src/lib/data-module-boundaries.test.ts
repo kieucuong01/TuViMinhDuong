@@ -99,4 +99,33 @@ describe("data module boundaries", () => {
       "@/lib/data",
     ]));
   });
+
+  it("owns free overview generation in its domain and re-exports its public API", () => {
+    const freeOverviewPath = path.join(dataDirectory, "free-overview.ts");
+    const expected = [
+      "getFreeOverviewStatus",
+      "claimFreeOverviewGeneration",
+      "claimFreeOverviewBlockGeneration",
+      "failFreeOverviewGeneration",
+      "generateAndStoreFreeOverviewBlock",
+      "generateAndStoreFreeOverview",
+      "getOrCreateFreeOverview",
+    ];
+
+    expect(fs.existsSync(freeOverviewPath)).toBe(true);
+    const owned = exportedDeclarations(freeOverviewPath);
+    const facadeExports = exportedDeclarations(path.join(projectRoot, "src", "lib", "data.ts"));
+    for (const name of expected) {
+      expect(owned.has(name), `${name} should be owned by free-overview.ts`).toBe(true);
+      expect(facadeExports.has(name), `${name} should remain exported by data.ts`).toBe(true);
+    }
+
+    expect(importSpecifiers(freeOverviewPath)).not.toEqual(expect.arrayContaining([
+      "./readings",
+      "./articles",
+      "./settings",
+      "./admin",
+      "@/lib/data",
+    ]));
+  });
 });

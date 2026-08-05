@@ -25,12 +25,14 @@ function chartFixture(): TuViChart {
 
 describe("free overview status", () => {
   it("keeps the page status synchronous and delegates LLM work to the process path", () => {
-    const source = readFileSync(fileURLToPath(new URL("./data.ts", import.meta.url)), "utf8");
+    const source = readFileSync(fileURLToPath(new URL("./data/free-overview.ts", import.meta.url)), "utf8");
+    const facade = readFileSync(fileURLToPath(new URL("./data.ts", import.meta.url)), "utf8");
 
     expect(source).toContain("generateAndStoreFreeOverviewBlock(chartId, nextBlockKey)");
     expect(source).not.toContain("generateFreeOverviewPreview");
     expect(source).not.toContain("fullOverviewPromise");
     expect(source).toContain("const FREE_OVERVIEW_PROCESSING_TTL_MS = 2 * 60 * 1000");
+    expect(facade).toContain('from "@/lib/data/free-overview"');
   });
 
   it("returns a fast 800-1200 visible-word block preview while the LLM overview is missing", async () => {
