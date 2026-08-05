@@ -6,16 +6,20 @@ const source = readFileSync(
   fileURLToPath(new URL("./actions.ts", import.meta.url)),
   "utf8",
 );
+const orchestration = readFileSync(
+  fileURLToPath(new URL("../lib/reading-checkout.ts", import.meta.url)),
+  "utf8",
+);
 
 describe("FULL checkout action guest contract", () => {
   it("requires email, claims an isolated guest, and restores it on PayOS return", () => {
     expect(source).toContain('normalizeCheckoutEmail(formData.get("email"))');
     expect(source).toContain("claimGuestChartForCheckout(chartId");
     expect(source).toContain("await setSession(user)");
-    expect(source).toContain('await createMagicSession(user, "checkout")');
-    expect(source).toContain("/api/payments/payos/full-return?token=");
+    expect(source).toContain('createMagicSession(user, "checkout")');
+    expect(orchestration).toContain("/api/payments/payos/full-return?token=");
     expect(source).toContain("buyerEmail");
-    expect(source).toContain("checkoutEmail: buyerEmail");
+    expect(orchestration).toContain("checkoutEmail: buyerEmail");
   });
 
   it("does not route a guest through the login modal", () => {

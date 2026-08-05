@@ -3,6 +3,7 @@ import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 
 const source = readFileSync(fileURLToPath(new URL("./actions.ts", import.meta.url)), "utf8");
+const orchestration = readFileSync(fileURLToPath(new URL("../lib/reading-checkout.ts", import.meta.url)), "utf8");
 const checkout = source.slice(
   source.indexOf("export async function checkoutFullReadingAction"),
   source.indexOf("export async function requestReadingAction"),
@@ -16,35 +17,35 @@ describe("direct FULL checkout action contract", () => {
     expect(checkout).toContain("getCurrentUser()");
     expect(checkout).toContain("getOperationSettings()");
     expect(checkout).toContain("record.userId !== user.id");
-    expect(checkout).toContain('getFeaturePrice("FULL")');
-    expect(checkout).toContain("const amountVnd = price.priceCoins * 1000");
-    expect(checkout).not.toContain('formData.get("amount');
-    expect(checkout).not.toContain('formData.get("price');
+    expect(orchestration).toContain('deps.getFeaturePrice("FULL")');
+    expect(orchestration).toContain("const amountVnd = price.priceCoins * 1000");
+    expect(`${checkout}\n${orchestration}`).not.toContain('formData.get("amount');
+    expect(`${checkout}\n${orchestration}`).not.toContain('formData.get("price');
   });
 
   it("creates a zero-coin directReading order with a checkout-scoped token", () => {
-    expect(checkout).toContain("coins: 0");
-    expect(checkout).toContain("directReading:");
-    expect(checkout).toContain('type: "FULL"');
-    expect(checkout).toContain('scopeKey: "all"');
-    expect(checkout).toContain("const returnToken = requiresCheckoutEmail");
-    expect(checkout).toContain('? await createMagicSession(user, "checkout")');
-    expect(checkout).toContain("...(returnToken ? { token: returnToken } : {})");
+    expect(orchestration).toContain("coins: 0");
+    expect(orchestration).toContain("directReading:");
+    expect(orchestration).toContain('type: "FULL"');
+    expect(orchestration).toContain('scopeKey: "all"');
+    expect(checkout).toContain('createMagicSession(user, "checkout")');
+    expect(orchestration).toContain("const returnToken = await input.getReturnToken()");
+    expect(orchestration).toContain("requiresCheckoutEmail && returnToken ? { token: returnToken } : {}");
   });
 
   it("uses PayOS return verification and creates only a pending reading in demo mode", () => {
-    expect(checkout).toContain("const returnPath = returnToken");
-    expect(checkout).toContain("? `/api/payments/payos/full-return?token=${encodeURIComponent(returnToken)}`");
-    expect(checkout).toContain(': "/api/payments/payos/full-return"');
-    expect(checkout).toContain("returnPath,");
-    expect(checkout).toContain("completePaidReadingOrder");
-    expect(checkout).toContain("createPendingReading");
-    expect(checkout).not.toContain("generateReading(");
+    expect(orchestration).toContain("const returnPath = returnToken");
+    expect(orchestration).toContain("? `/api/payments/payos/full-return?token=${encodeURIComponent(returnToken)}`");
+    expect(orchestration).toContain(': "/api/payments/payos/full-return"');
+    expect(orchestration).toContain("returnPath,");
+    expect(orchestration).toContain("completePaidReadingOrder");
+    expect(orchestration).toContain("createPendingReading");
+    expect(orchestration).not.toContain("generateReading(record.chart");
   });
 
   it("reuses a verified paid entitlement before creating another checkout", () => {
-    expect(checkout).toContain("retryPaidFullReading");
-    expect(checkout.indexOf("retryPaidFullReading")).toBeLessThan(checkout.indexOf("createPayOSCustomCheckout"));
+    expect(orchestration).toContain("retryPaidFullReading");
+    expect(orchestration.indexOf("retryPaidFullReading")).toBeLessThan(orchestration.lastIndexOf("createPayOSCustomCheckout"));
   });
 
   it("handles forbidden unlock results before reading their payload", () => {
@@ -54,6 +55,6 @@ describe("direct FULL checkout action contract", () => {
   it("blocks checkout guests from the coin top-up action", () => {
     expect(topupCheckout).toContain("isCheckoutGuestUser(user)");
     expect(topupCheckout.indexOf("isCheckoutGuestUser(user)"))
-      .toBeLessThan(topupCheckout.indexOf("createPayOSCheckout"));
+      .toBeLessThan(topupCheckout.indexOf("runCoinTopupCheckout"));
   });
 });

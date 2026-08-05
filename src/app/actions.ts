@@ -9,9 +9,7 @@ import { ARTICLES_CACHE_TAG, FEATURE_PRICES_CACHE_TAG, OPERATION_SETTINGS_CACHE_
 import { generateReading } from "@/lib/ai";
 import { getDb } from "@/lib/db";
 import { completePaidReadingOrder, createPayOSCheckout, createPayOSCustomCheckout, retryPaidFullReading } from "@/lib/payos";
-import type { CalendarType, Gender } from "@/lib/chart";
-import { COIN_PACKAGES, FEATURE_PRICE_KEYS, TEMPORARY_FULL_ACCESS } from "@/lib/pricing";
-import type { ReadingKey } from "@/lib/pricing";
+import { COIN_PACKAGES, TEMPORARY_FULL_ACCESS } from "@/lib/pricing";
 import { databaseEnvState, isPayOSEnabled } from "@/lib/env";
 import { startFullReadingJobForUser, unlockReadingBundleForUser, unlockReadingForUser } from "@/lib/reading-unlock";
 import { isReadingBundleKey } from "@/lib/reading-bundles";
@@ -22,6 +20,9 @@ import { savePseoPageFromForm } from "@/lib/pseo-data";
 import { chartCreationRateLimitExceeded, chartCreationRateLimitWindowStart, normalizeRequestIp, normalizeUserAgent, validateChartFullName } from "@/lib/chart-submission-guard";
 import { normalizeChartAttribution } from "@/lib/chart-attribution";
 import { AUTH_RATE_LIMIT_WINDOW_MS, LOGIN_RATE_LIMIT, checkRateLimit, rateLimitKeyFromHeaders } from "@/lib/rate-limit";
+import { parseChartActionInput, parseFeaturePriceUpdates, parseOperationSettingsInput, parseReadingBundleInput,
+  parseReadingRequestInput, safeNextPath } from "@/lib/action-input";
+import { runCoinTopupCheckout, runFullReadingCheckout, runQuickReadingCheckout } from "@/lib/reading-checkout";
 
 function createChartTimeoutMs(value = process.env.CREATE_CHART_ACTION_TIMEOUT_MS) {
   const parsed = Number(value);
@@ -29,6 +30,20 @@ function createChartTimeoutMs(value = process.env.CREATE_CHART_ACTION_TIMEOUT_MS
 }
 
 const CREATE_CHART_ACTION_TIMEOUT_MS = createChartTimeoutMs();
+
+const readingUnlockDependencies = {
+  getChart,
+  getCachedReading,
+  getReadingJobByScope,
+  getFeaturePrice,
+  getUserBalance,
+  adjustCoins,
+  hasReadingBundleAccess,
+  getCompletedReadingsForScopes,
+  generateReading,
+  createPendingReading,
+  saveReading,
+};
 
 class ChartSubmissionRejectedError extends Error {
   constructor(public code: "invalid" | "rate_limited") {
@@ -109,11 +124,6 @@ export async function logoutAction() {
   redirect("/");
 }
 
-function safeNextPath(value: FormDataEntryValue | null, fallback: string) {
-  const next = String(value || fallback);
-  return next.startsWith("/") && !next.startsWith("//") ? next : fallback;
-}
-
 function safeChartExperience(value: FormDataEntryValue | null): "default" | "wealth" {
   return value === "wealth" ? "wealth" : "default";
 }
@@ -175,21 +185,6 @@ function chartAttributionFromForm(formData: FormData, adSource: string) {
   });
 }
 
-function chartInputFromForm(formData: FormData) {
-  return {
-    fullName: String(formData.get("fullName") || ""),
-    gender: String(formData.get("gender") || "male") as Gender,
-    calendarType: String(formData.get("calendarType") || "solar") as CalendarType,
-    day: Number(formData.get("day") || 1),
-    month: Number(formData.get("month") || 1),
-    year: Number(formData.get("year") || 1990),
-    birthHour: Number(formData.get("birthHour") || 0),
-    birthMinute: Number(formData.get("birthMinute") || 0),
-    viewYear: Number(formData.get("viewYear") || new Date().getFullYear()),
-    timezone: "Asia/Bangkok",
-  };
-}
-
 async function getChartCreationMetadata(formData: FormData, adSource: string): Promise<ChartCreationMetadata> {
   const headerList = await headers();
   return {
@@ -204,7 +199,7 @@ async function getChartCreationMetadata(formData: FormData, adSource: string): P
   };
 }
 
-async function guardChartSubmission(input: ReturnType<typeof chartInputFromForm>, formData: FormData, adSource: string) {
+async function guardChartSubmission(input: ReturnType<typeof parseChartActionInput>, formData: FormData, adSource: string) {
   const validation = validateChartFullName(input.fullName);
   if (!validation.ok) throw new ChartSubmissionRejectedError("invalid");
   input.fullName = validation.fullName;
@@ -223,7 +218,7 @@ function chartSubmissionErrorParam(error: unknown) {
 
 export async function createChartAction(formData: FormData) {
   const timer = createPerfTimer();
-  const input = chartInputFromForm(formData);
+  const input = parseChartActionInput(formData);
   const adSource = safeAdSource(formData.get("adSource"));
   const experience = safeChartExperience(formData.get("chartExperience"));
   const paths = chartCreationPaths(experience);
@@ -268,7 +263,7 @@ export async function quickReadingCheckoutAction(formData: FormData) {
   const operationSettings = await getOperationSettings();
   if (!operationSettings.paymentsEnabled || !operationSettings.paidReadingsEnabled) redirect("/?paid=disabled");
 
-  const input = chartInputFromForm(formData);
+  const input = parseChartActionInput(formData);
   const adSource = safeAdSource(formData.get("adSource"));
   let metadata: ChartCreationMetadata;
   try {
@@ -282,61 +277,19 @@ export async function quickReadingCheckoutAction(formData: FormData) {
 
   const chart = await saveChart(input, user, metadata);
   const price = await getFeaturePrice("FULL");
-  const amountVnd = price.priceCoins * 1000;
   const token = await createMagicSession(user);
-  const successNext = `/la-so/${chart.id}/nang-cao`;
-  const magicPath = `/api/auth/magic?token=${encodeURIComponent(token)}&next=${encodeURIComponent(successNext)}`;
-  const cancelPath = `/la-so/${chart.id}?status=cancelled`;
-  const checkout = await createPayOSCustomCheckout({
-    amountVnd,
-    description: "Luan giai la so",
-    itemName: price.label,
-    buyerName: user.name,
-    buyerEmail: user.email,
-    returnPath: magicPath,
-    cancelPath,
-  });
+  const checkout = await runQuickReadingCheckout(
+    { getDb, createPayOSCustomCheckout, isPayOSEnabled, generateReading, saveReading },
+    { user, chart, token, price },
+  );
 
-  const db = getDb();
-  const isDemoCheckout = checkout.raw && typeof checkout.raw === "object" && "mode" in checkout.raw;
-  if (db) {
-    await db.paymentOrder.create({
-      data: {
-        userId: user.id,
-        orderCode: BigInt(checkout.orderCode),
-        paymentLinkId: checkout.paymentLinkId,
-        amountVnd,
-        coins: 0,
-        status: isDemoCheckout ? "PAID" : "PENDING",
-        paidAt: isDemoCheckout ? new Date() : undefined,
-        checkoutUrl: checkout.checkoutUrl,
-        rawPayload: {
-          raw: checkout.raw,
-          quickReading: {
-            chartId: chart.id,
-            type: "FULL",
-            scopeKey: "all",
-            email: user.email,
-            token,
-          },
-        },
-      },
-    });
+  if (checkout.status === "error") {
+    redirect(withQueryParams("/#lap-la-so", { checkout: checkout.code }));
   }
-
-  if (!isPayOSEnabled()) {
-    const result = await generateReading(chart.chart, "FULL", "all");
-    await saveReading(user, chart.id, "FULL", "all", price.priceCoins, result.content, {
-      type: "FULL",
-      scopeKey: "all",
-      model: result.model,
-      source: "quick-email-demo",
-    });
-    revalidatePath(`/la-so/${chart.id}`);
-    redirect(`/la-so/${chart.id}/nang-cao?status=demo-paid`);
+  if ("revalidatePath" in checkout && checkout.revalidatePath) {
+    revalidatePath(checkout.revalidatePath);
   }
-
-  redirect(checkout.checkoutUrl);
+  redirect(checkout.location);
 }
 
 export async function deleteChartAction(formData: FormData) {
@@ -420,89 +373,35 @@ export async function checkoutFullReadingAction(formData: FormData) {
     redirect(withQueryParams(nextPath, { checkout: "forbidden" }));
   }
 
-  const [cached, pending, price] = await Promise.all([
-    getCachedReading(user.id, chartId, "FULL", "all"),
-    getReadingJobByScope(user.id, chartId, "FULL", "all"),
-    getFeaturePrice("FULL"),
-  ]);
-  if (cached) redirect(`/la-so/${chartId}/nang-cao?reading=${cached.id}`);
-  if (pending?.status === "PENDING") {
-    redirect(`/la-so/${chartId}/nang-cao?reading=${pending.id}&generating=1`);
-  }
-
-  const db = getDb();
-  if (db && pending?.status === "FAILED") {
-    const retried = await retryPaidFullReading(db, user.id, chartId, pending);
-    if (retried) {
-      redirect(`/la-so/${chartId}/nang-cao?reading=${retried.readingId}&generating=1`);
-    }
-  }
-
-  const amountVnd = price.priceCoins * 1000;
-  const returnToken = requiresCheckoutEmail
-    ? await createMagicSession(user, "checkout")
-    : null;
-  const returnPath = returnToken
-    ? `/api/payments/payos/full-return?token=${encodeURIComponent(returnToken)}`
-    : "/api/payments/payos/full-return";
-  const checkout = await createPayOSCustomCheckout({
-    amountVnd,
-    description: "Luan giai FULL",
-    itemName: price.label,
-    buyerName: user.name,
-    buyerEmail,
-    returnPath,
-    cancelPath: `/la-so/${chartId}`,
-  }).catch(() => redirect(withQueryParams(nextPath, { checkout: "error" })));
-
-  const isDemoCheckout = checkout.raw && typeof checkout.raw === "object" && "mode" in checkout.raw;
-  if (!db) {
-    if (!isDemoCheckout) redirect(withQueryParams(nextPath, { checkout: "unavailable" }));
-    const reading = await createPendingReading(user, chartId, "FULL", "all", 0, {
-      type: "FULL",
-      scopeKey: "all",
-      source: "direct-full-checkout-demo",
-    });
-    redirect(`/la-so/${chartId}/nang-cao?reading=${reading.id}&generating=1&status=demo-paid&orderCode=${checkout.orderCode}`);
-  }
-
-  const order = await db.paymentOrder.create({
-    data: {
-      userId: user.id,
-      orderCode: BigInt(checkout.orderCode),
-      paymentLinkId: checkout.paymentLinkId,
-      amountVnd,
-      coins: 0,
-      status: isDemoCheckout ? "PAID" : "PENDING",
-      paidAt: isDemoCheckout ? new Date() : undefined,
-      checkoutUrl: checkout.checkoutUrl,
-      rawPayload: {
-        raw: checkout.raw,
-        directReading: {
-          chartId,
-          type: "FULL",
-          scopeKey: "all",
-          checkoutEmail: buyerEmail,
-          ...(returnToken ? { token: returnToken } : {}),
-        },
-      },
+  const checkout = await runFullReadingCheckout(
+    {
+      getDb,
+      getCachedReading,
+      getReadingJobByScope,
+      getFeaturePrice,
+      retryPaidFullReading,
+      createPayOSCustomCheckout,
+      createPendingReading,
+      completePaidReadingOrder,
     },
-  });
+    {
+      record,
+      user,
+      chartId,
+      buyerEmail,
+      requiresCheckoutEmail,
+      getReturnToken: async () => requiresCheckoutEmail ? createMagicSession(user, "checkout") : null,
+    },
+  );
 
-  if (isDemoCheckout) {
-    const settled = await completePaidReadingOrder(db, order, checkout.raw);
-    if (!settled) redirect(withQueryParams(nextPath, { checkout: "error" }));
-    redirect(`/la-so/${chartId}/nang-cao?reading=${settled.readingId}&generating=1&status=demo-paid&orderCode=${checkout.orderCode}`);
+  if (checkout.status === "error") {
+    redirect(withQueryParams(nextPath, { checkout: checkout.code }));
   }
-
-  redirect(checkout.checkoutUrl);
+  redirect(checkout.location);
 }
 
 export async function requestReadingAction(formData: FormData) {
-  const chartId = String(formData.get("chartId") || "");
-  const type = String(formData.get("type") || "FULL") as ReadingKey;
-  const scopeKey = String(formData.get("scopeKey") || "all");
-  const nextPath = safeNextPath(formData.get("next"), `/la-so/${chartId}`);
+  const { chartId, type, scopeKey, nextPath } = parseReadingRequestInput(formData);
   const [currentUser, operationSettings] = await Promise.all([getCurrentUser(), getOperationSettings()]);
 
   if (!operationSettings.paidReadingsEnabled && currentUser?.role !== "ADMIN") {
@@ -513,19 +412,7 @@ export async function requestReadingAction(formData: FormData) {
 
   if (type === "FULL" && scopeKey === "all") {
     const result = await startFullReadingJobForUser(
-      {
-        getChart,
-        getCachedReading,
-        getReadingJobByScope,
-        getFeaturePrice,
-        getUserBalance,
-        adjustCoins,
-        hasReadingBundleAccess,
-        getCompletedReadingsForScopes,
-        generateReading,
-        createPendingReading,
-        saveReading,
-      },
+      readingUnlockDependencies,
       { user, chartId, temporaryFullAccess: TEMPORARY_FULL_ACCESS, paidReadingsEnabled: operationSettings.paidReadingsEnabled },
     );
 
@@ -547,19 +434,7 @@ export async function requestReadingAction(formData: FormData) {
   }
 
   const result = await unlockReadingForUser(
-    {
-      getChart,
-      getCachedReading,
-      getReadingJobByScope,
-      getFeaturePrice,
-      getUserBalance,
-      adjustCoins,
-      hasReadingBundleAccess,
-      getCompletedReadingsForScopes,
-      generateReading,
-      createPendingReading,
-      saveReading,
-    },
+    readingUnlockDependencies,
     { user, chartId, type, scopeKey, temporaryFullAccess: TEMPORARY_FULL_ACCESS, paidReadingsEnabled: operationSettings.paidReadingsEnabled },
   );
 
@@ -580,9 +455,7 @@ export async function requestReadingAction(formData: FormData) {
 }
 
 export async function requestReadingBundleAction(formData: FormData) {
-  const chartId = String(formData.get("chartId") || "");
-  const rawType = String(formData.get("type") || "") as ReadingKey;
-  const nextPath = safeNextPath(formData.get("next"), `/la-so/${chartId}`);
+  const { chartId, type: rawType, nextPath } = parseReadingBundleInput(formData);
   if (!isReadingBundleKey(rawType)) redirect(nextPath);
 
   const [currentUser, operationSettings] = await Promise.all([getCurrentUser(), getOperationSettings()]);
@@ -593,19 +466,7 @@ export async function requestReadingBundleAction(formData: FormData) {
 
   const user = await getReadingUser(chartId, nextPath, currentUser);
   const result = await unlockReadingBundleForUser(
-    {
-      getChart,
-      getCachedReading,
-      getReadingJobByScope,
-      getFeaturePrice,
-      getUserBalance,
-      adjustCoins,
-      hasReadingBundleAccess,
-      getCompletedReadingsForScopes,
-      generateReading,
-      createPendingReading,
-      saveReading,
-    },
+    readingUnlockDependencies,
     { user, chartId, type: rawType, temporaryFullAccess: TEMPORARY_FULL_ACCESS, paidReadingsEnabled: operationSettings.paidReadingsEnabled },
   );
 
@@ -723,17 +584,7 @@ export async function saveOperationSettingsAction(formData: FormData) {
   const user = await getCurrentUser();
   if (user?.role !== "ADMIN") redirect("/dang-nhap?next=/admin");
 
-  const mode = String(formData.get("mode") || "custom");
-  const settings =
-    mode === "basic-free"
-      ? { paymentsEnabled: false, coinTopupEnabled: false, paidReadingsEnabled: false }
-      : mode === "commercial"
-        ? { paymentsEnabled: true, coinTopupEnabled: true, paidReadingsEnabled: true }
-        : {
-            paymentsEnabled: formData.get("paymentsEnabled") === "1",
-            coinTopupEnabled: formData.get("coinTopupEnabled") === "1",
-            paidReadingsEnabled: formData.get("paidReadingsEnabled") === "1",
-          };
+  const settings = parseOperationSettingsInput(formData);
 
   await updateOperationSettings(settings);
   revalidateTag(OPERATION_SETTINGS_CACHE_TAG, "max");
@@ -755,10 +606,7 @@ export async function saveFeaturePricesAction(formData: FormData) {
   const user = await getCurrentUser();
   if (user?.role !== "ADMIN") redirect("/dang-nhap?next=/admin");
 
-  const updates = FEATURE_PRICE_KEYS.map((key) => ({
-    key,
-    priceCoins: Number(formData.get(`priceCoins:${key}`)),
-  }));
+  const updates = parseFeaturePriceUpdates(formData);
 
   try {
     await updateFeaturePrices(updates);
@@ -787,44 +635,9 @@ export async function createCheckoutAction(formData: FormData) {
   if (isCheckoutGuestUser(user)) redirect("/la-so");
   const pack = COIN_PACKAGES.find((item) => item.key === packageKey) || COIN_PACKAGES[1];
   const adsReturnTo = withQueryParams(returnTo, { adPackage: pack.key, adValue: pack.priceVnd });
-  const checkout = await createPayOSCheckout(packageKey, user, adsReturnTo);
-  const db = getDb();
-
-  if (db) {
-    const packageRecord = await db.coinPackage.upsert({
-      where: { key: pack.key },
-      update: {
-        label: pack.label,
-        coins: pack.coins,
-        bonusCoins: pack.bonusCoins,
-        priceVnd: pack.priceVnd,
-        isActive: true,
-      },
-      create: {
-        key: pack.key,
-        label: pack.label,
-        coins: pack.coins,
-        bonusCoins: pack.bonusCoins,
-        priceVnd: pack.priceVnd,
-        isActive: true,
-      },
-    });
-    await db.paymentOrder.create({
-      data: {
-        userId: user.id,
-        packageId: packageRecord.id,
-        orderCode: BigInt(checkout.orderCode),
-        paymentLinkId: checkout.paymentLinkId,
-        amountVnd: checkout.amountVnd,
-        coins: checkout.coins,
-        checkoutUrl: checkout.checkoutUrl,
-        rawPayload: checkout.raw,
-      },
-    });
-  } else if (checkout.raw && typeof checkout.raw === "object" && "mode" in checkout.raw) {
-    await adjustCoins(user, checkout.coins, "Demo nạp xu", String(checkout.orderCode));
-    redirect(withQueryParams(adsReturnTo, { status: "demo-paid", orderCode: checkout.orderCode }));
-  }
-
-  redirect(checkout.checkoutUrl);
+  const checkout = await runCoinTopupCheckout(
+    { getDb, createPayOSCheckout, adjustCoins },
+    { user, packageKey, pack, returnTo: adsReturnTo },
+  );
+  redirect(checkout.location);
 }
