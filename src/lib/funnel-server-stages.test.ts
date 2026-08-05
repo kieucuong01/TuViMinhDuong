@@ -15,7 +15,7 @@ describe("trusted first-party funnel stages", () => {
   it("keeps a minimal indexed event model and bounded order snapshot", () => {
     expect(schema).toContain("model FunnelEvent");
     expect(schema).toContain("attribution   Json?");
-    expect(schema).toContain("dedupeKey            String?  @unique");
+    expect(schema).toMatch(/dedupeKey\s+String\?\s+@unique/);
     expect(schema).toContain("@@index([name, createdAt])");
     const model = schema.slice(schema.indexOf("model FunnelEvent"), schema.indexOf("model ArticleCategory"));
     expect(model).not.toMatch(/email|phone|birth|referrer|rawPayload|metadata/i);

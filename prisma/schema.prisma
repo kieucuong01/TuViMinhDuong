@@ -62,36 +62,36 @@ enum PseoStatus {
 }
 
 model User {
-  id           String       @id @default(cuid())
-  email        String       @unique
-  name         String?
-  passwordHash String?
-  avatarUrl    String?
-  coinBalance  Int          @default(0)
-  role         Role         @default(USER)
-  createdAt    DateTime     @default(now())
-  updatedAt    DateTime     @updatedAt
-  accounts     Account[]
-  sessions     Session[]
-  charts       Chart[]
-  readings     Reading[]
-  readingProgress ReadingProgress[]
-  ledgers      CoinLedger[]
-  payments     PaymentOrder[]
-  auditLogs    AuditLog[]
+  id                 String              @id @default(cuid())
+  email              String              @unique
+  name               String?
+  passwordHash       String?
+  avatarUrl          String?
+  coinBalance        Int                 @default(0)
+  role               Role                @default(USER)
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  accounts           Account[]
+  sessions           Session[]
+  charts             Chart[]
+  readings           Reading[]
+  readingProgress    ReadingProgress[]
+  ledgers            CoinLedger[]
+  payments           PaymentOrder[]
+  auditLogs          AuditLog[]
   assistantQuestions AssistantQuestion[]
-  funnelEvents  FunnelEvent[]
+  funnelEvents       FunnelEvent[]
 }
 
 model Account {
-  id                String   @id @default(cuid())
+  id                String    @id @default(cuid())
   userId            String
   provider          String
   providerAccountId String
   accessToken       String?
   refreshToken      String?
   expiresAt         DateTime?
-  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }
@@ -106,22 +106,22 @@ model Session {
 }
 
 model Chart {
-  id                String    @id @default(cuid())
-  userId            String?
-  title             String
-  input             Json
-  chart             Json
-  isPrivate         Boolean   @default(true)
-  creationIp        String?
-  creationUserAgent String?
-  creationSource    String?
+  id                  String              @id @default(cuid())
+  userId              String?
+  title               String
+  input               Json
+  chart               Json
+  isPrivate           Boolean             @default(true)
+  creationIp          String?
+  creationUserAgent   String?
+  creationSource      String?
   creationAttribution Json?
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
-  user              User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
-  readings          Reading[]
-  assistantQuestions AssistantQuestion[]
-  funnelEvents      FunnelEvent[]
+  createdAt           DateTime            @default(now())
+  updatedAt           DateTime            @updatedAt
+  user                User?               @relation(fields: [userId], references: [id], onDelete: SetNull)
+  readings            Reading[]
+  assistantQuestions  AssistantQuestion[]
+  funnelEvents        FunnelEvent[]
 
   @@index([userId, createdAt])
   @@index([creationIp, createdAt])
@@ -129,23 +129,23 @@ model Chart {
 }
 
 model Reading {
-  id          String        @id @default(cuid())
-  userId      String
-  chartId     String
-  type        ReadingType
-  scopeKey    String
-  status      ReadingStatus @default(PENDING)
-  priceCoins  Int
-  content     String?
-  promptMeta  Json?
-  model       String?
-  error       String?
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
-  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  chart       Chart         @relation(fields: [chartId], references: [id], onDelete: Cascade)
+  id                 String              @id @default(cuid())
+  userId             String
+  chartId            String
+  type               ReadingType
+  scopeKey           String
+  status             ReadingStatus       @default(PENDING)
+  priceCoins         Int
+  content            String?
+  promptMeta         Json?
+  model              String?
+  error              String?
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  user               User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  chart              Chart               @relation(fields: [chartId], references: [id], onDelete: Cascade)
   assistantQuestions AssistantQuestion[]
-  progress      ReadingProgress[]
+  progress           ReadingProgress[]
 
   @@unique([userId, chartId, type, scopeKey])
   @@index([userId, type, scopeKey, status, createdAt])
@@ -222,16 +222,16 @@ model CoinLedger {
 }
 
 model CoinPackage {
-  id          String   @id @default(cuid())
-  key         String   @unique
-  label       String
-  coins       Int
-  priceVnd    Int
-  bonusCoins  Int      @default(0)
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  payments    PaymentOrder[]
+  id         String         @id @default(cuid())
+  key        String         @unique
+  label      String
+  coins      Int
+  priceVnd   Int
+  bonusCoins Int            @default(0)
+  isActive   Boolean        @default(true)
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
+  payments   PaymentOrder[]
 }
 
 model FeaturePrice {
@@ -269,21 +269,42 @@ model PaymentOrder {
   package       CoinPackage?  @relation(fields: [packageId], references: [id], onDelete: SetNull)
 }
 
+model PaymentReconciliationRun {
+  id                String   @id @default(cuid())
+  dryRun            Boolean  @default(false)
+  olderThanHours    Int
+  scanned           Int
+  updated           Int
+  unchanged         Int
+  cancelled         Int
+  expired           Int
+  failed            Int
+  paidObserved      Int
+  mismatches        Int
+  providerErrors    Int
+  concurrentChanges Int
+  startedAt         DateTime
+  finishedAt        DateTime
+  createdAt         DateTime @default(now())
+
+  @@index([createdAt])
+}
+
 model FunnelEvent {
-  id                   String   @id @default(cuid())
-  name                 String
-  anonymousSessionId   String?
-  userId               String?
-  chartId              String?
-  source               String   @default("unknown")
-  landingClass         String   @default("other")
-  tool                 String   @default("other")
-  placement            String?
-  resultBand           String?
-  dedupeKey            String?  @unique
-  createdAt            DateTime @default(now())
-  user                 User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
-  chart                Chart?   @relation(fields: [chartId], references: [id], onDelete: SetNull)
+  id                 String   @id @default(cuid())
+  name               String
+  anonymousSessionId String?
+  userId             String?
+  chartId            String?
+  source             String   @default("unknown")
+  landingClass       String   @default("other")
+  tool               String   @default("other")
+  placement          String?
+  resultBand         String?
+  dedupeKey          String?  @unique
+  createdAt          DateTime @default(now())
+  user               User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  chart              Chart?   @relation(fields: [chartId], references: [id], onDelete: SetNull)
 
   @@index([createdAt])
   @@index([name, createdAt])
@@ -330,19 +351,19 @@ model Article {
 }
 
 model PseoEntity {
-  id             String         @id @default(cuid())
-  kind           PseoEntityKind
-  slug           String         @unique
-  name           String
-  element        String?
-  summary        String
-  strengths      Json?
-  cautions       Json?
-  canonicalPath  String?
-  createdAt      DateTime       @default(now())
-  updatedAt      DateTime       @updatedAt
-  pagesAsStar    PseoPage[]     @relation("PseoStar")
-  pagesAsPalace  PseoPage[]     @relation("PseoPalace")
+  id            String         @id @default(cuid())
+  kind          PseoEntityKind
+  slug          String         @unique
+  name          String
+  element       String?
+  summary       String
+  strengths     Json?
+  cautions      Json?
+  canonicalPath String?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  pagesAsStar   PseoPage[]     @relation("PseoStar")
+  pagesAsPalace PseoPage[]     @relation("PseoPalace")
 
   @@index([kind, name])
 }
@@ -367,8 +388,8 @@ model PseoPage {
   metaDescription String?
   canonicalUrl    String?
   robots          String       @default("noindex,follow")
-  auditScore       Int          @default(0)
-  auditFindings    Json?
+  auditScore      Int          @default(0)
+  auditFindings   Json?
   generationMeta  Json?
   publishedAt     DateTime?
   createdAt       DateTime     @default(now())

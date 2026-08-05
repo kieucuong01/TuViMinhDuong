@@ -9,6 +9,7 @@ import { DELETED_ARTICLE_STATUS } from "@/lib/data/articles";
 import { balances, charts, demoArticles, readings } from "@/lib/data/demo-store";
 import { getFeaturePrices, getOperationSettings } from "@/lib/data/settings";
 import { buildAdminFunnelDashboard, type FunnelReportEvent, type FunnelReportPayment } from "@/lib/funnel-report";
+import { buildPendingPaymentAgeBuckets, type PendingPaymentOrder } from "@/lib/payment-reconciliation";
 import type {
   AdminBusinessDashboard,
   AdminChartSubmission,
@@ -416,10 +417,19 @@ export async function getAdminBusinessDashboard(): Promise<AdminBusinessDashboar
       revenue: emptyRevenueMetrics(),
       recentUsers,
       recentPayments: [],
+      paymentHygiene: {
+        ageBuckets: buildPendingPaymentAgeBuckets([]),
+        latestRun: null,
+      },
     };
   }
 
-  const [payments, users] = await Promise.all([
+  const reconciliationRunModel = (db as unknown as {
+    paymentReconciliationRun?: {
+      findFirst(args: { where: { dryRun: false }; orderBy: { createdAt: "desc" } }): Promise<AdminBusinessDashboard["paymentHygiene"]["latestRun"]>;
+    };
+  }).paymentReconciliationRun;
+  const [payments, users, latestRun] = await Promise.all([
     db.paymentOrder.findMany({
       orderBy: { createdAt: "desc" },
       include: {
@@ -454,11 +464,26 @@ export async function getAdminBusinessDashboard(): Promise<AdminBusinessDashboar
         },
       },
     }),
+    reconciliationRunModel?.findFirst({
+      where: { dryRun: false },
+      orderBy: { createdAt: "desc" },
+    }) ?? Promise.resolve(null),
   ]);
 
   return {
     revenue: summarizeRevenue(payments as AdminPaymentRecord[]),
     recentPayments: (payments as AdminPaymentRecord[]).slice(0, 8).map(normalizeRecentPayment),
+    paymentHygiene: {
+      ageBuckets: buildPendingPaymentAgeBuckets((payments as AdminPaymentRecord[]).map((payment) => ({
+        id: payment.id,
+        orderCode: payment.orderCode,
+        amountVnd: payment.amountVnd,
+        status: payment.status,
+        createdAt: payment.createdAt,
+        rawPayload: payment.rawPayload,
+      })) as PendingPaymentOrder[]),
+      latestRun,
+    },
     recentUsers: users.map((item) => {
       const paidPayments = item.payments.filter((payment) => payment.status === "PAID");
       const lastPayment = paidPayments[0];

@@ -4,6 +4,7 @@ import type { ChartInput, TuViChart } from "@/lib/chart";
 import type { ArticleCategoryView, ArticleView } from "@/lib/content";
 import type { ReadingKey } from "@/lib/pricing";
 import type { ReadingProgressInput } from "@/lib/reading-progress";
+import type { PaymentAgeBucket } from "@/lib/payment-reconciliation";
 
 export type StoredChart = {
   id: string;
@@ -122,6 +123,19 @@ export type AdminBusinessDashboard = {
   revenue: AdminRevenueMetrics;
   recentUsers: AdminRecentUser[];
   recentPayments: AdminRecentPayment[];
+  paymentHygiene: {
+    ageBuckets: PaymentAgeBucket[];
+    latestRun: {
+      scanned: number;
+      updated: number;
+      unchanged: number;
+      paidObserved: number;
+      mismatches: number;
+      providerErrors: number;
+      concurrentChanges: number;
+      finishedAt: Date;
+    } | null;
+  };
 };
 
 export type AdminTrendPeriod = "day" | "week" | "month";

@@ -9,6 +9,7 @@ import { LoadingSubmitButton } from "@/components/loading-submit-button";
 import { AdminArticleDeleteForm } from "@/components/admin-article-delete-form";
 import { AdminTrendCharts } from "@/components/admin-trend-charts";
 import { AdminFunnelPanel } from "@/components/admin-funnel-panel";
+import { AdminPaymentHygienePanel } from "@/components/admin-payment-hygiene-panel";
 import { displayChartAttributionSource, type ChartAttributionSource } from "@/lib/chart-attribution";
 
 export const metadata = {
@@ -312,6 +313,8 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
           <AdminTrendCharts initialPeriod={trendPeriod} trendGroups={overview.trendGroups} />
 
           <AdminFunnelPanel dashboard={funnelDashboard} initialWindow={funnelWindow} />
+
+          <AdminPaymentHygienePanel paymentHygiene={business.paymentHygiene} />
 
           <section className="admin-business-grid admin-overview-revenue" aria-labelledby="admin-revenue-overview-title">
           <div className="panel admin-revenue-panel">

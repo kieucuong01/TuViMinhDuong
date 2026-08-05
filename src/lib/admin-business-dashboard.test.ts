@@ -94,6 +94,18 @@ describe("admin business dashboard", () => {
       user: {
         findMany: vi.fn(async () => users),
       },
+      paymentReconciliationRun: {
+        findFirst: vi.fn(async () => ({
+          scanned: 8,
+          updated: 3,
+          unchanged: 2,
+          paidObserved: 1,
+          mismatches: 1,
+          providerErrors: 1,
+          concurrentChanges: 0,
+          finishedAt: recentPaidAt,
+        })),
+      },
     };
     mocks.getDb.mockReturnValue(db);
 
@@ -119,6 +131,8 @@ describe("admin business dashboard", () => {
       source: "quick_reading",
       sourceLabel: "Luận giải nhanh",
     });
+    expect(dashboard.paymentHygiene.ageBuckets.reduce((sum, bucket) => sum + bucket.count, 0)).toBe(1);
+    expect(dashboard.paymentHygiene.latestRun).toMatchObject({ scanned: 8, updated: 3, paidObserved: 1 });
   });
 
   it("summarizes report overview metrics and daily trends", async () => {
