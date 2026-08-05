@@ -44,6 +44,8 @@ export function ChartForm({
       data-testid="chart-form"
       data-ad-event="create_chart_submit"
       data-ad-placement={adSource}
+      data-organic-submit={experience === "wealth" ? "wealth_submit" : undefined}
+      data-organic-placement={experience === "wealth" ? "wealth_landing_form" : undefined}
       data-loading-message="Đang lập lá số..."
       data-loading-label="Đang lập lá số..."
     >

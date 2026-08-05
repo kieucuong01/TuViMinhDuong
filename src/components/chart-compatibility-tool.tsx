@@ -5,6 +5,7 @@ import { ArrowRight, CheckCircle2, HeartHandshake, RefreshCcw, Scale, ShieldChec
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { buildChartCompatibilityReport, type ChartCompatibilityReport, type CompatibilityLevel } from "@/lib/chart-compatibility";
 import type { CalendarType, ChartInput, Gender } from "@/lib/chart";
+import { trackOrganicToolEvent } from "@/lib/client-analytics";
 
 const days = Array.from({ length: 31 }, (_, index) => index + 1);
 const months = Array.from({ length: 12 }, (_, index) => index + 1);
@@ -136,7 +137,16 @@ function CompatibilityReportView({ report, onEdit }: { report: ChartCompatibilit
               <article key={theme.key} className={`compatibility-theme level-${theme.level}`}>
                 <header><span>{String(index + 1).padStart(2, "0")}</span><div><h4>{theme.title}</h4><p className="compatibility-theme-level">{levelIcon(theme.level)} {theme.levelLabel}</p></div></header>
                 <p className="compatibility-theme-prose">{theme.prose}</p>
-                <details className="compatibility-evidence">
+                <details
+                  className="compatibility-evidence"
+                  onToggle={(event) => {
+                    if (!event.currentTarget.open) return;
+                    trackOrganicToolEvent("compatibility_evidence_open", {
+                      theme_key: theme.key,
+                      result_level: theme.level,
+                    });
+                  }}
+                >
                   <summary>Căn cứ từ hai lá số</summary>
                   <div>{theme.evidence.map((evidence) => <section key={evidence.personName}><h5>{evidence.personName}</h5><ul>{evidence.details.map((detail) => <li key={detail}>{detail}</li>)}</ul></section>)}</div>
                 </details>
@@ -157,7 +167,11 @@ function CompatibilityReportView({ report, onEdit }: { report: ChartCompatibilit
 
       <div className="compatibility-report-cta">
         <div><strong>Muốn hiểu từng người trước khi đặt cạnh nhau?</strong><span>Lập lá số riêng để đọc Mệnh–Thân và các cung trọng yếu đầy đủ hơn.</span></div>
-        <Link href="/#lap-la-so" className="btn btn-primary">Lập lá số riêng <ArrowRight aria-hidden="true" size={18} /></Link>
+        <Link
+          href="/#lap-la-so"
+          className="btn btn-primary"
+          onClick={() => trackOrganicToolEvent("compatibility_chart_cta", { cta_position: "report_footer" })}
+        >Lập lá số riêng <ArrowRight aria-hidden="true" size={18} /></Link>
       </div>
     </div>
   );
@@ -170,6 +184,10 @@ export function ChartCompatibilityTool() {
   const resultRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
+    trackOrganicToolEvent("compatibility_tool_view");
+  }, []);
+
+  useEffect(() => {
     if (!report) return;
     resultRef.current?.focus();
     resultRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -177,10 +195,13 @@ export function ChartCompatibilityTool() {
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    trackOrganicToolEvent("compatibility_submit");
     setError("");
     try {
       const formData = new FormData(event.currentTarget);
-      setReport(buildChartCompatibilityReport(inputFromForm(formData, "first"), inputFromForm(formData, "second")));
+      const nextReport = buildChartCompatibilityReport(inputFromForm(formData, "first"), inputFromForm(formData, "second"));
+      setReport(nextReport);
+      trackOrganicToolEvent("compatibility_result", { result_level: nextReport.overview.level });
     } catch (caught) {
       setReport(null);
       setError(errorMessage(caught));
@@ -188,6 +209,7 @@ export function ChartCompatibilityTool() {
   }
 
   function editInputs() {
+    trackOrganicToolEvent("compatibility_edit");
     setReport(null);
     window.requestAnimationFrame(() => {
       formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });

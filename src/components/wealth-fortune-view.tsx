@@ -21,6 +21,12 @@ const EVIDENCE_LINKS: Record<string, string> = {
   "Thiên Di": "/tra-cuu/cung-thien-di",
 };
 
+const EVIDENCE_TARGETS: Record<string, string> = {
+  "Tài Bạch": "tai_bach",
+  "Quan Lộc": "quan_loc",
+  "Thiên Di": "thien_di",
+};
+
 function trendCoordinates(points: WealthYearPoint[]) {
   const width = 560;
   const left = 40;
@@ -204,7 +210,12 @@ export function WealthFortuneView({ chartId, chart }: WealthFortuneViewProps) {
               <p><strong>Điểm cần lưu ý:</strong> {evidence.cautionStars.length
                 ? evidence.cautionStars.join(", ")
                 : evidence.available ? "Không ghi nhận điểm cần lưu ý trong nhóm theo dõi" : "Chưa có dữ liệu"}</p>
-              <a className="wealth-evidence-link" href={EVIDENCE_LINKS[evidence.palace]}>Đọc sâu về cung {evidence.palace}</a>
+              <a
+                className="wealth-evidence-link"
+                href={EVIDENCE_LINKS[evidence.palace]}
+                data-organic-click="wealth_evidence_click"
+                data-organic-target-palace={EVIDENCE_TARGETS[evidence.palace]}
+              >Đọc sâu về cung {evidence.palace}</a>
             </article>
           ))}
         </div>

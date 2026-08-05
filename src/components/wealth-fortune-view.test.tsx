@@ -91,6 +91,10 @@ describe("WealthFortuneView", () => {
     expect(html).toContain('href="/tra-cuu/cung-tai-bach"');
     expect(html).toContain('href="/tra-cuu/cung-quan-loc"');
     expect(html).toContain('href="/tra-cuu/cung-thien-di"');
+    expect((html.match(/data-organic-click="wealth_evidence_click"/g) ?? [])).toHaveLength(3);
+    expect(html).toContain('data-organic-target-palace="tai_bach"');
+    expect(html).toContain('data-organic-target-palace="quan_loc"');
+    expect(html).toContain('data-organic-target-palace="thien_di"');
   });
 
   it("renders the 90-day plan and all six pre-decision questions", async () => {

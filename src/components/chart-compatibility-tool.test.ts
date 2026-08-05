@@ -43,6 +43,23 @@ describe("two-chart compatibility tool", () => {
     expect(toolSource).toContain('tabIndex={-1}');
   });
 
+  it("measures the reading funnel with categorical evidence only", () => {
+    expect(toolSource).toContain('trackOrganicToolEvent("compatibility_tool_view"');
+    expect(toolSource).toContain('trackOrganicToolEvent("compatibility_submit"');
+    expect(toolSource).toContain('trackOrganicToolEvent("compatibility_result"');
+    expect(toolSource).toContain('trackOrganicToolEvent("compatibility_edit"');
+    expect(toolSource).toContain('trackOrganicToolEvent("compatibility_evidence_open"');
+    expect(toolSource).toContain('trackOrganicToolEvent("compatibility_chart_cta"');
+    expect(toolSource).toContain("result_level");
+    expect(toolSource).toContain("theme_key");
+    expect(toolSource).toContain('cta_position: "report_footer"');
+
+    const analyticsLines = toolSource.split(/\r?\n/)
+      .filter((line) => /trackOrganicToolEvent|theme_key|result_level|cta_position/.test(line))
+      .join("\n");
+    expect(analyticsLines).not.toMatch(/fullName|firstName|secondName|birth|gender|chartId|email|phone|FormData/);
+  });
+
   it("uses mobile-first two-profile styling with touch-friendly controls", () => {
     expect(globalsCss).toMatch(/\.compatibility-form-grid\s*{[\s\S]*grid-template-columns:\s*1fr/);
     expect(globalsCss).toMatch(/\.compatibility-person input,[\s\S]*\.compatibility-person select\s*{[\s\S]*min-height:\s*3rem/);

@@ -9,6 +9,9 @@ const dateFinderSource = source("src/components/date-range-finder.tsx");
 const birthHourSource = source("src/components/birth-hour-comparison.tsx");
 const ageToolSource = source("src/components/age-tool.tsx");
 const homeSource = source("src/app/page.tsx");
+const chartFormSource = source("src/components/chart-form.tsx");
+const analyticsShellSource = source("src/components/google-analytics.tsx");
+const eventReporterSource = source("src/components/organic-tool-event-reporter.tsx");
 
 describe("organic tool analytics", () => {
   it("sends date finder events without specific birth-year or birth-date data", () => {
@@ -51,9 +54,33 @@ describe("organic tool analytics", () => {
     expect(analyticsCalls).not.toContain("firstGender:");
     expect(analyticsCalls).not.toContain("secondGender:");
   });
+  it("mounts one delegated reporter and marks only the wealth form", () => {
+    expect(analyticsShellSource).toContain("<OrganicToolEventReporter />");
+    expect(eventReporterSource).toContain('document.addEventListener("submit"');
+    expect(eventReporterSource).toContain('document.addEventListener("click"');
+    expect(eventReporterSource).not.toMatch(/FormData|fullName|birth|gender|email|phone|href/);
+    expect(chartFormSource).toContain('data-organic-submit={experience === "wealth" ? "wealth_submit" : undefined}');
+    expect(chartFormSource).toContain('data-organic-placement={experience === "wealth" ? "wealth_landing_form" : undefined}');
+  });
 });
 
 describe("trackOrganicToolEvent", () => {
+  it("queues the first page-view event before the Google tag loader is ready", async () => {
+    const { trackOrganicToolEvent } = await import("@/lib/client-analytics");
+    const dataLayer: unknown[] = [];
+    vi.stubGlobal("window", { dataLayer });
+
+    trackOrganicToolEvent("compatibility_tool_view");
+
+    expect(dataLayer).toHaveLength(1);
+    expect(Array.from(dataLayer[0] as ArrayLike<unknown>)).toEqual([
+      "event",
+      "compatibility_tool_view",
+      { event_category: "organic_tools" },
+    ]);
+    vi.unstubAllGlobals();
+  });
+
   it("drops sensitive parameter keys before calling gtag", async () => {
     const { trackOrganicToolEvent } = await import("@/lib/client-analytics");
     const gtag = vi.fn();
@@ -70,6 +97,11 @@ describe("trackOrganicToolEvent", () => {
       personGender: "female",
       person_gender: "female",
       lunarYear: 1989,
+      chart_id: "chart-secret",
+      email: "reader@example.com",
+      phone: "0900000000",
+      birth_timestamp: "1990-01-01T00:00:00Z",
+      unexpected: "must-not-leak",
       canChi: "Kỷ Tỵ",
     });
 
@@ -81,5 +113,39 @@ describe("trackOrganicToolEvent", () => {
     });
 
     vi.unstubAllGlobals();
+  });
+
+  it("maps wealth routes to categorical events without exposing the chart id", async () => {
+    const { organicToolRouteEvent } = await import("@/lib/client-analytics");
+
+    expect(organicToolRouteEvent("/tu-vi-tai-loc-dau-tu", new URLSearchParams())).toEqual({
+      name: "wealth_tool_view",
+      params: {},
+    });
+    expect(organicToolRouteEvent("/la-so/private-chart-id", new URLSearchParams("view=tai-loc&created=1"))).toEqual({
+      name: "wealth_result",
+      params: { entry_state: "created" },
+    });
+    expect(organicToolRouteEvent("/la-so/private-chart-id", new URLSearchParams("view=tai-loc"))).toEqual({
+      name: "wealth_result",
+      params: { entry_state: "return" },
+    });
+    expect(JSON.stringify(organicToolRouteEvent("/la-so/private-chart-id", new URLSearchParams("view=tai-loc"))))
+      .not.toContain("private-chart-id");
+  });
+
+  it("maps only developer-authored wealth markers to submit and evidence events", async () => {
+    const { organicToolClickEvents, organicToolSubmitEvent } = await import("@/lib/client-analytics");
+
+    expect(organicToolSubmitEvent({ organicSubmit: "wealth_submit", organicPlacement: "wealth_landing_form" })).toEqual({
+      name: "wealth_submit",
+      params: { placement: "wealth_landing_form" },
+    });
+    expect(organicToolClickEvents({ organicClick: "wealth_evidence_click", organicTargetPalace: "tai_bach" })).toEqual([
+      { name: "wealth_evidence_click", params: { target_palace: "tai_bach" } },
+      { name: "wealth_next_step", params: { next_step: "palace_reference", target_palace: "tai_bach" } },
+    ]);
+    expect(organicToolSubmitEvent({ organicSubmit: "unknown", organicPlacement: "reader@example.com" })).toBeNull();
+    expect(organicToolClickEvents({ organicClick: "unknown", organicTargetPalace: "private-id" })).toEqual([]);
   });
 });
