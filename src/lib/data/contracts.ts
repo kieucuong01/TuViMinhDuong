@@ -1,6 +1,7 @@
 import type { FreeOverviewBlockKey } from "@/lib/ai";
 import type { ChartAttribution } from "@/lib/chart-attribution";
 import type { ChartInput, TuViChart } from "@/lib/chart";
+import type { ArticleView } from "@/lib/content";
 import type { ReadingKey } from "@/lib/pricing";
 import type { ReadingProgressInput } from "@/lib/reading-progress";
 
@@ -22,6 +23,11 @@ export type ChartCreationMetadata = {
   userAgent?: string;
   attribution?: ChartAttribution;
 };
+
+export type ArticleSummary = Pick<
+  ArticleView,
+  "id" | "slug" | "title" | "excerpt" | "coverImage" | "coverAlt" | "publishedAt" | "updatedAt"
+>;
 
 export type StoredReading = {
   id: string;

@@ -5,7 +5,7 @@ import type { CSSProperties } from "react";
 import { ChartForm } from "@/components/chart-form";
 import { DayFortuneCard } from "@/components/day-fortune-card";
 import { DeferredSocialProof } from "@/components/deferred-social-proof";
-import { listArticles } from "@/lib/data";
+import { listArticleSummaries } from "@/lib/data";
 import { routeMetadata } from "@/lib/metadata";
 import { faqJsonLd, organizationJsonLd, webPageJsonLd, websiteJsonLd } from "@/lib/seo";
 
@@ -46,8 +46,7 @@ function safeHomeAdSource(params: HomeSearchParams) {
 
 export default async function Home({ searchParams }: { searchParams?: Promise<HomeSearchParams> }) {
   const paramsPromise: Promise<HomeSearchParams> = searchParams ?? Promise.resolve({});
-  const [params, articleList] = await Promise.all([paramsPromise, listArticles()]);
-  const articles = articleList.slice(0, 3);
+  const [params, articles] = await Promise.all([paramsPromise, listArticleSummaries(3)]);
   const chartErrorMessage = chartFormErrorMessage(params.chartError);
   const chartAdSource = safeHomeAdSource(params);
   const homeFaqs = [

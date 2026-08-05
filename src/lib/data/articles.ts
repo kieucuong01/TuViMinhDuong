@@ -9,20 +9,46 @@ import { slugify } from "@/lib/format";
 import { scoreArticleSeo } from "@/lib/seo";
 import { cacheServerData } from "@/lib/data/cache";
 import { demoArticleCategories, demoArticles } from "@/lib/data/demo-store";
+import type { ArticleSummary } from "@/lib/data/contracts";
 
 type ArticleRecord = Omit<ArticleView, "faqs"> & {
   faqs?: unknown;
 };
 
+type ArticleSummaryRecord = ArticleSummary & {
+  status: string;
+  createdAt?: Date | null;
+};
+
 export const DELETED_ARTICLE_STATUS = "deleted";
 export const ARTICLES_CACHE_TAG = "articles";
 
-function articleSortValue(article: ArticleView) {
-  return article.updatedAt?.getTime() || article.publishedAt?.getTime() || 0;
+function articleSortValue(article: Pick<ArticleView, "updatedAt" | "publishedAt"> & { createdAt?: Date | null }) {
+  return article.updatedAt?.getTime() || article.publishedAt?.getTime() || article.createdAt?.getTime() || 0;
 }
 
-function sortArticlesNewestFirst(articles: ArticleView[]) {
+function sortArticlesNewestFirst<T extends Pick<ArticleView, "updatedAt" | "publishedAt"> & { createdAt?: Date | null }>(articles: T[]) {
   return articles.sort((a, b) => articleSortValue(b) - articleSortValue(a));
+}
+
+function articleSummaryRecord(article: ArticleSummaryRecord | ArticleView): ArticleSummaryRecord {
+  return {
+    id: article.id,
+    slug: article.slug,
+    title: article.title,
+    excerpt: article.excerpt,
+    coverImage: article.coverImage,
+    coverAlt: article.coverAlt,
+    publishedAt: article.publishedAt,
+    updatedAt: article.updatedAt,
+    status: article.status,
+    createdAt: "createdAt" in article ? article.createdAt : null,
+  };
+}
+
+function publicArticleSummary(article: ArticleSummaryRecord): ArticleSummary {
+  const { id, slug, title, excerpt, coverImage, coverAlt, publishedAt, updatedAt } = article;
+  return { id, slug, title, excerpt, coverImage, coverAlt, publishedAt, updatedAt };
 }
 
 function articleStatusFromForm(formData: FormData) {
@@ -164,6 +190,64 @@ const getCachedArticlesFromDb = cacheServerData(readArticlesFromDb, [ARTICLES_CA
 export async function listArticles() {
   if (!getDb()) return readArticlesFromDb();
   return getCachedArticlesFromDb();
+}
+
+async function readArticleSummariesFromDb(limit: number): Promise<ArticleSummary[]> {
+  const db = getDb();
+  if (!db) {
+    return sortArticlesNewestFirst(
+      Array.from(demoArticles().values())
+        .filter((article) => article.status === "published")
+        .map(articleSummaryRecord),
+    ).slice(0, limit).map(publicArticleSummary);
+  }
+
+  let articles: ArticleSummaryRecord[];
+  try {
+    articles = (await db.article.findMany({
+      where: { status: { in: ["published", DELETED_ARTICLE_STATUS] } },
+      select: {
+        id: true,
+        slug: true,
+        title: true,
+        excerpt: true,
+        coverImage: true,
+        coverAlt: true,
+        status: true,
+        publishedAt: true,
+        updatedAt: true,
+        createdAt: true,
+      },
+      orderBy: [{ publishedAt: "desc" }, { createdAt: "desc" }],
+    })) as ArticleSummaryRecord[];
+  } catch {
+    return sortArticlesNewestFirst(seedArticles.map(articleSummaryRecord)).slice(0, limit).map(publicArticleSummary);
+  }
+
+  const bySlug = new Map(seedArticles.map((article) => [article.slug, articleSummaryRecord(article)]));
+  for (const article of articles) {
+    if (article.status === DELETED_ARTICLE_STATUS) {
+      bySlug.delete(article.slug);
+      continue;
+    }
+    const fresherSeed = fresherSeedArticle(article.slug, article.updatedAt || article.publishedAt);
+    bySlug.set(article.slug, fresherSeed ? articleSummaryRecord(fresherSeed) : articleSummaryRecord(article));
+  }
+
+  return sortArticlesNewestFirst(Array.from(bySlug.values())).slice(0, limit).map(publicArticleSummary);
+}
+
+const getCachedArticleSummariesFromDb = cacheServerData(readArticleSummariesFromDb, [ARTICLES_CACHE_TAG, "summaries"], {
+  tags: [ARTICLES_CACHE_TAG],
+  revalidate: 300,
+});
+
+export async function listArticleSummaries(limit = 3): Promise<ArticleSummary[]> {
+  if (!Number.isInteger(limit) || limit < 1 || limit > 20) {
+    throw new Error("Article summary limit must be an integer between 1 and 20.");
+  }
+  if (!getDb()) return readArticleSummariesFromDb(limit);
+  return getCachedArticleSummariesFromDb(limit);
 }
 
 export async function listAdminArticles() {
