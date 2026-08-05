@@ -128,4 +128,46 @@ describe("data module boundaries", () => {
       "@/lib/data",
     ]));
   });
+
+  it("owns pricing and operation settings in the settings domain", () => {
+    const settingsPath = path.join(dataDirectory, "settings.ts");
+    const cachePath = path.join(dataDirectory, "cache.ts");
+    const expected = [
+      "OPERATION_SETTINGS_CACHE_TAG",
+      "FEATURE_PRICES_CACHE_TAG",
+      "DEFAULT_OPERATION_SETTINGS",
+      "getFeaturePrice",
+      "getFeaturePrices",
+      "updateFeaturePrices",
+      "getOperationSettings",
+      "updateOperationSettings",
+    ];
+
+    expect(fs.existsSync(settingsPath)).toBe(true);
+    expect(fs.existsSync(cachePath)).toBe(true);
+    const owned = exportedDeclarations(settingsPath);
+    const facadeExports = exportedDeclarations(path.join(projectRoot, "src", "lib", "data.ts"));
+    for (const name of expected) {
+      expect(owned.has(name), `${name} should be owned by settings.ts`).toBe(true);
+      expect(facadeExports.has(name), `${name} should remain exported by data.ts`).toBe(true);
+    }
+
+    expect(importSpecifiers(settingsPath)).not.toEqual(expect.arrayContaining([
+      "./admin",
+      "./articles",
+      "./charts",
+      "./free-overview",
+      "./readings",
+      "@/lib/data",
+    ]));
+    expect(importSpecifiers(cachePath)).not.toEqual(expect.arrayContaining([
+      "./admin",
+      "./articles",
+      "./charts",
+      "./free-overview",
+      "./readings",
+      "./settings",
+      "@/lib/data",
+    ]));
+  });
 });
