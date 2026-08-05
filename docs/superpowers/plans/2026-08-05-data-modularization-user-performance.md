@@ -48,17 +48,19 @@ Baseline môi trường đã quan sát khi lập kế hoạch: lint exit `0`; Vi
 
 **Files:**
 
-- Create: `tests/performance/performance-metrics.ts`
-- Create: `tests/performance/performance-metrics.test.ts`
+- Create: `src/lib/performance-metrics.ts`
+- Create: `src/lib/performance-metrics.test.ts`
 - Create: `tests/e2e/user-journey-performance.spec.ts`
+- Modify: `tests/e2e/helpers.ts`
 - Modify: `package.json`
+- Modify: `playwright.config.ts`
 - Runtime only, do not commit: `graphify-out/`
 - Runtime only, do not commit: `C:\tmp\tuvi-user-journey-before.json`
 - Runtime only, do not commit: `C:\tmp\tuvi-graphify-before-20260805\`
 
 ### 1.1 Write the failing pure metric tests
 
-- [ ] Create `tests/performance/performance-metrics.test.ts` with fixtures for three samples per route. Keep this Vitest file outside Playwright's `tests/e2e` test directory so the two runners do not collect each other's tests.
+- [ ] Create `src/lib/performance-metrics.test.ts` with fixtures for three samples per route. Vitest only collects `src/**/*.{test,spec}.{ts,tsx}` in this project; keeping it under `src/lib` also prevents Playwright from collecting it.
 - [ ] Assert median is the middle sorted value, not the minimum or arithmetic average.
 - [ ] Assert primary-bottleneck selection uses normalized diagnostic ratios and the documented tie order.
 - [ ] Assert `evaluateBudget` rejects LCP above `2500`, CLS above `0.1`, or initial JS greater than baseline.
@@ -95,10 +97,10 @@ export function evaluateBudget(
 - [ ] Run RED:
 
 ```powershell
-& $Node24 $Vitest run tests/performance/performance-metrics.test.ts
+& $Node24 $Vitest run src/lib/performance-metrics.test.ts
 ```
 
-Expected: fail because `tests/performance/performance-metrics.ts` or its exports do not exist.
+Expected: fail because `src/lib/performance-metrics.ts` or its exports do not exist.
 
 ### 1.2 Implement metric calculation without app runtime dependencies
 
@@ -125,9 +127,12 @@ after.initialJsBytes <= before.initialJsBytes;
 ### 1.3 Add the production-journey Playwright spec
 
 - [ ] Add an init script before each navigation that observes `largest-contentful-paint` and non-input `layout-shift` entries.
+- [ ] Wait for a non-zero observed LCP plus a fixed one-second settling window before capture; do not wait for `networkidle`, because free-overview polling intentionally keeps the chart page network-active.
 - [ ] Read TTFB and HTML transfer bytes from the navigation timing entry.
 - [ ] Sum `transferSize`, falling back to `encodedBodySize`, for script resources loaded during the initial navigation.
 - [ ] Run exactly three cold browser-context samples for `/` and three full guest chart journeys using the existing `createSmokeChart` helper.
+- [ ] After each helper creates a chart, close its creation context and open `/la-so/{id}` in a new cold context before recording chart-result Navigation Timing. Assert the navigation-entry pathname matches `window.location.pathname` so a Next client transition cannot be mislabeled as a cold route measurement.
+- [ ] Keep `createSmokeChart` aligned with the current form controls: day, month, year, birth hour and view year are `<select>` elements and must use `selectOption`.
 - [ ] Use a unique harmless name per chart sample and never call checkout, PayOS, coin, admin, or production endpoints.
 - [ ] Write `{ phase, generatedAt, summaries, samples }` to the absolute path from `PERF_OUTPUT_PATH`; reject a relative or missing path.
 - [ ] Add package script:
@@ -136,10 +141,12 @@ after.initialJsBytes <= before.initialJsBytes;
 "test:perf:user-journey": "playwright test tests/e2e/user-journey-performance.spec.ts --project=mobile-chrome"
 ```
 
+- [ ] Allow `PLAYWRIGHT_EXECUTABLE_PATH` to set Playwright `launchOptions.executablePath` for local machines that have system Chrome but not the package-matched browser cache. Leave CI/default behavior unchanged when the variable is absent.
+
 - [ ] Run the pure unit test and list the new Playwright test without starting a server:
 
 ```powershell
-& $Node24 $Vitest run tests/performance/performance-metrics.test.ts
+& $Node24 $Vitest run src/lib/performance-metrics.test.ts
 & $Node24 $Playwright test tests/e2e/user-journey-performance.spec.ts --project=mobile-chrome --list
 ```
 
@@ -184,7 +191,8 @@ try {
 
 ```powershell
 & $Graphify extract . --code-only --out . --force
-& $Graphify diagnose multigraph --graph '.\graphify-out\graph.json' --extract-path '.' --json
+& $Graphify cluster-only . --no-label
+& $Graphify diagnose multigraph --graph '.\graphify-out\graph.json' --json
 & $Graphify god-nodes --graph '.\graphify-out\graph.json' --top 15 --json
 ```
 
@@ -201,7 +209,7 @@ Copy-Item -LiteralPath '.\graphify-out\GRAPH_REPORT.md' -Destination $BeforeGrap
 - [ ] Commit only harness files:
 
 ```powershell
-git -c safe.directory=$SafeGit add package.json tests/performance/performance-metrics.ts tests/performance/performance-metrics.test.ts tests/e2e/user-journey-performance.spec.ts
+git -c safe.directory=$SafeGit add package.json playwright.config.ts src/lib/performance-metrics.ts src/lib/performance-metrics.test.ts tests/e2e/helpers.ts tests/e2e/user-journey-performance.spec.ts docs/superpowers/plans/2026-08-05-data-modularization-user-performance.md
 git -c safe.directory=$SafeGit commit -m "test: add mobile journey performance baseline"
 ```
 
@@ -913,7 +921,8 @@ $env:PERF_OUTPUT_PATH = 'C:\tmp\tuvi-user-journey-after.json'
 
 ```powershell
 & $Graphify extract . --code-only --out . --force
-& $Graphify diagnose multigraph --graph '.\graphify-out\graph.json' --extract-path '.' --json
+& $Graphify cluster-only . --no-label
+& $Graphify diagnose multigraph --graph '.\graphify-out\graph.json' --json
 & $Graphify god-nodes --graph '.\graphify-out\graph.json' --top 15 --json
 ```
 

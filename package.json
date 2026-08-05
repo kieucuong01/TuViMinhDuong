@@ -15,6 +15,7 @@
     "test:e2e": "playwright test",
     "test:e2e:headed": "playwright test --headed",
     "test:e2e:install": "playwright install chromium",
+    "test:perf:user-journey": "playwright test tests/e2e/user-journey-performance.spec.ts --project=mobile-chrome",
     "postinstall": "prisma generate",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",

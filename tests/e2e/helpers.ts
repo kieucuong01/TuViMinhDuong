@@ -7,11 +7,11 @@ export async function createSmokeChart(page: Page, fullName = `Smoke Test ${Date
   await page.getByTestId("chart-full-name").fill(fullName);
   await page.getByTestId("chart-gender").selectOption("male");
   await page.getByTestId("chart-calendar-type").selectOption("solar");
-  await page.getByTestId("chart-day").fill("7");
-  await page.getByTestId("chart-month").fill("5");
-  await page.getByTestId("chart-year").fill("1995");
+  await page.getByTestId("chart-day").selectOption("7");
+  await page.getByTestId("chart-month").selectOption("5");
+  await page.getByTestId("chart-year").selectOption("1995");
   await page.getByTestId("chart-birth-hour").selectOption("4");
-  await page.getByTestId("chart-view-year").fill("2026");
+  await page.getByTestId("chart-view-year").selectOption("2026");
   await page.getByTestId("chart-form").locator("button[type=submit]").click();
 
   await expect(page).toHaveURL(/\/la-so\/[^/?#]+/, { timeout: 45_000 });
