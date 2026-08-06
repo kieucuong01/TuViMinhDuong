@@ -6,6 +6,7 @@ import { GlobalLoadingToast } from "@/components/global-loading-toast";
 import { DeferredGlobalModals } from "@/components/deferred-global-modals";
 import { ClientErrorReporter } from "@/components/client-error-reporter";
 import { GoogleAnalytics } from "@/components/google-analytics";
+import { AdminRouteClassSync } from "@/components/admin-route-class-sync";
 import { APP_NAME, APP_URL } from "@/lib/env";
 import { getOperationSettings } from "@/lib/data";
 import "./globals.css";
@@ -63,8 +64,15 @@ export default async function RootLayout({
     <html
       lang="vi"
       className="h-full antialiased"
+      suppressHydrationWarning
     >
       <body className="min-h-full bg-[#fffaf0] text-stone-950">
+        <script
+          dangerouslySetInnerHTML={{
+            __html: "try{if(location.pathname==='/admin'||location.pathname.startsWith('/admin/'))document.documentElement.classList.add('admin-route')}catch(e){}",
+          }}
+        />
+        <AdminRouteClassSync />
         <SiteHeader />
         {children}
         <SiteFooter />

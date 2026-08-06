@@ -1,8 +1,4 @@
-import { Suspense } from "react";
-import { GoogleAdsEventReporter } from "@/components/google-ads-event-reporter";
-import { GoogleAnalyticsDeferredLoader } from "@/components/google-analytics-deferred-loader";
-import { OrganicToolEventReporter } from "@/components/organic-tool-event-reporter";
-import { FirstPartyFunnelReporter } from "@/components/first-party-funnel-reporter";
+import { GoogleAnalyticsRouteGate } from "@/components/google-analytics-route-gate";
 import { GOOGLE_ADS_ID, GOOGLE_ANALYTICS_ID } from "@/lib/env";
 
 export function GoogleAnalytics() {
@@ -10,17 +6,10 @@ export function GoogleAnalytics() {
   if (!tagId) return null;
 
   return (
-    <>
-      <GoogleAnalyticsDeferredLoader
-        tagId={tagId}
-        measurementId={GOOGLE_ANALYTICS_ID}
-        adsId={GOOGLE_ADS_ID}
-      />
-      <Suspense fallback={null}>
-        <GoogleAdsEventReporter />
-        <OrganicToolEventReporter />
-        <FirstPartyFunnelReporter />
-      </Suspense>
-    </>
+    <GoogleAnalyticsRouteGate
+      tagId={tagId}
+      measurementId={GOOGLE_ANALYTICS_ID}
+      adsId={GOOGLE_ADS_ID}
+    />
   );
 }

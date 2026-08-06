@@ -7,6 +7,12 @@ import { getAdminPseoPage, listAdminPseoPages } from "@/lib/pseo-data";
 
 export const metadata = { title: "Admin Tra cứu pSEO", robots: { index: false, follow: false } };
 
+function pseoStatusLabel(status: string) {
+  if (status === "PUBLISHED") return "Đã publish";
+  if (status === "ARCHIVED") return "Lưu trữ";
+  return "Nháp";
+}
+
 export default async function AdminPseoPage({
   searchParams,
 }: {
@@ -23,9 +29,25 @@ export default async function AdminPseoPage({
     return !query || `${page.title} ${page.slug}`.toLocaleLowerCase("vi").includes(query);
   });
   const editing = params.edit ? await getAdminPseoPage(params.edit) : null;
+  const publishedCount = pages.filter((page) => page.status === "PUBLISHED").length;
+  const draftCount = pages.filter((page) => page.status === "DRAFT").length;
+  const archivedCount = pages.filter((page) => page.status === "ARCHIVED").length;
 
   return (
-    <main className="section admin-pseo-page">
+    <main className="section admin-main admin-pseo-page">
+      <div className="admin-shell-bar mx-auto max-w-7xl px-4 sm:px-6 lg:px-8" aria-label="Thanh quản trị nhanh">
+        <Link href="/admin" className="admin-shell-brand" prefetch={false}>
+          <strong>LS Admin</strong>
+          <span>Tra cứu pSEO</span>
+        </Link>
+        <nav aria-label="Lối tắt admin">
+          <Link href="/admin?tab=overview" prefetch={false}>Tổng quan</Link>
+          <Link href="/admin?tab=content" prefetch={false}>CMS</Link>
+          <Link href="/admin/tra-cuu" prefetch={false}>pSEO</Link>
+          <Link href="/tra-cuu" prefetch={false}>Hub public</Link>
+        </nav>
+        <span>{user.email}</span>
+      </div>
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <header className="admin-hero">
           <div>
@@ -33,31 +55,53 @@ export default async function AdminPseoPage({
             <h1 className="section-title">Tra cứu pSEO</h1>
             <p>Sửa, preview và publish từng trang. Trang không vượt audit sẽ tự giữ trạng thái nháp.</p>
           </div>
-          <Link href="/admin" className="btn btn-ghost">Về Admin</Link>
+          <Link href="/admin?tab=content" className="btn btn-ghost">Về Admin CMS</Link>
         </header>
         {params.saved ? <p className="success mt-4">Đã lưu {params.saved}.</p> : null}
-        <form className="admin-pseo-filter">
-          <input name="q" defaultValue={params.q || ""} placeholder="Tìm theo tiêu đề hoặc slug" />
-          <select name="status" defaultValue={params.status || ""}>
-            <option value="">Mọi trạng thái</option>
-            <option value="PUBLISHED">Đã publish</option>
-            <option value="DRAFT">Nháp</option>
-            <option value="ARCHIVED">Lưu trữ</option>
-          </select>
+        <form className="admin-pseo-filter" aria-label="Lọc trang pSEO">
+          <label htmlFor="admin-pseo-query">
+            <span>Tìm kiếm</span>
+            <input id="admin-pseo-query" name="q" defaultValue={params.q || ""} placeholder="Tìm theo tiêu đề hoặc slug" />
+          </label>
+          <label htmlFor="admin-pseo-status">
+            <span>Trạng thái</span>
+            <select id="admin-pseo-status" name="status" defaultValue={params.status || ""}>
+              <option value="">Mọi trạng thái</option>
+              <option value="PUBLISHED">Đã publish</option>
+              <option value="DRAFT">Nháp</option>
+              <option value="ARCHIVED">Lưu trữ</option>
+            </select>
+          </label>
           <button className="btn btn-ghost" type="submit">Lọc</button>
         </form>
         <div className="admin-pseo-layout">
           <section className="panel admin-pseo-list">
-            <p>Hiển thị {filtered.length} / {pages.length} trang</p>
-            {filtered.map((page) => (
-              <article key={page.slug}>
-                <div><strong>{page.title}</strong><span>{page.slug}</span><em>{page.status}</em></div>
-                <div>
-                  <Link href={`/admin/tra-cuu?edit=${page.slug}`} className="btn btn-ghost btn-small">Sửa</Link>
-                  {page.status === "PUBLISHED" ? <Link href={`/tra-cuu/${page.slug}`} className="btn btn-ghost btn-small">Xem trang</Link> : null}
-                </div>
-              </article>
-            ))}
+            <div className="admin-pseo-results-head">
+              <div>
+                <p className="eyebrow">Danh sách trang</p>
+                <h2>Hiển thị {filtered.length} / {pages.length} trang</h2>
+              </div>
+              <div className="admin-pseo-stats" aria-label="Tổng hợp trạng thái pSEO">
+                <span><strong>{publishedCount}</strong> publish</span>
+                <span><strong>{draftCount}</strong> nháp</span>
+                <span><strong>{archivedCount}</strong> lưu trữ</span>
+              </div>
+            </div>
+            <div className="admin-pseo-list-grid">
+              {filtered.map((item) => (
+                <article key={item.slug} className={item.slug === editing?.slug ? "active" : ""}>
+                  <div>
+                    <strong>{item.title}</strong>
+                    <span>/{item.slug}</span>
+                    <em className={`admin-pseo-status-pill ${item.status.toLowerCase()}`}>{pseoStatusLabel(item.status)}</em>
+                  </div>
+                  <div className="admin-pseo-actions">
+                    <Link href={`/admin/tra-cuu?edit=${item.slug}`} className="btn btn-ghost btn-small">Sửa</Link>
+                    {item.status === "PUBLISHED" ? <Link href={`/tra-cuu/${item.slug}`} className="btn btn-ghost btn-small">Xem trang</Link> : null}
+                  </div>
+                </article>
+              ))}
+            </div>
           </section>
           {editing ? (
             <section className="panel admin-pseo-editor">
@@ -74,7 +118,7 @@ export default async function AdminPseoPage({
                 <label><span>Canonical</span><input name="canonicalUrl" defaultValue={editing.canonicalUrl} /></label>
                 <label><span>Nội dung Markdown</span><textarea name="body" rows={24} defaultValue={editing.body} /></label>
                 <div className="admin-submit-row">
-                  <LoadingSubmitButton className="btn btn-primary" loadingText="Đang lưu...">Lưu và chạy audit</LoadingSubmitButton>
+                  <LoadingSubmitButton className="btn btn-primary" loadingText="Đang lưu..." confirmMessage="Xác nhận lưu trang pSEO? Hệ thống sẽ chạy audit trước khi publish.">Lưu và chạy audit</LoadingSubmitButton>
                   {editing.status === "PUBLISHED" ? <Link href={`/tra-cuu/${editing.slug}`} className="btn btn-ghost">Xem trang</Link> : null}
                 </div>
               </form>

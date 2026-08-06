@@ -257,7 +257,20 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
   ];
 
   return (
-    <main className="section" data-testid="admin-page">
+    <main className="section admin-main" data-testid="admin-page">
+      <div className="admin-shell-bar mx-auto max-w-7xl px-4 sm:px-6 lg:px-8" aria-label="Thanh quản trị nhanh">
+        <Link href="/admin" className="admin-shell-brand" prefetch={false}>
+          <strong>LS Admin</strong>
+          <span>Vận hành nội bộ</span>
+        </Link>
+        <nav aria-label="Lối tắt admin">
+          <Link href="/admin?tab=overview" prefetch={false}>Tổng quan</Link>
+          <Link href="/admin?tab=content" prefetch={false}>CMS</Link>
+          <Link href="/admin/tra-cuu" prefetch={false}>pSEO</Link>
+          <Link href="/" prefetch={false}>Xem public</Link>
+        </nav>
+        <span>{user.email}</span>
+      </div>
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="admin-hero">
           <div>
@@ -402,7 +415,8 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
               <UsersRound size={17} /> {overview.users} tài khoản
             </span>
           </div>
-          <div className="admin-table-wrap">
+          <p className="admin-table-scroll-hint">Bảng rộng: kéo ngang để xem đủ dữ liệu. Cột thao tác được ghim bên phải.</p>
+          <div className="admin-table-wrap sticky-actions">
             <table className="admin-data-table">
               <thead>
                 <tr>
@@ -415,7 +429,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
                   <th>Đơn đã thanh toán</th>
                   <th>Tổng chi</th>
                   <th>Lần thanh toán gần nhất</th>
-                  <th>Thao tác admin</th>
+                  <th className="sticky-action">Thao tác admin</th>
                 </tr>
               </thead>
               <tbody>
@@ -433,7 +447,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
                     <td>{item.paidOrdersCount}</td>
                     <td>{formatVnd(item.totalPaidVnd)}</td>
                     <td>{readableDateTime(item.lastPaymentAt)}</td>
-                    <td className="admin-user-action-cell">
+                    <td className="admin-user-action-cell sticky-action">
                       <div className="admin-user-actions">
                         <form action={adjustUserCoinsAction} className="admin-user-credit-form" data-testid={`admin-user-coins-${item.id}`} data-loading-message="Đang cập nhật xu..." data-loading-label="Đang cập nhật...">
                           <input type="hidden" name="userId" value={item.id} />
@@ -489,7 +503,8 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
           <p className="admin-board-note">
             Hiển thị tối đa {chartSubmissions.length} bản ghi mới nhất, bao gồm cả Khách vãng lai và User đã đăng nhập.
           </p>
-          <div className="admin-table-wrap">
+          <p className="admin-table-scroll-hint">Bảng rộng: kéo ngang để xem đủ dữ liệu. Cột thao tác được ghim bên phải.</p>
+          <div className="admin-table-wrap sticky-actions">
             <table className="admin-data-table">
               <thead>
                 <tr>
@@ -502,7 +517,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
                   <th>Giới tính</th>
                   <th>Năm xem</th>
                   <th>Múi giờ</th>
-                  <th>Lá số</th>
+                  <th className="sticky-action">Lá số</th>
                 </tr>
               </thead>
               <tbody>
@@ -533,7 +548,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
                     <td>{genderLabel(item.gender)}</td>
                     <td>{item.viewYear}</td>
                     <td>{item.timezone}</td>
-                    <td>
+                    <td className="admin-chart-action-cell sticky-action">
                       <Link href={`/la-so/${item.id}`} className="btn btn-ghost btn-small" prefetch={false}>
                         Mở lá số
                       </Link>
@@ -563,6 +578,13 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
               <SlidersHorizontal size={17} /> {operationSettings.paidReadingsEnabled ? "Đang bán luận giải" : "Public chỉ xem bản cơ bản"}
             </span>
           </div>
+          <div className="admin-danger-note" role="note">
+            <strong>Thao tác ảnh hưởng public ngay.</strong>
+            <span>Tắt PayOS, nạp xu hoặc luận giải sẽ đổi funnel bán hàng cho người dùng thường. Hệ thống sẽ ghi audit log khi admin lưu.</span>
+          </div>
+          <p className="admin-settings-audit-note" data-testid="admin-settings-audit-note">
+            Cập nhật cấu hình gần nhất: {readableDateTime(operationSettings.updatedAt)}. Người lưu tiếp theo: {user.email}.
+          </p>
           <form action={saveOperationSettingsAction} className="admin-operation-form" data-loading-message="Đang lưu cấu hình..." data-loading-label="Đang lưu...">
             <label className="admin-operation-toggle">
               <input type="checkbox" name="paymentsEnabled" value="1" defaultChecked={operationSettings.paymentsEnabled} />
@@ -586,13 +608,13 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
               </span>
             </label>
             <div className="admin-operation-actions">
-              <LoadingSubmitButton className="btn btn-primary" name="mode" value="custom" loadingText="Đang lưu...">
+              <LoadingSubmitButton className="btn btn-primary" name="mode" value="custom" loadingText="Đang lưu..." confirmMessage="Xác nhận lưu cấu hình vận hành? Thay đổi này ảnh hưởng public ngay và sẽ được ghi audit log.">
                 Lưu cấu hình
               </LoadingSubmitButton>
-              <LoadingSubmitButton className="btn btn-ghost" name="mode" value="basic-free" loadingText="Đang tắt...">
+              <LoadingSubmitButton className="btn btn-ghost" name="mode" value="basic-free" loadingText="Đang tắt..." confirmMessage="Xác nhận tắt trả phí public? Người dùng thường sẽ không thấy luồng mở luận giải trả phí.">
                 Tắt trả phí public
               </LoadingSubmitButton>
-              <LoadingSubmitButton className="btn btn-ghost" name="mode" value="commercial" loadingText="Đang bật...">
+              <LoadingSubmitButton className="btn btn-ghost" name="mode" value="commercial" loadingText="Đang bật..." confirmMessage="Xác nhận bật lại thương mại? PayOS, nạp xu và luận giải trả phí sẽ mở lại cho public.">
                 Bật lại thương mại
               </LoadingSubmitButton>
             </div>
@@ -627,8 +649,8 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
             ))}
             </div>
             <div className="admin-pricing-actions">
-              <p>Giá này dùng chung cho nút mở luận giải, paywall và số xu bị trừ khi người dùng xác nhận.</p>
-              <LoadingSubmitButton className="btn btn-primary" loadingText="Đang lưu...">
+              <p>Giá này dùng chung cho nút mở luận giải, paywall và số xu bị trừ khi người dùng xác nhận. Khi lưu, hệ thống ghi audit log với email admin đang thao tác.</p>
+              <LoadingSubmitButton className="btn btn-primary" loadingText="Đang lưu..." confirmMessage="Xác nhận cập nhật bảng giá xu? Thay đổi này ảnh hưởng giá mở luận giải ngay.">
                 Lưu bảng giá
               </LoadingSubmitButton>
             </div>

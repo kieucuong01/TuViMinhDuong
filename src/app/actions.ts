@@ -16,6 +16,7 @@ import { isReadingBundleKey } from "@/lib/reading-bundles";
 import { adminAdjustUserCoins, adminDeleteUser } from "@/lib/admin-user-management";
 import { createPerfTimer, logPerfEvent } from "@/lib/perf";
 import { ActionTimeoutError, withActionTimeout } from "@/lib/action-timeout";
+import type { Prisma } from "@/generated/prisma/client";
 import { savePseoPageFromForm } from "@/lib/pseo-data";
 import { chartCreationRateLimitExceeded, chartCreationRateLimitWindowStart, normalizeRequestIp, normalizeUserAgent, validateChartFullName } from "@/lib/chart-submission-guard";
 import { normalizeChartAttribution } from "@/lib/chart-attribution";
@@ -584,13 +585,44 @@ export async function saveArticleCategoryAction(formData: FormData) {
   redirect(`/admin?tab=content&categorySaved=${category.slug}`);
 }
 
+async function logAdminAudit(user: SessionUser, action: string, entity: string, entityId: string | null, metadata: Record<string, unknown>) {
+  const db = getDb();
+  if (!db) return;
+  try {
+    const metadataJson = JSON.parse(JSON.stringify(metadata)) as Prisma.InputJsonValue;
+    await db.auditLog.create({
+      data: {
+        userId: user.id,
+        action,
+        entity,
+        entityId,
+        metadata: metadataJson,
+      },
+    });
+  } catch (error) {
+    console.error(JSON.stringify({
+      level: "error",
+      event: "admin_audit_log_failed",
+      action,
+      entity,
+      message: error instanceof Error ? error.message : String(error),
+    }));
+  }
+}
+
 export async function saveOperationSettingsAction(formData: FormData) {
   const user = await getCurrentUser();
   if (user?.role !== "ADMIN") redirect("/dang-nhap?next=/admin");
 
+  const before = await getOperationSettings();
   const settings = parseOperationSettingsInput(formData);
 
   await updateOperationSettings(settings);
+  await logAdminAudit(user, "update_operation_settings", "OperationSettings", "global", {
+    before,
+    after: settings,
+    mode: String(formData.get("mode") || "custom"),
+  });
   revalidateTag(OPERATION_SETTINGS_CACHE_TAG, "max");
   revalidatePath("/");
   revalidatePath("/admin");
@@ -614,6 +646,9 @@ export async function saveFeaturePricesAction(formData: FormData) {
 
   try {
     await updateFeaturePrices(updates);
+    await logAdminAudit(user, "update_feature_prices", "FeaturePrice", "bulk", {
+      updates,
+    });
   } catch (error) {
     redirect(`/admin?tab=settings&pricingError=${encodeURIComponent(adminPricingErrorMessage(error))}`);
   }
