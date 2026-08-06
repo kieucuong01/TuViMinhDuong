@@ -40,6 +40,9 @@ yarn-error.log*
 .tmp-npm-cache/
 .lighthouseci/
 .codex/tools*/
+.codex/skills/graphify/
+graphify-out/
+src/graphify-out/
 .worktrees/
 deploy-tmp/
 vps_*_tmp.py
