@@ -35,6 +35,14 @@ describe("production release command", () => {
     expect(releaseScript).toContain("https://lasotinhhoa.vn/kien-thuc-tu-vi");
   });
 
+  it("keeps only the active VPS release plus one previous rollback release", () => {
+    expect(releaseScript).toContain("RELEASES_TO_KEEP=2");
+    expect(releaseScript).toContain(
+      "Keep the active release plus one previous complete release for rollback",
+    );
+    expect(releaseScript).toContain("cleanup_old_releases");
+  });
+
   it("keeps CMS-uploaded article images in a persistent VPS upload directory", () => {
     expect(releaseScript).toContain('UPLOAD_DIR="$APP_ROOT/uploads/articles"');
     expect(releaseScript).toContain('mkdir -p "$UPLOAD_DIR"');

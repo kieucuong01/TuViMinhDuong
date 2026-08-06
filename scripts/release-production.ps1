@@ -225,7 +225,8 @@ CURRENT_DIR="$APP_ROOT/current"
 UPLOAD_DIR="$APP_ROOT/uploads/articles"
 REPO_URL="https://github.com/kieucuong01/TuViMinhDuong.git"
 PREVIOUS_RELEASE="$(readlink -f "$CURRENT_DIR" 2>/dev/null || true)"
-RELEASES_TO_KEEP=3
+# Keep the active release plus one previous complete release for rollback.
+RELEASES_TO_KEEP=2
 deploy_succeeded="0"
 
 start_app() {
