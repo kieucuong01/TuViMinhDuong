@@ -7,7 +7,7 @@ Purpose: give AI agents a low-token map of the @ls codebase without committing l
 | Field | Value |
 |---|---:|
 | Source repo | `/opt/lasotinhhoa/source` |
-| Baseline commit | `b043ebf74429` |
+| Graph freshness | Check `GRAPH_REPORT.md` in the durable artifact |
 | Graphify mode | `extract --code-only` |
 | Token/API cost | `0 input · 0 output` |
 | Nodes | `3082` |
