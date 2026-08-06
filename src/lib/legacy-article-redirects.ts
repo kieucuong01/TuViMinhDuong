@@ -4,11 +4,7 @@ export const LEGACY_ARTICLE_REDIRECTS = [
     destination: "/kien-thuc-tu-vi/luan-giai-la-so-tu-vi",
     permanent: true,
   },
-  {
-    source: "/kien-thuc-tu-vi/giai-ma-la-so-tu-vi",
-    destination: "/kien-thuc-tu-vi/cach-doc-la-so-tu-vi-cho-nguoi-moi",
-    permanent: true,
-  },
+
   {
     source: "/kien-thuc-tu-vi/phan-tich-la-so-tu-vi",
     destination: "/kien-thuc-tu-vi/binh-giai-la-so-tu-vi",
