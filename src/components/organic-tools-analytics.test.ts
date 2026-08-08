@@ -10,7 +10,7 @@ const birthHourSource = source("src/components/birth-hour-comparison.tsx");
 const ageToolSource = source("src/components/age-tool.tsx");
 const homeSource = source("src/app/page.tsx");
 const chartFormSource = source("src/components/chart-form.tsx");
-const analyticsShellSource = source("src/components/google-analytics.tsx");
+const analyticsRouteGateSource = source("src/components/google-analytics-route-gate.tsx");
 const eventReporterSource = source("src/components/organic-tool-event-reporter.tsx");
 
 describe("organic tool analytics", () => {
@@ -55,7 +55,7 @@ describe("organic tool analytics", () => {
     expect(analyticsCalls).not.toContain("secondGender:");
   });
   it("mounts one delegated reporter and marks only the wealth form", () => {
-    expect(analyticsShellSource).toContain("<OrganicToolEventReporter />");
+    expect(analyticsRouteGateSource).toContain("<OrganicToolEventReporter />");
     expect(eventReporterSource).toContain('document.addEventListener("submit"');
     expect(eventReporterSource).toContain('document.addEventListener("click"');
     expect(eventReporterSource).not.toMatch(/FormData|fullName|birth|gender|email|phone|href/);

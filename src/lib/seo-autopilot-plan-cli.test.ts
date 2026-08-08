@@ -61,7 +61,7 @@ describe("SEO Autopilot planner CLI", () => {
 
     expect(result.code, result.stderr).toBe(0);
     expect(result.stdout).toContain("Status: blocked");
-    expect(result.stdout).toContain("No safe new SEO article opportunities remain");
+    expect(result.stdout).toContain("No safe SEO content opportunities remain");
     expect(result.stdout).toContain("Weekly Content Plan");
   });
 });

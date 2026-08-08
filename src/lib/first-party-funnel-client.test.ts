@@ -29,7 +29,10 @@ describe("first-party funnel client", () => {
   });
 
   it("mounts one route reporter and keeps the existing analytics reporters", () => {
-    const googleAnalytics = readFileSync(fileURLToPath(new URL("../components/google-analytics.tsx", import.meta.url)), "utf8");
+    const googleAnalytics = readFileSync(
+      fileURLToPath(new URL("../components/google-analytics-route-gate.tsx", import.meta.url)),
+      "utf8",
+    );
     const organicAnalytics = readFileSync(fileURLToPath(new URL("./client-analytics.ts", import.meta.url)), "utf8");
 
     expect(googleAnalytics).toContain("FirstPartyFunnelReporter");

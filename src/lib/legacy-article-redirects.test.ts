@@ -10,11 +10,6 @@ const expectedRedirects = [
     permanent: true,
   },
   {
-    source: "/kien-thuc-tu-vi/giai-ma-la-so-tu-vi",
-    destination: "/kien-thuc-tu-vi/cach-doc-la-so-tu-vi-cho-nguoi-moi",
-    permanent: true,
-  },
-  {
     source: "/kien-thuc-tu-vi/phan-tich-la-so-tu-vi",
     destination: "/kien-thuc-tu-vi/binh-giai-la-so-tu-vi",
     permanent: true,
@@ -52,9 +47,9 @@ const expectedRedirects = [
 ] as const;
 
 describe("legacy article redirects", () => {
-  it("contains the nine reviewed permanent mappings", () => {
+  it("contains the eight reviewed permanent mappings", () => {
     expect(LEGACY_ARTICLE_REDIRECTS).toEqual(expectedRedirects);
-    expect(new Set(LEGACY_ARTICLE_REDIRECTS.map((item) => item.source)).size).toBe(9);
+    expect(new Set(LEGACY_ARTICLE_REDIRECTS.map((item) => item.source)).size).toBe(8);
     expect(
       LEGACY_ARTICLE_REDIRECTS.every((item) => item.source !== item.destination),
     ).toBe(true);

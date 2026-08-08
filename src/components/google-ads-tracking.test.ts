@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 
 const reporterSource = readFileSync(fileURLToPath(new URL("./google-ads-event-reporter.tsx", import.meta.url)), "utf8");
 const analyticsSource = readFileSync(fileURLToPath(new URL("./google-analytics.tsx", import.meta.url)), "utf8");
+const routeGateSource = readFileSync(fileURLToPath(new URL("./google-analytics-route-gate.tsx", import.meta.url)), "utf8");
 const deferredLoaderSource = readFileSync(
   fileURLToPath(new URL("./google-analytics-deferred-loader.tsx", import.meta.url)),
   "utf8",
@@ -48,8 +49,9 @@ describe("Google Ads tracking markers", () => {
   });
 
   it("mounts the event reporter alongside the Google tag", () => {
-    expect(analyticsSource).toContain("GoogleAdsEventReporter");
-    expect(analyticsSource).toContain("GoogleAnalyticsDeferredLoader");
+    expect(analyticsSource).toContain("GoogleAnalyticsRouteGate");
+    expect(routeGateSource).toContain("GoogleAdsEventReporter");
+    expect(routeGateSource).toContain("GoogleAnalyticsDeferredLoader");
     expect(analyticsSource).toContain("GOOGLE_ADS_ID");
     expect(deferredLoaderSource).toContain("googletagmanager.com/gtag/js");
     expect(deferredLoaderSource).toContain('from "next/script"');

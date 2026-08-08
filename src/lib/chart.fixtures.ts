@@ -1,11 +1,20 @@
-import type { ChartInput } from "@/lib/chart";
+import type { ChartInput, Gender, StarBrightness } from "@/lib/chart";
 
 type FixturePalaceStars = Record<string, string[]>;
 type FixturePalaceStates = Record<string, Record<string, string>>;
+type FixtureProvenance = "pdf" | "reference-image" | "web-cross-check" | "engine-regression";
 
 export type ChartFixture = {
   id: string;
   source: string;
+  provenance: FixtureProvenance;
+  coverage: {
+    hourBranch: string;
+    gender: Gender;
+    hasTuan: boolean;
+    hasTriet: boolean;
+    starStates: StarBrightness[];
+  };
   input: ChartInput;
   expected: {
     solar: { day: number; month: number; year: number };
@@ -32,6 +41,14 @@ export const CHART_FIXTURES: ChartFixture[] = [
   {
     id: "aituvi-reference-1995-suu-hour",
     source: "Reference image supplied by user, cross-checked against lasotuvi-style star placement rules",
+    provenance: "reference-image",
+    coverage: {
+      hourBranch: "Sửu",
+      gender: "male",
+      hasTuan: true,
+      hasTriet: true,
+      starStates: ["B", "H", "Đ", "V"],
+    },
     input: {
       fullName: "Hứa Thị Thúy Hằng",
       gender: "male",
@@ -99,6 +116,14 @@ export const CHART_FIXTURES: ChartFixture[] = [
   {
     id: "giap-tuat-1994-suu-hour",
     source: "Rule fixture for Giáp Tuất male chart, covers Hỏa cục and forward đại vận",
+    provenance: "engine-regression",
+    coverage: {
+      hourBranch: "Sửu",
+      gender: "male",
+      hasTuan: true,
+      hasTriet: true,
+      starStates: [],
+    },
     input: {
       fullName: "Kiều Tấn Cường",
       gender: "male",
@@ -149,6 +174,14 @@ export const CHART_FIXTURES: ChartFixture[] = [
   {
     id: "tracuutuvi-pdf-kieu-tan-cuong-1995-dan-hour",
     source: "Golden fixture extracted from user-provided tracuutuvi PDF La_so_tu_vi_KIEU_TAN_CUONG.pdf",
+    provenance: "pdf",
+    coverage: {
+      hourBranch: "Dần",
+      gender: "male",
+      hasTuan: true,
+      hasTriet: true,
+      starStates: ["M", "V", "Đ", "H"],
+    },
     input: {
       fullName: "Kiều Tấn Cường",
       gender: "male",
@@ -225,6 +258,14 @@ export const CHART_FIXTURES: ChartFixture[] = [
   {
     id: "lunar-new-year-2026-ty-hour",
     source: "Lunar-input regression fixture, covers lunar to solar conversion and same Menh/Than palace",
+    provenance: "engine-regression",
+    coverage: {
+      hourBranch: "Tý",
+      gender: "female",
+      hasTuan: true,
+      hasTriet: true,
+      starStates: [],
+    },
     input: {
       fullName: "Lunar sample",
       gender: "female",
@@ -278,6 +319,14 @@ export const CHART_FIXTURES: ChartFixture[] = [
   {
     id: "canh-ngo-1990-female-thin-hour",
     source: "Regression fixture for Canh Ngo female chart, covers solar input, Than at Dau, Lai Nhan Dien Trach, and 2026 yearly stars",
+    provenance: "engine-regression",
+    coverage: {
+      hourBranch: "Thìn",
+      gender: "female",
+      hasTuan: true,
+      hasTriet: true,
+      starStates: ["M", "V", "Đ", "H"],
+    },
     input: {
       fullName: "Fixture female 1990",
       gender: "female",
@@ -344,6 +393,177 @@ export const CHART_FIXTURES: ChartFixture[] = [
         "Tài Bạch": { "Vũ Khúc": "Đ", "Thất Sát": "H", "Kình Dương": "H", "Hỏa Tinh": "H", "Hóa Quyền (Vũ Khúc)": "Đ" },
         "Tử Tức": { "Thái Dương": "H", "Hóa Lộc (Thái Dương)": "Đ" },
         "Huynh Đệ": { "Thiên Cơ": "Đ", "Thiên Hư": "H", "Thiên Khốc": "Đ", "Thiên Hình": "H" },
+      },
+    },
+  },
+  {
+    id: "rule-lock-mau-thin-1988-ngo-hour",
+    source: "Engine regression fixture generated from the current deterministic chart engine; pending external PDF/web cross-check",
+    provenance: "engine-regression",
+    coverage: {
+      hourBranch: "Ngọ",
+      gender: "male",
+      hasTuan: true,
+      hasTriet: true,
+      starStates: ["M", "V", "Đ", "B", "H"],
+    },
+    input: {
+      fullName: "Golden Ngọ sample",
+      gender: "male",
+      calendarType: "solar",
+      day: 12,
+      month: 9,
+      year: 1988,
+      birthHour: 12,
+      viewYear: 2026,
+      timezone: "Asia/Bangkok",
+    },
+    expected: {
+      solar: { day: 12, month: 9, year: 1988 },
+      lunar: { day: 2, month: 8, year: 1988, leap: false },
+      canChi: { year: "Mậu Thìn", month: "Tân Dậu", day: "Canh Ngọ", hour: "Nhâm Ngọ" },
+      menh: "Mão",
+      than: "Mão",
+      cuc: "Thủy nhị cục",
+      banMenh: "Đại Lâm Mộc",
+      menhChu: "Liêm Trinh",
+      thanChu: "Văn Xương",
+      laiNhan: "Điền Trạch",
+      menhCucRelation: "Cục Thủy sinh Mệnh Mộc",
+      firstDaiVan: { palace: "Mệnh", branch: "Mão", range: "2-11" },
+      boneWeightLabel: "4 lượng 7 chỉ",
+      mainStarsByPalace: {
+        "Mệnh": ["Thái Âm"],
+        "Phụ Mẫu": ["Tham Lang"],
+        "Phúc Đức": ["Cự Môn"],
+        "Điền Trạch": ["Liêm Trinh", "Thiên Tướng"],
+        "Quan Lộc": ["Thiên Lương"],
+        "Nô Bộc": ["Thất Sát"],
+        "Thiên Di": ["Thiên Đồng"],
+        "Tật Ách": ["Vũ Khúc"],
+        "Tài Bạch": ["Thái Dương"],
+        "Tử Tức": ["Phá Quân"],
+        "Phu Thê": ["Thiên Cơ"],
+        "Huynh Đệ": ["Tử Vi", "Thiên Phủ"],
+      },
+      supportStarsInclude: {
+        "Mệnh": ["Hóa Quyền (Thái Âm)", "Hóa Khoa (Hữu Bật)"],
+        "Phụ Mẫu": ["Đà La", "Linh Tinh", "Văn Xương", "Hóa Lộc (Tham Lang)"],
+        "Phúc Đức": ["Thiên Không", "Địa Kiếp", "Địa Không", "Kiếp Sát"],
+        "Điền Trạch": ["Kình Dương"],
+        "Nô Bộc": ["Hỏa Tinh", "Văn Tinh"],
+        "Tật Ách": ["Văn Khúc", "Tuần"],
+        "Tài Bạch": ["Tuần"],
+        "Tử Tức": ["Triệt"],
+        "Phu Thê": ["Triệt", "Hóa Kỵ (Thiên Cơ)"],
+        "Huynh Đệ": ["Thiên Mã"],
+      },
+      yearlyStarsInclude: {
+        "Phụ Mẫu": ["L.Đà La"],
+        "Phúc Đức": ["L.Lộc Tồn"],
+        "Điền Trạch": ["LN Văn tinh", "L.Thái Tuế", "L.Kình Dương"],
+        "Nô Bộc": ["L.Tang Môn", "L.Thiên Mã"],
+        "Tử Tức": ["L.Thiên Hư", "L.Thiên Khốc"],
+        "Huynh Đệ": ["L.Bạch Hổ"],
+      },
+      starStatesInclude: {
+        "Mệnh": { "Thái Âm": "H", "Hóa Quyền (Thái Âm)": "Đ", "Hóa Khoa (Hữu Bật)": "Đ" },
+        "Phụ Mẫu": { "Tham Lang": "M", "Đà La": "H", "Linh Tinh": "Đ" },
+        "Phúc Đức": { "Cự Môn": "H", "Địa Kiếp": "Đ", "Địa Không": "Đ" },
+        "Điền Trạch": { "Liêm Trinh": "M", "Thiên Tướng": "V", "Kình Dương": "H" },
+        "Quan Lộc": { "Thiên Lương": "Đ" },
+        "Nô Bộc": { "Thất Sát": "M", "Hỏa Tinh": "H" },
+        "Thiên Di": { "Thiên Đồng": "H" },
+        "Tật Ách": { "Vũ Khúc": "M" },
+        "Tài Bạch": { "Thái Dương": "H" },
+        "Tử Tức": { "Phá Quân": "M" },
+        "Phu Thê": { "Thiên Cơ": "Đ", "Hóa Kỵ (Thiên Cơ)": "H" },
+        "Huynh Đệ": { "Tử Vi": "V", "Thiên Phủ": "M", "Thiên Mã": "Đ" },
+      },
+    },
+  },
+  {
+    id: "rule-lock-tan-ty-2001-hoi-hour",
+    source: "Engine regression fixture generated from the current deterministic chart engine; pending external PDF/web cross-check",
+    provenance: "engine-regression",
+    coverage: {
+      hourBranch: "Hợi",
+      gender: "female",
+      hasTuan: true,
+      hasTriet: true,
+      starStates: ["M", "V", "Đ", "B", "H"],
+    },
+    input: {
+      fullName: "Golden Hợi sample",
+      gender: "female",
+      calendarType: "solar",
+      day: 21,
+      month: 11,
+      year: 2001,
+      birthHour: 22,
+      viewYear: 2026,
+      timezone: "Asia/Bangkok",
+    },
+    expected: {
+      solar: { day: 21, month: 11, year: 2001 },
+      lunar: { day: 7, month: 10, year: 2001, leap: false },
+      canChi: { year: "Tân Tỵ", month: "Kỷ Hợi", day: "Mậu Tý", hour: "Quý Hợi" },
+      menh: "Tý",
+      than: "Tuất",
+      cuc: "Thổ ngũ cục",
+      banMenh: "Bạch Lạp Kim",
+      menhChu: "Vũ Khúc",
+      thanChu: "Thiên Cơ",
+      laiNhan: "Phụ Mẫu",
+      menhCucRelation: "Cục Thổ sinh Mệnh Kim",
+      firstDaiVan: { palace: "Mệnh", branch: "Tý", range: "5-14" },
+      boneWeightLabel: "3 lượng 8 chỉ",
+      mainStarsByPalace: {
+        "Mệnh": ["Tử Vi"],
+        "Phụ Mẫu": ["Vô chính diệu"],
+        "Phúc Đức": ["Phá Quân"],
+        "Điền Trạch": ["Vô chính diệu"],
+        "Quan Lộc": ["Liêm Trinh", "Thiên Phủ"],
+        "Nô Bộc": ["Thái Âm"],
+        "Thiên Di": ["Tham Lang"],
+        "Tật Ách": ["Thiên Đồng", "Cự Môn"],
+        "Tài Bạch": ["Vũ Khúc", "Thiên Tướng"],
+        "Tử Tức": ["Thái Dương", "Thiên Lương"],
+        "Phu Thê": ["Thất Sát"],
+        "Huynh Đệ": ["Thiên Cơ"],
+      },
+      supportStarsInclude: {
+        "Mệnh": ["Địa Không", "Văn Tinh"],
+        "Điền Trạch": ["Văn Khúc", "Hóa Khoa (Văn Khúc)"],
+        "Quan Lộc": ["Linh Tinh", "Triệt"],
+        "Nô Bộc": ["Triệt"],
+        "Thiên Di": ["Thiên Không", "Đào Hoa"],
+        "Tật Ách": ["Hóa Lộc (Cự Môn)"],
+        "Tài Bạch": ["Đà La", "Tuần"],
+        "Tử Tức": ["Hỏa Tinh", "Tuần", "Hóa Quyền (Thái Dương)"],
+        "Phu Thê": ["Kình Dương", "Địa Kiếp"],
+        "Huynh Đệ": ["Văn Xương", "Thiên Mã", "Hóa Kỵ (Văn Xương)"],
+      },
+      yearlyStarsInclude: {
+        "Mệnh": ["L.Thiên Hư", "L.Thiên Khốc"],
+        "Phúc Đức": ["L.Bạch Hổ"],
+        "Quan Lộc": ["L.Đà La"],
+        "Nô Bộc": ["L.Lộc Tồn"],
+        "Thiên Di": ["LN Văn tinh", "L.Thái Tuế", "L.Kình Dương"],
+        "Tài Bạch": ["L.Tang Môn", "L.Thiên Mã"],
+      },
+      starStatesInclude: {
+        "Mệnh": { "Tử Vi": "Đ", "Địa Không": "H" },
+        "Phúc Đức": { "Phá Quân": "H" },
+        "Điền Trạch": { "Văn Khúc": "Đ", "Hóa Khoa (Văn Khúc)": "Đ" },
+        "Quan Lộc": { "Liêm Trinh": "V", "Thiên Phủ": "V", "Linh Tinh": "Đ" },
+        "Nô Bộc": { "Thái Âm": "H" },
+        "Thiên Di": { "Tham Lang": "H" },
+        "Tật Ách": { "Thiên Đồng": "H", "Cự Môn": "H", "Hóa Lộc (Cự Môn)": "Đ" },
+        "Tài Bạch": { "Vũ Khúc": "V", "Thiên Tướng": "M", "Đà La": "Đ" },
+        "Tử Tức": { "Thái Dương": "H", "Thiên Lương": "H", "Hỏa Tinh": "H", "Hóa Quyền (Thái Dương)": "Đ" },
+        "Phu Thê": { "Thất Sát": "H", "Kình Dương": "Đ", "Địa Kiếp": "H", "Thiên Riêu": "H" },
+        "Huynh Đệ": { "Thiên Cơ": "H", "Văn Xương": "Đ", "Thiên Mã": "Đ", "Hóa Kỵ (Văn Xương)": "H" },
       },
     },
   },

@@ -36,7 +36,7 @@ try {
     : await buildSearchConsoleInsights({ siteUrl: args.gscSiteUrl || `${baseUrl}/` });
   const plan = planSeoAutopilotRun({
     snapshot,
-    existingSlugs,
+    existingSlugs: contentInventory.combinedSlugs,
     keywordRows: keywordSource.rows,
     searchConsole,
     articlesPerWeek,

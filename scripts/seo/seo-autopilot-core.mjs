@@ -474,7 +474,7 @@ export function buildKeywordDrivenOpportunities({ keywordRows, existingSlugs = [
 
   for (const cluster of intelligence.clusters) {
     for (const item of cluster.opportunities || [cluster.opportunity]) {
-      if (!item?.slug || existing.has(item.slug) || overlapsExistingIntent(item.slug, existing)) continue;
+      if (!item?.slug || hasExistingSlugOrIntent(item.slug, existing)) continue;
       const current = dedupedOpportunities.get(item.slug);
       if (!current || item.priority > current.priority) {
         dedupedOpportunities.set(item.slug, item);
@@ -483,7 +483,7 @@ export function buildKeywordDrivenOpportunities({ keywordRows, existingSlugs = [
   }
 
   for (const item of buildExpandedKeywordResearchOpportunities({ keywordRows, existing })) {
-    if (!item?.slug || existing.has(item.slug) || overlapsExistingIntent(item.slug, existing)) continue;
+    if (!item?.slug || hasExistingSlugOrIntent(item.slug, existing)) continue;
     const current = dedupedOpportunities.get(item.slug);
     if (!current || item.priority > current.priority) {
       dedupedOpportunities.set(item.slug, item);
@@ -519,7 +519,7 @@ function buildExpandedKeywordResearchOpportunities({ keywordRows, existing }) {
   return [...grouped.values()]
     .map((group) => buildExpandedKeywordOpportunity(group))
     .filter(Boolean)
-    .filter((item) => !existing.has(item.slug) && !overlapsExistingIntent(item.slug, existing))
+    .filter((item) => !hasExistingSlugOrIntent(item.slug, existing))
     .sort((left, right) => right.priority - left.priority)
     .slice(0, 12);
 }
@@ -721,9 +721,9 @@ export function rankTopicOpportunities(existingUrls) {
       .filter(Boolean),
   );
 
-  return [...DEFAULT_TOPIC_OPPORTUNITIES, ...BACKSTOP_TOPIC_OPPORTUNITIES].filter((item) => !existingSlugs.has(item.slug)).sort(
-    (left, right) => right.priority - left.priority,
-  );
+  return [...DEFAULT_TOPIC_OPPORTUNITIES, ...BACKSTOP_TOPIC_OPPORTUNITIES]
+    .filter((item) => !hasExistingSlugOrIntent(item.slug, existingSlugs))
+    .sort((left, right) => right.priority - left.priority);
 }
 
 export function extractSeedArticleSlugs(source) {
@@ -856,21 +856,26 @@ export function planSeoAutopilotRun({
   const keywordOpportunities = keywordPlan?.opportunities || [];
   const keywordIntelligence = keywordPlan?.intelligence || null;
   const refreshOpportunities = rankRefreshTopicOpportunities([...currentSlugs], keywordPlan);
+  const canRefreshFromEvidence = searchConsole?.status === "ok";
   const opportunities = keywordOpportunities.length
     ? keywordOpportunities
     : snapshotOpportunities.length
-      ? snapshotOpportunities.filter((item) => !currentSlugs.has(item.slug) && !overlapsExistingIntent(item.slug, currentSlugs))
+      ? snapshotOpportunities.filter((item) => !hasExistingSlugOrIntent(item.slug, currentSlugs))
       : rankTopicOpportunities([...currentSlugs]).length
         ? rankTopicOpportunities([...currentSlugs])
-        : isSinglePublisherRun
-          ? []
-          : refreshOpportunities;
+        : !isSinglePublisherRun && canRefreshFromEvidence
+          ? refreshOpportunities
+          : [];
   const normalizedOpportunities = avoidImmediateRepeat({
     opportunities,
     previousState,
     articlesPerWeek,
   });
-  if (isSinglePublisherRun && normalizedOpportunities.length === 0) {
+  if (normalizedOpportunities.length === 0) {
+    const searchConsoleUnavailable =
+      searchConsole && searchConsole.status !== "ok"
+        ? ` Search Console is currently ${searchConsole.status}, so near-page-1 refresh decisions need fresh GSC/funnel evidence before changing title, copy, FAQ, or CTA.`
+        : "";
     return {
       mode: "auto-safe",
       status: "blocked",
@@ -884,7 +889,7 @@ export function planSeoAutopilotRun({
         slug: "",
         slugs: [],
         reason:
-          "No safe new SEO article opportunities remain for the daily publisher run after excluding existing slugs and overlapping reader intents.",
+          `No safe SEO content opportunities remain after excluding existing slugs and overlapping reader intents.${searchConsoleUnavailable}`,
         approvalRequired: false,
         allowedToCommitDeployAfterVerification: false,
       },
@@ -894,7 +899,7 @@ export function planSeoAutopilotRun({
         articlesPerWeek,
         measurementCadence: "weekly",
         strategyNotes: [
-          "Daily publisher must stop with Blocked when no distinct SEMrush-backed topic remains after intent deduplication.",
+          "Planner must stop with Blocked when no distinct SEMrush-backed topic or evidence-led refresh remains after intent deduplication.",
         ],
         articles: [],
       },
@@ -1038,9 +1043,33 @@ function buildPublishReason({ slugs, brief, keywordIntelligence }) {
   return `Publish ${slugs.length} people-first articles this week across the keyword funnel; first topic: ${brief.intent}`;
 }
 
+function hasExistingSlugOrIntent(slug, existingSlugs) {
+  if (!slug) return true;
+  const existing = existingSlugs instanceof Set ? existingSlugs : new Set(existingSlugs || []);
+  return existing.has(slug) || overlapsExistingIntent(slug, existing);
+}
+
 function overlapsExistingIntent(slug, existingSlugs) {
   if (!slug || !existingSlugs?.size) return false;
+  const normalizedSlug = canonicalIntentSlug(slug);
+  for (const existingSlug of existingSlugs) {
+    if (canonicalIntentSlug(existingSlug) === normalizedSlug) return true;
+  }
   return OVERLAPPING_INTENT_SLUG_GROUPS.some((group) => group.includes(slug) && group.some((item) => existingSlugs.has(item)));
+}
+
+function canonicalIntentSlug(slug) {
+  const normalized = String(slug || "")
+    .split("?")[0]
+    .replace(/\/$/, "")
+    .split("/")
+    .pop()
+    ?.trim();
+  if (!normalized) return "";
+  if (/^sao-[a-z0-9-]+-trong-tu-vi$/.test(normalized)) {
+    return normalized.replace(/-trong-tu-vi$/, "");
+  }
+  return normalized;
 }
 
 export function renderContentDraft(brief, { generatedAt } = {}) {

@@ -20,11 +20,17 @@ import {
 } from "../../scripts/seo/seo-autopilot-core.mjs";
 
 const executeSource = readFileSync(fileURLToPath(new URL("../../scripts/seo/seo-autopilot-execute.mjs", import.meta.url)), "utf8");
+const planSource = readFileSync(fileURLToPath(new URL("../../scripts/seo/seo-autopilot-plan.mjs", import.meta.url)), "utf8");
 
 describe("SEO Autopilot core", () => {
   it("preserves confirmed published state across planning runs", () => {
     expect(executeSource).toContain("lastPublishedSlug: previousState?.lastPublishedSlug");
     expect(executeSource).toContain("lastPublishedAt: previousState?.lastPublishedAt");
+  });
+
+  it("plans against combined local and production article inventory", () => {
+    expect(planSource).toContain("existingSlugs: contentInventory.combinedSlugs");
+    expect(executeSource).toContain("existingSlugs: contentInventory.combinedSlugs");
   });
 
   it("extracts URL locations from a sitemap", () => {
@@ -477,6 +483,101 @@ export const seedArticles = [
         "npm run build",
       ]),
     );
+  });
+
+  it("blocks weekly content batches when only duplicate or overlapping intents remain", () => {
+    const plan = planSeoAutopilotRun({
+      snapshot: {
+        status: "ok",
+        sitemapUrlCount: 221,
+        knowledgeArticleCount: 75,
+        knowledgeArticleSlugs: ["sao-tu-vi-trong-tu-vi"],
+        warnings: [],
+        opportunities: [
+          {
+            slug: "sao-tu-vi",
+            cluster: "14 chÃ­nh tinh",
+            priority: 100,
+            focusKeyword: "sao Tá»­ Vi",
+            intent:
+              "NgÆ°á»i Ä‘á»c muá»‘n hiá»ƒu Ã½ nghÄ©a sao Tá»­ Vi trong lÃ¡ sá»‘ vÃ  cÃ¡ch Ä‘á»c theo cung.",
+          },
+          {
+            slug: "cung-phu-mau-trong-tu-vi",
+            cluster: "12 cung",
+            priority: 88,
+            focusKeyword: "cung Phá»¥ Máº«u",
+            intent:
+              "NgÆ°á»i Ä‘á»c muá»‘n hiá»ƒu duyÃªn vá»›i cha máº¹, ná»n gia Ä‘Ã¬nh vÃ  sá»± há»— trá»£ trÆ°á»Ÿng bá»‘i.",
+          },
+        ],
+      },
+      existingSlugs: ["cung-phu-mau-trong-tu-vi"],
+      searchConsole: {
+        status: "unavailable",
+        dateRange: {
+          startDate: "2026-07-09",
+          endDate: "2026-08-05",
+        },
+        warnings: ["OAuth refresh failed: Token has been expired or revoked."],
+      },
+    });
+
+    expect(plan.nextAction.type).toBe("blocked");
+    expect(plan.nextAction.slugs).toEqual([]);
+    expect(plan.nextAction.allowedToCommitDeployAfterVerification).toBe(false);
+    expect(plan.nextAction.reason).toContain("overlapping reader intents");
+    expect(plan.nextAction.reason).toContain("Search Console");
+    expect(plan.weeklyContentPlan.articles).toEqual([]);
+  });
+
+  it("does not refresh existing SEO topics without Search Console evidence", () => {
+    const rows = parseSemrushKeywordCsv(
+      [
+        "keyword,intent,volume,kd_percent,cpc_usd",
+        "táº¡o lÃ¡ sá»‘ tá»­ vi,I,8100,44,0.01",
+        "láº­p lÃ¡ sá»‘ tá»­ vi,I,8100,44,0.01",
+      ].join("\n"),
+    );
+    const plan = planSeoAutopilotRun({
+      snapshot: {
+        status: "ok",
+        sitemapUrlCount: 221,
+        knowledgeArticleCount: 75,
+        knowledgeArticleSlugs: [],
+        warnings: [],
+        opportunities: [],
+      },
+      existingSlugs: [
+        "tao-la-so-tu-vi",
+        "lap-la-so-tu-vi-chuan",
+        "la-so-tu-vi-online",
+        "sao-tu-vi-trong-tu-vi",
+        "sao-thien-co-trong-tu-vi",
+        "sao-thai-duong",
+        "menh-vo-chinh-dieu",
+        "cung-phu-mau-trong-tu-vi",
+        "tieu-van-la-gi",
+        "lap-la-so-tu-vi-can-gi",
+        "sao-vu-khuc-trong-tu-vi",
+        "sao-thai-am-trong-tu-vi",
+        "sao-thien-dong",
+        "sao-liem-trinh-trong-tu-vi",
+        "sao-thien-phu-trong-tu-vi",
+        "sao-cu-mon-trong-tu-vi",
+        "sao-thien-tuong-trong-tu-vi",
+        "sao-thien-luong-trong-tu-vi",
+      ],
+      keywordRows: rows,
+      searchConsole: {
+        status: "unavailable",
+        warnings: ["OAuth refresh failed: Token has been expired or revoked."],
+      },
+    });
+
+    expect(plan.nextAction.type).toBe("blocked");
+    expect(plan.nextAction.reason).toContain("Search Console");
+    expect(plan.weeklyContentPlan.articles).toEqual([]);
   });
 
   it("can plan a single publisher task to avoid repeated batch work", () => {

@@ -9,6 +9,26 @@ function findPalace(palaces: Palace[], name: string) {
 }
 
 describe("tu vi chart reference fixtures", () => {
+  it("declares the golden-fixture coverage needed to guard the chart engine", () => {
+    const coveredHours = new Set(CHART_FIXTURES.map((fixture) => fixture.coverage?.hourBranch));
+    const coveredGenders = new Set(CHART_FIXTURES.map((fixture) => fixture.coverage?.gender));
+    const coveredStates = new Set(CHART_FIXTURES.flatMap((fixture) => fixture.coverage?.starStates || []));
+    const knownProvenance = new Set(["pdf", "reference-image", "web-cross-check", "engine-regression"]);
+
+    expect([...coveredHours]).toEqual(expect.arrayContaining(["Tý", "Dần", "Ngọ", "Hợi"]));
+    expect([...coveredGenders]).toEqual(expect.arrayContaining(["male", "female"]));
+    expect(CHART_FIXTURES.some((fixture) => fixture.coverage?.hasTuan)).toBe(true);
+    expect(CHART_FIXTURES.some((fixture) => fixture.coverage?.hasTriet)).toBe(true);
+    expect([...coveredStates]).toEqual(expect.arrayContaining(["M", "V", "Đ", "B", "H"]));
+
+    for (const fixture of CHART_FIXTURES) {
+      expect(fixture.source.trim().length).toBeGreaterThan(20);
+      expect(knownProvenance.has(fixture.provenance)).toBe(true);
+      expect(fixture.expected.canChi.hour.endsWith(fixture.coverage.hourBranch)).toBe(true);
+      expect(fixture.input.gender).toBe(fixture.coverage.gender);
+    }
+  });
+
   for (const fixture of CHART_FIXTURES) {
     it(`matches ${fixture.id}`, () => {
       const chart = generateTuViChart(fixture.input);
