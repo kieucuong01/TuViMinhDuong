@@ -3,10 +3,11 @@
 import Link from "next/link";
 import { useEffect } from "react";
 
-export type FateView = "la-so" | "tai-loc" | "luan-cung" | "dai-van" | "tieu-van" | "nguyet-van" | "nhat-van";
+export type FateView = "la-so" | "nam-2026" | "tai-loc" | "luan-cung" | "dai-van" | "tieu-van" | "nguyet-van" | "nhat-van";
 
 const tabs: { key: FateView; label: string }[] = [
   { key: "la-so", label: "Lá số" },
+  { key: "nam-2026", label: "Vận năm 2026" },
   { key: "tai-loc", label: "Tài lộc" },
   { key: "luan-cung", label: "Luận cung" },
   { key: "dai-van", label: "Đại vận" },

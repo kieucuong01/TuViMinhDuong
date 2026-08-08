@@ -13,6 +13,7 @@ import { FateTabs, type FateView } from "@/components/fate-tabs";
 import { DailyFateView, MajorFateView, MinorFateView, MonthlyFateView } from "@/components/fate-views";
 import { PalaceFateView } from "@/components/palace-fate-view";
 import { WealthFortuneView } from "@/components/wealth-fortune-view";
+import { YearlyFortune2026View } from "@/components/yearly-fortune-2026-view";
 import { PremiumReadingCta } from "@/components/premium-reading-cta";
 import { DeferredChartActionPanel } from "@/components/deferred-chart-action-panel";
 import { ChartRetentionPanel } from "@/components/chart-retention-panel";
@@ -151,10 +152,10 @@ export default async function ChartPage({
   );
   const canUsePaidFateViews = paidFeaturesVisible && canReadFullOverview;
   const visibleViews: FateView[] = canUsePaidFateViews
-    ? ["la-so", "tai-loc", "luan-cung", "dai-van", "tieu-van", "nguyet-van", "nhat-van"]
-    : ["la-so", "tai-loc"];
+    ? ["la-so", "nam-2026", "tai-loc", "luan-cung", "dai-van", "tieu-van", "nguyet-van", "nhat-van"]
+    : ["la-so", "nam-2026", "tai-loc"];
   const activeView: FateView = visibleViews.includes(query.view as FateView) ? (query.view as FateView) : "la-so";
-  const isScopedReadingView = ["tai-loc", "luan-cung", "dai-van", "tieu-van", "nguyet-van", "nhat-van"].includes(activeView);
+  const isScopedReadingView = ["nam-2026", "tai-loc", "luan-cung", "dai-van", "tieu-van", "nguyet-van", "nhat-van"].includes(activeView);
 
   const [featurePrices, selectedReadingCandidate, viewerFullReading, coinBalance] = await Promise.all([
     paidFeaturesVisible ? getFeaturePrices() : Promise.resolve(null),
@@ -202,6 +203,7 @@ export default async function ChartPage({
         {activeView === "tieu-van" && featurePrices ? <MinorFateView chartId={id} chart={record.chart} user={user} activeReadingId={query.reading} featurePrices={featurePrices} /> : null}
         {activeView === "nguyet-van" && featurePrices ? <MonthlyFateView chartId={id} chart={record.chart} user={user} activeReadingId={query.reading} featurePrices={featurePrices} /> : null}
         {activeView === "nhat-van" && featurePrices ? <DailyFateView chartId={id} chart={record.chart} user={user} activeReadingId={query.reading} featurePrices={featurePrices} /> : null}
+        {activeView === "nam-2026" ? <YearlyFortune2026View chartId={id} chart={record.chart} /> : null}
         {activeView === "tai-loc" ? <WealthFortuneView chartId={id} chart={record.chart} /> : null}
         {isScopedReadingView ? null : (
         <>
