@@ -237,7 +237,7 @@ const THEME_STRATEGIES: Record<CompatibilityNarrativeThemeKey, ThemeNarrativeStr
     openings: {
       shared: [
         { family: "work-momentum", value: ({ first, second }) => `Khi cùng làm việc, ${first.name} và ${second.name} có khả năng bắt nhịp mục tiêu khá nhanh và nhận ra phần việc người kia làm tốt.` },
-        { family: "work-standard", value: ({ first, second }) => `${first.name} và ${second.name} có một vùng tiêu chuẩn chung; đây là nền tốt để phối hợp nếu quyền quyết định cũng rõ như trách nhiệm.` },
+        { family: "work-standard", value: ({ first, second }) => `Giữa ${first.name} và ${second.name} đã có một chuẩn phối hợp khá gần nhau; đây là nền tốt để làm việc chung nếu quyền quyết định cũng rõ như trách nhiệm.` },
       ],
       complementary: [
         { family: "work-handoff", value: ({ first, second }) => `Qua một lần bàn giao, ${first.name} đem tới khả năng ${first.contribution}; ${second.name} nối tiếp bằng việc ${second.contribution}. Cặp vai này có giá trị khi điểm chuyển việc được nói rõ.` },

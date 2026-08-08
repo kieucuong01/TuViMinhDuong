@@ -30,8 +30,7 @@ describe("tu vi chart reference fixtures", () => {
   });
 
   it("does not overstate external PDF/web validation coverage", () => {
-    expect(chartFixtureExternalValidationGaps()).toEqual(["Tý", "Ngọ", "Hợi"]);
-    expect(chartFixtureExternalValidationGaps()).not.toContain("Dần");
+    expect(chartFixtureExternalValidationGaps()).toEqual([]);
   });
 
   for (const fixture of CHART_FIXTURES) {
