@@ -37,6 +37,7 @@ function category(value?: string | null) {
 
 function clientLandingClass(pathname: string): FunnelLandingClass {
   if (pathname === "/") return "home";
+  if (pathname === "/xem-tu-vi-2026") return "annual_tool";
   if (pathname === "/tu-vi-tai-loc-dau-tu") return "wealth_tool";
   if (pathname === "/tuong-hop-la-so") return "compatibility_tool";
   if (pathname === "/xem-ngay" || pathname.startsWith("/xem-ngay/")) return "date_tool";
@@ -55,6 +56,7 @@ function clientTool(value?: string | null, pathname = ""): FunnelTool {
   if (normalized.includes("lam-an")) return "age_business";
   if (normalized.includes("cuoi-hoi")) return "age_marriage";
   if (normalized.includes("mua-xe")) return "age_vehicle";
+  if (normalized.includes("xem-tu-vi-2026") || normalized === "annual_2026" || pathname === "/xem-tu-vi-2026") return "annual_2026";
   if (normalized.includes("tai-loc") || normalized === "wealth" || pathname === "/tu-vi-tai-loc-dau-tu") return "wealth";
   if (normalized.includes("tuong-hop") || normalized === "compatibility" || pathname === "/tuong-hop-la-so") return "compatibility";
   if (normalized.includes("xem-ngay") || normalized === "date_finder" || pathname.startsWith("/xem-ngay")) return "date_finder";

@@ -39,7 +39,7 @@ const baseNav = [
 
 const tuViLinks = [
   { href: "/xem-tu-vi-tron-doi", label: "Xem Tử vi trọn đời", description: "Lập lá số, đọc tổng quan và mở bản FULL 9 chương.", icon: "spark" },
-  { label: "Xem Tử vi 2026", description: "Sẽ làm sau.", icon: "calendar" },
+  { href: "/xem-tu-vi-2026", label: "Xem Tử vi 2026", description: "Luận vận năm Bính Ngọ theo ngày giờ sinh và lá số cá nhân.", icon: "calendar" },
   { href: "/tu-vi-tai-loc-dau-tu", label: "Tử vi tài lộc & Đầu tư", description: "Chấm Tài - Quan - Di và biểu đồ 5 năm tới.", icon: "trend" },
   { href: "/tuong-hop-la-so", label: "Tương hợp 2 lá số", description: "So hai lá số, đọc giao tiếp, tình cảm và đời sống chung.", icon: "users" },
 ];

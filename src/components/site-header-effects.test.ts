@@ -36,6 +36,8 @@ describe("site header featured nav effects", () => {
     expect(headerSource).toContain("/xem-tu-vi-tron-doi");
     expect(headerSource).toContain('href: "/tu-vi-tai-loc-dau-tu"');
     expect(headerSource).toContain("Xem Tử vi 2026");
+    expect(headerSource).toContain('href: "/xem-tu-vi-2026"');
+    expect(headerSource).not.toContain("Sẽ làm sau.");
     expect(headerSource).toContain("Tử vi tài lộc & Đầu tư");
     expect(headerSource).toContain("Tương hợp 2 lá số");
     expect(headerSource).toContain('href: "/tuong-hop-la-so"');

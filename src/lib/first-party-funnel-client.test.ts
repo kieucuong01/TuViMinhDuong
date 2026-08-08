@@ -12,6 +12,11 @@ describe("first-party funnel client", () => {
       sourceSlug: "tu-vi-tai-loc-dau-tu",
     })).toEqual({ source: "ai", landingClass: "wealth_tool", tool: "wealth" });
 
+    expect(classifyClientFunnelContext({
+      pathname: "/xem-tu-vi-2026",
+      sourceSlug: "xem-tu-vi-2026",
+    })).toEqual({ source: "direct", landingClass: "annual_tool", tool: "annual_2026" });
+
     expect(JSON.stringify(classifyClientFunnelContext({
       pathname: "/xem-tuoi/vo-chong",
       search: "?utm_medium=cpc&utm_term=private-query",

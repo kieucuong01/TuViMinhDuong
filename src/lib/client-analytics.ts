@@ -22,7 +22,11 @@ export type OrganicToolEventName =
   | "wealth_submit"
   | "wealth_result"
   | "wealth_evidence_click"
-  | "wealth_next_step";
+  | "wealth_next_step"
+  | "annual_2026_tool_view"
+  | "annual_2026_submit"
+  | "annual_2026_result"
+  | "annual_2026_related_tool_click";
 
 export type AnalyticsParamValue = string | number | boolean | undefined;
 
@@ -32,7 +36,7 @@ type OrganicToolEvent = {
 };
 
 type OrganicDataset = Partial<Record<
-  "organicSubmit" | "organicPlacement" | "organicClick" | "organicTargetPalace",
+  "organicSubmit" | "organicPlacement" | "organicClick" | "organicTargetPalace" | "organicTarget",
   string
 >>;
 
@@ -57,9 +61,14 @@ const ALLOWED_PARAM_KEYS: Record<OrganicToolEventName, ReadonlySet<string>> = {
   wealth_result: new Set(["entry_state"]),
   wealth_evidence_click: new Set(["target_palace"]),
   wealth_next_step: new Set(["next_step", "target_palace"]),
+  annual_2026_tool_view: new Set(),
+  annual_2026_submit: new Set(["placement"]),
+  annual_2026_result: new Set(["entry_state"]),
+  annual_2026_related_tool_click: new Set(["target"]),
 };
 
 const WEALTH_PLACEMENTS = new Set(["wealth_landing_form"]);
+const ANNUAL_2026_PLACEMENTS = new Set(["annual_2026_landing_form"]);
 const WEALTH_PALACES = new Set(["tai_bach", "quan_loc", "thien_di"]);
 
 declare global {
@@ -86,6 +95,10 @@ function safeParams(name: OrganicToolEventName, params: Record<string, Analytics
 }
 
 export function organicToolRouteEvent(pathname: string, searchParams: Pick<URLSearchParams, "get">): OrganicToolEvent | null {
+  if (pathname === "/xem-tu-vi-2026") {
+    return { name: "annual_2026_tool_view", params: {} };
+  }
+
   if (pathname === "/tu-vi-tai-loc-dau-tu") {
     return { name: "wealth_tool_view", params: {} };
   }
@@ -97,10 +110,20 @@ export function organicToolRouteEvent(pathname: string, searchParams: Pick<URLSe
     };
   }
 
+  if (/^\/la-so\/[^/]+$/.test(pathname) && searchParams.get("view") === "nam-2026") {
+    return {
+      name: "annual_2026_result",
+      params: { entry_state: searchParams.get("created") === "1" ? "created" : "return" },
+    };
+  }
+
   return null;
 }
 
 export function organicToolSubmitEvent(dataset: OrganicDataset): OrganicToolEvent | null {
+  if (dataset.organicSubmit === "annual_2026_submit" && dataset.organicPlacement && ANNUAL_2026_PLACEMENTS.has(dataset.organicPlacement)) {
+    return { name: "annual_2026_submit", params: { placement: dataset.organicPlacement } };
+  }
   if (dataset.organicSubmit !== "wealth_submit" || !dataset.organicPlacement || !WEALTH_PLACEMENTS.has(dataset.organicPlacement)) {
     return null;
   }
@@ -108,6 +131,10 @@ export function organicToolSubmitEvent(dataset: OrganicDataset): OrganicToolEven
 }
 
 export function organicToolClickEvents(dataset: OrganicDataset): OrganicToolEvent[] {
+  if (dataset.organicClick === "annual_2026_related_tool_click" && dataset.organicTarget) {
+    const target = dataset.organicTarget.replace(/^\//, "").replace(/[^a-z0-9]+/gi, "_").replace(/^_+|_+$/g, "").toLowerCase();
+    if (target) return [{ name: "annual_2026_related_tool_click", params: { target } }];
+  }
   if (dataset.organicClick !== "wealth_evidence_click" || !dataset.organicTargetPalace || !WEALTH_PALACES.has(dataset.organicTargetPalace)) {
     return [];
   }

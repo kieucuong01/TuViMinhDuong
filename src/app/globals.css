@@ -404,6 +404,362 @@
   .annual-related-section a:hover { transform: none; }
 }
 
+/* Xem Tử vi 2026 landing */
+.annual-2026-landing {
+  color: #292524;
+  background:
+    radial-gradient(circle at 12% 6%, rgb(251 191 36 / 12%), transparent 26rem),
+    linear-gradient(180deg, #fffaf3 0%, #fff 38rem);
+}
+
+.annual-2026-shell {
+  width: min(100% - 2rem, 74rem);
+  margin-inline: auto;
+  padding-block: 1.1rem 4rem;
+}
+
+.annual-2026-breadcrumb {
+  display: flex;
+  min-height: 2.75rem;
+  align-items: center;
+  gap: 0.55rem;
+  color: #78716c;
+  font-size: 0.9rem;
+}
+
+.annual-2026-breadcrumb a { color: #9a3412; font-weight: 700; }
+
+.annual-2026-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.08fr) minmax(22rem, 0.92fr);
+  align-items: center;
+  gap: clamp(1.5rem, 4vw, 3.5rem);
+  padding-block: clamp(1.5rem, 5vw, 4rem);
+}
+
+.annual-2026-kicker {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #9a3412;
+  font-size: 0.88rem;
+  font-weight: 800;
+  letter-spacing: 0.025em;
+}
+
+.annual-2026-intro h1 {
+  max-width: 14ch;
+  margin-top: 0.8rem;
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(2.5rem, 6vw, 4.6rem);
+  line-height: 1.02;
+  letter-spacing: -0.045em;
+}
+
+.annual-2026-answer {
+  max-width: 66ch;
+  margin-top: 1.2rem;
+  color: #44403c;
+  font-size: clamp(1.03rem, 2vw, 1.17rem);
+  line-height: 1.75;
+}
+
+.annual-2026-trust {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  margin-top: 1.25rem;
+}
+
+.annual-2026-trust span {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.55rem 0.8rem;
+  border: 1px solid #fed7aa;
+  border-radius: 999px;
+  color: #7c2d12;
+  background: rgb(255 247 237 / 82%);
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+
+.annual-2026-form-card {
+  padding: clamp(1.1rem, 3vw, 1.6rem);
+  border: 1px solid #e8d8c2;
+  border-radius: 1.65rem;
+  background: rgb(255 255 255 / 92%);
+  box-shadow: 0 22px 60px rgb(120 53 15 / 12%);
+}
+
+.annual-2026-form-heading {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.annual-2026-form-heading > span {
+  display: inline-flex;
+  width: 3rem;
+  height: 3rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 1rem;
+  color: #fff;
+  background: linear-gradient(145deg, #c2410c, #ea580c);
+}
+
+.annual-2026-form-heading p { color: #9a3412; font-size: 0.78rem; font-weight: 800; text-transform: uppercase; }
+.annual-2026-form-heading h2 { margin-top: 0.15rem; font-size: 1.25rem; }
+
+.annual-2026-alert {
+  margin-bottom: 0.9rem;
+  padding: 0.8rem;
+  border: 1px solid #fdba74;
+  border-radius: 0.9rem;
+  color: #9a3412;
+  background: #fff7ed;
+  line-height: 1.55;
+}
+
+.annual-2026-form-card .chart-form {
+  gap: 0.9rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.annual-2026-form-card .chart-form input,
+.annual-2026-form-card .chart-form select {
+  min-height: 3rem;
+  font-size: 1rem;
+}
+
+.annual-2026-form-card .chart-form .btn-primary { min-height: 3.25rem; }
+
+.annual-2026-section {
+  margin-top: 1.5rem;
+  padding: clamp(1.35rem, 4vw, 2.5rem);
+  border: 1px solid #eadfd3;
+  border-radius: 1.5rem;
+  background: rgb(255 255 255 / 94%);
+}
+
+.annual-2026-section-heading > p {
+  color: #9a3412;
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0.055em;
+  text-transform: uppercase;
+}
+
+.annual-2026-section-heading h2 {
+  max-width: 28ch;
+  margin-top: 0.35rem;
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(1.65rem, 4vw, 2.55rem);
+  line-height: 1.15;
+}
+
+.annual-2026-section-heading > span {
+  display: block;
+  max-width: 72ch;
+  margin-top: 0.7rem;
+  color: #57534e;
+  line-height: 1.7;
+}
+
+.annual-2026-scope-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.annual-2026-scope-grid article {
+  padding: 1rem;
+  border-radius: 1rem;
+  background: #fffaf3;
+}
+
+.annual-2026-scope-grid article > span {
+  display: inline-flex;
+  width: 2.5rem;
+  height: 2.5rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.8rem;
+  color: #9a3412;
+  background: #ffedd5;
+}
+
+.annual-2026-scope-grid h3 { margin-top: 0.7rem; font-size: 1rem; }
+.annual-2026-scope-grid p { margin-top: 0.4rem; color: #57534e; font-size: 0.92rem; line-height: 1.55; }
+
+.annual-2026-method > ol {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.8rem;
+  margin-top: 1.4rem;
+}
+
+.annual-2026-method li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.7rem;
+  padding: 1rem;
+  border: 1px solid #f1e5d8;
+  border-radius: 1rem;
+}
+
+.annual-2026-method li > span {
+  display: inline-flex;
+  width: 2rem;
+  height: 2rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  color: #fff;
+  background: #c2410c;
+  font-weight: 800;
+}
+
+.annual-2026-method h3 { font-size: 1rem; }
+.annual-2026-method li p { margin-top: 0.35rem; color: #57534e; line-height: 1.6; }
+
+.annual-2026-text-link {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: 0.9rem;
+  color: #9a3412;
+  font-weight: 750;
+}
+
+.annual-2026-table-wrap { overflow-x: auto; margin-top: 1.25rem; }
+.annual-2026-table-wrap table { width: 100%; min-width: 42rem; border-collapse: collapse; }
+.annual-2026-table-wrap th,
+.annual-2026-table-wrap td { padding: 0.9rem; border-bottom: 1px solid #e7e5e4; text-align: left; vertical-align: top; line-height: 1.55; }
+.annual-2026-table-wrap thead th { color: #7c2d12; background: #fff7ed; }
+.annual-2026-table-wrap tbody th { color: #292524; }
+.annual-2026-table-wrap td { color: #57534e; }
+
+.annual-2026-next > div:last-child {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.8rem;
+  margin-top: 1.25rem;
+}
+
+.annual-2026-next a {
+  display: grid;
+  min-height: 6rem;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.25rem 0.75rem;
+  padding: 1rem;
+  border: 1px solid #eadfd3;
+  border-radius: 1rem;
+  color: #7c2d12;
+  transition: border-color 180ms ease, background-color 180ms ease;
+}
+
+.annual-2026-next a:hover { border-color: #fb923c; background: #fff7ed; }
+.annual-2026-next a span { color: #57534e; line-height: 1.55; }
+.annual-2026-next a svg { grid-column: 2; grid-row: 1 / 3; }
+
+.annual-2026-limits {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 1rem;
+  margin-top: 1.5rem;
+  padding: 1.35rem;
+  border: 1px solid #d6d3d1;
+  border-radius: 1.35rem;
+  color: #44403c;
+  background: #f5f5f4;
+}
+
+.annual-2026-limits h2 { font-size: 1.1rem; }
+.annual-2026-limits p { max-width: 78ch; margin-top: 0.35rem; line-height: 1.68; }
+
+.annual-2026-faq > div:last-child {
+  display: grid;
+  gap: 0.65rem;
+  margin-top: 1.25rem;
+}
+
+.annual-2026-faq details {
+  border: 1px solid #e7e5e4;
+  border-radius: 1rem;
+  background: #fff;
+}
+
+.annual-2026-faq summary {
+  display: flex;
+  min-height: 3.25rem;
+  cursor: pointer;
+  align-items: center;
+  padding: 0.85rem 1rem;
+  color: #44403c;
+  font-weight: 750;
+}
+
+.annual-2026-faq details p { padding: 0 1rem 1rem; color: #57534e; line-height: 1.7; }
+
+.annual-2026-final {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+  padding: clamp(1.4rem, 4vw, 2.4rem);
+  border-radius: 1.5rem;
+  color: #fff;
+  background: linear-gradient(135deg, #7c2d12, #c2410c 58%, #ea580c);
+}
+
+.annual-2026-final p { color: #fed7aa; font-size: 0.8rem; font-weight: 800; text-transform: uppercase; }
+.annual-2026-final h2 { margin-top: 0.3rem; font-family: var(--font-display), Georgia, serif; font-size: clamp(1.5rem, 4vw, 2.35rem); }
+.annual-2026-final span { display: block; max-width: 56ch; margin-top: 0.45rem; color: #ffedd5; line-height: 1.6; }
+.annual-2026-final .btn { flex: 0 0 auto; color: #7c2d12; background: #fff; }
+.annual-2026-updated { margin-top: 1rem; color: #78716c; text-align: center; font-size: 0.88rem; }
+
+.annual-2026-breadcrumb a:focus-visible,
+.annual-2026-text-link:focus-visible,
+.annual-2026-next a:focus-visible,
+.annual-2026-faq summary:focus-visible,
+.annual-2026-final a:focus-visible {
+  outline: 3px solid rgb(234 88 12 / 35%);
+  outline-offset: 3px;
+}
+
+@media (max-width: 980px) {
+  .annual-2026-hero { grid-template-columns: 1fr; }
+  .annual-2026-intro h1 { max-width: 18ch; }
+  .annual-2026-scope-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .annual-2026-method > ol { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 640px) {
+  .annual-2026-shell { width: min(100% - 1rem, 74rem); padding-top: 0.5rem; }
+  .annual-2026-hero { gap: 1.25rem; padding-top: 1rem; }
+  .annual-2026-trust { display: grid; }
+  .annual-2026-trust span { border-radius: 0.9rem; }
+  .annual-2026-form-card,
+  .annual-2026-section,
+  .annual-2026-final { border-radius: 1.1rem; }
+  .annual-2026-scope-grid,
+  .annual-2026-method > ol,
+  .annual-2026-next > div:last-child { grid-template-columns: 1fr; }
+  .annual-2026-final { align-items: stretch; flex-direction: column; }
+  .annual-2026-final .btn { width: 100%; }
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);

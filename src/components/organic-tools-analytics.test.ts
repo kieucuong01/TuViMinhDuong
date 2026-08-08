@@ -54,13 +54,15 @@ describe("organic tool analytics", () => {
     expect(analyticsCalls).not.toContain("firstGender:");
     expect(analyticsCalls).not.toContain("secondGender:");
   });
-  it("mounts one delegated reporter and marks only the wealth form", () => {
+  it("mounts one delegated reporter and marks the focused chart forms", () => {
     expect(analyticsRouteGateSource).toContain("<OrganicToolEventReporter />");
     expect(eventReporterSource).toContain('document.addEventListener("submit"');
     expect(eventReporterSource).toContain('document.addEventListener("click"');
     expect(eventReporterSource).not.toMatch(/FormData|fullName|birth|gender|email|phone|href/);
-    expect(chartFormSource).toContain('data-organic-submit={experience === "wealth" ? "wealth_submit" : undefined}');
-    expect(chartFormSource).toContain('data-organic-placement={experience === "wealth" ? "wealth_landing_form" : undefined}');
+    expect(chartFormSource).toContain("data-organic-submit={organicSubmitEvent}");
+    expect(chartFormSource).toContain("data-organic-placement={organicPlacement}");
+    expect(chartFormSource).toContain('"annual_2026_submit"');
+    expect(chartFormSource).toContain('"annual_2026_landing_form"');
   });
 });
 
@@ -132,6 +134,26 @@ describe("trackOrganicToolEvent", () => {
     });
     expect(JSON.stringify(organicToolRouteEvent("/la-so/private-chart-id", new URLSearchParams("view=tai-loc"))))
       .not.toContain("private-chart-id");
+  });
+
+  it("maps annual routes and submissions without exposing birth data", async () => {
+    const { organicToolClickEvents, organicToolRouteEvent, organicToolSubmitEvent } = await import("@/lib/client-analytics");
+
+    expect(organicToolRouteEvent("/xem-tu-vi-2026", new URLSearchParams())).toEqual({
+      name: "annual_2026_tool_view",
+      params: {},
+    });
+    expect(organicToolRouteEvent("/la-so/private-chart-id", new URLSearchParams("view=nam-2026&created=1"))).toEqual({
+      name: "annual_2026_result",
+      params: { entry_state: "created" },
+    });
+    expect(organicToolSubmitEvent({ organicSubmit: "annual_2026_submit", organicPlacement: "annual_2026_landing_form" })).toEqual({
+      name: "annual_2026_submit",
+      params: { placement: "annual_2026_landing_form" },
+    });
+    expect(organicToolClickEvents({ organicClick: "annual_2026_related_tool_click", organicTarget: "/xem-ngay" })).toEqual([
+      { name: "annual_2026_related_tool_click", params: { target: "xem_ngay" } },
+    ]);
   });
 
   it("maps only developer-authored wealth markers to submit and evidence events", async () => {
