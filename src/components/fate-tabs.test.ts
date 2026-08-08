@@ -25,11 +25,14 @@ describe("fate tabs", () => {
     expect(chartPageSource).toContain('<FateTabs chartId={id} active={activeView} visibleViews={visibleViews} />');
   });
 
-  it("keeps the wealth report visible without granting access to paid fate views", () => {
+  it("keeps the annual and wealth reports visible without granting access to paid fate views", () => {
+    expect(fateTabsSource).toContain('"nam-2026"');
+    expect(fateTabsSource).toContain('label: "Vận năm 2026"');
     expect(fateTabsSource).toContain('"tai-loc"');
     expect(fateTabsSource).toContain('label: "Tài lộc"');
     expect(fateTabsSource).toContain("visibleViews.includes(tab.key)");
-    expect(chartPageSource).toContain('["la-so", "tai-loc"]');
+    expect(chartPageSource).toContain('["la-so", "nam-2026", "tai-loc"]');
+    expect(chartPageSource).toContain('activeView === "nam-2026"');
     expect(chartPageSource).toContain('activeView === "tai-loc"');
   });
 

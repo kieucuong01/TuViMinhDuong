@@ -29,10 +29,10 @@ describe("lifetime Tu vi landing page", () => {
     expect(pageSource).not.toContain("<ChartForm");
   });
 
-  it("does not expose placeholder future Tu vi tools as crawlable routes from this hub", () => {
+  it("keeps launched Tu vi tools crawlable and removes placeholder copy from the hub", () => {
     expect(pageSource).not.toContain("Các mục còn lại đã đặt trong tab Tử vi");
     expect(pageSource).not.toContain("Làm sau");
-    expect(sitemapSource).not.toContain("/xem-tu-vi-2026");
+    expect(sitemapSource).toContain("/xem-tu-vi-2026");
     expect(sitemapSource).toContain("/tuong-hop-la-so");
   });
   it("keeps pagination client-side with filter controls and a thumbnail on every card", () => {
