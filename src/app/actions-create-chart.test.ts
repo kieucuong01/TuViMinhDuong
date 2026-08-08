@@ -28,6 +28,15 @@ describe("createChartAction timeout guard", () => {
     expect(actionsSource).not.toContain('safeNextPath(formData.get("chartExperience")');
   });
 
+  it("forces annual submissions to 2026 and returns them to the dedicated result", () => {
+    expect(actionsSource).toContain('type ChartExperience = "default" | "wealth" | "annual-2026"');
+    expect(actionsSource).toContain('value === "annual-2026"');
+    expect(actionsSource).toContain('input.viewYear = 2026');
+    expect(actionsSource).toContain('error: "/xem-tu-vi-2026#lap-la-so-2026"');
+    expect(actionsSource).toContain('`/la-so/${chartId}?view=nam-2026`');
+    expect(actionsSource).toContain('experience === "annual-2026" ? "annual_2026"');
+  });
+
   it("starts free LLM generation before redirecting to the chart page", () => {
     expect(actionsSource).toContain('import { after } from "next/server"');
     expect(actionsSource).toContain("generateAndStoreFreeOverview");

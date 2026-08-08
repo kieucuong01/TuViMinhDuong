@@ -17,7 +17,7 @@ type ChartFormProps = {
   sourceSlug?: string;
   entryArticle?: string;
   ctaLocation?: string;
-  experience?: "default" | "wealth";
+  experience?: "default" | "wealth" | "annual-2026";
   submitLabel?: string;
   defaultViewYear?: number;
 };
@@ -36,6 +36,12 @@ export function ChartForm({
   const currentYear = now.getFullYear();
   const birthYears = descendingYears(1900, currentYear);
   const viewYears = descendingYears(1900, 2100);
+  const organicSubmitEvent = experience === "wealth"
+    ? "wealth_submit"
+    : experience === "annual-2026" ? "annual_2026_submit" : undefined;
+  const organicPlacement = experience === "wealth"
+    ? "wealth_landing_form"
+    : experience === "annual-2026" ? "annual_2026_landing_form" : undefined;
 
   return (
     <form
@@ -44,13 +50,14 @@ export function ChartForm({
       data-testid="chart-form"
       data-ad-event="create_chart_submit"
       data-ad-placement={adSource}
-      data-organic-submit={experience === "wealth" ? "wealth_submit" : undefined}
-      data-organic-placement={experience === "wealth" ? "wealth_landing_form" : undefined}
+      data-organic-submit={organicSubmitEvent}
+      data-organic-placement={organicPlacement}
       data-loading-message="Đang lập lá số..."
       data-loading-label="Đang lập lá số..."
     >
       <input type="hidden" name="adSource" value={adSource} />
       <input type="hidden" name="chartExperience" value={experience} />
+      {experience === "annual-2026" ? <input type="hidden" name="viewYear" value="2026" /> : null}
       <ChartAttributionFields sourceSlug={sourceSlug} entryArticle={entryArticle} ctaLocation={ctaLocation} />
       <div className="form-grid">
         <label className="chart-name-field md:col-span-2">
@@ -127,14 +134,16 @@ export function ChartForm({
           </select>
         </label>
 
-        <label>
-          <span>Năm xem</span>
-          <select name="viewYear" defaultValue={defaultViewYear} required data-testid="chart-view-year">
-            {viewYears.map((year) => (
-              <option key={year} value={year}>Năm xem {year}</option>
-            ))}
-          </select>
-        </label>
+        {experience === "annual-2026" ? null : (
+          <label>
+            <span>Năm xem</span>
+            <select name="viewYear" defaultValue={defaultViewYear} required data-testid="chart-view-year">
+              {viewYears.map((year) => (
+                <option key={year} value={year}>Năm xem {year}</option>
+              ))}
+            </select>
+          </label>
+        )}
       </div>
 
       <LoadingSubmitButton className="btn btn-primary btn-large w-full" loadingText="Đang lập lá số...">

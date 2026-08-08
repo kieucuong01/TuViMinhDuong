@@ -14,7 +14,7 @@ describe("chart form compact picker UI", () => {
     expect(chartFormSource).not.toMatch(/<input[^>]+name="day"/);
     expect(chartFormSource).not.toMatch(/<input[^>]+name="month"/);
     expect(chartFormSource).not.toMatch(/<input[^>]+name="year"/);
-    expect(chartFormSource).not.toMatch(/<input[^>]+name="viewYear"/);
+    expect(chartFormSource).toContain('experience === "annual-2026"');
   });
 
   it("keeps birth years bounded while letting the viewed year stay broad", () => {
@@ -53,6 +53,13 @@ describe("chart form compact picker UI", () => {
     expect(chartFormSource).toContain("submitLabel");
     expect(chartFormSource).toContain("defaultViewYear");
     expect(chartFormSource).not.toContain("redirectUrl");
+  });
+
+  it("locks the annual 2026 experience to the intended year and tracking vocabulary", () => {
+    expect(chartFormSource).toContain('"annual-2026"');
+    expect(chartFormSource).toContain('<input type="hidden" name="viewYear" value="2026" />');
+    expect(chartFormSource).toContain('experience === "annual-2026" ? "annual_2026_submit"');
+    expect(chartFormSource).toContain('experience === "annual-2026" ? "annual_2026_landing_form"');
   });
 
   it("styles the hero form as a compact choice surface", () => {

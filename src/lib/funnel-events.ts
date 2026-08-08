@@ -25,6 +25,7 @@ export type FunnelLandingClass =
   | "date_tool"
   | "age_tool"
   | "wealth_tool"
+  | "annual_tool"
   | "compatibility_tool"
   | "chart_result"
   | "pricing"
@@ -39,6 +40,7 @@ export type FunnelTool =
   | "age_marriage"
   | "age_vehicle"
   | "wealth"
+  | "annual_2026"
   | "compatibility"
   | "full_reading"
   | "coin_topup"
@@ -76,8 +78,8 @@ export type ClientFunnelEvent = {
 
 const CLIENT_EVENT_NAMES = new Set<ClientFunnelEvent["name"]>(["landing", "tool_view", "submit", "result", "save_intent"]);
 const SOURCES = new Set<FunnelSource>(["ads", "organic_search", "ai", "internal", "referral", "direct", "unknown"]);
-const LANDING_CLASSES = new Set<FunnelLandingClass>(["home", "knowledge", "date_tool", "age_tool", "wealth_tool", "compatibility_tool", "chart_result", "pricing", "other"]);
-const TOOLS = new Set<FunnelTool>(["chart", "date_finder", "age_compatibility", "age_child", "age_house", "age_business", "age_marriage", "age_vehicle", "wealth", "compatibility", "full_reading", "coin_topup", "knowledge", "other"]);
+const LANDING_CLASSES = new Set<FunnelLandingClass>(["home", "knowledge", "date_tool", "age_tool", "wealth_tool", "annual_tool", "compatibility_tool", "chart_result", "pricing", "other"]);
+const TOOLS = new Set<FunnelTool>(["chart", "date_finder", "age_compatibility", "age_child", "age_house", "age_business", "age_marriage", "age_vehicle", "wealth", "annual_2026", "compatibility", "full_reading", "coin_topup", "knowledge", "other"]);
 const CLIENT_KEYS = new Set(["name", "eventId", "anonymousSessionId", "source", "landingClass", "tool", "placement", "resultBand"]);
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab0-9][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const CATEGORY_PATTERN = /^[a-z0-9][a-z0-9_-]{0,63}$/;
@@ -132,6 +134,7 @@ export function funnelLandingClass(rawPath?: string | null): FunnelLandingClass 
   if (/^https?:\/\//i.test(value) || value.startsWith("//")) return "other";
   const pathname = value.split(/[?#]/, 1)[0] || "/";
   if (pathname === "/") return "home";
+  if (pathname === "/xem-tu-vi-2026") return "annual_tool";
   if (pathname === "/tu-vi-tai-loc-dau-tu") return "wealth_tool";
   if (pathname === "/tuong-hop-la-so") return "compatibility_tool";
   if (pathname === "/xem-ngay" || pathname.startsWith("/xem-ngay/")) return "date_tool";
@@ -153,6 +156,7 @@ export function funnelTool(raw?: string | null): FunnelTool {
   if (["xem-tuoi-cuoi-hoi", "cuoi-hoi"].includes(value)) return "age_marriage";
   if (["xem-tuoi-mua-xe", "mua-xe"].includes(value)) return "age_vehicle";
   if (["wealth", "tu-vi-tai-loc-dau-tu"].includes(value)) return "wealth";
+  if (["annual_2026", "xem-tu-vi-2026"].includes(value)) return "annual_2026";
   if (["compatibility", "tuong-hop-la-so"].includes(value)) return "compatibility";
   if (["full_reading", "full", "direct_full", "quick_reading"].includes(value)) return "full_reading";
   if (["coin_topup", "nap-xu"].includes(value)) return "coin_topup";

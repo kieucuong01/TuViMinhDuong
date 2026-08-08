@@ -125,11 +125,20 @@ export async function logoutAction() {
   redirect("/");
 }
 
-function safeChartExperience(value: FormDataEntryValue | null): "default" | "wealth" {
-  return value === "wealth" ? "wealth" : "default";
+type ChartExperience = "default" | "wealth" | "annual-2026";
+
+function safeChartExperience(value: FormDataEntryValue | null): ChartExperience {
+  if (value === "wealth" || value === "annual-2026") return value;
+  return "default";
 }
 
-function chartCreationPaths(experience: "default" | "wealth", chartId?: string) {
+function chartCreationPaths(experience: ChartExperience, chartId?: string) {
+  if (experience === "annual-2026") {
+    return {
+      error: "/xem-tu-vi-2026#lap-la-so-2026",
+      success: chartId ? `/la-so/${chartId}?view=nam-2026` : "/xem-tu-vi-2026",
+    };
+  }
   if (experience === "wealth") {
     return {
       error: "/tu-vi-tai-loc-dau-tu#lap-la-so-tai-loc",
@@ -223,6 +232,7 @@ export async function createChartAction(formData: FormData) {
   const input = parseChartActionInput(formData);
   const adSource = safeAdSource(formData.get("adSource"));
   const experience = safeChartExperience(formData.get("chartExperience"));
+  if (experience === "annual-2026") input.viewYear = 2026;
   const paths = chartCreationPaths(experience);
   let result: { user: SessionUser | null; chart: Awaited<ReturnType<typeof saveChart>>; metadata: ChartCreationMetadata };
 
@@ -257,7 +267,8 @@ export async function createChartAction(formData: FormData) {
     void generateAndStoreFreeOverview(result.chart.id).catch((error) => {
       console.error("free_overview_early_generation_failed", error);
     });
-    void recordChartResultFunnelEvent(result.chart.id, result.user?.id, result.metadata, experience === "wealth" ? "wealth" : "chart");
+    const resultBand = experience === "wealth" ? "wealth" : experience === "annual-2026" ? "annual_2026" : "chart";
+    void recordChartResultFunnelEvent(result.chart.id, result.user?.id, result.metadata, resultBand);
   });
   redirect(withQueryParams(chartCreationPaths(experience, result.chart.id).success, { created: "1", adSource }));
 }

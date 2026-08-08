@@ -46,12 +46,14 @@ describe("first-party funnel privacy contract", () => {
   });
 
   it("normalizes routes and tools into a small reporting vocabulary", () => {
+    expect(funnelLandingClass("/xem-tu-vi-2026?source=menu")).toBe("annual_tool");
     expect(funnelLandingClass("/tu-vi-tai-loc-dau-tu?utm_source=google")).toBe("wealth_tool");
     expect(funnelLandingClass("/xem-tuoi/vo-chong")).toBe("age_tool");
     expect(funnelLandingClass("/kien-thuc-tu-vi/dai-van-la-gi")).toBe("knowledge");
     expect(funnelLandingClass("https://evil.example/private")).toBe("other");
     expect(funnelTool("xem-tuoi-vo-chong")).toBe("age_compatibility");
     expect(funnelTool("tu-vi-tai-loc-dau-tu")).toBe("wealth");
+    expect(funnelTool("xem-tu-vi-2026")).toBe("annual_2026");
     expect(funnelTool("unknown-free-text")).toBe("other");
   });
 
