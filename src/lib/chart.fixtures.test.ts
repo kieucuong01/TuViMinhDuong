@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { CHART_FIXTURES } from "@/lib/chart.fixtures";
+import { CHART_FIXTURES, chartFixtureExternalValidationGaps } from "@/lib/chart.fixtures";
 import { generateTuViChart, type Palace } from "@/lib/chart";
 
 function findPalace(palaces: Palace[], name: string) {
@@ -27,6 +27,11 @@ describe("tu vi chart reference fixtures", () => {
       expect(fixture.expected.canChi.hour.endsWith(fixture.coverage.hourBranch)).toBe(true);
       expect(fixture.input.gender).toBe(fixture.coverage.gender);
     }
+  });
+
+  it("does not overstate external PDF/web validation coverage", () => {
+    expect(chartFixtureExternalValidationGaps()).toEqual(["Tý", "Ngọ", "Hợi"]);
+    expect(chartFixtureExternalValidationGaps()).not.toContain("Dần");
   });
 
   for (const fixture of CHART_FIXTURES) {

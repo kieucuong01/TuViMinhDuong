@@ -4,6 +4,9 @@ type FixturePalaceStars = Record<string, string[]>;
 type FixturePalaceStates = Record<string, Record<string, string>>;
 type FixtureProvenance = "pdf" | "reference-image" | "web-cross-check" | "engine-regression";
 
+export const REQUIRED_GOLDEN_FIXTURE_HOURS = ["Tý", "Dần", "Ngọ", "Hợi"] as const;
+export const EXTERNAL_FIXTURE_PROVENANCE = ["pdf", "reference-image", "web-cross-check"] as const;
+
 export type ChartFixture = {
   id: string;
   source: string;
@@ -568,3 +571,13 @@ export const CHART_FIXTURES: ChartFixture[] = [
     },
   },
 ];
+
+export function chartFixtureExternalValidationGaps(fixtures: ChartFixture[] = CHART_FIXTURES) {
+  const externallyValidatedHours = new Set(
+    fixtures
+      .filter((fixture) => (EXTERNAL_FIXTURE_PROVENANCE as readonly string[]).includes(fixture.provenance))
+      .map((fixture) => fixture.coverage.hourBranch),
+  );
+
+  return REQUIRED_GOLDEN_FIXTURE_HOURS.filter((hourBranch) => !externallyValidatedHours.has(hourBranch));
+}
