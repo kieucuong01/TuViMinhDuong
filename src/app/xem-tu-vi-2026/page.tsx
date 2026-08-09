@@ -100,6 +100,14 @@ export default async function AnnualFortune2026Page({ searchParams }: { searchPa
             <p className="annual-2026-kicker"><CalendarDays size={18} aria-hidden="true" /> Vận năm Bính Ngọ · Cá nhân hóa theo lá số</p>
             <h1 id="annual-2026-title">Xem tử vi 2026 theo ngày giờ sinh</h1>
             <p className="annual-2026-answer" data-answer-block="true">Tử vi năm 2026 nên được đọc từ lá số riêng, không chỉ từ con giáp. Công cụ đối chiếu ngày–giờ sinh, giới tính, Mệnh–Thân, đại vận, các cung và sao lưu năm Bính Ngọ để luận công việc, tài chính, tình cảm, sức khỏe, quan hệ cùng nhịp 12 tháng dễ áp dụng.</p>
+            <div className="annual-2026-hero-actions">
+              <a href="#lap-la-so-2026" className="btn btn-primary btn-large" data-hero-primary-cta="annual-2026-form">
+                <Sparkles size={19} aria-hidden="true" /> Xem tử vi 2026 của tôi
+              </a>
+              <Link href="/phuong-phap-luan" className="annual-2026-hero-secondary">
+                Xem cách luận <ArrowRight size={17} aria-hidden="true" />
+              </Link>
+            </div>
             <div className="annual-2026-trust" aria-label="Ba điểm chính của công cụ">
               <span><ShieldCheck size={18} aria-hidden="true" /> Không phán sự kiện chắc chắn</span>
               <span><Compass size={18} aria-hidden="true" /> Có căn cứ cung sao đi kèm</span>
@@ -121,6 +129,7 @@ export default async function AnnualFortune2026Page({ searchParams }: { searchPa
               ctaLocation="annual_2026_hero_form"
               submitLabel="Xem tử vi năm 2026 của tôi"
               defaultViewYear={2026}
+              compact={true}
             />
           </aside>
         </section>

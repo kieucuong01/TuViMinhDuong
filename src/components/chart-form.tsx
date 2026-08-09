@@ -60,11 +60,22 @@ export function ChartForm({
       {experience === "annual-2026" ? <input type="hidden" name="viewYear" value="2026" /> : null}
       <ChartAttributionFields sourceSlug={sourceSlug} entryArticle={entryArticle} ctaLocation={ctaLocation} />
       <div className="form-grid">
-        <label className="chart-name-field md:col-span-2">
+        <label className="chart-name-field md:col-span-2" htmlFor="chart-full-name">
           <span className="chart-field-label">Họ và tên</span>
           <span className="chart-name-control">
-            <input name="fullName" placeholder="Họ và tên" required data-testid="chart-full-name" />
+            <input
+              id="chart-full-name"
+              name="fullName"
+              placeholder="Họ và tên"
+              required
+              autoComplete="name"
+              aria-describedby="chart-name-helper"
+              data-testid="chart-full-name"
+            />
           </span>
+          <small id="chart-name-helper" className="chart-field-helper">
+            Có thể dùng tên ngắn hoặc biệt danh nếu bạn muốn giữ riêng tư.
+          </small>
         </label>
 
         <fieldset className="birth-date-group chart-birth-field md:col-span-2">
