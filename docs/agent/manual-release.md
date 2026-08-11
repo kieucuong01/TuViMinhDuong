@@ -24,7 +24,7 @@ Lệnh thứ hai tự thực hiện:
 7. Tạo release sạch từ checkout nguồn, copy `.env*`, chạy `npm ci`, seed và build.
 8. Chuyển `/opt/lasotinhhoa/current`, khởi động lại PM2 `lasotinhhoa`.
 9. Tự rollback nếu app mới không vượt qua health check nội bộ.
-10. Dọn release cũ, chỉ giữ release đang chạy + 1 release cũ để rollback.
+10. Dọn release cũ, chỉ giữ release đang chạy; không giữ rollback release.
 11. Smoke các URL production quan trọng.
 
 Nếu release có migration Prisma đã được review và commit:

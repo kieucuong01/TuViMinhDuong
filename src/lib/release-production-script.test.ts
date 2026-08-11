@@ -35,10 +35,10 @@ describe("production release command", () => {
     expect(releaseScript).toContain("https://lasotinhhoa.vn/kien-thuc-tu-vi");
   });
 
-  it("keeps only the active VPS release plus one previous rollback release", () => {
-    expect(releaseScript).toContain("RELEASES_TO_KEEP=2");
+  it("keeps only the active VPS release with no rollback release", () => {
+    expect(releaseScript).toContain("RELEASES_TO_KEEP=1");
     expect(releaseScript).toContain(
-      "Keep the active release plus one previous complete release for rollback",
+      "Keep only the active release; no rollback release is retained",
     );
     expect(releaseScript).toContain("cleanup_old_releases");
   });
