@@ -65,6 +65,8 @@ function chartFormErrorMessage(chartError?: string) {
   if (chartError === "timeout") return "Hệ thống đang lập lá số chậm hơn bình thường. Bạn chờ ít phút rồi thử lại nhé.";
   if (chartError === "failed") return "Lượt này chưa lập được lá số. Bạn kiểm tra lại ngày giờ sinh rồi thử lại nhé.";
   if (chartError === "invalid") return "Tên trên lá số có ký tự chưa phù hợp. Bạn nhập tên ngắn gọn rồi thử lại nhé.";
+  if (chartError === "invalid_date") return "Ngày sinh chưa hợp lệ. Bạn kiểm tra lại ngày, tháng, năm và loại lịch rồi thử lại nhé.";
+  if (chartError === "invalid_input") return "Thông tin lập lá số chưa hợp lệ. Bạn chọn lại ngày giờ sinh rồi thử lại nhé.";
   if (chartError === "rate_limited") return "Bạn đã lập nhiều lá số trong vài phút. Vui lòng nghỉ một chút rồi quay lại nhé.";
   return "";
 }

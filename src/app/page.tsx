@@ -33,6 +33,12 @@ function chartFormErrorMessage(chartError?: string) {
   if (chartError === "invalid") {
     return "Tên trên lá số chứa ký tự không phù hợp. Bạn nhập tên thật hoặc tên gọi ngắn gọn rồi thử lại nhé.";
   }
+  if (chartError === "invalid_date") {
+    return "Ngày sinh chưa hợp lệ. Bạn kiểm tra lại ngày, tháng, năm và loại lịch rồi thử lại nhé.";
+  }
+  if (chartError === "invalid_input") {
+    return "Thông tin lập lá số chưa hợp lệ. Bạn chọn lại ngày giờ sinh rồi thử lại nhé.";
+  }
   if (chartError === "rate_limited") {
     return "Thiết bị này đã lập quá nhiều lá số trong vài phút. Bạn chờ một lúc rồi thử lại nhé.";
   }

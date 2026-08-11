@@ -18,7 +18,7 @@ import { createPerfTimer, logPerfEvent } from "@/lib/perf";
 import { ActionTimeoutError, withActionTimeout } from "@/lib/action-timeout";
 import type { Prisma } from "@/generated/prisma/client";
 import { savePseoPageFromForm } from "@/lib/pseo-data";
-import { chartCreationRateLimitExceeded, chartCreationRateLimitWindowStart, normalizeRequestIp, normalizeUserAgent, validateChartFullName } from "@/lib/chart-submission-guard";
+import { chartCreationRateLimitExceeded, chartCreationRateLimitWindowStart, normalizeRequestIp, normalizeUserAgent, validateChartFullName, validateChartSubmissionInput } from "@/lib/chart-submission-guard";
 import { normalizeChartAttribution } from "@/lib/chart-attribution";
 import { AUTH_RATE_LIMIT_WINDOW_MS, LOGIN_RATE_LIMIT, checkAuthRateLimit } from "@/lib/rate-limit";
 import { parseChartActionInput, parseFeaturePriceUpdates, parseOperationSettingsInput, parseReadingBundleInput, parseReadingRequestInput, safeNextPath } from "@/lib/action-input";
@@ -47,7 +47,7 @@ const readingUnlockDependencies = {
 };
 
 class ChartSubmissionRejectedError extends Error {
-  constructor(public code: "invalid" | "rate_limited") {
+  constructor(public code: "invalid" | "invalid_date" | "invalid_input" | "rate_limited") {
     super(code);
     this.name = "ChartSubmissionRejectedError";
   }
@@ -214,6 +214,9 @@ async function guardChartSubmission(input: ReturnType<typeof parseChartActionInp
   const validation = validateChartFullName(input.fullName);
   if (!validation.ok) throw new ChartSubmissionRejectedError("invalid");
   input.fullName = validation.fullName;
+
+  const inputValidation = validateChartSubmissionInput(input);
+  if (!inputValidation.ok) throw new ChartSubmissionRejectedError(inputValidation.reason);
 
   const metadata = await getChartCreationMetadata(formData, adSource);
   const recentCount = await countRecentChartsForIp(metadata.requestIp, chartCreationRateLimitWindowStart());
