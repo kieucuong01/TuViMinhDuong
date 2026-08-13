@@ -11,6 +11,22 @@ test.describe("read-only public journeys", () => {
     );
   });
 
+  test("mobile chart name field stays focusable and keyboard-safe", async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 667 });
+    await page.goto("/");
+    const nameInput = page.getByTestId("chart-full-name");
+
+    await nameInput.tap();
+    await expect(nameInput).toBeFocused();
+    await page.keyboard.insertText("An");
+    await expect(nameInput).toHaveValue("An");
+
+    await expect.poll(async () => Number.parseFloat(await nameInput.evaluate((input) => window.getComputedStyle(input).fontSize)))
+      .toBeGreaterThanOrEqual(16);
+    await expect.poll(async () => nameInput.evaluate((input) => input.getBoundingClientRect().height))
+      .toBeGreaterThanOrEqual(44);
+  });
+
   test("date tool explains the task and responds to local controls", async ({ page }) => {
     await page.goto("/xem-ngay");
     await expect(page.getByRole("heading", { level: 1, name: "Xem ngày tốt theo tuổi cho từng việc" })).toBeVisible();

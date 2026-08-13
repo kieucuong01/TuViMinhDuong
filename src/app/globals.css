@@ -13372,9 +13372,9 @@ button.is-loading:not(.icon-button)::before {
 
   .hero-form-card .chart-form input,
   .hero-form-card .chart-form select {
-    min-height: 2.65rem;
+    min-height: 3rem;
     padding-block: 0.4rem;
-    font-size: 0.98rem;
+    font-size: 1rem;
   }
 
   .hero-form-card .birth-date-grid label > span {
@@ -13547,13 +13547,13 @@ button.is-loading:not(.icon-button)::before {
     .hero-form-card .chart-name-control input,
     .hero-form-card .chart-name-control input:hover,
     .hero-form-card .chart-name-control input:focus {
-      min-height: 2.1rem;
+      min-height: 2.75rem;
     }
 
     .hero-form-card .chart-form input,
     .hero-form-card .chart-form select {
-      min-height: 2.5rem;
-      font-size: 0.95rem;
+      min-height: 2.75rem;
+      font-size: 1rem;
     }
 
     .hero-form-card .birth-date-grid {
@@ -13562,7 +13562,7 @@ button.is-loading:not(.icon-button)::before {
 
     .hero-form-card .birth-date-grid input,
     .hero-form-card .birth-date-grid select {
-      min-height: 2.55rem;
+      min-height: 2.75rem;
     }
 
     .hero-form-card .chart-form .btn-primary {
