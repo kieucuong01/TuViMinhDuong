@@ -5,6 +5,31 @@ import { LEGACY_ARTICLE_REDIRECTS } from "@/lib/legacy-article-redirects";
 
 const expectedRedirects = [
   {
+    source: "/sao-chinh-tinh-tu-vi",
+    destination: "/kien-thuc-tu-vi/sao-chinh-tinh-tu-vi",
+    permanent: true,
+  },
+  {
+    source: "/sao-cu-mon-trong-tu-vi",
+    destination: "/kien-thuc-tu-vi/sao-cu-mon-trong-tu-vi",
+    permanent: true,
+  },
+  {
+    source: "/sao-liem-trinh-trong-tu-vi",
+    destination: "/kien-thuc-tu-vi/sao-liem-trinh-trong-tu-vi",
+    permanent: true,
+  },
+  {
+    source: "/sao-pha-quan-trong-tu-vi",
+    destination: "/kien-thuc-tu-vi/sao-pha-quan-trong-tu-vi",
+    permanent: true,
+  },
+  {
+    source: "/sao-tham-lang-trong-tu-vi",
+    destination: "/kien-thuc-tu-vi/sao-tham-lang-trong-tu-vi",
+    permanent: true,
+  },
+  {
     source: "/kien-thuc-tu-vi/cach-luan-giai-la-so-tu-vi",
     destination: "/kien-thuc-tu-vi/luan-giai-la-so-tu-vi",
     permanent: true,
@@ -47,9 +72,9 @@ const expectedRedirects = [
 ] as const;
 
 describe("legacy article redirects", () => {
-  it("contains the eight reviewed permanent mappings", () => {
+  it("preserves reviewed legacy and crawler-discovered article paths", () => {
     expect(LEGACY_ARTICLE_REDIRECTS).toEqual(expectedRedirects);
-    expect(new Set(LEGACY_ARTICLE_REDIRECTS.map((item) => item.source)).size).toBe(8);
+    expect(new Set(LEGACY_ARTICLE_REDIRECTS.map((item) => item.source)).size).toBe(13);
     expect(
       LEGACY_ARTICLE_REDIRECTS.every((item) => item.source !== item.destination),
     ).toBe(true);
