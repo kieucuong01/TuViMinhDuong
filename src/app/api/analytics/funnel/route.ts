@@ -7,10 +7,19 @@ const FUNNEL_RATE_LIMIT = 60;
 const FUNNEL_RATE_WINDOW_MS = 60 * 1000;
 const MAX_BODY_BYTES = 2 * 1024;
 
+function requestOriginCandidates(request: Request, requestUrl: URL) {
+  const forwardedHost = request.headers.get("x-forwarded-host") || request.headers.get("host");
+  const forwardedProto = request.headers.get("x-forwarded-proto") || requestUrl.protocol.replace(":", "") || "https";
+  return new Set([
+    requestUrl.origin,
+    forwardedHost ? `${forwardedProto}://${forwardedHost}` : "",
+  ].filter(Boolean));
+}
+
 export async function POST(request: Request) {
   const url = new URL(request.url);
   const origin = request.headers.get("origin");
-  if (origin && origin !== url.origin) {
+  if (origin && !requestOriginCandidates(request, url).has(origin)) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 

@@ -76,6 +76,24 @@ describe("POST /api/analytics/funnel", () => {
     expect(mocks.recordFunnelEventBestEffort).not.toHaveBeenCalled();
   });
 
+  it("accepts same public origin when Next.js sees the internal proxy URL", async () => {
+    const proxied = new Request("http://127.0.0.1:4100/api/analytics/funnel", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        origin: "https://lasotinhhoa.vn",
+        "x-forwarded-host": "lasotinhhoa.vn",
+        "x-forwarded-proto": "https",
+      },
+      body: JSON.stringify(body),
+    });
+
+    const response = await POST(proxied);
+
+    expect(response.status).toBe(202);
+    expect(mocks.recordFunnelEventBestEffort).toHaveBeenCalled();
+  });
+
   it("rejects explicit cross-origin requests", async () => {
     const response = await POST(request(body, { origin: "https://evil.example" }));
 
