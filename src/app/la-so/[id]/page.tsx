@@ -23,6 +23,7 @@ import { ReadingHashScrollRestorer } from "@/components/reading-detail-cta";
 import { MarkdownContent } from "@/components/markdown-content";
 import { buildFreeOverviewTeaser, countVisibleMarkdownWords } from "@/lib/free-overview-presentation";
 import { PersonalizedReportOutline } from "@/components/personalized-report-outline";
+import { AiDiscoverySurvey } from "@/components/ai-discovery-survey";
 import { buildPersonalizedReportOutline } from "@/lib/chart-evidence";
 import { listAssistantQuestions } from "@/lib/chart-assistant-store";
 import type { AssistantAccess } from "@/components/assistant-widget";
@@ -130,7 +131,7 @@ export default async function ChartPage({
   searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ reading?: string; view?: string; checkout?: string; status?: string }>;
+  searchParams: Promise<{ created?: string; reading?: string; view?: string; checkout?: string; status?: string }>;
 }) {
   const { id } = await params;
   const query = await searchParams;
@@ -213,6 +214,7 @@ export default async function ChartPage({
         {paymentNotice ? <p className="chart-checkout-notice" role="status">{paymentNotice}</p> : null}
 
         <ChartReadingGuide chartId={id} chart={record.chart} canUsePaidFateViews={canUsePaidFateViews} />
+        {query.created === "1" ? <div className="mt-5"><AiDiscoverySurvey chartId={id} /></div> : null}
 
         <div id="chart-palaces">
           <MobileChartReader chart={record.chart} />

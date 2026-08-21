@@ -30,6 +30,7 @@
     "seo:autopilot:cluster": "node scripts/seo/seo-autopilot-execute.mjs --cluster --articles 5 --summary-json",
     "seo:lighthouse": "npx @lhci/cli@0.15.x autorun --config=./lighthouserc.cjs",
     "seo:autopilot:snapshot": "node scripts/seo/seo-autopilot-snapshot.mjs --json",
+    "ai:report": "node --experimental-strip-types scripts/seo/ai-search-report.ts",
     "traffic:autopilot": "node scripts/traffic/traffic-autopilot.mjs",
     "smoke:google-ads": "node scripts/smoke-google-ads.mjs",
     "smoke:payos": "node scripts/smoke-payos-checkout.mjs",

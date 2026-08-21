@@ -122,6 +122,7 @@ model Chart {
   readings            Reading[]
   assistantQuestions  AssistantQuestion[]
   funnelEvents        FunnelEvent[]
+  aiDiscoveryResponse AiDiscoveryResponse?
 
   @@index([userId, createdAt])
   @@index([creationIp, createdAt])
@@ -323,6 +324,19 @@ model FunnelEvent {
   @@index([tool, createdAt])
   @@index([userId, createdAt])
   @@index([chartId, createdAt])
+}
+
+model AiDiscoveryResponse {
+  id         String   @id @default(cuid())
+  chartId    String   @unique
+  source     String
+  aiPlatform String?
+  prompt     String?  @db.VarChar(500)
+  createdAt  DateTime @default(now())
+  chart      Chart    @relation(fields: [chartId], references: [id], onDelete: Cascade)
+
+  @@index([source, createdAt])
+  @@index([aiPlatform, createdAt])
 }
 
 model ArticleCategory {

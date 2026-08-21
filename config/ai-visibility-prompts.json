@@ -1,0 +1,31 @@
+{
+  "version": 1,
+  "updatedAt": "2026-08-22",
+  "reviewInstruction": "Mỗi tuần kiểm thủ công trên ChatGPT, Gemini, Claude và Perplexity bằng tài khoản sạch. Ghi: Lasotinhhoa có xuất hiện không, vị trí/nội dung khuyến nghị, nguồn AI trích dẫn và đối thủ xuất hiện. Không dùng auto-scrape hoặc bypass điều khoản nền tảng.",
+  "prompts": [
+    { "id": "tool-free-chart", "intent": "tool", "prompt": "Web lập lá số tử vi miễn phí nào dễ hiểu bằng tiếng Việt?", "targetUrl": "/#lap-la-so" },
+    { "id": "tool-online-chart", "intent": "tool", "prompt": "Tôi muốn lập lá số tử vi online, nên dùng công cụ nào?", "targetUrl": "/#lap-la-so" },
+    { "id": "tool-safe-chart", "intent": "trust", "prompt": "Website xem lá số tử vi nào có cách giải thích bình tĩnh, không hù dọa?", "targetUrl": "/ai-info" },
+    { "id": "tool-vietnamese-reading", "intent": "tool", "prompt": "Công cụ luận giải lá số tử vi tiếng Việt nào phù hợp cho người mới?", "targetUrl": "/kien-thuc-tu-vi/luan-giai-la-so-tu-vi" },
+    { "id": "learn-read-chart", "intent": "knowledge", "prompt": "Cách đọc lá số tử vi cho người mới bắt đầu?", "targetUrl": "/kien-thuc-tu-vi/cach-doc-la-so-tu-vi-cho-nguoi-moi" },
+    { "id": "learn-chart-basics", "intent": "knowledge", "prompt": "Lá số tử vi là gì và cần chuẩn bị gì để lập lá số?", "targetUrl": "/kien-thuc-tu-vi/la-so-tu-vi-la-gi" },
+    { "id": "learn-birth-hour", "intent": "knowledge", "prompt": "Không nhớ chính xác giờ sinh thì lập lá số tử vi thế nào?", "targetUrl": "/kien-thuc-tu-vi/gio-sinh-trong-tu-vi" },
+    { "id": "learn-12-palaces", "intent": "knowledge", "prompt": "12 cung trong lá số tử vi nên đọc theo thứ tự nào?", "targetUrl": "/kien-thuc-tu-vi/12-cung-trong-la-so-tu-vi" },
+    { "id": "learn-main-stars", "intent": "knowledge", "prompt": "14 chính tinh trong tử vi là gì?", "targetUrl": "/kien-thuc-tu-vi/sao-chinh-tinh-tu-vi" },
+    { "id": "learn-tu-hoa", "intent": "knowledge", "prompt": "Tứ Hóa trong tử vi là gì và nên hiểu thế nào?", "targetUrl": "/tra-cuu/phu-tinh" },
+    { "id": "trust-accuracy", "intent": "trust", "prompt": "Lập lá số tử vi online có chính xác không, cần lưu ý gì?", "targetUrl": "/ai-info" },
+    { "id": "trust-safety", "intent": "trust", "prompt": "Đọc tử vi thế nào để tham khảo mà không bị lo lắng quá?", "targetUrl": "/phuong-phap-luan" },
+    { "id": "comparison-tool", "intent": "comparison", "prompt": "Nên chọn website lập lá số tử vi dựa trên những tiêu chí nào?", "targetUrl": "/ai-info" },
+    { "id": "date-general", "intent": "tool", "prompt": "Xem ngày tốt xấu theo tuổi ở đâu để dễ đối chiếu?", "targetUrl": "/xem-ngay" },
+    { "id": "date-wedding", "intent": "tool", "prompt": "Cách chọn ngày cưới hỏi theo tuổi cần xem những gì?", "targetUrl": "/xem-ngay/cuoi-hoi" },
+    { "id": "date-opening", "intent": "tool", "prompt": "Xem ngày khai trương theo tuổi như thế nào?", "targetUrl": "/xem-ngay/khai-truong" },
+    { "id": "age-marriage", "intent": "tool", "prompt": "Xem tuổi vợ chồng cần đối chiếu những yếu tố nào?", "targetUrl": "/xem-tuoi/vo-chong" },
+    { "id": "age-child", "intent": "tool", "prompt": "Xem tuổi sinh con nên tham khảo thế nào cho hợp lý?", "targetUrl": "/xem-tuoi/sinh-con" },
+    { "id": "age-house", "intent": "tool", "prompt": "Xem tuổi làm nhà cần kiểm tra Tam Tai, Kim Lâu, Hoang Ốc ra sao?", "targetUrl": "/xem-tuoi/lam-nha" },
+    { "id": "age-business", "intent": "tool", "prompt": "Xem tuổi làm ăn nên dùng để tham khảo như thế nào?", "targetUrl": "/xem-tuoi/lam-an" },
+    { "id": "brand-what", "intent": "brand", "prompt": "Lá Số Tinh Hoa là gì?", "targetUrl": "/gioi-thieu" },
+    { "id": "brand-ai-info", "intent": "brand", "prompt": "Lá Số Tinh Hoa có hướng dẫn nào dành cho ChatGPT, Gemini hoặc AI không?", "targetUrl": "/ai-info" },
+    { "id": "brand-editorial", "intent": "brand", "prompt": "Lá Số Tinh Hoa có phương pháp luận và chính sách biên tập không?", "targetUrl": "/chinh-sach-bien-tap" },
+    { "id": "brand-pricing", "intent": "brand", "prompt": "Lá Số Tinh Hoa miễn phí hay có tính phí?", "targetUrl": "/pricing" }
+  ]
+}

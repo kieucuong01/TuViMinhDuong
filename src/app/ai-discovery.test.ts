@@ -30,7 +30,7 @@ describe("AI discovery", () => {
   });
 
   it("publishes lightweight AI visibility pages with extractable answers", () => {
-    for (const path of ["gioi-thieu", "phuong-phap-luan", "tac-gia", "chinh-sach-bien-tap"]) {
+    for (const path of ["gioi-thieu", "phuong-phap-luan", "tac-gia", "chinh-sach-bien-tap", "ai-info"]) {
       const source = pageSource(path);
       const answer = source.match(/data-answer-block="true">([^<]+)</)?.[1] || "";
 
@@ -60,7 +60,9 @@ describe("AI discovery", () => {
   it("advertises editorial and machine-readable agent resources", () => {
     const source = readFileSync("public/llms.txt", "utf8");
 
+    expect(source).toContain("lập lá số tử vi miễn phí");
     for (const route of [
+      "/ai-info",
       "/gioi-thieu",
       "/phuong-phap-luan",
       "/tac-gia",
@@ -87,7 +89,7 @@ describe("AI discovery", () => {
   });
 
   it("includes AI visibility pages in the sitemap source", () => {
-    for (const path of ["/gioi-thieu", "/phuong-phap-luan", "/tac-gia", "/chinh-sach-bien-tap"]) {
+    for (const path of ["/ai-info", "/gioi-thieu", "/phuong-phap-luan", "/tac-gia", "/chinh-sach-bien-tap"]) {
       expect(sitemapSource).toContain(path);
     }
 
