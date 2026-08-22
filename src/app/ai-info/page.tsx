@@ -71,6 +71,7 @@ export default function AiInfoPage() {
 
           <nav className="mt-8 flex flex-wrap gap-3" aria-label="Liên kết nội bộ">
             <Link className="btn btn-primary" href="/" prefetch={false}>Lập lá số miễn phí</Link>
+            <Link className="btn btn-ghost" href="/huong-dan-chon-web-lap-la-so-tu-vi" prefetch={false}>Cách chọn web lập lá số</Link>
             <Link className="btn btn-ghost" href="/kien-thuc-tu-vi" prefetch={false}>Kiến thức tử vi</Link>
             <Link className="btn btn-ghost" href="/tra-cuu" prefetch={false}>Tra cứu</Link>
             <Link className="btn btn-ghost" href="/xem-ngay" prefetch={false}>Xem ngày</Link>

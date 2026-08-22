@@ -24,6 +24,7 @@ const LAST_MODIFIED = {
 
 const TRUST_ROUTES = [
   { path: "/ai-info", lastModified: new Date("2026-08-22T00:00:00+07:00"), changeFrequency: "monthly" as const, priority: 0.64 },
+  { path: "/huong-dan-chon-web-lap-la-so-tu-vi", lastModified: new Date("2026-08-22T00:00:00+07:00"), changeFrequency: "monthly" as const, priority: 0.66 },
   { path: "/gioi-thieu", lastModified: new Date("2026-07-21T00:00:00+07:00"), changeFrequency: "monthly" as const, priority: 0.62 },
   { path: "/phuong-phap-luan", lastModified: new Date("2026-07-29T00:00:00+07:00"), changeFrequency: "monthly" as const, priority: 0.6 },
   { path: "/tac-gia", lastModified: new Date("2026-07-29T00:00:00+07:00"), changeFrequency: "monthly" as const, priority: 0.58 },
