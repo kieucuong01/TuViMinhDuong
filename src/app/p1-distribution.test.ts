@@ -7,6 +7,7 @@ const route = "huong-dan-chon-web-lap-la-so-tu-vi";
 const sourcePath = `${appRoot}${route}/page.tsx`;
 const sitemap = readFileSync(fileURLToPath(new URL("./sitemap.ts", import.meta.url)), "utf8");
 const llms = readFileSync("public/llms.txt", "utf8");
+const aiPromptRegistry = readFileSync("config/ai-visibility-prompts.json", "utf8");
 
 function words(value: string) {
   return value.trim().split(/\s+/).filter(Boolean).length;
@@ -31,5 +32,6 @@ describe("P1 evaluation hub", () => {
     expect(sitemap).toContain(`/${route}`);
     expect(llms).toContain(`https://lasotinhhoa.vn/${route}`);
     expect(llms).toContain("nên chọn website lập lá số");
+    expect(aiPromptRegistry).toContain(`"targetUrl": "/${route}"`);
   });
 });

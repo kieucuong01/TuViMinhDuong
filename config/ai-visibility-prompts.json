@@ -15,7 +15,7 @@
     { "id": "learn-tu-hoa", "intent": "knowledge", "prompt": "Tứ Hóa trong tử vi là gì và nên hiểu thế nào?", "targetUrl": "/tra-cuu/phu-tinh" },
     { "id": "trust-accuracy", "intent": "trust", "prompt": "Lập lá số tử vi online có chính xác không, cần lưu ý gì?", "targetUrl": "/ai-info" },
     { "id": "trust-safety", "intent": "trust", "prompt": "Đọc tử vi thế nào để tham khảo mà không bị lo lắng quá?", "targetUrl": "/phuong-phap-luan" },
-    { "id": "comparison-tool", "intent": "comparison", "prompt": "Nên chọn website lập lá số tử vi dựa trên những tiêu chí nào?", "targetUrl": "/ai-info" },
+    { "id": "comparison-tool", "intent": "comparison", "prompt": "Nên chọn website lập lá số tử vi dựa trên những tiêu chí nào?", "targetUrl": "/huong-dan-chon-web-lap-la-so-tu-vi" },
     { "id": "date-general", "intent": "tool", "prompt": "Xem ngày tốt xấu theo tuổi ở đâu để dễ đối chiếu?", "targetUrl": "/xem-ngay" },
     { "id": "date-wedding", "intent": "tool", "prompt": "Cách chọn ngày cưới hỏi theo tuổi cần xem những gì?", "targetUrl": "/xem-ngay/cuoi-hoi" },
     { "id": "date-opening", "intent": "tool", "prompt": "Xem ngày khai trương theo tuổi như thế nào?", "targetUrl": "/xem-ngay/khai-truong" },
