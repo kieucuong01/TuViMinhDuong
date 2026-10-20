@@ -22,7 +22,7 @@ import {
   Users,
   TreePine,
 } from "lucide-react";
-import { UserHeaderBadge } from "@/components/user-header-badge";
+import { UserHeaderBadge, UserHeaderLoginLink } from "@/components/user-header-badge";
 import { MobileSiteMenu } from "@/components/mobile-site-menu";
 import { SiteNavShell } from "@/components/site-nav-shell";
 import { dateCountdownMenuLinks, dateTaskMenuLinks, type DateMenuIcon } from "@/lib/date-menu";
@@ -247,7 +247,7 @@ export async function SiteHeader() {
         </SiteNavShell>
 
         <div className="site-header-actions flex items-center gap-2">
-          <Suspense fallback={<div className="user-header-skeleton" aria-hidden="true"><span /></div>}>
+          <Suspense fallback={<UserHeaderLoginLink href="/dang-nhap" />}>
             <UserHeaderBadge />
           </Suspense>
         </div>

@@ -1432,16 +1432,6 @@ button.is-loading:not(.icon-button)::before {
   gap: 0.32rem;
 }
 
-.user-header-skeleton {
-  display: none;
-  width: 7rem;
-  height: 2.1rem;
-  border-radius: 999px;
-  background: linear-gradient(90deg, #fff7ed, #ffedd5, #fff7ed);
-  background-size: 200% 100%;
-  animation: loading-toast-bar 1.2s ease-in-out infinite alternate;
-}
-
 .user-coin-pill,
 .user-admin-pill,
 .user-name-pill,
@@ -13946,10 +13936,6 @@ button.is-loading:not(.icon-button)::before {
   }
 
   .user-header-badge .user-account-value {
-    display: none;
-  }
-
-  .user-header-skeleton {
     display: none;
   }
 

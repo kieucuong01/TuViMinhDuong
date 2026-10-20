@@ -70,6 +70,10 @@ export function UserHeaderBadge() {
     return loginModalHref(pathname, searchParams, returnTo);
   }, [pathname, searchParams]);
 
+  if (!loaded) {
+    return <UserHeaderLoginLink href={loginHref} />;
+  }
+
   async function handleLogout() {
     if (loggingOut) return;
     setLoggingOut(true);
@@ -96,21 +100,8 @@ export function UserHeaderBadge() {
     }
   }
 
-  if (!loaded) {
-    return (
-      <div className="user-header-skeleton" aria-hidden="true">
-        <span />
-      </div>
-    );
-  }
-
   if (!user) {
-    return (
-      <Link href={loginHref} className="login-link btn btn-small btn-ghost" aria-label="Tài khoản" title="Tài khoản" prefetch={false}>
-        <UserCircle size={16} />
-        <span>Đăng nhập</span>
-      </Link>
-    );
+    return <UserHeaderLoginLink href={loginHref} />;
   }
 
   const coinLabel = formatCoins(user.coinBalance ?? 0);
@@ -164,5 +155,14 @@ export function UserHeaderBadge() {
         </div>
       </details>
     </div>
+  );
+}
+
+export function UserHeaderLoginLink({ href }: { href: string }) {
+  return (
+    <Link href={href} className="login-link btn btn-small btn-ghost" aria-label="Tài khoản" title="Tài khoản" prefetch={false}>
+      <UserCircle size={16} />
+      <span>Đăng nhập</span>
+    </Link>
   );
 }
