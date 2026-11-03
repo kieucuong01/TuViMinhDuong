@@ -10,6 +10,7 @@ import {
   type PaidReadingChapter,
   type PaidReadingGenerationProgress,
   buildPaidActionPlanContext,
+  assembleFreeOverviewContent,
   buildInstantFreeOverview,
   generateFreeOverview,
   generateReading,
@@ -255,7 +256,7 @@ describe("AI reading format", () => {
 
     expect(FREE_OVERVIEW_MIN_WORDS).toBe(700);
     expect(FREE_OVERVIEW_MAX_WORDS).toBe(1350);
-    expect(FREE_OVERVIEW_VERSION).toBe("free-reader-first-v9");
+    expect(FREE_OVERVIEW_VERSION).toBe("free-reader-first-v10");
     expect(result.model).toBe("deepseek/deepseek-v4-flash");
     expect(result).not.toHaveProperty("prompt");
     expect(isCompleteFreeOverview(result.content)).toBe(true);
@@ -403,6 +404,24 @@ describe("AI reading format", () => {
       expect(isCompleteFreeOverviewBlock("section_1", chart, block.replace(pattern, replacement))).toBe(false);
       expect(isCompleteFreeOverview(content.replace(pattern, replacement))).toBe(false);
     }
+  });
+
+  it("budgets all accepted rewrites so their assembled report still fits", () => {
+    const chart = sampleChart();
+    const draft = buildInstantFreeOverview(chart);
+    const { blocks } = splitFreeOverviewBlocks(draft);
+    const accepted = { ...blocks };
+    for (const key of Object.keys(blocks) as Array<keyof typeof blocks>) {
+      let candidate = blocks[key];
+      while (isCompleteFreeOverviewBlock(key, chart, `${candidate}\n\nthêm`)) {
+        candidate += "\n\nthêm";
+      }
+      accepted[key] = candidate;
+      expect(isCompleteFreeOverviewBlock(key, chart, `${candidate}\n\nthêm`)).toBe(false);
+    }
+    const assembled = assembleFreeOverviewContent(draft, accepted);
+    expect(countVisibleMarkdownWords(assembled)).toBeLessThanOrEqual(FREE_OVERVIEW_MAX_WORDS);
+    expect(isCompleteFreeOverview(assembled)).toBe(true);
   });
 
   it("defines eight interpretive chapters and one consolidated action chapter", () => {

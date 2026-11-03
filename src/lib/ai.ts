@@ -10,7 +10,7 @@ export const FREE_OVERVIEW_MAX_WORDS = 1350;
 export const FREE_OVERVIEW_TEMPLATE_MIN_WORDS = FREE_OVERVIEW_MIN_WORDS;
 export const FREE_OVERVIEW_TEMPLATE_MAX_WORDS = 1350;
 export const PAID_READING_CHAPTER_MAX_TOKENS = 7000;
-export const FREE_OVERVIEW_VERSION = "free-reader-first-v9";
+export const FREE_OVERVIEW_VERSION = "free-reader-first-v10";
 export const PAID_READING_VERSION = "paid-personal-dossier-v6";
 export const PAID_FULL_WORD_TARGET = "5.000-7.000 từ";
 export const READING_PROVIDER_ORDER = ["deepseek"] as const;
@@ -851,6 +851,12 @@ export function assembleFreeOverviewContent(fallbackContent: string, llmBlocks: 
 
 export function isCompleteFreeOverviewBlock(key: FreeOverviewBlockKey, chart: TuViChart, content: string) {
   const wordCount = countVisibleMarkdownWords(content);
+  const draft = splitFreeOverviewBlocks(buildInstantFreeOverview(chart));
+  const draftWords = FREE_OVERVIEW_BLOCK_KEYS.reduce((total, item) => total + countVisibleMarkdownWords(draft.blocks[item]), 0);
+  // Reserve each block's share so individually valid rewrites also fit when assembled.
+  const blockBudget = Math.floor((FREE_OVERVIEW_MAX_WORDS - countVisibleMarkdownWords(draft.finalCta))
+    * countVisibleMarkdownWords(draft.blocks[key]) / draftWords);
+  if (wordCount > blockBudget) return false;
   if (OLD_FREE_OVERVIEW_LABELS.test(content)) return false;
   if (/[\[\]]/u.test(content)) return false;
   if (key === "intro") {
