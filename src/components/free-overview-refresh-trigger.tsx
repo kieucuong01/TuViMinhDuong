@@ -22,7 +22,7 @@ type FreeOverviewPollPayload = {
 
 export function FreeOverviewRefreshTrigger({ chartId, shouldRefresh }: { chartId: string; shouldRefresh: boolean }) {
   const router = useRouter();
-  const [statusText, setStatusText] = useState("Đang gọi AI để viết bản luận giải hay hơn...");
+  const [statusText, setStatusText] = useState("Đang bổ sung lời giải thích...");
 
   useEffect(() => {
     if (!shouldRefresh) return;
@@ -43,14 +43,14 @@ export function FreeOverviewRefreshTrigger({ chartId, shouldRefresh }: { chartId
         if (!response.ok) throw new Error("free overview block queue failed");
       } catch {
         postedBlocks.delete(blockKey);
-        if (!cancelled) setStatusText("Chưa gọi được hàng đợi AI, hệ thống đang kiểm tra lại...");
+        if (!cancelled) setStatusText("Chưa tải được phần bổ sung, đang thử lại...");
       }
     }
 
     async function pollUntilReady(attempt = 0) {
       if (cancelled) return;
       if (attempt >= 45) {
-        setStatusText("AI đang mất nhiều thời gian hơn bình thường. Bản đọc nhanh vẫn dùng được, hệ thống sẽ thử lại khi bạn tải lại trang.");
+        setStatusText("Phần bổ sung đang mất nhiều thời gian hơn bình thường. Bạn vẫn có thể đọc nội dung hiện có và quay lại sau.");
         return;
       }
 
@@ -62,7 +62,7 @@ export function FreeOverviewRefreshTrigger({ chartId, shouldRefresh }: { chartId
         const payload = await response.json().catch(() => null) as FreeOverviewPollPayload | null;
 
         if (payload?.status === "ready" && payload?.source === "llm") {
-          setStatusText("Đã có đủ bản AI, đang cập nhật nội dung...");
+          setStatusText("Đã có phần bổ sung, đang cập nhật nội dung...");
           router.refresh();
           return;
         }
@@ -73,8 +73,8 @@ export function FreeOverviewRefreshTrigger({ chartId, shouldRefresh }: { chartId
         if ((payload?.jobStatus === "failed" || payload?.jobStatus === "stale") && nextBlock) postedBlocks.delete(nextBlock);
         const label = FREE_OVERVIEW_BLOCK_LABELS[nextBlock] || "phần tiếp theo";
         setStatusText(completed > 0
-          ? `AI đã viết ${completed}/${total} phần, đang viết tiếp ${label}...`
-          : `AI đang viết ${label} trước để phần đầu hay hơn...`);
+          ? `Đã bổ sung ${completed}/${total} phần, đang cập nhật ${label}...`
+          : `Đang bổ sung lời giải thích cho ${label}...`);
 
         if (nextBlock && payload?.jobStatus !== "processing") {
           await startBlock(nextBlock);
@@ -82,7 +82,7 @@ export function FreeOverviewRefreshTrigger({ chartId, shouldRefresh }: { chartId
 
         if (completed > 0 && attempt % 2 === 1) router.refresh();
       } catch {
-        if (!cancelled) setStatusText("Đường truyền AI đang chậm. Bản đọc nhanh vẫn hiển thị bình thường...");
+        if (!cancelled) setStatusText("Kết nối đang chậm. Bạn vẫn có thể đọc nội dung phía trên.");
       }
 
       timeoutId = setTimeout(() => {

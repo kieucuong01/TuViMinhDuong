@@ -2,76 +2,96 @@
   "cung_menh": {
     "chinh_tinh": {
       "thien_co": {
-        "loi_the": "Cung Mệnh của bạn được dẫn dắt bởi Thiên Cơ, mang năng lượng chủ đạo về tư duy logic, khả năng quan sát chi tiết và hoạch định đường đi trước khi hành động. Bạn có lợi thế trong việc nhìn ra cấu trúc lõi của vấn đề, đọc dữ liệu, sắp xếp nguồn lực và tìm cách làm thông minh hơn thay vì chỉ làm nhiều hơn.",
-        "rao_can": "Rào cản của khí chất này là dễ nghĩ quá lâu trước một quyết định quan trọng. Khi mọi thứ chưa đủ chắc, bạn có thể trì hoãn, tự mở thêm nhiều giả định và bỏ lỡ thời điểm nên thử một bước nhỏ.",
-        "premium_hook": "Điểm mù nào khiến bạn càng phân tích kỹ càng khó quyết định, và đâu là cách kích hoạt sự quyết đoán mà vẫn giữ được thế mạnh Thiên Cơ?"
+        "loi_the": "Bạn có thể khó bắt tay làm khi chưa hiểu rõ việc đó sẽ đi đến đâu. Trước một quyết định, bạn thường muốn so các phương án, hỏi thêm và tìm cách ít tốn công hơn. Với Thiên Cơ ở cung Mệnh, việc nhìn ra chỗ chưa hợp lý và nghĩ cách sửa là điểm đáng chú ý; bạn có thể thấy nó khi lên kế hoạch hoặc xử lý một việc đang rối.",
+        "rao_can": "Nhưng càng nghĩ ra nhiều phương án, bạn càng dễ khó chọn. Chẳng hạn, đã tìm hiểu khá kỹ mà vẫn muốn hỏi thêm một người nữa cho chắc. Khi ấy, điều làm bạn chậm có thể là sợ chọn sai hơn là thiếu thông tin.",
+        "premium_hook": "Khi nào nên tìm hiểu thêm, khi nào nên chốt để không bỏ lỡ việc bạn thực sự muốn làm?",
+        "self_check": "Quyết định gần nhất bị trì hoãn vì bạn thiếu một thông tin cụ thể, hay vì chưa yên tâm dù đã có đủ thông tin?",
+        "practical_tip": "Chọn một việc đang phân vân. Viết đúng một điều cần biết thêm, hẹn thời điểm chốt và thử bước có thể sửa được nếu chưa hợp."
       },
       "that_sat": {
-        "loi_the": "Với Thất Sát thủ Mệnh, bạn có khí chất mạnh, thích hành động rõ ràng và chịu được áp lực tốt hơn nhiều người. Khi đã thấy mục tiêu, bạn thường không ngại đi vào việc khó, tái thiết lại trật tự cũ hoặc nhận vai trò cần bản lĩnh.",
-        "rao_can": "Mặt cần quản trị là nhịp nóng và cái tôi khi bị cản đường. Nếu phản ứng quá nhanh, bạn dễ làm người khác phòng thủ, khiến cơ hội hợp tác hoặc sự ủng hộ quan trọng bị giảm đi.",
-        "premium_hook": "Khi nào sự quyết liệt của Thất Sát trở thành lợi thế dẫn đầu, và lúc nào nó âm thầm làm bạn mất đi người đồng hành quan trọng?"
+        "loi_the": "Khi việc khó xuất hiện, bạn có thể muốn xử lý ngay thay vì đợi mọi người thống nhất hết. Thất Sát ở cung Mệnh gợi ý cách phản ứng thẳng và thích kết quả rõ ràng. Trong nhóm, bạn có thể là người nhận phần khó, nhất là lúc mọi người còn đang bàn xem ai nên bắt đầu.",
+        "rao_can": "Chỗ dễ vướng là bạn đã nghĩ xong và muốn làm, còn người bên cạnh vẫn cần thời gian hiểu. Một câu nói ngắn để đẩy việc đi nhanh có thể bị nghe thành khó chịu hoặc áp đặt. Làm được việc rồi mà quan hệ lại căng là tình huống nên để ý.",
+        "premium_hook": "Làm sao giữ cách làm quyết đoán mà vẫn khiến người cùng làm muốn hợp tác với bạn?",
+        "self_check": "Lần gần nhất bất đồng, bạn bực vì cách làm của họ chưa hợp lý hay vì họ chưa theo kịp tốc độ bạn mong muốn?",
+        "practical_tip": "Trước một yêu cầu khó, nói rõ kết quả bạn cần và hỏi người cùng làm đang vướng ở đâu. Chốt thời hạn sau khi hai bên đã hiểu việc."
       },
       "thien_phu": {
-        "loi_the": "Cung Mệnh có Thiên Phủ cho thấy bạn thiên về khả năng giữ nền, quản trị nguồn lực và tạo cảm giác tin cậy. Bạn hợp với những việc cần sự bền bỉ, kín kẽ, biết tích lũy và biết giữ lời hứa trong thời gian dài.",
-        "rao_can": "Rào cản thường nằm ở sự an toàn quá mức. Bạn có thể giữ nhiều nguồn lực trong tay nhưng chậm dùng chúng để tạo bước tiến mới, nhất là khi phải chọn giữa ổn định và mở rộng.",
-        "premium_hook": "Nguồn lực nào bạn đang giữ quá chặt, thời điểm nào nên xoay chuyển, và ngưỡng rủi ro nào thực sự hợp với khí chất Thiên Phủ?"
+        "loi_the": "Bạn có thể thường là người nhớ việc phải lo, khoản phải dành và lời hứa chưa làm xong. Thiên Phủ ở cung Mệnh gợi ý cách sống coi trọng sự ổn định và việc chăm lo đến nơi đến chốn. Khi gia đình hoặc nhóm cần người trông coi việc chung, bạn có thể được tin vì làm đều và ít bỏ dở.",
+        "rao_can": "Nhưng quen lo cho chắc cũng có thể khiến bạn ôm việc lâu hơn cần thiết. Có nguồn lực, có ý định đổi mà vẫn chần chừ vì sợ mất thứ đang ổn. Bạn nên phân biệt điều gì thật sự cần bảo vệ với điều chỉ được giữ lại vì đã quá quen.",
+        "premium_hook": "Bạn nên giữ điều gì, và có thể thử thay đổi điều gì mà không làm xáo trộn cuộc sống?",
+        "self_check": "Có việc nào bạn vẫn tự làm chỉ vì chưa yên tâm giao cho người khác, dù nó đang lấy hết thời gian của bạn?",
+        "practical_tip": "Chọn một việc lặp lại có thể giao bớt. Thống nhất kết quả cần có và một lần kiểm tra, thay vì vừa giao vừa làm lại từ đầu."
       },
       "default": {
-        "loi_the": "Cung Mệnh của bạn cho thấy một lõi tính cách có khả năng thích nghi và tự điều chỉnh theo hoàn cảnh. Điểm đáng chú ý không chỉ là sao nào đứng đầu, mà là cách Mệnh phối hợp với Thân, Cục và các cung trọng yếu để tạo thành một kiểu ra quyết định riêng.",
-        "rao_can": "Rào cản chính là dễ đọc lá số như từng mảnh rời. Nếu chỉ nhìn một sao đơn lẻ, bạn có thể bỏ qua bối cảnh thật: giai đoạn tuổi, môi trường sống và kiểu áp lực đang lặp lại.",
-        "premium_hook": "Khi ghép Mệnh - Thân - Cục, đâu là năng lực đang bị dùng sai chỗ và bước điều chỉnh nào có thể tạo khác biệt rõ nhất trong 90 ngày tới?"
+        "loi_the": "Phần này chưa có đủ mẫu diễn giải riêng cho tổ hợp sao ở cung Mệnh của bạn. Vì thế, chưa nên gán cho bạn một kiểu tính cách chỉ từ tên một sao. Cách phản ứng của bạn cần được xem cùng cung Thân, các sao đi kèm và hoàn cảnh sống thực tế.",
+        "rao_can": "Bạn có thể bắt đầu bằng một việc cụ thể: lúc cần quyết định, bạn thường tự chọn, hỏi người khác hay chờ đến sát hạn? Câu trả lời giúp bạn đối chiếu nhận định tiếp theo, nhưng bản miễn phí chưa thể xác nhận lựa chọn nào mô tả bạn đúng nhất.",
+        "premium_hook": "Khi đọc cùng cung Thân và các sao đi kèm, cách ra quyết định nào đáng chú ý hơn ở bạn?",
+        "self_check": "Khi nhận lời làm một việc, điều quan trọng hơn với bạn là thấy việc đó phù hợp hay làm người khác yên tâm?",
+        "practical_tip": "Nhìn lại một quyết định bạn thấy hài lòng và một quyết định bạn tiếc. Ghi lại điểm khác nhau trong cách bạn đã chọn, trước khi dùng lời luận giải để kết luận về bản thân."
       }
     }
   },
   "cung_tai_bach": {
     "dong_tien_chinh": {
       "dong_luong": {
-        "loi_the": "Dòng tiền của bạn có xu hướng ổn định, thiên về tích lũy và kiếm tiền chân chính dựa trên chuyên môn, uy tín cá nhân và giá trị thật. Bạn không hợp kiểu đánh cược quá lớn; cách tạo tiền bền hơn là xây năng lực, giữ chữ tín và để thành quả tăng dần theo thời gian.",
-        "rao_can": "Điểm cần chú ý là sự thận trọng có thể khiến bạn chậm nắm cơ hội mới. Khi mọi phương án đều phải thật chắc, bạn dễ bỏ qua những cơ hội nhỏ nhưng có khả năng mở đường cho nguồn thu tốt hơn.",
-        "premium_hook": "Tỷ lệ giữ tiền, xoay vốn và tái đầu tư nào giúp bạn tăng trưởng mà không phá vỡ thế bền vốn có của cách cục Đồng Lương?"
+        "loi_the": "Với Thiên Đồng và Thiên Lương ở cung Tài Bạch, cách kiếm tiền được gợi ý thiên về công việc có ích và quan hệ tin cậy lâu dài. Bạn có thể thấy dễ làm hơn khi khách hàng quay lại vì tin cách bạn làm, thay vì mỗi lần phải tìm một cơ hội hoàn toàn mới. Đây là xu hướng cần đối chiếu với nghề và nguồn thu thực tế của bạn.",
+        "rao_can": "Điều đáng xem là bạn có đang đánh đổi quá nhiều thời gian để giữ sự ổn định hay không. Một công việc quen có thể khiến bạn yên tâm, nhưng nếu thu nhập gần như không đổi còn phần việc tăng dần, sự an toàn ấy cũng có giá của nó.",
+        "premium_hook": "Nguồn thu nào đáng tiếp tục xây, và công sức nào bạn cần định giá lại?",
+        "self_check": "Trong sáu tháng qua, thu nhập tăng nhờ bạn làm thêm giờ hay nhờ cùng một giờ làm đã tạo ra kết quả tốt hơn?",
+        "practical_tip": "Liệt kê ba việc tạo thu nhập chính, thời gian bỏ ra và số tiền thực nhận. Bắt đầu từ việc có công sức tăng nhưng thu nhập không đổi để trao đổi lại phạm vi hoặc mức phí."
       },
       "tu_tham": {
-        "loi_the": "Cung Tài Bạch có tín hiệu nhạy với cơ hội thương mại, dòng tiền biến động và khả năng xoay chuyển nhanh. Bạn có thể kiếm tốt khi đọc đúng nhu cầu thị trường, biết thương lượng và dám thử mô hình mới trong phạm vi kiểm soát được.",
-        "rao_can": "Rủi ro là dễ bị cuốn vào cơ hội sáng bóng nhưng thiếu nền. Nếu không đặt giới hạn vốn, giới hạn thời gian và tiêu chí dừng, dòng tiền có thể lên nhanh nhưng cũng xuống nhanh.",
-        "premium_hook": "Hố đen tài chính nào dễ xuất hiện khi cơ hội đến quá nhanh, và giới hạn nào cần đặt trước khi bạn đầu tư, hợp tác hoặc mở rộng?"
+        "loi_the": "Với Tử Vi và Tham Lang ở cung Tài Bạch, điều đáng chú ý là cách bạn tìm cơ hội qua khách hàng, trao đổi và hợp tác. Bạn có thể nhanh nhìn ra một nhu cầu có thể bán được, hoặc nghĩ đến việc thử thêm nguồn thu khi công việc cũ đã quen. Lá số gợi ý xu hướng này, chưa chứng minh một việc kinh doanh cụ thể sẽ thành công.",
+        "rao_can": "Chỗ cần đối chiếu là cảm giác cơ hội đang đến rất nhanh: sợ chậm thì người khác làm mất, nên nhận lời trước khi tính đủ chi phí. Bận hơn và có nhiều tiền đi qua tay chưa chắc đồng nghĩa với số tiền cuối tháng còn lại nhiều hơn.",
+        "premium_hook": "Cách hợp tác nào phù hợp với bạn, và giới hạn nào cần thống nhất trước khi nhận thêm việc?",
+        "self_check": "Cơ hội gần nhất hấp dẫn vì bạn đã hiểu khách hàng và chi phí, hay vì nghe thấy người khác đang làm tốt?",
+        "practical_tip": "Trước một hợp tác mới, viết rõ phần việc, chi phí, cách chia tiền và điều kiện dừng. Đối chiếu với người cùng làm trước khi cam kết."
       },
       "default": {
-        "loi_the": "Cung Tài Bạch cho biết cách bạn tạo và giữ nguồn lực. Trong lá số này, tài chính nên được đọc cùng Quan Lộc và Phúc Đức: tiền không chỉ đến từ may mắn, mà từ năng lực tạo giá trị, uy tín và khả năng giữ nhịp ổn định.",
-        "rao_can": "Điểm cần quản trị là quyết định tiền bạc theo cảm xúc hoặc theo áp lực của người khác. Khi chưa có tiêu chí rõ, bạn nên đi chậm, kiểm tra số liệu và tránh cam kết vượt quá sức chịu đựng.",
-        "premium_hook": "Cung nào đang nâng đỡ dòng tiền, vùng nào dễ gây thất thoát và mốc nào trong năm cần kiểm tra lại kế hoạch tài chính?"
+        "loi_the": "Phần này chưa đủ dữ kiện để nói bạn hợp kinh doanh, làm công hay đầu tư. Cung Tài Bạch cần được đọc cùng công việc tạo ra tiền và các cung liên quan. Điều có thể làm trước là xem tiền thực tế đang đến từ đâu và phần nào còn giữ được sau những khoản phải lo.",
+        "rao_can": "Nếu tháng nào cũng có thu nhập mà vẫn thấy thiếu, hãy tách hai câu hỏi: kiếm chưa đủ hay đã nhận quá nhiều khoản phải chi? Đây là cách tự kiểm tra đời sống thực tế, chưa phải kết luận rằng lá số của bạn có vấn đề về tiền.",
+        "premium_hook": "Khi đối chiếu Tài Bạch với Quan Lộc, cách tạo thu nhập nào đáng xem kỹ hơn?",
+        "self_check": "Khoản chi khiến bạn tiếc gần đây là khoản cần thiết, khoản mua cho bản thân hay khoản nhận giúp người khác?",
+        "practical_tip": "Xem lại thu chi một tháng, tách khoản bắt buộc và khoản có thể điều chỉnh. Dùng số thực nhận và thực chi; không dùng dự đoán tử vi để quyết định vay hoặc đầu tư."
       }
     }
   },
   "cung_quan_loc": {
     "moi_truong": {
       "thai_am_hoa_ky": {
-        "loi_the": "Cung Quan Lộc với Thái Âm đi cùng Hóa Kỵ cho thấy bạn hợp kiểu làm việc cần chiều sâu, sự độc lập và khả năng xử lý việc phía sau hậu trường. Bạn có thể mạnh khi được tự chủ, làm chuyên môn, quản trị dữ liệu, tài chính, nội dung hoặc những việc đòi hỏi sự tinh tế.",
-        "rao_can": "Rào cản là môi trường nhiều thị phi, thủ tục cứng hoặc cảm xúc âm ỉ. Nếu ở lâu trong nơi thiếu minh bạch, bạn dễ bị hao tâm trí, mất cảm hứng và khó nói rõ giá trị thật của bạn.",
-        "premium_hook": "Ba mô hình nghề nghiệp nào giúp chiều sâu của Thái Âm trở thành lợi thế, và đâu là cách thoát khỏi vòng thị phi do Hóa Kỵ tạo ra?"
+        "loi_the": "Bạn có thể làm tốt hơn khi được yên để nghĩ và xử lý việc cho kỹ, thay vì phải phản ứng liên tục trước đám đông. Thái Âm đi cùng Hóa Kỵ ở cung Quan Lộc gợi ý nên xem kỹ sự tập trung và cách giao tiếp trong công việc. Một nhiệm vụ rõ, có thời gian chuẩn bị có thể phù hợp hơn cảnh yêu cầu đổi liên tục mà không ai nói rõ lý do.",
+        "rao_can": "Chỗ dễ mệt là bạn thấy vấn đề nhưng ngại nói, hoặc nói rồi vẫn nghĩ mãi người khác hiểu thế nào. Nếu còn phải đoán ý cấp trên hay khách hàng, phần sức dành cho công việc có thể bị lấy mất bởi những cuộc trao đổi chưa rõ ràng.",
+        "premium_hook": "Bạn cần đổi công việc, đổi cách nhận việc hay đổi cách trao đổi với người cùng làm?",
+        "self_check": "Điều làm bạn mệt gần đây là nhiệm vụ thật sự quá khó, hay việc phải đoán ý và giải thích lại nhiều lần?",
+        "practical_tip": "Với nhiệm vụ tiếp theo, xác nhận ngắn bằng văn bản: cần làm gì, ai duyệt và khi nào xong. Nếu yêu cầu đổi, hỏi việc cũ nào sẽ được lùi lại."
       },
       "thien_tuong": {
-        "loi_the": "Quan Lộc có Thiên Tướng cho thấy bạn hợp vai trò cần trách nhiệm, điều phối và đứng giữa nhiều bên để giữ trật tự. Bạn có thể phát triển trong môi trường có quy trình, có chuẩn mực và cần người biết cân bằng lợi ích.",
-        "rao_can": "Điểm cần lưu ý là dễ ôm vai người giải quyết cho tất cả. Khi quyền hạn không rõ nhưng trách nhiệm lại nhiều, bạn có thể bị kẹt giữa cấp trên, khách hàng, đội nhóm và áp lực kết quả.",
-        "premium_hook": "Vai trò nào giúp Thiên Tướng vừa có quyền hạn vừa giữ được uy tín, và dấu hiệu nào cho thấy bạn đang gánh trách nhiệm không thuộc về mình?"
+        "loi_the": "Bạn có thể thường được nhờ đứng ra sắp xếp khi nhiều người cần phối hợp. Thiên Tướng ở cung Quan Lộc gợi ý khả năng giữ công việc có đầu có cuối: nhớ ai phụ trách, ai đang chờ và việc nào cần xử lý trước. Bạn có thể thấy rõ điều này trong vai trò điều phối hoặc chăm sóc một nhóm khách hàng.",
+        "rao_can": "Nhưng người biết lo việc chung cũng dễ trở thành người phải giải quyết mọi việc phát sinh. Bạn nhận trách nhiệm, còn quyền quyết định lại nằm ở người khác; cuối cùng phải nhắc, chờ và giải thích thay. Khi ấy, làm nhiều hơn chưa chắc giải quyết được nguyên nhân khiến bạn mệt.",
+        "premium_hook": "Vai trò nào cho bạn đủ quyền quyết định, thay vì chỉ thêm phần việc phải chịu trách nhiệm?",
+        "self_check": "Trong những việc đang chịu trách nhiệm, việc nào bạn được tự quyết và việc nào luôn phải xin ý kiến?",
+        "practical_tip": "Trước khi nhận thêm một đầu việc, hỏi rõ ai quyết định, bạn được tự xử lý đến đâu và việc nào sẽ được chuyển bớt. Ghi lại thỏa thuận để hai bên cùng theo."
       },
       "default": {
-        "loi_the": "Cung Quan Lộc mô tả kiểu môi trường giúp bạn phát huy năng lực. Lá số này cần đọc nghề nghiệp như một hệ sinh thái: vai trò nào làm bạn sáng lên, kiểu trách nhiệm nào đáng nhận và môi trường nào làm hao năng lượng.",
-        "rao_can": "Rào cản thường không nằm ở thiếu cố gắng, mà ở đặt bạn vào cấu trúc không hợp. Khi làm sai môi trường, bạn có thể làm nhiều nhưng kết quả không phản ánh đúng năng lực.",
-        "premium_hook": "Khi đối chiếu Quan Lộc với Mệnh và Tài Bạch, ngành nào đáng theo đuổi, mô hình nào nên tránh và lợi thế nào nên trở thành thương hiệu cá nhân?"
+        "loi_the": "Phần này chưa đủ để chọn thay bạn một nghề hoặc kết luận bạn nên nghỉ việc. Cung Quan Lộc cho thêm góc nhìn về công việc, nhưng cần nối với năng lực, nguồn thu và hoàn cảnh hiện tại. Điều hữu ích trước mắt là phân biệt: bạn không hợp việc đang làm, hay vẫn hợp việc nhưng cách tổ chức khiến bạn mệt?",
+        "rao_can": "Chẳng hạn, cùng một chuyên môn nhưng khi yêu cầu rõ và có người phối hợp, bạn thấy dễ làm hơn hẳn. Nếu điều đó đúng với bạn, đổi cách nhận việc có thể là câu hỏi cần xem trước khi nghĩ đến đổi hẳn nghề.",
+        "premium_hook": "Khi xem cùng Mệnh và Tài Bạch, bạn nên đổi vai trò, đổi môi trường hay tiếp tục phát triển chuyên môn hiện tại?",
+        "self_check": "Nếu giữ nguyên chuyên môn nhưng được đổi người quản lý hoặc cách giao việc, bạn còn muốn rời công việc này không?",
+        "practical_tip": "Chọn một việc bạn làm tốt và một việc khiến bạn kiệt sức trong tuần. So sánh quyền quyết định, cách giao việc và thời gian hoàn thành để tìm phần có thể trao đổi lại."
       }
     }
   },
   "van_han": {
     "nam": {
       "binh_ngo_2026": {
-        "loi_the": "Năm 2026 là một năm có tính bản lề vì năng lượng vận hạn thúc bạn nhìn lại vị trí cá nhân, cách dùng sức và những kế hoạch đã ấp ủ. Đây là thời điểm phù hợp để khởi tạo, sắp xếp lại ưu tiên và chọn một hướng có thể theo đuổi nghiêm túc hơn.",
-        "rao_can": "Áp lực của năm này là dễ muốn làm nhiều việc cùng lúc. Nếu không chọn trọng tâm, bạn có thể tiêu hao sức vào các cam kết song song, trong khi điều cần nhất là một kế hoạch có thứ tự và mốc kiểm tra rõ.",
-        "premium_hook": "Trong 12 tháng của năm Bính Ngọ, tháng nào nên mở việc mới, tháng nào cần đi chậm và giai đoạn nào phải giữ an toàn về tiền bạc, pháp lý hoặc sức khỏe?"
+        "loi_the": "Phần vận năm cần đặt trong giai đoạn tuổi và các cung đang được xét. Chỉ biết tên năm chưa đủ để nói bạn sẽ đổi việc, có thêm tiền hoặc gặp biến cố. Khi dữ kiện chưa đủ, bạn nên dùng phần này để đặt câu hỏi cho kế hoạch đang cân nhắc, thay vì nhận một lời dự đoán chung cho tất cả mọi người.",
+        "rao_can": "Một tháng được diễn giải là thuận lợi cũng không thay thế việc kiểm tra điều kiện thực tế. Nếu đang thiếu tiền dự phòng, thời gian hoặc sự đồng thuận của người cùng làm, đó vẫn là việc cần giải quyết trước khi nhận thêm cam kết.",
+        "premium_hook": "Khi đối chiếu thêm vận năm và từng tháng, kế hoạch bạn đang cân nhắc cần xem kỹ những điều gì?"
       },
       "default": {
-        "loi_the": "Vận hạn năm đang xem cho biết nhịp thời gian nào nên chủ động và nhịp nào nên quan sát. Khi đọc đúng vận, bạn không cần quyết định vội; bạn biết việc nào nên làm trước, việc nào cần chờ thêm dữ kiện.",
-        "rao_can": "Điểm cần tránh là xem vận hạn như lời phán chắc chắn. Cách đọc hữu ích hơn là biến tín hiệu thành kế hoạch: giảm rủi ro, giữ sức, kiểm tra tiền bạc và chọn thời điểm hành động phù hợp.",
-        "premium_hook": "Tháng nào trong năm xem là cửa sổ hành động tốt nhất, tháng nào nên quan sát và tín hiệu nào báo rằng kế hoạch cần đổi nhịp?"
+        "loi_the": "Phần vận năm cần đặt trong giai đoạn tuổi và các cung đang được xét. Chỉ biết tên năm chưa đủ để nói bạn sẽ đổi việc, có thêm tiền hoặc gặp biến cố. Khi dữ kiện chưa đủ, bạn nên dùng phần này để đặt câu hỏi cho kế hoạch đang cân nhắc, thay vì nhận một lời dự đoán chung cho tất cả mọi người.",
+        "rao_can": "Một tháng được diễn giải là thuận lợi cũng không thay thế việc kiểm tra điều kiện thực tế. Nếu đang thiếu tiền dự phòng, thời gian hoặc sự đồng thuận của người cùng làm, đó vẫn là việc cần giải quyết trước khi nhận thêm cam kết.",
+        "premium_hook": "Khi đối chiếu thêm vận năm và từng tháng, kế hoạch bạn đang cân nhắc cần xem kỹ những điều gì?"
       }
     }
   }

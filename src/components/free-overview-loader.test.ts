@@ -4,6 +4,7 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { FreeOverviewLoader } from "@/components/free-overview-loader";
+import { parseFreeOverviewSections } from "@/components/free-overview-reading-experience";
 
 const loaderSource = readFileSync(fileURLToPath(new URL("./free-overview-loader.tsx", import.meta.url)), "utf8");
 const refreshSource = readFileSync(fileURLToPath(new URL("./free-overview-refresh-trigger.tsx", import.meta.url)), "utf8");
@@ -59,9 +60,31 @@ Bạn hợp môi trường có quyền chủ động.
 };
 
 describe("FreeOverviewLoader seed-first LLM refresh gate", () => {
+  it("separates evidence and the self-check without repeating them in the narrative", () => {
+    const content = `## 1. Năng lực thiên phú (Cung Mệnh)
+
+Bạn thường cân nhắc trước khi nhận thêm việc.
+
+Căn cứ từ lá số: Cung Mệnh tại Tý có Thiên Cơ.
+
+Để tự đối chiếu: Bạn còn thiếu thông tin gì để chốt?
+
+Hãy viết một việc có thể thử ngay.
+
+🔒 Nâng cấp Premium để xem:
+- Cách ra quyết định của bạn khi đối chiếu thêm cung Thân.`;
+    const [section] = parseFreeOverviewSections(content);
+    expect(section.evidence).toBe("Cung Mệnh tại Tý có Thiên Cơ.");
+    expect(section.selfCheck).toContain("Bạn còn thiếu thông tin gì để chốt?");
+    expect(section.body).not.toContain("Căn cứ");
+    expect(section.body).not.toContain("Để tự đối chiếu");
+    expect(section.body).toContain("Hãy viết một việc có thể thử ngay.");
+    expect(section.premiumPreview).not.toContain("Căn cứ từ lá số");
+  });
+
   it("renders seed content immediately and keeps the background LLM refresh non-blocking", () => {
     expect(loaderSource).toContain('const isLlmReady = initialOverview.source === "llm"');
-    expect(loaderSource).toContain("AI đang cá nhân hóa phần phân tích chi tiết");
+    expect(loaderSource).toContain("Đang bổ sung lời giải thích cho từng phần");
     expect(loaderSource).toContain("<FreeOverviewReadingExperience");
     expect(loaderSource).not.toContain("FreeOverviewTypingReveal");
     expect(loaderSource).toContain("FreeOverviewRefreshTrigger");
@@ -87,30 +110,30 @@ describe("FreeOverviewLoader seed-first LLM refresh gate", () => {
       }),
     );
 
-    expect(html).toContain("Lá số của Nguyễn Minh Anh trong 30 giây");
-    expect(html).toContain("Thế mạnh cốt lõi");
-    expect(html).toContain("Cách tạo giá trị");
-    expect(html).toContain("Trọng tâm năm 2026");
+    expect(html).toContain("Nguyễn Minh Anh, bắt đầu từ điều bạn đang băn khoăn");
+    expect(html).toContain("Cách bạn quyết định");
+    expect(html).toContain("Chuyện tiền bạc");
+    expect(html).toContain("Chuyện công việc");
     expect(html).toContain('aria-label="Điều hướng luận giải miễn phí"');
     expect(html).toContain('href="#free-insight-1"');
     expect(html.match(/<details/gu)).toHaveLength(4);
     expect(html).toContain("4/4 phần miễn phí");
-    expect(html).toContain("phút đọc thật");
-    expect(html).toContain("4 phần có bằng chứng cung/sao");
-    expect(html).toContain("Gợi ý thực tế, không phán hù dọa");
+    expect(html).toContain("phút đọc");
+    expect(html).toContain("4 phần miễn phí");
+    expect(html).toContain("Có thể mở xem căn cứ từ lá số");
     expect(html).toContain("free-overview-chapter-list");
     expect(html.match(/<details/gu)).toHaveLength(4);
     expect(html).toContain("free-overview-self-check");
-    expect(html).toContain("Tự kiểm tra nhanh");
+    expect(html).toContain("Bạn có gặp điều này không?");
     expect(html).toContain('data-ad-view="free_overview_section_viewed"');
     expect(html).toContain('data-ad-click="free_overview_section_toggle"');
     expect(html).not.toContain("[Block Nội dung");
     expect(html).not.toContain('href="#personal-report-outline"');
-    expect(html).toContain("Bản FULL sẽ trả lời");
-    expect(html).toContain("Xem dòng tiền 12 tháng — 199.000đ");
+    expect(html).toContain("Nếu đây là điều bạn đang muốn hiểu rõ hơn");
+    expect(html).toContain("Đọc sâu về tiền bạc và công việc — 199.000đ");
     expect(html).toContain("Không cần đăng nhập");
-    expect(html).toContain("Muốn biết tháng nào nên tiến, tháng nào nên giữ?");
-    expect(html).toContain("Mở bản FULL — 199.000đ");
+    expect(html).toContain("Muốn hiểu rõ hơn chuyện bạn đang cân nhắc?");
+    expect(html).toContain("Xem bản chuyên sâu — 199.000đ");
     expect(html).toContain('data-ad-click="full_offer_bottom_clicked"');
     expect(html).not.toContain("free-overview-typing-cursor");
   });
@@ -174,7 +197,7 @@ describe("FreeOverviewLoader seed-first LLM refresh gate", () => {
     );
 
     expect(html).toContain('popoverTarget="premium-confirm-chart-1"');
-    expect(html).toContain("Xem dòng tiền 12 tháng — 199.000đ");
+    expect(html).toContain("Đọc sâu về tiền bạc và công việc — 199.000đ");
     expect(html).toContain("Không cần đăng nhập");
     expect(html).not.toContain("/dang-nhap");
     expect(html).not.toContain("login=1");
@@ -194,7 +217,7 @@ describe("FreeOverviewLoader seed-first LLM refresh gate", () => {
     );
 
     expect(html).not.toContain('popoverTarget="premium-confirm-chart-1"');
-    expect(html).not.toContain("Bản FULL sẽ trả lời");
+    expect(html).not.toContain("Nếu đây là điều bạn đang muốn hiểu rõ hơn");
     expect(html).toContain("Đăng nhập để lưu lá số");
   });
 

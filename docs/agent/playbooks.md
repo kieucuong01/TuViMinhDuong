@@ -47,7 +47,7 @@ Rules:
 - Preserve structured chart JSON for readings.
 - Build free, paid, preview, and assistant copy from the shared chart evidence profile; the LLM interprets engine output and never recalculates star placement.
 - Reading-related LLM calls use DeepSeek first, Groq second, then the deterministic chart-based fallback. Keep provider keys server-side.
-- The guest preview targets 800-950 visible Vietnamese words (sections 1-2); owners and admins receive the full 1,400-1,650 visible-word overview (sections 1-4). Each important claim must connect to supplied chart evidence.
+- The free overview has four sections for guests and owners, targeting 700-1,350 visible Vietnamese words. Use concrete situations, a self-check question, a practical step, and expandable chart evidence. Reuse the interpretation rules for matching stars rather than sending unmatched stars to generic praise. Do not infer yearly events from the decade period alone. Each important claim must connect to supplied chart evidence.
 - Chart AI chat requires a completed `FULL/all` reading for the same user/chart and is limited to three persisted questions.
 - If changing a rule, add a named fixture or assertion that explains the convention.
 - UI may be modern, but core labels should keep Vietnamese tử vi terminology.

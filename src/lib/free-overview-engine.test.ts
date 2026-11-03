@@ -7,6 +7,8 @@ import {
   extractFreeReadingSignals,
 } from "@/lib/free-overview-engine";
 import { countVisibleMarkdownWords } from "@/lib/free-overview-presentation";
+import { MAIN_INTERPRETATION_STARS } from "@/lib/interpretation-rules";
+import { isCompleteFreeOverview, isCompleteFreeOverviewBlock, splitFreeOverviewBlocks } from "@/lib/ai";
 
 function makeChart(fullName: string, gender: "male" | "female", day: number, month: number, year: number, birthHour: number) {
   return generateTuViChart({
@@ -25,6 +27,32 @@ function makeChart(fullName: string, gender: "male" | "female", day: number, mon
 const sampleChart = makeChart("Kiều Tấn Cường", "male", 3, 4, 1995, 1);
 
 describe("free reading block builder", () => {
+  it("keeps different real charts complete without padding or losing the evidence", () => {
+    for (const hour of [0, 1, 4, 7, 10, 13, 16, 19, 22, 23]) {
+      const chart = makeChart("Người xem thử", "female", 7, 5, 1995, hour);
+      const content = buildFreeOverviewFromInterpretationRules(chart);
+      const blocks = splitFreeOverviewBlocks(content).blocks;
+      const counts = Object.entries(blocks).map(([key, body]) => `${key}: ${countVisibleMarkdownWords(body)}`).join(", ");
+      expect(isCompleteFreeOverview(content), `hour ${hour}, words ${countVisibleMarkdownWords(content)}, ${counts}`).toBe(true);
+      for (const [key, body] of Object.entries(blocks)) {
+        expect(isCompleteFreeOverviewBlock(key as keyof typeof blocks, chart, body), `${key}, hour ${hour}, ${counts}`).toBe(true);
+      }
+      expect(content.match(/Căn cứ từ lá số:/gu)).toHaveLength(4);
+      expect(content.match(/Để tự đối chiếu/gu)).toHaveLength(4);
+      expect(content).not.toMatch(/năng lượng|chất liệu|bản lề|hố đen tài chính|bản án/iu);
+    }
+  });
+
+  it("uses the existing star-and-palace rules instead of identical default praise", () => {
+    const openings = new Set<string>();
+    for (const star of MAIN_INTERPRETATION_STARS) {
+      const chart = { ...sampleChart, palaces: sampleChart.palaces.map((palace) =>
+        palace.name === "Mệnh" ? { ...palace, mainStars: [star] } : palace) };
+      openings.add(buildFreeReadingSections(chart)[0].freeText);
+    }
+    expect(openings.size).toBe(MAIN_INTERPRETATION_STARS.length);
+  });
+
   it("extracts the four signals used by the free preview", () => {
     const signals = extractFreeReadingSignals(sampleChart);
 
@@ -77,7 +105,7 @@ describe("free reading block builder", () => {
     expect(sections).toHaveLength(4);
     for (const section of sections) {
       expect(section.freeText.length).toBeGreaterThan(120);
-      expect(section.quickTake).toMatch(/cung|tuổi|năm/iu);
+      expect(section.freeText).toContain(section.quickTake);
       expect(section.evidenceText).toMatch(/cung|Mệnh\/Thân\/Cục|đại vận/iu);
       expect(section.practicalTip.length).toBeGreaterThan(80);
       expect(section.premiumHook).toMatch(/\?$/u);
@@ -96,8 +124,8 @@ describe("free reading block builder", () => {
     expect(overview).toContain("## 4. Vận hạn năm 2026 (Năm Bính Ngọ)");
     expect(overview.match(/🔒 Nâng cấp Premium để xem:/gu)).toHaveLength(4);
     expect(overview.match(/^[-*]\s+\S/gmu)?.length).toBeGreaterThanOrEqual(12);
-    expect(overview).toContain("KHAI MỞ BẢN ĐỒ ĐỘC BẢN CỦA RIÊNG BẠN");
-    expect(overview).toContain("MỞ KHÓA BÁO CÁO FULL PREMIUM NGAY");
+    expect(overview).toContain("Đọc tiếp bản chuyên sâu");
+    expect(overview).toContain("Xem bản chuyên sâu khi bạn muốn tìm hiểu thêm.");
     expect(overview).toContain("Bản FULL 9 chương");
     expect(overview).toContain("lộ trình 12 tháng");
     expect(overview).toContain("kế hoạch 30/90 ngày");

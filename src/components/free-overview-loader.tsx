@@ -65,8 +65,8 @@ export function FreeOverviewLoader({
         <section className="free-overview-personalizing" role="status" aria-live="polite" data-ad-view="free_overview_loading" data-chart-id={chartId}>
           <FreeOverviewRefreshTrigger chartId={chartId} shouldRefresh />
           <div>
-            <strong>AI đang cá nhân hóa phần phân tích chi tiết theo từng phần...</strong>
-            <span>Bản đọc nhanh đã hiện trước. Khi từng block LLM xong, nội dung sẽ tự cập nhật mà không làm bạn mất vị trí đang đọc.</span>
+            <strong>Đang bổ sung lời giải thích cho từng phần...</strong>
+            <span>Bạn có thể đọc ngay nội dung phía trên. Các phần bổ sung sẽ tự cập nhật tại đây.</span>
           </div>
           <div className="free-overview-personalizing-dots" aria-hidden="true"><i /><i /><i /></div>
         </section>

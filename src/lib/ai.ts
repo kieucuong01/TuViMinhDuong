@@ -5,12 +5,12 @@ import { countVisibleMarkdownWords } from "@/lib/free-overview-presentation";
 import { generateWithLlmRouter, hasExternalLlmProvider } from "@/lib/llm-router";
 import { FEATURE_PRICES, type ReadingKey } from "@/lib/pricing";
 
-export const FREE_OVERVIEW_MIN_WORDS = 950;
-export const FREE_OVERVIEW_MAX_WORDS = 1650;
+export const FREE_OVERVIEW_MIN_WORDS = 700;
+export const FREE_OVERVIEW_MAX_WORDS = 1350;
 export const FREE_OVERVIEW_TEMPLATE_MIN_WORDS = FREE_OVERVIEW_MIN_WORDS;
-export const FREE_OVERVIEW_TEMPLATE_MAX_WORDS = 1550;
+export const FREE_OVERVIEW_TEMPLATE_MAX_WORDS = 1350;
 export const PAID_READING_CHAPTER_MAX_TOKENS = 7000;
-export const FREE_OVERVIEW_VERSION = "free-block-preview-v8";
+export const FREE_OVERVIEW_VERSION = "free-reader-first-v9";
 export const PAID_READING_VERSION = "paid-personal-dossier-v6";
 export const PAID_FULL_WORD_TARGET = "5.000-7.000 từ";
 export const READING_PROVIDER_ORDER = ["deepseek"] as const;
@@ -128,9 +128,11 @@ export function isCompleteFreeOverview(content: string) {
       const paragraphs = freeBody.split(/\n\s*\n/u).filter((paragraph) => paragraph.trim().length > 0);
       const premiumBullets = premiumBody.match(/^\s*[-*]\s+\S/gmu)?.length || 0;
       return (
-        countVisibleMarkdownWords(freeBody) >= 170 &&
+        countVisibleMarkdownWords(freeBody) >= 120 &&
         paragraphs.length >= 5 &&
         /(cung|mệnh|thân|sao|đại vận|tuần|triệt)/iu.test(freeBody) &&
+        /^Căn cứ từ lá số:[ \t]*\S.+$/mu.test(freeBody) &&
+        /^Để tự đối chiếu[:,][ \t]*\S.+\?/mu.test(freeBody) &&
         premiumBullets >= 2
       );
     });
@@ -151,8 +153,8 @@ export function isCompleteFreeOverview(content: string) {
     !usesRigidTemplateLabels &&
     hasClearPremiumValue &&
     /^# Luận giải miễn phí dành cho .+$/mu.test(content) &&
-    content.includes("KHAI MỞ BẢN ĐỒ ĐỘC BẢN CỦA RIÊNG BẠN") &&
-    content.includes("MỞ KHÓA BÁO CÁO FULL PREMIUM NGAY")
+    content.includes("Đọc tiếp bản chuyên sâu") &&
+    content.includes("Xem bản chuyên sâu khi bạn muốn tìm hiểu thêm.")
   );
 }
 
@@ -814,7 +816,7 @@ function freeOverviewSectionHeading(key: FreeOverviewBlockKey, chart: TuViChart)
 
 export function splitFreeOverviewBlocks(content: string): { blocks: Record<FreeOverviewBlockKey, string>; finalCta: string } {
   const matches = Array.from(content.matchAll(/^##\s+([1-4])\.\s+.+$/gmu));
-  const finalCtaIndex = content.search(/^##\s+KHAI MỞ BẢN ĐỒ ĐỘC BẢN CỦA RIÊNG BẠN\s*$/mu);
+  const finalCtaIndex = content.search(/^##\s+Đọc tiếp bản chuyên sâu\s*$/mu);
   const sectionStart = matches[0]?.index ?? (finalCtaIndex >= 0 ? finalCtaIndex : content.length);
   const blocks: Record<FreeOverviewBlockKey, string> = {
     intro: content.slice(0, sectionStart).trim(),
@@ -870,17 +872,22 @@ export function isCompleteFreeOverviewBlock(key: FreeOverviewBlockKey, chart: Tu
     && premiumMatches.length === 1
     && premiumBullets >= 2
     && paragraphCount >= 5
-    && bodyWords >= 170
+    && /^Căn cứ từ lá số:[ \t]*\S.+$/mu.test(bodyBeforePremium)
+    && /^Để tự đối chiếu[:,][ \t]*\S.+\?/mu.test(bodyBeforePremium)
+    && bodyWords >= 120
     && wordCount <= 420;
 }
 
 function blockStyleBrief() {
-  return `Giọng văn: tự nhiên, ấm, bình dân; nói với người đọc là “bạn”. Không dùng nhãn máy móc, không hù dọa, không phán chắc chắn. Giữ nhịp Praise → Tease → Cliffhanger → CTA, nhưng đừng gọi tên 4 bước đó trong bài. Chỉ diễn giải từ dữ kiện có sẵn, không bịa sao/cung/trạng thái sao. Offer Premium thật gồm: Bản FULL 9 chương, lộ trình 12 tháng, kế hoạch 30/90 ngày, 3 câu hỏi với Cố vấn AI, mua một lần và đọc lại.`;
+  return `Nói trực tiếp với “bạn”, như đang giải thích một chuyện người đó đang gặp. Mở bằng một nhận định cụ thể từ bản nháp, rồi một tình huống đời thường để họ kiểm tra: nhận thêm việc vì ngại từ chối, sửa việc vì yêu cầu không rõ, hay phân vân mãi trước quyết định. Chỉ chọn tình huống hợp với dữ kiện; không mặc định ai cũng gặp những chuyện này.
+Không khen xã giao, không dùng “năng lượng”, “bản đồ độc bản”, “khai mở”, “chất liệu”, “giữ nhịp”, “tỏa sáng”, “bản lề”, “hố đen tài chính”. Không viết kiểu “bạn mạnh mẽ nhưng đôi khi yếu lòng”. Không bịa trải nghiệm, nghề, thu nhập, tình trạng hôn nhân hoặc sự kiện quá khứ của bạn. Không dùng nỗi sợ hay giấu lời khuyên hữu ích để ép mua.
+Mỗi đoạn 1-3 câu. Giải thích thuật ngữ ngay khi dùng. Giữ một đoạn bắt đầu bằng “Căn cứ từ lá số:” để người đọc có thể mở xem, một đoạn “Để tự đối chiếu:” chứa đúng một câu hỏi, và một việc nhỏ có thể thử ngay. Chỉ diễn giải sao/cung/trạng thái đã được cung cấp. Đại vận là bối cảnh mười năm, không tự suy ra sự kiện hay tháng tốt xấu riêng của năm. Nội dung chưa đủ căn cứ thì nói rõ giới hạn.
+Kết thúc bằng câu hỏi còn cần nối thêm các cung, không lặp khẩu hiệu bán hàng. Offer thật gồm: Bản FULL 9 chương, lộ trình 12 tháng, kế hoạch 30/90 ngày, 3 câu hỏi với Cố vấn AI, mua một lần và đọc lại.`;
 }
 
 function buildFreeOverviewBlockPrompt(chart: TuViChart, key: FreeOverviewBlockKey, draftBlock: string) {
   const evidence = formatChartEvidence(buildChartEvidenceProfile(chart));
-  const target = key === "intro" ? "90-190 từ" : "170-360 từ";
+  const target = key === "intro" ? "70-140 từ" : "150-260 từ";
   const heading = freeOverviewSectionHeading(key, chart);
   const sectionRule = key === "intro"
     ? "Chỉ viết phần mở đầu. Không viết heading cấp 2, không viết premium hook. Giữ đúng tiêu đề H1 và các dòng hồ sơ nếu có trong bản nháp."

@@ -10,6 +10,7 @@ import {
   WalletCards,
 } from "lucide-react";
 import { MarkdownContent } from "@/components/markdown-content";
+import { FreeOverviewSectionLink } from "@/components/free-overview-section-link";
 import { premiumReadingModalId } from "@/components/premium-reading-target";
 
 type FreeOverviewSection = {
@@ -18,6 +19,8 @@ type FreeOverviewSection = {
   navTitle: string;
   id: string;
   body: string;
+  evidence: string;
+  selfCheck: string;
   takeaway: string;
   premiumPreview: string;
   ctaLabel: string;
@@ -25,10 +28,10 @@ type FreeOverviewSection = {
 };
 
 const SECTION_META = {
-  1: { navTitle: "Tổng quan", ctaLabel: "Xem bản đồ điểm mạnh", tone: "identity" },
-  2: { navTitle: "Tiền bạc", ctaLabel: "Xem dòng tiền 12 tháng", tone: "finance" },
-  3: { navTitle: "Công việc", ctaLabel: "Xem thời điểm phát triển công việc", tone: "career" },
-  4: { navTitle: "Vận năm", ctaLabel: "Xem lộ trình vận hạn 12 tháng", tone: "timing" },
+  1: { navTitle: "Bản thân", question: "Bạn thường quyết định và phản ứng ra sao?", ctaLabel: "Hiểu kỹ hơn về bản thân", tone: "identity" },
+  2: { navTitle: "Tiền bạc", question: "Cách kiếm và giữ tiền nào hợp với bạn?", ctaLabel: "Đọc sâu về tiền bạc và công việc", tone: "finance" },
+  3: { navTitle: "Công việc", question: "Bạn làm tốt hơn trong môi trường nào?", ctaLabel: "Đọc sâu về hướng đi công việc", tone: "career" },
+  4: { navTitle: "Vận năm", question: "Năm đang xem, bạn nên cân nhắc điều gì?", ctaLabel: "Đọc phân tích năm và từng tháng", tone: "timing" },
 } as const;
 
 function cleanMarkdownText(content: string) {
@@ -82,12 +85,13 @@ export function parseFreeOverviewSections(content: string): FreeOverviewSection[
     ).trim();
     const meta = SECTION_META[number];
 
+    const notes = splitReadingNotes(body);
     return {
       number,
       title,
       navTitle: number === 4 ? title.match(/\b20\d{2}\b/u)?.[0] ? `Vận ${title.match(/\b20\d{2}\b/u)?.[0]}` : meta.navTitle : meta.navTitle,
       id: `free-insight-${number}`,
-      body,
+      ...notes,
       takeaway: sectionTakeaway(body),
       premiumPreview,
       ctaLabel: meta.ctaLabel,
@@ -109,23 +113,25 @@ function sectionIcon(number: number) {
 
 function estimatedReadMinutes(content: string) {
   const words = cleanMarkdownText(content).split(/\s+/u).filter(Boolean).length;
-  return Math.max(5, Math.min(9, Math.ceil(words / 190)));
+  return Math.max(1, Math.ceil(words / 190));
 }
 
-function splitSelfCheck(body: string) {
+function splitReadingNotes(body: string) {
   const paragraphs = body.split(/\n{2,}/u).map((part) => part.trim()).filter(Boolean);
   const selfCheckIndex = paragraphs.findIndex((part) => /^(Để tự đối chiếu|Tự kiểm tra|Bạn có thể tự kiểm tra)/iu.test(cleanMarkdownText(part)));
-  if (selfCheckIndex < 0) return { body, selfCheck: "" };
-  const selfCheck = paragraphs[selfCheckIndex];
-  const bodyWithoutSelfCheck = paragraphs.filter((_, index) => index !== selfCheckIndex).join("\n\n");
-  return { body: bodyWithoutSelfCheck, selfCheck };
+  const evidenceIndex = paragraphs.findIndex((part) => /^Căn cứ (từ lá số:|trực tiếp)/iu.test(cleanMarkdownText(part)));
+  return {
+    body: paragraphs.filter((_, index) => index !== selfCheckIndex && index !== evidenceIndex).join("\n\n"),
+    selfCheck: selfCheckIndex < 0 ? "" : paragraphs[selfCheckIndex],
+    evidence: evidenceIndex < 0 ? "" : paragraphs[evidenceIndex].replace(/^Căn cứ từ lá số:\s*/iu, ""),
+  };
 }
 
 function defaultSelfCheck(section: FreeOverviewSection) {
-  if (section.tone === "finance") return "Hãy tự hỏi: khoản tiền nào đến nhờ năng lực thật của bạn, khoản nào đến rồi đi vì cảm xúc hoặc thiếu kế hoạch? Nếu hai vế này lệch nhau, phần Tài Bạch cần được đọc cùng Mệnh và Quan Lộc.";
-  if (section.tone === "career") return "Hãy tự hỏi: bạn phát triển tốt hơn khi được trao quyền chủ động, hay khi có khuôn mẫu rõ để làm theo? Câu trả lời này giúp kiểm tra nhận định về cung Quan Lộc trong thực tế.";
-  if (section.tone === "timing") return "Hãy tự hỏi: việc nào trong năm nay nên tiến, việc nào nên giữ lại thêm một nhịp? Nếu câu trả lời chưa rõ, bản FULL cần soi kỹ hơn theo từng tháng.";
-  return "Hãy tự hỏi: điểm mạnh này đang giúp bạn tiến lên ở đâu, và đang khiến bạn phải gồng ở đâu? Một lá số tốt nên giúp bạn nhận ra cả lợi thế lẫn điểm cần tiết chế.";
+  if (section.tone === "finance") return "Nhìn lại tháng vừa rồi: điều làm bạn lo hơn là thu nhập chưa đủ hay những khoản đã nhận lời chi?";
+  if (section.tone === "career") return "Bạn mệt vì công việc khó, hay vì yêu cầu và quyền quyết định chưa rõ?";
+  if (section.tone === "timing") return "Việc bạn đang cân nhắc còn thiếu điều kiện gì để bắt đầu?";
+  return "Trong một quyết định gần đây, điều gì đã khiến bạn nhận lời hoặc từ chối?";
 }
 
 export function FreeOverviewReadingExperience({
@@ -146,9 +152,8 @@ export function FreeOverviewReadingExperience({
   const sections = parseFreeOverviewSections(content);
   if (!sections.length) return <MarkdownContent content={content} />;
 
-  const quickSections = [sections[0], sections[1], sections[3] || sections[2]].filter(Boolean);
-  const quickYear = sections[3]?.title.match(/\b20\d{2}\b/u)?.[0];
-  const quickLabels = ["Thế mạnh cốt lõi", "Cách tạo giá trị", quickYear ? `Trọng tâm năm ${quickYear}` : "Trọng tâm hiện tại"];
+  const quickSections = sections.slice(0, 3);
+  const quickLabels = ["Cách bạn quyết định", "Chuyện tiền bạc", "Chuyện công việc"];
   const formattedPrice = cashLabel(priceCoins);
   const readMinutes = estimatedReadMinutes(content);
 
@@ -157,25 +162,26 @@ export function FreeOverviewReadingExperience({
       <section className="free-overview-quick-summary" aria-labelledby="free-overview-quick-title">
         <div className="free-overview-quick-heading">
           <span className="free-overview-ai-badge"><Sparkles size={15} aria-hidden="true" /> Cá nhân hóa theo lá số</span>
-          <h2 id="free-overview-quick-title">Lá số của {fullName} trong 30 giây</h2>
-          <p>{quickSections.length === 3 ? "Ba điểm quan trọng" : "Những điểm quan trọng"} để bạn nắm nhanh trước khi đọc sâu từng phần.</p>
+          <h2 id="free-overview-quick-title">{fullName}, bắt đầu từ điều bạn đang băn khoăn</h2>
+          <p>Chọn một phần để đọc trước. Bạn không cần biết tên sao hay cách đọc lá số.</p>
         </div>
         <ol className="free-overview-quick-grid">
           {quickSections.map((section, index) => (
             <li key={section.id} className={`free-overview-quick-card is-${section.tone}`}>
               <span>{String(index + 1).padStart(2, "0")}</span>
               <div>
-                <strong>{quickLabels[index]}</strong>
+                <strong><FreeOverviewSectionLink targetId={section.id}>{quickLabels[index]}</FreeOverviewSectionLink></strong>
                 <p>{section.takeaway}</p>
               </div>
             </li>
           ))}
         </ol>
         <div className="free-overview-trust-strip" aria-label="Cam kết chất lượng bản miễn phí">
-          <span><Clock3 size={16} aria-hidden="true" /> {readMinutes} phút đọc thật</span>
-          <span><BookOpenText size={16} aria-hidden="true" /> 4 phần có bằng chứng cung/sao</span>
-          <span><ShieldCheck size={16} aria-hidden="true" /> Gợi ý thực tế, không phán hù dọa</span>
+          <span><Clock3 size={16} aria-hidden="true" /> Khoảng {readMinutes} phút đọc</span>
+          <span><BookOpenText size={16} aria-hidden="true" /> {sections.length} phần miễn phí</span>
+          <span><ShieldCheck size={16} aria-hidden="true" /> Có thể mở xem căn cứ từ lá số</span>
         </div>
+        <p className="free-overview-reader-note">Hãy đối chiếu với chuyện bạn đã trải qua. Điều nào chưa giống bạn thì cứ để lại, không cần cố nhận là đúng.</p>
       </section>
 
       <nav className="free-overview-section-nav" aria-label="Điều hướng luận giải miễn phí">
@@ -186,25 +192,22 @@ export function FreeOverviewReadingExperience({
         <ol>
           {sections.map((section) => (
             <li key={section.id}>
-              <a href={`#${section.id}`}>
+              <FreeOverviewSectionLink targetId={section.id}>
                 <span className="free-overview-nav-index">{section.number}</span>
                 <span>{section.navTitle}</span>
-              </a>
+              </FreeOverviewSectionLink>
             </li>
           ))}
         </ol>
-        <div className="free-overview-progress" aria-hidden="true">
-          <span style={{ width: `${Math.min(sections.length, 4) * 25}%` }} />
-        </div>
       </nav>
 
       <div className="free-overview-chapter-list">
-        {sections.map((section) => {
+        {sections.map((section, index) => {
           const showPremiumPreview = canCheckoutFull && Boolean(section.premiumPreview);
           const showContextualCta = showPremiumPreview && (section.number === 2 || section.number === 4);
           const headingId = `${section.id}-title`;
-          const { body, selfCheck } = splitSelfCheck(section.body);
-          const selfCheckCopy = selfCheck ? cleanMarkdownText(selfCheck) : defaultSelfCheck(section);
+          const selfCheckCopy = section.selfCheck ? cleanMarkdownText(section.selfCheck).replace(/^Để tự đối chiếu[:,]?\s*/iu, "") : defaultSelfCheck(section);
+          const nextSection = sections[index + 1];
 
           return (
             <details
@@ -226,23 +229,29 @@ export function FreeOverviewReadingExperience({
                 <span className="free-overview-card-icon">{sectionIcon(section.number)}</span>
                 <div className="free-overview-card-title">
                   <small>Phần {section.number}/4</small>
-                  <h2 id={headingId}>{section.title}</h2>
-                  <p>{section.takeaway}</p>
+                  <h2 id={headingId}>{SECTION_META[section.number as keyof typeof SECTION_META].question}</h2>
+                  <p>{section.title}</p>
                 </div>
               </summary>
               <div className="free-overview-card-body">
-                <MarkdownContent content={body} />
+                <MarkdownContent content={section.body} />
                 <aside className="free-overview-self-check" aria-label={`Tự đối chiếu phần ${section.number}`}>
-                  <strong>Tự kiểm tra nhanh</strong>
+                  <strong>Bạn có gặp điều này không?</strong>
                   <p>{selfCheckCopy}</p>
                 </aside>
+                {section.evidence ? (
+                  <details className="free-overview-evidence">
+                    <summary>Vì sao lá số có nhận định này?</summary>
+                    <MarkdownContent content={section.evidence} />
+                  </details>
+                ) : null}
                 {showPremiumPreview ? (
                   <aside className="free-overview-premium-preview" aria-label={`Gợi ý nội dung bản FULL cho ${section.navTitle}`}>
                     <div className="free-overview-premium-heading">
                       <span><Sparkles size={17} aria-hidden="true" /></span>
                       <div>
-                        <strong>Bản FULL sẽ trả lời</strong>
-                        <p>Phần chuyên sâu nối trực tiếp với nhận định bạn vừa đọc.</p>
+                        <strong>Nếu đây là điều bạn đang muốn hiểu rõ hơn</strong>
+                        <p>Bản chuyên sâu sẽ xem thêm các cung liên quan:</p>
                       </div>
                     </div>
                     <MarkdownContent content={section.premiumPreview} />
@@ -267,6 +276,11 @@ export function FreeOverviewReadingExperience({
                     ) : null}
                   </aside>
                 ) : null}
+                {nextSection ? (
+                  <FreeOverviewSectionLink targetId={nextSection.id} className="free-overview-read-next">
+                    Đọc tiếp: {nextSection.navTitle.toLocaleLowerCase("vi")} <ArrowRight size={17} aria-hidden="true" />
+                  </FreeOverviewSectionLink>
+                ) : null}
               </div>
             </details>
           );
@@ -276,16 +290,16 @@ export function FreeOverviewReadingExperience({
       {canCheckoutFull ? (
         <section className="free-overview-final-offer" aria-labelledby="free-overview-final-offer-title" data-ad-view="full_offer_bottom_viewed" data-chart-id={chartId}>
           <div>
-            <span className="free-overview-ai-badge"><BadgeCheck size={15} aria-hidden="true" /> Sau khi đọc 4 phần miễn phí</span>
-            <h2 id="free-overview-final-offer-title">Muốn biết tháng nào nên tiến, tháng nào nên giữ?</h2>
+            <span className="free-overview-ai-badge"><BadgeCheck size={15} aria-hidden="true" /> Khi bạn muốn đọc sâu hơn</span>
+            <h2 id="free-overview-final-offer-title">Muốn hiểu rõ hơn chuyện bạn đang cân nhắc?</h2>
             <p>
-              Bản FULL không chỉ “xem tiếp”; nó mở 9 chương cá nhân hóa, lộ trình 12 tháng, kế hoạch 30/90 ngày và 3 câu hỏi riêng với Cố vấn AI.
+              Phần miễn phí giúp bạn nhận ra một vài cách nghĩ và cách làm quen thuộc. Bản chuyên sâu nối các phần đó với công việc, tiền bạc, tình cảm và năm đang xem, để bạn có thêm góc nhìn cho chuyện đang cân nhắc.
             </p>
           </div>
           <ul>
-            <li><BadgeCheck size={16} aria-hidden="true" /> Xem lại không mất phí sau khi mua</li>
-            <li><BadgeCheck size={16} aria-hidden="true" /> {isSignedIn ? "Thanh toán PayOS hoặc dùng xu nếu đủ" : "Thanh toán PayOS, không cần đăng nhập trước"}</li>
-            <li><BadgeCheck size={16} aria-hidden="true" /> Nối Mệnh - Tài - Quan - Vận thành kế hoạch dễ làm</li>
+            <li><BadgeCheck size={16} aria-hidden="true" /> 9 chương đọc cùng các cung liên quan, thay vì tách riêng từng sao</li>
+            <li><BadgeCheck size={16} aria-hidden="true" /> Phân tích 12 tháng và gợi ý kế hoạch 30/90 ngày</li>
+            <li><BadgeCheck size={16} aria-hidden="true" /> 3 câu hỏi với Cố vấn AI để hỏi thêm về điều bạn quan tâm</li>
           </ul>
           <button
             type="button"
@@ -295,9 +309,10 @@ export function FreeOverviewReadingExperience({
             data-chart-id={chartId}
             data-cta-location="free_overview_bottom"
           >
-            Mở bản FULL — {formattedPrice}
+            Xem bản chuyên sâu — {formattedPrice}
             <ArrowRight size={18} aria-hidden="true" />
           </button>
+          <p className="free-overview-offer-note">Mua một lần, đọc lại không mất phí. {isSignedIn ? "Thanh toán PayOS hoặc dùng xu nếu đủ." : "Không cần đăng nhập trước."}</p>
         </section>
       ) : null}
     </div>

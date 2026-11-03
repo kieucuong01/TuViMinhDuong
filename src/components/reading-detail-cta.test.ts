@@ -49,7 +49,7 @@ describe("reading detail CTA flow", () => {
     expect(loaderSource).toContain("hasPremiumHookPreview");
     expect(loaderSource).toContain("canCheckoutFull={canCheckoutFull}");
     expect(readingExperienceSource).toContain("full_offer_context_clicked");
-    expect(readingExperienceSource).toContain("Bản FULL sẽ trả lời");
+    expect(readingExperienceSource).toContain("Nếu đây là điều bạn đang muốn hiểu rõ hơn");
     expect(readingExperienceSource).toContain("popoverTarget={premiumReadingModalId(chartId)}");
     expect(readingExperienceSource).toContain("Không cần đăng nhập");
     expect(loaderSource).toContain("loginModalHref(chartPath, undefined, nextPath)");

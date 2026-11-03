@@ -16318,15 +16318,30 @@ button.is-loading:not(.icon-button)::before {
 .free-overview-quick-card strong {
   display: block;
   color: #292524;
-  font-size: 0.94rem;
+  font-size: 1rem;
   line-height: 1.35;
 }
 
 .free-overview-quick-card p {
   margin: 0.28rem 0 0;
   color: #57534e;
-  font-size: 0.92rem;
-  line-height: 1.55;
+  font-size: 1rem;
+  line-height: 1.65;
+}
+
+.free-overview-quick-card a {
+  display: inline-flex;
+  min-height: 3rem;
+  align-items: center;
+  color: #9a3412;
+  text-underline-offset: 0.2em;
+}
+
+.free-overview-reader-note {
+  margin: 1rem 0 0;
+  color: #57534e;
+  font-size: 1rem;
+  line-height: 1.65;
 }
 
 .free-overview-trust-strip {
@@ -16356,9 +16371,6 @@ button.is-loading:not(.icon-button)::before {
 }
 
 .free-overview-section-nav {
-  position: sticky;
-  z-index: 12;
-  top: 0.4rem;
   display: grid;
   gap: 0.55rem;
   border: 1px solid rgb(253 186 116 / 86%);
@@ -16413,7 +16425,7 @@ button.is-loading:not(.icon-button)::before {
 
 .free-overview-section-nav a {
   display: inline-flex;
-  min-height: 2.35rem;
+  min-height: 3rem;
   align-items: center;
   gap: 0.42rem;
   border: 1px solid transparent;
@@ -16456,27 +16468,13 @@ button.is-loading:not(.icon-button)::before {
   color: #7c2d12;
 }
 
-.free-overview-progress {
-  height: 0.25rem;
-  overflow: hidden;
-  border-radius: 999px;
-  background: #ffedd5;
-}
-
-.free-overview-progress span {
-  display: block;
-  height: 100%;
-  border-radius: inherit;
-  background: linear-gradient(90deg, #fb923c, #059669);
-}
-
 .free-overview-chapter-list {
   display: grid;
   gap: clamp(1.15rem, 2.6vw, 1.65rem);
 }
 
 .free-overview-insight-card {
-  scroll-margin-top: 6.75rem;
+  scroll-margin-top: 9rem;
   border: 1px solid #e7e5e4;
   border-radius: 1.05rem;
   background: #fff;
@@ -16497,7 +16495,7 @@ button.is-loading:not(.icon-button)::before {
 }
 
 .free-overview-insight-card > summary::after {
-  content: "Mở đọc";
+  content: "+";
   position: absolute;
   right: clamp(0.95rem, 2.4vw, 1.25rem);
   top: clamp(0.95rem, 2.4vw, 1.25rem);
@@ -16506,12 +16504,21 @@ button.is-loading:not(.icon-button)::before {
   background: #fff;
   padding: 0.34rem 0.72rem;
   color: var(--reading-accent);
-  font-size: 0.78rem;
+  font-size: 1.1rem;
   font-weight: 850;
 }
 
 .free-overview-insight-card[open] > summary::after {
-  content: "Đang mở";
+  content: "−";
+}
+
+.free-overview-insight-card > summary:focus-visible,
+.free-overview-evidence > summary:focus-visible,
+.free-overview-quick-card a:focus-visible,
+.free-overview-read-next:focus-visible {
+  outline: 3px solid #c2410c;
+  outline-offset: 4px;
+  border-radius: 0.5rem;
 }
 
 .free-overview-card-header {
@@ -16524,7 +16531,7 @@ button.is-loading:not(.icon-button)::before {
   border-top: 4px solid var(--reading-accent);
   border-radius: 1.05rem 1.05rem 0 0;
   background: linear-gradient(180deg, var(--reading-soft), #fff 88%);
-  padding: clamp(0.95rem, 2.4vw, 1.25rem) clamp(4.8rem, 10vw, 6.2rem) clamp(0.95rem, 2.4vw, 1.25rem) clamp(0.95rem, 2.4vw, 1.25rem);
+  padding: clamp(0.95rem, 2.4vw, 1.25rem) 3.6rem clamp(0.95rem, 2.4vw, 1.25rem) clamp(0.95rem, 2.4vw, 1.25rem);
 }
 
 .free-overview-card-icon {
@@ -16580,7 +16587,7 @@ button.is-loading:not(.icon-button)::before {
 .free-overview-card-body .prose-content p,
 .free-overview-card-body .prose-content li {
   color: #3f3a36;
-  font-size: 1.02rem;
+  font-size: 1.0625rem;
   line-height: 1.78;
 }
 
@@ -16608,8 +16615,35 @@ button.is-loading:not(.icon-button)::before {
 .free-overview-self-check p {
   margin: 0.35rem 0 0;
   color: #334155;
-  font-size: 0.97rem;
+  font-size: 1.0625rem;
   line-height: 1.7;
+}
+
+.free-overview-evidence {
+  max-width: 72ch;
+  border-block: 1px solid #e7e5e4;
+  padding-block: 0.25rem;
+}
+
+.free-overview-evidence > summary {
+  min-height: 3rem;
+  align-content: center;
+  cursor: pointer;
+  color: #57534e;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.free-overview-read-next {
+  display: inline-flex;
+  min-height: 3rem;
+  align-items: center;
+  justify-self: start;
+  gap: 0.5rem;
+  color: #9a3412;
+  font-size: 1rem;
+  font-weight: 650;
+  text-underline-offset: 0.2em;
 }
 
 .free-overview-premium-preview {
@@ -16648,7 +16682,7 @@ button.is-loading:not(.icon-button)::before {
 .free-overview-premium-heading p {
   margin: 0.15rem 0 0;
   color: #6b5c52;
-  font-size: 0.88rem;
+  font-size: 1rem;
   line-height: 1.5;
 }
 
@@ -16673,7 +16707,7 @@ button.is-loading:not(.icon-button)::before {
 
 .free-overview-contextual-offer .btn.free-overview-secondary-cta {
   gap: 0.5rem;
-  min-height: 2.75rem;
+  min-height: 3rem;
   border: 1px solid #fdba74;
   background: #fff7ed;
   color: #9a3412;
@@ -16812,9 +16846,6 @@ button.is-loading:not(.icon-button)::before {
     align-items: center;
   }
 
-  .free-overview-progress {
-    grid-column: 1 / -1;
-  }
 }
 
 @media (max-width: 520px) {

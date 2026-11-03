@@ -16,6 +16,7 @@ import {
   generateReadingWithProgress,
   getDeepReadingSummary,
   isCompleteFreeOverview,
+  isCompleteFreeOverviewBlock,
   isDisplayableFreeOverview,
   isCompletePaidChapter,
   paidReadingChapterPrompt,
@@ -252,9 +253,9 @@ describe("AI reading format", () => {
 
     const result = await generateFreeOverview(chart);
 
-    expect(FREE_OVERVIEW_MIN_WORDS).toBe(950);
-    expect(FREE_OVERVIEW_MAX_WORDS).toBe(1650);
-    expect(FREE_OVERVIEW_VERSION).toBe("free-block-preview-v8");
+    expect(FREE_OVERVIEW_MIN_WORDS).toBe(700);
+    expect(FREE_OVERVIEW_MAX_WORDS).toBe(1350);
+    expect(FREE_OVERVIEW_VERSION).toBe("free-reader-first-v9");
     expect(result.model).toBe("deepseek/deepseek-v4-flash");
     expect(result).not.toHaveProperty("prompt");
     expect(isCompleteFreeOverview(result.content)).toBe(true);
@@ -266,7 +267,7 @@ describe("AI reading format", () => {
     expect(prompts[0]).toContain("BLOCK CẦN VIẾT: intro");
     expect(prompts[1]).toContain("BLOCK CẦN VIẾT: section_1");
     expect(prompts[0]).toContain("BẢN NHÁP HỢP LỆ ĐANG HIỂN THỊ NHANH");
-    expect(prompts[0]).toContain("Praise → Tease → Cliffhanger → CTA");
+    expect(prompts[0]).toContain("Không khen xã giao");
     expect(prompts.join("\n")).toContain("Bản FULL 9 chương");
     expect(prompts.join("\n")).toContain("3 câu hỏi với Cố vấn AI");
     expect(prompts.join("\n")).not.toContain("Trong mỗi mục, viết đúng năm nhãn");
@@ -343,8 +344,8 @@ describe("AI reading format", () => {
     const chart = youngSampleChart();
     const content = buildInstantFreeOverview(chart);
 
-    expect(FREE_OVERVIEW_TEMPLATE_MIN_WORDS).toBe(950);
-    expect(FREE_OVERVIEW_TEMPLATE_MAX_WORDS).toBe(1550);
+    expect(FREE_OVERVIEW_TEMPLATE_MIN_WORDS).toBe(700);
+    expect(FREE_OVERVIEW_TEMPLATE_MAX_WORDS).toBe(1350);
     expect(countVisibleMarkdownWords(content)).toBeGreaterThanOrEqual(FREE_OVERVIEW_TEMPLATE_MIN_WORDS);
     expect(countVisibleMarkdownWords(content)).toBeLessThanOrEqual(FREE_OVERVIEW_TEMPLATE_MAX_WORDS);
     expect(content).toContain(`# Luận giải miễn phí dành cho ${chart.input.fullName}`);
@@ -364,7 +365,7 @@ describe("AI reading format", () => {
     expect(content).toContain("lộ trình 12 tháng");
     expect(content).toContain("kế hoạch 30/90 ngày");
     expect(content).toContain("3 câu hỏi với Cố vấn AI");
-    expect(content).toContain("MỞ KHÓA BÁO CÁO FULL PREMIUM NGAY");
+    expect(content).toContain("Xem bản chuyên sâu khi bạn muốn tìm hiểu thêm.");
     expect(content).toContain(chart.input.fullName);
     expect(content).toMatch(/\bbạn\b/iu);
     expect(content).not.toMatch(/người đọc|người này|đương số|\bmình\b/iu);
@@ -386,6 +387,22 @@ describe("AI reading format", () => {
     expect(isCompleteFreeOverview(content.split("## 3. Môi trường làm việc lý tưởng (Cung Quan Lộc)")[0])).toBe(false);
     expect(isDisplayableFreeOverview(content.replace(/^## 4\. Vận hạn năm .+$/mu, "## Ghi chú vận hạn"))).toBe(false);
     expect(isCompleteFreeOverview(`${content} ${"thêm ".repeat(300)}`)).toBe(false);
+  });
+
+  it("rejects a rewrite that drops or empties the chart evidence or self-check", () => {
+    const chart = sampleChart();
+    const content = buildInstantFreeOverview(chart);
+    const block = splitFreeOverviewBlocks(content).blocks.section_1;
+    expect(isCompleteFreeOverviewBlock("section_1", chart, block)).toBe(true);
+    for (const [pattern, replacement] of [
+      [/Căn cứ từ lá số:/u, "Cách nhìn chung:"],
+      [/Căn cứ từ lá số:[^\n]+/u, "Căn cứ từ lá số:"],
+      [/Để tự đối chiếu[:,]/u, "Câu hỏi khác:"],
+      [/Để tự đối chiếu[:,][^\n]+/u, "Để tự đối chiếu:"],
+    ] as const) {
+      expect(isCompleteFreeOverviewBlock("section_1", chart, block.replace(pattern, replacement))).toBe(false);
+      expect(isCompleteFreeOverview(content.replace(pattern, replacement))).toBe(false);
+    }
   });
 
   it("defines eight interpretive chapters and one consolidated action chapter", () => {
