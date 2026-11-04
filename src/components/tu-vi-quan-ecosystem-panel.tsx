@@ -32,10 +32,11 @@ function Reading({ value }: { value: Json | undefined }) {
   return <div className={styles.reading}>{Object.entries(value).filter(([key]) => !["id", "seed", "version", "contentVersion", "ruleVersion", "profileId", "birthInput", "input", "sourceId", "casts"].includes(key)).map(([key, entry]) => <section key={key}>{labels[key] && <strong>{labels[key]}</strong>}<Reading value={entry} /></section>)}</div>;
 }
 
-export default function QuanEcosystem({ alias, suspended, onOpen, onSnapshot, preferences, onPreferences, onLegacy, onExperience, lite, onLite, onRitual, readingPrice }: {
+export default function QuanEcosystem({ alias, suspended, onOpen, onSnapshot, preferences, onPreferences, onLegacy, onExperience, lite, onLite, onRitual, readingPrice, activityRequest }: {
   alias: string; suspended: boolean; onOpen: (open: boolean) => void; onSnapshot: (data: QuanSnapshot) => void;
   onRitual: (kind: "greet" | "incense" | "meditate" | "idle") => void;
   readingPrice: number | null;
+  activityRequest?: { tab: "today" | "divination" | "wishes"; id: number };
   lite: boolean; onLite: (lite: boolean) => void;
   onExperience: (experience: QuanExperience) => void;
   preferences: QuanPreferences; onPreferences: (data: QuanPreferences) => void; onLegacy: (panel: "session" | "support" | "map" | "restore") => void;
@@ -99,6 +100,11 @@ export default function QuanEcosystem({ alias, suspended, onOpen, onSnapshot, pr
     return () => clearInterval(timer);
   }, [tab, request]);
   useEffect(() => { const timer = setTimeout(() => { if (suspended) setTab(null); }, 0); return () => clearTimeout(timer); }, [suspended]);
+  useEffect(() => {
+    if (!activityRequest) return;
+    const timer = setTimeout(() => setTab(activityRequest.tab), 0);
+    return () => clearTimeout(timer);
+  }, [activityRequest]);
   useEffect(() => { onOpen(Boolean(tab)); if (tab) heading.current?.focus(); else opener.current?.focus(); }, [tab, onOpen]);
   useEffect(() => {
     if (!tab) return;

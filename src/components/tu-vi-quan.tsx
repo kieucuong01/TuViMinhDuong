@@ -55,6 +55,7 @@ export default function TuViQuan({ initialAlias, support, paymentsEnabled, ecosy
   const hydrated = useSyncExternalStore(subscribeToHydration, hydratedSnapshot, serverSnapshot);
   const [experience, setExperience] = useState<QuanExperience>("courtyard");
   const [ecosystemOpen, setEcosystemOpen] = useState(false);
+  const [activityRequest, setActivityRequest] = useState<{ tab: "today" | "divination" | "wishes"; id: number }>();
   const [ecosystem, setEcosystem] = useState<QuanSnapshot | null>(null);
   const communityWishes = useMemo(() => ecosystem?.wishes.map(wish => ({
     id: wish.id, text: wish.text || "", placement: wish.placement || "tree" as const,
@@ -338,6 +339,11 @@ export default function TuViQuan({ initialAlias, support, paymentsEnabled, ecosy
     .sort((a, b) => stationDistance(a.x, a.z) - stationDistance(b.x, b.z))[0];
 
   function interactStation(station: NonNullable<typeof nearby>) {
+    if (ecosystemEnabled && ["teacher", "incense", "meditate", "tea", "lotus"].includes(station.id)) {
+      openPanel(null);
+      setActivityRequest({ tab: station.id === "teacher" || station.id === "tea" ? "divination" : station.id === "lotus" ? "wishes" : "today", id: ++navigationRequest.current });
+      return;
+    }
     if (station.id === "teacher" || station.id === "support" || station.id === "incense") {
       openPanel(station.id === "teacher" ? "session" : station.id);
       return;
@@ -410,7 +416,7 @@ export default function TuViQuan({ initialAlias, support, paymentsEnabled, ecosy
         </section>
       ) : (
         <>
-          {ecosystemEnabled && <QuanEcosystem readingPrice={readingPrice} alias={alias} suspended={Boolean(panel) || help} onOpen={openEcosystem} onSnapshot={receiveEcosystem} preferences={preferences} onPreferences={setPreferences} lite={lite} onLite={setLite} onRitual={doAction} onExperience={setExperience} onLegacy={openPanel} />}
+          {ecosystemEnabled && <QuanEcosystem activityRequest={activityRequest} readingPrice={readingPrice} alias={alias} suspended={Boolean(panel) || help} onOpen={openEcosystem} onSnapshot={receiveEcosystem} preferences={preferences} onPreferences={setPreferences} lite={lite} onLite={setLite} onRitual={doAction} onExperience={setExperience} onLegacy={openPanel} />}
           {!ecosystemEnabled && <nav className={styles.actionDock} aria-label="Hoạt động trong quán" inert={Boolean(panel)}>
             <button className={styles.primary} onClick={() => openPanel("session")}><BookOpen size={21} aria-hidden="true" />Xem lá số</button>
             <button onClick={() => openPanel("incense")}><Flame size={21} aria-hidden="true" />Thắp hương</button>
