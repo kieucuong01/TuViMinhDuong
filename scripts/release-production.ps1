@@ -374,11 +374,12 @@ if [ -d "$SOURCE_DIR/.git" ]; then
   git remote set-url origin "$REPO_URL"
 else
   rm -rf -- "$SOURCE_DIR"
-  git clone --quiet "$REPO_URL" "$SOURCE_DIR"
+  GIT_CONFIG_GLOBAL=/dev/null git clone --quiet "$REPO_URL" "$SOURCE_DIR"
   cd "$SOURCE_DIR"
 fi
 
-git fetch --quiet origin master
+# This public repo uses HTTPS even when the VPS has SSH URL rules for other projects.
+GIT_CONFIG_GLOBAL=/dev/null git -c safe.directory="$SOURCE_DIR" fetch --quiet origin master
 git checkout --quiet master
 git reset --hard "$EXPECTED_SHA"
 ACTUAL_SHA="$(git rev-parse HEAD)"

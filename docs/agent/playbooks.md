@@ -207,7 +207,7 @@ Rules:
 - Production URL is `https://lasotinhhoa.vn`.
 - Production app path is `/opt/lasotinhhoa/current`; releases should update that symlink or directory deliberately.
 - Preferred SSH entrypoint from this workspace is `ssh tuvi-vps`; keep strict host-key checking and use the dedicated key in the local SSH config instead of password-only SSH.
-- The VPS source checkout has an exact repository-local HTTPS URL rule for this public GitHub repository. It prevents a broader machine-level SSH URL rewrite from breaking release fetches. Keep this rule scoped to `/opt/lasotinhhoa/source`.
+- The release fetch for this public GitHub repository uses HTTPS with the global Git config disabled for that command and an explicit trusted source directory. This avoids machine-level SSH URL rules without modifying the other VPS projects.
 - PM2 process name is `lasotinhhoa`; internal app port is `127.0.0.1:4100`.
 - Tử Vi Quán presence runs as `lasotinhhoa-quan-realtime` on `127.0.0.1:4101`. The release script installs the Nginx include for the exact `/tu-vi-quan-ws` location and checks the loopback service and HTTPS proxy before completing. Its socket ticket is tied to the guest cookie and kept out of the URL.
 - Locally start the app on port `4000` and run `node scripts/tu-vi-quan-realtime.mjs --serve` in another terminal for presence on `127.0.0.1:4001`. Use two browser contexts to see each guest move in the other context.
