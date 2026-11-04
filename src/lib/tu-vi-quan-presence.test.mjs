@@ -76,6 +76,22 @@ describe("Tử Vi Quán presence", () => {
     expect(error.message).toContain("403");
   });
 
+  it("synchronizes the expanded grounds and rejects lake and outside-world positions", async () => {
+    const url = await listen();
+    const first = connect(url, guest);
+    await snapshot(first);
+    const second = connect(url, { id: "wide-garden", alias: "Khách Vườn" });
+    await snapshot(second, (frame) => frame.players.length === 2);
+    const travelled = snapshot(first, frame => frame.players.some(player => player.x === -26 && player.z === 20));
+    second.send(JSON.stringify({ type: "move", x: -26, z: 20 }));
+    await travelled;
+    const rejected = snapshot(first, frame => frame.players.some(player => player.action === "meditate"));
+    second.send(JSON.stringify({ type: "move", x: 20, z: 18 }));
+    second.send(JSON.stringify({ type: "move", x: 1000, z: 20 }));
+    second.send(JSON.stringify({ type: "action", action: "meditate" }));
+    expect((await rejected).players[1]).toMatchObject({ x: -26, z: 20 });
+  });
+
   it("limits shared-room occupancy from one source without blocking another source", async () => {
     const url = await listen();
     const headers = { origin, "x-quan-client-ip": "192.0.2.9" };

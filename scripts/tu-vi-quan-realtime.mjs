@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import pg from "pg";
 import { WebSocket, WebSocketServer } from "ws";
 import { quanPresenceSecret, verifyQuanSocketTicket } from "../src/lib/tu-vi-quan-presence.mjs";
+import { isQuanWalkable, QUAN_SPAWN } from "../src/lib/tu-vi-quan-world.mjs";
 
 const MAX_GUESTS = 24;
 const MAX_PER_IP = 6;
@@ -68,12 +69,12 @@ export function createQuanPresenceServer({ secret, origins, readBoard = async ()
         return;
       }
       const spawnX = SPAWN_COLUMNS.find((x) => ![...guests.values()].some(
-        ({ player }) => Math.hypot(player.x - x, player.z - 7) < 1.3,
+        ({ player }) => Math.hypot(player.x - x, player.z - QUAN_SPAWN.z) < 1.3,
       )) ?? 0;
       const player = {
         ...identity,
         x: prior?.player.x ?? spawnX,
-        z: prior?.player.z ?? 7,
+        z: prior?.player.z ?? QUAN_SPAWN.z,
         action: "idle",
       };
       const presence = { client, player, ip, alive: true, actionUntil: 0 };
@@ -108,8 +109,7 @@ export function createQuanPresenceServer({ secret, origins, readBoard = async ()
           if (!data || typeof data !== "object") return;
           if (
             data.type === "move" &&
-            Number.isFinite(data.x) && Math.abs(data.x) <= 12 &&
-            Number.isFinite(data.z) && Math.abs(data.z) <= 12
+            typeof data.x === "number" && typeof data.z === "number" && isQuanWalkable(data.x, data.z)
           ) {
             player.x = Math.round(data.x * 100) / 100;
             player.z = Math.round(data.z * 100) / 100;

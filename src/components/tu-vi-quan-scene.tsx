@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
 import styles from "./tu-vi-quan-scene.module.css";
+import { findQuanPath, isQuanWalkable, QUAN_BOUNDS, QUAN_POND, QUAN_STATIONS } from "@/lib/tu-vi-quan-world.mjs";
 
 type Position = { x: number; z: number };
 type Player = Position & { id: string; alias: string; action: string };
@@ -13,6 +14,7 @@ type SceneProps = {
   onMove: (position: Position) => void;
   onUnavailable: () => void;
   interactive: boolean;
+  destination?: Position & { requestId: number } | null;
 };
 
 const PALETTE = {
@@ -20,7 +22,6 @@ const PALETTE = {
   roof: 0x9a4b38, ridge: 0x63362e, plaster: 0xefcea1,
   stone: 0xba9d82, moss: 0x798554, lantern: 0xf08344, light: 0xffc27a,
 };
-const FRONT_COLUMNS = [-6.1, -3.1, 0, 3.1, 6.1];
 
 function label(text: string, large = false) {
   const canvas = document.createElement("canvas");
@@ -55,27 +56,39 @@ function disposeLabel(sprite: THREE.Sprite) {
 
 function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: "low-power" });
-  renderer.setClearColor(0x95717b);
+  renderer.setClearColor(0xb99b97);
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.18;
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFShadowMap;
   renderer.setPixelRatio(Math.min(1.5, window.devicePixelRatio));
   const canvas = renderer.domElement;
   canvas.setAttribute("aria-hidden", "true");
   container.append(canvas);
 
   const scene = new THREE.Scene();
-  scene.fog = new THREE.Fog(0xa87979, 23, 69);
-  const camera = new THREE.PerspectiveCamera(54, 1, 0.08, 140);
-  const sky = new THREE.HemisphereLight(0xffe6d4, 0x74687f, 1.65);
+  scene.fog = new THREE.Fog(0xb99b97, 62, 158);
+  const camera = new THREE.PerspectiveCamera(56, 1, 0.1, 260);
+  const sky = new THREE.HemisphereLight(0xffe9ce, 0x496354, 1.9);
   const sun = new THREE.DirectionalLight(0xffc185, 2);
-  sun.position.set(-7, 14, 4);
+  sun.position.set(-24, 35, -21);
+  sun.intensity = 3.1;
+  sun.castShadow = true;
+  sun.shadow.mapSize.set(2048, 2048);
+  Object.assign(sun.shadow.camera, { left: -48, right: 48, top: 48, bottom: -48, near: 1, far: 130 });
+  sun.shadow.bias = -0.0004;
+  sun.shadow.normalBias = 0.06;
+  sun.shadow.radius = 3;
   scene.add(sky, sun);
   const skyDome = new THREE.Mesh(
-    new THREE.SphereGeometry(100, 24, 12),
+    new THREE.SphereGeometry(230, 24, 12),
     new THREE.ShaderMaterial({
       side: THREE.BackSide, depthWrite: false,
       vertexShader: "varying vec3 v; void main(){v=position;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}",
       fragmentShader: `varying vec3 v; void main(){
         vec3 dir=normalize(v); float h=smoothstep(-.14,.57,dir.y);
-        vec3 color=mix(vec3(.83,.48,.35),vec3(.16,.17,.32),h);
+        vec3 color=mix(vec3(.94,.65,.45),vec3(.22,.32,.46),h);
         float s=max(0.,dot(dir,normalize(vec3(-.42,.24,-1.))));
         color+=vec3(.33,.18,.08)*pow(s,22.)+vec3(.34,.26,.15)*smoothstep(.998,.999,s);
         gl_FragColor=vec4(color,1.);
@@ -92,11 +105,14 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
     head: new THREE.SphereGeometry(0.5, 12, 8),
   };
   type Shape = keyof typeof geometry;
-  const materials = new Map<number, THREE.MeshLambertMaterial>();
+  const materials = new Map<number, THREE.MeshStandardMaterial>();
   function material(color: number) {
     let entry = materials.get(color);
     if (!entry) {
-      entry = new THREE.MeshLambertMaterial({ color });
+      entry = new THREE.MeshStandardMaterial({ color, roughness: 0.84,
+        emissive: color === PALETTE.lantern || color === PALETTE.light ? color : 0x000000,
+        emissiveIntensity: color === PALETTE.lantern ? 0.75 : color === PALETTE.light ? 0.45 : 0,
+      });
       materials.set(color, entry);
     }
     return entry;
@@ -135,184 +151,298 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
     }
   }
 
-  // Nền, gạch sân và vườn bao quanh.
-  box(0x776e52, 0, -0.22, 0, 150, 0.4, 150);
-  for (let i = 0; i < 15; i++) {
-    const angle = i * Math.PI * 2 / 15;
-    const distance = 26 + (i % 3) * 5;
-    object("leaf", i % 2 ? 0x655565 : 0x6f6371, Math.sin(angle) * distance, -0.7, Math.cos(angle) * distance, 20, 7 + (i % 4) * 2.2, 15, 0, angle);
-  }
-  box(PALETTE.moss, 0, -0.12, 0, 25.4, 0.24, 25);
-  box(0x8d765f, 0, -0.1, 0, 19.6, 0.26, 22.6);
-  const tileColors = [0xc6a68a, 0xc2a085, 0xd0b397, 0xd5b69a, 0xb99a80];
-  for (let x = -7; x <= 7; x += 1) {
-    for (let z = -8; z <= 8; z += 1) {
-      box(tileColors[(x * x + z * z * 2 + (x + 7) * (z + 9)) % 5], x * 1.29, 0.012, z * 1.29, 1.27, 0.08, 1.27);
+  // A broad central court connects smaller gardens, with the hall as the northern landmark.
+  box(0x66764d, 0, -0.23, 0, 220, 0.4, 220);
+  box(0x7b8a54, 0, -0.09, 3, QUAN_BOUNDS.maxX - QUAN_BOUNDS.minX + 4, 0.16, QUAN_BOUNDS.maxZ - QUAN_BOUNDS.minZ + 4);
+  const tileColors = [0xc7b194, 0xcdb89c, 0xc3aa8c, 0xd0bba0, 0xbda58a];
+  function paving(cx: number, cz: number, width: number, depth: number) {
+    box(0x9b886c, cx, -0.002, cz, width + 0.2, 0.08, depth + 0.2);
+    const cols = Math.round(width / 1.4);
+    const rows = Math.round(depth / 1.4);
+    for (let ix = 0; ix < cols; ix++) for (let iz = 0; iz < rows; iz++) {
+      box(tileColors[(ix * 13 + iz * 7 + ix * iz) % 5], cx + (ix + 0.5) * width / cols - width / 2, 0.031,
+        cz + (iz + 0.5) * depth / rows - depth / 2, width / cols - 0.028, 0.065, depth / rows - 0.028);
     }
   }
-  for (const x of [-10.15, 10.15]) {
-    box(PALETTE.stone, x, 0.25, -0.45, 0.56, 0.5, 22);
-    box(PALETTE.edge, x, 0.54, -0.45, 0.7, 0.12, 22.2);
-    for (let z = -10; z <= 10; z += 3.3) {
-      box(PALETTE.stone, x, 0.55, z, 0.9, 1.1, 0.88);
-      box(PALETTE.plaster, x, 1.13, z, 0.97, 0.12, 0.97);
+  paving(0, -3, 24, 27);
+  paving(0, 23, 7, 25);
+  paving(-16, 13, 23, 5);
+  paving(14, 5, 18, 5);
+  paving(9, 17, 5, 20);
+  paving(0, -16, 27, 4);
+  // Layers of distant hills keep the estate open without an enclosing wall of trees.
+  for (let layer = 0; layer < 3; layer++) for (let i = 0; i < 16; i++) {
+    const angle = i * Math.PI * 2 / 16;
+    const distance = 76 + layer * 24;
+    object("leaf", [0x73857c, 0x89968e, 0xa5a49a][layer], Math.sin(angle) * distance,
+      2 + Math.sin(i * 3.4) * 2, Math.cos(angle) * distance, 32 + i % 4 * 6,
+      22 + (i * 7) % 21 + layer * 6, 31, 0, angle);
+  }
+  // Low plaster walls frame the garden; the southern gate stays open.
+  for (const x of [-33.5, 33.5]) {
+    box(0xd1bb93, x, 0.65, 3, 0.48, 1.35, 63);
+    box(PALETTE.ridge, x, 1.37, 3, 0.7, 0.2, 63.3);
+    for (let z = -27; z <= 33; z += 6) {
+      box(PALETTE.stone, x, 0.95, z, 0.85, 1.9, 0.85);
+      box(PALETTE.ridge, x, 1.96, z, 1.04, 0.16, 1.04);
     }
   }
-  box(PALETTE.stone, 0, 0.39, -11.2, 20.8, 0.78, 0.59);
-  box(PALETTE.edge, 0, 0.85, -11.2, 21.1, 0.16, 0.73);
-  for (const [x, z, size] of [
-    [-11.3, -8, 4.5], [10.9, -10, 4.1], [-10.95, 4.8, 4.1],
-    [10.9, 5.7, 4.8], [-13, -2, 3.6], [13.1, 0, 3.3], [-5.3, -12, 4.3],
-    [4, -12.8, 4.2], [-15, -14, 5.3], [13.5, -14, 5.9],
-  ]) tree(x, z, size, x === 10.9 || z === 4.8);
-  for (let i = 0; i < 16; i += 1) {
-    const x = (i % 2 ? 1 : -1) * (10.85 + (i % 3) * 0.2);
-    const z = -10 + i * 1.31;
-    object("leaf", [0x82884f, 0xa0a258, 0x71834d][i % 3], x, 0.26, z, 0.85, 0.77, 1);
+  for (const x of [-20.5, 20.5]) {
+    box(0xd1bb93, x, 0.68, 34.8, 25, 1.4, 0.5);
+    box(PALETTE.ridge, x, 1.44, 34.8, 25.4, 0.2, 0.72);
   }
-
-  // Nhà gỗ, cửa song và mái ngói có độ võng ở hai đầu.
-  box(PALETTE.stone, 0, 0.2, -7.65, 13.7, 0.39, 5.7);
-  box(0xd6b99a, 0, 0.43, -7.66, 13.4, 0.13, 5.53);
-  box(PALETTE.stone, 0, 0.12, -4.32, 7.4, 0.23, 1);
-  box(0xe2c6a3, 0, 0.28, -4.63, 7.4, 0.15, 0.63);
-  box(PALETTE.plaster, 0, 1.75, -10.17, 12.8, 2.55, 0.2);
-  for (const x of FRONT_COLUMNS) {
-    for (const z of [-9.93, -5.4]) {
-      box(PALETTE.stone, x, 0.59, z, 0.59, 0.24, 0.59);
-      drum(PALETTE.wood, x, 1.98, z, 0.43, 2.78);
-      drum(PALETTE.red, x, 3.25, z, 0.58, 0.28);
-    }
-  }
-  for (const z of [-9.94, -5.43]) {
-    box(PALETTE.wood, 0, 3.12, z, 13.65, 0.34, 0.41);
-    box(PALETTE.gold, 0, 3.0, z, 13.4, 0.055, 0.45);
-  }
-  for (const x of [-4.55, 0, 4.55]) {
-    box(PALETTE.edge, x, 1.73, -10.03, 2.3, 2.4, 0.16);
-    box(PALETTE.red, x, 2.12, -9.93, 2.12, 1.56, 0.09);
-    for (let i = -4; i <= 4; i += 1) box(PALETTE.gold, x + i * 0.22, 2.13, -9.85, 0.044, 1.46, 0.057);
-    for (const y of [1.65, 2.13, 2.6]) box(PALETTE.wood, x, y, -9.81, 2.13, 0.064, 0.1);
-  }
-  box(PALETTE.wood, 0, 3.47, -7.72, 14.55, 0.27, 6.1);
-  const roofZ = -7.73;
-  const roofWidth = 14.9;
-  for (let i = 0; i < 34; i += 1) {
-    const x = -roofWidth / 2 + (i + 0.5) * roofWidth / 34;
-    const tip = Math.pow(Math.abs(x) / (roofWidth / 2), 8) * 0.4;
-    for (const side of [-1, 1]) {
-      for (let row = 0; row < 6; row += 1) {
-        const depth = (row + 0.5) * 0.52;
-        const y = 5.05 - depth * 0.67 + depth * depth * 0.055 + tip;
-        const color = [0xa6533e, 0xad5e46, PALETTE.roof, 0x974832][(i + row * 3) % 4];
-        box(color, x, y, roofZ + side * depth, 0.455, 0.13, 0.65, side * (0.58 - depth * 0.13));
-        box(PALETTE.ridge, x, y + 0.065, roofZ + side * (depth + 0.28), 0.447, 0.06, 0.083);
-      }
-      box(PALETTE.ridge, x, 3.48 + tip, roofZ + side * 3.19, 0.455, 0.24, 0.23);
-    }
-    box(PALETTE.ridge, x, 5.13 + tip, roofZ, 0.46, 0.27, 0.39);
-    box(PALETTE.gold, x, 5.27 + tip, roofZ, 0.46, 0.062, 0.26);
-  }
-  for (const x of [-7.37, 7.37]) {
-    for (const side of [-1, 1]) {
-      box(PALETTE.ridge, x, 3.98, roofZ + side * 3.29, 0.37, 0.24, 0.84, side * -0.34);
-      object("leaf", PALETTE.gold, x, 4.22, roofZ + side * 3.58, 0.27, 0.37, 0.24);
-    }
-    object("leaf", PALETTE.gold, x, 5.62, roofZ, 0.4, 0.39, 0.32);
-  }
+  const lanternPools: THREE.Matrix4[] = [];
   function lantern(x: number, y: number, z: number) {
-    drum(PALETTE.wood, x, y + 0.47, z, 0.06, 0.56);
-    object("head", PALETTE.lantern, x, y, z, 0.57, 0.7, 0.56);
-    drum(PALETTE.light, x, y + 0.3, z, 0.37, 0.09);
-    drum(PALETTE.gold, x, y - 0.31, z, 0.33, 0.085);
-    drum(PALETTE.red, x, y - 0.47, z, 0.06, 0.26);
+    drum(PALETTE.wood, x, y + 0.5, z, 0.055, 0.6);
+    object("head", PALETTE.lantern, x, y, z, 0.64, 0.83, 0.64);
+    for (const offset of [-0.25, 0, 0.25]) drum(PALETTE.red, x, y + offset, z, offset === 0 ? 0.66 : 0.52, 0.035);
+    drum(PALETTE.gold, x, y + 0.38, z, 0.42, 0.1);
+    drum(PALETTE.light, x, y - 0.38, z, 0.36, 0.1);
+    drum(PALETTE.red, x, y - 0.62, z, 0.06, 0.35);
+    placement.position.set(x, 0.083, z);
+    placement.scale.set(2.25, 2.25, 1);
+    placement.rotation.set(-Math.PI / 2, 0, 0);
+    placement.updateMatrix();
+    lanternPools.push(placement.matrix.clone());
   }
-  for (const x of [-5.25, -2.9, 2.9, 5.25]) lantern(x, 2.43, -5.05);
-
-  // Ba bàn thầy, án hương, sàn thiền, hồ sen và hòm gỗ.
-  for (const x of [-4.3, 0, 4.3]) {
-    box(0x754531, x, 0.89, -7.3, 2.6, 0.18, 1.1);
-    box(0x926047, x, 0.63, -7.52, 2.43, 0.48, 0.16);
-    for (const side of [-1, 1]) {
-      box(PALETTE.edge, x + side * 1.03, 0.61, -7.3, 0.16, 0.52, 0.9);
-      box(0x86604b, x + side * 1.58, 1.14, -7.62, 0.12, 1.48, 1.65);
-      box(PALETTE.plaster, x + side * 1.57, 1.19, -7.61, 0.13, 1.11, 1.38);
+  function roof(cx: number, cz: number, width: number, depth: number, eaves: number) {
+    const cols = Math.round(width * 2.4);
+    const rows = Math.round(depth / 1.05);
+    const half = depth / 2;
+    box(PALETTE.wood, cx, eaves - 0.15, cz, width - 0.7, 0.24, depth - 0.4);
+    for (let col = 0; col < cols; col++) {
+      const x = -width / 2 + (col + 0.5) * width / cols;
+      const tip = Math.pow(Math.abs(x) / (width / 2), 8) * 0.65;
+      for (const side of [-1, 1]) for (let row = 0; row < rows; row++) {
+        const d = (row + 0.5) * half / rows;
+        const y = eaves + (half - d) * 0.5 + Math.pow(d / half, 4) * 0.34 + tip;
+        box([0x9d503a, 0xad6147, 0xb56e50, 0x99503c][(row * 3 + col) % 4], cx + x, y, cz + side * d,
+          width / cols - 0.013, 0.15, half / rows + 0.13, side * (0.47 - Math.pow(d / half, 3) * 0.56));
+        box(PALETTE.ridge, cx + x, y + 0.08, cz + side * (d + half / rows * 0.35), width / cols - 0.015, 0.055, 0.07);
+      }
+      box(PALETTE.ridge, cx + x, eaves + half * 0.5 + 0.17 + tip, cz, width / cols, 0.3, 0.48);
+      box(PALETTE.gold, cx + x, eaves + half * 0.5 + 0.34 + tip, cz, width / cols, 0.04, 0.25);
     }
-    box(PALETTE.plaster, x - 0.26, 1.0, -7.37, 0.73, 0.04, 0.52, 0, -0.09);
-    for (let i = 0; i < 4; i += 1) box(PALETTE.wood, x - 0.28, 1.023, -7.55 + i * 0.1, 0.54, 0.006, 0.024);
-    drum(0x688477, x + 0.65, 1.09, -7.4, 0.17, 0.19);
-  }
-  box(PALETTE.stone, -5, 0.14, -0.75, 3.2, 0.23, 1.9);
-  box(PALETTE.red, -5, 0.65, -0.75, 2.42, 0.86, 0.91);
-  box(PALETTE.wood, -5, 1.1, -0.75, 2.75, 0.18, 1.2);
-  box(PALETTE.gold, -5, 0.72, -0.27, 1.94, 0.06, 0.035);
-  drum(0x80623d, -5, 1.25, -0.75, 0.45, 0.19);
-  object("head", 0xa77a3e, -5, 1.48, -0.75, 0.81, 0.48, 0.64);
-  drum(PALETTE.gold, -5, 1.66, -0.75, 0.7, 0.16, 0.55);
-  for (const [x, tilt] of [[-5.15, 0.17], [-5, 0], [-4.84, -0.19]]) {
-    object("box", 0xa13e29, x, 1.91, -0.75, 0.03, 0.54, 0.03, 0, 0, tilt);
-    object("head", 0xff7a47, x - tilt * 0.22, 2.18, -0.75, 0.066, 0.066, 0.066);
-  }
-  for (const x of [-5.89, -4.11]) {
-    drum(0xe2bf85, x, 1.36, -0.74, 0.1, 0.34);
-    object("leaf", 0xffb55d, x, 1.58, -0.74, 0.09, 0.17, 0.09);
-  }
-  drum(0xb99a78, 5, 0.12, 0.3, 4.5, 0.25, 3.8);
-  drum(0xd0a773, 5, 0.26, 0.3, 4.13, 0.08, 3.45);
-  for (const x of [3.7, 5, 6.3]) {
-    drum(PALETTE.red, x, 0.36, 0.52, 0.89, 0.19, 0.7);
-    drum(PALETTE.gold, x, 0.405, 0.52, 0.79, 0.04, 0.62);
-  }
-  drum(PALETTE.stone, 7.8, 0.1, 2.72, 2.4, 0.23, 4.5);
-  drum(0x63867c, 7.8, 0.23, 2.72, 2.09, 0.08, 4.08);
-  for (const [x, z] of [[7.3, 2.14], [8.15, 3.3], [7.7, 3.98], [8.2, 1.77]]) {
-    drum(0x718955, x, 0.28, z, 0.49, 0.035);
-    for (let i = 0; i < 5; i += 1) {
-      const angle = i * (Math.PI * 2 / 5);
-      object("leaf", i % 2 ? 0xe49191 : 0xd27778, x + Math.cos(angle) * 0.13, 0.39, z + Math.sin(angle) * 0.13, 0.21, 0.18, 0.19);
+    for (const side of [-1, 1]) for (const direction of [-1, 1]) {
+      const x = cx + side * (width / 2 - 0.2);
+      box(PALETTE.ridge, x, eaves + 1, cz + direction * (half - 0.12), 0.4, 0.24, 1.15, -direction * 0.5);
+      object("leaf", PALETTE.gold, x, eaves + 1.35, cz + direction * (half + 0.25), 0.3, 0.5, 0.28);
     }
-    object("leaf", PALETTE.light, x, 0.45, z, 0.16, 0.12, 0.16);
   }
-  box(PALETTE.wood, 6.4, 0.58, -4.11, 1.13, 1.1, 0.86);
-  box(PALETTE.red, 6.4, 1.17, -4.11, 1.24, 0.18, 0.96);
-  box(PALETTE.gold, 6.4, 0.79, -3.673, 0.45, 0.31, 0.035);
-  box(PALETTE.edge, 6.4, 1.266, -4.11, 0.56, 0.017, 0.074);
-  for (const x of [-5.15, 5.15]) {
-    drum(PALETTE.stone, x, 0.16, 8.5, 0.55, 0.32);
-    drum(PALETTE.wood, x, 1.22, 8.5, 0.2, 2.26);
-    box(PALETTE.wood, x + (x < 0 ? 0.36 : -0.36), 2.34, 8.5, 0.87, 0.13, 0.15);
-    lantern(x + (x < 0 ? 0.72 : -0.72), 1.57, 8.5);
+  function column(x: number, z: number, height: number) {
+    drum(PALETTE.stone, x, 0.2, z, 0.85, 0.4);
+    drum(PALETTE.wood, x, height / 2 + 0.2, z, 0.5, height);
+    drum(PALETTE.red, x, height + 0.1, z, 0.73, 0.3);
+    drum(PALETTE.gold, x, 0.47, z, 0.57, 0.09);
   }
-  for (const [x, z] of [[-6.3, 5.65], [6.5, 6.6]]) {
-    box(PALETTE.wood, x, 0.53, z, 2.6, 0.15, 0.59);
-    for (const side of [-1, 1]) box(PALETTE.edge, x + side * 0.91, 0.28, z, 0.18, 0.49, 0.4);
+  // Main hall: timber lattice, curved tile roof, an open front veranda.
+  box(PALETTE.stone, 0, 0.15, -22, 26, 0.3, 10);
+  box(0xe0c6a0, 0, 0.34, -22, 25.6, 0.12, 9.6);
+  box(PALETTE.plaster, 0, 2.2, -26.3, 24.6, 3.7, 0.32);
+  for (const x of [-12, -8, -4, 0, 4, 8, 12]) {
+    column(x, -18.15, 4.1);
+    column(x, -25.8, 4.1);
   }
-  box(0x937052, 0, 0.058, 2, 1.43, 0.011, 1.43, 0, Math.PI / 4);
-  box(0xc49a67, 0, 0.066, 2, 1.25, 0.01, 1.25, 0, Math.PI / 4);
-  drum(0xb1855b, 0, 0.074, 2, 1.07, 0.009);
-  drum(0xcda471, 0, 0.082, 2, 0.73, 0.009);
-  const groundShadows = new THREE.MeshBasicMaterial({ color: 0x554332, transparent: true, opacity: 0.14, depthWrite: false });
-  function shadow(x: number, z: number, width: number, depth: number) {
-    const mesh = new THREE.Mesh(geometry.drum, groundShadows);
-    mesh.position.set(x, 0.066, z);
-    mesh.scale.set(width, 0.006, depth);
-    scene.add(mesh);
+  for (const z of [-25.9, -18.15]) {
+    box(PALETTE.wood, 0, 4.15, z, 26.3, 0.4, 0.5);
+    box(PALETTE.gold, 0, 3.92, z, 25.5, 0.06, 0.52);
   }
-  shadow(-4.83, -0.5, 3.53, 1.5);
-  shadow(6.55, -3.98, 1.74, 1.12);
-  shadow(0.38, -6.3, 14.7, 5.2);
+  for (const x of [-10, -6, -2, 2, 6, 10]) {
+    box(PALETTE.edge, x, 2.05, -26.05, 3.1, 3.1, 0.14);
+    box(PALETTE.red, x, 2.18, -25.94, 2.9, 2.6, 0.11);
+    for (let i = -5; i <= 5; i++) box(PALETTE.gold, x + i * 0.25, 2.24, -25.84, 0.05, 2.28, 0.065);
+    for (const y of [1.42, 2.2, 2.98]) box(PALETTE.wood, x, y, -25.8, 2.9, 0.07, 0.09);
+  }
+  roof(0, -22, 28, 11.6, 4.6);
+  for (const x of [-10, -6, -2, 2, 6, 10]) lantern(x, 3.2, -17.8);
+  for (let i = 0; i < 3; i++) box(PALETTE.stone, 0, 0.04 + i * 0.06, -16.8 - i * 0.25, 11 - i * 0.4, 0.12, 0.5);
+  for (const x of [-5.5, 0, 5.5]) {
+    box(0x815139, x, 0.98, -19.5, 3.1, 0.2, 1.25);
+    for (const side of [-1, 1]) box(PALETTE.wood, x + side * 1.2, 0.65, -19.5, 0.2, 0.62, 0.95);
+    box(PALETTE.plaster, x - 0.2, 1.1, -19.4, 1.1, 0.035, 0.65, 0, -0.12);
+    for (let i = 0; i < 5; i++) box(PALETTE.wood, x - 0.22, 1.123, -19.64 + i * 0.1, 0.8, 0.006, 0.02);
+    drum(0x6e9485, x + 1, 1.2, -19.5, 0.24, 0.24);
+  }
+  // Gate and lantern avenue.
+  for (const x of [-4.6, 4.6]) {
+    column(x, 35, 4.2);
+    box(PALETTE.stone, x, 0.28, 35, 1.3, 0.5, 1.3);
+    lantern(x < 0 ? -3.9 : 3.9, 3.3, 35);
+  }
+  box(PALETTE.wood, 0, 4.16, 35, 10.6, 0.4, 0.6);
+  roof(0, 35, 12, 4, 4.5);
+  for (const z of [24, 17, 6, -7, -13]) for (const side of [-1, 1]) {
+    const x = side * (z > 12 ? 4.6 : 12.7);
+    drum(PALETTE.stone, x, 0.22, z, 0.76, 0.44);
+    drum(PALETTE.wood, x, 1.65, z, 0.17, 2.8);
+    box(PALETTE.wood, x - side * 0.4, 3.04, z, 1, 0.13, 0.18);
+    lantern(x - side * 0.78, 2.3, z);
+  }
+  // Incense altar stands in its own quiet garden west of the court.
+  box(PALETTE.stone, -10, 0.16, -5.5, 3.8, 0.3, 3);
+  box(PALETTE.red, -10, 0.72, -5.5, 2.9, 0.9, 1.5);
+  box(PALETTE.wood, -10, 1.21, -5.5, 3.3, 0.2, 1.9);
+  box(PALETTE.gold, -10, 0.8, -4.73, 2.3, 0.07, 0.035);
+  drum(0x80623d, -10, 1.4, -5.5, 0.5, 0.25);
+  object("head", 0xa77a3e, -10, 1.65, -5.5, 0.9, 0.55, 0.75);
+  drum(PALETTE.gold, -10, 1.87, -5.5, 0.85, 0.14);
+  for (const [x, tilt] of [[-10.18, 0.14], [-10, 0], [-9.82, -0.14]]) {
+    box(0xa13e29, x, 2.15, -5.5, 0.034, 0.6, 0.034, 0, 0, tilt);
+    object("head", PALETTE.lantern, x - tilt * 0.25, 2.46, -5.5, 0.07, 0.07, 0.07);
+  }
+  for (const x of [-11.15, -8.85]) {
+    drum(PALETTE.gold, x, 1.53, -5.5, 0.14, 0.5);
+    object("leaf", PALETTE.light, x, 1.88, -5.5, 0.11, 0.22, 0.11);
+  }
+  box(PALETTE.wood, 9, 0.65, -15.7, 1.5, 1.25, 1.05);
+  box(PALETTE.red, 9, 1.32, -15.7, 1.66, 0.18, 1.2);
+  box(PALETTE.gold, 9, 0.83, -15.15, 0.7, 0.4, 0.035);
+  box(PALETTE.edge, 9, 1.42, -15.7, 0.7, 0.018, 0.08);
+  // Open tea and meditation pavilions share the hall's roof and timber language.
+  function pavilion(cx: number, cz: number, width: number, depth: number) {
+    box(PALETTE.stone, cx, 0.13, cz, width, 0.25, depth);
+    box(0xbba17a, cx, 0.28, cz, width - 0.25, 0.06, depth - 0.25);
+    for (const side of [-1, 1]) for (const end of [-1, 1]) column(cx + side * (width / 2 - 0.5), cz + end * (depth / 2 - 0.5), 3.15);
+    box(PALETTE.wood, cx, 3.25, cz, width + 0.2, 0.25, depth);
+    roof(cx, cz, width + 1.8, depth + 1.8, 3.55);
+    for (const side of [-1, 1]) lantern(cx + side * width * 0.31, 2.55, cz + depth / 2 - 0.25);
+  }
+  pavilion(-20, 8.5, 10, 5);
+  drum(PALETTE.wood, -20, 0.93, 8.4, 3.4, 0.22, 1.75);
+  for (const x of [-22.2, -20, -17.8]) {
+    drum(0x70553d, x, 0.51, 10.1, 0.7, 0.42);
+    drum(0x617c70, x, 0.77, 10.1, 0.74, 0.13);
+  }
+  object("head", 0x789d87, -20, 1.18, 8.4, 0.55, 0.44, 0.5);
+  drum(0x789d87, -20, 1.4, 8.4, 0.28, 0.07);
+  object("box", 0x789d87, -19.65, 1.19, 8.4, 0.4, 0.17, 0.17, 0, 0, 0.35);
+  for (const x of [-20.8, -19.25]) drum(0xe5d6b2, x, 1.12, 8.7, 0.2, 0.18);
+  pavilion(18, 0.4, 8, 6);
+  for (const x of [15.7, 18, 20.3]) {
+    drum(0x9d4e3e, x, 0.43, 2, 1.25, 0.24, 1);
+    drum(PALETTE.gold, x, 0.56, 2, 1.1, 0.035, 0.87);
+  }
+  // Round welcome medallion and benches around the central garden.
+  drum(0x927350, 0, 0.075, 10, 4, 0.04);
+  drum(0xdfbd86, 0, 0.102, 10, 3.7, 0.02);
+  for (let i = 0; i < 8; i++) box(PALETTE.wood, Math.sin(i * Math.PI / 4) * 1.3, 0.12, 10 + Math.cos(i * Math.PI / 4) * 1.3, 0.45, 0.018, 0.17, 0, i * Math.PI / 4);
+  for (const [x, z, rotation] of [[-15, 1, 0], [-26, 14, 0], [9, 23, Math.PI / 2], [24, -7, 0]]) {
+    box(PALETTE.wood, x, 0.56, z, 3.2, 0.18, 0.75, 0, rotation);
+    for (const side of [-1, 1]) box(PALETTE.stone, x + Math.cos(rotation) * side * 1.15, 0.28, z - Math.sin(rotation) * side * 1.15, 0.3, 0.5, 0.5, 0, rotation);
+  }
+  // Lotus lake: procedural reflected sky, moving ripples and bright evening glints.
+  const waterGeometry = new THREE.CircleGeometry(1, 80);
+  const waterMaterial = new THREE.ShaderMaterial({
+    uniforms: { time: { value: 0 } }, transparent: false,
+    vertexShader: `varying vec3 world; void main(){vec4 p=modelMatrix*vec4(position,1.); world=p.xyz;gl_Position=projectionMatrix*viewMatrix*p;}`,
+    fragmentShader: `uniform float time; varying vec3 world;
+      void main(){vec2 p=world.xz; vec3 view=normalize(cameraPosition-world);
+        float waves=sin(p.x*2.2+time*.8)*cos(p.y*1.8-time*.6);
+        vec3 normal=normalize(vec3(.075*cos(p.x*2.2+time*.8),1.,.075*sin(p.y*1.8-time*.6)));
+        float fresnel=pow(1.-max(dot(view,normal),0.),3.);
+        vec3 reflected=reflect(-view,normal);
+        vec3 color=mix(vec3(.075,.24,.22),vec3(.69,.49,.34),fresnel*.8);
+        float highlight=pow(max(dot(reflected,normalize(vec3(-.6,.28,-.8))),0.),90.);
+        float ripple=pow(max(0.,sin(p.y*9.+p.x*2.+waves*.9-time)),16.);
+        color+=vec3(1.,.75,.36)*(highlight*.8+ripple*.08)+waves*.018;
+        gl_FragColor=vec4(color,1.);
+        #include <tonemapping_fragment>
+        #include <colorspace_fragment>
+      }`,
+  });
+  const water = new THREE.Mesh(waterGeometry, waterMaterial);
+  water.rotation.x = -Math.PI / 2;
+  water.scale.set(QUAN_POND.radiusX, QUAN_POND.radiusZ, 1);
+  water.position.set(QUAN_POND.x, 0.09, QUAN_POND.z);
+  scene.add(water);
+  for (let i = 0; i < 68; i++) {
+    const angle = i * Math.PI * 2 / 68;
+    const x = QUAN_POND.x + Math.sin(angle) * (QUAN_POND.radiusX + 0.15);
+    const z = QUAN_POND.z + Math.cos(angle) * (QUAN_POND.radiusZ + 0.15);
+    object("leaf", [0x9e9c7e, 0xb1aa8d, 0x92957a][i % 3], x, 0.13, z, 0.95 + i % 3 * 0.12, 0.46, 0.95, 0, angle);
+  }
+  for (let i = 0; i < 25; i++) {
+    const angle = i * 2.39996;
+    const spread = 0.2 + (i % 7) * 0.095;
+    const x = 20 + Math.cos(angle) * spread * 7;
+    const z = 18 + Math.sin(angle) * spread * 9;
+    drum(0x5f7c4d, x, 0.125, z, 0.7 + i % 3 * 0.16, 0.035, 0.67);
+    if (i % 3 === 0) continue;
+    for (let j = 0; j < 7; j++) {
+      const a = j * Math.PI * 2 / 7;
+      object("leaf", j % 2 ? 0xe8a6a0 : 0xca7c85, x + Math.cos(a) * 0.18, 0.29, z + Math.sin(a) * 0.18, 0.29, 0.29, 0.2, 0, -a);
+    }
+    object("leaf", PALETTE.light, x, 0.38, z, 0.19, 0.13, 0.19);
+  }
+  // A viewing deck stays on the safe western shore; paths never cross deep water.
+  for (let i = 0; i < 19; i++) box(0x8c6746, 11.1, 0.18, 15.2 + i * 0.38, 3.1, 0.16, 0.34);
+  for (const z of [15.2, 17.5, 19.8, 22]) {
+    drum(PALETTE.wood, 12.55, 0.68, z, 0.13, 1.08);
+    drum(PALETTE.gold, 12.55, 1.23, z, 0.2, 0.1);
+  }
+  box(PALETTE.wood, 12.55, 0.94, 18.6, 0.13, 0.13, 7.1);
+  // Bamboo grove, flowering trees, rocks and individual flower beds, all instanced.
+  for (let i = 0; i < 28; i++) {
+    const x = -30 + (i % 4) * 1.06;
+    const z = -12 + Math.floor(i / 4) * 3.4;
+    const height = 4 + (i * 7 % 10) * 0.23;
+    drum(0x637b45, x, height / 2, z, 0.13, height);
+    for (let node = 1; node <= 5; node++) {
+      drum(0x87945a, x, node * height / 6, z, 0.16, 0.045);
+      if (node < 3) continue;
+      const a = i + node * 2.3;
+      object("leaf", [0x627c46, 0x8b9a57, 0x748d4e][node % 3], x + Math.sin(a) * 0.65, node * height / 6 + 0.3, z + Math.cos(a) * 0.65, 1.9, 0.38, 0.7, 0, a, 0.2);
+    }
+  }
+  for (const [x, z, size, warm] of [
+    [-24, -21, 6.4, 0], [24, -24, 7, 0], [-18, -13, 5.6, 1], [18, -13, 6, 1],
+    [-17, 22, 5, 1], [-25, 28, 5.5, 0], [-11, 29, 5, 1], [7, 30, 4.6, 1],
+    [29, 3, 5.7, 0], [30, 29, 6, 0], [-30, -26, 7, 0], [30, -17, 6, 0],
+  ]) tree(x, z, size, !!warm);
+  for (let i = 0; i < 120; i++) {
+    const patch = i % 6;
+    const [cx, cz] = [[-18, -2], [-21, 21], [-8, 20], [7, -5], [27, -6], [-11, -12]][patch];
+    const a = i * 2.4;
+    const radius = 0.45 + ((i * 7) % 17) * 0.16;
+    const x = cx + Math.cos(a) * radius;
+    const z = cz + Math.sin(a) * radius;
+    object("leaf", [0x7b8f51, 0x637d48, 0x8c9857][i % 3], x, 0.24, z, 0.67, 0.53, 0.65);
+    if (i % 2) object("leaf", [0xe2b088, 0xd58d88, 0xebd19a][i % 3], x, 0.54, z, 0.24, 0.21, 0.24);
+  }
+  for (let i = 0; i < 15; i++) {
+    object("leaf", [0x91957b, 0xa6a288, 0x7d876f][i % 3], -26 + i % 3 * 1.4, 0.35, -15 + Math.floor(i / 3) * 1.3,
+      1.2 + i % 3 * 0.3, 0.8 + i % 2 * 0.7, 1.4, 0, i * 1.4);
+  }
+  const groundShadows = new THREE.MeshBasicMaterial({ color: 0x36402d, transparent: true, opacity: 0.19, depthWrite: false });
+  const glowCanvas = document.createElement("canvas");
+  glowCanvas.width = glowCanvas.height = 64;
+  const glowContext = glowCanvas.getContext("2d")!;
+  const glow = glowContext.createRadialGradient(32, 32, 0, 32, 32, 32);
+  glow.addColorStop(0, "rgba(255,199,115,0.6)");
+  glow.addColorStop(0.4, "rgba(255,182,85,0.23)");
+  glow.addColorStop(1, "rgba(255,182,85,0)");
+  glowContext.fillStyle = glow;
+  glowContext.fillRect(0, 0, 64, 64);
+  const glowTexture = new THREE.CanvasTexture(glowCanvas);
+  glowTexture.colorSpace = THREE.SRGBColorSpace;
+  const glowGeometry = new THREE.PlaneGeometry(2, 2);
+  const glowMaterial = new THREE.MeshBasicMaterial({ map: glowTexture, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: 0.48 });
+  const pools = new THREE.InstancedMesh(glowGeometry, glowMaterial, lanternPools.length);
+  lanternPools.forEach((matrix, index) => pools.setMatrixAt(index, matrix));
+  scene.add(pools);
   for (const entry of batches.values()) {
     const mesh = new THREE.InstancedMesh(geometry[entry.shape], material(entry.color), entry.matrices.length);
     entry.matrices.forEach((matrix, index) => mesh.setMatrixAt(index, matrix));
+    mesh.castShadow = entry.matrices.some(matrix => matrix.elements[13] > 0.7);
+    mesh.receiveShadow = true;
     scene.add(mesh);
   }
-
   const signs: THREE.Sprite[] = [];
   for (const [title, x, y, z, large] of [
-    ["Tử Vi Quán", 0, 3.64, -3.85, true],
-    ["Bàn hương", -5, 2.65, -0.55, false],
-    ["Góc ngồi thiền", 5, 2.22, -0.62, false],
-    ["Hòm công đức", 6.38, 2.06, -4.04, false],
+    ["Tử Vi Quán", 0, 4.6, -17.45, true],
+    ["Tử Vi Quán", 0, 4.22, 35.4, true],
+    ...QUAN_STATIONS.filter(station => station.id !== "greet").map(station =>
+      [station.label, station.x, station.id === "teacher" ? 2.75 : 2.55, station.z - 0.8, false] as const),
   ] as const) {
     const sprite = label(title, large);
     sprite.position.set(x, y, z);
@@ -379,9 +509,9 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
   self.badge.visible = false;
   self.body.rotation.y = Math.PI;
   self.group.position.set(latest.current.position.x, 0.054, latest.current.position.z);
-  const teachers = [-4.3, 0, 4.3].map((x, index) => {
+  const teachers = [-5.5, 0, 5.5].map((x, index) => {
     const teacher = avatar(0x465a55, "Thầy AI · Bàn " + (index + 1));
-    teacher.group.position.set(x, 0.49, -8.28);
+    teacher.group.position.set(x, 0.4, -20.45);
     pose(teacher, "meditate", 0, false, true);
     return teacher;
   });
@@ -402,10 +532,10 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
   const cameraGoal = new THREE.Vector3();
   const cameraTarget = new THREE.Vector3();
   const look = new THREE.Vector3();
-  const sparks = new Float32Array(54 * 3);
+  const sparks = new Float32Array(90 * 3);
   const sparkGeometry = new THREE.BufferGeometry();
   sparkGeometry.setAttribute("position", new THREE.BufferAttribute(sparks, 3));
-  const sparkMaterial = new THREE.PointsMaterial({ color: 0xffc985, size: 0.085, transparent: true, opacity: 0.7, depthWrite: false });
+  const sparkMaterial = new THREE.PointsMaterial({ color: 0xffc985, size: 0.095, transparent: true, opacity: 0.7, depthWrite: false });
   const sparkCloud = new THREE.Points(sparkGeometry, sparkMaterial);
   sparkCloud.frustumCulled = false;
   scene.add(sparkCloud);
@@ -413,20 +543,17 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
   const knob = pad.firstElementChild as HTMLSpanElement;
   const movementKeys = new Set(["KeyW","KeyA","KeyS","KeyD","ArrowUp","ArrowLeft","ArrowDown","ArrowRight"]);
   let yaw = 0;
-  let pitch = 0.42;
+  let pitch = 0.49;
   let cameraReady = false;
   let padId: number | undefined;
   let press: { id: number; x: number; y: number; lastX: number; lastY: number; dragged: boolean } | undefined;
-  let walkTo: Position | null = null;
+  let route: Position[] = [];
+  let destinationId: number | undefined;
   let controlled: Position | null = null;
   let walked = false;
   let sentAt = 0;
-  function isClear(x: number, z: number) {
-    if (Math.abs(x) > 9.45 || z < -6.15 || z > 10.35) return false;
-    if (((x - 7.8) / 1.55) ** 2 + ((z - 2.72) / 2.53) ** 2 < 1) return false;
-    if (Math.abs(x + 5) < 1.86 && Math.abs(z + 0.75) < 1.25) return false;
-    if (Math.abs(x - 6.38) < 0.73 && Math.abs(z + 4.04) < 0.75) return false;
-    return !FRONT_COLUMNS.some(column => Math.abs(x - column) < 0.48 && Math.abs(z + 5.4) < 0.48);
+  function routeTo(destination: Position) {
+    route = findQuanPath(controlled ?? { x: self.group.position.x, z: self.group.position.z }, destination);
   }
   function pressDown(event: PointerEvent) {
     if (event.button !== 0 || press || !latest.current.interactive) return;
@@ -453,13 +580,15 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
     pointer.set((event.clientX - rect.left) / rect.width * 2 - 1, 1 - (event.clientY - rect.top) / rect.height * 2);
     ray.setFromCamera(pointer, camera);
     if (!ray.ray.intersectPlane(floor, hit)) return;
-    if (isClear(hit.x, hit.z)) walkTo = { x: hit.x, z: hit.z };
+    route = [];
+    if (isQuanWalkable(hit.x, hit.z)) routeTo({ x: hit.x, z: hit.z });
   }
   function cancelPress() { press = undefined; }
   function keyDown(event: KeyboardEvent) {
     if (!latest.current.interactive || !movementKeys.has(event.code) ||
         (event.target instanceof HTMLElement && event.target.closest("input, textarea, select, [contenteditable]"))) return;
     event.preventDefault();
+    route = [];
     keys.add(event.code);
   }
   function keyUp(event: KeyboardEvent) { keys.delete(event.code); }
@@ -471,18 +600,19 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
   }
   function padDown(event: PointerEvent) {
     if (!latest.current.interactive || padId !== undefined) return;
+    route = [];
     padId = event.pointerId;
     pad.setPointerCapture(padId);
     padMove(event);
   }
   function padEnd() { padId = undefined; steer.set(0, 0); knob.style.transform = ""; }
-  function clearInput() { keys.clear(); walkTo = null; press = undefined; padEnd(); }
+  function clearInput() { keys.clear(); route = []; press = undefined; padEnd(); }
   function resize() {
     const width = container.clientWidth;
     const height = container.clientHeight;
     if (!width || !height) return;
     camera.aspect = width / height;
-    camera.fov = camera.aspect < 0.8 ? 62 : 52;
+    camera.fov = camera.aspect < 0.8 ? 65 : 58;
     camera.updateProjectionMatrix();
     renderer.setSize(width, height, false);
   }
@@ -518,32 +648,42 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
     const dt = Math.min((time - (previous || time)) / 1000, 0.07);
     previous = time;
     const current = latest.current;
-    if (!current.interactive && (keys.size || walkTo || padId !== undefined)) clearInput();
+    if (!current.interactive && (keys.size || route.length || padId !== undefined)) clearInput();
+    if (!current.destination && destinationId !== undefined) {
+      destinationId = undefined;
+      route = [];
+    }
+    if (current.interactive && current.destination && current.destination.requestId !== destinationId) {
+      destinationId = current.destination.requestId;
+      routeTo(current.destination);
+    }
     let dx = steer.x + Number(keys.has("KeyD") || keys.has("ArrowRight")) - Number(keys.has("KeyA") || keys.has("ArrowLeft"));
     let dz = steer.y + Number(keys.has("KeyS") || keys.has("ArrowDown")) - Number(keys.has("KeyW") || keys.has("ArrowUp"));
     if (Math.hypot(dx, dz) > 0.09) {
-      walkTo = null;
+      route = [];
       const sideways = dx;
       dx = sideways * Math.cos(yaw) + dz * Math.sin(yaw);
       dz = dz * Math.cos(yaw) - sideways * Math.sin(yaw);
-    } else if (walkTo) {
+    } else if (route.length) {
       const point = controlled ?? current.position;
-      dx = walkTo.x - point.x;
-      dz = walkTo.z - point.z;
-      if (Math.hypot(dx, dz) < 0.17) { walkTo = null; dx = 0; dz = 0; }
+      while (route.length && Math.hypot(route[0].x - point.x, route[0].z - point.z) < 0.12) route.shift();
+      if (route.length) {
+        dx = route[0].x - point.x;
+        dz = route[0].z - point.z;
+      }
     }
     const magnitude = Math.hypot(dx, dz);
     if (current.interactive && magnitude > 0.09) {
       walked = true;
       controlled ??= { ...current.position };
-      const pace = 4.25 * dt / Math.max(walkTo ? 0.25 : 1, magnitude);
+      const pace = Math.min(5.8 * dt, route.length ? magnitude : Infinity) / Math.max(route.length ? 0.001 : 1, magnitude);
       const nx = controlled.x + dx * pace;
       const nz = controlled.z + dz * pace;
-      const clearX = isClear(nx, controlled.z);
+      const clearX = isQuanWalkable(nx, controlled.z);
       if (clearX) controlled.x = nx;
-      const clearZ = isClear(controlled.x, nz);
+      const clearZ = isQuanWalkable(controlled.x, nz);
       if (clearZ) controlled.z = nz;
-      if (!(clearX && Math.abs(dx) > 0.01) && !(clearZ && Math.abs(dz) > 0.01)) walkTo = null;
+      if (!(clearX && Math.abs(dx) > 0.01) && !(clearZ && Math.abs(dz) > 0.01)) route = [];
       if (time - sentAt >= 80) { current.onMove({ ...controlled }); sentAt = time; }
     } else if (controlled) {
       current.onMove({ ...controlled });
@@ -552,10 +692,10 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
     if (!walked) self.group.position.set(current.position.x, 0.054, current.position.z);
     move(self, controlled ?? current.position, current.action, time / 1000, dt);
     const { x, z } = self.group.position;
-    const distance = camera.aspect < 0.8 ? 4.9 : 4.55;
+    const distance = camera.aspect < 0.8 ? 7.8 : 9.3;
     const planar = Math.cos(pitch) * distance;
-    cameraGoal.set(x + Math.sin(yaw) * planar, 1.18 + Math.sin(pitch) * distance, z + Math.cos(yaw) * planar);
-    cameraTarget.set(x - Math.sin(yaw) * 2.1, 1.45, z - Math.cos(yaw) * 2.1);
+    cameraGoal.set(x + Math.sin(yaw) * planar, 1.5 + Math.sin(pitch) * distance, z + Math.cos(yaw) * planar);
+    cameraTarget.set(x - Math.sin(yaw) * 3.2, 1.7, z - Math.cos(yaw) * 3.2);
     const follow = !cameraReady || motion.matches ? 1 : 1 - Math.exp(-dt * 8);
     camera.position.lerp(cameraGoal, follow);
     look.lerp(cameraTarget, follow);
@@ -588,18 +728,21 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
     }
     smoke.forEach((mesh, index) => {
       const phase = motion.matches ? (index + 1) / 8 : ((time / 4600 + index / smoke.length) % 1);
-      mesh.position.set(-5 + phase * 0.76 + Math.sin(phase * 6) * 0.12, 2.17 + phase * 1.73, -0.75 + phase * 0.19);
+      mesh.position.set(-10 + phase * 0.76 + Math.sin(phase * 6) * 0.12, 2.46 + phase * 1.73, -5.5 + phase * 0.19);
       mesh.scale.setScalar(0.082 + phase * 0.35);
       mesh.material.opacity = (1 - phase) * (current.action === "incense" ? 0.42 : 0.25);
     });
-    for (let i = 0; i < 54; i++) {
+    for (let i = 0; i < 90; i++) {
       const t = motion.matches ? 0 : time * 0.00037;
-      sparks[i * 3] = Math.sin(i * 16.31) * 10 + Math.sin(i + t) * 0.7;
+      sparks[i * 3] = Math.sin(i * 16.31) * 29 + Math.sin(i + t) * 0.7;
       sparks[i * 3 + 1] = 0.6 + ((i * 1.39) % 4) + Math.sin(i * 3 + t) * 0.35;
-      sparks[i * 3 + 2] = Math.cos(i * 14.17) * 10 + Math.cos(i - t) * 0.8;
+      sparks[i * 3 + 2] = Math.cos(i * 14.17) * 27 + 3 + Math.cos(i - t) * 0.8;
     }
     sparkGeometry.attributes.position.needsUpdate = true;
+    waterMaterial.uniforms.time.value = motion.matches ? 0 : time / 1000;
     renderer.render(scene, camera);
+    // Architecture is static; contact blobs follow avatars without rerendering the shadow map.
+    renderer.shadowMap.autoUpdate = false;
   }
   canvas.addEventListener("pointerdown", pressDown);
   canvas.addEventListener("pointermove", pressMove);
@@ -638,6 +781,11 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
     disposeLabel(self.badge);
     teachers.forEach((teacher) => disposeLabel(teacher.badge));
     groundShadows.dispose();
+    glowGeometry.dispose();
+    glowMaterial.dispose();
+    glowTexture.dispose();
+    waterGeometry.dispose();
+    waterMaterial.dispose();
     smoke.forEach((mesh) => mesh.material.dispose());
     skyDome.geometry.dispose();
     skyDome.material.dispose();
@@ -660,7 +808,8 @@ export default function TuViQuanScene(props: SceneProps) {
     if (!container.current) return;
     try {
       return makeScene(container.current, latest);
-    } catch {
+    } catch (error) {
+      console.error("Không khởi tạo được sân 3D.", error);
       latest.current.onUnavailable();
     }
   }, []);

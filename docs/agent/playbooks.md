@@ -26,6 +26,7 @@ Done:
 
 - Desktop and mobile layouts do not overlap.
 - Touch targets are at least about 48px high for primary actions.
+- Tử Vi Quán keeps world bounds, station positions and collision/routing rules in `src/lib/tu-vi-quan-world.mjs`, shared by the 3D scene, map and presence server. Verify direct action buttons, automatic walking and portrait/landscape layouts when changing its scene.
 - Loading feedback appears for slow form submits and route-like actions.
 
 ## Chart Engine
