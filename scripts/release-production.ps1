@@ -285,13 +285,19 @@ configure_quan_proxy() {
 }
 
 verify_quan_proxy() {
-  local status
-  status="$(curl -sS --http1.1 --noproxy '*' --max-time 5 -o /dev/null -w '%{http_code}' \
-    --resolve 'lasotinhhoa.vn:443:127.0.0.1' \
-    -H 'Origin: https://lasotinhhoa.vn' -H 'Connection: Upgrade' -H 'Upgrade: websocket' \
-    -H 'Sec-WebSocket-Version: 13' -H 'Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==' \
-    'https://lasotinhhoa.vn/tu-vi-quan-ws')" || return 1
-  [ "$status" = "401" ]
+  local status attempt
+  # Reload returns before old workers have stopped accepting requests.
+  for attempt in $(seq 1 12); do
+    status="$(curl -sS --http1.1 --noproxy '*' --max-time 3 -o /dev/null -w '%{http_code}' \
+      --resolve 'lasotinhhoa.vn:443:127.0.0.1' \
+      -H 'Origin: https://lasotinhhoa.vn' -H 'Connection: Upgrade' -H 'Upgrade: websocket' \
+      -H 'Sec-WebSocket-Version: 13' -H 'Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==' \
+      'https://lasotinhhoa.vn/tu-vi-quan-ws')" || status="000"
+    [ "$status" = "401" ] && return 0
+    sleep 1
+  done
+  echo "Tử Vi Quán proxy returned ${status:-unknown}; expected 401 for a missing socket ticket." >&2
+  return 1
 }
 
 cleanup_npm_cache() {

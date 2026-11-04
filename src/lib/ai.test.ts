@@ -104,12 +104,14 @@ function completeGeneratedChapter(chapter: PaidReadingChapter, marker: string) {
 }
 
 beforeEach(() => {
+  vi.stubEnv("PLAYWRIGHT_DISABLE_LLM", "0");
   llmRouterMocks.generateWithLlmRouter.mockReset();
   llmRouterMocks.hasExternalLlmProvider.mockReset();
   llmRouterMocks.hasExternalLlmProvider.mockReturnValue(false);
 });
 
 afterEach(() => {
+  vi.unstubAllEnvs();
   restore("DEEPSEEK_API_KEY", oldDeepSeekKey);
   restore("DEEPSEEK_API_KEYS", oldDeepSeekKeys);
   restore("GROQ_API_KEY", oldGroqKey);
