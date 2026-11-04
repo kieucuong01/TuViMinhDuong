@@ -10,6 +10,7 @@ const MAX_PER_IP = 6;
 const ACTIONS = new Set(["idle", "incense", "greet", "meditate"]);
 const CHANNEL = "tu-vi-quan";
 const SOCKET_PATH = "/tu-vi-quan-ws";
+const SPAWN_COLUMNS = [0, 1.75, -1.75, 3.5, -3.5, 5.25, -5.25, 7, -7];
 
 export function createQuanPresenceServer({ secret, origins, readBoard = async () => null }) {
   if (!secret) throw new Error("Tử Vi Quán requires AUTH_SECRET in production.");
@@ -66,9 +67,12 @@ export function createQuanPresenceServer({ secret, origins, readBoard = async ()
         client.close(4003, "Courtyard full");
         return;
       }
+      const spawnX = SPAWN_COLUMNS.find((x) => ![...guests.values()].some(
+        ({ player }) => Math.hypot(player.x - x, player.z - 7) < 1.3,
+      )) ?? 0;
       const player = {
         ...identity,
-        x: prior?.player.x ?? 0,
+        x: prior?.player.x ?? spawnX,
         z: prior?.player.z ?? 7,
         action: "idle",
       };

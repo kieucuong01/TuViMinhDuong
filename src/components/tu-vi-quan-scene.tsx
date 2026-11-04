@@ -12,6 +12,7 @@ type SceneProps = {
   players: Player[];
   onMove: (position: Position) => void;
   onUnavailable: () => void;
+  interactive: boolean;
 };
 
 const PALETTE = {
@@ -19,6 +20,7 @@ const PALETTE = {
   roof: 0x9a4b38, ridge: 0x63362e, plaster: 0xefcea1,
   stone: 0xba9d82, moss: 0x798554, lantern: 0xf08344, light: 0xffc27a,
 };
+const FRONT_COLUMNS = [-6.1, -3.1, 0, 3.1, 6.1];
 
 function label(text: string, large = false) {
   const canvas = document.createElement("canvas");
@@ -42,7 +44,7 @@ function label(text: string, large = false) {
   texture.colorSpace = THREE.SRGBColorSpace;
   const material = new THREE.SpriteMaterial({ map: texture, depthWrite: false, sizeAttenuation: true });
   const sprite = new THREE.Sprite(material);
-  sprite.scale.set(large ? 5.7 : 3.65, large ? 1.48 : 0.95, 1);
+  sprite.scale.set(large ? 5.7 : 2.7, large ? 1.48 : 0.7, 1);
   return sprite;
 }
 
@@ -53,21 +55,34 @@ function disposeLabel(sprite: THREE.Sprite) {
 
 function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: "low-power" });
-  renderer.setClearColor(0xe0b98d);
+  renderer.setClearColor(0x95717b);
   renderer.setPixelRatio(Math.min(1.5, window.devicePixelRatio));
   const canvas = renderer.domElement;
   canvas.setAttribute("aria-hidden", "true");
   container.append(canvas);
 
   const scene = new THREE.Scene();
-  scene.fog = new THREE.Fog(0xe0b98d, 49, 90);
-  const camera = new THREE.OrthographicCamera(-14, 14, 10, -10, 0.1, 120);
-  camera.position.set(10, 23, 30);
-  camera.lookAt(0, 1.5, -0.5);
-  const sky = new THREE.HemisphereLight(0xffefd6, 0xb0a687, 2.6);
-  const sun = new THREE.DirectionalLight(0xffd5a4, 2.25);
+  scene.fog = new THREE.Fog(0xa87979, 23, 69);
+  const camera = new THREE.PerspectiveCamera(54, 1, 0.08, 140);
+  const sky = new THREE.HemisphereLight(0xffe6d4, 0x74687f, 1.65);
+  const sun = new THREE.DirectionalLight(0xffc185, 2);
   sun.position.set(-7, 14, 4);
   scene.add(sky, sun);
+  const skyDome = new THREE.Mesh(
+    new THREE.SphereGeometry(100, 24, 12),
+    new THREE.ShaderMaterial({
+      side: THREE.BackSide, depthWrite: false,
+      vertexShader: "varying vec3 v; void main(){v=position;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}",
+      fragmentShader: `varying vec3 v; void main(){
+        vec3 dir=normalize(v); float h=smoothstep(-.14,.57,dir.y);
+        vec3 color=mix(vec3(.83,.48,.35),vec3(.16,.17,.32),h);
+        float s=max(0.,dot(dir,normalize(vec3(-.42,.24,-1.))));
+        color+=vec3(.33,.18,.08)*pow(s,22.)+vec3(.34,.26,.15)*smoothstep(.998,.999,s);
+        gl_FragColor=vec4(color,1.);
+      }`,
+    }),
+  );
+  scene.add(skyDome);
 
   const geometry = {
     box: new THREE.BoxGeometry(),
@@ -121,7 +136,12 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
   }
 
   // Nền, gạch sân và vườn bao quanh.
-  box(0xc5a87c, 0, -0.22, 0, 150, 0.4, 150);
+  box(0x776e52, 0, -0.22, 0, 150, 0.4, 150);
+  for (let i = 0; i < 15; i++) {
+    const angle = i * Math.PI * 2 / 15;
+    const distance = 26 + (i % 3) * 5;
+    object("leaf", i % 2 ? 0x655565 : 0x6f6371, Math.sin(angle) * distance, -0.7, Math.cos(angle) * distance, 20, 7 + (i % 4) * 2.2, 15, 0, angle);
+  }
   box(PALETTE.moss, 0, -0.12, 0, 25.4, 0.24, 25);
   box(0x8d765f, 0, -0.1, 0, 19.6, 0.26, 22.6);
   const tileColors = [0xc6a68a, 0xc2a085, 0xd0b397, 0xd5b69a, 0xb99a80];
@@ -157,7 +177,7 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
   box(PALETTE.stone, 0, 0.12, -4.32, 7.4, 0.23, 1);
   box(0xe2c6a3, 0, 0.28, -4.63, 7.4, 0.15, 0.63);
   box(PALETTE.plaster, 0, 1.75, -10.17, 12.8, 2.55, 0.2);
-  for (const x of [-6.1, -3.1, 0, 3.1, 6.1]) {
+  for (const x of FRONT_COLUMNS) {
     for (const z of [-9.93, -5.4]) {
       box(PALETTE.stone, x, 0.59, z, 0.59, 0.24, 0.59);
       drum(PALETTE.wood, x, 1.98, z, 0.43, 2.78);
@@ -332,6 +352,7 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
       return leg;
     });
     const badge = label(name);
+    badge.scale.multiplyScalar(0.59);
     badge.position.set(0, 1.98, 0);
     const ground = new THREE.Mesh(geometry.drum, groundShadows);
     ground.scale.set(0.78, 0.005, 0.49);
@@ -354,7 +375,9 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
       arm.rotation.z = action === "greet" ? (i === 0 ? 0.52 : -0.52) : 0;
     });
   }
-  const self = avatar(0x9d4031, "Bạn");
+  const self = avatar(0x506f7e, "Bạn");
+  self.badge.visible = false;
+  self.body.rotation.y = Math.PI;
   self.group.position.set(latest.current.position.x, 0.054, latest.current.position.z);
   const teachers = [-4.3, 0, 4.3].map((x, index) => {
     const teacher = avatar(0x465a55, "Thầy AI · Bàn " + (index + 1));
@@ -374,34 +397,92 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
   const pointer = new THREE.Vector2();
   const floor = new THREE.Plane(new THREE.Vector3(0, 1, 0), -0.055);
   const hit = new THREE.Vector3();
-  let press: { x: number; y: number } | undefined;
+  const keys = new Set<string>();
+  const steer = new THREE.Vector2();
+  const cameraGoal = new THREE.Vector3();
+  const cameraTarget = new THREE.Vector3();
+  const look = new THREE.Vector3();
+  const sparks = new Float32Array(54 * 3);
+  const sparkGeometry = new THREE.BufferGeometry();
+  sparkGeometry.setAttribute("position", new THREE.BufferAttribute(sparks, 3));
+  const sparkMaterial = new THREE.PointsMaterial({ color: 0xffc985, size: 0.085, transparent: true, opacity: 0.7, depthWrite: false });
+  const sparkCloud = new THREE.Points(sparkGeometry, sparkMaterial);
+  sparkCloud.frustumCulled = false;
+  scene.add(sparkCloud);
+  const pad = container.querySelector<HTMLDivElement>("[data-joystick]")!;
+  const knob = pad.firstElementChild as HTMLSpanElement;
+  const movementKeys = new Set(["KeyW","KeyA","KeyS","KeyD","ArrowUp","ArrowLeft","ArrowDown","ArrowRight"]);
+  let yaw = 0;
+  let pitch = 0.42;
+  let cameraReady = false;
+  let padId: number | undefined;
+  let press: { id: number; x: number; y: number; lastX: number; lastY: number; dragged: boolean } | undefined;
+  let walkTo: Position | null = null;
+  let controlled: Position | null = null;
+  let walked = false;
+  let sentAt = 0;
+  function isClear(x: number, z: number) {
+    if (Math.abs(x) > 9.45 || z < -6.15 || z > 10.35) return false;
+    if (((x - 7.8) / 1.55) ** 2 + ((z - 2.72) / 2.53) ** 2 < 1) return false;
+    if (Math.abs(x + 5) < 1.86 && Math.abs(z + 0.75) < 1.25) return false;
+    if (Math.abs(x - 6.38) < 0.73 && Math.abs(z + 4.04) < 0.75) return false;
+    return !FRONT_COLUMNS.some(column => Math.abs(x - column) < 0.48 && Math.abs(z + 5.4) < 0.48);
+  }
   function pressDown(event: PointerEvent) {
-    if (event.button === 0) press = { x: event.clientX, y: event.clientY };
+    if (event.button !== 0 || press || !latest.current.interactive) return;
+    event.preventDefault();
+    container.closest("main")?.focus({ preventScroll: true });
+    canvas.setPointerCapture(event.pointerId);
+    press = { id: event.pointerId, x: event.clientX, y: event.clientY, lastX: event.clientX, lastY: event.clientY, dragged: false };
+  }
+  function pressMove(event: PointerEvent) {
+    if (!press || press.id !== event.pointerId) return;
+    if (!press.dragged && Math.hypot(event.clientX - press.x, event.clientY - press.y) < 7) return;
+    press.dragged = true;
+    yaw -= (event.clientX - press.lastX) * 0.008;
+    pitch = THREE.MathUtils.clamp(pitch + (event.clientY - press.lastY) * 0.006, 0.2, 1.02);
+    press.lastX = event.clientX;
+    press.lastY = event.clientY;
   }
   function pressEnd(event: PointerEvent) {
     const start = press;
+    if (start?.id !== event.pointerId) return;
     press = undefined;
-    if (!start || Math.hypot(event.clientX - start.x, event.clientY - start.y) > 12) return;
+    if (start.dragged || !latest.current.interactive) return;
     const rect = canvas.getBoundingClientRect();
     pointer.set((event.clientX - rect.left) / rect.width * 2 - 1, 1 - (event.clientY - rect.top) / rect.height * 2);
     ray.setFromCamera(pointer, camera);
     if (!ray.ray.intersectPlane(floor, hit)) return;
-    if (Math.abs(hit.x) > 9.65 || hit.z < -4.42 || hit.z > 10.62) return;
-    const inPond = ((hit.x - 7.8) / 1.17) ** 2 + ((hit.z - 2.72) / 2.2) ** 2 < 1;
-    const inAltar = Math.abs(hit.x + 5) < 1.6 && Math.abs(hit.z + 0.75) < 0.95;
-    if (!inPond && !inAltar) latest.current.onMove({ x: hit.x, z: hit.z });
+    if (isClear(hit.x, hit.z)) walkTo = { x: hit.x, z: hit.z };
   }
   function cancelPress() { press = undefined; }
+  function keyDown(event: KeyboardEvent) {
+    if (!latest.current.interactive || !movementKeys.has(event.code) ||
+        (event.target instanceof HTMLElement && event.target.closest("input, textarea, select, [contenteditable]"))) return;
+    event.preventDefault();
+    keys.add(event.code);
+  }
+  function keyUp(event: KeyboardEvent) { keys.delete(event.code); }
+  function padMove(event: PointerEvent) {
+    if (padId !== event.pointerId) return;
+    const rect = pad.getBoundingClientRect();
+    steer.set((event.clientX - rect.left - rect.width / 2) / 31, (event.clientY - rect.top - rect.height / 2) / 31).clampLength(0, 1);
+    knob.style.transform = `translate(${steer.x * 28}px, ${steer.y * 28}px)`;
+  }
+  function padDown(event: PointerEvent) {
+    if (!latest.current.interactive || padId !== undefined) return;
+    padId = event.pointerId;
+    pad.setPointerCapture(padId);
+    padMove(event);
+  }
+  function padEnd() { padId = undefined; steer.set(0, 0); knob.style.transform = ""; }
+  function clearInput() { keys.clear(); walkTo = null; press = undefined; padEnd(); }
   function resize() {
     const width = container.clientWidth;
     const height = container.clientHeight;
     if (!width || !height) return;
-    const ratio = width / height;
-    const halfWidth = Math.max(12.25, ratio * 9.7);
-    camera.left = -halfWidth;
-    camera.right = halfWidth;
-    camera.top = halfWidth / ratio;
-    camera.bottom = -camera.top;
+    camera.aspect = width / height;
+    camera.fov = camera.aspect < 0.8 ? 62 : 52;
     camera.updateProjectionMatrix();
     renderer.setSize(width, height, false);
   }
@@ -437,7 +518,50 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
     const dt = Math.min((time - (previous || time)) / 1000, 0.07);
     previous = time;
     const current = latest.current;
-    move(self, current.position, current.action, time / 1000, dt);
+    if (!current.interactive && (keys.size || walkTo || padId !== undefined)) clearInput();
+    let dx = steer.x + Number(keys.has("KeyD") || keys.has("ArrowRight")) - Number(keys.has("KeyA") || keys.has("ArrowLeft"));
+    let dz = steer.y + Number(keys.has("KeyS") || keys.has("ArrowDown")) - Number(keys.has("KeyW") || keys.has("ArrowUp"));
+    if (Math.hypot(dx, dz) > 0.09) {
+      walkTo = null;
+      const sideways = dx;
+      dx = sideways * Math.cos(yaw) + dz * Math.sin(yaw);
+      dz = dz * Math.cos(yaw) - sideways * Math.sin(yaw);
+    } else if (walkTo) {
+      const point = controlled ?? current.position;
+      dx = walkTo.x - point.x;
+      dz = walkTo.z - point.z;
+      if (Math.hypot(dx, dz) < 0.17) { walkTo = null; dx = 0; dz = 0; }
+    }
+    const magnitude = Math.hypot(dx, dz);
+    if (current.interactive && magnitude > 0.09) {
+      walked = true;
+      controlled ??= { ...current.position };
+      const pace = 4.25 * dt / Math.max(walkTo ? 0.25 : 1, magnitude);
+      const nx = controlled.x + dx * pace;
+      const nz = controlled.z + dz * pace;
+      const clearX = isClear(nx, controlled.z);
+      if (clearX) controlled.x = nx;
+      const clearZ = isClear(controlled.x, nz);
+      if (clearZ) controlled.z = nz;
+      if (!(clearX && Math.abs(dx) > 0.01) && !(clearZ && Math.abs(dz) > 0.01)) walkTo = null;
+      if (time - sentAt >= 80) { current.onMove({ ...controlled }); sentAt = time; }
+    } else if (controlled) {
+      current.onMove({ ...controlled });
+      controlled = null;
+    }
+    if (!walked) self.group.position.set(current.position.x, 0.054, current.position.z);
+    move(self, controlled ?? current.position, current.action, time / 1000, dt);
+    const { x, z } = self.group.position;
+    const distance = camera.aspect < 0.8 ? 4.9 : 4.55;
+    const planar = Math.cos(pitch) * distance;
+    cameraGoal.set(x + Math.sin(yaw) * planar, 1.18 + Math.sin(pitch) * distance, z + Math.cos(yaw) * planar);
+    cameraTarget.set(x - Math.sin(yaw) * 2.1, 1.45, z - Math.cos(yaw) * 2.1);
+    const follow = !cameraReady || motion.matches ? 1 : 1 - Math.exp(-dt * 8);
+    camera.position.lerp(cameraGoal, follow);
+    look.lerp(cameraTarget, follow);
+    camera.lookAt(look);
+    skyDome.position.copy(camera.position);
+    cameraReady = true;
     const active = new Set<string>();
     for (const player of current.players) {
       active.add(player.id);
@@ -454,6 +578,7 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
         visitors.set(player.id, visitor);
       }
       move(visitor, player, player.action, time / 1000, dt);
+      visitor.group.visible = Math.hypot(player.x - x, player.z - z) > 0.5;
     }
     for (const [id, visitor] of visitors) {
       if (active.has(id)) continue;
@@ -467,12 +592,27 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
       mesh.scale.setScalar(0.082 + phase * 0.35);
       mesh.material.opacity = (1 - phase) * (current.action === "incense" ? 0.42 : 0.25);
     });
+    for (let i = 0; i < 54; i++) {
+      const t = motion.matches ? 0 : time * 0.00037;
+      sparks[i * 3] = Math.sin(i * 16.31) * 10 + Math.sin(i + t) * 0.7;
+      sparks[i * 3 + 1] = 0.6 + ((i * 1.39) % 4) + Math.sin(i * 3 + t) * 0.35;
+      sparks[i * 3 + 2] = Math.cos(i * 14.17) * 10 + Math.cos(i - t) * 0.8;
+    }
+    sparkGeometry.attributes.position.needsUpdate = true;
     renderer.render(scene, camera);
   }
   canvas.addEventListener("pointerdown", pressDown);
+  canvas.addEventListener("pointermove", pressMove);
   canvas.addEventListener("pointerup", pressEnd);
   canvas.addEventListener("pointercancel", cancelPress);
   canvas.addEventListener("webglcontextlost", contextLost);
+  pad.addEventListener("pointerdown", padDown);
+  pad.addEventListener("pointermove", padMove);
+  pad.addEventListener("pointerup", padEnd);
+  pad.addEventListener("pointercancel", padEnd);
+  window.addEventListener("keydown", keyDown);
+  window.addEventListener("keyup", keyUp);
+  window.addEventListener("blur", clearInput);
   frame = requestAnimationFrame(draw);
 
   return () => {
@@ -480,9 +620,17 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
     cancelAnimationFrame(frame);
     resizeObserver.disconnect();
     canvas.removeEventListener("pointerdown", pressDown);
+    canvas.removeEventListener("pointermove", pressMove);
     canvas.removeEventListener("pointerup", pressEnd);
     canvas.removeEventListener("pointercancel", cancelPress);
     canvas.removeEventListener("webglcontextlost", contextLost);
+    pad.removeEventListener("pointerdown", padDown);
+    pad.removeEventListener("pointermove", padMove);
+    pad.removeEventListener("pointerup", padEnd);
+    pad.removeEventListener("pointercancel", padEnd);
+    window.removeEventListener("keydown", keyDown);
+    window.removeEventListener("keyup", keyUp);
+    window.removeEventListener("blur", clearInput);
     Object.values(geometry).forEach((value) => value.dispose());
     materials.forEach((value) => value.dispose());
     signs.forEach(disposeLabel);
@@ -491,6 +639,10 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
     teachers.forEach((teacher) => disposeLabel(teacher.badge));
     groundShadows.dispose();
     smoke.forEach((mesh) => mesh.material.dispose());
+    skyDome.geometry.dispose();
+    skyDome.material.dispose();
+    sparkGeometry.dispose();
+    sparkMaterial.dispose();
     scene.traverse((node) => {
       if (node instanceof THREE.InstancedMesh) node.dispose();
     });
@@ -514,7 +666,7 @@ export default function TuViQuanScene(props: SceneProps) {
   }, []);
   return (
     <div className={styles.scene} ref={container}>
-      <p className={styles.hint}>Chạm vào sân để di chuyển</p>
+      <div data-joystick className={props.interactive ? styles.joystick : styles.hidden} aria-hidden="true"><span /></div>
     </div>
   );
 }

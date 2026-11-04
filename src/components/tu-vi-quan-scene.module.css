@@ -1,31 +1,15 @@
-.scene {
-  position: relative;
-  width: 100%;
-  height: clamp(340px, 60vw, 590px);
-  overflow: hidden;
-  isolation: isolate;
-  background: #e0b98d;
-  border-radius: inherit;
-}
-
-.scene canvas {
-  display: block;
-  width: 100%;
-  height: 100%;
-  cursor: crosshair;
-  touch-action: pan-y pinch-zoom;
-}
-
-.hint {
-  position: absolute;
-  bottom: 14px;
-  left: 14px;
-  margin: 0;
-  padding: 7px 11px;
-  border-radius: 6px;
-  background: #3d2a21ed;
-  color: #fff1d9;
-  font-size: 0.8125rem;
-  line-height: 1.35;
-  pointer-events: none;
+.scene, .scene canvas { width: 100%; height: 100%; display: block; }
+.scene { position: relative; isolation: isolate; overflow: hidden; }
+.scene canvas { cursor: grab; touch-action: none; }
+.scene canvas:active { cursor: grabbing; }
+.hidden { display: none; }
+.joystick { display: none; }
+@media (pointer: coarse) {
+  .joystick {
+    position: absolute; z-index: 1; display: grid; place-items: center;
+    left: max(18px,env(safe-area-inset-left)); bottom: max(22px,env(safe-area-inset-bottom));
+    width: 104px; height: 104px; border-radius: 50%; touch-action: none;
+    border: 1px solid #f6d4a98a; background: #231a24a8; box-shadow: inset 0 0 0 9px #25192647,0 6px 22px #160f1a55;
+  }
+  .joystick span { width: 43px; height: 43px; border-radius: 50%; background: radial-gradient(circle at 35% 25%,#ffe0a9,#b98461); box-shadow: 0 4px 12px #1a121c9c; pointer-events: none; }
 }

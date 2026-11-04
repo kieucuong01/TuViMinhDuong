@@ -2,7 +2,9 @@
 
 import dynamic from "next/dynamic";
 import Image from "next/image";
+import Link from "next/link";
 import { useEffect, useRef, useState, type FormEvent } from "react";
+import { ArrowLeft, CircleHelp, Compass, MapPin, X } from "lucide-react";
 import styles from "./tu-vi-quan.module.css";
 
 const Scene = dynamic(() => import("./tu-vi-quan-scene"), { ssr: false });
@@ -45,6 +47,7 @@ export default function TuViQuan({ initialAlias, support, paymentsEnabled }: {
   const [courtyardFull, setCourtyardFull] = useState(false);
   const [board, setBoard] = useState<{ tables: number; occupied: number; queued: number } | null>(null);
   const [lite, setLite] = useState(false);
+  const [help, setHelp] = useState(false);
   const [notice, setNotice] = useState("");
   const [error, setError] = useState("");
   const [panel, setPanel] = useState<"session" | "support" | "restore" | null>(null);
@@ -56,6 +59,9 @@ export default function TuViQuan({ initialAlias, support, paymentsEnabled }: {
   const [busy, setBusy] = useState(false);
   const [now, setNow] = useState(Date.now);
   const socket = useRef<WebSocket | null>(null);
+  const latestPosition = useRef(origin);
+  const didSpawn = useRef(false);
+  const world = useRef<HTMLElement | null>(null);
   const panelHeading = useRef<HTMLHeadingElement | null>(null);
   const questionTurn = useRef<{ question: string; id: string } | null>(null);
   const actionTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -77,12 +83,24 @@ export default function TuViQuan({ initialAlias, support, paymentsEnabled }: {
         const url = (location.protocol === "https:" ? "wss://" : "ws://") +
           (local ? location.hostname + ":4001" : location.host) + "/tu-vi-quan-ws";
         const ws = new WebSocket(url, ["tu-vi-quan", ticket]);
+        let firstSnapshot = true;
         socket.current = ws;
         ws.onmessage = ({ data }) => {
           if (!live) return;
           try {
             const packet = JSON.parse(data);
             if (packet.type !== "snapshot" || !Array.isArray(packet.players)) return;
+            if (firstSnapshot) {
+              firstSnapshot = false;
+              const self = packet.players.find((player: Player) => player.id === packet.selfId);
+              if (!didSpawn.current && self && latestPosition.current === origin) {
+                latestPosition.current = { x: self.x, z: self.z };
+                setPosition(latestPosition.current);
+              } else {
+                ws.send(JSON.stringify({ type: "move", ...latestPosition.current }));
+              }
+              didSpawn.current = true;
+            }
             setOnline(true);
             setCourtyardFull(false);
             setBoard(packet.board ?? null);
@@ -131,10 +149,9 @@ export default function TuViQuan({ initialAlias, support, paymentsEnabled }: {
   }, [alias, session?.id]);
 
   useEffect(() => {
-    if (!panel) return;
-    panelHeading.current?.focus({ preventScroll: true });
-    panelHeading.current?.scrollIntoView({ block: "nearest" });
-  }, [panel]);
+    if (panel) panelHeading.current?.focus({ preventScroll: true });
+    else if (alias && !help) world.current?.focus({ preventScroll: true });
+  }, [alias, help, panel]);
 
   useEffect(() => {
     if (session?.status !== "active" && session?.status !== "pending") return;
@@ -169,9 +186,10 @@ export default function TuViQuan({ initialAlias, support, paymentsEnabled }: {
   }
 
   function move(target: Position) {
+    latestPosition.current = target;
     setPosition(target);
     send({ type: "move", ...target });
-    doAction("idle");
+    if (action !== "idle") doAction("idle");
   }
 
   async function submitGuest(event: FormEvent<HTMLFormElement>) {
@@ -242,19 +260,72 @@ export default function TuViQuan({ initialAlias, support, paymentsEnabled }: {
   const clock = Math.floor(remaining / 60) + ":" + String(remaining % 60).padStart(2, "0");
   const expiredQr = session?.status === "pending" && Boolean(session.expiresAt && Date.parse(session.expiresAt) <= now);
   const canOrder = !session || expiredQr || ["cancelled", "ended", "refund"].includes(session.status);
+  const stationDistance = (x: number, z: number) => Math.hypot(x - position.x, z - position.z);
+  const nearby = [
+    ...stations,
+    { action: "teacher" as const, label: "Xem lá số", x: 0, z: -5 },
+    ...(support ? [{ action: "support" as const, label: "Hòm công đức", x: 5, z: -4 }] : []),
+  ].filter((station) => stationDistance(station.x, station.z) <= 2.05)
+    .sort((a, b) => stationDistance(a.x, a.z) - stationDistance(b.x, b.z))[0];
+
+  function interactStation(station: NonNullable<typeof nearby>, shortcut = false) {
+    if (station.action === "teacher" || station.action === "support") {
+      if (shortcut) move(station);
+      openPanel(station.action === "teacher" ? "session" : "support");
+      return;
+    }
+    if (station.action === "meditate" && action === "meditate") {
+      doAction("idle");
+      setNotice("Bạn đã đứng dậy.");
+      return;
+    }
+    if (shortcut) move(station);
+    doAction(station.action);
+    setNotice(station.action === "incense" ? "Bạn đã thắp một nén hương." : station.action === "greet" ? "Bạn đã chắp tay chào khách." : "Bạn đang ngồi thiền.");
+  }
+
+  function handleWorldKey(event: React.KeyboardEvent<HTMLElement>) {
+    if (event.key === "Escape") {
+      if (panel) openPanel(null);
+      else setHelp(false);
+      return;
+    }
+    if (panel && event.key === "Tab") {
+      const focusable = event.currentTarget.querySelectorAll<HTMLElement>(
+        '[role="dialog"] :is(button, input, textarea, select, a[href]):not(:disabled)',
+      );
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (first && ((event.shiftKey && (event.target === first || event.target === panelHeading.current)) ||
+          (!event.shiftKey && event.target === last))) {
+        event.preventDefault();
+        (event.shiftKey ? last : first).focus();
+      }
+      return;
+    }
+    if (event.code === "KeyE" && nearby && alias && !panel && !help && !event.repeat &&
+        !(event.target instanceof HTMLElement && event.target.closest("input,textarea,select,[contenteditable]"))) {
+      event.preventDefault();
+      interactStation(nearby);
+    }
+  }
 
   return (
-    <main className={styles.page}>
+    <main ref={world} className={styles.page} data-quan-world onKeyDown={handleWorldKey} tabIndex={-1}>
+      <section className={styles.courtyard} aria-label="Sân Tử Vi Quán">
+        {!lite && <Scene position={position} action={action} players={players} onMove={move} interactive={Boolean(alias && !panel && !help)} onUnavailable={() => setLite(true)} />}
+      </section>
       <header className={styles.mast}>
-        <div><p className={styles.eyebrow}>LÁ SỐ TINH HOA</p><h1>Tử Vi Quán</h1></div>
-        {alias && <div className={styles.guest}><strong>{alias}</strong><span>{online ? players.length + 1 + " khách trong sân" : courtyardFull ? "Sân chung đang đông" : "Đang kết nối sân chung"}</span></div>}
+        <Link href="/" className={styles.icon} aria-label="Về Lá số tinh hoa"><ArrowLeft size={20} /></Link>
+        <div className={styles.identity}><h1>Tử Vi Quán</h1><span>{alias ? online ? players.length + 1 + " khách trong sân" : courtyardFull ? "Sân chung đang đông" : "Đang kết nối sân chung" : "Lá số tinh hoa"}</span></div>
+        {alias && <button className={styles.icon} aria-label="Hướng dẫn và tùy chọn" aria-expanded={help} onClick={() => setHelp(!help)}><CircleHelp size={22} /></button>}
       </header>
       {!alias ? (
         <section className={styles.welcome}>
           <div className={styles.welcomeInner}>
-            <p className={styles.eyebrow}>MỘT GÓC TĨNH TÂM</p>
+            <p className={styles.eyebrow}>SÂN QUÁN LÚC CHIỀU XUỐNG</p>
             <h2>Mời bạn ghé quán</h2>
-            <p>Thắp hương, chắp tay chào khách và ngồi nghỉ dưới hiên. Khi muốn luận lá số, bạn có thể vào bàn trò chuyện riêng với thầy AI.</p>
+            <p>Dạo sân, thắp hương và ghé bàn thầy để trò chuyện riêng về lá số của bạn.</p>
             <form onSubmit={submitGuest}>
               <label htmlFor="quan-alias">Bí danh của bạn</label>
               <input id="quan-alias" name="alias" autoComplete="nickname" minLength={2} maxLength={24} placeholder="Ví dụ Mây Trắng" required />
@@ -266,36 +337,29 @@ export default function TuViQuan({ initialAlias, support, paymentsEnabled }: {
         </section>
       ) : (
         <>
-          <section className={styles.courtyard} aria-label="Sân Tử Vi Quán">
-            {!lite ? <Scene position={position} action={action} players={players} onMove={move} onUnavailable={() => setLite(true)} /> :
-              <div className={styles.lite}><h2>Sân quán</h2><p>Chọn một hoạt động hoặc ghé bàn thầy.</p>{players.length > 0 && <p>Khách đang ở sân: {players.map((player) => player.alias).join(", ")}</p>}</div>}
-            <span className={styles.badge}>SÂN QUÁN</span>
-          </section>
-          <div className={styles.actions} aria-label="Hoạt động trong quán">
-            {stations.map((station) => <button key={station.action} aria-pressed={action === station.action} onClick={() => {
-              if (action === "meditate" && station.action === "meditate") {
-                doAction("idle");
-                setNotice("Bạn đã đứng dậy.");
-                return;
-              }
-              move({ x: station.x, z: station.z });
-              doAction(station.action);
-              setNotice(station.action === "incense" ? "Bạn đã thắp một nén hương." : station.action === "greet" ? "Bạn đã chắp tay chào khách." : "Bạn đang ngồi thiền.");
-            }}>{action === "meditate" && station.action === "meditate" ? "Đứng dậy" : station.label}</button>)}
-            <button className={styles.primary} onClick={() => { move({ x: 0, z: -5 }); openPanel("session"); }}>
-              {session && !canOrder ? "Lượt xem của bạn" : "Xem lá số"}
-              {session?.status === "invited" ? " · Đến lượt" : ""}
-            </button>
-            {support && <button onClick={() => { move({ x: 5, z: -4 }); openPanel("support"); }}>Hòm công đức</button>}
-          </div>
-          <div className={styles.utility}>
-            <p role="status">{notice || (lite ? "Đang dùng giao diện nhẹ." : "Chạm xuống sân để di chuyển.")}</p>
-            {board && <span>{board.tables ? `${Math.min(board.occupied, board.tables)}/${board.tables} bàn đang dùng · ${board.queued} lượt chờ` : "Bàn thầy đang tạm nghỉ"}</span>}
-            <button onClick={() => setLite(!lite)}>{lite ? "Thử lại 3D" : "Giao diện nhẹ"}</button>
-            <button onClick={() => openPanel("restore")}>Khôi phục lượt đã mua</button>
-          </div>
-          {panel && <section className={styles.panel} aria-label={panel === "session" ? "Bàn thầy" : panel === "support" ? "Hòm công đức" : "Khôi phục lượt"}>
-            <div className={styles.panelHead}><h2 ref={panelHeading} tabIndex={-1}>{panel === "session" ? "Bàn luận lá số" : panel === "support" ? "Hòm công đức" : "Khôi phục lượt xem"}</h2><button onClick={() => openPanel(null)}>Đóng</button></div>
+          {lite && <section className={styles.lite}><h2>Sân quán</h2><p>Chọn một hoạt động hoặc ghé bàn thầy.</p>
+            {players.length > 0 && <p>Khách đang ở sân: {players.map((player) => player.alias).join(", ")}</p>}
+            <div className={styles.quickActions}>{stations.map((station) => <button key={station.action} onClick={() => interactStation(station, true)}>{station.action === "meditate" && action === "meditate" ? "Đứng dậy" : station.label}</button>)}
+              <button className={styles.primary} onClick={() => openPanel("session")}>Xem lá số</button>
+              {support && <button onClick={() => openPanel("support")}>Hòm công đức</button>}
+            </div>
+          </section>}
+          {!lite && <div className={styles.location}><Compass size={15} /><span>{nearby?.label ?? "Sân quán"}</span></div>}
+          {session && !canOrder && <button className={styles.sessionBadge} onClick={() => openPanel("session")}>{session.status === "invited" ? "Đã đến lượt" : "Lượt xem của bạn"}</button>}
+          {help && <aside className={styles.help} aria-label="Hướng dẫn và tùy chọn">
+            <strong>Đi lại trong quán</strong><p>Dùng cần điều khiển hoặc phím WASD. Chạm nền để đi, kéo cảnh để xoay góc nhìn.</p>
+            <p>Đến gần bàn hương, góc thiền hoặc bàn thầy để hiện nút tương tác.</p>
+            {board && <p>{board.tables ? `${board.occupied}/${board.tables} bàn đang dùng · ${board.queued} lượt chờ` : "Bàn thầy đang tạm nghỉ"}</p>}
+            <button onClick={() => { setLite(!lite); setHelp(false); }}>{lite ? "Thử lại 3D" : "Giao diện nhẹ"}</button>
+            <button onClick={() => { setHelp(false); openPanel("restore"); }}>Khôi phục lượt đã mua</button>
+          </aside>}
+          {notice && <p className={styles.notice} role="status">{notice}</p>}
+          {!lite && !panel && !help && <div className={styles.interaction}>
+            {nearby ? <button className={styles.primary} onClick={() => interactStation(nearby)}>{nearby.action === "meditate" && action === "meditate" ? "Đứng dậy" : nearby.label}<kbd>E</kbd></button> :
+              <span><MapPin size={15} /> Ghé bàn thầy dưới mái ngói</span>}
+          </div>}
+          {panel && <div className={styles.scrim}><section className={styles.panel} role="dialog" aria-modal="true" aria-labelledby="quan-panel-title">
+            <div className={styles.panelHead}><h2 id="quan-panel-title" ref={panelHeading} tabIndex={-1}>{panel === "session" ? "Bàn luận lá số" : panel === "support" ? "Hòm công đức" : "Khôi phục lượt xem"}</h2><button className={styles.icon} aria-label="Đóng" onClick={() => openPanel(null)}><X size={21} /></button></div>
             {panel === "support" && support && <div className={styles.payment}><p>Ủng hộ tự nguyện để duy trì Tử Vi Quán.</p><Image src={support.qr} alt="QR ủng hộ vận hành Tử Vi Quán" width={250} height={250} unoptimized /><p>Người nhận: <strong>{support.recipient}</strong></p></div>}
             {panel === "restore" && <form onSubmit={(event) => {
               event.preventDefault();
@@ -357,7 +421,7 @@ export default function TuViQuan({ initialAlias, support, paymentsEnabled }: {
               </form> : <p>Quán chưa mở nhận thanh toán. Bạn vẫn có thể ghé sân và tham gia các hoạt động miễn phí.</p>)}
             </>}
             {error && <p role="alert" className={styles.error}>{error}</p>}
-          </section>}
+          </section></div>}
         </>
       )}
     </main>

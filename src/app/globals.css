@@ -18498,3 +18498,8 @@ button.is-loading:not(.icon-button)::before {
     white-space: nowrap;
   }
 }
+
+/* Tử Vi Quán renders its own HUD instead of site navigation. */
+body:has([data-quan-world]) { overflow: hidden; }
+body:has([data-quan-world]) > .site-header,
+body:has([data-quan-world]) > .site-footer { display: none; }
