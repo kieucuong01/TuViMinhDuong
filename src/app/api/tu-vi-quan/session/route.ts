@@ -1,0 +1,78 @@
+import { randomUUID } from "node:crypto";
+import { getDb } from "@/lib/db";
+import { checkAuthRateLimit } from "@/lib/rate-limit";
+import { getQuanGuest, setQuanGuest } from "@/lib/tu-vi-quan-guest";
+import { quanError, quanJson, readQuanBody } from "@/lib/tu-vi-quan-http";
+import { refreshQuanPayment } from "@/lib/tu-vi-quan-payment";
+import {
+  answerQuanTurn, changeQuanAdmission, checkoutQuanSession, quanTransaction,
+  QuanSessionError, readQuanSession, reissueQuanRecoveryCode, restoreQuanSession,
+} from "@/lib/tu-vi-quan-session";
+
+const orderIdPattern = /^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i;
+const turnIdPattern = /^[A-Za-z0-9_-]{8,80}$/;
+
+export async function GET(request: Request) {
+  try {
+    const guest = await getQuanGuest();
+    if (!guest) return quanJson({ session: null });
+    const id = new URL(request.url).searchParams.get("id");
+    if (id && !orderIdPattern.test(id)) throw new QuanSessionError("Không tìm thấy lượt xem.", 404);
+    const db = getDb();
+    if (!db) return quanJson({ session: null });
+    const order = await db.quanOrder.findFirst({
+      where: { ownerId: guest.id, ...(id ? { id } : {}) },
+      orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+    });
+    if (!order) {
+      if (id) throw new QuanSessionError("Không tìm thấy lượt xem.", 404);
+      return quanJson({ session: null });
+    }
+    await refreshQuanPayment(db, order);
+    return quanJson(await quanTransaction(db, (tx, now) => readQuanSession(tx, guest.id, order.id, now)));
+  } catch (error) {
+    return quanError(error);
+  }
+}
+
+export async function POST(request: Request) {
+  try {
+    const body = await readQuanBody(request);
+    const db = getDb();
+    if (!db) throw new QuanSessionError("Tử Vi Quán chưa mở phiên xem.", 503);
+    const guest = await getQuanGuest();
+    if (body.action === "restore") {
+      const limit = await checkAuthRateLimit("quan-restore", request.headers, { limit: 8, windowMs: 15 * 60_000 });
+      if (limit.rateLimited) throw new QuanSessionError("Bạn hãy đợi rồi thử khôi phục lại.", 429);
+      const code = typeof body.code === "string" ? body.code.trim() : "";
+      if (!/^[A-Za-z0-9_-]{32}$/.test(code)) throw new QuanSessionError("Mã khôi phục không hợp lệ.", 400);
+      const owner = guest ?? { id: randomUUID(), alias: "Khách" };
+      const restored = await restoreQuanSession(db, owner, code);
+      if (!guest) await setQuanGuest(owner);
+      return quanJson(restored);
+    }
+    if (!guest) throw new QuanSessionError("Hãy nhập bí danh trước khi xem.", 401);
+    if (body.action === "checkout") {
+      const limit = await checkAuthRateLimit("quan-checkout", request.headers, { limit: 12, windowMs: 15 * 60_000 });
+      if (limit.rateLimited) throw new QuanSessionError("Bạn đã tạo nhiều đơn. Hãy đợi rồi thử lại.", 429);
+      return quanJson(await checkoutQuanSession(db, guest, body.minutes, body.chart));
+    }
+    const { id, action } = body;
+    if (typeof id !== "string" || !orderIdPattern.test(id)) throw new QuanSessionError("Không tìm thấy lượt xem.", 404);
+    if (action === "reissue") return quanJson(await reissueQuanRecoveryCode(db, guest.id, id));
+    if (action === "join" || action === "leave" || action === "start") {
+      return quanJson(await changeQuanAdmission(db, guest.id, id, action));
+    }
+    if (action === "chat") {
+      const question = typeof body.question === "string" ? body.question.trim() : "";
+      const turnId = typeof body.turnId === "string" ? body.turnId : "";
+      if (!question || question.length > 1200 || !turnIdPattern.test(turnId)) {
+        throw new QuanSessionError("Hãy nhập câu hỏi tối đa 1.200 ký tự.", 400);
+      }
+      return quanJson(await answerQuanTurn(db, guest.id, id, turnId, question));
+    }
+    throw new QuanSessionError("Yêu cầu không hợp lệ.", 400);
+  } catch (error) {
+    return quanError(error);
+  }
+}

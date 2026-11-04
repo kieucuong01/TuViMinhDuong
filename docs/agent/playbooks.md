@@ -207,6 +207,10 @@ Rules:
 - Production app path is `/opt/lasotinhhoa/current`; releases should update that symlink or directory deliberately.
 - Preferred SSH entrypoint from this workspace is `ssh tuvi-vps`; keep strict host-key checking and use the dedicated key in the local SSH config instead of password-only SSH.
 - PM2 process name is `lasotinhhoa`; internal app port is `127.0.0.1:4100`.
+- Tử Vi Quán presence runs as `lasotinhhoa-quan-realtime` on `127.0.0.1:4101`. The release script installs the Nginx include for the exact `/tu-vi-quan-ws` location and checks the loopback service and HTTPS proxy before completing. Its socket ticket is tied to the guest cookie and kept out of the URL.
+- Locally start the app on port `4000` and run `node scripts/tu-vi-quan-realtime.mjs --serve` in another terminal for presence on `127.0.0.1:4001`. Use two browser contexts to see each guest move in the other context.
+- Ship the first Tử Vi Quán release with `npm run ship -- "feat: add Tu Vi Quan" -Migrate`. The courtyard opens independently of paid checkout. Enable `TU_VI_QUAN_PAYMENTS_ENABLED` only after verifying both PayOS packages and an AI provider. Admin manages capacity and records reconciled refunds at `/admin/tu-vi-quan`.
+- Set `TU_VI_QUAN_SUPPORT_QR` to a same-site image path or HTTPS image URL and `TU_VI_QUAN_SUPPORT_RECIPIENT` to the recipient name to show the optional support QR. This QR does not create or settle orders.
 - Nginx owns public HTTP/HTTPS and reverse proxies to the internal app port. Avoid port collisions with the other VPS app on `127.0.0.1:5000`.
 - Production DB is PostgreSQL 17 on the VPS, not local demo fallback.
 - Production `DATABASE_URL` should point to the VPS-local DB at `127.0.0.1:5433/lasotinhhoa`; do not route production back to remote hosted Postgres.

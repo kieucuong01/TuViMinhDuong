@@ -300,6 +300,10 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
               <span>{tab.helper}</span>
             </Link>
           ))}
+          <Link href="/admin/tu-vi-quan" className="admin-tab-link" prefetch={false}>
+            <strong>Tử Vi Quán</strong>
+            <span>Bàn thầy, đơn xem và hoàn tiền</span>
+          </Link>
         </nav>
 
         {activeTab === "overview" ? <section className="admin-tab-section">

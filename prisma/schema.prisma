@@ -291,6 +291,69 @@ model PaymentReconciliationRun {
   @@index([createdAt])
 }
 
+enum QuanOrderStatus {
+  PENDING
+  PAID
+  QUEUED
+  INVITED
+  ACTIVE
+  ENDED
+  REFUND
+  CANCELLED
+}
+
+model QuanOrder {
+  id              String          @id @default(uuid())
+  ownerId         String
+  alias           String
+  recoveryDigest  String          @unique
+  orderCode       BigInt          @unique
+  paymentLinkId   String?         @unique
+  checkoutUrl     String?
+  qrCode          String?
+  amountVnd       Int
+  minutes         Int
+  chart           Json
+  status          QuanOrderStatus @default(PENDING)
+  expiresAt       DateTime
+  checkedAt       DateTime?
+  paidAt          DateTime?
+  queuedAt        DateTime?
+  inviteExpiresAt DateTime?
+  tableNumber     Int?
+  startedAt       DateTime?
+  endsAt          DateTime?
+  outageSince     DateTime?
+  refundAmountVnd Int?
+  refundSettledAt DateTime?
+  createdAt       DateTime        @default(now())
+  turns           QuanTurn[]
+
+  @@index([ownerId, createdAt])
+  @@index([status, queuedAt])
+}
+
+model QuanTurn {
+  orderId    String
+  id         String
+  question   String
+  answer     String?
+  state      String
+  attempt    Int      @default(1)
+  startedAt  DateTime
+  deadlineAt DateTime
+  createdAt  DateTime @default(now())
+  order      QuanOrder @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@id([orderId, id])
+  @@index([orderId, state])
+}
+
+model QuanSettings {
+  id        String @id
+  maxTables Int    @default(3)
+}
+
 model RateLimitBucket {
   keyHash     String
   windowStart DateTime

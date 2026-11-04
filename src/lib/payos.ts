@@ -45,7 +45,7 @@ type TopupPaymentOrder = {
   attribution?: unknown;
 };
 
-export async function getPayOSPaymentRequest(orderCode: string | number | bigint): Promise<PayOSPaymentRequestStatus | null> {
+export async function getPayOSPaymentRequest(orderCode: string | number | bigint, signal?: AbortSignal): Promise<PayOSPaymentRequestStatus | null> {
   if (!isPayOSEnabled()) return null;
   const response = await fetch(`https://api-merchant.payos.vn/v2/payment-requests/${orderCode}`, {
     headers: {
@@ -53,6 +53,7 @@ export async function getPayOSPaymentRequest(orderCode: string | number | bigint
       "x-api-key": process.env.PAYOS_API_KEY || "",
     },
     cache: "no-store",
+    signal,
   });
   if (!response.ok) return null;
   const json = await response.json().catch(() => null);
@@ -348,10 +349,13 @@ type CheckoutInput = {
   buyerEmail?: string | null;
   returnPath: string;
   cancelPath: string;
+  orderCode?: number;
+  expiresAt?: number;
+  signal?: AbortSignal;
 };
 
 export async function createPayOSCustomCheckout(input: CheckoutInput) {
-  const orderCode = Number(`${Date.now()}${Math.floor(Math.random() * 90 + 10)}`.slice(-12));
+  const orderCode = input.orderCode ?? Number(`${Date.now()}${Math.floor(Math.random() * 90 + 10)}`.slice(-12));
   const returnPath = normalizeReturnPath(input.returnPath);
   const cancelPath = normalizeReturnPath(input.cancelPath);
   const returnJoin = returnPath.includes("?") ? "&" : "?";
@@ -366,6 +370,7 @@ export async function createPayOSCustomCheckout(input: CheckoutInput) {
     buyerEmail: input.buyerEmail || undefined,
     returnUrl: successUrl,
     cancelUrl: cancelledUrl,
+    expiredAt: input.expiresAt,
     items: [{ name: input.itemName, quantity: 1, price: input.amountVnd }],
   };
   const signature = signPayOSData({
@@ -394,6 +399,7 @@ export async function createPayOSCustomCheckout(input: CheckoutInput) {
       "x-api-key": process.env.PAYOS_API_KEY || "",
     },
     body: JSON.stringify({ ...body, signature }),
+    signal: input.signal,
   });
 
   if (!response.ok) {

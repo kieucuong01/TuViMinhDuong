@@ -6,6 +6,7 @@ import {
   settlePaidOrder,
   verifyPayOSWebhook,
 } from "@/lib/payos";
+import { isQuanOrderCode, settleQuanWebhook } from "@/lib/tu-vi-quan-payment";
 
 export async function POST(request: Request) {
   const payload = await request.json().catch(() => null);
@@ -25,6 +26,11 @@ export async function POST(request: Request) {
 
   const db = getDb();
   if (!db) return NextResponse.json({ ok: true, mode: "demo" });
+
+  if (isQuanOrderCode(orderCode)) {
+    const settled = await settleQuanWebhook(db, orderCode, payload.data);
+    return NextResponse.json({ ok: true, settled });
+  }
 
   const order = await db.paymentOrder.findUnique({ where: { orderCode } });
   if (!order) return NextResponse.json({ ok: true, ignored: "unknown-order" });

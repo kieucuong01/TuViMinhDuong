@@ -9,6 +9,7 @@ const mocks = vi.hoisted(() => ({
   paidReadingOrderPayload: vi.fn(),
   verifyPayOSWebhook: vi.fn(),
   settlePaidOrder: vi.fn(),
+  isPayOSEnabled: vi.fn(),
 }));
 
 vi.mock("next/server", () => ({
@@ -17,11 +18,14 @@ vi.mock("next/server", () => ({
   },
 }));
 vi.mock("@/lib/db", () => ({ getDb: mocks.getDb }));
+vi.mock("server-only", () => ({}));
+vi.mock("@/lib/env", () => ({ isPayOSEnabled: mocks.isPayOSEnabled }));
 vi.mock("@/lib/payos", () => ({
   isPayOSRequestPaid: mocks.isPayOSRequestPaid,
   paidReadingOrderPayload: mocks.paidReadingOrderPayload,
   verifyPayOSWebhook: mocks.verifyPayOSWebhook,
   settlePaidOrder: mocks.settlePaidOrder,
+  getPayOSPaymentRequest: vi.fn(),
 }));
 
 const order = {
@@ -44,6 +48,7 @@ function request(data: Record<string, unknown>, signature = "valid") {
 
 describe("PayOS webhook", () => {
   const db = {
+    quanOrder: { updateMany: vi.fn() },
     paymentOrder: {
       findUnique: vi.fn(),
       update: vi.fn(),
@@ -53,6 +58,7 @@ describe("PayOS webhook", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mocks.getDb.mockReturnValue(db);
+    mocks.isPayOSEnabled.mockReturnValue(true);
     mocks.paidReadingOrderPayload.mockReturnValue({
       kind: "directReading",
       chartId: "chart-1",
@@ -140,5 +146,36 @@ describe("PayOS webhook", () => {
     db.paymentOrder.findUnique.mockResolvedValue({ ...order, status: "PAID", paidAt: new Date() });
     await POST(request({ orderCode: "123", status: "CANCELLED" }));
     expect(db.paymentOrder.update).not.toHaveBeenCalled();
+  });
+
+  it("settles the exact signed Tử Vi Quán order once without touching account orders", async () => {
+    db.quanOrder.updateMany.mockResolvedValueOnce({ count: 1 }).mockResolvedValueOnce({ count: 0 });
+    const { POST } = await import("./route");
+    const data = {
+      orderCode: 1_000_000_000_001, code: "00", currency: "VND",
+      amount: 200_000, paymentLinkId: "quan-link",
+    };
+    expect(await (await POST(request(data))).json()).toEqual({ ok: true, settled: true });
+    expect(await (await POST(request(data))).json()).toEqual({ ok: true, settled: false });
+    expect(db.quanOrder.updateMany).toHaveBeenCalledWith({
+      where: {
+        orderCode: 1_000_000_000_001n, status: { in: ["PENDING", "CANCELLED"] },
+        amountVnd: 200_000, paymentLinkId: "quan-link",
+      },
+      data: { status: "PAID", paidAt: expect.any(Date) },
+    });
+    expect(db.paymentOrder.findUnique).not.toHaveBeenCalled();
+    expect(mocks.settlePaidOrder).not.toHaveBeenCalled();
+  });
+
+  it("rejects Tử Vi Quán settlement without production PayOS credentials", async () => {
+    mocks.isPayOSEnabled.mockReturnValue(false);
+    const { POST } = await import("./route");
+    const data = {
+      orderCode: 1_000_000_000_001, code: "00", currency: "VND",
+      amount: 200_000, paymentLinkId: "quan-link",
+    };
+    expect(await (await POST(request(data))).json()).toEqual({ ok: true, settled: false });
+    expect(db.quanOrder.updateMany).not.toHaveBeenCalled();
   });
 });

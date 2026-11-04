@@ -27,7 +27,7 @@ const securityHeaders = [
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data: blob: https:",
       "font-src 'self' data:",
-      "connect-src 'self' https://www.google-analytics.com https://analytics.google.com https://www.googletagmanager.com https://googleads.g.doubleclick.net",
+      ("connect-src 'self' https://www.google-analytics.com https://analytics.google.com https://www.googletagmanager.com https://googleads.g.doubleclick.net" + (process.env.NODE_ENV === "development" ? " ws://localhost:4001 ws://127.0.0.1:4001" : " wss://lasotinhhoa.vn")),
       "frame-src https://www.googletagmanager.com https://td.doubleclick.net",
       "upgrade-insecure-requests",
     ].join("; "),
@@ -35,6 +35,8 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  agentRules: false,
+  typescript: { tsconfigPath: "tsconfig.build.json" },
   poweredByHeader: false,
   allowedDevOrigins: ["127.0.0.1"],
   async redirects() {

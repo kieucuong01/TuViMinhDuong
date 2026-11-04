@@ -1,0 +1,31 @@
+.scene {
+  position: relative;
+  width: 100%;
+  height: clamp(340px, 60vw, 590px);
+  overflow: hidden;
+  isolation: isolate;
+  background: #e0b98d;
+  border-radius: inherit;
+}
+
+.scene canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  cursor: crosshair;
+  touch-action: pan-y pinch-zoom;
+}
+
+.hint {
+  position: absolute;
+  bottom: 14px;
+  left: 14px;
+  margin: 0;
+  padding: 7px 11px;
+  border-radius: 6px;
+  background: #3d2a21ed;
+  color: #fff1d9;
+  font-size: 0.8125rem;
+  line-height: 1.35;
+  pointer-events: none;
+}

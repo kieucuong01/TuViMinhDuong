@@ -107,7 +107,7 @@ function Assert-ReleaseFilesAreSafe {
     $normalizedPath = $path.Trim('"').Replace("\", "/")
 
     if (
-      $normalizedPath -match '(^|/)\.env($|\.)' -or
+      ($normalizedPath -ne '.env.example' -and $normalizedPath -match '(^|/)\.env($|\.)') -or
       $normalizedPath -match '(^|/)\.next($|/)' -or
       $normalizedPath -match '(^|/)node_modules($|/)' -or
       $normalizedPath -match '(^|/)src/generated/prisma($|/)' -or
@@ -231,9 +231,67 @@ deploy_succeeded="0"
 
 start_app() {
   local app_dir="$1"
-  cd "$app_dir"
+  cd "$app_dir" || return 1
   pm2 delete lasotinhhoa >/dev/null 2>&1 || true
-  pm2 start node_modules/next/dist/bin/next --name lasotinhhoa -- start -p 4100 -H 127.0.0.1
+  pm2 start node_modules/next/dist/bin/next --name lasotinhhoa -- start -p 4100 -H 127.0.0.1 || return 1
+  pm2 delete lasotinhhoa-quan-realtime >/dev/null 2>&1 || true
+  if [ -f scripts/tu-vi-quan-realtime.mjs ]; then
+    NODE_ENV=production pm2 start scripts/tu-vi-quan-realtime.mjs --name lasotinhhoa-quan-realtime -- --serve || return 1
+  fi
+}
+
+configure_quan_proxy() {
+  local site="/etc/nginx/sites-available/lasotinhhoa.conf"
+  local enabled="/etc/nginx/sites-enabled/lasotinhhoa.conf"
+  local snippet="/etc/nginx/snippets/tu-vi-quan-realtime.inc"
+  local include="    include $snippet;"
+  local source="$RELEASE_DIR/scripts/nginx/tu-vi-quan-realtime.inc"
+  local anchor='    location / {'
+  local backup
+
+  # The live canonical site has exactly one catch-all proxy. Refuse a changed layout.
+  [ "$(readlink -f "$enabled")" = "$site" ] || return 1
+  [ "$(grep -Fxc "$anchor" "$site")" = "1" ] || return 1
+  [ -f "$source" ] || return 1
+  if grep -Fxq "$include" "$site" && cmp -s "$source" "$snippet"; then
+    verify_quan_proxy
+    return $?
+  fi
+
+  backup="$(mktemp -d)" || return 1
+  cp -p -- "$site" "$backup/site" || return 1
+  if [ -f "$snippet" ]; then
+    cp -p -- "$snippet" "$backup/snippet" || return 1
+  fi
+  if install -m 0644 -- "$source" "$snippet" &&
+    { grep -Fxq "$include" "$site" ||
+      { awk -v anchor="$anchor" -v line="$include" '$0 == anchor { print line } { print }' "$backup/site" > "$site"; }; } &&
+    nginx -t && systemctl reload nginx && verify_quan_proxy; then
+    rm -f -- "$backup/site" "$backup/snippet"
+    rmdir -- "$backup"
+    return 0
+  fi
+
+  cp -p -- "$backup/site" "$site" || return 1
+  if [ -f "$backup/snippet" ]; then
+    cp -p -- "$backup/snippet" "$snippet" || return 1
+  else
+    rm -f -- "$snippet"
+  fi
+  nginx -t && systemctl reload nginx || true
+  rm -f -- "$backup/site" "$backup/snippet"
+  rmdir -- "$backup"
+  return 1
+}
+
+verify_quan_proxy() {
+  local status
+  status="$(curl -sS --http1.1 --noproxy '*' --max-time 5 -o /dev/null -w '%{http_code}' \
+    --resolve 'lasotinhhoa.vn:443:127.0.0.1' \
+    -H 'Origin: https://lasotinhhoa.vn' -H 'Connection: Upgrade' -H 'Upgrade: websocket' \
+    -H 'Sec-WebSocket-Version: 13' -H 'Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==' \
+    'https://lasotinhhoa.vn/tu-vi-quan-ws')" || return 1
+  [ "$status" = "401" ]
 }
 
 cleanup_npm_cache() {
@@ -331,7 +389,7 @@ mkdir -p "$UPLOAD_DIR"
 
 if [ -d "$CURRENT_DIR" ]; then
   for env_file in "$CURRENT_DIR"/.env "$CURRENT_DIR"/.env.*; do
-    if [ -f "$env_file" ]; then
+    if [ -f "$env_file" ] && [ "${env_file##*/}" != ".env.example" ]; then
       cp "$env_file" "$RELEASE_DIR/"
     fi
   done
@@ -347,16 +405,22 @@ npm run seed:interpretations
 npm run build
 
 ln -sfn "$RELEASE_DIR" "$CURRENT_DIR"
-start_app "$RELEASE_DIR"
 
 healthy="0"
-for attempt in $(seq 1 30); do
-  if curl -fsS "http://127.0.0.1:4100/kien-thuc-tu-vi" >/dev/null; then
-    healthy="1"
-    break
-  fi
-  sleep 1
-done
+if start_app "$RELEASE_DIR"; then
+  for attempt in $(seq 1 30); do
+    if curl -fsS "http://127.0.0.1:4100/kien-thuc-tu-vi" >/dev/null &&
+      curl -fsS "http://127.0.0.1:4101/health" >/dev/null; then
+      healthy="1"
+      break
+    fi
+    sleep 1
+  done
+fi
+if [ "$healthy" = "1" ] && ! configure_quan_proxy; then
+  echo "Unable to configure the Tử Vi Quán WebSocket proxy." >&2
+  healthy="0"
+fi
 
 if [ "$healthy" != "1" ]; then
   echo "New release failed local health check. Rolling back." >&2
@@ -371,6 +435,7 @@ fi
 pm2 save
 pm2 describe lasotinhhoa
 pm2 describe lasotinhhoa | grep -F "$RELEASE_DIR" >/dev/null
+pm2 describe lasotinhhoa-quan-realtime | grep -F "$RELEASE_DIR" >/dev/null
 echo "DEPLOYED_RELEASE=$RELEASE_DIR"
 deploy_succeeded="1"
 cleanup_old_releases
@@ -392,6 +457,7 @@ Assert-Http200 -Url "https://lasotinhhoa.vn"
 Assert-Http200 -Url "https://lasotinhhoa.vn/kien-thuc-tu-vi"
 Assert-Http200 -Url "https://lasotinhhoa.vn/api/knowledge-articles?page=1&pageSize=6"
 Assert-Http200 -Url "https://lasotinhhoa.vn/sitemap.xml"
+Assert-Http200 -Url "https://lasotinhhoa.vn/tu-vi-quan"
 
 Write-Host ""
 Write-Host "Release completed: $commitSha" -ForegroundColor Green
