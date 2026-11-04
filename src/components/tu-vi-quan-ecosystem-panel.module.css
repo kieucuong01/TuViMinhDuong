@@ -1,0 +1,62 @@
+.top { position:absolute; z-index:4; right:max(14px,env(safe-area-inset-right)); top:76px; display:flex; gap:8px; }
+.dock { position:absolute; z-index:4; bottom:max(18px,env(safe-area-inset-bottom)); left:50%; transform:translateX(-50%); display:flex; gap:8px; padding:9px; background:#201821ed; border:1px solid #efbc8150; border-radius:18px; width:max-content; max-width:calc(100% - 24px); box-shadow:0 10px 40px #100d18a0; }
+.dock button { position:relative; }
+.newFortune { position:absolute; top:4px; right:4px; width:6px; height:6px; border-radius:50%; background:#f3c483; }
+.scrim { position:absolute; z-index:12; inset:0; background:linear-gradient(90deg,#100e1922,#100e19a6); display:grid; place-items:center end; padding:20px; }
+.panel { width:min(620px,100%); max-height:calc(100dvh - 40px); overflow:auto; border:1px solid #efbc8170; border-radius:22px; background:#241b20; color:#f9e9ce; box-shadow:0 30px 100px #0008; font-size:16px; line-height:1.65; overscroll-behavior:contain; }
+.header { position:sticky; top:0; z-index:2; padding:18px 24px; display:flex; align-items:center; justify-content:space-between; gap:15px; background:#241b20f5; border-bottom:1px solid #efbc813b; }
+.header h2 { font-size:26px; margin:0; font-family:Georgia,serif; }
+.body { padding:22px 24px 32px; display:grid; gap:18px; }
+.body h3 { margin:14px 0 0; color:#f3c483; font-size:22px; }
+.body h4,.body p { margin:0; }
+.body a { color:#f3c483; text-underline-offset:4px; }
+.body label { display:flex; gap:8px; flex-direction:column; }
+.body label:has(input[type=checkbox]) { flex-direction:row; align-items:center; }
+.body input[type=checkbox] { width:24px; height:24px; min-height:24px; accent-color:#f3c483; }
+.body textarea { min-height:105px; resize:vertical; width:100%; }
+.body select,.body input { width:100%; max-width:100%; }
+.body button,.top button,.dock button { min-height:48px; font-size:16px; }
+.body summary { padding:12px 0; cursor:pointer; color:#f3c483; }
+.row { display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+.row label { flex:1 1 100px; min-width:90px; }
+.form { display:grid; gap:14px; }
+.card { border:1px solid #efbc813b; background:#33262d; border-radius:14px; padding:18px; display:grid; gap:12px; overflow-wrap:anywhere; }
+.reading { display:grid; gap:12px; overflow-wrap:anywhere; }
+.reading section > strong { color:#f3c483; }
+.shop { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:14px; }
+.cosmeticPreview { display:grid; place-items:center; height:100px; background:radial-gradient(ellipse,#e7b77a33,transparent 65%); color:#f3c483; font-size:56px; }
+.deck { display:flex; flex-wrap:wrap; gap:8px; justify-content:center; perspective:800px; padding:15px 0; }
+.deck .tarotCard { height:150px; width:84px; background:repeating-linear-gradient(45deg,#392b48,#392b48 8px,#483452 8px,#483452 9px); border:2px solid #e9bd7b; display:flex; flex-direction:column; justify-content:center; gap:18px; align-items:center; color:#edc38c; transform:rotateY(-12deg); animation:shuffle .6s ease both; }
+.deck .tarotCard[aria-pressed=true] { transform:translateY(-12px) rotateY(0); background:#795241; }
+.reveal { animation:reveal .7s ease both; transform-origin:center; }
+.face { flex:1 1 106px; max-width:155px; margin:0; padding:10px; border:1px solid #e0b273; border-radius:12px; color:#ffda9c; text-align:center; background:linear-gradient(145deg,#462e48,#211c2a); }
+.face svg { display:block; width:100%; max-height:114px; margin:auto; }
+.face figcaption { font-size:.9rem; line-height:1.35; }
+.coins { display:flex; gap:12px; justify-content:center; perspective:360px; }
+.coins span { display:grid; place-items:center; width:46px; height:46px; border:2px double #f3c483; border-radius:50%; background:#715137; color:#ffe4b0; animation:toss .35s ease-out both; }
+@keyframes toss { from { transform:translateY(-18px) rotateX(250deg); opacity:.35; } to { transform:translateY(0) rotateX(0); opacity:1; } }
+.error { padding:16px 24px; color:#ffbdb5; }
+.code { padding:15px; background:#15151b; overflow-wrap:anywhere; font-family:monospace; user-select:all; }
+.shareImage { width:min(100%,360px); height:auto; border:1px solid #efbc8160; border-radius:12px; }
+.download { min-height:48px; display:inline-flex; align-items:center; }
+@keyframes shuffle { from { transform:translateX(-45px) rotateY(90deg); opacity:.2; } to { transform:rotateY(-12deg); opacity:1; } }
+@keyframes reveal { from { transform:rotateY(80deg); opacity:.1; } to { transform:rotateY(0); opacity:1; } }
+@media(max-width:600px) { .scrim { place-items:end center; padding:8px 8px max(8px,env(safe-area-inset-bottom)); } .panel { max-height:calc(88dvh - env(safe-area-inset-bottom)); border-radius:15px; } .header { padding:14px 16px; } .body { padding:16px; } .dock { gap:4px; padding:6px; bottom:max(12px,env(safe-area-inset-bottom)); } .dock button { padding:8px; font-size:15px; } .top { top:75px; right:12px; } .top button { padding:8px 10px; } .shop { grid-template-columns:1fr 1fr; } .card { padding:13px; } }
+@media(prefers-reduced-motion:reduce) { .tarotCard,.reveal,.coins span { animation:none!important; transform:none!important; } }
+.table { width:100%; border-collapse:collapse; font-size:16px; table-layout:fixed; }
+.table td,.table th { padding:10px 6px; border-bottom:1px solid #efbc8140; text-align:left; overflow-wrap:anywhere; vertical-align:top; }
+.table caption { text-align:left; color:#f3c483; padding:10px 0; }
+.table th:nth-child(1) { width:23%; }
+.table th:nth-child(2) { width:22%; }
+.body[data-reduced-motion=true] .tarotCard,.body[data-reduced-motion=true] .reveal { animation:none; transform:none; }
+.body button[aria-pressed=true] { border-color:#f3c483; background:#5f4338; }
+.hexagram { list-style:none; display:flex; flex-direction:column-reverse; gap:9px; padding:16px; margin:0; border:1px solid #efbc813b; border-radius:12px; }
+.hexagram li { display:flex; gap:12px; align-items:center; }
+.coinLine { width:90px; height:8px; border-radius:2px; background:#f3c483; }
+.coinLine[data-yin=true] { background:linear-gradient(90deg,#f3c483 42%,transparent 42% 58%,#f3c483 58%); }
+.coinLine[data-changing=true] { outline:1px solid #f3c483; outline-offset:4px; }
+@media(max-width:380px) {
+  .shop { grid-template-columns:minmax(0,1fr); }
+  .dock { width:calc(100% - 24px); }
+  .dock button { flex:1 1 0; min-width:0; padding:6px 4px; }
+}

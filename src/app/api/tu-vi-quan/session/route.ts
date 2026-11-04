@@ -1,5 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { getDb } from "@/lib/db";
+import { getCurrentUser } from "@/lib/auth";
+import { quanEcosystemEnabled, resolveQuanOwners } from "@/lib/tu-vi-quan-ecosystem";
 import { checkAuthRateLimit } from "@/lib/rate-limit";
 import { getQuanGuest, setQuanGuest } from "@/lib/tu-vi-quan-guest";
 import { quanError, quanJson, readQuanBody } from "@/lib/tu-vi-quan-http";
@@ -20,8 +22,9 @@ export async function GET(request: Request) {
     if (id && !orderIdPattern.test(id)) throw new QuanSessionError("Không tìm thấy lượt xem.", 404);
     const db = getDb();
     if (!db) return quanJson({ session: null });
+    const owners = await resolveQuanOwners(db, guest.id, quanEcosystemEnabled() ? (await getCurrentUser())?.id : undefined);
     const order = await db.quanOrder.findFirst({
-      where: { ownerId: guest.id, ...(id ? { id } : {}) },
+      where: { ownerId: { in: owners }, ...(id ? { id } : {}) },
       orderBy: [{ createdAt: "desc" }, { id: "desc" }],
     });
     if (!order) {
@@ -29,7 +32,7 @@ export async function GET(request: Request) {
       return quanJson({ session: null });
     }
     await refreshQuanPayment(db, order);
-    return quanJson(await quanTransaction(db, (tx, now) => readQuanSession(tx, guest.id, order.id, now)));
+    return quanJson(await quanTransaction(db, (tx, now) => readQuanSession(tx, order.ownerId, order.id, now)));
   } catch (error) {
     return quanError(error);
   }
@@ -59,9 +62,12 @@ export async function POST(request: Request) {
     }
     const { id, action } = body;
     if (typeof id !== "string" || !orderIdPattern.test(id)) throw new QuanSessionError("Không tìm thấy lượt xem.", 404);
-    if (action === "reissue") return quanJson(await reissueQuanRecoveryCode(db, guest.id, id));
+    const owners = await resolveQuanOwners(db, guest.id, quanEcosystemEnabled() ? (await getCurrentUser())?.id : undefined);
+    const order = await db.quanOrder.findFirst({ where: { id, ownerId: { in: owners } }, select: { ownerId: true } });
+    if (!order) throw new QuanSessionError("Không tìm thấy lượt xem.", 404);
+    if (action === "reissue") return quanJson(await reissueQuanRecoveryCode(db, order.ownerId, id));
     if (action === "join" || action === "leave" || action === "start") {
-      return quanJson(await changeQuanAdmission(db, guest.id, id, action));
+      return quanJson(await changeQuanAdmission(db, order.ownerId, id, action));
     }
     if (action === "chat") {
       const question = typeof body.question === "string" ? body.question.trim() : "";
@@ -69,7 +75,7 @@ export async function POST(request: Request) {
       if (!question || question.length > 1200 || !turnIdPattern.test(turnId)) {
         throw new QuanSessionError("Hãy nhập câu hỏi tối đa 1.200 ký tự.", 400);
       }
-      return quanJson(await answerQuanTurn(db, guest.id, id, turnId, question));
+      return quanJson(await answerQuanTurn(db, order.ownerId, id, turnId, question));
     }
     throw new QuanSessionError("Yêu cầu không hợp lệ.", 400);
   } catch (error) {

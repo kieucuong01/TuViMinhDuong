@@ -2,12 +2,20 @@
 
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
+import { courtyardAssets } from "./tu-vi-quan-scene-assets";
 import styles from "./tu-vi-quan-scene.module.css";
 import { findQuanPath, isQuanWalkable, QUAN_BOUNDS, QUAN_POND, QUAN_STATIONS } from "@/lib/tu-vi-quan-world.mjs";
 
 type Position = { x: number; z: number };
 type Player = Position & { id: string; alias: string; action: string };
 type SceneProps = {
+  ecosystemEnabled?: boolean;
+  quality?: "low" | "medium" | "high";
+  reducedMotion?: boolean;
+  muted?: boolean;
+  appearance?: Record<string, string>;
+  experience?: "courtyard" | "teacher" | "tarot" | "iching" | "personal";
+  communityWishes?: { id: string; text: string; placement: "tree" | "lotus" }[];
   position: Position;
   action: string;
   players: Player[];
@@ -68,6 +76,8 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
   container.append(canvas);
 
   const scene = new THREE.Scene();
+  const ecosystemEnabled = latest.current.ecosystemEnabled === true;
+  const assets = ecosystemEnabled ? courtyardAssets(scene) : undefined;
   scene.fog = new THREE.Fog(0xb99b97, 62, 158);
   const camera = new THREE.PerspectiveCamera(56, 1, 0.1, 260);
   const sky = new THREE.HemisphereLight(0xffe9ce, 0x496354, 1.9);
@@ -109,7 +119,9 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
   function material(color: number) {
     let entry = materials.get(color);
     if (!entry) {
-      entry = new THREE.MeshStandardMaterial({ color, roughness: 0.84,
+      const surface = [PALETTE.wood, PALETTE.edge, PALETTE.ridge].includes(color) ? assets?.wood
+        : [PALETTE.stone, 0xc7b194, 0xcdb89c, 0xc3aa8c, 0xd0bba0, 0xbda58a].includes(color) ? assets?.stone : {};
+      entry = new THREE.MeshStandardMaterial({ ...surface, color, roughness: 0.84,
         emissive: color === PALETTE.lantern || color === PALETTE.light ? color : 0x000000,
         emissiveIntensity: color === PALETTE.lantern ? 0.75 : color === PALETTE.light ? 0.45 : 0,
       });
@@ -456,13 +468,18 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
     const group = new THREE.Group();
     const body = new THREE.Group();
     const arms = [new THREE.Group(), new THREE.Group()];
+    const robe = new THREE.MeshStandardMaterial({ color, roughness: 0.94 });
     function part(parent: THREE.Object3D, shape: Shape, colorValue: number, x: number, y: number, z: number, sx: number, sy: number, sz = sx) {
-      const mesh = new THREE.Mesh(geometry[shape], material(colorValue));
+      const mesh = new THREE.Mesh(geometry[shape], colorValue === color ? robe : material(colorValue));
       mesh.position.set(x, y, z);
       mesh.scale.set(sx, sy, sz);
       parent.add(mesh);
     }
-    part(body, "cone", color, 0, 0.76, 0, 0.58, 0.77, 0.42);
+    if (ecosystemEnabled) {
+      part(body, "cone", color, 0, 0.75, 0, 0.68, 0.94, 0.47);
+      part(body, "drum", color, 0, 1.1, 0, 0.23, 0.16, 0.24);
+      part(body, "box", PALETTE.gold, 0.06, 0.91, 0.225, 0.017, 0.35, 0.014);
+    } else part(body, "cone", color, 0, 0.76, 0, 0.58, 0.77, 0.42);
     part(body, "drum", PALETTE.gold, 0, 0.71, 0, 0.52, 0.055, 0.4);
     part(body, "head", 0xe9b180, 0, 1.34, 0, 0.49, 0.51, 0.46);
     part(body, "head", 0x40302a, 0, 1.53, -0.04, 0.53, 0.22, 0.48);
@@ -489,11 +506,11 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
     ground.position.y = 0.03;
     group.add(body, badge, ground);
     scene.add(group);
-    return { group, body, badge, arms, legs, name };
+    return { group, body, badge, arms, legs, name, robe };
   }
   function pose(visitor: ReturnType<typeof avatar>, action: string, seconds: number, walking: boolean, reduced: boolean) {
     const stride = walking && !reduced ? Math.sin(seconds * 14) * 0.48 : 0;
-    visitor.body.position.y = action === "meditate" ? -0.26 : Math.abs(stride) * 0.09;
+    visitor.body.position.y = action === "meditate" ? -0.26 : Math.abs(stride) * (ecosystemEnabled ? 0.045 : 0.09) + (!ecosystemEnabled || reduced ? 0 : Math.sin(seconds * 1.6) * 0.008);
     visitor.body.rotation.x = action === "greet" ? 0.15 : 0;
     visitor.badge.position.y = action === "meditate" ? 1.73 : 1.98;
     visitor.legs.forEach((leg, i) => {
@@ -522,7 +539,71 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
     return mesh;
   });
 
+  const personal = new THREE.Group(); personal.position.set(55, 0, -5); scene.add(personal);
+  function privatePart(shape: Shape, color: number, x: number, y: number, z: number, sx: number, sy: number, sz: number) {
+    const mesh = new THREE.Mesh(geometry[shape], material(color));
+    mesh.position.set(x, y, z); mesh.scale.set(sx, sy, sz);
+    mesh.castShadow = mesh.receiveShadow = true; personal.add(mesh); return mesh;
+  }
+  privatePart("box", PALETTE.stone, 0, 0.12, 0, 9, 0.24, 8);
+  privatePart("box", PALETTE.plaster, 0, 1.8, -3.8, 9, 3.6, 0.2);
+  privatePart("box", PALETTE.wood, -4.4, 1.8, 0, 0.2, 3.6, 8);
+  for (let i = 0; i < 9; i++) privatePart("box", PALETTE.wood, -4 + i, 2.6, -3.6, 0.07, 2, 0.08);
+  privatePart("box", 0x6b465a, 0, 0.27, 0.5, 3.2, 0.035, 3);
+  const lamp = privatePart("head", PALETTE.lantern, 3, 1.9, -2.5, 0.7, 1, 0.7);
+  const card = privatePart("box", 0x624171, 0.15, 1.58, -1.4, 0.45, 0.025, 0.73);
+  const tableColor = new THREE.Color(0xffffff);
+  assets?.model("chinese_tea_table", [
+    { x: -22.8, y: 0.31, z: 7.5, width: 1.9 },
+    { x: -17.2, y: 0.31, z: 7.5, width: 1.9 },
+    ...[-5.5, 0, 5.5].map(x => ({ x, y: 0.42, z: -22.8, width: 2.3 })),
+    { x: 0, y: 0.26, z: -1.4, width: 2.2, parent: personal, tint: tableColor },
+  ]);
+  assets?.model("ceramic_pot", [
+    { x: -12.7, y: 0.3, z: -18.2, width: 0.8 },
+    { x: 12.7, y: 0.3, z: -18.2, width: 0.8 },
+    { x: 2.9, y: 0.25, z: -2.5, width: 0.75, parent: personal },
+  ]);
+  const personalLabel = label("Góc riêng của bạn"); personalLabel.position.set(0, 2.6, -3.4); personal.add(personalLabel);
+  const auraMaterial = new THREE.MeshBasicMaterial({ color: 0xe6c57d, transparent: true, opacity: 0.2, depthWrite: false, side: THREE.DoubleSide });
+  const auraGeometry = new THREE.RingGeometry(0.47, 0.62, 40);
+  const aura = new THREE.Mesh(auraGeometry, auraMaterial); aura.rotation.x = -Math.PI / 2; aura.position.y = 0.022; self.group.add(aura);
+  const cosmeticColors: Record<string, number> = { "robe-jade":0x6c9778,"robe-plum":0x855f88,"robe-gold":0xc5a365,"lantern-amber":0xffc56e,"lantern-lotus":0xeca5b5,"table-walnut":0x694938,"table-jade":0x598374,"card-indigo":0x394f80,"card-sun":0xc39749,"aura-mist":0xb7c9c4,"aura-lotus":0xe8acbc,"aura-gold":0xe7c780 };
+  const cosmeticColor = (choice: string | undefined, fallback: number) => choice && /^#[0-9a-f]{6}$/i.test(choice) ? Number.parseInt(choice.slice(1), 16) : cosmeticColors[choice ?? ""] ?? fallback;
+  const wishes = new THREE.Group(); scene.add(wishes); let wishKey = "";
+  let previousWishes: SceneProps["communityWishes"];
+  function updateWishes(items: NonNullable<SceneProps["communityWishes"]>) {
+    const bounded = items.slice(0, 24); const key = JSON.stringify(bounded); if (key === wishKey) return; wishKey = key;
+    for (const child of [...wishes.children]) { child.traverse(node => { if (node instanceof THREE.Sprite) disposeLabel(node); }); wishes.remove(child); }
+    bounded.forEach((wish, index) => {
+      const tag = new THREE.Group(); const tree = wish.placement === "tree";
+      const plaque = new THREE.Mesh(geometry.box, material(tree ? PALETTE.red : PALETTE.gold));
+      plaque.scale.set(0.27, tree ? 0.65 : 0.1, 0.09); tag.add(plaque);
+      if (tree) { const angle = index * 2.4; tag.position.set(-17 + Math.sin(angle) * 1.6, 1.9 + index % 3 * 0.4, 22 + Math.cos(angle) * 1.5); }
+      else tag.position.set(16 + index % 4 * 1.2, 0.26, 16 + Math.floor(index / 4) * 1.1);
+      const text = label(wish.text.slice(0, 24)); text.scale.multiplyScalar(0.38); text.position.y = 0.45; tag.add(text); wishes.add(tag);
+    });
+  }
+  let audio: AudioContext | undefined; let audioGain: GainNode | undefined; const oscillators: OscillatorNode[] = [];
+  let audible = false;
+  function updateSound() {
+    if (!audioGain || !audio) return;
+    const next = latest.current.muted === false && !document.hidden;
+    if (audible === next) return;
+    audible = next;
+    audioGain.gain.setTargetAtTime(next ? 0.008 : 0, audio.currentTime, 0.1);
+  }
+  function startSound() {
+    if (!ecosystemEnabled || latest.current.muted !== false || audio) return;
+    try {
+      audio = new AudioContext(); audioGain = audio.createGain(); audioGain.gain.value = 0; audioGain.connect(audio.destination);
+      for (const frequency of [174.61, 261.63, 349.23]) { const oscillator = audio.createOscillator(); oscillator.frequency.value = frequency; oscillator.connect(audioGain); oscillator.start(); oscillators.push(oscillator); }
+      updateSound();
+      void audio.resume().catch(() => {});
+    } catch { /* Sound is optional and starts only after a gesture. */ }
+  }
   const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
+  const reducedMotion = () => ecosystemEnabled ? latest.current.reducedMotion ?? motion.matches : motion.matches;
   const ray = new THREE.Raycaster();
   const pointer = new THREE.Vector2();
   const floor = new THREE.Plane(new THREE.Vector3(0, 1, 0), -0.055);
@@ -558,6 +639,7 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
   function pressDown(event: PointerEvent) {
     if (event.button !== 0 || press || !latest.current.interactive) return;
     event.preventDefault();
+    startSound();
     container.closest("main")?.focus({ preventScroll: true });
     canvas.setPointerCapture(event.pointerId);
     press = { id: event.pointerId, x: event.clientX, y: event.clientY, lastX: event.clientX, lastY: event.clientY, dragged: false };
@@ -588,6 +670,7 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
     if (!latest.current.interactive || !movementKeys.has(event.code) ||
         (event.target instanceof HTMLElement && event.target.closest("input, textarea, select, [contenteditable]"))) return;
     event.preventDefault();
+    startSound();
     route = [];
     keys.add(event.code);
   }
@@ -600,6 +683,7 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
   }
   function padDown(event: PointerEvent) {
     if (!latest.current.interactive || padId !== undefined) return;
+    startSound();
     route = [];
     padId = event.pointerId;
     pad.setPointerCapture(padId);
@@ -619,6 +703,7 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
   const resizeObserver = new ResizeObserver(resize);
   resizeObserver.observe(container);
   resize();
+  let selectedQuality = ""; let adaptiveLow = false; let slowFrames = 0; let qualityApplied = "";
   let previous = 0;
   let renderedAt = -1000;
   let frame = 0;
@@ -634,20 +719,46 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
     const dz = position.z - visitor.group.position.z;
     const walking = Math.hypot(dx, dz) > 0.045;
     if (walking) visitor.body.rotation.y = Math.atan2(dx, dz);
-    const speed = motion.matches ? 1 : 1 - Math.exp(-delta * 6);
+    const speed = reducedMotion() ? 1 : 1 - Math.exp(-delta * 6);
     visitor.group.position.x += dx * speed;
     visitor.group.position.z += dz * speed;
-    pose(visitor, walking ? "idle" : action, time, walking, motion.matches);
+    pose(visitor, walking ? "idle" : action, time, walking, reducedMotion());
   }
   const colors = [0x5d7b72, 0x7d5c7b, 0x9a703d, 0x43637a, 0x69794c];
   function draw(time: number) {
     if (stopped) return;
     frame = requestAnimationFrame(draw);
-    if (document.hidden || time - renderedAt < 32) return;
-    renderedAt = time;
+    if (document.hidden || time - renderedAt < (qualityApplied === "high" ? 16 : qualityApplied === "low" ? 48 : 32)) return;
+    const elapsed = time - renderedAt; renderedAt = time;
+    const requestedQuality = latest.current.quality ?? (navigator.hardwareConcurrency <= 4 ? "low" : "medium");
+    if (requestedQuality !== selectedQuality) { selectedQuality = requestedQuality; adaptiveLow = false; slowFrames = 0; }
+    if (elapsed > 48 && elapsed < 1000) slowFrames++; else slowFrames = Math.max(0, slowFrames - 1);
+    if (slowFrames > 45) adaptiveLow = true;
+    const quality = adaptiveLow ? "low" : requestedQuality;
+    if (ecosystemEnabled && quality !== qualityApplied) {
+      qualityApplied = quality;
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, quality === "low" ? 1 : quality === "high" ? 2 : 1.5));
+      renderer.shadowMap.enabled = quality !== "low"; sun.shadow.mapSize.setScalar(quality === "high" ? 2048 : 1024);
+      sun.shadow.map?.dispose(); sun.shadow.map = null; renderer.shadowMap.needsUpdate = true;
+      sparkCloud.visible = quality !== "low"; container.dataset.quality = quality; resize();
+    }
     const dt = Math.min((time - (previous || time)) / 1000, 0.07);
     previous = time;
     const current = latest.current;
+    if (ecosystemEnabled && current.communityWishes !== previousWishes) {
+      previousWishes = current.communityWishes;
+      updateWishes(previousWishes ?? []);
+    }
+    const experience = ecosystemEnabled ? current.experience ?? "courtyard" : "courtyard";
+    personal.visible = experience === "personal"; self.group.visible = experience === "courtyard" || experience === "teacher";
+    updateSound();
+    const appearance = ecosystemEnabled ? current.appearance ?? {} : {};
+    self.robe.color.set(cosmeticColor(appearance.robe, 0x506f7e));
+    aura.visible = Boolean(appearance.aura); auraMaterial.color.set(cosmeticColor(appearance.aura, 0xe6c57d));
+    tableColor.set(cosmeticColor(appearance.table, 0xffffff));
+    lamp.material = material(cosmeticColor(appearance.lantern, PALETTE.lantern));
+    card.material = material(cosmeticColor(appearance.cardBack, 0x624171));
+    renderer.toneMappingExposure = experience === "teacher" ? 0.96 : experience === "personal" ? 1.04 : 1.18;
     if (!current.interactive && (keys.size || route.length || padId !== undefined)) clearInput();
     if (!current.destination && destinationId !== undefined) {
       destinationId = undefined;
@@ -696,7 +807,11 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
     const planar = Math.cos(pitch) * distance;
     cameraGoal.set(x + Math.sin(yaw) * planar, 1.5 + Math.sin(pitch) * distance, z + Math.cos(yaw) * planar);
     cameraTarget.set(x - Math.sin(yaw) * 3.2, 1.7, z - Math.cos(yaw) * 3.2);
-    const follow = !cameraReady || motion.matches ? 1 : 1 - Math.exp(-dt * 8);
+    if (experience === "teacher") { cameraGoal.set(1, 3.5, -13.8); cameraTarget.set(0, 1.6, -20.5); }
+    if (experience === "personal") { cameraGoal.set(58.5, 4.2, 1.2); cameraTarget.set(55, 1.2, -6.4); }
+    if (experience === "tarot") { cameraGoal.set(-17, 3.1, 13); cameraTarget.set(-20, 1.2, 8.4); }
+    if (experience === "iching") { cameraGoal.set(20, 3.2, 6); cameraTarget.set(18, 1, 0.4); }
+    const follow = !cameraReady || reducedMotion() ? 1 : 1 - Math.exp(-dt * 8);
     camera.position.lerp(cameraGoal, follow);
     look.lerp(cameraTarget, follow);
     camera.lookAt(look);
@@ -708,7 +823,7 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
       let visitor = visitors.get(player.id);
       if (visitor && visitor.name !== player.alias) {
         visitor.group.removeFromParent();
-        disposeLabel(visitor.badge);
+        disposeLabel(visitor.badge); visitor.robe.dispose();
         visitor = undefined;
       }
       if (!visitor) {
@@ -718,28 +833,29 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
         visitors.set(player.id, visitor);
       }
       move(visitor, player, player.action, time / 1000, dt);
-      visitor.group.visible = Math.hypot(player.x - x, player.z - z) > 0.5;
+      visitor.group.visible = experience === "courtyard" && Math.hypot(player.x - x, player.z - z) > 0.5;
     }
     for (const [id, visitor] of visitors) {
       if (active.has(id)) continue;
       visitor.group.removeFromParent();
-      disposeLabel(visitor.badge);
+      disposeLabel(visitor.badge); visitor.robe.dispose();
       visitors.delete(id);
     }
     smoke.forEach((mesh, index) => {
-      const phase = motion.matches ? (index + 1) / 8 : ((time / 4600 + index / smoke.length) % 1);
+      const phase = reducedMotion() ? (index + 1) / 8 : ((time / 4600 + index / smoke.length) % 1);
       mesh.position.set(-10 + phase * 0.76 + Math.sin(phase * 6) * 0.12, 2.46 + phase * 1.73, -5.5 + phase * 0.19);
       mesh.scale.setScalar(0.082 + phase * 0.35);
       mesh.material.opacity = (1 - phase) * (current.action === "incense" ? 0.42 : 0.25);
     });
     for (let i = 0; i < 90; i++) {
-      const t = motion.matches ? 0 : time * 0.00037;
+      const t = reducedMotion() ? 0 : time * 0.00037;
       sparks[i * 3] = Math.sin(i * 16.31) * 29 + Math.sin(i + t) * 0.7;
       sparks[i * 3 + 1] = 0.6 + ((i * 1.39) % 4) + Math.sin(i * 3 + t) * 0.35;
       sparks[i * 3 + 2] = Math.cos(i * 14.17) * 27 + 3 + Math.cos(i - t) * 0.8;
     }
     sparkGeometry.attributes.position.needsUpdate = true;
-    waterMaterial.uniforms.time.value = motion.matches ? 0 : time / 1000;
+    waterMaterial.uniforms.time.value = reducedMotion() ? 0 : time / 1000;
+    if (scene.userData.assetsChanged) { renderer.shadowMap.needsUpdate = true; scene.userData.assetsChanged = false; }
     renderer.render(scene, camera);
     // Architecture is static; contact blobs follow avatars without rerendering the shadow map.
     renderer.shadowMap.autoUpdate = false;
@@ -756,6 +872,7 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
   window.addEventListener("keydown", keyDown);
   window.addEventListener("keyup", keyUp);
   window.addEventListener("blur", clearInput);
+  document.addEventListener("visibilitychange", updateSound);
   frame = requestAnimationFrame(draw);
 
   return () => {
@@ -774,12 +891,16 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
     window.removeEventListener("keydown", keyDown);
     window.removeEventListener("keyup", keyUp);
     window.removeEventListener("blur", clearInput);
+    document.removeEventListener("visibilitychange", updateSound);
     Object.values(geometry).forEach((value) => value.dispose());
     materials.forEach((value) => value.dispose());
     signs.forEach(disposeLabel);
-    visitors.forEach((visitor) => disposeLabel(visitor.badge));
-    disposeLabel(self.badge);
-    teachers.forEach((teacher) => disposeLabel(teacher.badge));
+    visitors.forEach((visitor) => { disposeLabel(visitor.badge); visitor.robe.dispose(); });
+    disposeLabel(self.badge); self.robe.dispose(); assets?.dispose();
+    oscillators.forEach(oscillator => { oscillator.stop(); oscillator.disconnect(); }); audioGain?.disconnect(); if (audio) void audio.close();
+    disposeLabel(personalLabel); wishes.traverse(node => { if (node instanceof THREE.Sprite) disposeLabel(node); });
+    auraGeometry.dispose(); auraMaterial.dispose();
+    teachers.forEach((teacher) => { disposeLabel(teacher.badge); teacher.robe.dispose(); });
     groundShadows.dispose();
     glowGeometry.dispose();
     glowMaterial.dispose();

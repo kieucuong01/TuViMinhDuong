@@ -212,6 +212,7 @@ Rules:
 - Locally start the app on port `4000` and run `node scripts/tu-vi-quan-realtime.mjs --serve` in another terminal for presence on `127.0.0.1:4001`. Use two browser contexts to see each guest move in the other context.
 - Ship the first Tử Vi Quán release with `npm run ship -- "feat: add Tu Vi Quan" -Migrate`. The courtyard opens independently of paid checkout. Enable `TU_VI_QUAN_PAYMENTS_ENABLED` only after verifying both PayOS packages and an AI provider. Admin manages capacity and records reconciled refunds at `/admin/tu-vi-quan`.
 - Set `TU_VI_QUAN_SUPPORT_QR` to a same-site image path or HTTPS image URL and `TU_VI_QUAN_SUPPORT_RECIPIENT` to the recipient name to show the optional support QR. This QR does not create or settle orders.
+- The ecosystem launch flag `TU_VI_QUAN_ECOSYSTEM_ENABLED` is shared by the app and presence service. It defaults on in development and off in production. Apply the additive migration before enabling it. Test both services with the same flag and keep the payment flag separate. See [ecosystem acceptance and launch](../tu-vi-quan-ecosystem.md#acceptance-and-launch).
 - Nginx owns public HTTP/HTTPS and reverse proxies to the internal app port. Avoid port collisions with the other VPS app on `127.0.0.1:5000`.
 - Production DB is PostgreSQL 17 on the VPS, not local demo fallback.
 - Production `DATABASE_URL` should point to the VPS-local DB at `127.0.0.1:5433/lasotinhhoa`; do not route production back to remote hosted Postgres.

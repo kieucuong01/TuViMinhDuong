@@ -81,6 +81,7 @@ model User {
   auditLogs          AuditLog[]
   assistantQuestions AssistantQuestion[]
   funnelEvents       FunnelEvent[]
+  quanProfile        QuanProfile?
 }
 
 model Account {
@@ -352,6 +353,131 @@ model QuanTurn {
 model QuanSettings {
   id        String @id
   maxTables Int    @default(3)
+}
+
+model QuanProfile {
+  id             String   @id @default(uuid())
+  userId         String?  @unique
+  alias          String
+  birthInput     Json?
+  equipped       Json     @default("{}")
+  recoveryDigest String?  @unique
+  blocked        Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  user           User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  identities     QuanIdentity[]
+  entries        QuanEntry[]
+  items          QuanItem[]
+  wishes         QuanWish[]
+  reactions      QuanWishReaction[]
+  reports        QuanWishReport[]
+  shares         QuanShare[]
+  metrics        QuanMetric[]
+}
+
+model QuanIdentity {
+  guestId   String      @id
+  profileId String
+  profile   QuanProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  @@index([profileId])
+}
+
+model QuanEntry {
+  id        String      @id @default(uuid())
+  profileId String
+  kind      String
+  dayKey    String
+  points    Int         @default(0)
+  data      Json
+  version   String
+  createdAt DateTime    @default(now())
+  profile   QuanProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  @@unique([profileId, kind, dayKey])
+  @@index([profileId, createdAt])
+}
+
+model QuanItem {
+  profileId  String
+  itemId     String
+  acquiredAt DateTime    @default(now())
+  profile    QuanProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  @@id([profileId, itemId])
+}
+
+model QuanWish {
+  id        String      @id @default(uuid())
+  profileId String
+  text      String
+  placement String
+  status    String      @default("private")
+  expiresAt DateTime?
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  profile   QuanProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  reactions QuanWishReaction[]
+  reports   QuanWishReport[]
+  @@index([status, expiresAt, createdAt])
+  @@index([profileId, createdAt])
+}
+
+model QuanWishReaction {
+  wishId    String
+  profileId String
+  kind      String
+  wish      QuanWish    @relation(fields: [wishId], references: [id], onDelete: Cascade)
+  profile   QuanProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  @@id([wishId, profileId, kind])
+}
+
+model QuanWishReport {
+  wishId    String
+  profileId String
+  userId    String?
+  createdAt DateTime    @default(now())
+  wish      QuanWish    @relation(fields: [wishId], references: [id], onDelete: Cascade)
+  profile   QuanProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  @@id([wishId, profileId])
+  @@unique([wishId, userId])
+}
+
+model QuanEvent {
+  id         String   @id @default(uuid())
+  title      String
+  startsAt   DateTime
+  endsAt     DateTime
+  cancelled  Boolean  @default(false)
+  @@index([startsAt, endsAt])
+}
+
+model QuanShare {
+  id        String      @id
+  profileId String
+  snapshot  Json
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime    @default(now())
+  profile   QuanProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  @@index([profileId, createdAt])
+}
+
+model QuanMetric {
+  id         String      @id @default(uuid())
+  profileId  String
+  name       String
+  dayKey     String
+  source     String      @default("direct")
+  linked     Boolean     @default(false)
+  createdAt  DateTime    @default(now())
+  profile    QuanProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  @@unique([profileId, name, dayKey])
+  @@index([name, dayKey])
+}
+
+model QuanEcosystemSettings {
+  id            String  @id
+  publicPosting Boolean @default(true)
+  features      Json    @default("{}")
 }
 
 model RateLimitBucket {

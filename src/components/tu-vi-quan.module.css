@@ -72,7 +72,7 @@
 .eyebrow { font-size: .7rem; font-weight: 800; letter-spacing: .17em; color: #f0b67d; }
 .note { color: var(--muted); font-size: .88rem; }
 .page form { display: grid; gap: 12px; margin: 14px 0; }
-.page label { display: grid; gap: 6px; font-weight: 650; min-width: 0; }
+.page label { display: grid; gap: 6px; font-weight: 650; min-width: 0; color: var(--ink); }
 .page input:not([type="radio"]), .page select, .page textarea { width: 100%; min-width: 0; }
 .page input::placeholder { color: #cbb4a5; }
 .page fieldset { min-width: 0; }

@@ -104,6 +104,7 @@ async function sessionSnapshot(tx: Tx, ownerId: string, id: string, now: Date) {
     select: { id: true, question: true, answer: true, state: true },
   });
   const pendingCheckout = order.status === "PENDING" && order.expiresAt > now;
+  const chart = order.status === "ACTIVE" || order.status === "ENDED" ? order.chart as unknown as TuViChart : null;
   const paused = order.status === "ACTIVE" && Boolean(order.outageSince);
   const remainingSeconds = order.endsAt
     ? Math.max(0, Math.ceil((order.endsAt.getTime() - (paused ? order.outageSince!.getTime() : now.getTime())) / 1000))
@@ -154,12 +155,13 @@ async function sessionSnapshot(tx: Tx, ownerId: string, id: string, now: Date) {
     remainingSeconds,
     inFlight: turns.some((turn) => turn.state === "pending"),
     messages: turns.map(({ id, question, answer }) => ({ id, question, answer })),
+    chartSummary: chart ? { banMenh: chart.banMenh, menh: chart.menh, cuc: chart.cuc, notes: chart.summary?.slice(0, 3) || [] } : undefined,
     refundAmountVnd: order.refundAmountVnd ?? undefined,
     refundSettledAt: order.refundSettledAt?.toISOString(),
   };
 }
 
-function readChart(value: unknown) {
+export function readQuanChart(value: unknown) {
   if (!value || typeof value !== "object") throw new QuanSessionError("Hãy nhập thông tin lập lá số.", 400);
   const { fullName, gender, calendarType, day, month, year, birthHour } = value as Record<string, unknown>;
   const viewYear = Number(new Intl.DateTimeFormat("en", { year: "numeric", timeZone: "Asia/Ho_Chi_Minh" }).format());
@@ -194,7 +196,7 @@ export async function checkoutQuanSession(db: PrismaClient, guest: Guest, minute
       !isPayOSEnabled() || !hasExternalLlmProvider()) {
     throw new QuanSessionError("Tử Vi Quán chưa mở thanh toán. Bạn vẫn có thể tham quan và chơi miễn phí.", 503);
   }
-  const chart = readChart(chartInput);
+  const chart = readQuanChart(chartInput);
   const recoveryCode = randomBytes(24).toString("base64url");
   const orderCode = randomInt(QUAN_ORDER_CODE_MIN, QUAN_ORDER_CODE_MAX);
   const order = await quanTransaction(db, async (tx, now) => {

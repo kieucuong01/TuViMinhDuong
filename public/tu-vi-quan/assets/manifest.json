@@ -1,0 +1,92 @@
+{
+  "license": "https://creativecommons.org/publicdomain/zero/1.0/",
+  "licenseEvidence": "https://polyhaven.com/license",
+  "retrieved": "2026-11-04",
+  "runtimeExternalRequests": false,
+  "entries": [
+    {
+      "file": "chinese_tea_table.glb",
+      "source": "https://polyhaven.com/a/chinese_tea_table",
+      "sources": [
+        "https://dl.polyhaven.org/file/ph-assets/Models/gltf/1k/chinese_tea_table/chinese_tea_table_1k.gltf",
+        "https://dl.polyhaven.org/file/ph-assets/Models/jpg/1k/chinese_tea_table/chinese_tea_table_arm_1k.jpg",
+        "https://dl.polyhaven.org/file/ph-assets/Models/gltf/8k/chinese_tea_table/chinese_tea_table.bin",
+        "https://dl.polyhaven.org/file/ph-assets/Models/jpg/1k/chinese_tea_table/chinese_tea_table_nor_gl_1k.jpg",
+        "https://dl.polyhaven.org/file/ph-assets/Models/jpg/1k/chinese_tea_table/chinese_tea_table_diff_1k.jpg"
+      ],
+      "license": "CC0-1.0",
+      "modification": "glTF repacked as self-contained GLB; PBR images resized to 512px JPEG",
+      "bytes": 173300,
+      "sha256": "4f4aaef91fcf20720e5224dd2f37c8998bf9cb5f931f734671ef29034fb1529c"
+    },
+    {
+      "file": "ceramic_pot.glb",
+      "source": "https://polyhaven.com/a/ceramic_pot",
+      "sources": [
+        "https://dl.polyhaven.org/file/ph-assets/Models/gltf/1k/ceramic_pot/ceramic_pot_1k.gltf",
+        "https://dl.polyhaven.org/file/ph-assets/Models/jpg/1k/ceramic_pot/ceramic_pot_nor_gl_1k.jpg",
+        "https://dl.polyhaven.org/file/ph-assets/Models/jpg/1k/ceramic_pot/ceramic_pot_diff_1k.jpg",
+        "https://dl.polyhaven.org/file/ph-assets/Models/jpg/1k/ceramic_pot/ceramic_pot_arm_1k.jpg",
+        "https://dl.polyhaven.org/file/ph-assets/Models/gltf/4k/ceramic_pot/ceramic_pot.bin"
+      ],
+      "license": "CC0-1.0",
+      "modification": "glTF repacked as self-contained GLB; PBR images resized to 512px JPEG",
+      "bytes": 202140,
+      "sha256": "2672ddc6f11588d153449901a6b81fc7e6b438cc467fe65bf908e55ccf03a36a"
+    },
+    {
+      "file": "stone_floor_diff.jpg",
+      "source": "https://polyhaven.com/a/stone_floor",
+      "download": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/stone_floor/stone_floor_diff_1k.jpg",
+      "license": "CC0-1.0",
+      "modification": "Resized to 512px JPEG",
+      "bytes": 54978,
+      "sha256": "0f9146940acc99a5312413e48378e2560ab2033fbe5a8fbc290fabb6c4bbc60e"
+    },
+    {
+      "file": "stone_floor_normal.jpg",
+      "source": "https://polyhaven.com/a/stone_floor",
+      "download": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/stone_floor/stone_floor_nor_gl_1k.jpg",
+      "license": "CC0-1.0",
+      "modification": "Resized to 512px JPEG",
+      "bytes": 65125,
+      "sha256": "755610f323ad194247d7619afe6302b557823dd2e63488f4a44124df5e7a0eee"
+    },
+    {
+      "file": "stone_floor_rough.jpg",
+      "source": "https://polyhaven.com/a/stone_floor",
+      "download": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/stone_floor/stone_floor_rough_1k.jpg",
+      "license": "CC0-1.0",
+      "modification": "Resized to 512px JPEG",
+      "bytes": 20807,
+      "sha256": "d4cc137cc2cd73e0707e85c2ccf450710e4742ec0357543feb634a6809c69303"
+    },
+    {
+      "file": "wood_planks_diff.jpg",
+      "source": "https://polyhaven.com/a/wood_planks",
+      "download": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/wood_planks/wood_planks_diff_1k.jpg",
+      "license": "CC0-1.0",
+      "modification": "Resized to 512px JPEG",
+      "bytes": 33654,
+      "sha256": "d05d5d8c64651c607355fd21d31f10e3cfff097a14e2e5252bbe8936294b1ab5"
+    },
+    {
+      "file": "wood_planks_normal.jpg",
+      "source": "https://polyhaven.com/a/wood_planks",
+      "download": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/wood_planks/wood_planks_nor_gl_1k.jpg",
+      "license": "CC0-1.0",
+      "modification": "Resized to 512px JPEG",
+      "bytes": 25051,
+      "sha256": "b922669a21ef40f9dcdd92214e0ebe49a5a15d320c4e839dde3dae7a93b9e3b4"
+    },
+    {
+      "file": "wood_planks_rough.jpg",
+      "source": "https://polyhaven.com/a/wood_planks",
+      "download": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/wood_planks/wood_planks_rough_1k.jpg",
+      "license": "CC0-1.0",
+      "modification": "Resized to 512px JPEG",
+      "bytes": 13597,
+      "sha256": "7fb545b725412576f0dec77e058a3da7b3a7cc2c7d3f3c4dd779f8db0af217b2"
+    }
+  ]
+}

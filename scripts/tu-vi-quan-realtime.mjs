@@ -7,14 +7,16 @@ import { quanPresenceSecret, verifyQuanSocketTicket } from "../src/lib/tu-vi-qua
 import { isQuanWalkable, QUAN_SPAWN } from "../src/lib/tu-vi-quan-world.mjs";
 
 const MAX_GUESTS = 24;
+const ROOM_NAMES = ["Sân Trúc", "Sân Sen", "Sân Mai", "Sân Trà"];
 const MAX_PER_IP = 6;
 const ACTIONS = new Set(["idle", "incense", "greet", "meditate"]);
 const CHANNEL = "tu-vi-quan";
 const SOCKET_PATH = "/tu-vi-quan-ws";
 const SPAWN_COLUMNS = [0, 1.75, -1.75, 3.5, -3.5, 5.25, -5.25, 7, -7];
 
-export function createQuanPresenceServer({ secret, origins, readBoard = async () => null }) {
-  if (!secret) throw new Error("Tử Vi Quán requires AUTH_SECRET in production.");
+export function createQuanPresenceServer({ secret, origins, readBoard = async () => null, ecosystemEnabled = true }) {
+  if (!secret) throw new Error("Tá»­ Vi QuÃ¡n requires AUTH_SECRET in production.");
+  const roomNames = ecosystemEnabled ? ROOM_NAMES : ROOM_NAMES.slice(0, 1);
   const allowedOrigins = new Set(origins);
   const guests = new Map();
   let dirty = false;
@@ -42,8 +44,10 @@ export function createQuanPresenceServer({ secret, origins, readBoard = async ()
       socket.terminate();
       return;
     }
-    const players = [...guests.values()].map(({ player }) => player);
-    socket.send(JSON.stringify({ type: "snapshot", selfId, players, board }));
+    const room = guests.get(selfId)?.room ?? 0;
+    const players = [...guests.values()].filter(presence => presence.room === room).map(({ player }) => player);
+    const rooms = roomNames.map((name, id) => ({ id, name, count: [...guests.values()].filter(presence => presence.room === id).length, capacity: MAX_GUESTS }));
+    socket.send(JSON.stringify({ type: "snapshot", selfId, players, board, ...(ecosystemEnabled ? { room: rooms[room], rooms } : {}) }));
   }
 
   function reject(socket, status) {
@@ -63,13 +67,14 @@ export function createQuanPresenceServer({ secret, origins, readBoard = async ()
     const sameSource = [...guests.values()].filter((presence) => presence !== prior && presence.ip === ip).length;
 
     ws.handleUpgrade(request, socket, head, (client) => {
-      if ((!prior && guests.size >= MAX_GUESTS) || sameSource >= MAX_PER_IP) {
+      if ((!prior && guests.size >= MAX_GUESTS * roomNames.length) || sameSource >= MAX_PER_IP) {
         client.on("error", () => client.terminate());
         client.close(4003, "Courtyard full");
         return;
       }
+      const room = prior?.room ?? roomNames.findIndex((_, id) => [...guests.values()].filter(presence => presence.room === id).length < MAX_GUESTS);
       const spawnX = SPAWN_COLUMNS.find((x) => ![...guests.values()].some(
-        ({ player }) => Math.hypot(player.x - x, player.z - QUAN_SPAWN.z) < 1.3,
+        ({ player, room: occupiedRoom }) => occupiedRoom === room && Math.hypot(player.x - x, player.z - QUAN_SPAWN.z) < 1.3,
       )) ?? 0;
       const player = {
         ...identity,
@@ -77,7 +82,7 @@ export function createQuanPresenceServer({ secret, origins, readBoard = async ()
         z: prior?.player.z ?? QUAN_SPAWN.z,
         action: "idle",
       };
-      const presence = { client, player, ip, alive: true, actionUntil: 0 };
+      const presence = { client, player, room, ip, alive: true, actionUntil: 0 };
       guests.set(player.id, presence);
       prior?.client.close(4000, "Replaced by another tab");
       dirty = true;
@@ -189,6 +194,7 @@ if (process.argv.includes("--serve")) {
   pool?.on("error", () => { /* A later board refresh retries the connection. */ });
   const server = createQuanPresenceServer({
     secret: quanPresenceSecret(), origins,
+    ecosystemEnabled: process.env.TU_VI_QUAN_ECOSYSTEM_ENABLED === "true" || (!production && process.env.TU_VI_QUAN_ECOSYSTEM_ENABLED !== "false"),
     async readBoard() {
       if (!pool) return null;
       const { rows: [board] } = await pool.query(`
@@ -204,5 +210,5 @@ if (process.argv.includes("--serve")) {
       return board;
     },
   });
-  server.listen(port, "127.0.0.1", () => console.log(`Tử Vi Quán presence listening on 127.0.0.1:${port}`));
+  server.listen(port, "127.0.0.1", () => console.log(`Tá»­ Vi QuÃ¡n presence listening on 127.0.0.1:${port}`));
 }

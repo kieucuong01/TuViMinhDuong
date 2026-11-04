@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import TuViQuan from "@/components/tu-vi-quan";
 import { getQuanGuest } from "@/lib/tu-vi-quan-guest";
+import { quanEcosystemEnabled } from "@/lib/tu-vi-quan-ecosystem";
 
 export const metadata: Metadata = {
   title: "Tử Vi Quán",
@@ -15,5 +16,5 @@ export default async function TuViQuanPage() {
   const qr = process.env.TU_VI_QUAN_SUPPORT_QR?.trim();
   const recipient = process.env.TU_VI_QUAN_SUPPORT_RECIPIENT?.trim();
   const support = qr && recipient && (/^\/(?!\/)/.test(qr) || qr.startsWith("https://")) ? { qr, recipient } : null;
-  return <TuViQuan initialAlias={guest?.alias || ""} support={support} paymentsEnabled={process.env.TU_VI_QUAN_PAYMENTS_ENABLED === "true"} />;
+  return <TuViQuan initialAlias={guest?.alias || ""} support={support} ecosystemEnabled={quanEcosystemEnabled()} paymentsEnabled={process.env.TU_VI_QUAN_PAYMENTS_ENABLED === "true"} />;
 }

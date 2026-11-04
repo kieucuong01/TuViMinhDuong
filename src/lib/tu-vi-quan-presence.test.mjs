@@ -13,8 +13,8 @@ afterEach(async () => {
   while (cleanups.length) await cleanups.pop()();
 });
 
-async function listen() {
-  const server = createQuanPresenceServer({ secret, origins: [origin] });
+async function listen(options = {}) {
+  const server = createQuanPresenceServer({ secret, origins: [origin], ...options });
   server.listen(0, "127.0.0.1");
   await once(server, "listening");
   cleanups.push(() => new Promise((resolve) => server.close(resolve)));
@@ -101,4 +101,49 @@ describe("Tử Vi Quán presence", () => {
     const other = connect(url, { id: "guest-8", alias: "Khách Mộc" }, { origin, "x-quan-client-ip": "192.0.2.10" });
     expect((await snapshot(other)).players).toHaveLength(7);
   });
+});
+
+
+describe("four courtyards at capacity", () => {
+  it("isolates 96 visitors into four rooms, keeps the paid board global, and reuses a vacancy", async () => {
+    const board = { tables: 3, queued: 1, occupied: 2 };
+    let publishBoard = false;
+    const url = await listen({ readBoard: async () => publishBoard ? board : null });
+    const clients = [];
+    const frames = [];
+    for (let i = 0; i < 96; i++) {
+      const client = connect(url, { id: `load-${i}`, alias: `Khách ${i}` }, { origin, "x-quan-client-ip": `192.0.2.${i + 1}` });
+      clients.push(client);
+      frames.push(await snapshot(client));
+    }
+    expect(frames.map(frame => frame.room.id)).toEqual(Array.from({ length: 96 }, (_, i) => Math.floor(i / 24)));
+    expect(frames[95].rooms.map(room => room.count)).toEqual([24, 24, 24, 24]);
+    expect(frames[95].players).toHaveLength(24);
+    expect(frames[95].players.every(player => !/^private|^load-/.test(player.id))).toBe(true);
+    const firstUpdate = snapshot(clients[0], frame => frame.rooms.every(room => room.count === 24));
+    const full = await firstUpdate;
+    expect(full.players.every(player => Number(player.alias.split(" ")[1]) < 24)).toBe(true);
+    const boardUpdates = Promise.all([clients[0], clients[95]].map(client => snapshot(client, frame => frame.board !== null)));
+    publishBoard = true;
+    for (const frame of await boardUpdates) expect(frame.board).toEqual(board);
+    const blocked = connect(url, { id: "overflow", alias: "Khách mới" }, { origin, "x-quan-client-ip": "198.51.100.1" });
+    expect((await once(blocked, "close"))[0]).toBe(4003);
+    const departed = once(clients[24], "close"); clients[24].close(); await departed;
+    const replacement = await snapshot(connect(url, { id: "replacement", alias: "Khách thay" }, { origin, "x-quan-client-ip": "198.51.100.2" }));
+    expect(replacement.room).toMatchObject({id:1,count:24,capacity:24});
+    expect(replacement.players.some(player => player.alias === "Khách 0")).toBe(false);
+  }, 20_000);
+});
+
+
+it("preserves the original single-room payload and capacity when the ecosystem is disabled", async () => {
+  const url = await listen({ ecosystemEnabled: false });
+  for (let i = 0; i < 24; i++) {
+    const client = connect(url, { id: `legacy-${i}`, alias: "Legacy" }, { origin, "x-quan-client-ip": `192.0.2.${i + 1}` });
+    const frame = await snapshot(client);
+    expect(frame.room).toBeUndefined();
+    expect(frame.players).toHaveLength(i + 1);
+  }
+  const overflow = connect(url, { id: "legacy-overflow", alias: "Overflow" }, { origin, "x-quan-client-ip": "192.0.2.25" });
+  expect((await once(overflow, "close"))[0]).toBe(4003);
 });

@@ -2,6 +2,8 @@ import { getCurrentUser } from "@/lib/auth";
 import { getDb } from "@/lib/db";
 import { quanError, quanJson, readQuanBody } from "@/lib/tu-vi-quan-http";
 import { getQuanCapacity, quanTransaction, QuanSessionError, reconcileQueue } from "@/lib/tu-vi-quan-session";
+import { readQuanAdminEcosystem, updateQuanAdminEcosystem } from "@/lib/tu-vi-quan-admin";
+import { quanEcosystemEnabled } from "@/lib/tu-vi-quan-ecosystem";
 
 const orderFields = {
   id: true, orderCode: true, status: true, minutes: true, amountVnd: true, paidAt: true,
@@ -28,7 +30,8 @@ export async function GET() {
         select: orderFields,
       }),
     ]);
-    return quanJson({ maxTables, orders: [...refunds, ...recent].map((order) => ({
+    const ecosystem = quanEcosystemEnabled() ? await readQuanAdminEcosystem(db) : null;
+    return quanJson({ maxTables, ecosystem, orders: [...refunds, ...recent].map((order) => ({
       ...order, orderCode: String(order.orderCode), status: order.status.toLowerCase(),
     })) });
   } catch (error) {
@@ -38,10 +41,15 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    if ((await getCurrentUser())?.role !== "ADMIN") return quanJson({ error: "Cần quyền quản trị." }, 403);
+    const admin = await getCurrentUser();
+    if (admin?.role !== "ADMIN") return quanJson({ error: "Cần quyền quản trị." }, 403);
     const body = await readQuanBody(request);
     const db = getDb();
     if (!db) throw new QuanSessionError("Chưa kết nối dữ liệu.", 503);
+    if (body.ecosystemAction && quanEcosystemEnabled()) {
+      await updateQuanAdminEcosystem(db, admin.id, body);
+      return quanJson({ ok: true });
+    }
     const { maxTables, refundOrderId } = body;
     if (typeof maxTables === "number" && Number.isInteger(maxTables) && maxTables >= 0 && maxTables <= 3) {
       await quanTransaction(db, async (tx) => {

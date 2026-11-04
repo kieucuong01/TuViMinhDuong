@@ -3,12 +3,14 @@
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useRef, useState, useSyncExternalStore, type FormEvent } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore, type FormEvent } from "react";
 import { ArrowLeft, BookOpen, CircleHelp, Compass, Flame, Heart, MapPin, Navigation, X } from "lucide-react";
 import { QUAN_BLOCKS, QUAN_BOUNDS, QUAN_POND, QUAN_SPAWN, QUAN_STATIONS } from "@/lib/tu-vi-quan-world.mjs";
 import styles from "./tu-vi-quan.module.css";
+import type { QuanSnapshot, QuanPreferences, QuanExperience } from "./tu-vi-quan-ecosystem-panel";
 
 const Scene = dynamic(() => import("./tu-vi-quan-scene"), { ssr: false });
+const QuanEcosystem = dynamic(() => import("./tu-vi-quan-ecosystem-panel"), { ssr: false });
 type Position = { x: number; z: number };
 type Player = Position & { id: string; alias: string; action: string };
 type Session = {
@@ -18,6 +20,7 @@ type Session = {
   position?: number; waitSeconds?: number; endsAt?: string; paused?: boolean; remainingSeconds?: number;
   expiresAt?: string; tableNumber?: number; inFlight?: boolean; refundAmountVnd?: number; refundSettledAt?: string;
   messages?: { id: string; question: string; answer: string | null }[];
+  chartSummary?: { banMenh: string; menh: string; cuc: string; notes: string[] };
 };
 
 const stations = QUAN_STATIONS;
@@ -46,11 +49,20 @@ async function jsonRequest<T>(path: string, body?: object): Promise<T> {
   return data;
 }
 
-export default function TuViQuan({ initialAlias, support, paymentsEnabled }: {
-  initialAlias: string; support: { qr: string; recipient: string } | null; paymentsEnabled: boolean;
+export default function TuViQuan({ initialAlias, support, paymentsEnabled, ecosystemEnabled = false }: {
+  initialAlias: string; support: { qr: string; recipient: string } | null; paymentsEnabled: boolean; ecosystemEnabled?: boolean;
 }) {
   const hydrated = useSyncExternalStore(subscribeToHydration, hydratedSnapshot, serverSnapshot);
+  const [experience, setExperience] = useState<QuanExperience>("courtyard");
+  const [ecosystemOpen, setEcosystemOpen] = useState(false);
+  const [ecosystem, setEcosystem] = useState<QuanSnapshot | null>(null);
+  const communityWishes = useMemo(() => ecosystem?.wishes.map(wish => ({
+    id: wish.id, text: wish.text || "", placement: wish.placement || "tree" as const,
+  })), [ecosystem?.wishes]);
+  const [preferences, setPreferences] = useState<QuanPreferences>({ quality: "medium", reducedMotion: false, muted: true });
+
   const [alias, setAlias] = useState(initialAlias);
+  const receiveEcosystem = useCallback((snapshot: QuanSnapshot) => { setEcosystem(snapshot); setAlias(snapshot.profile.alias); }, []);
   const [position, setPosition] = useState(origin);
   const [destination, setDestination] = useState<(Position & { requestId: number }) | null>(null);
   const [action, setAction] = useState("idle");
@@ -63,6 +75,7 @@ export default function TuViQuan({ initialAlias, support, paymentsEnabled }: {
   const [notice, setNotice] = useState("");
   const [error, setError] = useState("");
   const [panel, setPanel] = useState<"session" | "support" | "restore" | "incense" | "map" | null>(null);
+  const openEcosystem = useCallback((open: boolean) => { setEcosystemOpen(open); if (open) { setPanel(null); setHelp(false); setDestination(null); } }, []);
   const [session, setSession] = useState<Session | null>(null);
   const [recovery, setRecovery] = useState("");
   const [minutes, setMinutes] = useState<15 | 30>(15);
@@ -159,6 +172,7 @@ export default function TuViQuan({ initialAlias, support, paymentsEnabled }: {
         const next = await jsonRequest<Session | { session: null }>(path + (id ? "?id=" + encodeURIComponent(id) : ""));
         if (!live || version !== pollVersion.current || "session" in next) return;
         setSession(next);
+        if (!session?.id && returned === next.id) setPanel("session");
       } catch { /* A transient status failure leaves the current panel intact. */ }
       finally { polling = false; }
     }
@@ -205,10 +219,33 @@ export default function TuViQuan({ initialAlias, support, paymentsEnabled }: {
   }
 
   function move(target: Position) {
+    if (ecosystemOpen || help) return;
     latestPosition.current = target;
     setPosition(target);
     send({ type: "move", ...target });
     if (action !== "idle") doAction("idle");
+  }
+
+  useEffect(() => {
+    if (!ecosystemEnabled || !alias) return;
+    const url = new URL(location.href);
+    const shareId = url.searchParams.get("tu-vi-share");
+    if (!shareId || !/^[A-Za-z0-9_-]{24}$/.test(shareId)) return;
+    url.searchParams.delete("tu-vi-share");
+    history.replaceState(history.state, "", url);
+    void jsonRequest("/api/tu-vi-quan/ecosystem", { action: "telemetry", name: "share_open", shareId }).catch(() => {});
+  }, [ecosystemEnabled, alias]);
+
+  async function restoreProfile(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (operation.current) return;
+    operation.current = true;
+    setBusy(true);
+    setError("");
+    const code = new FormData(event.currentTarget).get("code");
+    try { receiveEcosystem(await jsonRequest<QuanSnapshot>("/api/tu-vi-quan/ecosystem", { action: "recovery_restore", code })); }
+    catch (err) { setError((err as Error).message); }
+    finally { operation.current = false; setBusy(false); }
   }
 
   async function submitGuest(event: FormEvent<HTMLFormElement>) {
@@ -273,6 +310,7 @@ export default function TuViQuan({ initialAlias, support, paymentsEnabled }: {
   function openPanel(next: typeof panel) {
     setError("");
     setHelp(false);
+    setEcosystemOpen(false);
     setDestination(null);
     setPanel(next);
   }
@@ -288,6 +326,8 @@ export default function TuViQuan({ initialAlias, support, paymentsEnabled }: {
     }
   }
 
+  const savedBirth = ecosystem?.profile.birthInput;
+  const savedSolar = savedBirth?.calendarType === "solar" ? [savedBirth.year, savedBirth.month, savedBirth.day].map((part, index) => String(part).padStart(index === 0 ? 4 : 2, "0")).join("-") : undefined;
   const remaining = session?.paused ? (session.remainingSeconds || 0) :
     Math.max(0, Math.ceil(((session?.endsAt ? Date.parse(session.endsAt) : now) - now) / 1000));
   const clock = Math.floor(remaining / 60) + ":" + String(remaining % 60).padStart(2, "0");
@@ -335,7 +375,7 @@ export default function TuViQuan({ initialAlias, support, paymentsEnabled }: {
       }
       return;
     }
-    if (event.code === "KeyE" && nearby && alias && !panel && !help && !event.repeat &&
+    if (event.code === "KeyE" && nearby && alias && !panel && !help && !ecosystemOpen && !event.repeat &&
         !(event.target instanceof HTMLElement && event.target.closest("input,textarea,select,[contenteditable]"))) {
       event.preventDefault();
       interactStation(nearby);
@@ -345,9 +385,9 @@ export default function TuViQuan({ initialAlias, support, paymentsEnabled }: {
   return (
     <main ref={world} className={styles.page} data-quan-world onKeyDown={handleWorldKey} tabIndex={-1}>
       <section className={styles.courtyard} aria-label="Sân Tử Vi Quán">
-        {!lite && <Scene position={position} destination={destination} action={action} players={players} onMove={move} interactive={Boolean(alias && !panel && !help)} onUnavailable={() => setLite(true)} />}
+        {!lite && <Scene ecosystemEnabled={ecosystemEnabled} position={position} destination={destination} action={action} players={players} onMove={move} experience={panel === "session" ? "teacher" : experience} quality={preferences.quality} reducedMotion={preferences.reducedMotion} muted={preferences.muted} appearance={ecosystem?.profile.equipped} communityWishes={communityWishes} interactive={Boolean(alias && !panel && !help && !ecosystemOpen)} onUnavailable={() => setLite(true)} />}
       </section>
-      <header className={styles.mast}>
+      <header className={styles.mast} inert={Boolean(panel) || ecosystemOpen}>
         <Link href="/" className={styles.icon} aria-label="Về Lá số tinh hoa"><ArrowLeft size={20} /></Link>
         <div className={styles.identity}><h1>Tử Vi Quán</h1><span>{alias ? online ? players.length + 1 + " khách trong sân" : courtyardFull ? "Sân chung đang đông" : "Đang kết nối sân chung" : "Lá số tinh hoa"}</span></div>
         {alias && <button className={styles.icon} aria-label="Hướng dẫn và tùy chọn" aria-expanded={help} onClick={() => setHelp(!help)}><CircleHelp size={22} /></button>}
@@ -363,34 +403,36 @@ export default function TuViQuan({ initialAlias, support, paymentsEnabled }: {
               <input id="quan-alias" name="alias" autoComplete="nickname" minLength={2} maxLength={24} placeholder="Ví dụ Mây Trắng" required />
               <button disabled={busy || !hydrated} className={styles.primary}>{hydrated ? "Vào quán" : "Đang mở cổng…"}</button>
             </form>
+            {ecosystemEnabled && <details><summary>Đã có mã khôi phục hồ sơ?</summary><form onSubmit={restoreProfile}><label>Mã khôi phục<input name="code" required autoComplete="off" maxLength={32} /></label><button disabled={busy}>Khôi phục hồ sơ</button><Link href="/dang-nhap?next=%2Ftu-vi-quan">Đăng nhập nếu đã gắn tài khoản</Link></form></details>}
             <p className={styles.note}>Vào sân và tham gia hoạt động miễn phí. Bạn không cần tài khoản.</p>
             {error && <p role="alert" className={styles.error}>{error}</p>}
           </div>
         </section>
       ) : (
         <>
-          <nav className={styles.actionDock} aria-label="Hoạt động trong quán" inert={Boolean(panel)}>
+          {ecosystemEnabled && <QuanEcosystem alias={alias} suspended={Boolean(panel) || help} onOpen={openEcosystem} onSnapshot={receiveEcosystem} preferences={preferences} onPreferences={setPreferences} lite={lite} onLite={setLite} onRitual={doAction} onExperience={setExperience} onLegacy={openPanel} />}
+          {!ecosystemEnabled && <nav className={styles.actionDock} aria-label="Hoạt động trong quán" inert={Boolean(panel)}>
             <button className={styles.primary} onClick={() => openPanel("session")}><BookOpen size={21} aria-hidden="true" />Xem lá số</button>
             <button onClick={() => openPanel("incense")}><Flame size={21} aria-hidden="true" />Thắp hương</button>
             <button onClick={() => openPanel("support")}><Heart size={21} aria-hidden="true" />Ủng hộ quán</button>
             <button onClick={() => openPanel("map")}><Compass size={21} aria-hidden="true" />Khám phá</button>
-          </nav>
-          {lite && <section className={styles.lite}><h2>Sân quán</h2><p>Chọn một hoạt động hoặc ghé bàn thầy.</p>
+          </nav>}
+          {lite && <section className={styles.lite} inert={Boolean(panel) || ecosystemOpen}><h2>Sân quán</h2><p>Chọn một hoạt động hoặc ghé bàn thầy.</p>
             {players.length > 0 && <p>Khách đang ở sân: {players.map((player) => player.alias).join(", ")}</p>}
             <div className={styles.quickActions}><button onClick={() => interactStation(stations.find((station) => station.id === "meditate")!)}>{action === "meditate" ? "Đứng dậy" : "Ngồi thiền miễn phí"}</button><button onClick={() => openPanel("map")}>Xem các góc trong quán</button></div>
           </section>}
           {!lite && <div className={styles.location}><Compass size={15} /><span>{nearby?.label ?? "Sân quán"}</span></div>}
-          {!lite && !panel && !help && <button className={styles.miniMap} aria-label="Mở bản đồ quán, chấm sáng là vị trí của bạn" onClick={() => openPanel("map")}><CourtyardMap position={position} /><span>Bản đồ quán</span></button>}
-          {session && !canOrder && <button className={styles.sessionBadge} onClick={() => openPanel("session")}>{session.status === "invited" ? "Đã đến lượt" : "Lượt xem của bạn"}</button>}
+          {!lite && !panel && !help && !ecosystemOpen && <button className={styles.miniMap} aria-label="Mở bản đồ quán, chấm sáng là vị trí của bạn" onClick={() => openPanel("map")}><CourtyardMap position={position} /><span>Bản đồ quán</span></button>}
+          {session && !canOrder && <button className={styles.sessionBadge} inert={Boolean(panel) || ecosystemOpen} onClick={() => openPanel("session")}>{session.status === "invited" ? "Đã đến lượt" : "Lượt xem của bạn"}</button>}
           {help && <aside className={styles.help} aria-label="Hướng dẫn và tùy chọn">
-            <strong>Mời bạn thong thả dạo quán</strong><p>Chọn Xem lá số, Thắp hương hoặc Ủng hộ quán để mở ngay. Vào Khám phá và chọn một nơi, nhân vật sẽ tự đi đến.</p>
+            <strong>Mời bạn thong thả dạo quán</strong><p>{ecosystemEnabled ? "Dùng các nút dưới sân để mở hoạt động. Trong Khám phá, chọn Bản đồ để nhân vật tự đi đến nơi bạn chọn." : "Chọn Xem lá số, Thắp hương hoặc Ủng hộ quán để mở ngay. Vào Khám phá và chọn một nơi, nhân vật sẽ tự đi đến."}</p>
             <p>Dùng cần điều khiển hoặc phím WASD để đi. Chạm nền để đi, kéo cảnh để xoay góc nhìn. Thắp hương và ngồi thiền đều miễn phí.</p>
             {board && <p>{board.tables ? `${board.occupied}/${board.tables} bàn đang dùng · ${board.queued} lượt chờ` : "Bàn thầy đang tạm nghỉ"}</p>}
             <button onClick={() => { setLite(!lite); setHelp(false); }}>{lite ? "Thử lại 3D" : "Giao diện nhẹ"}</button>
             <button onClick={() => { setHelp(false); openPanel("restore"); }}>Khôi phục lượt đã mua</button>
           </aside>}
           {notice && <p className={styles.notice} role="status">{notice}</p>}
-          {!lite && !panel && !help && <div className={styles.interaction}>
+          {!lite && !panel && !help && !ecosystemOpen && <div className={styles.interaction}>
             {nearby ? <button className={styles.primary} onClick={() => interactStation(nearby)}>{nearby.id === "meditate" && action === "meditate" ? "Đứng dậy" : nearby.label}<kbd>E</kbd></button> :
               <span><MapPin size={15} /> Khám phá để chọn nơi muốn tới</span>}
           </div>}
@@ -426,6 +468,11 @@ export default function TuViQuan({ initialAlias, support, paymentsEnabled }: {
               {session?.status === "ended" && <p>Phiên xem đã kết thúc. Bạn có thể đọc lại cuộc trò chuyện bên dưới.</p>}
               {session?.status === "refund" && <p>Phiên dừng do lỗi hệ thống. Khoản hoàn {money.format(session.refundAmountVnd || 0)}đ {session.refundSettledAt ? "đã được đối soát" : "đang được đối soát"}.</p>}
               {session?.status === "cancelled" && <p>Đơn đã hết hạn hoặc đã được hủy. Bạn có thể tạo đơn mới.</p>}
+              {ecosystemEnabled && session?.chartSummary && <details className={styles.recovery}>
+                <summary>Tóm tắt lá số của bạn</summary>
+                <p>Mệnh {session.chartSummary.menh} · {session.chartSummary.banMenh} · {session.chartSummary.cuc}</p>
+                {session.chartSummary.notes.map((note) => <p key={note}>{note}</p>)}
+              </details>}
               {session?.messages && session.messages.length > 0 && <div className={styles.messages} aria-label="Cuộc trò chuyện" aria-live="polite">
                 {session.messages.map((message) => <article key={message.id}><p><strong>Bạn</strong><br />{message.question}</p>{message.answer && <p><strong>Thầy AI</strong><br />{message.answer}</p>}</article>)}
               </div>}
@@ -437,6 +484,10 @@ export default function TuViQuan({ initialAlias, support, paymentsEnabled }: {
                   setQuestion("");
                 }
               }}>
+                {ecosystemEnabled && <div className={styles.quickActions} aria-label="Gợi ý câu hỏi">
+                  {[["Công việc", "Cung Quan Lộc gợi ý gì về hướng phát triển công việc?"], ["Tình cảm", "Tôi có thể nhìn lại điều gì trong chuyện tình cảm?"], ["Gia đình", "Lá số có gợi ý gì để tôi vun đắp quan hệ gia đình?"], ["Tài chính", "Tôi nên để ý điều gì khi sắp xếp tài chính?" ]].map(([label, prompt]) =>
+                    <button type="button" key={label} onClick={() => setQuestion(prompt)}>{label}</button>)}
+                </div>}
                 <label htmlFor="quan-question">Câu hỏi dành cho thầy AI</label>
                 <textarea id="quan-question" value={question} onChange={(event) => setQuestion(event.target.value)} required maxLength={1000} rows={3} />
                 <button className={styles.primary} disabled={busy || session.inFlight || remaining <= 0 || !question.trim()}>{busy || session.inFlight ? "Thầy đang trả lời…" : "Gửi câu hỏi"}</button>
@@ -450,11 +501,11 @@ export default function TuViQuan({ initialAlias, support, paymentsEnabled }: {
                 </div></fieldset>
                 {!paymentsEnabled && <p role="status">Quán chưa mở nhận thanh toán. Hai mức phí trên để bạn tham khảo; dạo sân, thắp hương và ngồi thiền đều miễn phí.</p>}
                 {paymentsEnabled && <>
-                <label>Người được xem<input name="fullName" maxLength={80} placeholder={alias} /></label>
+                <label>Người được xem<input name="fullName" maxLength={80} placeholder={alias} defaultValue={savedBirth?.fullName} /></label>
                 <div className={styles.birth}>
-                  <label>Ngày sinh dương lịch<input type="date" name="birthDate" min="1900-01-01" max={new Date().toLocaleDateString("sv-SE", { timeZone: "Asia/Ho_Chi_Minh" })} required /></label>
-                  <label>Giờ sinh<select name="hour" defaultValue="" required><option value="" disabled>Chọn giờ</option>{Array.from({ length: 24 }, (_, hour) => <option key={hour} value={hour}>{hour} giờ</option>)}</select></label>
-                  <label>Giới tính<select name="gender"><option value="male">Nam</option><option value="female">Nữ</option></select></label>
+                  <label>Ngày sinh dương lịch<input type="date" name="birthDate" defaultValue={savedSolar} min="1900-01-01" max={new Date().toLocaleDateString("sv-SE", { timeZone: "Asia/Ho_Chi_Minh" })} required /></label>
+                  <label>Giờ sinh<select name="hour" defaultValue={savedBirth?.birthHour ?? ""} required><option value="" disabled>Chọn giờ</option>{Array.from({ length: 24 }, (_, hour) => <option key={hour} value={hour}>{hour} giờ</option>)}</select></label>
+                  <label>Giới tính<select name="gender" defaultValue={savedBirth?.gender}><option value="male">Nam</option><option value="female">Nữ</option></select></label>
                 </div>
                 </>}
                 <p className={styles.note}>Thầy AI trả lời bằng chữ. Nội dung câu hỏi và dữ liệu luận số được xử lý bằng dịch vụ AI. Phiên mang tính tham khảo.</p>
