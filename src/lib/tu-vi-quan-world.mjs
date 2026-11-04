@@ -3,11 +3,14 @@ export const QUAN_SPAWN = { x: 0, z: 22 };
 export const QUAN_STATIONS = [
   { id: "teacher", label: "Xem lá số", x: 0, z: -15, description: "Trò chuyện riêng với thầy AI" },
   { id: "incense", label: "Thắp hương", x: -10, z: -2, description: "Một khoảng lặng giữa sân quán" },
-  { id: "meditate", label: "Ngồi thiền", x: 18, z: 4, description: "Nghỉ chân dưới hiên vườn" },
+  { id: "meditate", label: "Ngồi thiền", x: 15.5, z: 4, description: "Nghỉ chân dưới hiên vườn" },
+  { id: "iching", label: "Bàn Thầy Dịch", x: 20, z: 3.7, description: "Gieo quẻ và trò chuyện cùng Thầy Dịch" },
   { id: "support", label: "Hòm công đức", x: 9, z: -15, description: "Ủng hộ duy trì quán tự nguyện" },
   { id: "greet", label: "Chắp tay", x: 0, z: 10, description: "Gửi lời chào đến khách trong sân" },
   { id: "tea", label: "Trà đình", x: -20, z: 13, description: "Dạo vườn trúc và nghỉ bên bàn trà" },
   { id: "lotus", label: "Vườn hồ sen", x: 10, z: 19, description: "Ngắm hồ sen và đèn hoa đăng" },
+  { id: "ranking", label: "Bảng vàng công đức", x: -6.3, z: -13, description: "Xem năm khách có nhiều Điểm An Nhiên" },
+  { id: "calligraphy", label: "Xin chữ", x: -14, z: 14, description: "Nhận một chữ đầu ngày hoặc một câu vui" },
 ];
 export const QUAN_BLOCKS = [
   { minX: -13, maxX: 13, minZ: -27, maxZ: -17.4 },

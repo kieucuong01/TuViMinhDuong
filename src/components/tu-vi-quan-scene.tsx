@@ -14,13 +14,15 @@ type SceneProps = {
   encounter?: { kind: QuanHost; state: "greeting" | "listening" | "thinking" | "speaking" | "idle"; audioLevel: number };
   showHostControls?: boolean;
   onHost?: (kind: QuanHost) => void;
-  ritual?: { kind: "incense" | "meditate" | "greet" | "tarot" | "iching"; requestId: number; count?: number; values?: number[] };
+  ritual?: { kind: "incense" | "meditate" | "greet" | "tarot" | "iching" | "chart"; requestId: number; count?: number; values?: number[] };
   speech?: { id: string; text: string }[];
   ecosystemEnabled?: boolean;
   quality?: "low" | "medium" | "high";
   reducedMotion?: boolean;
   muted?: boolean;
   appearance?: Record<string, string>;
+  leaders?: { alias: string; points: number }[];
+  eventEndsAt?: number;
   experience?: "courtyard" | "teacher" | "tarot" | "iching" | "personal";
   communityWishes?: { id: string; text: string; placement: "tree" | "lotus" }[];
   position: Position;
@@ -421,6 +423,25 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
     drum(PALETTE.gold, 12.55, 1.23, z, 0.2, 0.1);
   }
   box(PALETTE.wood, 12.55, 0.94, 18.6, 0.13, 0.13, 7.1);
+  if (ecosystemEnabled) {
+    // A roofed honor board before the hall and a small stall on the bamboo path.
+    for (const x of [-7.95, -4.65]) {
+      drum(PALETTE.stone, x, 0.12, -14.15, 0.5, 0.24);
+      box(PALETTE.wood, x, 1.55, -14.15, 0.23, 2.9, 0.23);
+    }
+    box(PALETTE.edge, -6.3, 1.68, -14.15, 3.3, 2.04, 0.18);
+    roof(-6.3, -14.15, 4.1, 1.64, 3.0);
+    for (const x of [-15.1, -12.9]) {
+      box(PALETTE.wood, x, 1.43, 12.1, 0.15, 2.65, 0.17);
+      box(PALETTE.wood, x, 1.43, 13.1, 0.15, 2.65, 0.17);
+    }
+    roof(-14, 12.6, 2.85, 1.75, 2.74);
+    box(PALETTE.edge, -14, 0.55, 12.65, 2.16, 0.94, 0.62);
+    box(PALETTE.wood, -14, 1.01, 12.65, 2.3, 0.12, 0.79);
+    for (const x of [-14.69, -14.30, -13.91]) box(PALETTE.plaster, x, 1.087, 12.63, 0.29, 0.035, 0.45);
+    lantern(-14, 2.16, 12.2);
+    for (const z of [15.35, 19.9, 22.0]) lantern(12.53, 1.54, z);
+  }
   // Bamboo grove, flowering trees, rocks and individual flower beds, all instanced.
   for (let i = 0; i < 28; i++) {
     const x = -30 + (i % 4) * 1.06;
@@ -610,6 +631,19 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
     panel.receiveShadow = true;
     readingDecor.push(panel); scene.add(panel); return panel;
   }
+  function paintRanking(ctx: CanvasRenderingContext2D, leaders: NonNullable<SceneProps["leaders"]>) {
+    ctx.fillStyle = "#3a2020"; ctx.fillRect(0, 0, 512, 512);
+    ctx.strokeStyle = "#bb8750"; ctx.lineWidth = 4; ctx.strokeRect(13, 16, 486, 480);
+    ctx.fillStyle = "#ffe0a5"; ctx.textAlign = "center"; ctx.font = "bold 31px Georgia";
+    ctx.fillText("BẢNG VÀNG CÔNG ĐỨC", 256, 77, 435);
+    ctx.font = "20px Georgia"; ctx.fillText("ĐIỂM AN NHIÊN", 256, 116);
+    ctx.font = "27px Georgia";
+    if (!leaders.length) ctx.fillText("Đang chờ những vị khách đầu tiên", 256, 252, 436);
+    leaders.slice(0, 5).forEach((leader, index) => ctx.fillText(`${index + 1}. ${leader.alias}  ·  ${leader.points} điểm`, 256, 172 + index * 60, 435));
+  }
+  const rankingBoard = ecosystemEnabled ? paintedPanel(3.1, 1.86, ctx => paintRanking(ctx, [])) : null;
+  rankingBoard?.position.set(-6.3, 1.68, -14.05);
+  let previousLeaders: SceneProps["leaders"];
   if (ecosystemEnabled) {
     const rug = paintedPanel(4.3, 4.4, ctx => {
       ctx.fillStyle = "#4f2525"; ctx.fillRect(0, 0, 512, 512);
@@ -642,6 +676,17 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
   }
   const tableLight = new THREE.PointLight(0xffab5e, 0, 7, 2);
   scene.add(tableLight);
+  const chartHalo = new THREE.Group(); chartHalo.position.set(5.5, 1.22, -19.5); chartHalo.visible = false; scene.add(chartHalo);
+  const haloGeometry = new THREE.RingGeometry(0.58, 0.596, 48);
+  const haloMaterial = new THREE.MeshBasicMaterial({ color: 0xf6c773, transparent: true, opacity: 0.8, depthWrite: false, side: THREE.DoubleSide });
+  const focusMaterial = haloMaterial.clone(); focusMaterial.color.setHex(0xfff2c2);
+  const circle = new THREE.Mesh(haloGeometry, haloMaterial); circle.rotation.x = -Math.PI / 2; chartHalo.add(circle);
+  const chartStars = Array.from({ length: 12 }, (_, index) => {
+    const angle = index * Math.PI / 6;
+    const star = new THREE.Mesh(geometry.leaf, haloMaterial);
+    star.position.set(Math.sin(angle) * 0.59, 0, Math.cos(angle) * 0.59);
+    chartHalo.add(star); return star;
+  });
   const incense = [-1, 0, 1].map(side => ({
     stick: ritualPart("box", 0xa13e29, -10 + side * 0.16, 2.15, -5.5, 0.034, 0.6, 0.034),
     ember: ritualPart("head", PALETTE.lantern, -10 + side * 0.16, 2.46, -5.5, 0.07, 0.07, 0.07),
@@ -679,6 +724,10 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
     const mesh = new THREE.Mesh(geometry.leaf, smokeMaterial);
     scene.add(mesh);
     return mesh;
+  });
+  const eventLanterns = Array.from({ length: 8 }, (_, index) => {
+    const lamp = ritualPart("head", PALETTE.lantern, 15 + index * 0.8, 1.1, 3.1 + (index % 2) * 1.25, 0.29, 0.35, 0.29);
+    lamp.visible = false; return lamp;
   });
 
   const personal = new THREE.Group(); personal.position.set(55, 0, -5); scene.add(personal);
@@ -891,6 +940,17 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
     const dt = Math.min((time - (previous || time)) / 1000, 0.07);
     previous = time;
     const current = latest.current;
+    const eventVisible = Boolean(current.eventEndsAt && current.eventEndsAt > Date.now());
+    eventLanterns.forEach((lamp, index) => {
+      lamp.visible = eventVisible;
+      if (eventVisible) lamp.position.y = 1.1 + (reducedMotion() ? 0 : Math.sin(time / 1050 + index) * 0.23);
+    });
+    if (rankingBoard && current.leaders !== previousLeaders) {
+      previousLeaders = current.leaders;
+      const map = rankingBoard.material.map!;
+      const context = map.image instanceof HTMLCanvasElement ? map.image.getContext("2d") : null;
+      if (context) { paintRanking(context, current.leaders ?? []); map.needsUpdate = true; }
+    }
     if (ecosystemEnabled && current.communityWishes !== previousWishes) {
       previousWishes = current.communityWishes;
       updateWishes(previousWishes ?? []);
@@ -962,6 +1022,11 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
     move(self, controlled ?? current.position, current.action, time / 1000, dt);
     if (current.ritual?.requestId !== ritualId) {
       ritualId = current.ritual?.requestId; ritualStarted = time;
+      if (current.ritual?.kind === "chart") chartStars.forEach((star, index) => {
+        const highlighted = index === current.ritual?.values?.[0];
+        star.material = highlighted ? focusMaterial : haloMaterial;
+        star.scale.setScalar(highlighted ? 0.12 : 0.046);
+      });
       if (current.ritual?.kind === "incense") incense.forEach(({stick, ember}, i) => { stick.visible = ember.visible = current.ritual?.count === 3 || i === 1; });
       if (current.ritual?.kind === "tarot") tarotCards.forEach(({face}, i) => {
         const value = current.ritual?.values?.[i]; face.material.map?.dispose(); face.material.dispose();
@@ -974,6 +1039,12 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
       }));
     }
     const ritualActive = current.ritual && time - ritualStarted < (current.ritual.kind === "meditate" ? 20000 : 5000);
+    chartHalo.visible = seated?.kind === "tuvi" && current.ritual?.kind === "chart" && Boolean(ritualActive);
+    if (chartHalo.visible) {
+      const elapsed = Math.min(1, (time - ritualStarted) / 5000);
+      chartHalo.rotation.y = reducedMotion() ? 0 : Math.PI * 2 * (1 - (1 - elapsed) ** 3);
+      haloMaterial.opacity = 0.8 * (1 - elapsed ** 3); focusMaterial.opacity = 1 - elapsed ** 3;
+    }
     if (!seated && ritualActive) pose(self, current.ritual!.kind, time / 1000, false, reducedMotion());
     teachers.forEach((teacher, index) => {
       const speaking = seated?.kind === hostKinds[index] && (seated.state === "speaking" || seated.state === "greeting");
@@ -1099,6 +1170,7 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
     tarotCards.forEach(({face}) => { face.material.map?.dispose(); face.material.dispose(); });
     teachers.forEach((teacher) => { disposeLabel(teacher.badge); teacher.robe.dispose(); });
     readingDecor.forEach(({ geometry, material }) => { geometry.dispose(); material.map?.dispose(); material.dispose(); });
+    haloGeometry.dispose(); haloMaterial.dispose(); focusMaterial.dispose();
     groundShadows.dispose();
     glowGeometry.dispose();
     glowMaterial.dispose();

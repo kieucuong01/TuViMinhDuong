@@ -9,7 +9,7 @@ import { QUAN_BLOCKS, QUAN_BOUNDS, QUAN_POND, QUAN_SPAWN, QUAN_STATIONS } from "
 import styles from "./tu-vi-quan.module.css";
 import type { EncounterKind, EncounterVisual } from "./tu-vi-quan-encounter";
 import type { QuanSocialMessage } from "./tu-vi-quan-social";
-import type { QuanSnapshot, QuanPreferences, QuanExperience } from "./tu-vi-quan-ecosystem-panel";
+import type { QuanSnapshot, QuanPreferences, QuanExperience, QuanLeader } from "./tu-vi-quan-ecosystem-panel";
 
 const Scene = dynamic(() => import("./tu-vi-quan-scene"), { ssr: false });
 const Encounter = dynamic(() => import("./tu-vi-quan-encounter"), { ssr: false });
@@ -60,12 +60,14 @@ export default function TuViQuan({ initialAlias, support, paymentsEnabled, ecosy
   const [host, setHost] = useState<{kind: EncounterKind; orderId?: string; visit: number} | null>(null);
   const [readingKind, setReadingKind] = useState<EncounterKind>("tuvi");
   const [encounterVisual, setEncounterVisual] = useState<EncounterVisual | null>(null);
-  const [ritual, setRitual] = useState<{kind: "incense" | "meditate" | "greet" | "tarot" | "iching"; requestId: number; count?: number; values?: number[]}>();
+  const [ritual, setRitual] = useState<{kind: "incense" | "meditate" | "greet" | "tarot" | "iching" | "chart"; requestId: number; count?: number; values?: number[]}>();
   const [ritualBusy, setRitualBusy] = useState(false);
   const [meditationUntil, setMeditationUntil] = useState(0);
   const ritualOperation = useRef(false);
   const pendingRitual = useRef<{kind: "incense" | "meditate" | "greet"; count?: number} | null>(null);
   const [socialMessages, setSocialMessages] = useState<QuanSocialMessage[]>([]);
+  const [communityActivity, setCommunityActivity] = useState<{ id: string; text: string }[]>([]);
+  const [leaders, setLeaders] = useState<QuanLeader[]>([]);
   const [ownId, setOwnId] = useState<string>();
   const [roomName, setRoomName] = useState<string>();
   const [socialError, setSocialError] = useState("");
@@ -77,11 +79,12 @@ export default function TuViQuan({ initialAlias, support, paymentsEnabled, ecosy
   const publicSpeech = useMemo(() => socialMessages.slice(-2).map(message => ({id: message.playerId, text: `${message.alias}: ${message.text}`})), [socialMessages]);
   const [experience, setExperience] = useState<QuanExperience>("courtyard");
   const [ecosystemOpen, setEcosystemOpen] = useState(false);
-  const [activityRequest, setActivityRequest] = useState<{ tab: "today" | "divination" | "wishes"; id: number }>();
+  const [activityRequest, setActivityRequest] = useState<{ tab: "today" | "divination" | "wishes" | "ranking" | "calligraphy"; id: number }>();
   const [ecosystem, setEcosystem] = useState<QuanSnapshot | null>(null);
   const communityWishes = useMemo(() => ecosystem?.wishes.map(wish => ({
     id: wish.id, text: wish.text || "", placement: wish.placement || "tree" as const,
   })), [ecosystem?.wishes]);
+  const eventEndsAt = ecosystem?.event?.active && ecosystem.event.joinedAt ? Date.parse(ecosystem.event.endsAt) : undefined;
   const [preferences, setPreferences] = useState<QuanPreferences>({ quality: "medium", reducedMotion: false, muted: true });
 
   const [alias, setAlias] = useState(initialAlias);
@@ -157,6 +160,8 @@ export default function TuViQuan({ initialAlias, support, paymentsEnabled, ecosy
             setOwnId(packet.selfId);
             setRoomName(packet.room?.name);
             setSocialMessages(Array.isArray(packet.messages) ? packet.messages : []);
+            if (Array.isArray(packet.activity)) setCommunityActivity(previous => JSON.stringify(previous) === JSON.stringify(packet.activity) ? previous : packet.activity);
+            if (Array.isArray(packet.leaders)) setLeaders(previous => JSON.stringify(previous) === JSON.stringify(packet.leaders) ? previous : packet.leaders);
             setOnline(true);
             setCourtyardFull(false);
             setBoard(packet.board ?? null);
@@ -168,6 +173,7 @@ export default function TuViQuan({ initialAlias, support, paymentsEnabled, ecosy
           setOnline(false);
           setPlayers([]);
           setSocialMessages([]);
+          setCommunityActivity([]); setLeaders([]);
           setSocialFocused(false);
           setBoard(null);
           setCourtyardFull(event.code === 4003);
@@ -415,9 +421,14 @@ export default function TuViQuan({ initialAlias, support, paymentsEnabled, ecosy
     .sort((a, b) => stationDistance(a.x, a.z) - stationDistance(b.x, b.z))[0];
 
   function interactStation(station: NonNullable<typeof nearby>) {
+    if (ecosystemEnabled && (station.id === "ranking" || station.id === "calligraphy")) {
+      openPanel(null);
+      setActivityRequest({ tab: station.id, id: ++navigationRequest.current });
+      return;
+    }
     if (voiceEnabled) {
-      if (["teacher", "tea", "meditate"].includes(station.id)) { openHost(station.id === "tea" ? "tarot" : station.id === "meditate" ? "iching" : "tuvi"); return; }
-      if (station.id === "incense" || station.id === "greet") { requestRitual(station.id); return; }
+      if (["teacher", "tea", "iching"].includes(station.id)) { openHost(station.id === "tea" ? "tarot" : station.id === "iching" ? "iching" : "tuvi"); return; }
+      if (station.id === "incense" || station.id === "greet" || station.id === "meditate") { requestRitual(station.id); return; }
     }
     if (ecosystemEnabled && ["teacher", "incense", "meditate", "tea", "lotus"].includes(station.id)) {
       openPanel(null);
@@ -472,7 +483,7 @@ export default function TuViQuan({ initialAlias, support, paymentsEnabled, ecosy
   return (
     <main ref={world} className={`${styles.page} ${voiceEnabled ? styles.liveGame : ""} ${host ? styles.seated : ""}`} data-quan-world onKeyDown={handleWorldKey} tabIndex={-1}>
       <section className={styles.courtyard} aria-label="Sân Tử Vi Quán">
-        {!lite && <Scene encounter={voiceEnabled && host ? encounterVisual ?? {kind: host.kind, state: "greeting", audioLevel: 0} : undefined} onHost={voiceEnabled && alias && !panel && !ecosystemOpen && !help ? openHost : undefined} showHostControls={false} ritual={voiceEnabled ? ritual : undefined} speech={voiceEnabled && !host ? publicSpeech : undefined} ecosystemEnabled={ecosystemEnabled} position={position} destination={destination} action={action} players={players} onMove={move} experience={!voiceEnabled && panel === "session" ? "teacher" : experience} quality={preferences.quality} reducedMotion={preferences.reducedMotion} muted={preferences.muted} appearance={ecosystem?.profile.equipped} communityWishes={communityWishes} interactive={Boolean(alias && !panel && !host && !socialFocused && !help && !ecosystemOpen)} onUnavailable={() => setLite(true)} />}
+        {!lite && <Scene encounter={voiceEnabled && host ? encounterVisual ?? {kind: host.kind, state: "greeting", audioLevel: 0} : undefined} onHost={voiceEnabled && alias && !panel && !ecosystemOpen && !help ? openHost : undefined} showHostControls={false} ritual={voiceEnabled ? ritual : undefined} speech={voiceEnabled && !host ? publicSpeech : undefined} ecosystemEnabled={ecosystemEnabled} position={position} destination={destination} action={action} players={players} onMove={move} experience={!voiceEnabled && panel === "session" ? "teacher" : experience} quality={preferences.quality} reducedMotion={preferences.reducedMotion} muted={preferences.muted} appearance={ecosystem?.profile.equipped} leaders={leaders} eventEndsAt={eventEndsAt} communityWishes={communityWishes} interactive={Boolean(alias && !panel && !host && !socialFocused && !help && !ecosystemOpen)} onUnavailable={() => setLite(true)} />}
       </section>
       <header className={styles.mast} inert={Boolean(panel) || ecosystemOpen}>
         <Link href="/" className={styles.icon} aria-label="Về Lá số tinh hoa"><ArrowLeft size={20} /></Link>
@@ -497,7 +508,7 @@ export default function TuViQuan({ initialAlias, support, paymentsEnabled, ecosy
         </section>
       ) : (
         <>
-          {ecosystemEnabled && <div hidden={Boolean(host)}><QuanEcosystem gameMode={voiceEnabled} activityRequest={activityRequest} readingPrice={readingPrice} alias={alias} suspended={Boolean(panel) || help || Boolean(host)} onOpen={openEcosystem} onSnapshot={receiveEcosystem} preferences={preferences} onPreferences={setPreferences} lite={lite} onLite={setLite} onRitual={doAction} onExperience={setExperience} onLegacy={openPanel} /></div>}
+          {ecosystemEnabled && <div hidden={Boolean(host)}><QuanEcosystem leaders={leaders} online={online} gameMode={voiceEnabled} activityRequest={activityRequest} readingPrice={readingPrice} alias={alias} suspended={Boolean(panel) || help || Boolean(host)} onOpen={openEcosystem} onSnapshot={receiveEcosystem} preferences={preferences} onPreferences={setPreferences} lite={lite} onLite={setLite} onRitual={doAction} onExperience={setExperience} onLegacy={openPanel} /></div>}
           {!ecosystemEnabled && !voiceEnabled && <nav className={styles.actionDock} aria-label="Hoạt động trong quán" inert={Boolean(panel)}>
             <button className={styles.primary} onClick={() => openPanel("session")}><BookOpen size={21} aria-hidden="true" />Xem lá số</button>
             <button onClick={() => openPanel("incense")}><Flame size={21} aria-hidden="true" />Thắp hương</button>
@@ -507,9 +518,9 @@ export default function TuViQuan({ initialAlias, support, paymentsEnabled, ecosy
           {voiceEnabled && !host && !panel && !help && !ecosystemOpen && <>
             <nav className={styles.hostChoices} aria-label="Chọn người trò chuyện"><p>Mời bạn ngồi · 5 phút miễn phí mỗi ngày</p><div>{([["tuvi", "Thầy Tử Vi"], ["tarot", "Cô Tarot"], ["iching", "Thầy Dịch"]] as const).map(([kind, label]) => <button key={kind} onClick={() => openHost(kind)}>{label}</button>)}</div></nav>
             <nav className={styles.ritualToolbar} aria-label="Hoạt động miễn phí"><button disabled={ritualBusy} onClick={() => requestRitual("incense", 1)}>Thắp 1 nén</button><button disabled={ritualBusy} onClick={() => requestRitual("incense", 3)}>Thắp 3 nén</button><button disabled={ritualBusy || Boolean(meditationUntil && now < meditationUntil)} onClick={() => requestRitual("meditate")}>{meditationUntil ? now < meditationUntil ? `Thở chậm · ${Math.ceil((meditationUntil - now) / 1000)} giây` : "Hoàn thành tĩnh tâm" : action === "meditate" ? "Đứng dậy" : "Ngồi thiền"}</button><button disabled={ritualBusy} onClick={() => requestRitual("greet")}>Chắp tay</button><button onClick={() => openPanel("support")}>Ủng hộ quán</button><button onClick={() => openPanel("map")}>Bản đồ</button></nav>
-            <div className={styles.socialWrap}><Social socketSend={socialSend} messages={socialMessages} ownId={ownId} roomName={roomName} connected={online} error={socialError} onFocusChange={setSocialFocused} /></div>
+            <aside className={styles.communityActivity} aria-live="polite">{communityActivity.slice(0, 2).map(item => <p key={item.id}>{item.text}</p>)}</aside><div className={styles.socialWrap}><Social socketSend={socialSend} messages={socialMessages} ownId={ownId} roomName={roomName} connected={online} error={socialError} onFocusChange={setSocialFocused} /></div>
           </>}
-          {voiceEnabled && host && <Encounter key={`${host.kind}-${host.visit}`} kind={host.kind} orderId={host.orderId} onLeave={leaveHost} onVisual={setEncounterVisual} onRitual={revealRitual} onUpgrade={kind => { leaveHost(); setReadingKind(kind); openPanel("session"); }} />}
+          {voiceEnabled && host && <Encounter key={`${host.kind}-${host.visit}`} kind={host.kind} orderId={host.orderId} muted={preferences.muted} onLeave={leaveHost} onVisual={setEncounterVisual} onRitual={revealRitual} onChartReady={palace => setRitual({ kind: "chart", values: [palace], requestId: Date.now() })} onUpgrade={kind => { leaveHost(); setReadingKind(kind); openPanel("session"); }} />}
           {lite && !host && <section className={styles.lite} inert={Boolean(panel) || ecosystemOpen}><h2>Sân quán</h2><p>Chọn một hoạt động hoặc ghé bàn thầy.</p>
             {players.length > 0 && <p>Khách đang ở sân: {players.map((player) => player.alias).join(", ")}</p>}
             <div className={styles.quickActions}><button onClick={() => interactStation(stations.find((station) => station.id === "meditate")!)}>{action === "meditate" ? "Đứng dậy" : "Ngồi thiền miễn phí"}</button><button onClick={() => openPanel("map")}>Xem các góc trong quán</button></div>

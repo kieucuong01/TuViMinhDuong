@@ -94,6 +94,7 @@ describe("Tử Vi Quán content", () => {
     expect(first.yearLabel).toBe("Bính Ngọ");
     expect(second.yearLabel).toBe("Đinh Mùi");
     expect(second.areas).toHaveLength(5);
+    expect(second.areas.find(area => area.key === "luck")).toMatchObject({ title: "May mắn", score: expect.any(Number) });
     expect(second.months.map((item) => item.month)).toEqual(Array.from({ length: 12 }, (_, i) => i + 1));
     expect(second.months.every((item) => !Object.hasOwn(item, "score"))).toBe(true);
     expect(second.areas.map((area) => area.evidence)).not.toEqual(first.areas.map((area) => area.evidence));

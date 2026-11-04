@@ -10,7 +10,7 @@ export type EncounterVisual = { kind: EncounterKind; state: "greeting" | "listen
 type Message = { id: string; question: string; answer: string | null; interrupted: boolean };
 type Encounter = { id: string; kind: EncounterKind; tier: "free" | "paid"; state: "waiting" | "invited" | "active" | "ended" | "left"; endsAt?: string; remainingSeconds: number; messages: Message[]; context: { title: string; brief?: string; cards?: { id: string; title: string }[]; lines?: number[]; chartMissing?: boolean } };
 type Snapshot = { encounter: Encounter | null; freeRemainingSeconds: number; capabilities: { stt: boolean; tts: boolean } };
-type Props = { kind: EncounterKind; orderId?: string; onLeave(): void; onVisual(value: EncounterVisual): void; onUpgrade(kind: EncounterKind): void; onRitual(kind: "tarot" | "iching", count?: number, values?: number[]): void };
+type Props = { kind: EncounterKind; orderId?: string; muted: boolean; onLeave(): void; onVisual(value: EncounterVisual): void; onUpgrade(kind: EncounterKind): void; onRitual(kind: "tarot" | "iching", count?: number, values?: number[]): void; onChartReady(palace: number): void };
 const names = { tuvi: "Thầy tử vi", tarot: "Người đọc Tarot", iching: "Thầy Dịch" };
 const endpoint = "/api/tu-vi-quan/encounter";
 
@@ -20,7 +20,7 @@ async function readResponse(response: Response) {
   return data;
 }
 
-export default function TuViQuanEncounter({ kind, orderId, onLeave, onVisual, onUpgrade, onRitual }: Props) {
+export default function TuViQuanEncounter({ kind, orderId, muted, onLeave, onVisual, onUpgrade, onRitual, onChartReady }: Props) {
   const [snapshot, setSnapshot] = useState<Snapshot | null>(null);
   const [busy, setBusy] = useState(false);
   const [recording, setRecording] = useState(false);
@@ -58,6 +58,24 @@ export default function TuViQuanEncounter({ kind, orderId, onLeave, onVisual, on
     stopSpeech();
   }
   async function unlockAudio() { audio.current ??= new AudioContext(); await audio.current.resume(); }
+  async function soundDraw(kind: "tarot" | "iching") {
+    if (muted) return;
+    try {
+      await unlockAudio();
+      const context = audio.current!;
+      const duration = kind === "tarot" ? 0.58 : 0.43;
+      const clip = context.createBuffer(1, Math.ceil(context.sampleRate * duration), context.sampleRate);
+      const samples = clip.getChannelData(0);
+      for (let i = 0; i < samples.length; i++) {
+        const t = i / context.sampleRate;
+        const pulse = t % (kind === "tarot" ? 0.15 : 0.105);
+        samples[i] = kind === "tarot"
+          ? (Math.random() * 2 - 1) * Math.sin(Math.PI * pulse / 0.15) ** 2 * (1 - t / duration) * 0.085
+          : Math.sin(2 * Math.PI * (1350 + Math.floor(t / 0.105) * 290) * t) * Math.exp(-pulse * 62) * (1 - t / duration) * 0.10;
+      }
+      const source = context.createBufferSource(); source.buffer = clip; source.connect(context.destination); source.start();
+    } catch { /* The tabletop reveal also works without sound. */ }
+  }
   async function action(actionName: string, fields: Record<string, unknown> = {}, signal?: AbortSignal): Promise<Snapshot> {
     return readResponse(await fetch(endpoint, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: actionName, ...fields }), signal }));
   }
@@ -144,7 +162,7 @@ export default function TuViQuanEncounter({ kind, orderId, onLeave, onVisual, on
     setBusy(true);
     setError("");
     try {
-      await readResponse(await fetch("/api/tu-vi-quan/ecosystem", {
+      const data = await readResponse(await fetch("/api/tu-vi-quan/ecosystem", {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "birth", input: {
           fullName: "Khách", gender: form.get("gender"), calendarType: "solar",
@@ -152,6 +170,8 @@ export default function TuViQuanEncounter({ kind, orderId, onLeave, onVisual, on
         } }),
       }));
       setBirthSaved(true);
+      const palace = data.chartSummary?.palaces?.findIndex((item: { name: string }) => item.name === "Mệnh");
+      if (Number.isInteger(palace) && palace >= 0) onChartReady(palace);
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "Chưa lưu được ngày giờ sinh.");
     } finally {
@@ -203,6 +223,12 @@ export default function TuViQuanEncounter({ kind, orderId, onLeave, onVisual, on
   const last = encounter?.messages.filter(message => message.answer).at(-1);
   const ended = encounter?.state === "ended" || (active && !!encounter.endsAt && Date.parse(encounter.endsAt) <= Date.now());
   const exhausted = !encounter && snapshot?.freeRemainingSeconds === 0 && !orderId;
+  function drawAtTable() {
+    if (!encounter || kind === "tuvi") return;
+    void soundDraw(kind);
+    if (kind === "iching") onRitual(kind, 6, encounter.context.lines);
+    else onRitual(kind, encounter.context.cards?.length || 3, encounter.context.cards?.map(card => QUAN_TAROT_CARDS.findIndex(item => item.id === card.id)).filter(index => index >= 0));
+  }
   return <section className={styles.hud} aria-label={`Trò chuyện với ${names[kind]}`}>
     <div className={styles.caption}>
       <div className={styles.eyebrow}>{names[kind]}{active && <span className={styles.timer}> · {Math.floor(seconds / 60)}:{String(seconds % 60).padStart(2, "0")}</span>}</div>
@@ -213,7 +239,7 @@ export default function TuViQuanEncounter({ kind, orderId, onLeave, onVisual, on
     <div className={styles.bar}>
       {!encounter && !exhausted && <button className={styles.primary} disabled={busy || !snapshot} onClick={() => void run("begin")}>Ngồi xuống trò chuyện</button>}
       {encounter?.state === "invited" && <button className={styles.primary} disabled={busy} onClick={() => void run("start")}>Bắt đầu trò chuyện</button>}
-      {active && !ended && <><button className={recording ? styles.recording : styles.primary} disabled={busy || !snapshot?.capabilities.stt} onClick={() => void startMic()} aria-pressed={recording}>{recording ? "Nói xong · Gửi" : speaking ? "Ngắt lời và nói" : "Bật micro để nói"}</button><button onClick={() => setShowText(value => !value)}>Gõ câu hỏi</button>{!recording && !busy && !speaking && kind !== "tuvi" && <button onClick={() => onRitual(kind, kind === "tarot" ? encounter.context.cards?.length || 3 : 6, kind === "tarot" ? encounter.context.cards?.map(card => QUAN_TAROT_CARDS.findIndex(item => item.id === card.id)).filter(index => index >= 0) : encounter.context.lines)}>{kind === "tarot" ? "Rút bài trên bàn" : "Gieo quẻ trên bàn"}</button>}</>}
+      {active && !ended && <><button className={recording ? styles.recording : styles.primary} disabled={busy || !snapshot?.capabilities.stt} onClick={() => void startMic()} aria-pressed={recording}>{recording ? "Nói xong · Gửi" : speaking ? "Ngắt lời và nói" : "Bật micro để nói"}</button><button onClick={() => setShowText(value => !value)}>Gõ câu hỏi</button>{!recording && !busy && !speaking && kind !== "tuvi" && <button onClick={drawAtTable}>{kind === "tarot" ? "Rút bài trên bàn" : "Gieo quẻ trên bàn"}</button>}</>}
       {(ended || exhausted) && <button className={styles.primary} onClick={() => onUpgrade(kind)}>Trò chuyện thêm · 100.000đ/15 phút · 200.000đ/30 phút</button>}
       <button onClick={() => void leave()}>Rời ghế</button>
     </div>

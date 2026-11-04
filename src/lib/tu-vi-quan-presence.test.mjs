@@ -62,6 +62,8 @@ describe("Tử Vi Quán presence", () => {
     const second = connect(url, { id: "second-private-id", alias: "Bạn Mộc" });
     const joined = await snapshot(second, (frame) => frame.players.length === 2);
     expect(joined.players.map(({ alias }) => alias)).toEqual(["Khách Trà", "Bạn Mộc"]);
+    expect(joined.activity).toEqual([{ id: expect.any(String), text: "Khách Trà vừa ghé quán." }]);
+    expect(JSON.stringify(joined.activity)).not.toContain(guest.id);
     expect(initial.selfId).not.toBe(guest.id);
 
     const updated = snapshot(first, (frame) => frame.players.some((player) => player.action === "meditate"));

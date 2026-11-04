@@ -31,6 +31,20 @@ afterAll(async () => {
 });
 
 describe.skipIf(!db)("Tử Vi Quán ecosystem in PostgreSQL", () => {
+  it("keeps one shareable calligraphy card per day and requires consent for ranking", async () => {
+    const guest = actor();
+    const first = await mutateEcosystem(db!, guest, { action: "calligraphy", mood: "playful" }, date);
+    const again = await mutateEcosystem(db!, guest, { action: "calligraphy", mood: "calm" }, later(1));
+    expect(again.calligraphy).toEqual(first.calligraphy);
+    expect(first.calligraphy?.title).toEqual(expect.any(String));
+    expect(first.profile.points).toBe(0);
+    expect(first.rankingOptIn).toBe(false);
+    const accepted = await mutateEcosystem(db!, guest, { action: "ranking", enabled: true }, date);
+    expect(accepted.rankingOptIn).toBe(true);
+    const declined = await mutateEcosystem(db!, guest, { action: "ranking", enabled: false }, date);
+    expect(declined.rankingOptIn).toBe(false);
+  });
+
   it("persists daily draws and caps points under concurrency and Vietnam midnight", async () => {
     const guest = actor();
     await readEcosystem(db!, guest, date);

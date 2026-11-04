@@ -302,7 +302,7 @@ const AREAS = [
   { key: "money", title: "Tài chính", sources: [["Tài Bạch", .5], ["Điền Trạch", .25], ["Phúc Đức", .25]], body: "Nhìn riêng dòng tiền thường xuyên và các quyết định chi lớn.", action: "Tách khoản thiết yếu, khoản dự phòng và khoản chi linh hoạt trước khi cam kết." },
   { key: "love", title: "Tình cảm", sources: [["Phu Thê", .45], ["Phúc Đức", .3], ["Tử Tức", .25]], body: "Để ý cách lắng nghe và chia sẻ trách nhiệm trong các mối quan hệ gần.", action: "Giữ một khoảng nói chuyện mỗi tuần và thống nhất một việc nhỏ cần làm cùng." },
   { key: "health", title: "Sức khỏe và nhịp sống", sources: [["Tật Ách", .5], ["Mệnh", .3], ["Phúc Đức", .2]], body: "Dùng phần này để nhìn lại thói quen nghỉ ngơi và cách bạn phân bổ sức lực.", action: "Theo dõi nhịp ngủ và vận động trong hai tuần. Trao đổi với chuyên gia y tế nếu có triệu chứng kéo dài." },
-  { key: "relations", title: "Quan hệ và hợp tác", sources: [["Thiên Di", .45], ["Nô Bộc", .35], ["Quan Lộc", .2]], body: "Khi bước vào môi trường mới, tìm hiểu vai trò, giới hạn và cách xử lý bất đồng.", action: "Thử một việc nhỏ trước và ghi lại quyền, trách nhiệm của mỗi bên." },
+  { key: "luck", title: "May mắn", sources: [["Phúc Đức", .45], ["Thiên Di", .35], ["Mệnh", .2]], body: "Chỉ số tổng hợp các tín hiệu thuận và nghịch ở ba cung. Bạn có thể dùng để nghĩ về nguồn lực sẵn có trong năm.", action: "Xác định một người hoặc nguồn lực có thể giúp bạn và chủ động chuẩn bị trước khi cần." },
 ] as const;
 
 const BRIGHTNESS: Record<StarBrightness, number> = { M: 9, V: 7, "Đ": 5, B: 1, H: -7 };

@@ -173,6 +173,10 @@
 .ritualToolbar { position: absolute; z-index: 2; right: max(14px,env(safe-area-inset-right)); bottom: max(14px,env(safe-area-inset-bottom)); display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 6px; max-width: min(580px,calc(100% - 28px)); }
 .ritualToolbar button { background: #201821e8; font-size: .9rem; }
 .socialWrap { position: absolute; inset: 0; pointer-events: none; z-index: 3; }
+.communityActivity { position:absolute; z-index:2; top:220px; left:14px; max-width:min(320px,calc(100% - 28px)); display:grid; gap:5px; pointer-events:none; }
+.communityActivity p { margin:0; padding:5px 10px; border-radius:8px; background:#201821dc; color:#ffe6b3; font-size:.83rem; }
+@media (max-width:760px) and (orientation:portrait) { .communityActivity { top:305px; } }
+@media (max-height:500px) and (orientation:landscape) { .communityActivity { top:155px; } }
 .seated .mast, .seated .location { display: none; }
 .liveGame .sessionBadge { top: 240px; }
 .liveGame .interaction { bottom: 90px; }

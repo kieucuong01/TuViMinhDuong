@@ -1,6 +1,12 @@
 .top { position:absolute; z-index:4; right:max(14px,env(safe-area-inset-right)); top:76px; display:flex; gap:8px; }
 .dock { position:absolute; z-index:4; bottom:max(18px,env(safe-area-inset-bottom)); left:50%; transform:translateX(-50%); display:flex; gap:8px; padding:9px; background:#201821ed; border:1px solid #efbc8150; border-radius:18px; width:max-content; max-width:calc(100% - 24px); box-shadow:0 10px 40px #100d18a0; }
 .dock button { position:relative; }
+.ranking { margin:0; padding-left:1.65rem; }
+.ranking li { padding:.6rem .3rem; border-bottom:1px solid #efbc8140; }
+.ranking li span { float:right; color:#e8c48b; }
+.dock.gameDock { top:138px; bottom:auto; left:max(14px,env(safe-area-inset-left)); transform:none; }
+@media (max-width:760px) and (orientation:portrait) { .dock.gameDock { top:236px; right:12px; left:12px; width:auto; max-width:none; justify-content:space-between; } }
+@media (max-height:500px) and (orientation:landscape) { .dock.gameDock { top:86px; } }
 .newFortune { position:absolute; top:4px; right:4px; width:6px; height:6px; border-radius:50%; background:#f3c483; }
 .scrim { position:absolute; z-index:12; inset:0; background:linear-gradient(90deg,#100e1922,#100e19a6); display:grid; place-items:center end; padding:20px; }
 .panel { width:min(620px,100%); max-height:calc(100dvh - 40px); overflow:auto; border:1px solid #efbc8170; border-radius:22px; background:#241b20; color:#f9e9ce; box-shadow:0 30px 100px #0008; font-size:16px; line-height:1.65; overscroll-behavior:contain; }

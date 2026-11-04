@@ -22,6 +22,7 @@ export function createQuanPresenceServer({ secret, origins, readBoard = async ()
   const allowedOrigins = new Set(origins);
   const guests = new Map();
   const messages = roomNames.map(() => []);
+  const arrivals = roomNames.map(() => []);
   const chatRates = new Map();
   let dirty = false;
   let board = null;
@@ -51,7 +52,10 @@ export function createQuanPresenceServer({ secret, origins, readBoard = async ()
     const room = guests.get(selfId)?.room ?? 0;
     const players = [...guests.values()].filter(presence => presence.room === room).map(({ player }) => player);
     const rooms = roomNames.map((name, id) => ({ id, name, count: [...guests.values()].filter(presence => presence.room === id).length, capacity: MAX_GUESTS }));
-    socket.send(JSON.stringify({ type: "snapshot", selfId, players, board, ...(ecosystemEnabled ? { room: rooms[room], rooms, messages: messages[room] } : {}) }));
+    const activity = [...arrivals[room].filter(item => item.playerId !== selfId), ...(board?.activities ?? [])]
+      .sort((a, b) => b.at - a.at).slice(0, 4).map(({ id, text }) => ({ id, text }));
+    const seats = board && { tables: board.tables, queued: board.queued, occupied: board.occupied };
+    socket.send(JSON.stringify({ type: "snapshot", selfId, players, board: seats, ...(ecosystemEnabled ? { room: rooms[room], rooms, messages: messages[room], activity, leaders: board?.leaders ?? [] } : {}) }));
   }
 
   function reject(socket, status) {
@@ -88,6 +92,10 @@ export function createQuanPresenceServer({ secret, origins, readBoard = async ()
       };
       const presence = { client, player, room, ip, alive: true, actionUntil: 0 };
       guests.set(player.id, presence);
+      if (ecosystemEnabled && !prior && !arrivals[room].some(item => item.playerId === player.id)) {
+        const name = moderateWish(player.alias).ok ? player.alias : "Một vị khách";
+        arrivals[room] = [...arrivals[room], { id: randomUUID(), playerId: player.id, at: Date.now(), text: `${name} vừa ghé quán.` }].slice(-8);
+      }
       prior?.client.close(4000, "Replaced by another tab");
       dirty = true;
       let windowStart = Date.now();
@@ -163,6 +171,8 @@ export function createQuanPresenceServer({ secret, origins, readBoard = async ()
     for (let room = 0; room < messages.length; room++) {
       const active = messages[room].filter(message => now - message.createdAt < 60_000);
       if (active.length !== messages[room].length) { messages[room] = active; dirty = true; }
+      const recent = arrivals[room].filter(item => now - item.at < 30_000);
+      if (recent.length !== arrivals[room].length) { arrivals[room] = recent; dirty = true; }
     }
     for (const presence of guests.values()) {
       if (presence.actionUntil && presence.actionUntil <= now) {
@@ -220,9 +230,9 @@ if (process.argv.includes("--serve")) {
     ? new pg.Pool({ connectionString: process.env.DATABASE_URL, max: 1, connectionTimeoutMillis: 2000, query_timeout: 2000 })
     : null;
   pool?.on("error", () => { /* A later board refresh retries the connection. */ });
+  const ecosystemEnabled = process.env.TU_VI_QUAN_ECOSYSTEM_ENABLED === "true" || (!production && process.env.TU_VI_QUAN_ECOSYSTEM_ENABLED !== "false");
   const server = createQuanPresenceServer({
-    secret: quanPresenceSecret(), origins,
-    ecosystemEnabled: process.env.TU_VI_QUAN_ECOSYSTEM_ENABLED === "true" || (!production && process.env.TU_VI_QUAN_ECOSYSTEM_ENABLED !== "false"),
+    secret: quanPresenceSecret(), origins, ecosystemEnabled,
     async readBoard() {
       if (!pool) return null;
       const { rows: [board] } = await pool.query(`
@@ -235,7 +245,28 @@ if (process.argv.includes("--serve")) {
             ))::int AS occupied
         FROM "QuanOrder" WHERE status IN ('QUEUED', 'INVITED', 'ACTIVE')
       `);
-      return board;
+      if (!ecosystemEnabled) return board;
+      const { rows: leaders } = await pool.query(`
+        SELECT p.alias, SUM(e.points)::int AS points
+        FROM "QuanEntry" e JOIN "QuanProfile" p ON p.id = e."profileId"
+        WHERE e.kind IN ('daily','incense','meditate') AND e.points > 0 AND NOT p.blocked
+          AND EXISTS (SELECT 1 FROM "QuanEntry" o WHERE o."profileId" = p.id AND o.kind = 'ranking_opt_in' AND o."dayKey" = 'profile')
+        GROUP BY p.id, p.alias ORDER BY points DESC, p.id ASC LIMIT 5
+      `);
+      const { rows: notices } = await pool.query(`
+        SELECT w.id, w."createdAt" AT TIME ZONE 'UTC' AS at, w.placement AS kind, NULL::text AS alias, NULL::text AS title
+        FROM "QuanWish" w WHERE w.status = 'public' AND w."expiresAt" > timezone('UTC', NOW()) AND w."createdAt" > timezone('UTC', NOW()) - INTERVAL '30 seconds'
+        UNION ALL
+        SELECT e.id, e."createdAt" AT TIME ZONE 'UTC', 'level', p.alias, e.data->>'title'
+        FROM "QuanEntry" e JOIN "QuanProfile" p ON p.id = e."profileId"
+        WHERE e.kind = 'public_level' AND NOT p.blocked AND e."createdAt" > timezone('UTC', NOW()) - INTERVAL '30 seconds'
+          AND EXISTS (SELECT 1 FROM "QuanEntry" o WHERE o."profileId" = p.id AND o.kind = 'ranking_opt_in' AND o."dayKey" = 'profile')
+        ORDER BY at DESC LIMIT 4
+      `);
+      const activities = notices.map(({ id, at, kind, alias, title }) => ({ id, at: at.getTime(), text:
+        kind === "level" && moderateWish(alias ?? "").ok ? `${alias} nhận danh hiệu ${title}.`
+          : kind === "lotus" ? "Một vị khách vừa thả hoa đăng." : "Một vị khách vừa treo lời nguyện công khai." }));
+      return { ...board, activities, leaders: leaders.filter(({alias}) => moderateWish(alias).ok) };
     },
   });
   server.listen(port, "127.0.0.1", () => console.log(`Tá»­ Vi QuÃ¡n presence listening on 127.0.0.1:${port}`));

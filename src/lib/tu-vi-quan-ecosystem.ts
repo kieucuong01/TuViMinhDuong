@@ -17,6 +17,10 @@ type Actor = { guest: QuanGuest; userId?: string };
 type Bag = Record<string, unknown>;
 const DAY = 86_400_000;
 const TTL = 30 * DAY;
+const CALLIGRAPHY = {
+  calm: [["An", "Dành mười phút cho việc giúp bạn thấy nhẹ lòng."], ["Bền", "Làm tiếp một việc nhỏ mà bạn đã bắt đầu."], ["Sáng", "Viết rõ điều bạn biết và điều còn phải hỏi."], ["Tĩnh", "Cho mình một nhịp thở trước khi trả lời."]],
+  playful: [["Gọn", "Dọn một tab trình duyệt. Ba mươi tab còn lại xin hẹn mai."], ["Nghỉ", "Deadline biết chạy. Mình biết đi lấy nước."], ["Thảnh", "Hôm nay cho phép trả lời tin nhắn sau khi ăn xong."], ["Bớt", "Bớt ôm việc để còn hai tay ôm gối."]],
+} as const;
 const asBag = (value: unknown): Bag => value && typeof value === "object" && !Array.isArray(value) ? value as Bag : {};
 const json = (value: unknown) => JSON.parse(JSON.stringify(value)) as Prisma.InputJsonValue;
 const digest = (code: string) => createHash("sha256").update("quan-profile:" + code).digest("hex");
@@ -108,7 +112,7 @@ function itemDetails(id: string) {
 
 async function snapshot(tx: Tx, profile: QuanProfile, now: Date) {
   const dayKey = quanDayKey(now);
-  const [balance, entries, items, settings, wishes, own, shares, event, charts, identities] = await Promise.all([
+  const [balance, entries, items, settings, wishes, own, shares, event, charts, identities, ranking] = await Promise.all([
     totals(tx, profile.id),
     tx.quanEntry.findMany({ where: { profileId: profile.id }, orderBy: { createdAt: "desc" }, take: 100 }),
     tx.quanItem.findMany({ where: { profileId: profile.id }, orderBy: { acquiredAt: "asc" } }),
@@ -119,6 +123,7 @@ async function snapshot(tx: Tx, profile: QuanProfile, now: Date) {
     currentEvent(tx, now),
     profile.userId ? tx.chart.findMany({ where: { userId: profile.userId }, orderBy: { createdAt: "desc" }, take: 30, select: { id: true, title: true, input: true } }) : [],
     tx.quanIdentity.findMany({ where: { profileId: profile.id }, select: { guestId: true } }),
+    tx.quanEntry.findUnique({ where: { profileId_kind_dayKey: { profileId: profile.id, kind: "ranking_opt_in", dayKey: "profile" } }, select: { id: true } }),
   ]);
   const sessions = await tx.quanOrder.findMany({
     where: { ownerId: { in: identities.map((identity) => identity.guestId) }, paidAt: { not: null } },
@@ -134,13 +139,16 @@ async function snapshot(tx: Tx, profile: QuanProfile, now: Date) {
     myReactions: wish.reactions.map((r) => r.kind), createdAt: wish.createdAt.toISOString(),
   });
   const daily = entries.find((e) => e.kind === "daily" && e.dayKey === dayKey);
+  const calligraphy = entries.find((e) => e.kind === "calligraphy" && e.dayKey === dayKey);
   const meditation = entries.find((e) => e.kind === "meditate_start" && e.dayKey === dayKey);
   const eventJoin = event ? await tx.quanEntry.findUnique({ where: { profileId_kind_dayKey: { profileId: profile.id, kind: "event_join", dayKey: event.id } } }) : null;
   const eventClaim = event ? await tx.quanEntry.findUnique({ where: { profileId_kind_dayKey: { profileId: profile.id, kind: "event_claim", dayKey: event.id } } }) : null;
   return {
     profile: { id: profile.id, alias: profile.alias, linked: Boolean(profile.userId), ...balance, title: title(balance.earned), birthInput: profile.birthInput, equipped: profile.equipped },
     daily: daily ? { ...asBag(daily.data), sourceId: daily.id } : null,
-    history: entries.filter((e) => ["daily", "tarot1", "tarot3", "iching", "incense", "greet", "meditate"].includes(e.kind)).slice(0, 50).map((e) => ({ id: e.id, kind: e.kind, dayKey: e.dayKey, result: e.data, createdAt: e.createdAt.toISOString() })),
+    calligraphy: calligraphy ? { ...asBag(calligraphy.data), sourceId: calligraphy.id } : null,
+    rankingOptIn: Boolean(ranking),
+    history: entries.filter((e) => ["daily", "calligraphy", "tarot1", "tarot3", "iching", "incense", "greet", "meditate"].includes(e.kind)).slice(0, 50).map((e) => ({ id: e.id, kind: e.kind, dayKey: e.dayKey, result: e.data, createdAt: e.createdAt.toISOString() })),
     inventory: items.map((item) => ({ ...itemDetails(item.itemId), id: item.itemId, acquiredAt: item.acquiredAt.toISOString() })),
     cosmetics: QUAN_COSMETICS, wishes: wishes.map(wishView), myWishes: own.map(wishView),
     charts: charts.map((chart) => ({ id: chart.id, label: chart.title, year: asBag(chart.input).year })),
@@ -230,6 +238,8 @@ export async function mutateEcosystem(db: PrismaClient, actor: Actor, body: Bag,
     const extra: Bag = {};
     const settings = await tx.quanEcosystemSettings.findUnique({ where: { id: "global" } });
     if (asBag(settings?.features)[action] === false) fail("Hoạt động này đang tạm nghỉ.", 503);
+    const ranking = (action === "daily" || action === "ritual") && await tx.quanEntry.findUnique({ where: { profileId_kind_dayKey: { profileId: profile.id, kind: "ranking_opt_in", dayKey: "profile" } }, select: { id: true } });
+    const beforeTitle = ranking ? title((await totals(tx, profile.id)).earned) : null;
     if (action === "daily") {
       if (!["career", "love", "money"].includes(String(body.topic))) fail("Chọn một chủ đề.");
       const input = profile.birthInput as unknown as ChartInput | null;
@@ -254,6 +264,18 @@ export async function mutateEcosystem(db: PrismaClient, actor: Actor, body: Bag,
         await entry(tx, profile.id, "meditate", day, { title: "Một phút tĩnh tâm", body: note }, 5, now);
       } else await entry(tx, profile.id, kind, day, { title: kind === "incense" ? "Thắp hương cầu an" : kind === "greet" ? "Chắp tay" : "Bắt đầu tĩnh tâm", body: note, count: body.count || 1 }, kind === "incense" ? 5 : 0, now);
       if (kind !== "meditate_start") await metric(tx, profile, "ritual", now);
+    } else if (action === "calligraphy") {
+      if (body.mood !== "calm" && body.mood !== "playful") fail("Chọn phong cách xin chữ.");
+      const set = CALLIGRAPHY[body.mood as keyof typeof CALLIGRAPHY];
+      const [word, message] = set[randomInt(set.length)];
+      const saved = await entry(tx, profile.id, "calligraphy", day, { title: word, body: message, action: "Chữ hôm nay của bạn tại Tử Vi Quán." }, 0, now);
+      extra.latestResult = { ...asBag(saved.data), sourceId: saved.id };
+    } else if (action === "ranking") {
+      if (typeof body.enabled !== "boolean") fail("Chọn có tham gia bảng vàng hay không.");
+      if (body.enabled === true) {
+        if (profile.blocked || !moderateWish(profile.alias).ok) fail("Hãy chọn bí danh phù hợp trước khi hiện lên bảng.");
+        await entry(tx, profile.id, "ranking_opt_in", "profile", {}, 0, now);
+      } else await tx.quanEntry.deleteMany({ where: { profileId: profile.id, kind: "ranking_opt_in", dayKey: "profile" } });
     } else if (action === "tarot" || action === "iching") {
       if (action === "tarot" && body.count !== 1 && body.count !== 3) fail("Chọn một hoặc ba lá.");
       const kind = action === "tarot" ? "tarot" + body.count : "iching";
@@ -277,6 +299,7 @@ export async function mutateEcosystem(db: PrismaClient, actor: Actor, body: Bag,
     } else if (action === "alias") {
       const alias = normalizeQuanAlias(body.alias) || fail("Bí danh không hợp lệ.");
       profile = await tx.quanProfile.update({ where: { id: profile.id }, data: { alias } });
+      if (!moderateWish(alias).ok) await tx.quanEntry.deleteMany({ where: { profileId: profile.id, kind: "ranking_opt_in" } });
     } else if (action === "link") {
       if (!actor.userId) fail("Đăng nhập để liên kết tiến trình.", 401);
       if (profile.userId && profile.userId !== actor.userId) fail("Hồ sơ đã liên kết tài khoản khác.", 403);
@@ -372,7 +395,7 @@ export async function mutateEcosystem(db: PrismaClient, actor: Actor, body: Bag,
       extra.chartSummary = quanChartSummary(generateTuViChart({ ...profile.birthInput as unknown as ChartInput, viewYear: year }));
     } else if (action === "share") {
       const sourceId = str(body.sourceId, 64);
-      const source = await tx.quanEntry.findFirst({ where: { id: sourceId, profileId: profile.id, kind: { in: ["daily", "tarot1", "tarot3", "iching"] } } });
+      const source = await tx.quanEntry.findFirst({ where: { id: sourceId, profileId: profile.id, kind: { in: ["daily", "calligraphy", "tarot1", "tarot3", "iching"] } } });
       const wish = !source ? await tx.quanWish.findFirst({ where: { id: sourceId, profileId: profile.id, NOT: { status: "deleted" } } }) : null;
       const achievement = sourceId === "achievement";
       if (!source && !wish && !achievement) fail("Không tìm thấy nội dung để chia sẻ.", 404);
@@ -396,7 +419,11 @@ export async function mutateEcosystem(db: PrismaClient, actor: Actor, body: Bag,
       }
       await metric(tx, profile, name, now, source);
     } else fail("Thao tác không hợp lệ.");
-    return { ...await snapshot(tx, profile, now), ...extra };
+    const view = await snapshot(tx, profile, now);
+    if (beforeTitle && beforeTitle !== view.profile.title) {
+      await entry(tx, profile.id, "public_level", view.profile.title, { title: view.profile.title }, 0, now);
+    }
+    return { ...view, ...extra };
   });
 }
 
