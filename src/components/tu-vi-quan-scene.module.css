@@ -13,3 +13,9 @@
   }
   .joystick span { width: 43px; height: 43px; border-radius: 50%; background: radial-gradient(circle at 35% 25%,#ffe0a9,#b98461); box-shadow: 0 4px 12px #1a121c9c; pointer-events: none; }
 }
+
+.hosts { position: absolute; z-index: 2; top: 16px; right: 16px; display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; max-width: calc(100% - 32px); }
+.hosts button { min-height: 48px; padding: 8px 14px; border: 1px solid #dfbe84; border-radius: 10px; background: #30251de8; color: #fff0cb; font: inherit; cursor: pointer; }
+.hosts button:focus-visible { outline: 3px solid #fff0cb; outline-offset: 3px; }
+.publicSpeech { position: absolute; z-index: 1; top: 80px; right: 16px; max-width: min(340px, calc(100% - 32px)); color: #fff0cb; pointer-events: none; }
+.publicSpeech p { margin: 6px 0; padding: 8px 12px; border-radius: 12px; background: #30251de8; }

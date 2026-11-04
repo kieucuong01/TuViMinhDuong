@@ -50,6 +50,7 @@ const nextConfig: NextConfig = {
 
     return [
       { source: "/:path*", headers: securityHeaders },
+      { source: "/tu-vi-quan", headers: [{ key: "Permissions-Policy", value: "camera=(), microphone=(self), geolocation=()" }] },
       { source: "/", headers: [publicSeoCacheHeader] },
       { source: "/kien-thuc-tu-vi", headers: [publicSeoCacheHeader] },
       { source: "/xem-ngay", headers: [publicSeoCacheHeader] },

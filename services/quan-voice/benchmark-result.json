@@ -1,0 +1,194 @@
+{
+  "runs": [
+    {
+      "simultaneous_requests": 1,
+      "results": [
+        {
+          "index": 10,
+          "text": "Thái Dương, Thái Âm, Thiên Cơ và Cự Môn là những tên sao trong lá số tử vi.",
+          "ttfa_s": 1.2441223356872797,
+          "elapsed_s": 5.487712919712067,
+          "audio_s": 3.84,
+          "rtf": 1.4290919061750174,
+          "pcm_bytes": 184320
+        }
+      ]
+    },
+    {
+      "simultaneous_requests": 2,
+      "results": [
+        {
+          "index": 20,
+          "text": "Mình cùng nhìn cung Phu Thê và cung Tài Bạch. Bạn đang băn khoăn điều gì?",
+          "ttfa_s": 1.1759336441755295,
+          "elapsed_s": 5.045186625793576,
+          "audio_s": 3.52,
+          "rtf": 1.4332916550549932,
+          "pcm_bytes": 168960
+        },
+        {
+          "index": 21,
+          "text": "Cung Mệnh có sao Tử Vi và Thiên Phủ. Bạn muốn hỏi về công việc hay gia đình?",
+          "ttfa_s": 6.28449890948832,
+          "elapsed_s": 10.691413143649697,
+          "audio_s": 3.84,
+          "rtf": 2.784222172825442,
+          "pcm_bytes": 184320
+        }
+      ]
+    },
+    {
+      "simultaneous_requests": 3,
+      "results": [
+        {
+          "index": 30,
+          "text": "Cung Mệnh có sao Tử Vi và Thiên Phủ. Bạn muốn hỏi về công việc hay gia đình?",
+          "ttfa_s": 8.59829293936491,
+          "elapsed_s": 13.405859900638461,
+          "audio_s": 3.92,
+          "rtf": 3.419862219550628,
+          "pcm_bytes": 188160
+        },
+        {
+          "index": 31,
+          "text": "Thái Dương, Thái Âm, Thiên Cơ và Cự Môn là những tên sao trong lá số tử vi.",
+          "ttfa_s": 1.4807850290089846,
+          "elapsed_s": 6.851568378508091,
+          "audio_s": 4.16,
+          "rtf": 1.6470116294490602,
+          "pcm_bytes": 199680
+        },
+        {
+          "index": 32,
+          "text": "Mình cùng nhìn cung Phu Thê và cung Tài Bạch. Bạn đang băn khoăn điều gì?",
+          "ttfa_s": 14.8748690020293,
+          "elapsed_s": 19.057960221543908,
+          "audio_s": 3.36,
+          "rtf": 5.672011970697592,
+          "pcm_bytes": 161280
+        }
+      ]
+    }
+  ],
+  "host_samples": [
+    {
+      "at": "2026-11-04T11:56:50.658581+00:00",
+      "web_s": 0.11338477395474911,
+      "web_status": 200,
+      "available_mib": 835,
+      "unit": "MainPID=2770864\nMemoryCurrent=1467826176\nMemoryPeak=1468649472\nActiveState=active"
+    },
+    {
+      "at": "2026-11-04T11:56:52.757128+00:00",
+      "web_s": 0.07112752832472324,
+      "web_status": 200,
+      "available_mib": 822,
+      "unit": "MainPID=2770864\nMemoryCurrent=1467809792\nMemoryPeak=1468649472\nActiveState=active"
+    },
+    {
+      "at": "2026-11-04T11:56:54.823500+00:00",
+      "web_s": 0.055847927927970886,
+      "web_status": 200,
+      "available_mib": 829,
+      "unit": "MainPID=2770864\nMemoryCurrent=1467887616\nMemoryPeak=1468649472\nActiveState=active"
+    },
+    {
+      "at": "2026-11-04T11:56:56.906969+00:00",
+      "web_s": 0.07353744469583035,
+      "web_status": 200,
+      "available_mib": 810,
+      "unit": "MainPID=2770864\nMemoryCurrent=1467932672\nMemoryPeak=1468649472\nActiveState=active"
+    },
+    {
+      "at": "2026-11-04T11:56:58.960316+00:00",
+      "web_s": 0.04292224906384945,
+      "web_status": 200,
+      "available_mib": 823,
+      "unit": "MainPID=2770864\nMemoryCurrent=1467801600\nMemoryPeak=1468649472\nActiveState=active"
+    },
+    {
+      "at": "2026-11-04T11:57:01.015770+00:00",
+      "web_s": 0.04558340832591057,
+      "web_status": 200,
+      "available_mib": 821,
+      "unit": "MainPID=2770864\nMemoryCurrent=1467768832\nMemoryPeak=1468649472\nActiveState=active"
+    },
+    {
+      "at": "2026-11-04T11:57:03.107637+00:00",
+      "web_s": 0.08145210333168507,
+      "web_status": 200,
+      "available_mib": 788,
+      "unit": "MainPID=2770864\nMemoryCurrent=1467813888\nMemoryPeak=1468649472\nActiveState=active"
+    },
+    {
+      "at": "2026-11-04T11:57:05.188916+00:00",
+      "web_s": 0.06849704682826996,
+      "web_status": 200,
+      "available_mib": 783,
+      "unit": "MainPID=2770864\nMemoryCurrent=1467813888\nMemoryPeak=1468649472\nActiveState=active"
+    },
+    {
+      "at": "2026-11-04T11:57:07.266282+00:00",
+      "web_s": 0.06470268592238426,
+      "web_status": 200,
+      "available_mib": 779,
+      "unit": "MainPID=2770864\nMemoryCurrent=1467895808\nMemoryPeak=1468649472\nActiveState=active"
+    },
+    {
+      "at": "2026-11-04T11:57:09.344155+00:00",
+      "web_s": 0.051752831786870956,
+      "web_status": 200,
+      "available_mib": 766,
+      "unit": "MainPID=2770864\nMemoryCurrent=1467809792\nMemoryPeak=1468649472\nActiveState=active"
+    },
+    {
+      "at": "2026-11-04T11:57:11.445526+00:00",
+      "web_s": 0.08623955398797989,
+      "web_status": 200,
+      "available_mib": 764,
+      "unit": "MainPID=2770864\nMemoryCurrent=1467809792\nMemoryPeak=1468649472\nActiveState=active"
+    },
+    {
+      "at": "2026-11-04T11:57:13.545922+00:00",
+      "web_s": 0.08743852935731411,
+      "web_status": 200,
+      "available_mib": 759,
+      "unit": "MainPID=2770864\nMemoryCurrent=1467944960\nMemoryPeak=1468649472\nActiveState=active"
+    },
+    {
+      "at": "2026-11-04T11:57:15.604147+00:00",
+      "web_s": 0.046400679275393486,
+      "web_status": 200,
+      "available_mib": 737,
+      "unit": "MainPID=2770864\nMemoryCurrent=1467854848\nMemoryPeak=1468649472\nActiveState=active"
+    },
+    {
+      "at": "2026-11-04T11:57:17.692652+00:00",
+      "web_s": 0.07757147029042244,
+      "web_status": 200,
+      "available_mib": 746,
+      "unit": "MainPID=2770864\nMemoryCurrent=1467854848\nMemoryPeak=1468649472\nActiveState=active"
+    },
+    {
+      "at": "2026-11-04T11:57:19.773239+00:00",
+      "web_s": 0.047041404992341995,
+      "web_status": 200,
+      "available_mib": 747,
+      "unit": "MainPID=2770864\nMemoryCurrent=1467854848\nMemoryPeak=1468649472\nActiveState=active"
+    },
+    {
+      "at": "2026-11-04T11:57:21.869694+00:00",
+      "web_s": 0.07916295155882835,
+      "web_status": 200,
+      "available_mib": 723,
+      "unit": "MainPID=2770864\nMemoryCurrent=1467834368\nMemoryPeak=1468649472\nActiveState=active"
+    },
+    {
+      "at": "2026-11-04T11:57:24.032705+00:00",
+      "web_s": 0.1476638987660408,
+      "web_status": 200,
+      "available_mib": 692,
+      "unit": "MainPID=2770864\nMemoryCurrent=1467641856\nMemoryPeak=1468649472\nActiveState=active"
+    }
+  ]
+}

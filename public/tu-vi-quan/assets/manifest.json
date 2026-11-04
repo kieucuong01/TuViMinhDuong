@@ -5,6 +5,15 @@
   "runtimeExternalRequests": false,
   "entries": [
     {
+      "file": "terlenka_normal.jpg",
+      "source": "https://polyhaven.com/a/terlenka",
+      "download": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/terlenka/terlenka_nor_gl_1k.jpg",
+      "license": "CC0-1.0",
+      "modification": "Normal map resized to 512px JPEG",
+      "bytes": 3311,
+      "sha256": "82bbf1c57526e7309edf20e402c8e12a120122ae3696321c494cda16b4462f08"
+    },
+    {
       "file": "chinese_tea_table.glb",
       "source": "https://polyhaven.com/a/chinese_tea_table",
       "sources": [

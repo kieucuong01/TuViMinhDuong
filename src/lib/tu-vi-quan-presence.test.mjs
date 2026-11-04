@@ -1,5 +1,5 @@
 import { once } from "node:events";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import WebSocket from "ws";
 import { issueQuanSocketTicket, verifyQuanSocketTicket } from "./tu-vi-quan-presence.mjs";
 import { createQuanPresenceServer } from "../../scripts/tu-vi-quan-realtime.mjs";
@@ -11,6 +11,7 @@ const cleanups = [];
 
 afterEach(async () => {
   while (cleanups.length) await cleanups.pop()();
+  vi.restoreAllMocks();
 });
 
 async function listen(options = {}) {
@@ -142,8 +143,91 @@ it("preserves the original single-room payload and capacity when the ecosystem i
     const client = connect(url, { id: `legacy-${i}`, alias: "Legacy" }, { origin, "x-quan-client-ip": `192.0.2.${i + 1}` });
     const frame = await snapshot(client);
     expect(frame.room).toBeUndefined();
+    expect(frame.messages).toBeUndefined();
     expect(frame.players).toHaveLength(i + 1);
   }
   const overflow = connect(url, { id: "legacy-overflow", alias: "Overflow" }, { origin, "x-quan-client-ip": "192.0.2.25" });
   expect((await once(overflow, "close"))[0]).toBe(4003);
+});
+
+
+describe("ephemeral courtyard conversation", () => {
+  it("shares moderated text with a real second guest, ignores spoofed identity and private voice payloads, and rate limits reconnects", async () => {
+    const url = await listen();
+    const first = connect(url, guest);
+    const initial = await snapshot(first);
+    const second = connect(url, { id: "social-two", alias: "Bạn Mộc" });
+    await snapshot(second);
+    const received = snapshot(second, frame => frame.messages?.length === 1);
+    first.send(JSON.stringify({ type: "chat", text: "Chào bạn!", alias: "Giả mạo", playerId: "other", transcript: "PRIVATE", audio: "PRIVATE" }));
+    const frame = await received;
+    expect(frame.messages[0]).toMatchObject({ playerId: initial.selfId, alias: guest.alias, text: "Chào bạn!" });
+    expect(JSON.stringify(frame)).not.toContain("PRIVATE");
+    expect(JSON.stringify(frame)).not.toContain("Giả mạo");
+    const rateError = snapshot(first, frame => frame.type === "chat-error");
+    first.send(JSON.stringify({ type: "chat", text: "Gửi quá nhanh" }));
+    expect((await rateError).message).toContain("đợi");
+    const replacement = connect(url, guest);
+    await snapshot(replacement);
+    const reconnectError = snapshot(replacement, frame => frame.type === "chat-error");
+    replacement.send(JSON.stringify({ type: "chat", text: "Thử đổi thẻ" }));
+    expect((await reconnectError).message).toContain("đợi");
+  });
+
+  it("rejects URLs, phones, profanity, malformed text and oversized text without publishing them", async () => {
+    const url = await listen();
+    const first = connect(url, guest);
+    await snapshot(first);
+    let now = Date.now();
+    vi.spyOn(Date, "now").mockImplementation(() => now);
+    for (const text of ["https://example.com", "0901234567", "đồ ngu", "a".repeat(121), 42, "<script>"]) {
+      now += 11_000;
+      const error = snapshot(first, frame => frame.type === "chat-error");
+      first.send(JSON.stringify({ type: "chat", text }));
+      expect((await error).message).toContain("120");
+    }
+    const second = connect(url, { id: "social-clean", alias: "Khách" });
+    expect((await snapshot(second)).messages).toEqual([]);
+  });
+
+  it("keeps only 20 messages per room, isolates a second courtyard and expires messages after 60 seconds", async () => {
+    const url = await listen();
+    const clients = [];
+    for (let i = 0; i < 25; i++) {
+      const client = connect(url, { id: `social-${i}`, alias: `Khách ${i}` }, { origin, "x-quan-client-ip": `192.0.2.${i + 1}` });
+      clients.push(client);
+      await snapshot(client);
+    }
+    let now = Date.now();
+    vi.spyOn(Date, "now").mockImplementation(() => now);
+    for (let i = 0; i < 21; i++) {
+      const received = snapshot(clients[1], frame => frame.messages?.at(-1)?.text === `Lời chào ${i}`);
+      clients[i].send(JSON.stringify({ type: "chat", text: `Lời chào ${i}` }));
+      const frame = await received;
+      expect(frame.messages.length).toBeLessThanOrEqual(20);
+      if (i === 20) expect(frame.messages[0].text).toBe("Lời chào 1");
+    }
+    const privateRoom = snapshot(clients[24], frame => frame.messages?.length === 1);
+    clients[24].send(JSON.stringify({ type: "chat", text: "Sân riêng" }));
+    expect((await privateRoom).messages.map(message => message.text)).toEqual(["Sân riêng"]);
+    const expired = snapshot(clients[1], frame => frame.messages?.length === 0);
+    now += 60_001;
+    expect((await expired).messages).toEqual([]);
+  }, 20_000);
+
+  it("allows at most three messages in ten seconds even with two-second spacing", async () => {
+    const first = connect(await listen(), guest);
+    await snapshot(first);
+    let now = Date.now();
+    vi.spyOn(Date, "now").mockImplementation(() => now);
+    for (let i = 0; i < 3; i++) {
+      const published = snapshot(first, frame => frame.messages?.length === i + 1);
+      first.send(JSON.stringify({ type: "chat", text: `Xin chào ${i}` }));
+      await published;
+      now += 2100;
+    }
+    const limited = snapshot(first, frame => frame.type === "chat-error");
+    first.send(JSON.stringify({ type: "chat", text: "Lời thứ tư" }));
+    expect((await limited).message).toContain("đợi");
+  });
 });

@@ -32,7 +32,8 @@ function Reading({ value }: { value: Json | undefined }) {
   return <div className={styles.reading}>{Object.entries(value).filter(([key]) => !["id", "seed", "version", "contentVersion", "ruleVersion", "profileId", "birthInput", "input", "sourceId", "casts"].includes(key)).map(([key, entry]) => <section key={key}>{labels[key] && <strong>{labels[key]}</strong>}<Reading value={entry} /></section>)}</div>;
 }
 
-export default function QuanEcosystem({ alias, suspended, onOpen, onSnapshot, preferences, onPreferences, onLegacy, onExperience, lite, onLite, onRitual, readingPrice, activityRequest }: {
+export default function QuanEcosystem({ gameMode = false, alias, suspended, onOpen, onSnapshot, preferences, onPreferences, onLegacy, onExperience, lite, onLite, onRitual, readingPrice, activityRequest }: {
+  gameMode?: boolean;
   alias: string; suspended: boolean; onOpen: (open: boolean) => void; onSnapshot: (data: QuanSnapshot) => void;
   onRitual: (kind: "greet" | "incense" | "meditate" | "idle") => void;
   readingPrice: number | null;
@@ -180,12 +181,12 @@ export default function QuanEcosystem({ alias, suspended, onOpen, onSnapshot, pr
   const wishes = filter === "mine" ? data?.myWishes : data?.wishes.filter(item => filter === "all" || item.placement === filter);
   return <>
     <div className={styles.top} inert={Boolean(tab) || suspended}><button onClick={() => open("profile")}>{data?.profile.alias || alias} · {data?.profile.points ?? 0} điểm</button><button onClick={() => open("settings")}>Tùy chọn</button></div>
-    <nav className={styles.dock} aria-label="Dịch vụ Tử Vi Quán" inert={Boolean(tab) || suspended}>
+    {!gameMode && <nav className={styles.dock} aria-label="Dịch vụ Tử Vi Quán" inert={Boolean(tab) || suspended}>
       {(["today", "divination", "wishes", "explore"] as Tab[]).map(item => {
         const newFortune = item === "today" && dayKey && !data?.daily && dismissedReminder !== dayKey;
         return <button key={item} onClick={() => open(item)}>{names[item]}{newFortune && <span className={styles.newFortune} aria-label="Có quẻ mới" title="Có quẻ mới" />}</button>;
       })}
-    </nav>
+    </nav>}
     {tab && <div className={styles.scrim}><section ref={dialog} className={styles.panel} role="dialog" aria-modal="true" aria-labelledby="ecosystem-title" onKeyDown={event => {
       if (event.key === "Escape") { event.stopPropagation(); setTab(null); }
       if (event.key === "Tab") { event.stopPropagation(); const nodes = dialog.current?.querySelectorAll<HTMLElement>('button:not(:disabled),input,select,textarea,a[href]'); const first = nodes?.[0], last = nodes?.[nodes.length - 1]; if (first && last && ((event.shiftKey && (document.activeElement === first || document.activeElement === heading.current)) || (!event.shiftKey && document.activeElement === last))) { event.preventDefault(); (event.shiftKey ? last : first).focus(); } }

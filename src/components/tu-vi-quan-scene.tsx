@@ -3,12 +3,19 @@
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
 import { courtyardAssets } from "./tu-vi-quan-scene-assets";
+import { QUAN_TAROT_CARDS } from "@/lib/tu-vi-quan-content";
 import styles from "./tu-vi-quan-scene.module.css";
 import { findQuanPath, isQuanWalkable, QUAN_BOUNDS, QUAN_POND, QUAN_STATIONS } from "@/lib/tu-vi-quan-world.mjs";
 
 type Position = { x: number; z: number };
 type Player = Position & { id: string; alias: string; action: string };
+export type QuanHost = "tuvi" | "tarot" | "iching";
 type SceneProps = {
+  encounter?: { kind: QuanHost; state: "greeting" | "listening" | "thinking" | "speaking" | "idle"; audioLevel: number };
+  showHostControls?: boolean;
+  onHost?: (kind: QuanHost) => void;
+  ritual?: { kind: "incense" | "meditate" | "greet" | "tarot" | "iching"; requestId: number; count?: number; values?: number[] };
+  speech?: { id: string; text: string }[];
   ecosystemEnabled?: boolean;
   quality?: "low" | "medium" | "high";
   reducedMotion?: boolean;
@@ -78,12 +85,12 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
   const scene = new THREE.Scene();
   const ecosystemEnabled = latest.current.ecosystemEnabled === true;
   const assets = ecosystemEnabled ? courtyardAssets(scene) : undefined;
-  scene.fog = new THREE.Fog(0xb99b97, 62, 158);
+  scene.fog = new THREE.Fog(0x778995, 49, 132);
   const camera = new THREE.PerspectiveCamera(56, 1, 0.1, 260);
-  const sky = new THREE.HemisphereLight(0xffe9ce, 0x496354, 1.9);
+  const sky = new THREE.HemisphereLight(0xb9d1ef, 0x594032, 1.65);
   const sun = new THREE.DirectionalLight(0xffc185, 2);
   sun.position.set(-24, 35, -21);
-  sun.intensity = 3.1;
+  sun.intensity = 2.25;
   sun.castShadow = true;
   sun.shadow.mapSize.set(2048, 2048);
   Object.assign(sun.shadow.camera, { left: -48, right: 48, top: 48, bottom: -48, near: 1, far: 130 });
@@ -98,7 +105,7 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
       vertexShader: "varying vec3 v; void main(){v=position;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}",
       fragmentShader: `varying vec3 v; void main(){
         vec3 dir=normalize(v); float h=smoothstep(-.14,.57,dir.y);
-        vec3 color=mix(vec3(.94,.65,.45),vec3(.22,.32,.46),h);
+        vec3 color=mix(vec3(.72,.65,.63),vec3(.20,.32,.50),h);
         float s=max(0.,dot(dir,normalize(vec3(-.42,.24,-1.))));
         color+=vec3(.33,.18,.08)*pow(s,22.)+vec3(.34,.26,.15)*smoothstep(.998,.999,s);
         gl_FragColor=vec4(color,1.);
@@ -112,7 +119,9 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
     drum: new THREE.CylinderGeometry(0.5, 0.5, 1, 12),
     cone: new THREE.CylinderGeometry(0.35, 0.5, 1, 9),
     leaf: new THREE.IcosahedronGeometry(0.5, 1),
+    surface: new THREE.PlaneGeometry(1, 1),
     head: new THREE.SphereGeometry(0.5, 12, 8),
+    face: new THREE.SphereGeometry(0.5, 24, 16),
   };
   type Shape = keyof typeof geometry;
   const materials = new Map<number, THREE.MeshStandardMaterial>();
@@ -206,8 +215,11 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
   const lanternPools: THREE.Matrix4[] = [];
   function lantern(x: number, y: number, z: number) {
     drum(PALETTE.wood, x, y + 0.5, z, 0.055, 0.6);
-    object("head", PALETTE.lantern, x, y, z, 0.64, 0.83, 0.64);
-    for (const offset of [-0.25, 0, 0.25]) drum(PALETTE.red, x, y + offset, z, offset === 0 ? 0.66 : 0.52, 0.035);
+    object("head", PALETTE.lantern, x, y, z, 0.62, 0.86, 0.62);
+    for (let rib = 0; rib < 6; rib++) {
+      const angle = rib * Math.PI / 3;
+      object("head", PALETTE.light, x, y, z, 0.65, 0.87, 0.016, 0, angle);
+    }
     drum(PALETTE.gold, x, y + 0.38, z, 0.42, 0.1);
     drum(PALETTE.light, x, y - 0.38, z, 0.36, 0.1);
     drum(PALETTE.red, x, y - 0.62, z, 0.06, 0.35);
@@ -249,7 +261,7 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
   }
   // Main hall: timber lattice, curved tile roof, an open front veranda.
   box(PALETTE.stone, 0, 0.15, -22, 26, 0.3, 10);
-  box(0xe0c6a0, 0, 0.34, -22, 25.6, 0.12, 9.6);
+  box(PALETTE.stone, 0, 0.34, -22, 25.6, 0.12, 9.6);
   box(PALETTE.plaster, 0, 2.2, -26.3, 24.6, 3.7, 0.32);
   for (const x of [-12, -8, -4, 0, 4, 8, 12]) {
     column(x, -18.15, 4.1);
@@ -271,10 +283,30 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
   for (const x of [-5.5, 0, 5.5]) {
     box(0x815139, x, 0.98, -19.5, 3.1, 0.2, 1.25);
     for (const side of [-1, 1]) box(PALETTE.wood, x + side * 1.2, 0.65, -19.5, 0.2, 0.62, 0.95);
-    box(PALETTE.plaster, x - 0.2, 1.1, -19.4, 1.1, 0.035, 0.65, 0, -0.12);
-    for (let i = 0; i < 5; i++) box(PALETTE.wood, x - 0.22, 1.123, -19.64 + i * 0.1, 0.8, 0.006, 0.02);
+    if (!ecosystemEnabled || x !== 5.5) {
+      box(PALETTE.plaster, x - 0.2, 1.1, -19.4, 1.1, 0.035, 0.65, 0, -0.12);
+      for (let i = 0; i < 5; i++) box(PALETTE.wood, x - 0.22, 1.123, -19.64 + i * 0.1, 0.8, 0.006, 0.02);
+    }
     drum(0x6e9485, x + 1, 1.2, -19.5, 0.24, 0.24);
   }
+  for (const side of [-1, 1]) {
+    box(PALETTE.edge, 5.5, 0.86, -19.5 + side * 0.55, 2.62, 0.17, 0.10);
+    box(PALETTE.gold, 5.5, 0.9, -19.5 + side * 0.606, 2.34, 0.018, 0.018);
+    for (const x of [4.65, 5.5, 6.35]) box(PALETTE.gold, x, 0.84, -19.5 + side * 0.61, 0.08, 0.08, 0.018, 0, 0, Math.PI / 4);
+  }
+  // Carved screens and rafters frame the open side of the reading hall.
+  for (const x of [-10, -6, -2, 2, 10]) {
+    for (const edge of [-1, 1]) box(PALETTE.wood, x + edge * 0.86, 2.1, -18.23, 0.1, 2.85, 0.15);
+    for (const y of [0.7, 1.1, 1.55, 3.02, 3.5]) box(PALETTE.edge, x, y, -18.23, 1.8, 0.10, 0.16);
+    for (const offset of [-0.58, -0.29, 0, 0.29, 0.58]) {
+      box(PALETTE.wood, x + offset, 2.26, -18.23, 0.065, 1.52, 0.09);
+      box(PALETTE.gold, x + offset, 3.24, -18.23, 0.12, 0.12, 0.1, 0, 0, Math.PI / 4);
+    }
+  }
+  for (let x = -12; x <= 12; x += 1.65) box(PALETTE.edge, x, 4.34, -22, 0.22, 0.23, 10.1);
+  for (const x of [3.9, 7.8]) lantern(x, 3.25, -20.7);
+  box(PALETTE.edge, 5.5, 2.97, -21.85, 1.8, 0.67, 0.08);
+  for (const side of [-1, 1]) box(PALETTE.wood, 5.5 + side * 0.69, 3.83, -21.85, 0.08, 1.35, 0.08);
   // Gate and lantern avenue.
   for (const x of [-4.6, 4.6]) {
     column(x, 35, 4.2);
@@ -298,10 +330,6 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
   drum(0x80623d, -10, 1.4, -5.5, 0.5, 0.25);
   object("head", 0xa77a3e, -10, 1.65, -5.5, 0.9, 0.55, 0.75);
   drum(PALETTE.gold, -10, 1.87, -5.5, 0.85, 0.14);
-  for (const [x, tilt] of [[-10.18, 0.14], [-10, 0], [-9.82, -0.14]]) {
-    box(0xa13e29, x, 2.15, -5.5, 0.034, 0.6, 0.034, 0, 0, tilt);
-    object("head", PALETTE.lantern, x - tilt * 0.25, 2.46, -5.5, 0.07, 0.07, 0.07);
-  }
   for (const x of [-11.15, -8.85]) {
     drum(PALETTE.gold, x, 1.53, -5.5, 0.14, 0.5);
     object("leaf", PALETTE.light, x, 1.88, -5.5, 0.11, 0.22, 0.11);
@@ -325,10 +353,10 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
     drum(0x70553d, x, 0.51, 10.1, 0.7, 0.42);
     drum(0x617c70, x, 0.77, 10.1, 0.74, 0.13);
   }
-  object("head", 0x789d87, -20, 1.18, 8.4, 0.55, 0.44, 0.5);
-  drum(0x789d87, -20, 1.4, 8.4, 0.28, 0.07);
-  object("box", 0x789d87, -19.65, 1.19, 8.4, 0.4, 0.17, 0.17, 0, 0, 0.35);
-  for (const x of [-20.8, -19.25]) drum(0xe5d6b2, x, 1.12, 8.7, 0.2, 0.18);
+  object("head", 0x789d87, -21.1, 1.18, 7.95, 0.55, 0.44, 0.5);
+  drum(0x789d87, -21.1, 1.4, 7.95, 0.28, 0.07);
+  object("box", 0x789d87, -20.75, 1.19, 7.95, 0.4, 0.17, 0.17, 0, 0, 0.35);
+  for (const x of [-19.5, -18.8]) drum(0xe5d6b2, x, 1.12, 8.05, 0.2, 0.18);
   pavilion(18, 0.4, 8, 6);
   for (const x of [15.7, 18, 20.3]) {
     drum(0x9d4e3e, x, 0.43, 2, 1.25, 0.24, 1);
@@ -464,16 +492,17 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
 
   // Nhân vật khách và động tác, dùng lại lưới và vật liệu.
   const visitors = new Map<string, ReturnType<typeof avatar>>();
-  function avatar(color: number, name: string) {
+  function avatar(color: number, name: string, detailed = false) {
     const group = new THREE.Group();
     const body = new THREE.Group();
     const arms = [new THREE.Group(), new THREE.Group()];
-    const robe = new THREE.MeshStandardMaterial({ color, roughness: 0.94 });
+    const robe = new THREE.MeshStandardMaterial({ color, roughness: 0.9, normalMap: detailed ? assets?.cloth : null, normalScale: new THREE.Vector2(0.32, 0.32) });
     function part(parent: THREE.Object3D, shape: Shape, colorValue: number, x: number, y: number, z: number, sx: number, sy: number, sz = sx) {
       const mesh = new THREE.Mesh(geometry[shape], colorValue === color ? robe : material(colorValue));
       mesh.position.set(x, y, z);
       mesh.scale.set(sx, sy, sz);
       parent.add(mesh);
+      return mesh;
     }
     if (ecosystemEnabled) {
       part(body, "cone", color, 0, 0.75, 0, 0.68, 0.94, 0.47);
@@ -481,10 +510,25 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
       part(body, "box", PALETTE.gold, 0.06, 0.91, 0.225, 0.017, 0.35, 0.014);
     } else part(body, "cone", color, 0, 0.76, 0, 0.58, 0.77, 0.42);
     part(body, "drum", PALETTE.gold, 0, 0.71, 0, 0.52, 0.055, 0.4);
-    part(body, "head", 0xe9b180, 0, 1.34, 0, 0.49, 0.51, 0.46);
-    part(body, "head", 0x40302a, 0, 1.53, -0.04, 0.53, 0.22, 0.48);
-    part(body, "head", 0x34241d, -0.087, 1.35, 0.213, 0.04, 0.045, 0.035);
-    part(body, "head", 0x34241d, 0.087, 1.35, 0.213, 0.04, 0.045, 0.035);
+    if (detailed) {
+      const hair = name === "Thầy Tử Vi" ? 0x777167 : 0x332321;
+      part(body, "drum", 0xc28a60, 0, 1.123, 0, 0.16, 0.19, 0.15);
+      part(body, "face", 0xd69d72, 0, 1.355, 0.013, 0.38, 0.44, 0.34);
+      part(body, "face", hair, 0, 1.46, -0.065, 0.394, 0.30, 0.325);
+      part(body, "face", 0xd69d72, 0, 1.332, 0.184, 0.066, 0.085, 0.076);
+      for (const side of [-1, 1]) {
+        part(body, "face", 0xc28a60, side * 0.175, 1.349, 0.013, 0.065, 0.109, 0.075);
+        part(body, "face", 0x46302c, side * 0.077, 1.38, 0.16, 0.064, 0.024, 0.026);
+        part(body, "face", 0x30231d, side * 0.079, 1.382, 0.175, 0.025, 0.023, 0.014);
+        part(body, "face", hair, side * 0.078, 1.415, 0.158, 0.075, 0.016, 0.017).rotation.z = side * -0.14;
+        part(body, "box", PALETTE.gold, side * 0.071, 1.04, 0.175, 0.024, 0.22, 0.021).rotation.z = side * 0.43;
+      }
+    } else {
+      part(body, "head", 0xe9b180, 0, 1.34, 0, 0.49, 0.51, 0.46);
+      part(body, "head", 0x40302a, 0, 1.53, -0.04, 0.53, 0.22, 0.48);
+      for (const side of [-1, 1]) part(body, "head", 0x34241d, side * 0.087, 1.35, 0.213, 0.04, 0.045, 0.035);
+    }
+    const mouth = part(body, "face", 0x743c35, 0, detailed ? 1.278 : 1.235, detailed ? 0.176 : 0.224, 0.074, 0.018, 0.024);
     const legs = [-1, 1].map((side, index) => {
       const leg = new THREE.Group();
       leg.position.set(side * 0.15, 0.34, 0);
@@ -506,32 +550,130 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
     ground.position.y = 0.03;
     group.add(body, badge, ground);
     scene.add(group);
-    return { group, body, badge, arms, legs, name, robe };
+    return { group, body, badge, arms, legs, mouth, name, robe };
   }
   function pose(visitor: ReturnType<typeof avatar>, action: string, seconds: number, walking: boolean, reduced: boolean) {
     const stride = walking && !reduced ? Math.sin(seconds * 14) * 0.48 : 0;
-    visitor.body.position.y = action === "meditate" ? -0.26 : Math.abs(stride) * (ecosystemEnabled ? 0.045 : 0.09) + (!ecosystemEnabled || reduced ? 0 : Math.sin(seconds * 1.6) * 0.008);
+    visitor.body.position.y = (action === "meditate" || action === "seated") ? -0.26 : Math.abs(stride) * (ecosystemEnabled ? 0.045 : 0.09) + (!ecosystemEnabled || reduced ? 0 : Math.sin(seconds * 1.6) * 0.008);
     visitor.body.rotation.x = action === "greet" ? 0.15 : 0;
-    visitor.badge.position.y = action === "meditate" ? 1.73 : 1.98;
+    visitor.badge.position.y = (action === "meditate" || action === "seated") ? 1.73 : 1.98;
     visitor.legs.forEach((leg, i) => {
-      leg.rotation.x = action === "meditate" ? -Math.PI / 2 : stride * (i === 0 ? 1 : -1);
-      leg.rotation.z = action === "meditate" ? (i === 0 ? -0.5 : 0.5) : 0;
+      leg.rotation.x = (action === "meditate" || action === "seated") ? -Math.PI / 2 : stride * (i === 0 ? 1 : -1);
+      leg.rotation.z = (action === "meditate" || action === "seated") ? (i === 0 ? -0.5 : 0.5) : 0;
     });
     visitor.arms.forEach((arm, i) => {
-      arm.rotation.x = action === "greet" ? -1.83 : action === "incense" ? -1.3 : action === "meditate" ? -0.6 : -stride * (i === 0 ? 1 : -1);
+      arm.rotation.x = action === "greet" ? -1.83 : action === "incense" ? -1.3 : (action === "meditate" || action === "seated") ? -0.6 : -stride * (i === 0 ? 1 : -1);
       arm.rotation.z = action === "greet" ? (i === 0 ? 0.52 : -0.52) : 0;
     });
   }
-  const self = avatar(0x506f7e, "Bạn");
+  const self = avatar(0x506f7e, "Bạn", true);
   self.badge.visible = false;
   self.body.rotation.y = Math.PI;
   self.group.position.set(latest.current.position.x, 0.054, latest.current.position.z);
-  const teachers = [-5.5, 0, 5.5].map((x, index) => {
-    const teacher = avatar(0x465a55, "Thầy AI · Bàn " + (index + 1));
-    teacher.group.position.set(x, 0.4, -20.45);
-    pose(teacher, "meditate", 0, false, true);
+  const hostKinds: QuanHost[] = ["tuvi", "tarot", "iching"];
+  const teachers = hostKinds.map((kind, index) => {
+    const teacher = avatar([0x6f4430, 0x694052, 0x57706b][index], ["Thầy Tử Vi", "Cô Tarot", "Thầy Dịch"][index], true);
+    const locations = [[5.5, 0.4, -20.45], [-20, 0.31, 7.25], [18, 0.3, -0.8]];
+    teacher.group.position.set(locations[index][0], locations[index][1], locations[index][2]);
+    teacher.group.userData.host = kind;
+    pose(teacher, "seated", 0, false, true);
+    if (index !== 1) {
+      const hat = new THREE.Mesh(geometry.drum, material(0x3c2b27));
+      hat.position.set(0, 1.6, -0.02); hat.scale.set(0.43, 0.19, 0.39); teacher.body.add(hat);
+      const rim = new THREE.Mesh(geometry.drum, material(PALETTE.gold));
+      rim.position.copy(hat.position); rim.position.y -= 0.049; rim.scale.set(0.44, 0.025, 0.40); teacher.body.add(rim);
+      for (const side of [-1, 1]) {
+        const moustache = new THREE.Mesh(geometry.face, material(index === 0 ? 0xaba397 : 0x594a43));
+        moustache.position.set(side * 0.045, 1.268, 0.173); moustache.scale.set(0.087, 0.033, 0.038); moustache.rotation.z = side * -0.33;
+        teacher.body.add(moustache);
+      }
+      const beard = new THREE.Mesh(geometry.face, material(index === 0 ? 0xc0b7a8 : 0x64574d));
+      beard.position.set(0, 1.17, 0.146); beard.scale.set(0.14, 0.14, 0.10); teacher.body.add(beard);
+    } else {
+      const bun = new THREE.Mesh(geometry.face, material(0x2d201c));
+      bun.position.set(0, 1.51, -0.22); bun.scale.set(0.25, 0.23, 0.25); teacher.body.add(bun);
+    }
     return teacher;
   });
+  function ritualPart(shape: Shape, color: number, x: number, y: number, z: number, sx: number, sy: number, sz: number) {
+    const mesh = new THREE.Mesh(geometry[shape], material(color)); mesh.position.set(x, y, z); mesh.scale.set(sx, sy, sz); scene.add(mesh); return mesh;
+  }
+  const seatCushions = teachers.flatMap((teacher, index) => [0, 2.5].map(offset => {
+    const seat = ritualPart("drum", index === 1 ? 0x6d466f : 0x617c70, teacher.group.position.x, teacher.group.position.y + 0.11, teacher.group.position.z + offset, 0.85, 0.2, 0.7); return seat;
+  }));
+  const readingDecor: THREE.Mesh<THREE.PlaneGeometry, THREE.MeshStandardMaterial>[] = [];
+  function paintedPanel(width: number, height: number, paint: (ctx: CanvasRenderingContext2D) => void) {
+    const surface = document.createElement("canvas"); surface.width = surface.height = 512;
+    const ctx = surface.getContext("2d")!; paint(ctx);
+    const map = new THREE.CanvasTexture(surface); map.colorSpace = THREE.SRGBColorSpace; map.anisotropy = 4;
+    const panel = new THREE.Mesh(new THREE.PlaneGeometry(width, height), new THREE.MeshStandardMaterial({ map, roughness: 0.9 }));
+    panel.receiveShadow = true;
+    readingDecor.push(panel); scene.add(panel); return panel;
+  }
+  if (ecosystemEnabled) {
+    const rug = paintedPanel(4.3, 4.4, ctx => {
+      ctx.fillStyle = "#4f2525"; ctx.fillRect(0, 0, 512, 512);
+      ctx.strokeStyle = "#ac8454";
+      for (const edge of [12, 25, 50, 60]) { ctx.lineWidth = edge === 25 ? 3 : 2; ctx.strokeRect(edge, edge, 512 - edge * 2, 512 - edge * 2); }
+      ctx.fillStyle = "#9a6244";
+      for (let row = 1; row < 8; row++) for (let col = 1; col < 8; col++) {
+        ctx.save(); ctx.translate(col * 64, row * 64); ctx.rotate(Math.PI / 4); ctx.fillRect(-7, -7, 14, 14); ctx.restore();
+      }
+    });
+    rug.position.set(5.5, 0.407, -19.2); rug.rotation.x = -Math.PI / 2;
+    const chart = paintedPanel(1.65, 0.97, ctx => {
+      ctx.fillStyle = "#b68b55"; ctx.fillRect(0, 0, 512, 512);
+      ctx.strokeStyle = "#623821"; ctx.lineWidth = 3; ctx.strokeRect(12, 12, 488, 488); ctx.strokeRect(22, 22, 468, 468);
+      ctx.save(); ctx.translate(256, 256); ctx.scale(0.74, 1.19);
+      for (const radius of [45, 78, 126, 154, 168]) { ctx.beginPath(); ctx.arc(0, 0, radius, 0, 2 * Math.PI); ctx.stroke(); }
+      for (let sector = 0; sector < 12; sector++) {
+        ctx.rotate(Math.PI / 6); ctx.beginPath(); ctx.moveTo(0, 77); ctx.lineTo(0, 169); ctx.stroke();
+        ctx.fillStyle = "#633820"; ctx.fillRect(12, 135, 22, 3); ctx.fillRect(12, 142, 22, 3);
+      }
+      ctx.restore(); ctx.font = "700 23px Georgia"; ctx.textAlign = "center"; ctx.fillStyle = "#633820"; ctx.fillText("TỬ VI", 256, 264);
+    });
+    chart.position.set(5.5, 1.084, -19.5); chart.rotation.x = -Math.PI / 2;
+    const plaque = paintedPanel(1.7, 0.58, ctx => {
+      ctx.fillStyle = "#4c2521"; ctx.fillRect(0, 0, 512, 512);
+      ctx.strokeStyle = "#c18d4d"; ctx.lineWidth = 7; ctx.strokeRect(14, 24, 484, 464); ctx.strokeRect(31, 58, 450, 396);
+      ctx.save(); ctx.scale(1, 2.5); ctx.font = "700 79px Georgia"; ctx.textAlign = "center"; ctx.fillStyle = "#f2c779"; ctx.fillText("TỬ VI", 256, 133); ctx.restore();
+    });
+    plaque.position.set(5.5, 2.97, -21.8);
+  }
+  const tableLight = new THREE.PointLight(0xffab5e, 0, 7, 2);
+  scene.add(tableLight);
+  const incense = [-1, 0, 1].map(side => ({
+    stick: ritualPart("box", 0xa13e29, -10 + side * 0.16, 2.15, -5.5, 0.034, 0.6, 0.034),
+    ember: ritualPart("head", PALETTE.lantern, -10 + side * 0.16, 2.46, -5.5, 0.07, 0.07, 0.07),
+  }));
+  function cardFace(title: string, value: number) {
+    const surface = document.createElement("canvas"); surface.width = 256; surface.height = 400;
+    const ctx = surface.getContext("2d")!;
+    ctx.fillStyle = "#ead6ac"; ctx.fillRect(0, 0, 256, 400);
+    ctx.strokeStyle = "#775637"; ctx.lineWidth = 7; ctx.strokeRect(10, 10, 236, 380);
+    ctx.fillStyle = ["#916444", "#4c647a", "#6a507b", "#556e57"][Math.abs(value) % 4];
+    ctx.beginPath(); ctx.arc(128, 165, 68, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = "#f8e5b7"; ctx.font = "64px Georgia"; ctx.textAlign = "center"; ctx.fillText(["☀", "☾", "✦", "♧"][Math.abs(value) % 4], 128, 188);
+    ctx.fillStyle = "#49372b"; ctx.font = "bold 24px Georgia";
+    const words = title.slice(0, 70).split(" "); let line = ""; let y = 290;
+    for (const word of words) { if (ctx.measureText(line + word).width > 215) { ctx.fillText(line, 128, y); line = ""; y += 30; } line += word + " "; }
+    ctx.fillText(line, 128, y);
+    const map = new THREE.CanvasTexture(surface); map.colorSpace = THREE.SRGBColorSpace;
+    return new THREE.MeshBasicMaterial({map, side: THREE.DoubleSide});
+  }
+  const tarotCards = [-1, 0, 1].map(side => {
+    const back = ritualPart("box", 0x553268, -20 + side * 0.62, 1.065, 8.85, 0.48, 0.025, 0.78);
+    const face = new THREE.Mesh(geometry.surface, cardFace("", 0)); face.scale.set(0.46, 0.76, 1); face.position.set(back.position.x, 1.085, back.position.z); face.rotation.x = -Math.PI / 2; face.visible = false; scene.add(face); return {back, face};
+  });
+  ritualPart("drum", PALETTE.wood, 18, 0.9, 0.45, 2.7, 0.2, 1.6);
+  const coins = [-1, 0, 1].map(side => {
+    const coin = ritualPart("drum", PALETTE.gold, 18 + side * 0.45, 1.04, 0.7, 0.26, 0.05, 0.26);
+    const hole = new THREE.Mesh(geometry.box, material(PALETTE.wood)); hole.position.y = 0.54; hole.scale.set(0.28, 0.08, 0.28); coin.add(hole); return coin;
+  });
+  const hexagram = Array.from({length: 6}, (_, i) => [-1, 1].map(side => {
+    const line = ritualPart("box", PALETTE.gold, 18 + side * 0.17, 1.025, -0.12 + i * 0.12, 0.29, 0.018, 0.055); line.visible = false; return line;
+  }));
+  let ritualId: number | undefined; let ritualStarted = 0;
   const smoke = Array.from({ length: 7 }, () => {
     const smokeMaterial = new THREE.MeshBasicMaterial({ color: 0xffe7c6, transparent: true, opacity: 0, depthWrite: false });
     const mesh = new THREE.Mesh(geometry.leaf, smokeMaterial);
@@ -588,7 +730,7 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
   let audible = false;
   function updateSound() {
     if (!audioGain || !audio) return;
-    const next = latest.current.muted === false && !document.hidden;
+    const next = latest.current.muted === false && !latest.current.encounter && !document.hidden;
     if (audible === next) return;
     audible = next;
     audioGain.gain.setTargetAtTime(next ? 0.008 : 0, audio.currentTime, 0.1);
@@ -626,6 +768,7 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
   let yaw = 0;
   let pitch = 0.49;
   let cameraReady = false;
+  let framedHost: QuanHost | undefined;
   let padId: number | undefined;
   let press: { id: number; x: number; y: number; lastX: number; lastY: number; dragged: boolean } | undefined;
   let route: Position[] = [];
@@ -637,7 +780,7 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
     route = findQuanPath(controlled ?? { x: self.group.position.x, z: self.group.position.z }, destination);
   }
   function pressDown(event: PointerEvent) {
-    if (event.button !== 0 || press || !latest.current.interactive) return;
+    if (event.button !== 0 || press || latest.current.encounter || !latest.current.interactive) return;
     event.preventDefault();
     startSound();
     container.closest("main")?.focus({ preventScroll: true });
@@ -661,13 +804,15 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
     const rect = canvas.getBoundingClientRect();
     pointer.set((event.clientX - rect.left) / rect.width * 2 - 1, 1 - (event.clientY - rect.top) / rect.height * 2);
     ray.setFromCamera(pointer, camera);
+    const selected = ray.intersectObjects(teachers.map(teacher => teacher.group), true)[0];
+    if (selected) { let node: THREE.Object3D | null = selected.object; while (node && !node.userData.host) node = node.parent; if (node) latest.current.onHost?.(node.userData.host as QuanHost); return; }
     if (!ray.ray.intersectPlane(floor, hit)) return;
     route = [];
     if (isQuanWalkable(hit.x, hit.z)) routeTo({ x: hit.x, z: hit.z });
   }
   function cancelPress() { press = undefined; }
   function keyDown(event: KeyboardEvent) {
-    if (!latest.current.interactive || !movementKeys.has(event.code) ||
+    if (latest.current.encounter || !latest.current.interactive || !movementKeys.has(event.code) ||
         (event.target instanceof HTMLElement && event.target.closest("input, textarea, select, [contenteditable]"))) return;
     event.preventDefault();
     startSound();
@@ -682,7 +827,7 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
     knob.style.transform = `translate(${steer.x * 28}px, ${steer.y * 28}px)`;
   }
   function padDown(event: PointerEvent) {
-    if (!latest.current.interactive || padId !== undefined) return;
+    if (latest.current.encounter || !latest.current.interactive || padId !== undefined) return;
     startSound();
     route = [];
     padId = event.pointerId;
@@ -724,6 +869,7 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
     visitor.group.position.z += dz * speed;
     pose(visitor, walking ? "idle" : action, time, walking, reducedMotion());
   }
+  const activeVisitors = new Set<string>();
   const colors = [0x5d7b72, 0x7d5c7b, 0x9a703d, 0x43637a, 0x69794c];
   function draw(time: number) {
     if (stopped) return;
@@ -750,7 +896,18 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
       updateWishes(previousWishes ?? []);
     }
     const experience = ecosystemEnabled ? current.experience ?? "courtyard" : "courtyard";
-    personal.visible = experience === "personal"; self.group.visible = experience === "courtyard" || experience === "teacher";
+    const seated = current.encounter;
+    if (seated) {
+      const host = teachers[hostKinds.indexOf(seated.kind)].group.position;
+      tableLight.position.set(host.x + 1.1, host.y + 2.35, host.z + 1.2);
+    }
+    tableLight.intensity = seated ? 27 : 0;
+    for (let i = 0; i < seatCushions.length; i++) seatCushions[i].visible = i % 2 === 0 || seated?.kind === hostKinds[Math.floor(i / 2)];
+    if (framedHost !== seated?.kind) {
+      framedHost = seated?.kind; cameraReady = false;
+      signs.forEach(sign => { sign.visible = !seated; });
+    }
+    personal.visible = experience === "personal"; self.group.visible = Boolean(seated) || experience === "courtyard" || experience === "teacher";
     updateSound();
     const appearance = ecosystemEnabled ? current.appearance ?? {} : {};
     self.robe.color.set(cosmeticColor(appearance.robe, 0x506f7e));
@@ -759,12 +916,12 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
     lamp.material = material(cosmeticColor(appearance.lantern, PALETTE.lantern));
     card.material = material(cosmeticColor(appearance.cardBack, 0x624171));
     renderer.toneMappingExposure = experience === "teacher" ? 0.96 : experience === "personal" ? 1.04 : 1.18;
-    if (!current.interactive && (keys.size || route.length || padId !== undefined)) clearInput();
+    if ((!current.interactive || seated) && (keys.size || route.length || padId !== undefined)) clearInput();
     if (!current.destination && destinationId !== undefined) {
       destinationId = undefined;
       route = [];
     }
-    if (current.interactive && current.destination && current.destination.requestId !== destinationId) {
+    if (!seated && current.interactive && current.destination && current.destination.requestId !== destinationId) {
       destinationId = current.destination.requestId;
       routeTo(current.destination);
     }
@@ -784,7 +941,7 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
       }
     }
     const magnitude = Math.hypot(dx, dz);
-    if (current.interactive && magnitude > 0.09) {
+    if (!seated && current.interactive && magnitude > 0.09) {
       walked = true;
       controlled ??= { ...current.position };
       const pace = Math.min(5.8 * dt, route.length ? magnitude : Infinity) / Math.max(route.length ? 0.001 : 1, magnitude);
@@ -800,8 +957,41 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
       current.onMove({ ...controlled });
       controlled = null;
     }
+    if (!seated) self.group.position.y = 0.054;
     if (!walked) self.group.position.set(current.position.x, 0.054, current.position.z);
     move(self, controlled ?? current.position, current.action, time / 1000, dt);
+    if (current.ritual?.requestId !== ritualId) {
+      ritualId = current.ritual?.requestId; ritualStarted = time;
+      if (current.ritual?.kind === "incense") incense.forEach(({stick, ember}, i) => { stick.visible = ember.visible = current.ritual?.count === 3 || i === 1; });
+      if (current.ritual?.kind === "tarot") tarotCards.forEach(({face}, i) => {
+        const value = current.ritual?.values?.[i]; face.material.map?.dispose(); face.material.dispose();
+        face.material = cardFace(value === undefined ? "Chưa rút lá" : QUAN_TAROT_CARDS[value]?.title ?? "Lá bài", value ?? 0); face.visible = value !== undefined;
+      });
+      if (current.ritual?.kind === "iching") hexagram.forEach((line, i) => line.forEach((segment, side) => {
+        const value = current.ritual?.values?.[i]; segment.visible = value !== undefined;
+        segment.scale.x = value !== undefined && value % 2 ? 0.34 : 0.26;
+        segment.position.x = 18 + (side === 0 ? -1 : 1) * (value !== undefined && value % 2 ? 0.17 : 0.21);
+      }));
+    }
+    const ritualActive = current.ritual && time - ritualStarted < (current.ritual.kind === "meditate" ? 20000 : 5000);
+    if (!seated && ritualActive) pose(self, current.ritual!.kind, time / 1000, false, reducedMotion());
+    teachers.forEach((teacher, index) => {
+      const speaking = seated?.kind === hostKinds[index] && (seated.state === "speaking" || seated.state === "greeting");
+      const listening = seated?.kind === hostKinds[index] && seated.state === "listening";
+      const level = speaking ? THREE.MathUtils.clamp(Number.isFinite(seated.audioLevel) ? seated.audioLevel : 0, 0, 1) : 0;
+      pose(teacher, "seated", time / 1000, false, reducedMotion());
+      teacher.mouth.scale.y = 0.022 + level * 0.12;
+      teacher.body.rotation.x = listening ? 0.08 : !reducedMotion() && speaking ? Math.sin(time * 0.004) * 0.025 : 0;
+      teacher.arms[0].rotation.x = -0.6 - (reducedMotion() ? 0 : level * 0.55);
+      teacher.badge.visible = !seated;
+    });
+    if (seated) {
+      const host = teachers[hostKinds.indexOf(seated.kind)];
+      self.group.position.set(host.group.position.x, host.group.position.y, host.group.position.z + 2.5);
+      self.body.rotation.y = Math.PI; pose(self, "seated", time / 1000, false, reducedMotion());
+    }
+    tarotCards.forEach(({back, face}, i) => { const lift = ritualActive && current.ritual?.kind === "tarot" && !reducedMotion() ? Math.sin(Math.min(1, (time - ritualStarted) / 1200) * Math.PI) * (0.2 + i * 0.1) : 0; back.position.y = 1.065 + lift; face.position.y = 1.085 + lift; });
+    coins.forEach((coin, i) => { const tossing = ritualActive && current.ritual?.kind === "iching" && time - ritualStarted < 1200 && !reducedMotion(); coin.position.y = 1.04 + (tossing ? Math.sin((time - ritualStarted) / 1200 * Math.PI) * 0.7 : 0); coin.rotation.x = tossing ? (time - ritualStarted) * 0.015 + i : 0; });
     const { x, z } = self.group.position;
     const distance = camera.aspect < 0.8 ? 7.8 : 9.3;
     const planar = Math.cos(pitch) * distance;
@@ -811,13 +1001,19 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
     if (experience === "personal") { cameraGoal.set(58.5, 4.2, 1.2); cameraTarget.set(55, 1.2, -6.4); }
     if (experience === "tarot") { cameraGoal.set(-17, 3.1, 13); cameraTarget.set(-20, 1.2, 8.4); }
     if (experience === "iching") { cameraGoal.set(20, 3.2, 6); cameraTarget.set(18, 1, 0.4); }
+    if (seated) {
+      const host = teachers[hostKinds.indexOf(seated.kind)].group.position;
+      const portrait = camera.aspect < 0.8;
+      cameraGoal.set(host.x + (portrait ? 1.45 : 3.65), host.y + (portrait ? 1.48 : 1.72), host.z + (portrait ? 3.35 : 0.32));
+      cameraTarget.set(host.x, host.y + (portrait ? 0.87 : 1.08), host.z + (portrait ? 0.38 : 1.24));
+    }
     const follow = !cameraReady || reducedMotion() ? 1 : 1 - Math.exp(-dt * 8);
     camera.position.lerp(cameraGoal, follow);
     look.lerp(cameraTarget, follow);
     camera.lookAt(look);
     skyDome.position.copy(camera.position);
     cameraReady = true;
-    const active = new Set<string>();
+    const active = activeVisitors; active.clear();
     for (const player of current.players) {
       active.add(player.id);
       let visitor = visitors.get(player.id);
@@ -845,7 +1041,7 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
       const phase = reducedMotion() ? (index + 1) / 8 : ((time / 4600 + index / smoke.length) % 1);
       mesh.position.set(-10 + phase * 0.76 + Math.sin(phase * 6) * 0.12, 2.46 + phase * 1.73, -5.5 + phase * 0.19);
       mesh.scale.setScalar(0.082 + phase * 0.35);
-      mesh.material.opacity = (1 - phase) * (current.action === "incense" ? 0.42 : 0.25);
+      mesh.material.opacity = (1 - phase) * (current.action === "incense" || ritualActive && current.ritual?.kind === "incense" ? 0.42 : 0.25);
     });
     for (let i = 0; i < 90; i++) {
       const t = reducedMotion() ? 0 : time * 0.00037;
@@ -900,7 +1096,9 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
     oscillators.forEach(oscillator => { oscillator.stop(); oscillator.disconnect(); }); audioGain?.disconnect(); if (audio) void audio.close();
     disposeLabel(personalLabel); wishes.traverse(node => { if (node instanceof THREE.Sprite) disposeLabel(node); });
     auraGeometry.dispose(); auraMaterial.dispose();
+    tarotCards.forEach(({face}) => { face.material.map?.dispose(); face.material.dispose(); });
     teachers.forEach((teacher) => { disposeLabel(teacher.badge); teacher.robe.dispose(); });
+    readingDecor.forEach(({ geometry, material }) => { geometry.dispose(); material.map?.dispose(); material.dispose(); });
     groundShadows.dispose();
     glowGeometry.dispose();
     glowMaterial.dispose();
@@ -936,7 +1134,9 @@ export default function TuViQuanScene(props: SceneProps) {
   }, []);
   return (
     <div className={styles.scene} ref={container}>
-      <div data-joystick className={props.interactive ? styles.joystick : styles.hidden} aria-hidden="true"><span /></div>
+      {props.showHostControls !== false && !props.encounter && props.onHost && <nav className={styles.hosts} aria-label="Mời người luận chuyện"><button onClick={() => props.onHost?.("tuvi")}>Thầy Tử Vi</button><button onClick={() => props.onHost?.("tarot")}>Cô Tarot</button><button onClick={() => props.onHost?.("iching")}>Thầy Dịch</button></nav>}
+      {props.speech?.length ? <div className={styles.publicSpeech} aria-live="polite">{props.speech.slice(-2).map((message, index) => <p key={`${message.id}-${index}`}>{message.text.slice(0, 120)}</p>)}</div> : null}
+      <div data-joystick className={props.interactive && !props.encounter ? styles.joystick : styles.hidden} aria-hidden="true"><span /></div>
     </div>
   );
 }

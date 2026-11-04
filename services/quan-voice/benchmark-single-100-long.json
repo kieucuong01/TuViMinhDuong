@@ -1,0 +1,88 @@
+{
+  "runs": [
+    {
+      "index": 3,
+      "text": "Trong lá số này, mình đang nhìn cung Mệnh, cung Quan Lộc và cung Tài Bạch. Sao Tử Vi và Thiên Phủ gợi ý cách bạn sắp xếp công việc và giữ tiền. Điều đó không có nghĩa tương lai đã được định sẵn. Bạn thử nhớ lại ba tháng vừa rồi: khi gặp việc khó, bạn thường tự làm hay nhờ người hỗ trợ? Từ câu trả lời đó, mình sẽ cùng bạn chọn một bước nhỏ phù hợp với hoàn cảnh hiện tại. Bạn muốn nói trước về công việc hay chuyện gia đình?",
+      "ttfa_s": 0.7547530271112919,
+      "elapsed_s": 17.08575216308236,
+      "audio_s": 21.25,
+      "rtf": 0.8040353959097581,
+      "pcm_bytes": 1020000,
+      "min_playback_lead_s": 0.17054166666666667
+    }
+  ],
+  "host_samples": [
+    {
+      "at": "2026-11-04T12:02:57.492021+00:00",
+      "web_s": 0.09797282330691814,
+      "web_status": 200,
+      "available_mib": 733,
+      "unit": "MainPID=2771526\nMemoryCurrent=1467813888\nMemoryPeak=1468006400\nActiveState=active",
+      "process_memory": "VmHWM:\t 1400976 kB\nVmRSS:\t 1400976 kB"
+    },
+    {
+      "at": "2026-11-04T12:02:59.552166+00:00",
+      "web_s": 0.04915253072977066,
+      "web_status": 200,
+      "available_mib": 743,
+      "unit": "MainPID=2771526\nMemoryCurrent=1467817984\nMemoryPeak=1468006400\nActiveState=active",
+      "process_memory": "VmHWM:\t 1400976 kB\nVmRSS:\t 1400976 kB"
+    },
+    {
+      "at": "2026-11-04T12:03:01.634315+00:00",
+      "web_s": 0.06685663759708405,
+      "web_status": 200,
+      "available_mib": 739,
+      "unit": "MainPID=2771526\nMemoryCurrent=1464840192\nMemoryPeak=1468006400\nActiveState=active",
+      "process_memory": "VmHWM:\t 1403920 kB\nVmRSS:\t 1400844 kB"
+    },
+    {
+      "at": "2026-11-04T12:03:03.719627+00:00",
+      "web_s": 0.07177105732262135,
+      "web_status": 200,
+      "available_mib": 737,
+      "unit": "MainPID=2771526\nMemoryCurrent=1466757120\nMemoryPeak=1468006400\nActiveState=active",
+      "process_memory": "VmHWM:\t 1403920 kB\nVmRSS:\t 1402508 kB"
+    },
+    {
+      "at": "2026-11-04T12:03:05.776349+00:00",
+      "web_s": 0.044959936290979385,
+      "web_status": 200,
+      "available_mib": 730,
+      "unit": "MainPID=2771526\nMemoryCurrent=1467867136\nMemoryPeak=1468006400\nActiveState=active",
+      "process_memory": "VmHWM:\t 1404172 kB\nVmRSS:\t 1404172 kB"
+    },
+    {
+      "at": "2026-11-04T12:03:07.836286+00:00",
+      "web_s": 0.048414019867777824,
+      "web_status": 200,
+      "available_mib": 712,
+      "unit": "MainPID=2771526\nMemoryCurrent=1448476672\nMemoryPeak=1468006400\nActiveState=active",
+      "process_memory": "VmHWM:\t 1423244 kB\nVmRSS:\t 1404240 kB"
+    },
+    {
+      "at": "2026-11-04T12:03:09.917787+00:00",
+      "web_s": 0.06764846853911877,
+      "web_status": 200,
+      "available_mib": 711,
+      "unit": "MainPID=2771526\nMemoryCurrent=1467785216\nMemoryPeak=1468006400\nActiveState=active",
+      "process_memory": "VmHWM:\t 1424336 kB\nVmRSS:\t 1424336 kB"
+    },
+    {
+      "at": "2026-11-04T12:03:11.967517+00:00",
+      "web_s": 0.039214931428432465,
+      "web_status": 200,
+      "available_mib": 710,
+      "unit": "MainPID=2771526\nMemoryCurrent=1447436288\nMemoryPeak=1468006400\nActiveState=active",
+      "process_memory": "VmHWM:\t 1424336 kB\nVmRSS:\t 1404500 kB"
+    },
+    {
+      "at": "2026-11-04T12:03:14.016175+00:00",
+      "web_s": 0.039112258702516556,
+      "web_status": 200,
+      "available_mib": 712,
+      "unit": "MainPID=2771526\nMemoryCurrent=1447440384\nMemoryPeak=1468006400\nActiveState=active",
+      "process_memory": "VmHWM:\t 1424340 kB\nVmRSS:\t 1404500 kB"
+    }
+  ]
+}

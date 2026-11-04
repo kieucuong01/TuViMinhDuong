@@ -37,7 +37,7 @@ export function ecosystemTransaction<T>(db: PrismaClient, run: (tx: Tx) => Promi
   }, { maxWait: 15_000, timeout: 20_000 });
 }
 
-async function ensureProfile(tx: Tx, actor: Actor) {
+export async function ensureProfile(tx: Tx, actor: Actor) {
   const identity = await tx.quanIdentity.findUnique({ where: { guestId: actor.guest.id }, include: { profile: true } });
   if (identity) {
     if (identity.profile.userId && identity.profile.userId !== actor.userId) fail("Đăng nhập tài khoản đã liên kết để mở sổ của bạn.", 401);
@@ -190,6 +190,21 @@ async function mergeProfiles(tx: Tx, source: QuanProfile, target: QuanProfile) {
   await tx.quanIdentity.updateMany({ where: { profileId: source.id }, data: { profileId: target.id } });
   await tx.quanWish.updateMany({ where: { profileId: source.id }, data: { profileId: target.id } });
   await tx.quanShare.updateMany({ where: { profileId: source.id }, data: { profileId: target.id } });
+  const encounters = await tx.quanEncounter.findMany({ where: { profileId: source.id } });
+  for (const encounter of encounters) {
+    if (encounter.freeDay) {
+      const existing = await tx.quanEncounter.findUnique({ where: { profileId_freeDay: { profileId: target.id, freeDay: encounter.freeDay } } });
+      if (existing) {
+        // Preserve the stricter elapsed daily window when linking two devices.
+        if (encounter.endsAt && (!existing.endsAt || encounter.endsAt < existing.endsAt)) {
+          await tx.quanEncounter.update({ where: { id: existing.id }, data: { endsAt: encounter.endsAt, startedAt: encounter.startedAt, state: "left" } });
+        }
+        await tx.quanEncounter.update({ where: { id: encounter.id }, data: { profileId: target.id, freeDay: null, state: "ended" } });
+        continue;
+      }
+    }
+    await tx.quanEncounter.update({ where: { id: encounter.id }, data: { profileId: target.id } });
+  }
   const merged = await tx.quanProfile.update({ where: { id: target.id }, data: {
     birthInput: target.birthInput ? undefined : source.birthInput ?? Prisma.DbNull,
     createdAt: source.createdAt < target.createdAt ? source.createdAt : target.createdAt,

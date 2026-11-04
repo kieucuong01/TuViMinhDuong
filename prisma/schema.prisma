@@ -315,6 +315,7 @@ model QuanOrder {
   amountVnd       Int
   minutes         Int
   chart           Json
+  readingKind     String          @default("tuvi")
   status          QuanOrderStatus @default(PENDING)
   expiresAt       DateTime
   checkedAt       DateTime?
@@ -329,6 +330,7 @@ model QuanOrder {
   refundSettledAt DateTime?
   createdAt       DateTime        @default(now())
   turns           QuanTurn[]
+  encounter       QuanEncounter?
 
   @@index([ownerId, createdAt])
   @@index([status, queuedAt])
@@ -374,6 +376,46 @@ model QuanProfile {
   reports        QuanWishReport[]
   shares         QuanShare[]
   metrics        QuanMetric[]
+  encounters     QuanEncounter[]
+}
+
+model QuanEncounter {
+  id              String      @id @default(uuid())
+  profileId       String
+  kind            String
+  tier            String      @default("free")
+  freeDay         String?
+  orderId         String?     @unique
+  state           String      @default("waiting")
+  context         Json
+  queuedAt        DateTime?
+  inviteExpiresAt DateTime?
+  startedAt       DateTime?
+  endsAt          DateTime?
+  outageSince     DateTime?
+  speakingUntil   DateTime?
+  createdAt       DateTime    @default(now())
+  profile         QuanProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  order           QuanOrder?  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  turns           QuanEncounterTurn[]
+  @@unique([profileId, freeDay])
+  @@index([state, queuedAt])
+}
+
+model QuanEncounterTurn {
+  encounterId String
+  id          String
+  kind        String
+  question    String
+  answer      String?
+  state       String    @default("pending")
+  interrupted Boolean   @default(false)
+  attempt     Int       @default(1)
+  deadlineAt  DateTime
+  createdAt   DateTime  @default(now())
+  encounter   QuanEncounter @relation(fields: [encounterId], references: [id], onDelete: Cascade)
+  @@id([encounterId, id])
+  @@index([encounterId, createdAt])
 }
 
 model QuanIdentity {

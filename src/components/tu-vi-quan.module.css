@@ -165,3 +165,27 @@
   .notice { bottom: calc(max(14px,env(safe-area-inset-bottom)) + 64px); max-width: 340px; }
 }
 @media (prefers-reduced-motion: reduce) { .page button { transition: none; } }
+
+.hostChoices { position: absolute; z-index: 2; right: max(14px,env(safe-area-inset-right)); top: 138px; width: min(370px,calc(100% - 28px)); padding: 10px; border: 1px solid var(--line); border-radius: 14px; background: #201821e8; }
+.hostChoices p { margin: 0 0 8px; color: var(--muted); font-size: .88rem; }
+.hostChoices > div { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 6px; }
+.hostChoices button { padding: 8px 6px; font-size: .92rem; }
+.ritualToolbar { position: absolute; z-index: 2; right: max(14px,env(safe-area-inset-right)); bottom: max(14px,env(safe-area-inset-bottom)); display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 6px; max-width: min(580px,calc(100% - 28px)); }
+.ritualToolbar button { background: #201821e8; font-size: .9rem; }
+.socialWrap { position: absolute; inset: 0; pointer-events: none; z-index: 3; }
+.seated .mast, .seated .location { display: none; }
+.liveGame .sessionBadge { top: 240px; }
+.liveGame .interaction { bottom: 90px; }
+@media(max-width:767px) {
+  .socialWrap { bottom: 66px; }
+  .ritualToolbar { left: 134px; max-width: none; display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .ritualToolbar button { padding: 6px; font-size: .82rem; }
+  .liveGame .interaction { bottom: 180px; }
+  .liveGame .sessionBadge { top: 250px; }
+  .hostChoices { top: 138px; }
+}
+@media(max-height:500px) and (orientation:landscape) {
+  .hostChoices { top: 76px; width: 340px; }
+  .ritualToolbar { left: auto; width: 360px; display: flex; }
+  .liveGame .sessionBadge { top: 180px; }
+}

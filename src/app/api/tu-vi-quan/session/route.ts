@@ -6,6 +6,8 @@ import { checkAuthRateLimit } from "@/lib/rate-limit";
 import { getQuanGuest, setQuanGuest } from "@/lib/tu-vi-quan-guest";
 import { quanError, quanJson, readQuanBody } from "@/lib/tu-vi-quan-http";
 import { refreshQuanPayment } from "@/lib/tu-vi-quan-payment";
+import { quanVoiceGameEnabled } from "@/lib/tu-vi-quan-encounter";
+import { quanVoiceCapabilities } from "@/lib/tu-vi-quan-voice";
 import {
   answerQuanTurn, changeQuanAdmission, checkoutQuanSession, quanTransaction,
   QuanSessionError, readQuanSession, reissueQuanRecoveryCode, restoreQuanSession,
@@ -56,11 +58,20 @@ export async function POST(request: Request) {
     }
     if (!guest) throw new QuanSessionError("Hãy nhập bí danh trước khi xem.", 401);
     if (body.action === "checkout") {
+      if (quanVoiceGameEnabled() && process.env.NODE_ENV === "production") {
+        const voice = await quanVoiceCapabilities();
+        if (!voice.stt || !voice.tts) throw new QuanSessionError("Bàn thoại đang tạm nghỉ.", 503);
+      }
       const limit = await checkAuthRateLimit("quan-checkout", request.headers, { limit: 12, windowMs: 15 * 60_000 });
       if (limit.rateLimited) throw new QuanSessionError("Bạn đã tạo nhiều đơn. Hãy đợi rồi thử lại.", 429);
-      return quanJson(await checkoutQuanSession(db, guest, body.minutes, body.chart));
+      const kind = body.readingKind;
+      if (kind !== undefined && kind !== "tuvi" && kind !== "tarot" && kind !== "iching") throw new QuanSessionError("Bàn xem không hợp lệ.", 400);
+      return quanJson(await checkoutQuanSession(db, guest, body.minutes, body.chart, quanVoiceGameEnabled() ? kind : undefined));
     }
     const { id, action } = body;
+    if (quanVoiceGameEnabled() && process.env.NODE_ENV === "production" && (action === "start" || action === "chat")) {
+      throw new QuanSessionError("Hãy vào bàn trò chuyện để dùng phiên này.", 409);
+    }
     if (typeof id !== "string" || !orderIdPattern.test(id)) throw new QuanSessionError("Không tìm thấy lượt xem.", 404);
     const owners = await resolveQuanOwners(db, guest.id, quanEcosystemEnabled() ? (await getCurrentUser())?.id : undefined);
     const order = await db.quanOrder.findFirst({ where: { id, ownerId: { in: owners } }, select: { ownerId: true } });

@@ -1,3 +1,5 @@
+import { randomUUID } from "node:crypto";
+import { moderateWish } from "../src/lib/tu-vi-quan-moderation.mjs";
 import { createServer } from "node:http";
 import { isIP } from "node:net";
 import dotenv from "dotenv";
@@ -19,6 +21,8 @@ export function createQuanPresenceServer({ secret, origins, readBoard = async ()
   const roomNames = ecosystemEnabled ? ROOM_NAMES : ROOM_NAMES.slice(0, 1);
   const allowedOrigins = new Set(origins);
   const guests = new Map();
+  const messages = roomNames.map(() => []);
+  const chatRates = new Map();
   let dirty = false;
   let board = null;
   let readingBoard = false;
@@ -33,7 +37,7 @@ export function createQuanPresenceServer({ secret, origins, readBoard = async ()
   server.maxConnections = 192;
   const ws = new WebSocketServer({
     noServer: true,
-    maxPayload: 256,
+    maxPayload: 1024,
     perMessageDeflate: false,
     handleProtocols: (protocols) => protocols.has(CHANNEL) ? CHANNEL : false,
   });
@@ -47,7 +51,7 @@ export function createQuanPresenceServer({ secret, origins, readBoard = async ()
     const room = guests.get(selfId)?.room ?? 0;
     const players = [...guests.values()].filter(presence => presence.room === room).map(({ player }) => player);
     const rooms = roomNames.map((name, id) => ({ id, name, count: [...guests.values()].filter(presence => presence.room === id).length, capacity: MAX_GUESTS }));
-    socket.send(JSON.stringify({ type: "snapshot", selfId, players, board, ...(ecosystemEnabled ? { room: rooms[room], rooms } : {}) }));
+    socket.send(JSON.stringify({ type: "snapshot", selfId, players, board, ...(ecosystemEnabled ? { room: rooms[room], rooms, messages: messages[room] } : {}) }));
   }
 
   function reject(socket, status) {
@@ -121,6 +125,23 @@ export function createQuanPresenceServer({ secret, origins, readBoard = async ()
             player.action = "idle";
             presence.actionUntil = 0;
             dirty = true;
+          } else if (ecosystemEnabled && data.type === "chat") {
+            const recent = (chatRates.get(player.id) || []).filter(at => now - at < 10_000);
+            if (recent.length >= 3 || (recent.length && now - recent.at(-1) < 2_000)) {
+              client.send(JSON.stringify({ type: "chat-error", message: "Bạn đợi một chút rồi gửi tiếp nhé." }));
+              return;
+            }
+            // Count rejected text too: moderation attempts have the same rate limit.
+            chatRates.set(player.id, [...recent, now]);
+            const verdict = typeof data.text === "string" ? moderateWish(data.text) : { ok: false };
+            if (!verdict.ok) {
+              client.send(JSON.stringify({ type: "chat-error", message: "Viết tối đa 120 ký tự, không gửi liên kết, số điện thoại hay lời xúc phạm." }));
+              return;
+            }
+            messages[presence.room] = [...messages[presence.room].filter(message => now - message.createdAt < 60_000), {
+              id: randomUUID(), playerId: player.id, alias: player.alias, text: verdict.text, createdAt: now,
+            }].slice(-20);
+            dirty = true;
           } else if (data.type === "action" && ACTIONS.has(data.action)) {
             player.action = data.action;
             presence.actionUntil = data.action === "incense" || data.action === "greet" ? now + 4_000 : 0;
@@ -136,6 +157,13 @@ export function createQuanPresenceServer({ secret, origins, readBoard = async ()
 
   const updates = setInterval(() => {
     const now = Date.now();
+    for (const [id, recent] of chatRates) {
+      if (!recent.length || now - recent.at(-1) >= 10_000) chatRates.delete(id);
+    }
+    for (let room = 0; room < messages.length; room++) {
+      const active = messages[room].filter(message => now - message.createdAt < 60_000);
+      if (active.length !== messages[room].length) { messages[room] = active; dirty = true; }
+    }
     for (const presence of guests.values()) {
       if (presence.actionUntil && presence.actionUntil <= now) {
         presence.player.action = "idle";

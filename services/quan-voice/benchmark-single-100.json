@@ -1,0 +1,91 @@
+{
+  "runs": [
+    {
+      "simultaneous_requests": 1,
+      "results": [
+        {
+          "index": 10,
+          "text": "Thái Dương, Thái Âm, Thiên Cơ và Cự Môn là những tên sao trong lá số tử vi.",
+          "ttfa_s": 0.7253854852169752,
+          "elapsed_s": 3.616735927760601,
+          "audio_s": 4.4,
+          "rtf": 0.8219854381274092,
+          "pcm_bytes": 211200,
+          "min_playback_lead_s": 0.17054166666666667
+        }
+      ]
+    },
+    {
+      "simultaneous_requests": 1,
+      "results": [
+        {
+          "index": 20,
+          "text": "Mình cùng nhìn cung Phu Thê và cung Tài Bạch. Bạn đang băn khoăn điều gì?",
+          "ttfa_s": 0.7070455029606819,
+          "elapsed_s": 3.117189459502697,
+          "audio_s": 3.6,
+          "rtf": 0.8658859609729713,
+          "pcm_bytes": 172800,
+          "min_playback_lead_s": 0.17054166666666667
+        }
+      ]
+    },
+    {
+      "simultaneous_requests": 1,
+      "results": [
+        {
+          "index": 30,
+          "text": "Cung Mệnh có sao Tử Vi và Thiên Phủ. Bạn muốn hỏi về công việc hay gia đình?",
+          "ttfa_s": 0.7298897858709097,
+          "elapsed_s": 3.146470721811056,
+          "audio_s": 3.76,
+          "rtf": 0.8368273196306001,
+          "pcm_bytes": 180480,
+          "min_playback_lead_s": 0.17054166666666667
+        }
+      ]
+    }
+  ],
+  "host_samples": [
+    {
+      "at": "2026-11-04T12:02:29.144561+00:00",
+      "web_s": 0.10007551312446594,
+      "web_status": 200,
+      "available_mib": 739,
+      "unit": "MainPID=2771526\nMemoryCurrent=1467936768\nMemoryPeak=1468006400\nActiveState=active",
+      "process_memory": "VmHWM:\t 1398288 kB\nVmRSS:\t 1398288 kB"
+    },
+    {
+      "at": "2026-11-04T12:02:31.210322+00:00",
+      "web_s": 0.053873587399721146,
+      "web_status": 200,
+      "available_mib": 736,
+      "unit": "MainPID=2771526\nMemoryCurrent=1467813888\nMemoryPeak=1468006400\nActiveState=active",
+      "process_memory": "VmHWM:\t 1398416 kB\nVmRSS:\t 1398416 kB"
+    },
+    {
+      "at": "2026-11-04T12:02:33.271355+00:00",
+      "web_s": 0.050507476553320885,
+      "web_status": 200,
+      "available_mib": 739,
+      "unit": "MainPID=2771526\nMemoryCurrent=1467834368\nMemoryPeak=1468006400\nActiveState=active",
+      "process_memory": "VmHWM:\t 1398544 kB\nVmRSS:\t 1398544 kB"
+    },
+    {
+      "at": "2026-11-04T12:02:35.400985+00:00",
+      "web_s": 0.09540185332298279,
+      "web_status": 200,
+      "available_mib": 738,
+      "unit": "MainPID=2771526\nMemoryCurrent=1467838464\nMemoryPeak=1468006400\nActiveState=active",
+      "process_memory": "VmHWM:\t 1398544 kB\nVmRSS:\t 1398544 kB"
+    },
+    {
+      "at": "2026-11-04T12:02:37.465178+00:00",
+      "web_s": 0.05082821287214756,
+      "web_status": 200,
+      "available_mib": 742,
+      "unit": "MainPID=2771526\nMemoryCurrent=1467928576\nMemoryPeak=1468006400\nActiveState=active",
+      "process_memory": "VmHWM:\t 1399696 kB\nVmRSS:\t 1399696 kB"
+    }
+  ]
+}
