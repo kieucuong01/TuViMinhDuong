@@ -163,14 +163,15 @@ async function sessionSnapshot(tx: Tx, ownerId: string, id: string, now: Date) {
 
 export function readQuanChart(value: unknown) {
   if (!value || typeof value !== "object") throw new QuanSessionError("Hãy nhập thông tin lập lá số.", 400);
-  const { fullName, gender, calendarType, day, month, year, birthHour } = value as Record<string, unknown>;
+  const { fullName, gender, calendarType, day, month, year, birthHour, birthMinute = 0 } = value as Record<string, unknown>;
   const viewYear = Number(new Intl.DateTimeFormat("en", { year: "numeric", timeZone: "Asia/Ho_Chi_Minh" }).format());
   if (typeof fullName !== "string" || !fullName.trim() || fullName.length > 100 || /[\u0000-\u001f\u007f]/u.test(fullName) ||
       (gender !== "male" && gender !== "female") || (calendarType !== "solar" && calendarType !== "lunar") ||
       typeof day !== "number" || !Number.isInteger(day) || day < 1 || day > 31 ||
       typeof month !== "number" || !Number.isInteger(month) || month < 1 || month > 12 ||
       typeof year !== "number" || !Number.isInteger(year) || year < 1900 || year > viewYear ||
-      typeof birthHour !== "number" || !Number.isInteger(birthHour) || birthHour < 0 || birthHour > 23) {
+      typeof birthHour !== "number" || !Number.isInteger(birthHour) || birthHour < 0 || birthHour > 23 ||
+      typeof birthMinute !== "number" || !Number.isInteger(birthMinute) || birthMinute < 0 || birthMinute > 59) {
     throw new QuanSessionError("Kiểm tra lại tên, ngày sinh và giờ sinh.", 400);
   }
   const solar = calendarType === "lunar" ? lunarToSolar(day, month, year, false, 7) : { day, month, year };
@@ -182,7 +183,7 @@ export function readQuanChart(value: unknown) {
     throw new QuanSessionError("Ngày sinh không hợp lệ.", 400);
   }
   return generateTuViChart({
-    fullName: fullName.trim(), gender, calendarType, day, month, year, birthHour, viewYear, timezone: "Asia/Ho_Chi_Minh",
+    fullName: fullName.trim(), gender, calendarType, day, month, year, birthHour, birthMinute, viewYear, timezone: "Asia/Ho_Chi_Minh",
   });
 }
 

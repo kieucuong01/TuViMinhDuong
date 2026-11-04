@@ -1,7 +1,7 @@
 "use client";
 
 import { Sparkles, X } from "lucide-react";
-import type { ToggleEvent } from "react";
+import { useEffect, useRef, type ToggleEvent } from "react";
 import { checkoutFullReadingAction, requestReadingAction } from "@/app/actions";
 import { LoadingSubmitButton } from "@/components/loading-submit-button";
 import { premiumReadingModalId } from "@/components/premium-reading-target";
@@ -13,6 +13,7 @@ type PremiumReadingCtaProps = {
   fullPriceCoins: number;
   coinBalance: number;
   requiresCheckoutEmail: boolean;
+  openQuanOffer?: boolean;
 };
 
 function cashLabel(priceCoins: number) {
@@ -33,13 +34,19 @@ export function PremiumReadingCta({
   fullPriceCoins,
   coinBalance,
   requiresCheckoutEmail,
+  openQuanOffer = false,
 }: PremiumReadingCtaProps) {
+  const popover = useRef<HTMLElement>(null);
+  useEffect(() => {
+    if (openQuanOffer && popover.current && !popover.current.matches(":popover-open")) popover.current.showPopover?.();
+  }, [openQuanOffer]);
   if (hasAdvancedReading) return null;
   const modalId = premiumReadingModalId(chartId);
   const hasEnoughCoins = coinBalance >= fullPriceCoins;
 
   return (
     <section
+      ref={popover}
       id={modalId}
       className="premium-confirm-modal premium-confirm-popover"
       aria-labelledby="premium-confirm-title"
@@ -52,12 +59,12 @@ export function PremiumReadingCta({
       </button>
       <span className="premium-confirm-icon" aria-hidden="true"><Sparkles size={26} /></span>
       <p className="eyebrow">Bản FULL 9 chương cá nhân hóa</p>
-      <h2 id="premium-confirm-title">{requiresCheckoutEmail ? "Nhập email để thanh toán" : "Chọn cách thanh toán"}</h2>
+      <h2 id="premium-confirm-title">{requiresCheckoutEmail ? "Nhập email để thanh toán" : openQuanOffer ? "Thanh toán qua PayOS" : "Chọn cách thanh toán"}</h2>
       <p>Lá số của <strong>{fullName}</strong> sẽ được lưu để bạn đọc lại không mất thêm phí.</p>
 
       <div className="premium-confirm-price">
         <span>Giá trọn gói</span>
-        <strong>{cashLabel(fullPriceCoins)} ({fullPriceCoins} xu)</strong>
+        <strong>{cashLabel(fullPriceCoins)}{!openQuanOffer && ` (${fullPriceCoins} xu)`}</strong>
       </div>
 
       <form
@@ -70,6 +77,7 @@ export function PremiumReadingCta({
         data-loading-message="Đang mở PayOS..."
       >
         <input type="hidden" name="chartId" value={chartId} />
+        {openQuanOffer && <input type="hidden" name="payosOnly" value="1" />}
         {requiresCheckoutEmail ? (
           <label className="premium-confirm-email">
             <span>Email đối soát giao dịch</span>
@@ -88,7 +96,7 @@ export function PremiumReadingCta({
         </LoadingSubmitButton>
       </form>
 
-      {!requiresCheckoutEmail && hasEnoughCoins ? (
+      {!openQuanOffer && !requiresCheckoutEmail && hasEnoughCoins ? (
         <form
           action={requestReadingAction}
           className="premium-confirm-actions premium-confirm-coin-action"

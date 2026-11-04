@@ -235,6 +235,7 @@ export async function createChartAction(formData: FormData) {
   const input = parseChartActionInput(formData);
   const adSource = safeAdSource(formData.get("adSource"));
   const experience = safeChartExperience(formData.get("chartExperience"));
+  const quanOffer = formData.get("readingOffer") === "quan-payos";
   if (experience === "annual-2026") input.viewYear = 2026;
   const paths = chartCreationPaths(experience);
   let result: { user: SessionUser | null; chart: Awaited<ReturnType<typeof saveChart>>; metadata: ChartCreationMetadata };
@@ -273,7 +274,7 @@ export async function createChartAction(formData: FormData) {
     const resultBand = experience === "wealth" ? "wealth" : experience === "annual-2026" ? "annual_2026" : "chart";
     void recordChartResultFunnelEvent(result.chart.id, result.user?.id, result.metadata, resultBand);
   });
-  redirect(withQueryParams(chartCreationPaths(experience, result.chart.id).success, { created: "1", adSource }));
+  redirect(withQueryParams(chartCreationPaths(experience, result.chart.id).success, { created: "1", adSource, offer: quanOffer ? "quan-payos" : undefined }));
 }
 
 export async function quickReadingCheckoutAction(formData: FormData) {
@@ -365,7 +366,7 @@ export async function checkoutFullReadingAction(formData: FormData) {
   if (!/^[a-zA-Z0-9_-]{1,100}$/.test(chartId)) redirect("/la-so?checkout=invalid");
 
   const [currentUser, operationSettings] = await Promise.all([getCurrentUser(), getOperationSettings()]);
-  if (!operationSettings.paymentsEnabled || !operationSettings.paidReadingsEnabled) {
+  if (!operationSettings.paymentsEnabled || !operationSettings.paidReadingsEnabled || (formData.get("payosOnly") === "1" && !isPayOSEnabled())) {
     redirect(withQueryParams(nextPath, { checkout: "disabled" }));
   }
 

@@ -131,7 +131,7 @@ export default async function ChartPage({
   searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ created?: string; reading?: string; view?: string; checkout?: string; status?: string }>;
+  searchParams: Promise<{ created?: string; reading?: string; view?: string; checkout?: string; status?: string; offer?: string }>;
 }) {
   const { id } = await params;
   const query = await searchParams;
@@ -290,7 +290,7 @@ export default async function ChartPage({
               canCheckoutFull={canCheckoutFull}
             />
             {canReadFullOverview && featurePrices ? <ReadingTabs chartId={id} chart={record.chart} featurePrices={featurePrices} /> : null}
-            {canCheckoutFull && featurePrices ? <PremiumReadingCta chartId={id} fullName={record.chart.input.fullName} hasAdvancedReading={hasAdvancedReading} fullPriceCoins={featurePrices.FULL.priceCoins} coinBalance={coinBalance} requiresCheckoutEmail={requiresCheckoutEmail} /> : null}
+            {canCheckoutFull && featurePrices ? <PremiumReadingCta chartId={id} fullName={record.chart.input.fullName} hasAdvancedReading={hasAdvancedReading} fullPriceCoins={featurePrices.FULL.priceCoins} coinBalance={coinBalance} requiresCheckoutEmail={requiresCheckoutEmail} openQuanOffer={query.offer === "quan-payos"} /> : null}
           </>
         ) : null}
         </>

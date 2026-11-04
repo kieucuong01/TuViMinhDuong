@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import TuViQuan from "@/components/tu-vi-quan";
 import { getQuanGuest } from "@/lib/tu-vi-quan-guest";
 import { quanEcosystemEnabled } from "@/lib/tu-vi-quan-ecosystem";
+import { getFeaturePrice, getOperationSettings } from "@/lib/data/settings";
+import { isPayOSEnabled } from "@/lib/env";
 
 export const metadata: Metadata = {
   title: "Tử Vi Quán",
@@ -13,8 +15,12 @@ export const metadata: Metadata = {
 
 export default async function TuViQuanPage() {
   const guest = await getQuanGuest();
-  const qr = process.env.TU_VI_QUAN_SUPPORT_QR?.trim();
+  const ecosystemEnabled = quanEcosystemEnabled();
+  const settings = ecosystemEnabled && isPayOSEnabled() ? await getOperationSettings() : null;
+  const readingPrice = settings?.paymentsEnabled && settings.paidReadingsEnabled ? (await getFeaturePrice("FULL")).priceCoins * 1000 : null;
+  const bankImage = Boolean(process.env.TU_VI_QUAN_SUPPORT_QR_FILE?.trim());
+  const qr = bankImage ? "/api/tu-vi-quan/support-qr" : process.env.TU_VI_QUAN_SUPPORT_QR?.trim();
   const recipient = process.env.TU_VI_QUAN_SUPPORT_RECIPIENT?.trim();
-  const support = qr && recipient && (/^\/(?!\/)/.test(qr) || qr.startsWith("https://")) ? { qr, recipient } : null;
-  return <TuViQuan initialAlias={guest?.alias || ""} support={support} ecosystemEnabled={quanEcosystemEnabled()} paymentsEnabled={process.env.TU_VI_QUAN_PAYMENTS_ENABLED === "true"} />;
+  const support = qr && recipient && (/^\/(?!\/)/.test(qr) || qr.startsWith("https://")) ? { qr, recipient, bankImage } : null;
+  return <TuViQuan initialAlias={guest?.alias || ""} support={support} ecosystemEnabled={ecosystemEnabled} readingPrice={readingPrice} paymentsEnabled={process.env.TU_VI_QUAN_PAYMENTS_ENABLED === "true"} />;
 }

@@ -110,6 +110,7 @@
 .package:has(input:checked) { background: #53382f; border-color: #daaa75; }
 .payment, .recovery { display: grid; justify-items: start; gap: 10px; margin-bottom: 14px; }
 .payment img { border: 1px solid var(--line); border-radius: 10px; background: white; max-width: 100%; height: auto; }
+.payment img.bankQr { width: min(100%, 360px); aspect-ratio: 1; object-fit: cover; object-position: 50% 40%; }
 .recovery { border: 1px dashed var(--line); padding: 12px; overflow-wrap: anywhere; }
 .clock { font-size: 1.15rem; font-variant-numeric: tabular-nums; font-weight: 750; }
 .messages { max-height: 38dvh; overflow: auto; overflow-wrap: anywhere; padding: 8px 0; }

@@ -49,8 +49,8 @@ async function jsonRequest<T>(path: string, body?: object): Promise<T> {
   return data;
 }
 
-export default function TuViQuan({ initialAlias, support, paymentsEnabled, ecosystemEnabled = false }: {
-  initialAlias: string; support: { qr: string; recipient: string } | null; paymentsEnabled: boolean; ecosystemEnabled?: boolean;
+export default function TuViQuan({ initialAlias, support, paymentsEnabled, ecosystemEnabled = false, readingPrice = null }: {
+  initialAlias: string; support: { qr: string; recipient: string; bankImage?: boolean } | null; paymentsEnabled: boolean; ecosystemEnabled?: boolean; readingPrice?: number | null;
 }) {
   const hydrated = useSyncExternalStore(subscribeToHydration, hydratedSnapshot, serverSnapshot);
   const [experience, setExperience] = useState<QuanExperience>("courtyard");
@@ -410,7 +410,7 @@ export default function TuViQuan({ initialAlias, support, paymentsEnabled, ecosy
         </section>
       ) : (
         <>
-          {ecosystemEnabled && <QuanEcosystem alias={alias} suspended={Boolean(panel) || help} onOpen={openEcosystem} onSnapshot={receiveEcosystem} preferences={preferences} onPreferences={setPreferences} lite={lite} onLite={setLite} onRitual={doAction} onExperience={setExperience} onLegacy={openPanel} />}
+          {ecosystemEnabled && <QuanEcosystem readingPrice={readingPrice} alias={alias} suspended={Boolean(panel) || help} onOpen={openEcosystem} onSnapshot={receiveEcosystem} preferences={preferences} onPreferences={setPreferences} lite={lite} onLite={setLite} onRitual={doAction} onExperience={setExperience} onLegacy={openPanel} />}
           {!ecosystemEnabled && <nav className={styles.actionDock} aria-label="Hoạt động trong quán" inert={Boolean(panel)}>
             <button className={styles.primary} onClick={() => openPanel("session")}><BookOpen size={21} aria-hidden="true" />Xem lá số</button>
             <button onClick={() => openPanel("incense")}><Flame size={21} aria-hidden="true" />Thắp hương</button>
@@ -438,7 +438,7 @@ export default function TuViQuan({ initialAlias, support, paymentsEnabled, ecosy
           </div>}
           {panel && <div className={styles.scrim}><section className={styles.panel} role="dialog" aria-modal="true" aria-labelledby="quan-panel-title">
             <div className={styles.panelHead}><h2 id="quan-panel-title" ref={panelHeading} tabIndex={-1}>{panel === "session" ? "Bàn luận lá số" : panel === "support" ? "Ủng hộ Tử Vi Quán" : panel === "incense" ? "Một nén hương an lành" : panel === "map" ? "Dạo một vòng quanh quán" : "Khôi phục lượt xem"}</h2><button className={styles.icon} aria-label="Đóng" onClick={() => openPanel(null)}><X size={21} /></button></div>
-            {panel === "support" && <div className={styles.payment}>{support ? <><p>Ủng hộ tự nguyện để duy trì Tử Vi Quán. Không bắt buộc để vào sân, thắp hương hay ngồi thiền.</p><Image src={support.qr} alt="QR ủng hộ vận hành Tử Vi Quán" width={250} height={250} unoptimized /><p>Người nhận: <strong>{support.recipient}</strong></p></> : <><p><strong>Quán chưa mở nhận ủng hộ.</strong></p><p>Bạn vẫn có thể dạo sân, thắp hương và ngồi thiền miễn phí.</p></>}<button onClick={() => navigate(stations.find((station) => station.id === "support")!)}><Navigation size={18} aria-hidden="true" /> Đi đến hòm công đức</button></div>}
+            {panel === "support" && <div className={styles.payment}>{support ? <><p>Ủng hộ tự nguyện để duy trì Tử Vi Quán. Bạn tự chọn số tiền khi chuyển khoản.</p><Image className={support.bankImage ? styles.bankQr : undefined} src={support.qr} alt="Mã QR ngân hàng để ủng hộ Tử Vi Quán" width={support.bankImage ? 320 : 250} height={support.bankImage ? 692 : 250} unoptimized /><p>Người nhận <strong>{support.recipient}</strong></p><a className={styles.primary} href={support.qr} target="_blank" rel="noreferrer">Mở hoặc lưu ảnh QR</a></> : <><p><strong>Quán chưa mở nhận ủng hộ.</strong></p><p>Bạn vẫn có thể dạo sân, thắp hương và ngồi thiền miễn phí.</p></>}<button onClick={() => navigate(stations.find((station) => station.id === "support")!)}><Navigation size={18} aria-hidden="true" /> Đi đến hòm công đức</button></div>}
             {panel === "incense" && <div className={styles.incenseActions}><p>Dành một khoảng lặng, gửi gắm một lời nguyện bình an. Thắp hương hoàn toàn miễn phí.</p><div className={styles.packages}>{[1, 3].map((count) => <button className={count === 1 ? styles.primary : undefined} key={count} onClick={() => { openPanel(null); doAction("incense"); setNotice(`Bạn đã thắp ${count === 1 ? "một" : "ba"} nén hương. Chúc bạn một ngày bình an.`); }}><Flame size={20} aria-hidden="true" />Thắp {count} nén</button>)}</div><button onClick={() => navigate(stations.find((station) => station.id === "incense")!)}><Navigation size={18} aria-hidden="true" /> Đi đến bàn hương</button></div>}
             {panel === "map" && <><p>Chọn một nơi để nhân vật tự đi đến. Bạn có thể đổi hướng bất cứ lúc nào.</p><div className={styles.largeMap}><CourtyardMap position={position} /><span><i /> Vị trí của bạn</span></div><ol className={styles.destinationList}>{stations.map((station, index) => <li key={station.id}><span className={styles.destinationNumber}>{index + 1}</span><div><strong>{station.label}</strong><small>{station.description}</small></div><button aria-label={`Đi tới ${station.label}`} onClick={() => navigate(station)}>Đi tới đây</button></li>)}</ol></>}
             {panel === "restore" && <form onSubmit={(event) => {
