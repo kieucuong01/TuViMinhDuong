@@ -66,7 +66,14 @@ export async function POST(request: Request) {
       if (limit.rateLimited) throw new QuanSessionError("Bạn đã tạo nhiều đơn. Hãy đợi rồi thử lại.", 429);
       const kind = body.readingKind;
       if (kind !== undefined && kind !== "tuvi" && kind !== "tarot" && kind !== "iching") throw new QuanSessionError("Bàn xem không hợp lệ.", 400);
-      return quanJson(await checkoutQuanSession(db, guest, body.minutes, body.chart, quanVoiceGameEnabled() ? kind : undefined));
+      let chart = body.chart;
+      if (quanVoiceGameEnabled() && (kind === undefined || kind === "tuvi")) {
+        const owners = await resolveQuanOwners(db, guest.id, (await getCurrentUser())?.id);
+        const identity = await db.quanIdentity.findFirst({ where: { guestId: { in: owners } }, select: { profile: { select: { birthInput: true } } } });
+        chart = identity?.profile.birthInput;
+        if (!chart) throw new QuanSessionError("Con hãy gặp Thầy lập lá số trước khi mua thêm phút.", 400);
+      }
+      return quanJson(await checkoutQuanSession(db, guest, body.minutes, chart, quanVoiceGameEnabled() ? kind : undefined));
     }
     const { id, action } = body;
     if (quanVoiceGameEnabled() && process.env.NODE_ENV === "production" && (action === "start" || action === "chat")) {

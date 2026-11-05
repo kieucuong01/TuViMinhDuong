@@ -11,7 +11,7 @@ import { APP_NAME, APP_URL } from "@/lib/env";
 import { getOperationSettings } from "@/lib/data";
 import "./globals.css";
 
-const defaultOgImage = `/api/og?title=${encodeURIComponent("Tử Vi Quán 3D")}&subtitle=${encodeURIComponent("Gặp thầy Tử Vi · Tarot · Kinh Dịch · Tu viện")}`;
+const defaultOgImage = `/api/og?title=${encodeURIComponent("Tử Vi Quán 3D")}&subtitle=${encodeURIComponent("Gặp thầy Tử Vi · Hai viện · Tám bàn Thầy · Tu viện")}`;
 
 export const metadata: Metadata = {
   metadataBase: new URL(APP_URL),
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
     "Bước vào Tử Vi Quán 3D, gặp thầy để trò chuyện riêng và thực hành những nghi thức an nhiên.",
   openGraph: {
     title: `${APP_NAME} - Tử Vi Quán 3D`,
-    description: "Trò chuyện với thầy Tử Vi, Tarot, Kinh Dịch và ghé Tu viện An Nhiên.",
+    description: "Trò chuyện với tám Thầy Tử Vi và ghé Tu viện An Nhiên.",
     url: APP_URL,
     siteName: APP_NAME,
     images: [defaultOgImage],
@@ -33,7 +33,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: `${APP_NAME} - Tử Vi Quán 3D`,
-    description: "Trò chuyện với thầy Tử Vi, Tarot, Kinh Dịch và ghé Tu viện An Nhiên.",
+    description: "Trò chuyện với tám Thầy Tử Vi và ghé Tu viện An Nhiên.",
     images: [defaultOgImage],
   },
   alternates: {

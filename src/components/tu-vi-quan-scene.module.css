@@ -13,3 +13,5 @@
 .publicSpeech { position: absolute; z-index: 1; top: 80px; right: 16px; max-width: min(340px, calc(100% - 32px)); color: #fff0cb; pointer-events: none; }
 .publicSpeech p { margin: 6px 0; padding: 8px 12px; border-radius: 12px; background: #30251de8; }
 @media (max-width:767px), (pointer:coarse) and (max-height:600px) { .publicSpeech { display:none; } }
+
+.moveHint{display:none;pointer-events:none}@media(pointer:coarse),(max-width:767px){.moveHint{position:absolute;left:18px;bottom:145px;display:flex;flex-direction:column;align-items:center;gap:6px;color:#fff0cb;font-size:12px;text-shadow:0 1px 3px #000;pointer-events:none}.moveHint span{display:grid;place-items:center;width:70px;height:70px;border:2px solid #f6d4a980;border-radius:50%;background:#231a244f;font-size:38px}}

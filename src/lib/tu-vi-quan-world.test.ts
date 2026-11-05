@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { QUAN_BOUNDS, QUAN_SPAWN, QUAN_STATIONS, QUAN_MONASTERY_SEATS, QUAN_MONASTERY_ENTRY, findQuanPath, findQuanMonasteryPath, isQuanWalkable, isQuanMonasteryWalkable, quanGroundHeight, getQuanZone, quanMonasteryToWorld, quanWorldToMonastery } from "./tu-vi-quan-world.mjs";
+import { QUAN_TEACHER_DESKS, QUAN_BOUNDS, QUAN_SPAWN, QUAN_STATIONS, QUAN_MONASTERY_SEATS, QUAN_MONASTERY_ENTRY, findQuanPath, findQuanMonasteryPath, isQuanWalkable, isQuanMonasteryWalkable, quanGroundHeight, getQuanZone, quanMonasteryToWorld, quanWorldToMonastery } from "./tu-vi-quan-world.mjs";
 
 describe("expanded Tử Vi Quán world", () => {
   it("keeps every station and spawn in walkable terrain", () => {
@@ -57,10 +57,19 @@ describe("expanded Tử Vi Quán world", () => {
     expect(quanGroundHeight(0, -18)).toBeCloseTo(1.2);
     expect(quanGroundHeight(10, 0)).toBe(0);
   });
+  it("has eight accessible teacher chairs split equally between two halls", () => {
+    expect(QUAN_TEACHER_DESKS).toHaveLength(8);
+    expect(QUAN_TEACHER_DESKS.filter(seat => seat.x < 0)).toHaveLength(4);
+    for (const seat of QUAN_TEACHER_DESKS) {
+      expect(getQuanZone(seat.x, seat.z)).toBe("tuvi");
+      expect(findQuanPath(QUAN_SPAWN, seat).length).toBeGreaterThan(0);
+    }
+    expect(QUAN_STATIONS.some(item => /Tarot|Kinh Dịch/.test(item.label))).toBe(false);
+  });
   it("walks directly through every open doorway and identifies the activity zone", () => {
     for (const [zone, point] of [
       ["monastery", { x: 0, z: -22 }], ["tuvi", { x: -36, z: -9.8 }],
-      ["tarot", { x: -26, z: 16.6 }], ["iching", { x: 28, z: 2.2 }],
+      ["tuvi", { x: 34, z: -9.8 }],
     ] as const) {
       expect(getQuanZone(point.x, point.z)).toBe(zone);
       expect(findQuanPath(QUAN_SPAWN, point).length).toBeGreaterThan(0);

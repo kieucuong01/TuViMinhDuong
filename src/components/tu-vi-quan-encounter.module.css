@@ -6,3 +6,5 @@
 .birth select{font:inherit;min-height:48px;border-radius:12px;border:1px solid #a98c58;background:#25201b;color:#fff7df}
 .birth{max-height:min(38dvh,360px);overflow:auto;padding:4px}
 @media(max-height:480px){.hud{gap:4px}.caption{padding:6px 12px}.hud details{padding-block:2px}.birth{max-height:28dvh}}
+
+.birth{max-height:none;overflow:visible}.birth>label:first-child,.birth>button,.dateRow{grid-column:1/-1}.dateRow{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;border:0;padding:0;margin:0}.dateRow legend{padding:0;margin-bottom:4px}.birth label{display:flex;flex-direction:column;gap:4px}.birth button{position:sticky;bottom:0}.hud details[open]{max-height:60dvh;overflow:auto;overscroll-behavior:contain}.hud:has(.birth) .caption{padding:8px 12px}.hud:has(.birth) .caption p{max-height:12dvh;overflow:auto}@media(max-height:480px){.hud details[open]{max-height:45dvh}}

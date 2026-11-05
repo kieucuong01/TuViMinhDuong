@@ -1,4 +1,5 @@
-export const QUAN_BOUNDS = { minX: -56, maxX: 40, minZ: -42, maxZ: 34 };
+export const QUAN_BOUNDS = { minX: -56, maxX: 56, minZ: -42, maxZ: 34 };
+export const QUAN_TEACHER_DESKS = [-34, 34].flatMap((center, wing) => [-8.25, -2.75, 2.75, 8.25].map((offset, index) => ({ desk: wing * 4 + index + 1, x: center + offset, z: -9.95 })));
 export const QUAN_SPAWN = { x: 0, z: 22 };
 export const QUAN_MONASTERY_SEATS = Array.from({ length: 28 }, (_, index) => ({ index, x: -9 + index % 7 * 3, z: -6 + Math.floor(index / 7) * 3.5 }));
 export const QUAN_MONASTERY_ENTRY = { x: 0, z: 10 };
@@ -11,9 +12,7 @@ export function quanWorldToMonastery(/** @type {{x:number,z:number}} */ point) {
 }
 export function getQuanZone(/** @type {number} */ x, /** @type {number} */ z) {
   if (Math.abs(x) <= 15.5 && z >= -38 && z <= -17) return "monastery";
-  if (x >= -48.5 && x <= -23.5 && z >= -18.5 && z <= -9.4) return "tuvi";
-  if (x >= -31 && x <= -21 && z >= 12.5 && z <= 17.5) return "tarot";
-  if (x >= 24 && x <= 32 && z >= -2.6 && z <= 3.4) return "iching";
+  if (Math.abs(Math.abs(x) - 34) <= 12.5 && z >= -18.5 && z <= -9.4) return "tuvi";
   return null;
 }
 export function isQuanMonasteryWalkable(/** @type {number} */ x, /** @type {number} */ z) {
@@ -24,25 +23,25 @@ export function quanGroundHeight(/** @type {number} */ x, /** @type {number} */ 
   if (Math.abs(x) <= 6.25 && z >= -17 && z < -13) return Math.min(1.2, Math.ceil((-z - 13) / 0.8) * 0.24);
   const zone = getQuanZone(x, z);
   if (zone === "tuvi") return .4;
-  if (zone === "tarot" || zone === "iching") return .31;
   return 0;
 }
 export const QUAN_STATIONS = [
-  { id: "teacher", label: "Tử Vi Quán", x: -36, z: -9.8, description: "Gặp ba Thầy Tử Vi, nói hoặc nhập thông tin lập lá số" },
+  { id: "teacher", label: "Tử Vi Quán · Tây viện", x: -34, z: -9.8, description: "Gặp bốn Thầy Tử Vi, nói hoặc nhập thông tin lập lá số" },
   { id: "incense", label: "Bàn thờ Thần Tài", x: -18, z: 26.5, description: "Thắp hương bên vườn trúc, xin lộc đầu ngày" },
   { id: "monastery", label: "Tu viện An Nhiên", x: 0, z: -18, description: "Lên bậc thang, vào điện và đi đến đệm trống để ngồi" },
-  { id: "iching", label: "Kinh Dịch Quán", x: 28, z: 2.2, description: "Gieo quẻ và trò chuyện cùng Thầy Dịch" },
+  { id: "teacher-east", label: "Tử Vi Quán · Đông viện", x: 34, z: -9.8, description: "Bốn bàn Thầy Tử Vi bên phải Tu viện" },
   { id: "support", label: "Hòm công đức", x: 4, z: -16, description: "Ủng hộ tự nguyện bên lối lên Tu viện" },
-  { id: "tea", label: "Tarot Quán", x: -26, z: 16.6, description: "Trải bài và trò chuyện cùng Cô Tarot" },
   { id: "lotus", label: "Vườn hồ sen", x: 10, z: 19, description: "Ngắm hồ sen và đèn hoa đăng" },
   { id: "ranking", label: "Bảng vàng công đức", x: -10, z: -2, description: "Xem năm khách có nhiều Điểm An Nhiên" },
   { id: "calligraphy", label: "Xin chữ", x: -14, z: 14, description: "Nhận một chữ đầu ngày hoặc một câu vui" },
 ];
 export const QUAN_BLOCKS = [
-  { minX: -49, maxX: -23, minZ: -19, maxZ: -18.6 },
-  { minX: -49, maxX: -48.6, minZ: -19, maxZ: -9.7 },
-  { minX: -23.4, maxX: -23, minZ: -19, maxZ: -9.7 },
-  ...[-41.5, -36, -30.5].map(x => ({ minX: x - 1.55, maxX: x + 1.55, minZ: -12.125, maxZ: -10.875 })),
+  ...[-34, 34].flatMap(center => [
+    { minX: center - 13, maxX: center + 13, minZ: -19, maxZ: -18.6 },
+    { minX: center - 13, maxX: center - 12.6, minZ: -19, maxZ: -9.7 },
+    { minX: center + 12.6, maxX: center + 13, minZ: -19, maxZ: -9.7 },
+  ]),
+  ...QUAN_TEACHER_DESKS.map(({x}) => ({ minX: x - 1.55, maxX: x + 1.55, minZ: -12.125, maxZ: -10.875 })),
   { minX: -17, maxX: 17, minZ: -40, maxZ: -38 },
   { minX: -17, maxX: -15.5, minZ: -39, maxZ: -17.1 },
   { minX: 15.5, maxX: 17, minZ: -39, maxZ: -17.1 },
@@ -50,8 +49,6 @@ export const QUAN_BLOCKS = [
   { minX: -19.9, maxX: -16.1, minZ: 21.5, maxZ: 24.5 },
   { minX: -13, maxX: -7, minZ: -6.8, maxZ: -5.8 },
   { minX: 3, maxX: 5, minZ: -18.4, maxZ: -17.1 },
-  { minX: -27.7, maxX: -24.3, minZ: 14.45, maxZ: 15.55 },
-  { minX: 26.65, maxX: 29.35, minZ: -.35, maxZ: 1.25 },
 ];
 export const QUAN_POND = { x: 20, z: 18, radiusX: 7, radiusZ: 9 };
 

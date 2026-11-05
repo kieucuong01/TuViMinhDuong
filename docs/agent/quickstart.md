@@ -71,3 +71,5 @@ Before final:
 3. For UI, verify mobile and desktop behavior when practical.
 4. For payment/auth/SEO/indexing, state exactly what was and was not verified.
 5. If docs, routes, payment rules, env, or agent workflow changed, update `docs/agent/*`.
+
+- Courtyard: central monastery with two Tu Vi halls (west/east), four visual teacher desks each. Tarot/IChing entrances removed; historical data/APIs retained. Voice checkout reads the owned saved birth profile; conversation history follows the profile across free/paid sessions.

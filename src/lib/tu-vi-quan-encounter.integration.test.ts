@@ -142,7 +142,7 @@ describe.skipIf(!db)("Tử Vi Quán voice seats in PostgreSQL", () => {
       expect(done.encounter?.context.chartMissing).toBeUndefined();
       expect(done.encounter?.context.birthDraft).toBeUndefined();
       const overview = done.encounter?.messages.at(-1);
-      expect(overview).toMatchObject({ id: "chart-opening", answer: expect.stringContaining("Bạn muốn thầy nói thêm") });
+      expect(overview).toMatchObject({ id: "chart-opening", answer: expect.stringContaining("Con muốn Thầy nói thêm") });
       const speech = await getEncounterSpeech(db!, guest, id, "chart-opening");
       expect(speech.text).toEqual(overview?.answer);
       await finishEncounterSpeech(db!, guest, id, { failed: false, aborted: true }, speech.speakingUntil);
@@ -164,6 +164,28 @@ describe.skipIf(!db)("Tử Vi Quán voice seats in PostgreSQL", () => {
     } finally {
       await act(a, "leave", id);
     }
+  });
+
+  it("keeps the owned chart and prior discussion when free time becomes paid", async () => {
+    const a = player(), stranger = player();
+    const first = (await begin(a)).encounter!.id;
+    await act(a, "start", first);
+    await answerEncounter(db!, a, { id: first, turnId: randomUUID(), question: "Tôi đang làm nghề gốm, xin xem công việc." });
+    await act(a, "leave", first);
+    const order = await db!.quanOrder.create({ data: {
+      ownerId: a.guest.id, alias: a.guest.alias, chart: {}, readingKind: "tuvi", amountVnd: 100000,
+      minutes: 15, orderCode: BigInt(Date.now()), recoveryDigest: randomUUID(), expiresAt: new Date(), status: "PAID", paidAt: new Date(),
+    } });
+    const next = await changeEncounter(db!, a, { action: "begin", kind: "tuvi", orderId: order.id });
+    expect(next.encounter?.context.chartMissing).toBeUndefined();
+    expect(next.encounter?.messages.some(turn => turn.question.includes("nghề gốm"))).toBe(true);
+    await act(a, "start", next.encounter!.id);
+    await answerEncounter(db!, a, { id: next.encounter!.id, turnId: randomUUID(), question: "Thầy nhắc lại ý vừa nói giúp tôi." });
+    const prompt = vi.mocked(generateWithLlmRouter).mock.lastCall![0].prompt;
+    expect(prompt).toContain("nghề gốm");
+    expect(prompt).toContain("Luôn xưng Thầy, gọi người xem là con");
+    await expect(changeEncounter(db!, stranger, { action: "begin", kind: "tuvi", orderId: order.id })).rejects.toMatchObject({ status: 404 });
+    await act(a, "leave", next.encounter!.id);
   });
 
   it("never starts an unpaid order and gives both paid durations only when starting the encounter", async () => {

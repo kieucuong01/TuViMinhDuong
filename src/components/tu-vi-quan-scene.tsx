@@ -6,7 +6,7 @@ import { courtyardAssets } from "./tu-vi-quan-scene-assets";
 import { QUAN_TAROT_CARDS } from "@/lib/tu-vi-quan-content";
 import type { MonasteryPose } from "./tu-vi-quan-monastery";
 import styles from "./tu-vi-quan-scene.module.css";
-import { findQuanPath, isQuanWalkable, quanGroundHeight, quanMonasteryToWorld, quanWorldToMonastery, QUAN_BOUNDS, QUAN_POND, QUAN_STATIONS, QUAN_MONASTERY_SEATS, QUAN_MONASTERY_SPACE } from "@/lib/tu-vi-quan-world.mjs";
+import { QUAN_TEACHER_DESKS, findQuanPath, isQuanWalkable, quanGroundHeight, quanMonasteryToWorld, quanWorldToMonastery, QUAN_BOUNDS, QUAN_POND, QUAN_STATIONS, QUAN_MONASTERY_SEATS, QUAN_MONASTERY_SPACE } from "@/lib/tu-vi-quan-world.mjs";
 
 type Position = { x: number; z: number };
 type Player = Position & { id: string; alias: string; action: string; seatIndex?: number | null; monasteryPose?: MonasteryPose; monasteryPosition?: Position };
@@ -289,7 +289,8 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
     drum(PALETTE.gold, x, 0.47, z, 0.57, 0.09);
   }
   // Main hall: timber lattice, curved tile roof, an open front veranda.
-  offsetX = -36; offsetZ = 8;
+  for (const center of [-34, 34]) {
+  offsetX = center; offsetZ = 8;
   box(PALETTE.stone, 0, 0.15, -22, 26, 0.3, 10);
   box(PALETTE.stone, 0, 0.34, -22, 25.6, 0.12, 9.6);
   box(PALETTE.plaster, 0, 2.2, -26.3, 24.6, 3.7, 0.32);
@@ -327,17 +328,9 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
     box(PALETTE.ridge, x, 4.22, -17.94, .48, .41, .26, 0, 0, Math.PI / 4);
   }
   for (const x of [-10, -6, -2, 2, 6, 10]) lantern(x, 3.2, -17.8);
-  for (const [x, z] of [[-39, -49], [35, -61]]) {
-    offsetX = 0; offsetZ = 0;
-    for (let level = 0; level < 3; level++) {
-      const width = 5.4 - level * 1.32;
-      box(0x536270, x, 3.2 + level * 2.3, z, width * 0.69, 2.35, width * 0.67);
-      roof(x, z, width, width * 0.8, 4.45 + level * 2.3);
-    }
-  }
-  offsetX = -36; offsetZ = 8;
+  offsetX = center; offsetZ = 8;
   for (let i = 0; i < 3; i++) box(PALETTE.stone, 0, 0.04 + i * 0.06, -16.8 - i * 0.25, 11 - i * 0.4, 0.12, 0.5);
-  for (const x of [-5.5, 0, 5.5]) {
+  for (const x of [-8.25, -2.75, 2.75, 8.25]) {
     box(0x815139, x, 0.98, -19.5, 3.1, 0.2, 1.25);
     for (const side of [-1, 1]) box(PALETTE.wood, x + side * 1.2, 0.65, -19.5, 0.2, 0.62, 0.95);
     if (!ecosystemEnabled || x !== 5.5) {
@@ -351,19 +344,7 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
     box(PALETTE.gold, 5.5, 0.9, -19.5 + side * 0.606, 2.34, 0.018, 0.018);
     for (const x of [4.65, 5.5, 6.35]) box(PALETTE.gold, x, 0.84, -19.5 + side * 0.61, 0.08, 0.08, 0.018, 0, 0, Math.PI / 4);
   }
-  // Carved screens and rafters frame the open side of the reading hall.
-  for (const x of [-10, -6, -2, 2, 10]) {
-    for (const edge of [-1, 1]) box(PALETTE.wood, x + edge * 0.86, 2.1, -18.23, 0.1, 2.85, 0.15);
-    for (const y of [0.7, 1.1, 1.55, 3.02, 3.5]) box(PALETTE.edge, x, y, -18.23, 1.8, 0.10, 0.16);
-    for (const offset of [-0.58, -0.29, 0, 0.29, 0.58]) {
-      box(PALETTE.wood, x + offset, 2.26, -18.23, 0.065, 1.52, 0.09);
-      box(PALETTE.gold, x + offset, 3.24, -18.23, 0.12, 0.12, 0.1, 0, 0, Math.PI / 4);
-    }
   }
-  for (let x = -12; x <= 12; x += 1.65) box(PALETTE.edge, x, 4.34, -22, 0.22, 0.23, 10.1);
-  for (const x of [3.9, 7.8]) lantern(x, 3.25, -20.7);
-  box(PALETTE.edge, 5.5, 2.97, -21.85, 1.8, 0.67, 0.08);
-  for (const side of [-1, 1]) box(PALETTE.wood, 5.5 + side * 0.69, 3.83, -21.85, 0.08, 1.35, 0.08);
   // Gate and lantern avenue.
   offsetX = 0; offsetZ = 0;
   for (const x of [-4.6, 4.6]) {
@@ -404,23 +385,6 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
   box(PALETTE.red, 4, 2.52, -17.7, 1.66, 0.18, 1.2);
   box(PALETTE.gold, 4, 2.03, -17.15, 0.7, 0.4, 0.035);
   box(PALETTE.edge, 4, 2.62, -17.7, 0.7, 0.018, 0.08);
-  // Open tea and meditation pavilions share the hall's roof and timber language.
-  function pavilion(cx: number, cz: number, width: number, depth: number, accent: number, tiles: number[]) {
-    box(PALETTE.stone, cx, 0.13, cz, width, 0.25, depth);
-    box(0xbba17a, cx, 0.28, cz, width - 0.25, 0.06, depth - 0.25);
-    for (const side of [-1, 1]) for (const end of [-1, 1]) column(cx + side * (width / 2 - 0.5), cz + end * (depth / 2 - 0.5), 3.15);
-    box(PALETTE.wood, cx, 3.25, cz, width + 0.2, 0.25, depth);
-    roof(cx, cz, width + 1.8, depth + 1.8, 3.55, tiles);
-    const front = cz + depth / 2;
-    box(PALETTE.edge, cx, 2.91, front + 0.02, 3.72, 1.04, .16);
-    for (const side of [-1, 1]) {
-      box(accent, cx + side * (width / 2 - 1.45), 2.18, front - 0.17, .53, 1.66, .08);
-      box(PALETTE.gold, cx + side * (width / 2 - 1.45), 1.37, front - 0.12, .55, .055, .09);
-    }
-    for (const side of [-1, 1]) lantern(cx + side * width * 0.31, 2.55, cz + depth / 2 - 0.25);
-  }
-  offsetX = -6; offsetZ = 6.5;
-  pavilion(-20, 8.5, 10, 5, 0x774477, [0x53455d, 0x64506b, 0x715979, 0x4b3d55]);
   offsetX = 0; offsetZ = 0;
   // Tu viện là công trình trung tâm, cao nhất; hiên và năm bậc thang mở ra sân.
   box(PALETTE.stone, 0, .6, -28, 34, 1.2, 22);
@@ -505,30 +469,6 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
     object("head", PALETTE.light, x, 0.85, -8.2, 0.12, 0.28, 0.12);
   }
   monasteryGeometry = false;
-  offsetX = -6; offsetZ = 6.5;
-  for (const side of [-1, 1]) for (const offset of [-1, 0, 1]) {
-    box(offset === 0 ? 0xc58bb9 : 0x946295, -20 + side * 2.7 + offset * .17, 2.95, 11.07 + offset * .015, .26, .52, .055, 0, 0, offset * .28);
-  }
-  drum(PALETTE.wood, -20, 0.93, 8.4, 3.4, 0.22, 1.75);
-  for (const x of [-22.2, -20, -17.8]) {
-    drum(0x70553d, x, 0.51, 10.1, 0.7, 0.42);
-    drum(0x617c70, x, 0.77, 10.1, 0.74, 0.13);
-  }
-  object("head", 0x789d87, -21.1, 1.18, 7.95, 0.55, 0.44, 0.5);
-  drum(0x789d87, -21.1, 1.4, 7.95, 0.28, 0.07);
-  object("box", 0x789d87, -20.75, 1.19, 7.95, 0.4, 0.17, 0.17, 0, 0, 0.35);
-  for (const x of [-19.5, -18.8]) drum(0xe5d6b2, x, 1.12, 8.05, 0.2, 0.18);
-  offsetX = 10; offsetZ = 0;
-  pavilion(18, 0.4, 8, 6, 0x38695c, [0x36564e, 0x496959, 0x597765, 0x35574c]);
-  for (const side of [-1, 1]) {
-    const x = 18 + side * 2.65;
-    for (const y of [2.75, 3.12]) box(PALETTE.gold, x, y, 3.48, .56, .08, .08);
-    for (const gap of [-.18, .18]) box(PALETTE.gold, x + gap, 2.93, 3.48, .20, .08, .08);
-  }
-  for (const x of [15.7, 18, 20.3]) {
-    drum(0x9d4e3e, x, 0.43, 2, 1.25, 0.24, 1);
-    drum(PALETTE.gold, x, 0.56, 2, 1.1, 0.035, 0.87);
-  }
   // Round welcome medallion and benches around the central garden.
   offsetX = 0; offsetZ = 0;
   drum(0x927350, 0, 0.075, 10, 4, 0.04);
@@ -789,13 +729,11 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
   self.badge.visible = false;
   self.body.rotation.y = Math.PI;
   self.group.position.set(latest.current.position.x, 0.054, latest.current.position.z);
-  const hostKinds: QuanHost[] = ["tuvi", "tarot", "iching", "tuvi", "tuvi"];
-  const teachers = hostKinds.map((kind, index) => {
-    const teacher = avatar([0x6f4430, 0x694052, 0x57706b, 0x643743, 0x46566a][index], ["Thầy Tử Vi · Bàn 3", "Cô Tarot", "Thầy Dịch", "Thầy Tử Vi · Bàn 1", "Thầy Tử Vi · Bàn 2"][index], true);
-    const locations = [[-30.5, 0.4, -12.45], [-26, 0.31, 13.75], [28, 0.3, -0.8], [-41.5, 0.4, -12.45], [-36, 0.4, -12.45]];
-    teacher.group.position.set(locations[index][0], locations[index][1], locations[index][2]);
-    teacher.group.userData.host = kind;
-    if (kind === "tuvi") teacher.group.userData.desk = index === 0 ? 3 : index - 2;
+  const teachers = QUAN_TEACHER_DESKS.map(({desk, x}, index) => {
+    const teacher = avatar([0x6f4430, 0x643743, 0x46566a, 0x57706b][index % 4], `Thầy Tử Vi · ${desk <= 4 ? "Tây" : "Đông"} ${((desk - 1) % 4) + 1}`, true);
+    teacher.group.position.set(x, .4, -12.45);
+    teacher.group.userData.host = "tuvi";
+    teacher.group.userData.desk = desk;
     pose(teacher, "seated", 0, false, true);
     if (index !== 1) {
       const hat = new THREE.Mesh(geometry.drum, material(0x3c2b27));
@@ -827,7 +765,7 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
   const seatCushions = teachers.flatMap((teacher, index) => [0, 2.5].map(offset => {
     const seat = ritualPart("drum", index === 1 ? 0x6d466f : 0x617c70, teacher.group.position.x, teacher.group.position.y + 0.11, teacher.group.position.z + offset, 0.85, 0.2, 0.7); return seat;
   }));
-  const tableSkins = [-41.5, -36, -30.5].map(x => ritualPart("box", 0x354e67, x, 1.081, -11.5, 3.1, 0.012, 1.25));
+  const tableSkins = QUAN_TEACHER_DESKS.map(({x}) => ritualPart("box", 0x354e67, x, 1.081, -11.5, 3.1, 0.012, 1.25));
   const altarSkin = ritualPart("box", 0xa33d31, -18, 0.72, 23, 2.91, 0.9, 1.51);
   const templeLight = new THREE.PointLight(0xffd49b, 45, 42, 1.4);
   templeLight.position.set(templeX, 6.2 + QUAN_MONASTERY_SPACE.floor, quanMonasteryToWorld({ x: 0, z: -9 }).z); scene.add(templeLight);
@@ -892,9 +830,7 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
     plate.material.emissiveIntensity = width > 6 ? .62 : .35;
     return plate;
   }
-  facadePlate("TỬ VI QUÁN", "BA BÀN THẦY · LUẬN LÁ SỐ", "#4d2423", 6.31, 1.46).position.set(-36, 7.5, -10.71);
-  facadePlate("TAROT QUÁN", "CÔ TAROT · TRẢI BÀI", "#402743", 3.59, .92).position.set(-26, 2.91, 17.608);
-  facadePlate("KINH DỊCH QUÁN", "THẦY DỊCH · GIEO QUẺ", "#214440", 3.59, .92).position.set(28, 2.91, 3.508);
+  for (const center of [-34, 34]) facadePlate("TỬ VI QUÁN", center < 0 ? "TÂY VIỆN · BỐN BÀN THẦY" : "ĐÔNG VIỆN · BỐN BÀN THẦY", "#4d2423", 6.31, 1.46).position.set(center, 7.5, -10.71);
   facadePlate("BÀN THỜ THẦN TÀI", "XIN LỘC ĐẦU NGÀY", "#5a2824", 2.5, 1.43).position.set(-18, 2.2, 22.02);
   facadePlate("TU VIỆN AN NHIÊN", "ĐIỆN PHẬT · THIỀN · TRÀNG HẠT", "#6a2b24", 11.2, 2.4).position.set(0, 10.6, -15.04);
   const templePlaque = facadePlate("TU VIỆN AN NHIÊN", "MỘT KHOẢNG LẶNG CHO MỖI NGÀY", "#6a2b24", 6.1, 1.23);
@@ -970,7 +906,7 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
     seal.position.y = 0.55; seal.scale.set(0.2, 0.16, 0.14); seal.rotation.y = Math.PI / 4; seal.visible = false; back.add(seal);
     const face = new THREE.Mesh(geometry.surface, cardFace("", 0)); face.scale.set(0.46, 0.76, 1); face.position.set(back.position.x, 1.085, back.position.z); face.rotation.x = -Math.PI / 2; face.visible = false; scene.add(face); return {back, face, seal};
   });
-  ritualPart("drum", PALETTE.wood, 28, 0.9, 0.45, 2.7, 0.2, 1.6);
+
   const coins = [-1, 0, 1].map(side => {
     const coin = ritualPart("drum", PALETTE.gold, 28 + side * 0.45, 1.04, 0.7, 0.26, 0.05, 0.26);
     const hole = new THREE.Mesh(geometry.box, material(PALETTE.wood)); hole.position.y = 0.54; hole.scale.set(0.28, 0.08, 0.28); coin.add(hole); return coin;
@@ -978,6 +914,9 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
   const hexagram = Array.from({length: 6}, (_, i) => [-1, 1].map(side => {
     const line = ritualPart("box", PALETTE.gold, 28 + side * 0.17, 1.025, -0.12 + i * 0.12, 0.29, 0.018, 0.055); line.visible = false; return line;
   }));
+  for (const card of tarotCards) { scene.remove(card.back); scene.remove(card.face); }
+  for (const coin of coins) scene.remove(coin);
+  for (const line of hexagram.flat()) scene.remove(line);
   let ritualId: number | undefined; let ritualStarted = 0;
   const smoke = Array.from({ length: 7 }, () => {
     const smokeMaterial = new THREE.MeshBasicMaterial({ color: 0xffe7c6, transparent: true, opacity: 0, depthWrite: false });
@@ -1253,7 +1192,7 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
     });
     templeSash.visible = templeBeads.visible = monastery;
     const seated = current.encounter;
-    const selectedHost = !seated ? -1 : seated.kind === "tuvi" ? (seated.desk === 1 ? 3 : seated.desk === 2 ? 4 : 0) : hostKinds.indexOf(seated.kind);
+    const selectedHost = !seated ? -1 : seated.kind === "tuvi" ? Math.max(0, (seated.desk ?? 1) - 1) : 0;
     const hostPosition = teachers[selectedHost]?.group.position;
     if (hostPosition) tableLight.position.set(hostPosition.x + 1.1, hostPosition.y + 2.35, hostPosition.z + 1.2);
     tableLight.intensity = seated ? 27 : 0;
@@ -1545,6 +1484,7 @@ export default function TuViQuanScene(props: SceneProps) {
     <div className={styles.scene} ref={container}>
       {props.showHostControls !== false && !props.encounter && props.onHost && <nav className={styles.hosts} aria-label="Mời người luận chuyện"><button onClick={() => props.onHost?.("tuvi")}>Thầy Tử Vi</button><button onClick={() => props.onHost?.("tarot")}>Cô Tarot</button><button onClick={() => props.onHost?.("iching")}>Thầy Dịch</button></nav>}
       {props.speech?.length ? <div className={styles.publicSpeech} aria-live="polite">{props.speech.slice(-2).map((message, index) => <p key={`${message.id}-${index}`}>{message.text.slice(0, 120)}</p>)}</div> : null}
+      {props.interactive && !props.encounter && <div className={styles.moveHint} aria-hidden="true"><span>✥</span>Kéo bên trái để di chuyển</div>}
       <div data-joystick className={props.interactive && !props.encounter ? styles.joystick : styles.hidden} aria-hidden="true"><span /></div>
     </div>
   );

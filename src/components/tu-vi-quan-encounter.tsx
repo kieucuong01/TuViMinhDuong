@@ -280,13 +280,13 @@ export default function TuViQuanEncounter({ kind, orderId, ticketId, muted, onLe
     {active && !ended && !snapshot?.capabilities.stt && <div className={styles.status}>Thu âm đang tạm nghỉ. {intake ? "Bạn có thể nhập ngày giờ sinh bên dưới." : "Bạn có thể gõ câu hỏi."}</div>}
     {active && !ended && !snapshot?.capabilities.tts && <div className={styles.status}>Giọng đọc đang tạm nghỉ. Lời của thầy sẽ hiện ở phụ đề.</div>}
     {busy && <div className={styles.status} role="status">Thầy đang lắng nghe và suy ngẫm…</div>}
-    {intake && !ended && <details open><summary>Nói bằng micro hoặc nhập thông tin bên dưới</summary><p>Họ tên và ngày giờ sinh chỉ dùng trong phiên riêng. Chưa tính thời gian luận giải.</p>
+    {intake && !ended && <details open><summary>Nói bằng micro hoặc nhập thông tin bên dưới</summary><p>Thông tin chỉ dùng riêng. Thầy chưa tính phút khi lập lá số.</p>
         <form key={JSON.stringify(draft)} className={styles.birth} onSubmit={event => { event.preventDefault(); void saveBirth(new FormData(event.currentTarget)); }}>
           <label>Họ tên thật<input name="fullName" maxLength={100} defaultValue={draft?.fullName === "Khách" ? "" : draft?.fullName} autoComplete="name" required /></label>
-          <label>Ngày<input name="day" type="number" min="1" max="31" defaultValue={draft?.day} required /></label>
+          <fieldset className={styles.dateRow}><legend>Ngày sinh</legend><label>Ngày<input name="day" type="number" min="1" max="31" defaultValue={draft?.day} required /></label>
           <label>Tháng<input name="month" type="number" min="1" max="12" defaultValue={draft?.month} required /></label>
           <label>Năm<input name="year" type="number" min="1900" max={new Date().getFullYear()} defaultValue={draft?.year} required /></label>
-          <label>Loại lịch<select name="calendarType" defaultValue={draft?.calendarType || ""} required><option value="">Chọn loại lịch</option><option value="solar">Dương lịch</option><option value="lunar">Âm lịch</option></select></label>
+          </fieldset><label>Loại lịch<select name="calendarType" defaultValue={draft?.calendarType || ""} required><option value="">Chọn loại lịch</option><option value="solar">Dương lịch</option><option value="lunar">Âm lịch</option></select></label>
           <label>Giờ sinh (0–23)<input name="hour" type="number" min="0" max="23" defaultValue={draft?.birthHour} required /></label>
           <label>Phút sinh<input name="minute" type="number" min="0" max="59" defaultValue={draft?.birthMinute ?? 0} /></label>
           <label>Lá số<select name="gender" defaultValue={draft?.gender || ""} required><option value="">Chọn nam hoặc nữ</option><option value="male">Nam</option><option value="female">Nữ</option></select></label>

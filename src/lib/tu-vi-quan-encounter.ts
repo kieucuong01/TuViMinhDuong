@@ -39,7 +39,7 @@ function buildContext(kind: Kind, chart: TuViChart | null): Context {
     const drawn = drawIChing(randomInt);
     return { title: titles[kind], lines: drawn.lines, grounding: [drawn.title, drawn.body, drawn.action, ...drawn.evidence].join(". ") };
   }
-  return { title: titles[kind], chartMissing: true, ...(chart ? { birthDraft: chart.input } : {}) };
+  return chart ? { title: titles[kind], grounding: formatChartEvidence({ ...buildChartEvidenceProfile(chart), fullName: "Khách" }), menhIndex: chart.palaces.findIndex(palace => palace.isMenh) } : { title: titles[kind], chartMissing: true };
 }
 
 function contextFor(kind: Kind, chart: TuViChart | null, previous?: { kind: string; context: unknown }): Context {
@@ -50,24 +50,24 @@ function contextFor(kind: Kind, chart: TuViChart | null, previous?: { kind: stri
 }
 
 function greeting(kind: string, context: Context) {
-  if (kind === "tarot") return "Chào bạn, mời bạn ngồi. Bạn có thể rút bài trên bàn. Hôm nay bạn muốn cùng tôi nhìn lại chuyện gì?";
-  if (kind === "iching") return "Chào bạn. Mình gieo quẻ để có thêm một góc nhìn. Bạn đang phân vân chuyện gì?";
+  if (kind === "tarot") return "Chào con, mời con ngồi. Con có thể rút bài trên bàn. Con muốn Thầy xem chuyện gì?";
+  if (kind === "iching") return "Chào con. Thầy cùng con gieo quẻ để chiêm nghiệm. Con đang phân vân chuyện gì?";
   return context.chartMissing
-    ? "Chào bạn, mời bạn ngồi. Bạn cho thầy xin họ tên thật, ngày tháng năm sinh, lịch âm hay dương, giờ sinh và lá số nam hay nữ nhé. Bạn có thể nói từng phần hoặc nhập biểu mẫu. Thời gian luận giải chưa chạy trong lúc chuẩn bị."
-    : "Chào bạn, mời bạn ngồi. Thầy đã có lá số của bạn. Hôm nay điều gì khiến bạn muốn ghé quán?";
+    ? "Chào con, mời con ngồi. Con cho Thầy xin họ tên thật, ngày tháng năm sinh, lịch âm hay dương, giờ sinh và lá số nam hay nữ nhé. Con có thể nói từng phần hoặc nhập biểu mẫu. Thời gian luận giải chưa chạy trong lúc chuẩn bị."
+    : "Chào con, mời con ngồi. Thầy đã có lá số của con. Con muốn Thầy luận thêm về việc gì?";
 }
 
 function birthPrompt(draft: BirthDraft) {
-  if (!draft.fullName?.trim() || draft.fullName === "Khách") return "Bạn cho thầy xin họ tên thật để lập lá số nhé. Tên này chỉ dùng trong phiên riêng.";
-  if (!draft.day || !draft.month || !draft.year) return "Bạn cho thầy xin " +
+  if (!draft.fullName?.trim() || draft.fullName === "Khách") return "Con cho Thầy xin họ tên thật để lập lá số nhé. Tên này chỉ dùng trong phiên riêng.";
+  if (!draft.day || !draft.month || !draft.year) return "Con cho Thầy xin " +
     [!draft.day && "ngày", !draft.month && "tháng", !draft.year && "năm"].filter(Boolean).join(", ") + " sinh nhé.";
-  if (!draft.calendarType) return "Ngày sinh bạn vừa nói tính theo âm lịch hay dương lịch?";
-  if (draft.birthHour === undefined) return "Bạn sinh lúc mấy giờ? Cho thầy biết là sáng, chiều hay tối nếu cần nhé.";
-  if (!draft.gender) return "Thầy lập lá số nam hay nữ cho bạn?";
+  if (!draft.calendarType) return "Ngày sinh con vừa nói tính theo âm lịch hay dương lịch?";
+  if (draft.birthHour === undefined) return "Con sinh lúc mấy giờ? Cho Thầy biết là sáng, chiều hay tối nếu cần nhé.";
+  if (!draft.gender) return "Thầy lập lá số nam hay nữ cho con?";
   try { readQuanChart(draft); }
   catch (error) {
     if (!(error instanceof QuanSessionError)) throw error;
-    return "Ngày sinh này chưa khớp với lịch đã chọn. Bạn đọc lại ngày tháng năm sinh hoặc sửa trong biểu mẫu nhé.";
+    return "Ngày sinh này chưa khớp với lịch đã chọn. Con đọc lại ngày tháng năm sinh hoặc sửa trong biểu mẫu nhé.";
   }
   return null;
 }
@@ -181,13 +181,13 @@ async function snapshot(tx: Tx, profile: QuanProfile, now: Date, requestedId?: s
   const { grounding: _grounding, ...context } = row.context as Context;
   void _grounding;
   const turns = await tx.quanEncounterTurn.findMany({
-    where: { encounterId: row.id, kind: row.kind, state: "answered" }, orderBy: [{ createdAt: "desc" }, { id: "desc" }], take: 30,
+    where: { encounter: { profileId: profile.id }, kind: row.kind, state: "answered" }, orderBy: [{ createdAt: "desc" }, { id: "desc" }], take: 30,
     select: { id: true, question: true, answer: true, interrupted: true },
   });
   const messages = turns.reverse();
   if (context.opening) messages.unshift({ id: "chart-opening", question: "", answer: context.opening, interrupted: false });
   if (context.birthPrompt) messages.push({ id: "birth-prompt", question: "", answer: context.birthPrompt, interrupted: false });
-  if (row.startedAt || row.state === "invited") messages.unshift({ id: "greeting", question: "", answer: greeting(row.kind, context), interrupted: false });
+  if (row.startedAt || row.state === "invited") messages.unshift({ id: "greeting", question: "", answer: turns.length ? "Con cứ tiếp tục, Thầy vẫn giữ lá số và những điều hai Thầy con đã trao đổi." : greeting(row.kind, context), interrupted: false });
   const remainingSeconds = Math.ceil(quanRemainingMs(row, row.tier === "free" ? freeMs : 0, now) / 1000);
   return { freeRemainingSeconds, paidRemainingSeconds, rewardTickets: tickets, encounter: {
     id: row.id, visitId: (row.queuedAt ?? row.createdAt).toISOString(), kind: row.kind, tier: row.tier, state: row.state, startedAt: row.startedAt?.toISOString(),
@@ -294,11 +294,11 @@ export async function changeEncounter(db: PrismaClient, actor: Actor, body: Reco
       const sections = buildFreeReadingSections(chart);
       const menh = chart.palaces.find(palace => palace.isMenh);
       const opening = [
-        menh ? `Thầy đã lập lá số. Cung Mệnh của bạn ở ${menh.branch}${menh.mainStars.length ? `, có ${menh.mainStars.join(" và ")}` : ""}.` : "Thầy đã lập lá số cho bạn.",
+        menh ? `Thầy đã lập lá số. Cung Mệnh của con ở ${menh.branch}${menh.mainStars.length ? `, có ${menh.mainStars.join(" và ")}` : ""}.` : "Thầy đã lập lá số cho con.",
         sections.find(section => section.key === "menh")?.quickTake,
         sections.find(section => section.key === "quan_loc")?.quickTake,
-        "Bạn muốn thầy nói thêm về công việc, tình cảm, tài chính hay chuyện gì khác?",
-      ].filter(Boolean).join(" ");
+        "Con muốn Thầy nói thêm về công việc, tình cảm, tài chính hay chuyện gì khác?",
+      ].filter(Boolean).join(" ").replaceAll("bạn", "con").replaceAll("Bạn", "Con");
       await saveQuanBirth(tx, profile, chart, now);
       await tx.quanEncounter.update({ where: { id: row.id }, data: { context: {
         title: titles.tuvi, grounding: formatChartEvidence({ ...buildChartEvidenceProfile(chart), fullName: "Khách" }),
@@ -356,7 +356,7 @@ export async function captureEncounterBirth(db: PrismaClient, actor: Actor, body
     if (patch.birthHour !== undefined && patch.birthMinute === undefined) delete draft.birthMinute;
     const prompt = birthPrompt(draft) || (!Object.keys(patch).length
       ? "Bạn muốn sửa mục nào? Nếu thông tin thầy đọc đã đúng, bạn có thể nói “đúng rồi”."
-      : `Thầy nghe bạn là ${draft.fullName}, sinh ngày ${draft.day} tháng ${draft.month} năm ${draft.year}, ${draft.calendarType === "lunar" ? "âm lịch" : "dương lịch"}, lúc ${draft.birthHour} giờ${draft.birthMinute ? ` ${draft.birthMinute} phút` : ""}, lá số ${draft.gender === "male" ? "nam" : "nữ"}. Nếu đúng, bạn nói “đúng rồi” để thầy lập lá số nhé.`);
+      : `Thầy nghe con là ${draft.fullName}, sinh ngày ${draft.day} tháng ${draft.month} năm ${draft.year}, ${draft.calendarType === "lunar" ? "âm lịch" : "dương lịch"}, lúc ${draft.birthHour} giờ${draft.birthMinute ? ` ${draft.birthMinute} phút` : ""}, lá số ${draft.gender === "male" ? "nam" : "nữ"}. Nếu đúng, bạn nói “đúng rồi” để thầy lập lá số nhé.`);
     await tx.quanEncounter.update({ where: { id: row.id }, data: { context: { ...context, birthDraft: draft, birthPrompt: prompt } } });
     return snapshot(tx, profile, now, row.id);
   });
@@ -387,7 +387,7 @@ export async function answerEncounter(db: PrismaClient, actor: Actor, body: Reco
       await tx.quanEncounter.update({ where: { id: row.id }, data: { context } });
     }
     const history = await tx.quanEncounterTurn.findMany({
-      where: { encounterId: row.id, kind: row.kind, state: "answered" }, orderBy: { createdAt: "desc" }, take: 8,
+      where: { encounter: { profileId: profile.id }, kind: row.kind, state: "answered" }, orderBy: { createdAt: "desc" }, take: 40,
       select: { question: true, answer: true, interrupted: true },
     });
     return { row, turn, context, history: history.reverse() };
@@ -438,7 +438,8 @@ export function getEncounterSpeech(db: PrismaClient, actor: Actor, id: string, t
     if (!preparing && (row.state !== "active" || !row.endsAt || now.getTime() > row.endsAt.getTime() + holdMs)) reject("Cuộc trò chuyện đã hết giờ.");
     if (await tx.quanEncounter.findFirst({ where: { speakingUntil: { gt: now } }, select: { id: true } })) reject("Thầy đang nói. Bạn đợi một chút nhé.");
     const context = row.context as Context;
-    const fixedText = turnId === "greeting" ? greeting(row.kind, context) : turnId === "birth-prompt" ? context.birthPrompt : turnId === "chart-opening" ? context.opening : undefined;
+    const returning = turnId === "greeting" && await tx.quanEncounterTurn.findFirst({ where: { encounter: { profileId: profile.id }, kind: row.kind, state: "answered" }, select: { id: true } });
+    const fixedText = turnId === "greeting" ? (returning ? "Con cứ tiếp tục, Thầy vẫn giữ lá số và những điều hai Thầy con đã trao đổi." : greeting(row.kind, context)) : turnId === "birth-prompt" ? context.birthPrompt : turnId === "chart-opening" ? context.opening : undefined;
     const turn = fixedText ? null : await tx.quanEncounterTurn.findUnique({ where: { encounterId_id: { encounterId: id, id: turnId } } });
     const text = fixedText || (turn?.kind === row.kind && !turn.interrupted ? turn.answer : null);
     if (!text) reject("Không tìm thấy lời đọc.", 404);
