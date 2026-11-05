@@ -25,6 +25,8 @@ export type QuanExperience = "courtyard" | "teacher" | "tarot" | "iching" | "per
 export type QuanPreferences = { quality: "low" | "medium" | "high"; reducedMotion: boolean; muted: boolean };
 type Tab = "today" | "divination" | "wishes" | "explore" | "profile" | "settings" | "ranking" | "calligraphy";
 const names: Record<Tab, string> = { today: "Hôm nay", divination: "Xem bói", wishes: "Cầu an", explore: "Khám phá", profile: "Hồ sơ của bạn", settings: "Tùy chọn", ranking: "Bảng vàng công đức", calligraphy: "Xin chữ đầu ngày" };
+const vietnamDay = new Intl.DateTimeFormat("sv-SE", { timeZone: "Asia/Ho_Chi_Minh" });
+const vietnamHour = new Intl.DateTimeFormat("en-GB", { timeZone: "Asia/Ho_Chi_Minh", hour: "numeric", hourCycle: "h23" });
 const labels: Record<string, string> = { title: "Thông điệp", body: "Lời luận", evidence: "Căn cứ", disclaimer: "Lưu ý", color: "Màu gợi ý", personalized: "Theo ngày sinh", primary: "Quẻ chính", changed: "Quẻ biến", changingLines: "Hào động", lower: "Hạ quái", upper: "Thượng quái", message: "Lời nhắn", advice: "Gợi ý", summary: "Tổng quan", interpretation: "Luận giải", meaning: "Ý nghĩa", name: "Tên", upright: "Xuôi", reversed: "Ngược", position: "Vị trí", month: "Tháng", narrative: "Lời luận", career: "Công việc", love: "Tình cảm", money: "Tài chính", lines: "Sáu hào", cards: "Lá bài", months: "Từng tháng", axes: "Các phương diện", score: "Mức độ", value: "Giá trị", label: "Phương diện", guidance: "Gợi ý thực hành", caution: "Điều cần lưu ý", reflection: "Câu hỏi suy ngẫm", action: "Việc nhỏ hôm nay", coins: "Ba đồng xu", changing: "Hào động", number: "Số quẻ", hexagram: "Quẻ chính", transformed: "Quẻ biến" };
 function Reading({ value }: { value: Json | undefined }) {
   if (value === null || value === undefined) return null;
@@ -40,7 +42,7 @@ export default function QuanEcosystem({ gameMode = false, leaders, online, alias
   readingPrice: number | null;
   leaders: QuanLeader[];
   online: boolean;
-  activityRequest?: { tab: "today" | "divination" | "wishes" | "ranking" | "calligraphy"; id: number };
+  activityRequest?: { tab: Tab; id: number };
   lite: boolean; onLite: (lite: boolean) => void;
   onExperience: (experience: QuanExperience) => void;
   preferences: QuanPreferences; onPreferences: (data: QuanPreferences) => void; onLegacy: (panel: "session" | "support" | "map" | "restore") => void;
@@ -120,7 +122,10 @@ export default function QuanEcosystem({ gameMode = false, leaders, online, alias
     return () => window.removeEventListener("keydown", dismiss);
   }, [tab]);
   useEffect(() => { onExperience(tab === "divination" ? drawExperience : tab === "profile" ? "personal" : "courtyard"); }, [tab, drawExperience, onExperience]);
-  const dayKey = data ? new Intl.DateTimeFormat("sv-SE", { timeZone: "Asia/Ho_Chi_Minh" }).format(new Date(data.serverTime)) : "";
+  const dayKey = data ? vietnamDay.format(now - serverOffset) : "";
+  const daily = data && vietnamDay.format(new Date(data.serverTime)) === dayKey ? data.daily : null;
+  const hour = data ? Number(vietnamHour.format(now - serverOffset)) : -1;
+  const morningReminder = hour >= 5 && hour < 12 && Boolean(dayKey) && !daily && dismissedReminder !== dayKey;
   useEffect(() => {
     const timer = setTimeout(() => {
       try { setDismissedReminder(localStorage.getItem("quan-daily-reminder") || ""); } catch { /* Storage may be disabled. */ }
@@ -132,6 +137,10 @@ export default function QuanEcosystem({ gameMode = false, leaders, online, alias
     setTab(next);
     setMessage("");
     if (next === "explore" || next === "wishes" || !data) void request();
+  }
+  function dismissMorning() {
+    setDismissedReminder(dayKey);
+    try { localStorage.setItem("quan-daily-reminder", dayKey); } catch { /* Dismissed for this visit. */ }
   }
   async function perform(action: string, fields: Record<string, unknown> = {}) { const result = await request({ action, ...fields }); if (result) setMessage("Đã lưu vào sổ của bạn."); return result; }
   async function ritual(kind: "incense" | "greet" | "meditate_start" | "meditate_finish", count?: number) {
@@ -193,10 +202,11 @@ export default function QuanEcosystem({ gameMode = false, leaders, online, alias
   const eventUntil = event?.joinedAt ? Date.parse(event.joinedAt) + 60000 + serverOffset : 0;
   const wishes = filter === "mine" ? data?.myWishes : data?.wishes.filter(item => filter === "all" || item.placement === filter);
   return <>
-    <div className={styles.top} inert={Boolean(tab) || suspended}><button onClick={() => open("profile")}>{data?.profile.alias || alias} · {data?.profile.points ?? 0} điểm</button><button onClick={() => open("settings")}>Tùy chọn</button></div>
+    <div className={`${styles.top}${gameMode ? ` ${styles.gameTop}` : ""}`} inert={Boolean(tab) || suspended}><button onClick={() => open("profile")}>{data?.profile.alias || alias} · {data?.profile.points ?? 0} điểm</button><button onClick={() => open("settings")}>Tùy chọn</button></div>
+    {morningReminder && !tab && !suspended && <aside className={styles.morning} aria-label="Nhắc gieo quẻ sáng"><button onClick={() => open("today")}>Gieo quẻ sáng</button><button onClick={dismissMorning} aria-label="Ẩn lời nhắc gieo quẻ sáng">×</button></aside>}
     <nav className={`${styles.dock}${gameMode ? ` ${styles.gameDock}` : ""}`} aria-label="Dịch vụ Tử Vi Quán" inert={Boolean(tab) || suspended}>
       {(["today", "divination", "wishes", "explore"] as Tab[]).map(item => {
-        const newFortune = item === "today" && dayKey && !data?.daily && dismissedReminder !== dayKey;
+        const newFortune = item === "today" && dayKey && !daily && dismissedReminder !== dayKey;
         return <button key={item} onClick={() => open(item)}>{gameMode && item === "divination" ? "Vận trình" : names[item]}{newFortune && <span className={styles.newFortune} aria-label="Có quẻ mới" title="Có quẻ mới" />}</button>;
       })}
     </nav>
@@ -210,10 +220,10 @@ export default function QuanEcosystem({ gameMode = false, leaders, online, alias
       <div aria-busy={busy} data-reduced-motion={preferences.reducedMotion} className={styles.body}>
       {tab === "calligraphy" && <><p>Mỗi ngày một chữ để mang về. Chọn nhẹ nhàng hoặc xin một câu vui.</p>{!data?.calligraphy && <div className={styles.row}><button disabled={busy} onClick={() => void perform("calligraphy", { mood: "calm" })}>Xin chữ an nhiên</button><button disabled={busy} onClick={() => void perform("calligraphy", { mood: "playful" })}>Xin chữ cho vui</button></div>}<Reading value={data?.calligraphy} />{data?.calligraphy && <button onClick={() => chooseShare(data.calligraphy)}>Tạo thiệp chữ hôm nay</button>}</>}
       {tab === "ranking" && <><p>Vinh danh năm khách đồng ý hiện bí danh, theo tổng Điểm An Nhiên kiếm được từ hoạt động miễn phí.</p>{leaders.length ? <ol className={styles.ranking}>{leaders.map((leader, index) => <li key={index}><strong>{leader.alias}</strong><span>{leader.points} điểm</span></li>)}</ol> : <p>{online ? "Chưa có khách đủ điều kiện hiển thị." : "Đang kết nối bảng vàng."}</p>}<label><input type="checkbox" checked={data?.rankingOptIn ?? false} disabled={busy || !data} onChange={event => void perform("ranking", { enabled: event.target.checked })} /> Cho hiện bí danh của tôi trên bảng vàng và khi lên danh hiệu</label></>}
-      {tab === "today" && <>{dayKey && !data?.daily && dismissedReminder !== dayKey && <aside className={styles.card}>
+      {tab === "today" && <>{dayKey && !daily && dismissedReminder !== dayKey && <aside className={styles.card}>
         <p>Lần đầu ghé hôm nay? Chọn một chủ đề để nhận lời gợi mở.</p>
         <button onClick={() => { setDismissedReminder(dayKey); try { localStorage.setItem("quan-daily-reminder", dayKey); } catch { /* Keep the dismissal for this visit. */ } }}>Ẩn lời nhắc hôm nay</button>
-      </aside>}<p>Một lời gợi mở mỗi ngày. Dùng để suy ngẫm, không thay thế quyết định của bạn.</p><div className={styles.row}>{[["career", "Công việc"], ["love", "Tình cảm"], ["money", "Tài chính"]].map(([topic, name]) => <button disabled={busy} key={topic} onClick={() => void perform("daily", { topic })}>{name}</button>)}</div><Reading value={data?.daily} />{data?.daily && <button onClick={() => chooseShare(data.daily)}>Tạo thiệp lời gợi mở</button>}<h3>Một phút an lành</h3><label>Lời nhắc riêng (tùy chọn)<input value={ritualNote} onChange={event => setRitualNote(event.target.value)} maxLength={120} /></label><div className={styles.row}>{[1, 3].map(count => <button key={count} disabled={busy} onClick={() => void ritual("incense", count)}>Thắp {count} nén hương</button>)}<button disabled={busy} onClick={() => void ritual("greet")}>Chắp tay chào</button></div><button disabled={busy || data?.meditation?.completed || remaining(ritualUntil) > 0} onClick={() => void ritual(ritualUntil ? "meditate_finish" : "meditate_start")}>{data?.meditation?.completed ? "Đã tĩnh tâm hôm nay" : ritualUntil ? remaining(ritualUntil) ? `Thở chậm · còn ${remaining(ritualUntil)} giây` : "Hoàn thành một phút tĩnh tâm" : "Bắt đầu một phút tĩnh tâm"}</button><p>Điểm mỗi ngày: lời gợi mở 10 · hương 5 · tĩnh tâm 5. Tarot và chia sẻ không cộng điểm.</p></>}
+      </aside>}<p>Một lời gợi mở mỗi ngày. Dùng để suy ngẫm, không thay thế quyết định của bạn.</p><div className={styles.row}>{[["career", "Sự nghiệp"], ["love", "Tình duyên"], ["money", "Tài lộc"]].map(([topic, name]) => <button disabled={busy} key={topic} onClick={() => void perform("daily", { topic })}>{name}</button>)}</div><DailyFortune value={daily} />{daily && <button onClick={() => chooseShare(daily)}>Tạo thiệp lời gợi mở</button>}<h3>Một phút an lành</h3><label>Lời nhắc riêng (tùy chọn)<input value={ritualNote} onChange={event => setRitualNote(event.target.value)} maxLength={120} /></label><div className={styles.row}>{[1, 3].map(count => <button key={count} disabled={busy} onClick={() => void ritual("incense", count)}>Thắp {count} nén hương</button>)}<button disabled={busy} onClick={() => void ritual("greet")}>Chắp tay chào</button></div><button disabled={busy || data?.meditation?.completed || remaining(ritualUntil) > 0} onClick={() => void ritual(ritualUntil ? "meditate_finish" : "meditate_start")}>{data?.meditation?.completed ? "Đã tĩnh tâm hôm nay" : ritualUntil ? remaining(ritualUntil) ? `Thở chậm · còn ${remaining(ritualUntil)} giây` : "Hoàn thành một phút tĩnh tâm" : "Bắt đầu một phút tĩnh tâm"}</button><p>Điểm mỗi ngày: lời gợi mở 10 · hương 5 · tĩnh tâm 5. Tarot và chia sẻ không cộng điểm.</p></>}
       {tab === "divination" && <><h3>Lá số cơ bản · Miễn phí</h3><p>Lập lá số, xem 12 cung và vận trình năm ngay trong quán.</p>{Boolean(data?.charts?.length) && <form className={styles.form} onSubmit={event => {
         event.preventDefault();
         if (!chartId) return;
@@ -257,6 +267,17 @@ function BirthForm({ input, disabled, onSave }: { input: ChartInput | null | und
   return <details><summary>Lập lá số miễn phí</summary><p>Thông tin này chỉ dành cho hồ sơ của bạn. Chọn đúng lịch và giờ sinh bạn biết.</p><form className={styles.form} onSubmit={event => { event.preventDefault(); const form = new FormData(event.currentTarget); onSave({ fullName: String(form.get("fullName")), gender: form.get("gender") as ChartInput["gender"], calendarType: form.get("calendarType") as ChartInput["calendarType"], day: Number(form.get("day")), month: Number(form.get("month")), year: Number(form.get("year")), birthHour: Number(form.get("birthHour")), birthMinute: Number(form.get("birthMinute")), viewYear: new Date().getFullYear(), timezone: "Asia/Ho_Chi_Minh" }); }}><label>Tên gọi<input name="fullName" required maxLength={80} defaultValue={input?.fullName} /></label><label>Giới tính<select name="gender" defaultValue={input?.gender || "male"}><option value="male">Nam</option><option value="female">Nữ</option></select></label><label>Lịch<select name="calendarType" defaultValue={input?.calendarType || "solar"}><option value="solar">Dương lịch</option><option value="lunar">Âm lịch</option></select></label><div className={styles.row}>{[["day", "Ngày", 1, 31], ["month", "Tháng", 1, 12], ["year", "Năm sinh", 1900, new Date().getFullYear()], ["birthHour", "Giờ", 0, 23], ["birthMinute", "Phút", 0, 59]].map(([name, label, min, max]) => <label key={name}>{label}<input type="number" name={String(name)} required min={Number(min)} max={Number(max)} defaultValue={input?.[name as keyof ChartInput] ?? (name === "year" ? 1990 : Number(min) || 0)} /></label>)}</div><button disabled={disabled}>Lưu ngày giờ sinh</button>{input && <button type="button" disabled={disabled} onClick={() => onSave(null)}>Xóa thông tin ngày sinh</button>}</form></details>;
 }
 
+function DailyFortune({ value }: { value?: Json }) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+  return <article className={styles.card}>
+    <h3>{String(value.title ?? "")}</h3>
+    <p>{String(value.body ?? "")}</p>
+    <p><strong>Việc nhỏ hôm nay</strong> {String(value.action ?? "")}</p>
+    <p><strong>Màu may mắn</strong> {String(value.color ?? "")} · <strong>Con số may mắn</strong> {String(value.number ?? "")}</p>
+    {Array.isArray(value.evidence) && value.evidence.length > 0 && <details><summary>Căn cứ</summary><Reading value={value.evidence} /></details>}
+    <p>{String(value.disclaimer ?? "")}</p>
+  </article>;
+}
 function Horoscope({ value }: { value: Json | undefined }) {
   const [view, setView] = useState<"depth" | "flat" | "table">("flat");
   const [angle, setAngle] = useState(26);

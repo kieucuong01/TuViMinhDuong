@@ -8,6 +8,14 @@
 @media (max-width:760px) and (orientation:portrait) { .dock.gameDock { top:236px; right:12px; left:12px; width:auto; max-width:none; justify-content:space-between; } }
 @media (max-height:500px) and (orientation:landscape) { .dock.gameDock { top:86px; } }
 .newFortune { position:absolute; top:4px; right:4px; width:6px; height:6px; border-radius:50%; background:#f3c483; }
+.morning { position:absolute; z-index:4; top:207px; left:max(14px,env(safe-area-inset-left)); display:flex; gap:4px; padding:4px; border:1px solid #efbc8150; background:#201821ed; border-radius:12px; }
+.morning button:first-child { color:#ffe0a5; }
+.morning button:last-child { min-width:44px; }
+@media (max-width:767px), (pointer:coarse) and (max-height:600px) {
+  .gameTop, .dock.gameDock { display:none; }
+  .morning { top:calc(max(10px,env(safe-area-inset-top)) + 62px); left:max(10px,env(safe-area-inset-left)); }
+  .morning button { padding:5px 8px; font-size:.8rem; }
+}
 .scrim { position:absolute; z-index:12; inset:0; background:linear-gradient(90deg,#100e1922,#100e19a6); display:grid; place-items:center end; padding:20px; }
 .panel { width:min(620px,100%); max-height:calc(100dvh - 40px); overflow:auto; border:1px solid #efbc8170; border-radius:22px; background:#241b20; color:#f9e9ce; box-shadow:0 30px 100px #0008; font-size:16px; line-height:1.65; overscroll-behavior:contain; }
 .header { position:sticky; top:0; z-index:2; padding:18px 24px; display:flex; align-items:center; justify-content:space-between; gap:15px; background:#241b20f5; border-bottom:1px solid #efbc813b; }

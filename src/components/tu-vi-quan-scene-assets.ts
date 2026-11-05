@@ -22,6 +22,9 @@ export function courtyardAssets(scene: THREE.Scene) {
   const stone = { map: texture("stone_floor_diff", true), normalMap: texture("stone_floor_normal"), roughnessMap: texture("stone_floor_rough") };
   const wood = { map: texture("wood_planks_diff", true), normalMap: texture("wood_planks_normal"), roughnessMap: texture("wood_planks_rough") };
   const cloth = texture("terlenka_normal");
+  const grass = texture("leafy_grass_diff", true);
+  grass.repeat.set(18, 17);
+  const paving = texture("grassy_cobblestone_diff", true);
   const gltfLoader = new GLTFLoader().register(parser => {
     // Embedded images use img-src blob: without relaxing the site's connect-src policy.
     parser.textureLoader = new THREE.TextureLoader(parser.options.manager);
@@ -73,7 +76,7 @@ export function courtyardAssets(scene: THREE.Scene) {
     materials.forEach(value => value.dispose());
     textures.forEach(value => value.dispose());
   }
-  return { stone, wood, cloth, model, dispose() {
+  return { stone, wood, cloth, grass, paving, model, dispose() {
     disposed = true;
     roots.forEach(root => root.removeFromParent());
     disposeResources();

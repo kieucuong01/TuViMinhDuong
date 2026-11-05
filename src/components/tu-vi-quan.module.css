@@ -1,3 +1,13 @@
+@font-face {
+  font-family: "Quan Sans"; src: url("/tu-vi-quan/assets/noto-sans-latin.woff2") format("woff2");
+  font-weight:400 800; font-display:swap;
+  unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;
+}
+@font-face {
+  font-family: "Quan Sans"; src: url("/tu-vi-quan/assets/noto-sans-vietnamese.woff2") format("woff2");
+  font-weight:400 800; font-display:swap;
+  unicode-range:U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB;
+}
 .page {
   --ink: #f9e9ce;
   --muted: #d3baa0;
@@ -14,6 +24,7 @@
   background: linear-gradient(153deg,#302538,#35232b 63%,#744835);
   overflow: hidden;
   overscroll-behavior: none;
+  font-family: "Quan Sans", system-ui, sans-serif;
 }
 .page button, .page input, .page select, .page textarea, .primary {
   min-height: 48px;
@@ -48,7 +59,7 @@
   background: #201821de; border: 1px solid var(--line); box-shadow: 0 4px 16px #180e172d;
 }
 .identity { padding: 7px 15px 8px; border-radius: 12px; line-height: 1.1; }
-.identity h1 { font: 700 1.25rem/1.15 Georgia, serif; color: #ffe6b7; }
+.identity h1 { font: 700 1.25rem/1.15 "Quan Sans", system-ui, sans-serif; color: #ffe6b7; }
 .identity span { display: block; margin-top: 3px; color: var(--muted); font-size: .74rem; }
 .page .icon {
   width: 48px; height: 48px; flex: 0 0 48px; display: grid; place-items: center; padding: 0;
@@ -67,7 +78,7 @@
 }
 .welcomeInner, .panel { width: min(100%, 530px); max-height: 100%; overflow: auto; padding: clamp(18px, 4vw, 36px); }
 .welcomeInner { max-width: 420px; }
-.page h2 { font-family: Georgia, serif; color: #ffe3b3; font-weight: 700; line-height: 1.12; }
+.page h2 { color: #ffe3b3; font-weight: 700; line-height: 1.2; }
 .welcomeInner h2 { margin: 10px 0; font-size: clamp(2rem, 6vw, 3.15rem); }
 .eyebrow { font-size: .7rem; font-weight: 800; letter-spacing: .17em; color: #f0b67d; }
 .note { color: var(--muted); font-size: .88rem; }
@@ -180,6 +191,8 @@
 .seated .mast, .seated .location { display: none; }
 .liveGame .sessionBadge { top: 240px; }
 .liveGame .interaction { bottom: 90px; }
+.mobileBar { display:none; }
+.menuGrid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
 @media(max-width:767px) {
   .socialWrap { bottom: 66px; }
   .ritualToolbar { left: 134px; max-width: none; display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); }
@@ -192,4 +205,21 @@
   .hostChoices { top: 76px; width: 340px; }
   .ritualToolbar { left: auto; width: 360px; display: flex; }
   .liveGame .sessionBadge { top: 180px; }
+}
+@media (max-width:767px), (pointer:coarse) and (max-height:600px) {
+  .liveGame .hostChoices, .liveGame .ritualToolbar, .liveGame .location { display:none; }
+  .liveGame .mobileBar { position:absolute; z-index:4; display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:4px; inset:auto max(8px,env(safe-area-inset-right)) max(8px,env(safe-area-inset-bottom)) max(8px,env(safe-area-inset-left)); width:auto; max-width:500px; margin-inline:auto; padding:4px; border-radius:12px; background:#211920db; }
+  .liveGame .mobileBar button { padding:5px 3px; font-size:.83rem; background:#382c30ee; }
+  .liveGame .interaction { bottom:calc(max(8px,env(safe-area-inset-bottom)) + 64px); right:max(10px,env(safe-area-inset-right)); left:auto; transform:none; }
+  .liveGame .interaction > span { display:none; }
+  .liveGame .notice { bottom:calc(max(8px,env(safe-area-inset-bottom)) + 114px); }
+  .liveGame .sessionBadge { top:auto; bottom:calc(max(8px,env(safe-area-inset-bottom)) + 64px); right:auto; left:max(10px,env(safe-area-inset-left)); }
+  .liveGame .communityActivity { top:125px; left:max(10px,env(safe-area-inset-left)); }
+  .liveGame .communityActivity p:nth-child(n+2) { display:none; }
+  .liveGame .socialWrap { bottom:0; }
+  .liveGame .lite { top:155px; left:50%; transform:translateX(-50%); width:calc(100% - 32px); max-height:calc(100dvh - 236px); }
+}
+@media (max-height:600px) and (orientation:landscape) {
+  .liveGame .mast { padding-block:4px; }
+  .liveGame .communityActivity { display:none; }
 }

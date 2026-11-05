@@ -96,6 +96,24 @@
       "modification": "Resized to 512px JPEG",
       "bytes": 13597,
       "sha256": "7fb545b725412576f0dec77e058a3da7b3a7cc2c7d3f3c4dd779f8db0af217b2"
+    },
+    {
+      "file": "leafy_grass_diff.jpg",
+      "source": "https://polyhaven.com/a/leafy_grass",
+      "download": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/leafy_grass/leafy_grass_diff_1k.jpg",
+      "license": "CC0-1.0",
+      "modification": "Diffuse map resized to 512px JPEG",
+      "bytes": 59659,
+      "sha256": "d64b8ed3c9561c32ff06dd6ee66c2669d6d32d372411162d4b4ab4e9d8f3b3df"
+    },
+    {
+      "file": "grassy_cobblestone_diff.jpg",
+      "source": "https://polyhaven.com/a/grassy_cobblestone",
+      "download": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/grassy_cobblestone/grassy_cobblestone_diff_1k.jpg",
+      "license": "CC0-1.0",
+      "modification": "Diffuse map resized to 512px JPEG",
+      "bytes": 20495,
+      "sha256": "2def37846209ec03bd09a9e5a767f171a06d408ac666ca14563e18642776a8d4"
     }
   ]
 }

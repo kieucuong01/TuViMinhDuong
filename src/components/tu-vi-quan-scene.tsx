@@ -45,7 +45,7 @@ function label(text: string, large = false) {
   canvas.width = 384;
   canvas.height = 100;
   const ctx = canvas.getContext("2d")!;
-  ctx.font = `700 ${large ? 49 : 39}px Georgia, serif`;
+  ctx.font = `700 ${large ? 49 : 39}px "Quan Sans", sans-serif`;
   const width = Math.min(380, ctx.measureText(text).width + 39);
   ctx.fillStyle = large ? "#552c23" : "#49372b";
   ctx.beginPath();
@@ -87,7 +87,7 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
   const scene = new THREE.Scene();
   const ecosystemEnabled = latest.current.ecosystemEnabled === true;
   const assets = ecosystemEnabled ? courtyardAssets(scene) : undefined;
-  scene.fog = new THREE.Fog(0x778995, 49, 132);
+  scene.fog = new THREE.Fog(0x8198a6, 42, 145);
   const camera = new THREE.PerspectiveCamera(56, 1, 0.1, 260);
   const sky = new THREE.HemisphereLight(0xb9d1ef, 0x594032, 1.65);
   const sun = new THREE.DirectionalLight(0xffc185, 2);
@@ -107,7 +107,12 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
       vertexShader: "varying vec3 v; void main(){v=position;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}",
       fragmentShader: `varying vec3 v; void main(){
         vec3 dir=normalize(v); float h=smoothstep(-.14,.57,dir.y);
-        vec3 color=mix(vec3(.72,.65,.63),vec3(.20,.32,.50),h);
+        vec3 color=mix(vec3(.78,.62,.57),vec3(.15,.26,.44),h);
+        float band=(dir.y-.075)*10.; float horizon=exp(-band*band);
+        float wisps=smoothstep(.05,.86,sin(dir.x*9.+dir.z*5.+dir.y*23.)*.55+sin(dir.x*19.-dir.z*13.)*.28+.34);
+        color=mix(color,vec3(.64,.70,.80),horizon*(.23+wisps*.28));
+        float moon=max(0.,dot(dir,normalize(vec3(.47,.31,-.9))));
+        color+=vec3(.34,.40,.51)*pow(moon,108.)+vec3(.67,.67,.57)*smoothstep(.99935,.9996,moon);
         float s=max(0.,dot(dir,normalize(vec3(-.42,.24,-1.))));
         color+=vec3(.33,.18,.08)*pow(s,22.)+vec3(.34,.26,.15)*smoothstep(.998,.999,s);
         gl_FragColor=vec4(color,1.);
@@ -127,10 +132,13 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
   };
   type Shape = keyof typeof geometry;
   const materials = new Map<number, THREE.MeshStandardMaterial>();
+  const tileColors = [0xbda994, 0xc3b098, 0xb8a48c, 0xcbb7a0, 0xb7a38e];
   function material(color: number) {
     let entry = materials.get(color);
     if (!entry) {
-      const surface = [PALETTE.wood, PALETTE.edge, PALETTE.ridge].includes(color) ? assets?.wood
+      const surface = color === 0x91a671 ? { map: assets?.grass ?? null }
+        : tileColors.includes(color) ? { map: assets?.paving ?? null }
+        : [PALETTE.wood, PALETTE.edge, PALETTE.ridge].includes(color) ? assets?.wood
         : [PALETTE.stone, 0xc7b194, 0xcdb89c, 0xc3aa8c, 0xd0bba0, 0xbda58a].includes(color) ? assets?.stone : {};
       entry = new THREE.MeshStandardMaterial({ ...surface, color, roughness: 0.84,
         emissive: color === PALETTE.lantern || color === PALETTE.light ? color : 0x000000,
@@ -176,8 +184,7 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
 
   // A broad central court connects smaller gardens, with the hall as the northern landmark.
   box(0x66764d, 0, -0.23, 0, 220, 0.4, 220);
-  box(0x7b8a54, 0, -0.09, 3, QUAN_BOUNDS.maxX - QUAN_BOUNDS.minX + 4, 0.16, QUAN_BOUNDS.maxZ - QUAN_BOUNDS.minZ + 4);
-  const tileColors = [0xc7b194, 0xcdb89c, 0xc3aa8c, 0xd0bba0, 0xbda58a];
+  box(0x91a671, 0, -0.09, 3, QUAN_BOUNDS.maxX - QUAN_BOUNDS.minX + 4, 0.16, QUAN_BOUNDS.maxZ - QUAN_BOUNDS.minZ + 4);
   function paving(cx: number, cz: number, width: number, depth: number) {
     box(0x9b886c, cx, -0.002, cz, width + 0.2, 0.08, depth + 0.2);
     const cols = Math.round(width / 1.4);
@@ -281,6 +288,13 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
   }
   roof(0, -22, 28, 11.6, 4.6);
   for (const x of [-10, -6, -2, 2, 6, 10]) lantern(x, 3.2, -17.8);
+  for (const [x, z] of [[-39, -49], [35, -61]]) {
+    for (let level = 0; level < 3; level++) {
+      const width = 5.4 - level * 1.32;
+      box(0x536270, x, 3.2 + level * 2.3, z, width * 0.69, 2.35, width * 0.67);
+      roof(x, z, width, width * 0.8, 4.45 + level * 2.3);
+    }
+  }
   for (let i = 0; i < 3; i++) box(PALETTE.stone, 0, 0.04 + i * 0.06, -16.8 - i * 0.25, 11 - i * 0.4, 0.12, 0.5);
   for (const x of [-5.5, 0, 5.5]) {
     box(0x815139, x, 0.98, -19.5, 3.1, 0.2, 1.25);
@@ -383,10 +397,11 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
         vec3 normal=normalize(vec3(.075*cos(p.x*2.2+time*.8),1.,.075*sin(p.y*1.8-time*.6)));
         float fresnel=pow(1.-max(dot(view,normal),0.),3.);
         vec3 reflected=reflect(-view,normal);
-        vec3 color=mix(vec3(.075,.24,.22),vec3(.69,.49,.34),fresnel*.8);
+        vec3 color=mix(vec3(.038,.16,.15),vec3(.31,.50,.62),fresnel*.87);
         float highlight=pow(max(dot(reflected,normalize(vec3(-.6,.28,-.8))),0.),90.);
         float ripple=pow(max(0.,sin(p.y*9.+p.x*2.+waves*.9-time)),16.);
-        color+=vec3(1.,.75,.36)*(highlight*.8+ripple*.08)+waves*.018;
+        float lamps=exp(-abs(p.x-13.4)*.75)*pow(max(0.,cos((p.y-15.35)*1.53+waves*.38)),5.);
+        color+=vec3(1.,.60,.23)*(highlight*.62+lamps*.24)+vec3(.34,.61,.79)*ripple*.12+waves*.018;
         gl_FragColor=vec4(color,1.);
         #include <tonemapping_fragment>
         #include <colorspace_fragment>
@@ -441,6 +456,22 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
     for (const x of [-14.69, -14.30, -13.91]) box(PALETTE.plaster, x, 1.087, 12.63, 0.29, 0.035, 0.45);
     lantern(-14, 2.16, 12.2);
     for (const z of [15.35, 19.9, 22.0]) lantern(12.53, 1.54, z);
+    for (const z of [-10.2, -3.2, 4.4, 11.8, 28.4]) for (const side of [-1, 1]) {
+      const x = side * (z < 8 ? 11.85 : 4.1);
+      drum(PALETTE.stone, x, .13, z, .7, .25);
+      drum(PALETTE.wood, x, .78, z, .18, 1.12);
+      box(PALETTE.edge, x, 1.35, z, .62, .1, .6);
+      box(PALETTE.light, x, 1.59, z, .38, .43, .38);
+      object("cone", PALETTE.ridge, x, 1.92, z, .68, .23, .68);
+    }
+    for (let i = 0; i < 56; i++) {
+      const a = i * 2.39996;
+      const x = 20 + Math.sin(a) * (7.45 + (i % 3) * .23);
+      const z = 18 + Math.cos(a) * (9.45 + (i % 3) * .23);
+      if (x < 13.4) continue;
+      object("leaf", i % 3 ? 0x4f7551 : 0x9ca85d, x, .23, z, .13, .47, .38, .2, a, .32);
+      if (i % 5 === 0) object("head", 0xe5a194, x, .45, z, .19, .14, .18);
+    }
   }
   // Bamboo grove, flowering trees, rocks and individual flower beds, all instanced.
   for (let i = 0; i < 28; i++) {
@@ -634,10 +665,10 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
   function paintRanking(ctx: CanvasRenderingContext2D, leaders: NonNullable<SceneProps["leaders"]>) {
     ctx.fillStyle = "#3a2020"; ctx.fillRect(0, 0, 512, 512);
     ctx.strokeStyle = "#bb8750"; ctx.lineWidth = 4; ctx.strokeRect(13, 16, 486, 480);
-    ctx.fillStyle = "#ffe0a5"; ctx.textAlign = "center"; ctx.font = "bold 31px Georgia";
+    ctx.fillStyle = "#ffe0a5"; ctx.textAlign = "center"; ctx.font = "bold 31px 'Quan Sans', sans-serif";
     ctx.fillText("BẢNG VÀNG CÔNG ĐỨC", 256, 77, 435);
-    ctx.font = "20px Georgia"; ctx.fillText("ĐIỂM AN NHIÊN", 256, 116);
-    ctx.font = "27px Georgia";
+    ctx.font = "20px 'Quan Sans', sans-serif"; ctx.fillText("ĐIỂM AN NHIÊN", 256, 116);
+    ctx.font = "27px 'Quan Sans', sans-serif";
     if (!leaders.length) ctx.fillText("Đang chờ những vị khách đầu tiên", 256, 252, 436);
     leaders.slice(0, 5).forEach((leader, index) => ctx.fillText(`${index + 1}. ${leader.alias}  ·  ${leader.points} điểm`, 256, 172 + index * 60, 435));
   }
@@ -664,13 +695,13 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
         ctx.rotate(Math.PI / 6); ctx.beginPath(); ctx.moveTo(0, 77); ctx.lineTo(0, 169); ctx.stroke();
         ctx.fillStyle = "#633820"; ctx.fillRect(12, 135, 22, 3); ctx.fillRect(12, 142, 22, 3);
       }
-      ctx.restore(); ctx.font = "700 23px Georgia"; ctx.textAlign = "center"; ctx.fillStyle = "#633820"; ctx.fillText("TỬ VI", 256, 264);
+      ctx.restore(); ctx.font = "700 23px 'Quan Sans', sans-serif"; ctx.textAlign = "center"; ctx.fillStyle = "#633820"; ctx.fillText("TỬ VI", 256, 264);
     });
     chart.position.set(5.5, 1.084, -19.5); chart.rotation.x = -Math.PI / 2;
     const plaque = paintedPanel(1.7, 0.58, ctx => {
       ctx.fillStyle = "#4c2521"; ctx.fillRect(0, 0, 512, 512);
       ctx.strokeStyle = "#c18d4d"; ctx.lineWidth = 7; ctx.strokeRect(14, 24, 484, 464); ctx.strokeRect(31, 58, 450, 396);
-      ctx.save(); ctx.scale(1, 2.5); ctx.font = "700 79px Georgia"; ctx.textAlign = "center"; ctx.fillStyle = "#f2c779"; ctx.fillText("TỬ VI", 256, 133); ctx.restore();
+      ctx.save(); ctx.scale(1, 2.5); ctx.font = "700 79px 'Quan Sans', sans-serif"; ctx.textAlign = "center"; ctx.fillStyle = "#f2c779"; ctx.fillText("TỬ VI", 256, 133); ctx.restore();
     });
     plaque.position.set(5.5, 2.97, -21.8);
   }
@@ -698,8 +729,8 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
     ctx.strokeStyle = "#775637"; ctx.lineWidth = 7; ctx.strokeRect(10, 10, 236, 380);
     ctx.fillStyle = ["#916444", "#4c647a", "#6a507b", "#556e57"][Math.abs(value) % 4];
     ctx.beginPath(); ctx.arc(128, 165, 68, 0, Math.PI * 2); ctx.fill();
-    ctx.fillStyle = "#f8e5b7"; ctx.font = "64px Georgia"; ctx.textAlign = "center"; ctx.fillText(["☀", "☾", "✦", "♧"][Math.abs(value) % 4], 128, 188);
-    ctx.fillStyle = "#49372b"; ctx.font = "bold 24px Georgia";
+    ctx.fillStyle = "#f8e5b7"; ctx.font = "64px 'Quan Sans', sans-serif"; ctx.textAlign = "center"; ctx.fillText(["☀", "☾", "✦", "♧"][Math.abs(value) % 4], 128, 188);
+    ctx.fillStyle = "#49372b"; ctx.font = "bold 24px 'Quan Sans', sans-serif";
     const words = title.slice(0, 70).split(" "); let line = ""; let y = 290;
     for (const word of words) { if (ctx.measureText(line + word).width > 215) { ctx.fillText(line, 128, y); line = ""; y += 30; } line += word + " "; }
     ctx.fillText(line, 128, y);
@@ -818,7 +849,7 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
   let pitch = 0.49;
   let cameraReady = false;
   let framedHost: QuanHost | undefined;
-  let padId: number | undefined;
+  let thumb: { id: number; x: number; y: number } | undefined;
   let press: { id: number; x: number; y: number; lastX: number; lastY: number; dragged: boolean } | undefined;
   let route: Position[] = [];
   let destinationId: number | undefined;
@@ -829,14 +860,30 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
     route = findQuanPath(controlled ?? { x: self.group.position.x, z: self.group.position.z }, destination);
   }
   function pressDown(event: PointerEvent) {
-    if (event.button !== 0 || press || latest.current.encounter || !latest.current.interactive) return;
+    if (event.button !== 0 || latest.current.encounter || !latest.current.interactive) return;
+    const rect = canvas.getBoundingClientRect();
+    const leftTouch = event.pointerType === "touch" && event.clientX < rect.left + rect.width / 2;
+    if (leftTouch ? thumb : press) return;
     event.preventDefault();
     startSound();
     container.closest("main")?.focus({ preventScroll: true });
     canvas.setPointerCapture(event.pointerId);
+    if (leftTouch) {
+      thumb = { id: event.pointerId, x: event.clientX, y: event.clientY };
+      route = [];
+      pad.style.left = `${event.clientX - rect.left}px`;
+      pad.style.top = `${event.clientY - rect.top}px`;
+      pad.dataset.active = "true";
+      return;
+    }
     press = { id: event.pointerId, x: event.clientX, y: event.clientY, lastX: event.clientX, lastY: event.clientY, dragged: false };
   }
   function pressMove(event: PointerEvent) {
+    if (thumb?.id === event.pointerId) {
+      steer.set((event.clientX - thumb.x) / 52, (event.clientY - thumb.y) / 52).clampLength(0, 1);
+      knob.style.transform = `translate(${steer.x * 23}px, ${steer.y * 23}px)`;
+      return;
+    }
     if (!press || press.id !== event.pointerId) return;
     if (!press.dragged && Math.hypot(event.clientX - press.x, event.clientY - press.y) < 7) return;
     press.dragged = true;
@@ -846,6 +893,7 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
     press.lastY = event.clientY;
   }
   function pressEnd(event: PointerEvent) {
+    if (thumb?.id === event.pointerId) { endMove(); return; }
     const start = press;
     if (start?.id !== event.pointerId) return;
     press = undefined;
@@ -855,11 +903,15 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
     ray.setFromCamera(pointer, camera);
     const selected = ray.intersectObjects(teachers.map(teacher => teacher.group), true)[0];
     if (selected) { let node: THREE.Object3D | null = selected.object; while (node && !node.userData.host) node = node.parent; if (node) latest.current.onHost?.(node.userData.host as QuanHost); return; }
+    if (event.pointerType === "touch") return;
     if (!ray.ray.intersectPlane(floor, hit)) return;
     route = [];
     if (isQuanWalkable(hit.x, hit.z)) routeTo({ x: hit.x, z: hit.z });
   }
-  function cancelPress() { press = undefined; }
+  function cancelPress(event: PointerEvent) {
+    if (thumb?.id === event.pointerId) endMove();
+    if (press?.id === event.pointerId) press = undefined;
+  }
   function keyDown(event: KeyboardEvent) {
     if (latest.current.encounter || !latest.current.interactive || !movementKeys.has(event.code) ||
         (event.target instanceof HTMLElement && event.target.closest("input, textarea, select, [contenteditable]"))) return;
@@ -869,26 +921,13 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
     keys.add(event.code);
   }
   function keyUp(event: KeyboardEvent) { keys.delete(event.code); }
-  function padMove(event: PointerEvent) {
-    if (padId !== event.pointerId) return;
-    const rect = pad.getBoundingClientRect();
-    steer.set((event.clientX - rect.left - rect.width / 2) / 31, (event.clientY - rect.top - rect.height / 2) / 31).clampLength(0, 1);
-    knob.style.transform = `translate(${steer.x * 28}px, ${steer.y * 28}px)`;
-  }
-  function padDown(event: PointerEvent) {
-    if (latest.current.encounter || !latest.current.interactive || padId !== undefined) return;
-    startSound();
-    route = [];
-    padId = event.pointerId;
-    pad.setPointerCapture(padId);
-    padMove(event);
-  }
-  function padEnd() { padId = undefined; steer.set(0, 0); knob.style.transform = ""; }
-  function clearInput() { keys.clear(); route = []; press = undefined; padEnd(); }
+  function endMove() { thumb = undefined; steer.set(0, 0); knob.style.transform = ""; delete pad.dataset.active; }
+  function clearInput() { keys.clear(); route = []; press = undefined; endMove(); }
   function resize() {
     const width = container.clientWidth;
     const height = container.clientHeight;
     if (!width || !height) return;
+    if ((camera.aspect > 1) !== (width > height)) clearInput();
     camera.aspect = width / height;
     camera.fov = camera.aspect < 0.8 ? 65 : 58;
     camera.updateProjectionMatrix();
@@ -976,7 +1015,7 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
     lamp.material = material(cosmeticColor(appearance.lantern, PALETTE.lantern));
     card.material = material(cosmeticColor(appearance.cardBack, 0x624171));
     renderer.toneMappingExposure = experience === "teacher" ? 0.96 : experience === "personal" ? 1.04 : 1.18;
-    if ((!current.interactive || seated) && (keys.size || route.length || padId !== undefined)) clearInput();
+    if ((!current.interactive || seated) && (keys.size || route.length || thumb || press)) clearInput();
     if (!current.destination && destinationId !== undefined) {
       destinationId = undefined;
       route = [];
@@ -1131,11 +1170,8 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
   canvas.addEventListener("pointermove", pressMove);
   canvas.addEventListener("pointerup", pressEnd);
   canvas.addEventListener("pointercancel", cancelPress);
+  canvas.addEventListener("lostpointercapture", cancelPress);
   canvas.addEventListener("webglcontextlost", contextLost);
-  pad.addEventListener("pointerdown", padDown);
-  pad.addEventListener("pointermove", padMove);
-  pad.addEventListener("pointerup", padEnd);
-  pad.addEventListener("pointercancel", padEnd);
   window.addEventListener("keydown", keyDown);
   window.addEventListener("keyup", keyUp);
   window.addEventListener("blur", clearInput);
@@ -1150,11 +1186,8 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
     canvas.removeEventListener("pointermove", pressMove);
     canvas.removeEventListener("pointerup", pressEnd);
     canvas.removeEventListener("pointercancel", cancelPress);
+    canvas.removeEventListener("lostpointercapture", cancelPress);
     canvas.removeEventListener("webglcontextlost", contextLost);
-    pad.removeEventListener("pointerdown", padDown);
-    pad.removeEventListener("pointermove", padMove);
-    pad.removeEventListener("pointerup", padEnd);
-    pad.removeEventListener("pointercancel", padEnd);
     window.removeEventListener("keydown", keyDown);
     window.removeEventListener("keyup", keyUp);
     window.removeEventListener("blur", clearInput);
@@ -1196,13 +1229,16 @@ export default function TuViQuanScene(props: SceneProps) {
   const latest = useRef(props);
   useEffect(() => { latest.current = props; }, [props]);
   useEffect(() => {
-    if (!container.current) return;
-    try {
-      return makeScene(container.current, latest);
-    } catch (error) {
-      console.error("Không khởi tạo được sân 3D.", error);
-      latest.current.onUnavailable();
+    let cancelled = false;
+    let dispose: (() => void) | undefined;
+    async function start() {
+      await document.fonts.load('700 39px "Quan Sans"', "Thắp hương · Ngồi thiền · Bàn Thầy Dịch").catch(() => {});
+      if (cancelled || !container.current) return;
+      try { dispose = makeScene(container.current, latest); }
+      catch (error) { console.error("Không khởi tạo được sân 3D.", error); latest.current.onUnavailable(); }
     }
+    void start();
+    return () => { cancelled = true; dispose?.(); };
   }, []);
   return (
     <div className={styles.scene} ref={container}>

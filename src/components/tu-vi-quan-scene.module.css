@@ -4,18 +4,12 @@
 .scene canvas:active { cursor: grabbing; }
 .hidden { display: none; }
 .joystick { display: none; }
-@media (pointer: coarse) {
-  .joystick {
-    position: absolute; z-index: 1; display: grid; place-items: center;
-    left: max(18px,env(safe-area-inset-left)); bottom: max(22px,env(safe-area-inset-bottom));
-    width: 104px; height: 104px; border-radius: 50%; touch-action: none;
-    border: 1px solid #f6d4a98a; background: #231a24a8; box-shadow: inset 0 0 0 9px #25192647,0 6px 22px #160f1a55;
-  }
-  .joystick span { width: 43px; height: 43px; border-radius: 50%; background: radial-gradient(circle at 35% 25%,#ffe0a9,#b98461); box-shadow: 0 4px 12px #1a121c9c; pointer-events: none; }
-}
+.joystick[data-active] { position:absolute; z-index:1; display:grid; place-items:center; width:74px; height:74px; transform:translate(-50%,-50%); border-radius:50%; pointer-events:none; border:1px solid #f6d4a98a; background:#231a244f; }
+.joystick span { width:30px; height:30px; border-radius:50%; background:#efc188b8; }
 
 .hosts { position: absolute; z-index: 2; top: 16px; right: 16px; display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; max-width: calc(100% - 32px); }
 .hosts button { min-height: 48px; padding: 8px 14px; border: 1px solid #dfbe84; border-radius: 10px; background: #30251de8; color: #fff0cb; font: inherit; cursor: pointer; }
 .hosts button:focus-visible { outline: 3px solid #fff0cb; outline-offset: 3px; }
 .publicSpeech { position: absolute; z-index: 1; top: 80px; right: 16px; max-width: min(340px, calc(100% - 32px)); color: #fff0cb; pointer-events: none; }
 .publicSpeech p { margin: 6px 0; padding: 8px 12px; border-radius: 12px; background: #30251de8; }
+@media (max-width:767px), (pointer:coarse) and (max-height:600px) { .publicSpeech { display:none; } }

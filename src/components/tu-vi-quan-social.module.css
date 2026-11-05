@@ -15,3 +15,8 @@
 .form input { width:0; flex:1; min-height:44px; padding:8px; border-radius:8px; border:1px solid #a38e68; color:#fff8e7; background:#11180e; font-size:16px; }
 .error { font-size:13px; color:#ffd8b4; margin:6px 0 0; }
 @media(min-width:768px) { .social { bottom:24px; } }
+@media (max-width:767px), (pointer:coarse) and (max-height:600px) {
+  .social { top:calc(max(10px,env(safe-area-inset-top)) + 62px); right:max(10px,env(safe-area-inset-right)); left:auto; bottom:auto; width:max-content; max-width:calc(100% - 20px); }
+  .social .toggle { display:block; margin-left:auto; min-width:44px; font-size:.8rem; }
+  .social .body { width:min(340px,calc(100vw - 28px)); }
+}
