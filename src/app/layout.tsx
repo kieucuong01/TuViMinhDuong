@@ -11,19 +11,19 @@ import { APP_NAME, APP_URL } from "@/lib/env";
 import { getOperationSettings } from "@/lib/data";
 import "./globals.css";
 
-const defaultOgImage = `/api/og?title=${encodeURIComponent("Lập lá số tử vi miễn phí")}&subtitle=${encodeURIComponent("Xem lá số, xem ngày và luận giải dễ hiểu")}`;
+const defaultOgImage = `/api/og?title=${encodeURIComponent("Tử Vi Quán 3D")}&subtitle=${encodeURIComponent("Gặp thầy Tử Vi · Tarot · Kinh Dịch · Tu viện")}`;
 
 export const metadata: Metadata = {
   metadataBase: new URL(APP_URL),
   title: {
-    default: `${APP_NAME} - Lập lá số tử vi miễn phí`,
+    default: `${APP_NAME} - Tử Vi Quán 3D`,
     template: `%s | ${APP_NAME}`,
   },
   description:
-    "Lập lá số tử vi, xem luận giải dễ hiểu, kiến thức tử vi và nạp xu nhanh cho người dùng Việt Nam.",
+    "Bước vào Tử Vi Quán 3D, gặp thầy để trò chuyện riêng và thực hành những nghi thức an nhiên.",
   openGraph: {
-    title: `${APP_NAME} - Lập lá số tử vi miễn phí`,
-    description: "Tra cứu lá số tử vi chuẩn phổ thông, xem ngày và kiến thức tử vi dễ hiểu.",
+    title: `${APP_NAME} - Tử Vi Quán 3D`,
+    description: "Trò chuyện với thầy Tử Vi, Tarot, Kinh Dịch và ghé Tu viện An Nhiên.",
     url: APP_URL,
     siteName: APP_NAME,
     images: [defaultOgImage],
@@ -32,8 +32,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: `${APP_NAME} - Lập lá số tử vi miễn phí`,
-    description: "Tra cứu lá số tử vi chuẩn phổ thông, xem ngày và kiến thức tử vi dễ hiểu.",
+    title: `${APP_NAME} - Tử Vi Quán 3D`,
+    description: "Trò chuyện với thầy Tử Vi, Tarot, Kinh Dịch và ghé Tu viện An Nhiên.",
     images: [defaultOgImage],
   },
   alternates: {

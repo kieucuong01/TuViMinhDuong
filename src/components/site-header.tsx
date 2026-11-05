@@ -30,7 +30,7 @@ import { AGE_TOOL_LINKS, type AgeToolSlug } from "@/lib/age-tools";
 import { APP_NAME } from "@/lib/env";
 
 const baseNav = [
-  { href: "/", label: "Lập lá số", tone: "primary" },
+  { href: "/", label: "Vào Tử Vi Quán", tone: "primary" },
   { href: "/xem-tu-vi-tron-doi", label: "Tử vi", tone: "tuvi" },
   { href: "/xem-ngay", label: "Xem ngày", tone: "date" },
   { href: "/xem-tuoi", label: "Xem tuổi", tone: "age" },

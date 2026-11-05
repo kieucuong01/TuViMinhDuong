@@ -8,7 +8,6 @@ function source(path: string) {
 const dateFinderSource = source("src/components/date-range-finder.tsx");
 const birthHourSource = source("src/components/birth-hour-comparison.tsx");
 const ageToolSource = source("src/components/age-tool.tsx");
-const homeSource = source("src/app/page.tsx");
 const chartFormSource = source("src/components/chart-form.tsx");
 const analyticsRouteGateSource = source("src/components/google-analytics-route-gate.tsx");
 const eventReporterSource = source("src/components/organic-tool-event-reporter.tsx");
@@ -32,14 +31,6 @@ describe("organic tool analytics", () => {
     expect(birthHourSource).toContain("hour_branch");
     expect(birthHourSource).not.toContain("full_name");
     expect(birthHourSource).not.toContain("birth_date");
-  });
-
-  it("routes date finder CTA source into the final create-chart source", () => {
-    expect(homeSource).toContain("safeHomeAdSource");
-    expect(homeSource).toContain('params.source === "date_finder"');
-    expect(homeSource).toContain("chartAdSource");
-    expect(homeSource).toContain("<ChartForm adSource={chartAdSource} />");
-    expect(homeSource).toContain('params.source === "seo_article"');
   });
 
   it("tracks the Xem Tuổi funnel without birth details", () => {

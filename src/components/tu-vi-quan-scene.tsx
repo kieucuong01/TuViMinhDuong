@@ -6,7 +6,7 @@ import { courtyardAssets } from "./tu-vi-quan-scene-assets";
 import { QUAN_TAROT_CARDS } from "@/lib/tu-vi-quan-content";
 import type { MonasteryPose } from "./tu-vi-quan-monastery";
 import styles from "./tu-vi-quan-scene.module.css";
-import { findQuanPath, findQuanMonasteryPath, isQuanWalkable, isQuanMonasteryWalkable, quanGroundHeight, QUAN_BOUNDS, QUAN_POND, QUAN_STATIONS, QUAN_MONASTERY_SEATS, QUAN_MONASTERY_ENTRY } from "@/lib/tu-vi-quan-world.mjs";
+import { findQuanPath, isQuanWalkable, quanGroundHeight, quanMonasteryToWorld, quanWorldToMonastery, QUAN_BOUNDS, QUAN_POND, QUAN_STATIONS, QUAN_MONASTERY_SEATS, QUAN_MONASTERY_SPACE } from "@/lib/tu-vi-quan-world.mjs";
 
 type Position = { x: number; z: number };
 type Player = Position & { id: string; alias: string; action: string; seatIndex?: number | null; monasteryPose?: MonasteryPose; monasteryPosition?: Position };
@@ -25,10 +25,8 @@ type SceneProps = {
   appearance?: Record<string, string>;
   monasteryPose?: MonasteryPose;
   monasterySeat?: number | null;
-  monasteryPosition?: Position;
   monasteryDestination?: { index: number; requestId: number } | null;
   onMonasteryNearby?: (index: number | null) => void;
-  onMonasteryMove?: (position: Position) => void;
   leaders?: { alias: string; points: number }[];
   eventEndsAt?: number;
   experience?: "courtyard" | "teacher" | "tarot" | "iching" | "personal" | "monastery";
@@ -159,6 +157,8 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
     return entry;
   }
   let monasteryGeometry = false;
+  const interiorTransform = new THREE.Matrix4().makeScale(1, 1, QUAN_MONASTERY_SPACE.depthScale);
+  interiorTransform.setPosition(QUAN_MONASTERY_SPACE.x, QUAN_MONASTERY_SPACE.floor, QUAN_MONASTERY_SPACE.z);
   let offsetX = 0, offsetZ = 0;
   const batches = new Map<string, { shape: Shape; color: number; monastery: boolean; matrices: THREE.Matrix4[] }>();
   const placement = new THREE.Object3D();
@@ -176,6 +176,7 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
     placement.scale.set(sx, sy, sz);
     placement.rotation.set(rx, ry, rz);
     placement.updateMatrix();
+    if (monasteryGeometry) placement.matrix.premultiply(interiorTransform);
     entry.matrices.push(placement.matrix.clone());
   }
   function box(color: number, x: number, y: number, z: number, sx: number, sy: number, sz: number, rx = 0, ry = 0, rz = 0) {
@@ -250,7 +251,8 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
     drum(PALETTE.gold, x, y + 0.38, z, 0.42, 0.1);
     drum(PALETTE.light, x, y - 0.38, z, 0.36, 0.1);
     drum(PALETTE.red, x, y - 0.62, z, 0.06, 0.35);
-    placement.position.set(x + offsetX, 0.083, z + offsetZ);
+    const pool = monasteryGeometry ? quanMonasteryToWorld({ x, z }) : { x: x + offsetX, z: z + offsetZ };
+    placement.position.set(pool.x, 0.083 + (monasteryGeometry ? QUAN_MONASTERY_SPACE.floor : 0), pool.z);
     placement.scale.set(2.25, 2.25, 1);
     placement.rotation.set(-Math.PI / 2, 0, 0);
     placement.updateMatrix();
@@ -292,7 +294,7 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
   box(PALETTE.stone, 0, 0.34, -22, 25.6, 0.12, 9.6);
   box(PALETTE.plaster, 0, 2.2, -26.3, 24.6, 3.7, 0.32);
   for (const x of [-12, -8, -4, 0, 4, 8, 12]) {
-    column(x, -18.15, 4.72);
+    if (x !== 0) column(x, -18.15, 4.72);
     column(x, -25.8, 4.72);
   }
   for (const z of [-25.9, -18.15]) {
@@ -443,7 +445,7 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
     lantern(side * 8, 3.2, -16.6);
   }
   monasteryGeometry = true;
-  const templeX = -68;
+  const templeX = 0;
   const templeGold = 0xd9a742, templeRed = 0x9d3028, templeCream = 0xe9cc8c;
   box(0xa35443, templeX, -0.03, -2, 32, 0.2, 34);
   for (let row = 0; row < 15; row++) for (let col = 0; col < 14; col++) {
@@ -678,7 +680,6 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
   scene.add(pools);
   for (const entry of batches.values()) {
     const mesh = new THREE.InstancedMesh(geometry[entry.shape], material(entry.color), entry.matrices.length);
-    if (entry.monastery) mesh.layers.set(1);
     entry.matrices.forEach((matrix, index) => mesh.setMatrixAt(index, matrix));
     mesh.castShadow = entry.matrices.some(matrix => matrix.elements[13] > 0.7);
     mesh.receiveShadow = true;
@@ -818,8 +819,9 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
     const mesh = new THREE.Mesh(geometry[shape], material(color)); mesh.position.set(x, y, z); mesh.scale.set(sx, sy, sz); scene.add(mesh); return mesh;
   }
   const monasterySeats = QUAN_MONASTERY_SEATS.map(seat => {
-    const mesh = ritualPart("drum", 0xf2d17c, templeX + seat.x, 0.422, seat.z, 1.48, 0.025, 1.18);
-    mesh.layers.set(1); mesh.userData.seatIndex = seat.index;
+    const position = quanMonasteryToWorld(seat);
+    const mesh = ritualPart("drum", 0xf2d17c, position.x, QUAN_MONASTERY_SPACE.floor + 0.422, position.z, 1.48, 0.025, 1.18 * QUAN_MONASTERY_SPACE.depthScale);
+    mesh.userData.seatIndex = seat.index;
     return mesh;
   });
   const seatCushions = teachers.flatMap((teacher, index) => [0, 2.5].map(offset => {
@@ -828,11 +830,10 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
   const tableSkins = [-41.5, -36, -30.5].map(x => ritualPart("box", 0x354e67, x, 1.081, -11.5, 3.1, 0.012, 1.25));
   const altarSkin = ritualPart("box", 0xa33d31, -18, 0.72, 23, 2.91, 0.9, 1.51);
   const templeLight = new THREE.PointLight(0xffd49b, 45, 42, 1.4);
-  templeLight.layers.set(1);
-  templeLight.position.set(templeX, 6.2, -9); scene.add(templeLight);
-  const statueLights = [-8, 0, 8].map(offset => {
+  templeLight.position.set(templeX, 6.2 + QUAN_MONASTERY_SPACE.floor, quanMonasteryToWorld({ x: 0, z: -9 }).z); scene.add(templeLight);
+  [-8, 0, 8].forEach(offset => {
     const light = new THREE.PointLight(0xffe6b3, 28, 15, 1.3);
-    light.position.set(templeX + offset, 6.5, -9.5); light.layers.set(1); scene.add(light); return light;
+    light.position.set(templeX + offset, 6.5 + QUAN_MONASTERY_SPACE.floor, quanMonasteryToWorld({ x: 0, z: -9.5 }).z); scene.add(light);
   });
   const readingDecor: THREE.Mesh<THREE.PlaneGeometry, THREE.MeshStandardMaterial>[] = [];
   function paintedPanel(width: number, height: number, paint: (ctx: CanvasRenderingContext2D) => void) {
@@ -897,7 +898,7 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
   facadePlate("BÀN THỜ THẦN TÀI", "XIN LỘC ĐẦU NGÀY", "#5a2824", 2.5, 1.43).position.set(-18, 2.2, 22.02);
   facadePlate("TU VIỆN AN NHIÊN", "ĐIỆN PHẬT · THIỀN · TRÀNG HẠT", "#6a2b24", 11.2, 2.4).position.set(0, 10.6, -15.04);
   const templePlaque = facadePlate("TU VIỆN AN NHIÊN", "MỘT KHOẢNG LẶNG CHO MỖI NGÀY", "#6a2b24", 6.1, 1.23);
-  templePlaque.position.set(templeX, 7.53, -17.31); templePlaque.layers.set(1);
+  templePlaque.position.set(templeX, 7.53 + QUAN_MONASTERY_SPACE.floor, quanMonasteryToWorld({ x: 0, z: -17.31 }).z);
   let previousLeaders: SceneProps["leaders"];
   if (ecosystemEnabled) {
     const rug = paintedPanel(4.3, 4.4, ctx => {
@@ -1078,7 +1079,6 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
   let pitch = 0.49;
   let cameraReady = false;
   let framedHost = -1;
-  let previousExperience = "courtyard";
   let buddhaRequested = false;
   let thumb: { id: number; x: number; y: number; dragged: boolean } | undefined;
   let press: { id: number; x: number; y: number; lastX: number; lastY: number; dragged: boolean } | undefined;
@@ -1090,10 +1090,8 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
   let nearbySeat: number | null = null;
   let monasteryDestinationId: number | undefined;
   function routeTo(destination: Position) {
-    const from = controlled ?? { x: self.group.position.x, z: self.group.position.z };
-    route = latest.current.experience === "monastery"
-      ? findQuanMonasteryPath({ x: from.x - templeX, z: from.z }, { x: destination.x - templeX, z: destination.z }).map(point => ({ x: templeX + point.x, z: point.z }))
-      : findQuanPath(from, destination);
+    const from = controlled ?? latest.current.position;
+    route = findQuanPath(from, destination);
   }
   function pressDown(event: PointerEvent) {
     if (event.button !== 0 || latest.current.encounter || !latest.current.interactive) return;
@@ -1139,25 +1137,21 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
     const rect = canvas.getBoundingClientRect();
     pointer.set((event.clientX - rect.left) / rect.width * 2 - 1, 1 - (event.clientY - rect.top) / rect.height * 2);
     ray.setFromCamera(pointer, camera);
-    if (latest.current.experience === "monastery") {
-      ray.layers.set(1);
-      const selected = ray.intersectObjects(monasterySeats, false)[0];
-      if (latest.current.monasterySeat != null) return;
-      if (selected) {
-        const index = selected.object.userData.seatIndex;
-        if (latest.current.players.some(player => player.action === "monastery" && player.seatIndex === index)) return;
-        const seat = QUAN_MONASTERY_SEATS[index];
-        routeTo({ x: templeX + seat.x, z: seat.z + 1.3 });
-      } else if (!leftTouch && ray.ray.intersectPlane(floor, hit) && isQuanMonasteryWalkable(hit.x - templeX, hit.z)) routeTo(hit);
-      return;
-    }
     ray.layers.set(0);
+    const cushion = ray.intersectObjects(monasterySeats, false)[0];
+    if (cushion) {
+      const index = cushion.object.userData.seatIndex;
+      if (latest.current.monasterySeat != null || latest.current.players.some(player => player.action === "monastery" && player.seatIndex === index)) return;
+      const seat = QUAN_MONASTERY_SEATS[index];
+      routeTo(quanMonasteryToWorld({ x: seat.x, z: seat.z + 1.3 })); return;
+    }
     if (latest.current.onIncense && ray.ray.intersectsBox(altarHit)) { latest.current.onIncense(); return; }
     if (leftTouch) return;
     const selected = ray.intersectObjects(teachers.map(teacher => teacher.group), true)[0];
     if (selected) { let node: THREE.Object3D | null = selected.object; while (node && !node.userData.host) node = node.parent; if (node) latest.current.onHost?.(node.userData.host as QuanHost, node.userData.desk); return; }
     if (event.pointerType === "touch") return;
-    if (!ray.ray.intersectPlane(floor, hit)) return;
+    const walkingFloor = latest.current.experience === "monastery" ? new THREE.Plane(new THREE.Vector3(0, 1, 0), -QUAN_MONASTERY_SPACE.floor) : floor;
+    if (!ray.ray.intersectPlane(walkingFloor, hit)) return;
     route = [];
     if (isQuanWalkable(hit.x, hit.z)) routeTo({ x: hit.x, z: hit.z });
   }
@@ -1249,22 +1243,10 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
     }
     const experience = ecosystemEnabled ? current.experience ?? "courtyard" : "courtyard";
     const monastery = experience === "monastery";
-    camera.layers.set(monastery ? 1 : 0);
-    if (experience !== previousExperience) {
-      if (monastery || previousExperience === "monastery") {
-        clearInput(); controlled = null; walked = false;
-        const entry = current.monasteryPosition ?? QUAN_MONASTERY_ENTRY;
-        self.group.position.set(monastery ? templeX + entry.x : current.position.x, 0.054, monastery ? entry.z : current.position.z); cameraReady = false;
-        yaw = 0; pitch = 0.49;
-      }
-      previousExperience = experience;
-    }
-    if (monastery && !buddhaRequested && assets) {
+    if (!buddhaRequested && assets) {
       buddhaRequested = true;
-      assets.model("buddha-amoghasiddhi", [-8, 0, 8].map(offset => ({ x: templeX + offset, y: 1.24, z: -13.1, height: offset === 0 ? 5.8 : 4.9, layer: 1 })));
+      assets.model("buddha-amoghasiddhi", [-8, 0, 8].map(offset => ({ ...quanMonasteryToWorld({ x: offset, z: -13.1 }), y: 1.24 + QUAN_MONASTERY_SPACE.floor, height: offset === 0 ? 5.8 : 4.9 })));
     }
-    templeLight.visible = monastery;
-    statueLights.forEach(light => { light.visible = monastery; });
     monasterySeats.forEach((mesh, index) => {
       const occupied = current.players.some(person => person.action === "monastery" && person.seatIndex === index);
       mesh.material = material(current.monasterySeat === index ? 0x82b9ab : occupied ? 0x795449 : 0xf2d17c);
@@ -1304,17 +1286,16 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
       destinationId = undefined;
       route = [];
     }
-    if (!monastery && !seated && current.interactive && current.destination && current.destination.requestId !== destinationId) {
+    if (!seated && current.monasterySeat == null && current.interactive && current.destination && current.destination.requestId !== destinationId) {
       destinationId = current.destination.requestId;
       routeTo(current.destination);
     }
     if (monastery && current.monasterySeat == null && current.monasteryDestination && current.monasteryDestination.requestId !== monasteryDestinationId) {
       monasteryDestinationId = current.monasteryDestination.requestId;
       const seat = QUAN_MONASTERY_SEATS[current.monasteryDestination.index];
-      routeTo({ x: templeX + seat.x, z: seat.z + 1.3 });
+      routeTo(quanMonasteryToWorld({ x: seat.x, z: seat.z + 1.3 }));
     }
-    const templePosition = current.monasteryPosition ?? QUAN_MONASTERY_ENTRY;
-    const walkingPosition = monastery ? { x: templeX + templePosition.x, z: templePosition.z } : current.position;
+    const walkingPosition = current.position;
     let dx = steer.x + Number(keys.has("KeyD") || keys.has("ArrowRight")) - Number(keys.has("KeyA") || keys.has("ArrowLeft"));
     let dz = steer.y + Number(keys.has("KeyS") || keys.has("ArrowDown")) - Number(keys.has("KeyW") || keys.has("ArrowUp"));
     if (Math.hypot(dx, dz) > 0.09) {
@@ -1331,25 +1312,24 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
       }
     }
     const magnitude = Math.hypot(dx, dz);
-    const reportMove = (position: Position) => monastery ? current.onMonasteryMove?.({ x: position.x - templeX, z: position.z }) : current.onMove(position);
     if ((!monastery || current.monasterySeat == null) && !seated && current.interactive && magnitude > 0.09) {
       walked = true;
       controlled ??= { ...walkingPosition };
       const pace = Math.min(5.8 * dt, route.length ? magnitude : Infinity) / Math.max(route.length ? 0.001 : 1, magnitude);
       const nx = controlled.x + dx * pace;
       const nz = controlled.z + dz * pace;
-      const clearX = monastery ? isQuanMonasteryWalkable(nx - templeX, controlled.z) : isQuanWalkable(nx, controlled.z);
+      const clearX = isQuanWalkable(nx, controlled.z);
       if (clearX) controlled.x = nx;
-      const clearZ = monastery ? isQuanMonasteryWalkable(controlled.x - templeX, nz) : isQuanWalkable(controlled.x, nz);
+      const clearZ = isQuanWalkable(controlled.x, nz);
       if (clearZ) controlled.z = nz;
       if (!(clearX && Math.abs(dx) > 0.01) && !(clearZ && Math.abs(dz) > 0.01)) route = [];
-      if (time - sentAt >= 80) { reportMove({ ...controlled }); sentAt = time; }
+      if (time - sentAt >= 80) { current.onMove({ ...controlled }); sentAt = time; }
     } else if (controlled) {
-      reportMove({ ...controlled });
+      if (current.monasterySeat == null) current.onMove({ ...controlled });
       controlled = null;
     }
-    if (!seated) self.group.position.y = 0.054 + (monastery ? 0 : quanGroundHeight(self.group.position.x, self.group.position.z));
-    if (!walked) self.group.position.set(walkingPosition.x, 0.054 + (monastery ? 0 : quanGroundHeight(walkingPosition.x, walkingPosition.z)), walkingPosition.z);
+    if (!seated) self.group.position.y = 0.054 + quanGroundHeight(self.group.position.x, self.group.position.z);
+    if (!walked) self.group.position.set(walkingPosition.x, 0.054 + quanGroundHeight(walkingPosition.x, walkingPosition.z), walkingPosition.z);
     move(self, controlled ?? walkingPosition, current.action, time / 1000, dt);
     if (current.ritual?.requestId !== ritualId) {
       ritualId = current.ritual?.requestId; ritualStarted = time;
@@ -1395,9 +1375,10 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
     if (monastery) {
       const prayer = current.monasteryPose ?? "idle";
       const seat = current.monasterySeat == null ? null : QUAN_MONASTERY_SEATS[current.monasterySeat];
-      if (seat) self.group.position.set(templeX + seat.x, 0.46, seat.z);
+      if (seat) { const location = quanMonasteryToWorld(seat); self.group.position.set(location.x, QUAN_MONASTERY_SPACE.floor + 0.46, location.z); }
       if (seat || prayer !== "idle") { self.body.rotation.y = Math.PI; pose(self, ["greet", "incense"].includes(prayer) ? "greet" : seat || prayer === "bow" ? "seated" : "idle", time / 1000, false, reducedMotion()); }
-      const nearest = seat ? null : QUAN_MONASTERY_SEATS.find(candidate => !current.players.some(player => player.action === "monastery" && player.seatIndex === candidate.index) && Math.hypot(self.group.position.x - templeX - candidate.x, self.group.position.z - candidate.z) <= 1.8)?.index ?? null;
+      const local = quanWorldToMonastery(self.group.position);
+      const nearest = seat ? null : QUAN_MONASTERY_SEATS.find(candidate => !current.players.some(player => player.action === "monastery" && player.seatIndex === candidate.index) && Math.hypot(local.x - candidate.x, local.z - candidate.z) <= 1.8)?.index ?? null;
       if (nearest !== nearbySeat) { nearbySeat = nearest; current.onMonasteryNearby?.(nearest); }
       if (prayer === "bow") {
         self.arms.forEach((arm, index) => { arm.rotation.x = -1.83; arm.rotation.z = index === 0 ? 0.52 : -0.52; });
@@ -1411,16 +1392,12 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
     const { x, z } = self.group.position;
     const distance = camera.aspect < 0.8 ? 7.8 : 9.3;
     const planar = Math.cos(pitch) * distance;
-    cameraGoal.set(x + Math.sin(yaw) * planar, 1.5 + Math.sin(pitch) * distance, z + Math.cos(yaw) * planar);
-    cameraTarget.set(x - Math.sin(yaw) * 3.2, 1.7, z - Math.cos(yaw) * 3.2);
+    cameraGoal.set(x + Math.sin(yaw) * planar, self.group.position.y + 1.5 + Math.sin(pitch) * distance, z + Math.cos(yaw) * planar);
+    cameraTarget.set(x - Math.sin(yaw) * 3.2, self.group.position.y + 1.7, z - Math.cos(yaw) * 3.2);
     if (experience === "teacher") { cameraGoal.set(-35, 3.5, -5.8); cameraTarget.set(-36, 1.6, -12.5); }
     if (experience === "personal") { cameraGoal.set(58.5, 4.2, 1.2); cameraTarget.set(55, 1.2, -6.4); }
     if (experience === "tarot") { cameraGoal.set(-23, 3.1, 19.5); cameraTarget.set(-26, 1.2, 14.9); }
     if (experience === "iching") { cameraGoal.set(30, 3.2, 6); cameraTarget.set(28, 1, 0.4); }
-    if (monastery) {
-      cameraGoal.set(x + Math.sin(yaw) * planar, self.group.position.y + 1.5 + Math.sin(pitch) * distance, z + Math.cos(yaw) * planar);
-      cameraTarget.set(x - Math.sin(yaw) * 3.2, 1.7, z - Math.cos(yaw) * 3.2);
-    }
     if (hostPosition) {
       const host = hostPosition;
       const portrait = camera.aspect < 0.8;
@@ -1449,19 +1426,19 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
         visitor.group.position.set(player.x, 0.054, player.z);
         visitors.set(player.id, visitor);
       }
-      if (monastery && player.action === "monastery") {
+      if (player.action === "monastery") {
         const seat = Number.isInteger(player.seatIndex) ? QUAN_MONASTERY_SEATS[player.seatIndex!] : null;
-        const location = seat ?? player.monasteryPosition ?? QUAN_MONASTERY_ENTRY;
-        if (!seat) move(visitor, { x: templeX + location.x, z: location.z }, "idle", time / 1000, dt);
-        else visitor.group.position.set(templeX + seat.x, 0.46, seat.z);
+        if (!seat) { move(visitor, player, "idle", time / 1000, dt); visitor.group.position.y = quanGroundHeight(player.x, player.z) + .054; }
+        else { const location = quanMonasteryToWorld(seat); visitor.group.position.set(location.x, QUAN_MONASTERY_SPACE.floor + .46, location.z); }
         visitor.body.rotation.y = Math.PI;
         const prayer = player.monasteryPose ?? "idle";
         if (seat || prayer !== "idle") pose(visitor, ["greet", "incense"].includes(prayer) ? "greet" : seat ? "seated" : "idle", time / 1000, false, reducedMotion());
         if (prayer === "bow") visitor.body.rotation.x = reducedMotion() ? -0.65 : -0.15 - Math.sin(time / 1100) ** 2 * 0.9;
-        visitor.group.visible = true;
+        visitor.group.visible = !seated && experience !== "personal";
       } else {
         move(visitor, player, player.action, time / 1000, dt);
-        visitor.group.visible = experience === "courtyard" && player.action !== "monastery" && Math.hypot(player.x - x, player.z - z) > 0.5;
+        visitor.group.position.y = quanGroundHeight(player.x, player.z) + .054;
+        visitor.group.visible = !seated && experience !== "personal" && Math.hypot(player.x - x, player.z - z) > 0.5;
       }
     }
     for (const [id, visitor] of visitors) {
@@ -1473,7 +1450,7 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
     smoke.forEach((mesh, index) => {
       mesh.layers.enable(1);
       const phase = reducedMotion() ? (index + 1) / 8 : ((time / 4600 + index / smoke.length) % 1);
-      mesh.position.set((monastery ? templeX : -18) + phase * 0.76 + Math.sin(phase * 6) * 0.12, (monastery ? 2.7 : 2.46) + phase * 1.73, (monastery ? -9 : 23) + phase * 0.19);
+      mesh.position.set((monastery ? templeX : -18) + phase * 0.76 + Math.sin(phase * 6) * 0.12, (monastery ? 2.7 + QUAN_MONASTERY_SPACE.floor : 2.46) + phase * 1.73, (monastery ? QUAN_MONASTERY_SPACE.z - 9 * QUAN_MONASTERY_SPACE.depthScale : 23) + phase * 0.19);
       mesh.scale.setScalar(0.082 + phase * 0.35);
       mesh.material.opacity = (1 - phase) * (monastery ? current.monasteryPose === "incense" ? 0.42 : 0.12 : current.action === "incense" || ritualActive && current.ritual?.kind === "incense" ? 0.42 : incense[1].stick.visible ? 0.22 : 0);
     });

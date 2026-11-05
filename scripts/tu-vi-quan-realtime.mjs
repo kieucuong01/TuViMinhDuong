@@ -6,7 +6,7 @@ import dotenv from "dotenv";
 import pg from "pg";
 import { WebSocket, WebSocketServer } from "ws";
 import { quanPresenceSecret, quanSeatCheckToken, verifyQuanSocketTicket } from "../src/lib/tu-vi-quan-presence.mjs";
-import { isQuanWalkable, isQuanMonasteryWalkable, QUAN_SPAWN, QUAN_MONASTERY_SEATS, QUAN_MONASTERY_ENTRY } from "../src/lib/tu-vi-quan-world.mjs";
+import { isQuanWalkable, isQuanMonasteryWalkable, getQuanZone, quanWorldToMonastery, quanMonasteryToWorld, QUAN_SPAWN, QUAN_MONASTERY_SEATS, QUAN_MONASTERY_ENTRY } from "../src/lib/tu-vi-quan-world.mjs";
 
 const MAX_GUESTS = 24;
 const ROOM_NAMES = ["Sân Trúc", "Sân Sen", "Sân Mai", "Sân Trà"];
@@ -135,12 +135,13 @@ export function createQuanPresenceServer({ secret, origins, readBoard = async ()
           const data = JSON.parse(raw.toString("utf8"));
           if (!data || typeof data !== "object") return;
           if (
-            data.type === "move" &&
+            data.type === "move" && player.seatIndex === null &&
             typeof data.x === "number" && typeof data.z === "number" && isQuanWalkable(data.x, data.z)
           ) {
             player.x = Math.round(data.x * 100) / 100;
             player.z = Math.round(data.z * 100) / 100;
-            player.action = "idle";
+            player.action = ecosystemEnabled && getQuanZone(player.x, player.z) === "monastery" ? "monastery" : "idle";
+            if (player.action === "monastery") player.monasteryPosition = quanWorldToMonastery(player);
             player.seatIndex = null; player.monasteryPose = "idle";
             presence.actionUntil = 0;
             dirty = true;
@@ -163,11 +164,13 @@ export function createQuanPresenceServer({ secret, origins, readBoard = async ()
             dirty = true;
           } else if (ecosystemEnabled && data.type === "monastery-move" && player.action === "monastery" && player.seatIndex === null && isQuanMonasteryWalkable(data.x, data.z)) {
             player.monasteryPosition = { x: Math.round(data.x * 100) / 100, z: Math.round(data.z * 100) / 100 };
+            Object.assign(player, quanMonasteryToWorld(player.monasteryPosition));
             player.monasteryPose = "idle"; dirty = true;
           } else if (ecosystemEnabled && data.type === "monastery-seat") {
             if (data.seatIndex !== null && (!Number.isInteger(data.seatIndex) || !QUAN_MONASTERY_SEATS[data.seatIndex])) return;
             const seat = QUAN_MONASTERY_SEATS[data.seatIndex];
-            if (seat && (player.action !== "monastery" || Math.hypot(player.monasteryPosition.x - seat.x, player.monasteryPosition.z - seat.z) > 1.8)) {
+            const local = quanWorldToMonastery(player);
+            if (seat && (player.action !== "monastery" || getQuanZone(player.x, player.z) !== "monastery" || Math.hypot(local.x - seat.x, local.z - seat.z) > 1.8)) {
               client.send(JSON.stringify({ type: "seat-error", message: "Bạn đi đến gần đệm trống rồi chọn Ngồi xuống nhé." })); return;
             }
             if (data.seatIndex !== null && [...guests.values()].some(other => other !== presence && other.room === presence.room && other.player.seatIndex === data.seatIndex)) {

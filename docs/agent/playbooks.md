@@ -17,7 +17,7 @@ Read first:
 Rules:
 
 - Optimize for 30-60 year old readers: larger text, clear labels, obvious buttons, fewer decorative badges.
-- Keep homepage form-first. New users should be able to create a chart without reading a long hero.
+- Homepage opens Tử Vi Quán directly. New guests choose a host or monastery after entering an alias. `/lap-la-so` sends them to `/?visit=tuvi`, preserving allowlisted campaign parameters; legacy `/#lap-la-so` opens the same host intention. Do not restore the old homepage form funnel.
 - Use orange/gold CTAs for money actions, but do not cover report content.
 - On mobile, keep navigation in the header: menu button on the left for `Lá số`, `Xem ngày`, `Kiến thức`; logo centered; account trigger on the right. Do not reintroduce a bottom nav unless the user explicitly asks.
 - For server-action forms, use `LoadingSubmitButton` or `data-loading-message` so the global toast can show progress.
@@ -28,6 +28,7 @@ Done:
 - Touch targets are at least about 48px high for primary actions.
 - Tử Vi Quán keeps world bounds, station positions and collision/routing rules in `src/lib/tu-vi-quan-world.mjs`, shared by the 3D scene, map and presence server. Verify direct action buttons, automatic walking and portrait/landscape layouts when changing its scene.
 - The central monastery has stepped ground height and its own bounded interior paths. Real users must approach a cushion before reserving it; keep the numbered seat grid retired.
+- All four houses share the courtyard coordinate space and render layer. Interiors are visible outside; entering/leaving their doorway updates the activity HUD automatically. No portal or E-key entry is required. Keep collision, zone classification and monastery coordinate transforms shared with presence.
 - Loading feedback appears for slow form submits and route-like actions.
 
 ## Chart Engine

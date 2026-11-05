@@ -85,12 +85,14 @@ npm run build
 
 ## Smoke Tests
 
-Home/chart:
+Home/game:
 
 - Open `http://localhost:4000/`.
-- Submit the chart form.
-- Confirm loading feedback appears.
-- Confirm the chart detail page loads and mobile layout is readable.
+- Enter an alias and confirm the four-choice arrival dialog.
+- Walk through each house doorway without E and confirm the matching activity HUD.
+- Confirm monastery statues/interior are visible from the courtyard, real cushion reservation and exit walking work.
+- Confirm `/lap-la-so` enters the Tu Vi game intention, and existing saved chart/report URLs still open for their owner.
+- Verify portrait/landscape, lite mode, and PayOS return to the owned session on `/`.
 
 Auth/history:
 

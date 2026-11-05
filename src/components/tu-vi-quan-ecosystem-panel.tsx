@@ -50,7 +50,7 @@ export default function QuanEcosystem({ gameMode = false, leaders, online, alias
   activityRequest?: { tab: Tab; id: number };
   lite: boolean; onLite: (lite: boolean) => void;
   onExperience: (experience: QuanExperience) => void;
-  preferences: QuanPreferences; onPreferences: (data: QuanPreferences) => void; onLegacy: (panel: "session" | "support" | "map" | "restore") => void;
+  preferences: QuanPreferences; onPreferences: (data: QuanPreferences) => void; onLegacy: (panel: "session" | "support" | "map" | "restore" | "hosts") => void;
 }) {
   const [dismissedReminder, setDismissedReminder] = useState("");
   const [tab, setTab] = useState<Tab | null>(null);
@@ -205,7 +205,7 @@ export default function QuanEcosystem({ gameMode = false, leaders, online, alias
     <nav className={`${styles.dock}${gameMode ? ` ${styles.gameDock}` : ""}`} aria-label="Dịch vụ Tử Vi Quán" inert={Boolean(tab) || suspended}>
       {(["today", "divination", "wishes", "explore"] as Tab[]).map(item => {
         const newFortune = item === "today" && dayKey && !daily && dismissedReminder !== dayKey;
-        return <button key={item} onClick={() => open(item)}>{gameMode && item === "divination" ? "Vận trình" : names[item]}{newFortune && <span className={styles.newFortune} aria-label="Có quẻ mới" title="Có quẻ mới" />}</button>;
+        return <button key={item} onClick={() => gameMode && item === "divination" ? onLegacy("hosts") : open(item)}>{gameMode && item === "divination" ? "Gặp thầy" : names[item]}{newFortune && <span className={styles.newFortune} aria-label="Có quẻ mới" title="Có quẻ mới" />}</button>;
       })}
     </nav>
     {tab && <div className={styles.scrim}><section ref={dialog} className={styles.panel} role="dialog" aria-modal="true" aria-labelledby="ecosystem-title" onKeyDown={event => {

@@ -66,6 +66,7 @@
   background: #201821de; border: 1px solid var(--line); color: #ffe1ae; border-radius: 12px;
 }
 .mast button { margin-left: auto; }
+.mast > button:first-child { margin-left:0; }
 .welcome, .scrim {
   position: absolute; inset: 0; z-index: 4; display: grid; place-items: center;
   padding: max(16px,env(safe-area-inset-top)) max(14px,env(safe-area-inset-right)) max(16px,env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-left));
@@ -193,6 +194,14 @@
 .liveGame .interaction { bottom: 122px; }
 .mobileBar { display:none; }
 .menuGrid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
+.arrivalChoices p { line-height:1.6; }
+.arrivalChoices .menuGrid { margin:18px 0; }
+.arrivalChoices .menuGrid button { min-height:72px; padding:12px; font-size:17px; }
+.zoneActions { position:absolute; z-index:4; left:50%; bottom:max(16px,env(safe-area-inset-bottom)); transform:translateX(-50%); width:max-content; max-width:calc(100% - 24px); padding:12px; border:1px solid var(--line); border-radius:16px; background:#211920ed; }
+.zoneActions p { margin:0 0 8px; text-align:center; color:var(--muted); }
+.zoneActions > div { display:flex; justify-content:center; gap:8px; }
+.zoneActions button { min-height:48px; }
+.help nav a { display:flex; align-items:center; min-height:48px; padding:8px; border:1px solid var(--line); border-radius:10px; text-decoration:none; }
 @media(max-width:767px) {
   .socialWrap { bottom: 66px; }
   .ritualToolbar { left: 134px; max-width: none; display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); }

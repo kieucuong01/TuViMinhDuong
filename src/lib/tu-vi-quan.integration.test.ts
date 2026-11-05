@@ -3,6 +3,7 @@ import { afterAll, describe, expect, it, vi } from "vitest";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "@/generated/prisma/client";
 import { settleQuanWebhook } from "./tu-vi-quan-payment";
+import { createPayOSCustomCheckout } from "./payos";
 import { checkoutQuanSession, changeQuanAdmission, restoreQuanSession, answerQuanTurn, quanTransaction, readQuanSession, reissueQuanRecoveryCode } from "./tu-vi-quan-session";
 
 vi.mock("server-only", () => ({}));
@@ -47,6 +48,7 @@ describe.skipIf(!db)("Tử Vi Quán with PostgreSQL and simulated PayOS", () => 
 
     const fifteen = await checkoutQuanSession(client, guest(0), 15, chart);
     const thirty = await checkoutQuanSession(client, guest(1), 30, chart);
+    expect(vi.mocked(createPayOSCustomCheckout).mock.calls[0][0]).toMatchObject({ returnPath: `/?session=${fifteen.id}`, cancelPath: `/?session=${fifteen.id}` });
     expect([fifteen.amountVnd, thirty.amountVnd]).toEqual([100_000, 200_000]);
     for (const [id, amount] of [[fifteen.id, 100_000], [thirty.id, 200_000]] as const) {
       const row = await client.quanOrder.findUniqueOrThrow({ where: { id } });

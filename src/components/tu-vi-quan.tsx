@@ -4,8 +4,8 @@ import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore, type FormEvent } from "react";
-import { ArrowLeft, BookOpen, CircleHelp, Compass, Flame, Heart, MapPin, Navigation, X } from "lucide-react";
-import { QUAN_BLOCKS, QUAN_BOUNDS, QUAN_POND, QUAN_SPAWN, QUAN_STATIONS, QUAN_MONASTERY_ENTRY, QUAN_MONASTERY_SEATS } from "@/lib/tu-vi-quan-world.mjs";
+import { BookOpen, CircleHelp, Compass, Flame, Heart, MapPin, Menu, Navigation, X } from "lucide-react";
+import { QUAN_BLOCKS, QUAN_BOUNDS, QUAN_POND, QUAN_SPAWN, QUAN_STATIONS, QUAN_MONASTERY_ENTRY, QUAN_MONASTERY_SEATS, getQuanZone, quanMonasteryToWorld } from "@/lib/tu-vi-quan-world.mjs";
 import styles from "./tu-vi-quan.module.css";
 import type { MonasteryPose } from "./tu-vi-quan-monastery";
 import type { EncounterKind, EncounterVisual } from "./tu-vi-quan-encounter";
@@ -64,11 +64,9 @@ export default function TuViQuan({ initialAlias, support, paymentsEnabled, ecosy
   const [encounterVisual, setEncounterVisual] = useState<EncounterVisual | null>(null);
   const [ritual, setRitual] = useState<{kind: "incense" | "meditate" | "greet" | "tarot" | "iching" | "chart"; requestId: number; count?: number; values?: number[]}>();
   const [ritualBusy, setRitualBusy] = useState(false);
-  const [inMonastery, setInMonastery] = useState(false);
   const [monasteryPose, setMonasteryPose] = useState<MonasteryPose>("idle");
   const [monasterySeat, setMonasterySeat] = useState<number | null>(null);
   const monasteryOpen = useRef(false);
-  const [monasteryPosition, setMonasteryPosition] = useState<Position>(QUAN_MONASTERY_ENTRY);
   const [monasteryNearby, setMonasteryNearby] = useState<number | null>(null);
   const [monasteryDestination, setMonasteryDestination] = useState<{ index: number; requestId: number } | null>(null);
   const [monasterySeatError, setMonasterySeatError] = useState("");
@@ -108,10 +106,14 @@ export default function TuViQuan({ initialAlias, support, paymentsEnabled, ecosy
   const [courtyardFull, setCourtyardFull] = useState(false);
   const [board, setBoard] = useState<{ tables: number; occupied: number; queued: number } | null>(null);
   const [lite, setLite] = useState(false);
+  const zone = getQuanZone(position.x, position.z);
+  const inMonastery = zone === "monastery";
+  const arrivalShown = useRef(false);
+  const pendingVisit = useRef<{ kind: EncounterKind; target: Position } | null>(null);
 
   const [notice, setNotice] = useState("");
   const [error, setError] = useState("");
-  const [panel, setPanel] = useState<"session" | "support" | "restore" | "incense" | "map" | "hosts" | "activities" | null>(null);
+  const [panel, setPanel] = useState<"arrival" | "session" | "support" | "restore" | "incense" | "map" | "hosts" | "activities" | null>(null);
   const [help, setHelp] = useState(false);
   const openEcosystem = useCallback((open: boolean) => { setEcosystemOpen(open); if (open) { setPanel(null); setHelp(false); setDestination(null); } }, []);
   const [session, setSession] = useState<Session | null>(null);
@@ -131,6 +133,22 @@ export default function TuViQuan({ initialAlias, support, paymentsEnabled, ecosy
   const operation = useRef(false);
   const pollVersion = useRef(0);
   const navigationRequest = useRef(0);
+
+  useEffect(() => { monasteryOpen.current = inMonastery; }, [inMonastery]);
+  useEffect(() => {
+    if (!alias || arrivalShown.current || new URLSearchParams(location.search).has("session")) return;
+    const timer = setTimeout(() => {
+      arrivalShown.current = true;
+      if (new URLSearchParams(location.search).has("chartError")) setNotice("Lượt lập lá số trước chưa hoàn tất. Bạn có thể gặp thầy để nhập hoặc nói lại thông tin.");
+      const intent = new URLSearchParams(location.search).get("visit") || (location.hash === "#lap-la-so" ? "tuvi" : "");
+      if (intent === "tuvi" || intent === "tarot" || intent === "iching") visitHost(intent);
+      else if (intent === "monastery") enterMonastery();
+      else setPanel("arrival");
+    }, 0);
+    return () => clearTimeout(timer);
+    // Resolve the entry intention once after the guest identity is ready.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [alias]);
 
   useEffect(() => {
     if (!alias) return;
@@ -271,7 +289,7 @@ export default function TuViQuan({ initialAlias, support, paymentsEnabled, ecosy
   }
 
   function move(target: Position) {
-    if (ecosystemOpen || help || host || socialFocused || inMonastery) return;
+    if (ecosystemOpen || help || host || socialFocused) return;
     latestPosition.current = target;
     setPosition(target);
     send({ type: "move", ...target });
@@ -280,7 +298,12 @@ export default function TuViQuan({ initialAlias, support, paymentsEnabled, ecosy
       const station = stations.find(item => item.id === pending.kind)!;
       if (Math.hypot(target.x - station.x, target.z - station.z) <= 0.35) { pendingRitual.current = null; void freeRitual(pending.kind, pending.count); return; }
     }
-    if (action !== "idle") doAction("idle");
+    const nextAction = getQuanZone(target.x, target.z) === "monastery" ? "monastery" : "idle";
+    if (action !== nextAction) doAction(nextAction);
+    const visit = pendingVisit.current;
+    if (visit && Math.hypot(target.x - visit.target.x, target.z - visit.target.z) <= .35) {
+      pendingVisit.current = null; openHost(visit.kind);
+    }
   }
 
   useEffect(() => {
@@ -380,8 +403,12 @@ export default function TuViQuan({ initialAlias, support, paymentsEnabled, ecosy
 
   function openHost(kind: EncounterKind, orderId?: string, desk?: number, ticketId?: string) {
     pendingRitual.current = null;
+    pendingVisit.current = null;
+    const seat = kind === "tuvi" ? { x: desk === 1 ? -41.5 : desk === 2 ? -36 : -30.5, z: -9.95 } : kind === "tarot" ? { x: -26, z: 16.25 } : { x: 28, z: 1.7 };
+    doAction("idle");
+    latestPosition.current = { ...seat }; setPosition(seat); send({ type: "move", ...seat });
     setReadingKind(kind); setPanel(null); setHelp(false); setEcosystemOpen(false); setDestination(null); setSocialFocused(false); setEncounterVisual(null);
-    doAction("idle"); setExperience("courtyard"); setInMonastery(false); setHost({kind, orderId, desk, ticketId, visit: ++navigationRequest.current});
+    setExperience("courtyard"); setHost({kind, orderId, desk, ticketId, visit: ++navigationRequest.current});
   }
 
   function openActivity(tab: NonNullable<typeof activityRequest>["tab"]) {
@@ -390,10 +417,13 @@ export default function TuViQuan({ initialAlias, support, paymentsEnabled, ecosy
   }
 
   function enterMonastery() {
-    monasteryOpen.current = true;
     pendingRitual.current = null;
-    setPanel(null); setHelp(false); setEcosystemOpen(false); setDestination(null);
-    doAction("monastery"); setMonasteryPose("idle"); setMonasteryPosition(QUAN_MONASTERY_ENTRY); setMonasteryNearby(null); setMonasteryDestination(null); setInMonastery(true);
+    setMonasteryNearby(null); setMonasteryDestination(null);
+    if (lite) {
+      const target = quanMonasteryToWorld(QUAN_MONASTERY_ENTRY);
+      latestPosition.current = target; setPosition(target); send({ type: "move", ...target });
+      openPanel(null); doAction("monastery");
+    } else navigate(stations.find(station => station.id === "monastery")!);
   }
 
   const selectMonasterySeat = useCallback((index: number | null) => {
@@ -403,7 +433,8 @@ export default function TuViQuan({ initialAlias, support, paymentsEnabled, ecosy
 
   const moveInMonastery = useCallback((position: Position) => {
     setMonasteryPose("idle");
-    setMonasteryPosition(position);
+    const target = quanMonasteryToWorld(position);
+    latestPosition.current = target; setPosition(target);
     send({ type: "monastery-move", ...position });
   }, [send]);
 
@@ -451,13 +482,30 @@ export default function TuViQuan({ initialAlias, support, paymentsEnabled, ecosy
   }
 
   function navigate(station: Position & { label: string }) {
+    pendingVisit.current = null;
     openPanel(null);
     doAction("idle");
     if (lite) {
-      setNotice("Chọn Thử lại 3D trong hướng dẫn để dạo quán. Các hoạt động miễn phí vẫn dùng được ở giao diện nhẹ.");
+      const target = { x: station.x, z: station.z };
+      latestPosition.current = target; setPosition(target); send({ type: "move", ...target });
     } else {
       setDestination({ x: station.x, z: station.z, requestId: ++navigationRequest.current });
       setNotice(`Đang đi tới ${station.label.toLocaleLowerCase("vi-VN")}. Kéo nửa trái hoặc dùng WASD để đổi hướng.`);
+    }
+  }
+
+  function visitHost(kind: EncounterKind) {
+    if (lite) { openHost(kind); return; }
+    const target = stations.find(station => station.id === (kind === "tuvi" ? "teacher" : kind === "tarot" ? "tea" : "iching"))!;
+    navigate(target); pendingVisit.current = { kind, target };
+  }
+
+  function useLiteMode() {
+    setLite(true);
+    if (pendingVisit.current) { openHost(pendingVisit.current.kind); return; }
+    if (destination) {
+      const target = { x: destination.x, z: destination.z };
+      latestPosition.current = target; setPosition(target); send({ type: "move", ...target }); setDestination(null);
     }
   }
 
@@ -536,11 +584,11 @@ export default function TuViQuan({ initialAlias, support, paymentsEnabled, ecosy
   return (
     <main ref={world} className={`${styles.page} ${voiceEnabled ? styles.liveGame : ""} ${host ? styles.seated : ""}`} data-quan-world onKeyDown={handleWorldKey} tabIndex={-1}>
       <section className={styles.courtyard} aria-label="Sân Tử Vi Quán">
-        {!lite && <Scene encounter={voiceEnabled && host ? { ...(encounterVisual ?? {kind: host.kind, state: "greeting", audioLevel: 0}), desk: host.desk } : undefined} onHost={voiceEnabled && alias && !panel && !ecosystemOpen && !help && !inMonastery ? (kind, desk) => openHost(kind, undefined, desk) : undefined} onIncense={ecosystemEnabled && !inMonastery ? () => requestRitual("incense", 1) : undefined} showHostControls={false} ritual={voiceEnabled ? ritual : undefined} speech={voiceEnabled && !host ? publicSpeech : undefined} ecosystemEnabled={ecosystemEnabled} position={position} destination={destination} action={action} players={players} onMove={move} monasteryPose={monasteryPose} monasterySeat={monasterySeat} monasteryPosition={monasteryPosition} monasteryDestination={monasteryDestination} onMonasteryNearby={setMonasteryNearby} onMonasteryMove={moveInMonastery} experience={inMonastery ? "monastery" : !voiceEnabled && panel === "session" ? "teacher" : experience} quality={preferences.quality} reducedMotion={preferences.reducedMotion} muted={preferences.muted} appearance={ecosystem?.profile.equipped} leaders={leaders} eventEndsAt={eventEndsAt} communityWishes={communityWishes} interactive={Boolean(alias && !panel && !host && !socialFocused && !help && !ecosystemOpen)} onUnavailable={() => setLite(true)} />}
+        {!lite && <Scene encounter={voiceEnabled && host ? { ...(encounterVisual ?? {kind: host.kind, state: "greeting", audioLevel: 0}), desk: host.desk } : undefined} onHost={voiceEnabled && alias && !panel && !ecosystemOpen && !help && !inMonastery ? (kind, desk) => openHost(kind, undefined, desk) : undefined} onIncense={ecosystemEnabled && !inMonastery ? () => requestRitual("incense", 1) : undefined} showHostControls={false} ritual={voiceEnabled ? ritual : undefined} speech={voiceEnabled && !host ? publicSpeech : undefined} ecosystemEnabled={ecosystemEnabled} position={position} destination={destination} action={action} players={players} onMove={move} monasteryPose={monasteryPose} monasterySeat={monasterySeat} monasteryDestination={monasteryDestination} onMonasteryNearby={setMonasteryNearby} experience={inMonastery ? "monastery" : !voiceEnabled && panel === "session" ? "teacher" : experience} quality={preferences.quality} reducedMotion={preferences.reducedMotion} muted={preferences.muted} appearance={ecosystem?.profile.equipped} leaders={leaders} eventEndsAt={eventEndsAt} communityWishes={communityWishes} interactive={Boolean(alias && !panel && !host && !socialFocused && !help && !ecosystemOpen)} onUnavailable={useLiteMode} />}
       </section>
-      {alias && inMonastery && <Monastery initial={ecosystem ?? undefined} participants={players.filter(player => player.action === "monastery" && Number.isInteger(player.seatIndex)).length + (monasterySeat === null ? 0 : 1)} connected={online} seatIndex={monasterySeat} nearbySeat={monasteryNearby} onFindSeat={findMonasterySeat} seatError={monasterySeatError} onSeat={selectMonasterySeat} alias={alias} lite={lite} onSnapshot={receiveEcosystem} onPose={poseInMonastery} onLeave={() => { monasteryOpen.current = false; setInMonastery(false); setMonasteryPose("idle"); doAction("idle"); }} onUseTicket={id => openHost("tuvi", undefined, undefined, id)} />}
+      {alias && inMonastery && <Monastery initial={ecosystem ?? undefined} participants={players.filter(player => player.action === "monastery" && Number.isInteger(player.seatIndex)).length + (monasterySeat === null ? 0 : 1)} connected={online} seatIndex={monasterySeat} nearbySeat={monasteryNearby} onFindSeat={findMonasterySeat} seatError={monasterySeatError} onSeat={selectMonasterySeat} alias={alias} lite={lite} onSnapshot={receiveEcosystem} onPose={poseInMonastery} onLeave={() => navigate({ x: 0, z: -12, label: "sân quán" })} onUseTicket={id => openHost("tuvi", undefined, undefined, id)} />}
       <header style={inMonastery ? { display: "none" } : undefined} className={styles.mast} inert={Boolean(panel) || ecosystemOpen}>
-        <Link href="/" className={styles.icon} aria-label="Về Lá số tinh hoa"><ArrowLeft size={20} /></Link>
+        <button className={styles.icon} aria-label="Mở trình đơn" onClick={() => setHelp(!help)}><Menu size={20} /></button>
         <div className={styles.identity}><h1>Tử Vi Quán</h1><span>{alias ? online ? players.length + 1 + " khách trong sân" : courtyardFull ? "Sân chung đang đông" : "Đang kết nối sân chung" : "Lá số tinh hoa"}</span></div>
         {alias && <button className={styles.icon} aria-label="Hướng dẫn và tùy chọn" aria-expanded={help} onClick={() => setHelp(!help)}><CircleHelp size={22} /></button>}
       </header>
@@ -570,9 +618,9 @@ export default function TuViQuan({ initialAlias, support, paymentsEnabled, ecosy
             <button onClick={() => openPanel("map")}><Compass size={21} aria-hidden="true" />Khám phá</button>
           </nav>}
           {voiceEnabled && !host && !inMonastery && !panel && !help && !ecosystemOpen && <>
-            <nav className={styles.hostChoices} aria-label="Chọn người trò chuyện"><p>Mời bạn ngồi · 5 phút miễn phí mỗi ngày</p><div>{([["tuvi", "Thầy Tử Vi"], ["tarot", "Cô Tarot"], ["iching", "Thầy Dịch"]] as const).map(([kind, label]) => <button key={kind} onClick={() => openHost(kind)}>{label}</button>)}</div></nav>
-            <nav className={styles.ritualToolbar} aria-label="Hoạt động miễn phí">{rituals}<button onClick={() => openPanel("map")}>Bản đồ</button></nav>
-            <nav className={styles.mobileBar} aria-label="Lối tắt trong sân"><button onClick={() => openActivity("today")}>Quẻ ngày</button><button onClick={() => openPanel("hosts")}>Gặp thầy</button><button onClick={enterMonastery}>Tu viện</button><button onClick={() => openPanel("activities")}>Hoạt động</button></nav><aside className={styles.communityActivity} aria-live="polite">{communityActivity.slice(0, 2).map(item => <p key={item.id}>{item.text}</p>)}</aside><div className={styles.socialWrap}><Social socketSend={socialSend} messages={socialMessages} ownId={ownId} roomName={roomName} connected={online} error={socialError} onFocusChange={setSocialFocused} /></div>
+            {zone ? <nav className={styles.zoneActions} aria-label={`Hoạt động tại ${zone === "tuvi" ? "Tử Vi Quán" : zone === "tarot" ? "Tarot Quán" : "Kinh Dịch Quán"}`}><p>{zone === "tuvi" ? "Tử Vi Quán · Mời bạn chọn bàn" : zone === "tarot" ? "Tarot Quán · Trải bài và trò chuyện" : "Kinh Dịch Quán · Gieo quẻ và trò chuyện"}</p><div>{zone === "tuvi" ? <><button onClick={() => openHost("tuvi", undefined, 1)}>Gặp thầy · Bàn 1</button><button onClick={() => openHost("tuvi", undefined, 2)}>Gặp thầy · Bàn 2</button><button onClick={() => openHost("tuvi", undefined, 3)}>Gặp thầy · Bàn 3</button></> : <button onClick={() => openHost(zone === "tarot" ? "tarot" : "iching")}>Ngồi xuống {zone === "tarot" ? "trải bài" : "gieo quẻ"}</button>}</div></nav> : <nav className={styles.hostChoices} aria-label="Chọn người trò chuyện"><p>Mời bạn ngồi · 5 phút miễn phí mỗi ngày</p><div>{([["tuvi", "Thầy Tử Vi"], ["tarot", "Cô Tarot"], ["iching", "Thầy Dịch"]] as const).map(([kind, label]) => <button key={kind} onClick={() => visitHost(kind)}>{label}</button>)}</div></nav>}
+            <nav style={zone ? { display: "none" } : undefined} className={styles.ritualToolbar} aria-label="Hoạt động miễn phí">{rituals}<button onClick={() => openPanel("map")}>Bản đồ</button></nav>
+            <nav style={zone ? { display: "none" } : undefined} className={styles.mobileBar} aria-label="Lối tắt trong sân"><button onClick={() => openActivity("today")}>Quẻ ngày</button><button onClick={() => openPanel("hosts")}>Gặp thầy</button><button onClick={enterMonastery}>Tu viện</button><button onClick={() => openPanel("activities")}>Hoạt động</button></nav><aside className={styles.communityActivity} aria-live="polite">{communityActivity.slice(0, 2).map(item => <p key={item.id}>{item.text}</p>)}</aside><div className={styles.socialWrap}><Social socketSend={socialSend} messages={socialMessages} ownId={ownId} roomName={roomName} connected={online} error={socialError} onFocusChange={setSocialFocused} /></div>
           </>}
           {voiceEnabled && host && <Encounter key={`${host.kind}-${host.visit}`} kind={host.kind} orderId={host.orderId} ticketId={host.ticketId} muted={preferences.muted} onLeave={leaveHost} onVisual={setEncounterVisual} onRitual={revealRitual} onChartReady={palace => setRitual({ kind: "chart", values: [palace], requestId: Date.now() })} onUpgrade={kind => { leaveHost(); setReadingKind(kind); openPanel("session"); }} />}
           {lite && !host && !inMonastery && <section className={styles.lite} inert={Boolean(panel) || ecosystemOpen}><h2>Sân quán</h2><p>Chọn một hoạt động hoặc ghé bàn thầy.</p>
@@ -586,16 +634,20 @@ export default function TuViQuan({ initialAlias, support, paymentsEnabled, ecosy
             <strong>Mời bạn thong thả dạo quán</strong><p>{ecosystemEnabled ? "Dùng các nút dưới sân để mở hoạt động. Trong Khám phá, chọn Bản đồ để nhân vật tự đi đến nơi bạn chọn." : "Chọn Xem lá số, Thắp hương hoặc Ủng hộ quán để mở ngay. Vào Khám phá và chọn một nơi, nhân vật sẽ tự đi đến."}</p>
             <p>Trên điện thoại, kéo nửa trái để đi và kéo nửa phải để xoay góc nhìn. Có thể dùng hai ngón cùng lúc hoặc quay ngang máy. Trên máy tính, dùng WASD hoặc bấm nền để đi, kéo chuột để xoay.</p>
             {board && <p>{board.tables ? `${board.occupied}/${board.tables} bàn đang dùng · ${board.queued} lượt chờ` : "Bàn thầy đang tạm nghỉ"}</p>}
+            <button onClick={() => openPanel("arrival")}>Chọn nơi muốn ghé</button>
+            <button onClick={() => openPanel("map")}>Bản đồ các viện</button>
             <button onClick={() => { setLite(!lite); setHelp(false); }}>{lite ? "Thử lại 3D" : "Giao diện nhẹ"}</button>
             <button onClick={() => { setHelp(false); openPanel("restore"); }}>Khôi phục lượt đã mua</button>
+            <nav className={styles.menuGrid} aria-label="Các trang trong Lá số tinh hoa"><Link href="/la-so">Lá số đã lưu</Link><Link href="/xem-ngay">Xem ngày</Link><Link href="/kien-thuc-tu-vi">Kiến thức</Link><Link href="/dang-nhap?next=%2F">Tài khoản</Link></nav>
           </aside>}
           {notice && <p className={styles.notice} role="status">{notice}</p>}
           {!lite && !host && !inMonastery && !panel && !help && !ecosystemOpen && <div className={styles.interaction}>
-            {nearby ? <button className={styles.primary} onClick={() => interactStation(nearby)}>{nearby.id === "incense" ? "Thắp hương" : nearby.id === "meditate" && action === "meditate" ? "Đứng dậy" : nearby.label}<kbd>E</kbd></button> :
+            {nearby && !["teacher", "tea", "iching", "monastery"].includes(nearby.id) ? <button className={styles.primary} onClick={() => interactStation(nearby)}>{nearby.id === "incense" ? "Thắp hương" : nearby.id === "meditate" && action === "meditate" ? "Đứng dậy" : nearby.label}<kbd>E</kbd></button> :
               <span><MapPin size={15} /> Khám phá để chọn nơi muốn tới</span>}
           </div>}
           {panel && <div className={styles.scrim}><section className={styles.panel} role="dialog" aria-modal="true" aria-labelledby="quan-panel-title">
-            <div className={styles.panelHead}><h2 id="quan-panel-title" ref={panelHeading} tabIndex={-1}>{panel === "session" ? voiceEnabled ? "Đặt phiên trò chuyện riêng" : "Bàn luận lá số" : panel === "support" ? "Ủng hộ Tử Vi Quán" : panel === "incense" ? "Một nén hương an lành" : panel === "map" ? "Dạo một vòng quanh quán" : panel === "hosts" ? "Chọn bàn trò chuyện" : panel === "activities" ? "Hoạt động trong quán" : "Khôi phục lượt xem"}</h2><button className={styles.icon} aria-label="Đóng" onClick={() => openPanel(null)}><X size={21} /></button></div>
+            <div className={styles.panelHead}><h2 id="quan-panel-title" ref={panelHeading} tabIndex={-1}>{panel === "arrival" ? "Hôm nay bạn muốn ghé đâu?" : panel === "session" ? voiceEnabled ? "Đặt phiên trò chuyện riêng" : "Bàn luận lá số" : panel === "support" ? "Ủng hộ Tử Vi Quán" : panel === "incense" ? "Một nén hương an lành" : panel === "map" ? "Dạo một vòng quanh quán" : panel === "hosts" ? "Chọn bàn trò chuyện" : panel === "activities" ? "Hoạt động trong quán" : "Khôi phục lượt xem"}</h2><button className={styles.icon} aria-label="Đóng" onClick={() => openPanel(null)}><X size={21} /></button></div>
+            {panel === "arrival" && <div className={styles.arrivalChoices}><p>Chọn một nơi, nhân vật sẽ tự đi đến. Bạn cũng có thể tự do dạo sân và bước thẳng vào các viện.</p><nav className={styles.menuGrid} aria-label="Chọn nơi ghé đầu tiên"><button onClick={() => visitHost("tuvi")}>Gặp thầy Tử Vi</button><button onClick={() => visitHost("tarot")}>Gặp thầy Tarot</button><button onClick={() => visitHost("iching")}>Gặp thầy Kinh Dịch</button><button onClick={enterMonastery}>Vào tu viện</button></nav><button onClick={() => openPanel(null)}>Tôi muốn tự dạo sân</button></div>}
             {panel === "hosts" && <><p>5 phút miễn phí mỗi ngày, dùng chung cho Tử Vi, Tarot và Kinh Dịch.</p><nav className={styles.menuGrid} aria-label="Chọn người trò chuyện">{[1, 2, 3].map(desk => <button key={desk} onClick={() => openHost("tuvi", undefined, desk)}>Thầy Tử Vi · Bàn {desk}</button>)}<button onClick={() => openHost("tarot")}>Cô Tarot</button><button onClick={() => openHost("iching")}>Thầy Dịch</button></nav></>}{panel === "activities" && <nav className={styles.menuGrid} aria-label="Hoạt động miễn phí">{rituals}<button onClick={() => openActivity("wishes")}>Cầu an và hoa đăng</button><button onClick={() => openActivity("calligraphy")}>Xin chữ</button><button onClick={() => openActivity("divination")}>Vận trình</button><button onClick={() => openActivity("explore")}>Khám phá</button><button onClick={() => openActivity("profile")}>Hồ sơ</button><button onClick={() => openActivity("settings")}>Tùy chọn</button></nav>}{panel === "support" && <div className={styles.payment}>{support ? <><p>Ủng hộ tự nguyện để duy trì Tử Vi Quán. Bạn tự chọn số tiền khi chuyển khoản.</p><Image className={support.bankImage ? styles.bankQr : undefined} src={support.qr} alt="Mã QR ngân hàng để ủng hộ Tử Vi Quán" width={support.bankImage ? 320 : 250} height={support.bankImage ? 692 : 250} unoptimized /><p>Người nhận <strong>{support.recipient}</strong></p><a className={styles.primary} href={support.qr} target="_blank" rel="noreferrer">Mở hoặc lưu ảnh QR</a></> : <><p><strong>Quán chưa mở nhận ủng hộ.</strong></p><p>Bạn vẫn có thể dạo sân, thắp hương và ngồi thiền miễn phí.</p></>}<button onClick={() => navigate(stations.find((station) => station.id === "support")!)}><Navigation size={18} aria-hidden="true" /> Đi đến hòm công đức</button></div>}
             {panel === "incense" && <div className={styles.incenseActions}><p>Dành một khoảng lặng, gửi gắm một lời nguyện bình an.</p><button className={styles.primary} onClick={() => { openPanel(null); requestRitual("incense"); }}><Flame size={20} />Thắp hương</button></div>}
             {panel === "map" && <><p>Chọn một nơi để nhân vật tự đi đến. Bạn có thể đổi hướng bất cứ lúc nào.</p><div className={styles.largeMap}><CourtyardMap position={position} /><span><i /> Vị trí của bạn</span></div><ol className={styles.destinationList}>{stations.map((station, index) => <li key={station.id}><span className={styles.destinationNumber}>{index + 1}</span><div><strong>{station.label}</strong><small>{station.description}</small></div><button aria-label={`Đi tới ${station.label}`} onClick={() => navigate(station)}>Đi tới đây</button></li>)}</ol></>}

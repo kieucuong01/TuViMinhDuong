@@ -59,6 +59,10 @@ it("reserves real monastery seats atomically and releases them when a player sta
   const seated = snapshot(a, frame => frame.type === "snapshot" && frame.players.some(player => player.id === frame.selfId && player.seatIndex === 0));
   a.send(JSON.stringify({ type: "monastery-seat", seatIndex: 0 }));
   await seated;
+  const held = snapshot(b, frame => frame.type === "snapshot" && frame.players.some(player => player.monasteryPose === "greet"));
+  a.send(JSON.stringify({ type: "move", x: 0, z: -12 }));
+  a.send(JSON.stringify({ type: "monastery-pose", pose: "greet" }));
+  expect((await held).players.find(player => player.seatIndex === 0)).toMatchObject({ action: "monastery", monasteryPose: "greet" });
   const endpoint = url.replace("ws:", "http:").replace("/tu-vi-quan-ws", "/monastery-seat/" + quanPresenceId(guest.id, secret));
   expect((await fetch(endpoint)).status).toBe(404);
   const authorized = await fetch(endpoint, { headers: { Authorization: "Bearer " + quanSeatCheckToken(secret) } });
@@ -75,6 +79,18 @@ it("reserves real monastery seats atomically and releases them when a player sta
   const reseated = snapshot(b, frame => frame.type === "snapshot" && frame.players.find(player => player.id === frame.selfId)?.seatIndex === 0);
   b.send(JSON.stringify({ type: "monastery-seat", seatIndex: 0 }));
   await reseated;
+});
+
+it("enters and exits the monastery by walking, publishing the same world position to guests outside", async () => {
+  const url = await listen();
+  const outside = connect(url, guest), inside = connect(url, { id: "walking-guest", alias: "Khách đi bộ" });
+  await Promise.all([snapshot(outside), snapshot(inside)]);
+  const entered = snapshot(outside, frame => frame.type === "snapshot" && frame.players.some(player => player.alias === "Khách đi bộ" && player.action === "monastery"));
+  inside.send(JSON.stringify({ type: "move", x: 0, z: -22 }));
+  expect((await entered).players.find(player => player.alias === "Khách đi bộ")).toMatchObject({ x: 0, z: -22, action: "monastery" });
+  const left = snapshot(outside, frame => frame.type === "snapshot" && frame.players.some(player => player.alias === "Khách đi bộ" && player.z === -12));
+  inside.send(JSON.stringify({ type: "move", x: 0, z: -12 }));
+  expect((await left).players.find(player => player.alias === "Khách đi bộ")).toMatchObject({ action: "idle", seatIndex: null });
 });
 
 describe("Tử Vi Quán presence", () => {

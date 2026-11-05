@@ -1,5 +1,3 @@
-import { readFileSync } from "node:fs";
-import { fileURLToPath } from "node:url";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("server-only", () => ({}));
@@ -203,11 +201,4 @@ describe("public article summaries", () => {
     expect(dbState.findMany).not.toHaveBeenCalled();
   });
 
-  it("makes the homepage request exactly three summaries", () => {
-    const homeSource = readFileSync(fileURLToPath(new URL("../app/page.tsx", import.meta.url)), "utf8");
-
-    expect(homeSource).toContain("listArticleSummaries(3)");
-    expect(homeSource).not.toMatch(/listArticles\(\)\.slice\(0,\s*3\)/);
-    expect(homeSource).not.toMatch(/listArticles\(\)/);
-  });
 });

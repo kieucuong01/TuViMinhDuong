@@ -5,7 +5,7 @@ import { FooterAccountPolicyLink } from "@/components/footer-account-policy-link
 import { APP_NAME } from "@/lib/env";
 
 const primaryLinks = [
-  { href: "/#lap-la-so", label: "Lập lá số tử vi miễn phí", description: "Tạo lá số 12 cung và xem phần cơ bản ngay.", icon: Sparkles },
+  { href: "/?visit=tuvi", label: "Gặp thầy Tử Vi", description: "Lập lá số và trò chuyện riêng trong không gian 3D.", icon: Sparkles },
   { href: "/xem-ngay", label: "Xem ngày tốt xấu", description: "Tra ngày phù hợp cho việc quan trọng.", icon: CalendarDays },
   { href: "/kien-thuc-tu-vi", label: "Kiến thức tử vi", description: "Bài viết nền tảng, dễ đọc cho người mới.", icon: BookOpenText },
   { href: "/dang-nhap", label: "Đăng nhập", description: "Lưu lá số, xem lại lịch sử và luận giải đã mở.", icon: LogIn },
@@ -38,7 +38,7 @@ const fortuneLinks = [
 ];
 
 const utilityLinks = [
-  { href: "/#lap-la-so", label: "Lập lá số tử vi miễn phí" },
+  { href: "/?visit=tuvi", label: "Gặp thầy và lập lá số" },
   { href: "/tra-cuu", label: "Tra cứu sao và cung" },
   { href: "/kien-thuc-tu-vi/la-so-tu-vi-la-gi", label: "Lá số tử vi là gì?" },
   { href: "/kien-thuc-tu-vi/cach-doc-la-so-tu-vi-cho-nguoi-moi", label: "Cách đọc lá số tử vi" },
