@@ -190,7 +190,7 @@
 @media (max-height:500px) and (orientation:landscape) { .communityActivity { top:155px; } }
 .seated .mast, .seated .location { display: none; }
 .liveGame .sessionBadge { top: 240px; }
-.liveGame .interaction { bottom: 90px; }
+.liveGame .interaction { bottom: 122px; }
 .mobileBar { display:none; }
 .menuGrid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
 @media(max-width:767px) {

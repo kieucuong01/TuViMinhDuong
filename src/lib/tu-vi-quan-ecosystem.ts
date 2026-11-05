@@ -235,7 +235,7 @@ export async function mutateEcosystem(db: PrismaClient, actor: Actor, body: Bag,
     let profile = await ensureProfile(tx, actor);
     const action = str(body.action, 40);
     const day = quanDayKey(now);
-    const extra: Bag = {};
+    const extra: Bag & { incensePoints?: number } = {};
     const settings = await tx.quanEcosystemSettings.findUnique({ where: { id: "global" } });
     if (asBag(settings?.features)[action] === false) fail("Hoạt động này đang tạm nghỉ.", 503);
     const ranking = (action === "daily" || action === "ritual") && await tx.quanEntry.findUnique({ where: { profileId_kind_dayKey: { profileId: profile.id, kind: "ranking_opt_in", dayKey: "profile" } }, select: { id: true } });
@@ -258,11 +258,15 @@ export async function mutateEcosystem(db: PrismaClient, actor: Actor, body: Bag,
       if (!["incense", "greet", "meditate_start", "meditate_finish"].includes(kind)) fail("Nghi thức không hợp lệ.");
       const note = body.note === undefined ? "" : str(body.note, 120).trim();
       if (kind === "incense" && body.count !== undefined && body.count !== 1 && body.count !== 3) fail("Chọn một hoặc ba nén hương.");
+      if (kind === "incense") {
+        const alreadyLit = await tx.quanEntry.findUnique({ where: { profileId_kind_dayKey: { profileId: profile.id, kind, dayKey: day } }, select: { id: true } });
+        extra.incensePoints = alreadyLit ? 0 : 5;
+      }
       if (kind === "meditate_finish") {
         const started = await tx.quanEntry.findUnique({ where: { profileId_kind_dayKey: { profileId: profile.id, kind: "meditate_start", dayKey: day } } });
         if (!started || now.getTime() - started.createdAt.getTime() < 60_000) fail("Hãy dành đủ một phút tĩnh tâm.", 409);
         await entry(tx, profile.id, "meditate", day, { title: "Một phút tĩnh tâm", body: note }, 5, now);
-      } else await entry(tx, profile.id, kind, day, { title: kind === "incense" ? "Thắp hương cầu an" : kind === "greet" ? "Chắp tay" : "Bắt đầu tĩnh tâm", body: note, count: body.count || 1 }, kind === "incense" ? 5 : 0, now);
+      } else await entry(tx, profile.id, kind, day, { title: kind === "incense" ? "Xin lộc đầu ngày" : kind === "greet" ? "Chắp tay" : "Bắt đầu tĩnh tâm", body: note, count: body.count || 1 }, kind === "incense" ? 5 : 0, now);
       if (kind !== "meditate_start") await metric(tx, profile, "ritual", now);
     } else if (action === "calligraphy") {
       if (body.mood !== "calm" && body.mood !== "playful") fail("Chọn phong cách xin chữ.");

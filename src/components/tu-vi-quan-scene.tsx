@@ -14,6 +14,7 @@ type SceneProps = {
   encounter?: { kind: QuanHost; state: "greeting" | "listening" | "thinking" | "speaking" | "idle"; audioLevel: number };
   showHostControls?: boolean;
   onHost?: (kind: QuanHost) => void;
+  onIncense?: () => void;
   ritual?: { kind: "incense" | "meditate" | "greet" | "tarot" | "iching" | "chart"; requestId: number; count?: number; values?: number[] };
   speech?: { id: string; text: string }[];
   ecosystemEnabled?: boolean;
@@ -238,7 +239,7 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
     placement.updateMatrix();
     lanternPools.push(placement.matrix.clone());
   }
-  function roof(cx: number, cz: number, width: number, depth: number, eaves: number) {
+  function roof(cx: number, cz: number, width: number, depth: number, eaves: number, tiles = [0x9d503a, 0xad6147, 0xb56e50, 0x99503c]) {
     const cols = Math.round(width * 2.4);
     const rows = Math.round(depth / 1.05);
     const half = depth / 2;
@@ -249,7 +250,7 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
       for (const side of [-1, 1]) for (let row = 0; row < rows; row++) {
         const d = (row + 0.5) * half / rows;
         const y = eaves + (half - d) * 0.5 + Math.pow(d / half, 4) * 0.34 + tip;
-        box([0x9d503a, 0xad6147, 0xb56e50, 0x99503c][(row * 3 + col) % 4], cx + x, y, cz + side * d,
+        box(tiles[(row * 3 + col) % 4], cx + x, y, cz + side * d,
           width / cols - 0.013, 0.15, half / rows + 0.13, side * (0.47 - Math.pow(d / half, 3) * 0.56));
         box(PALETTE.ridge, cx + x, y + 0.08, cz + side * (d + half / rows * 0.35), width / cols - 0.015, 0.055, 0.07);
       }
@@ -273,12 +274,12 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
   box(PALETTE.stone, 0, 0.34, -22, 25.6, 0.12, 9.6);
   box(PALETTE.plaster, 0, 2.2, -26.3, 24.6, 3.7, 0.32);
   for (const x of [-12, -8, -4, 0, 4, 8, 12]) {
-    column(x, -18.15, 4.1);
-    column(x, -25.8, 4.1);
+    column(x, -18.15, 4.72);
+    column(x, -25.8, 4.72);
   }
   for (const z of [-25.9, -18.15]) {
-    box(PALETTE.wood, 0, 4.15, z, 26.3, 0.4, 0.5);
-    box(PALETTE.gold, 0, 3.92, z, 25.5, 0.06, 0.52);
+    box(PALETTE.wood, 0, 4.8, z, 26.3, 0.4, 0.5);
+    box(PALETTE.gold, 0, 4.57, z, 25.5, 0.06, 0.52);
   }
   for (const x of [-10, -6, -2, 2, 6, 10]) {
     box(PALETTE.edge, x, 2.05, -26.05, 3.1, 3.1, 0.14);
@@ -286,7 +287,25 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
     for (let i = -5; i <= 5; i++) box(PALETTE.gold, x + i * 0.25, 2.24, -25.84, 0.05, 2.28, 0.065);
     for (const y of [1.42, 2.2, 2.98]) box(PALETTE.wood, x, y, -25.8, 2.9, 0.07, 0.09);
   }
-  roof(0, -22, 28, 11.6, 4.6);
+  roof(0, -22, 28.5, 11.7, 5.15);
+  box(PALETTE.red, 0, 7.3, -22, 16.8, 2.45, 5.45);
+  for (const x of [-7.4, -5.4, -3.4, 3.4, 5.4, 7.4]) {
+    box(PALETTE.edge, x, 7.65, -19.24, 1.28, 1.27, 0.18);
+    box(0xe0a568, x, 7.65, -19.13, 1.05, 1.04, 0.07);
+    for (const offset of [-0.31, 0, 0.31]) box(PALETTE.wood, x + offset, 7.65, -19.06, 0.055, 1.1, 0.075);
+  }
+  roof(0, -22, 20.5, 7.9, 8.34);
+  for (const side of [-1, 1]) {
+    box(PALETTE.ridge, side * 9.25, 10.48, -22, 1.4, .24, .48, 0, 0, side * .42);
+    object("leaf", PALETTE.gold, side * 9.94, 10.95, -22, .35, .64, .3, 0, 0, side * .3);
+    box(PALETTE.wood, side * 3.45, 7.48, -18.93, .25, 2, .34);
+    lantern(side * 3.68, 6.85, -18.77);
+  }
+  box(PALETTE.edge, 0, 7.5, -18.84, 6.5, 1.64, .24);
+  for (const x of [-12, -8, -4, 4, 8, 12]) {
+    box(PALETTE.gold, x, 4.33, -17.9, .78, .09, .24);
+    box(PALETTE.ridge, x, 4.22, -17.94, .48, .41, .26, 0, 0, Math.PI / 4);
+  }
   for (const x of [-10, -6, -2, 2, 6, 10]) lantern(x, 3.2, -17.8);
   for (const [x, z] of [[-39, -49], [35, -61]]) {
     for (let level = 0; level < 3; level++) {
@@ -349,21 +368,38 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
   for (const x of [-11.15, -8.85]) {
     drum(PALETTE.gold, x, 1.53, -5.5, 0.14, 0.5);
     object("leaf", PALETTE.light, x, 1.88, -5.5, 0.11, 0.22, 0.11);
+    drum(0x86633d, x, 1.35, -5.02, .38, .07);
+    for (const offset of [-.09, .09]) object("face", 0xd6934c, x + offset, 1.45, -5.02, .15, .18, .15);
   }
+  for (const x of [-11.72, -8.28]) {
+    box(PALETTE.wood, x, 1.59, -6.48, .2, 2.9, .23);
+    box(PALETTE.gold, x, .49, -6.48, .27, .075, .29);
+  }
+  box(PALETTE.red, -10, 2.17, -6.57, 2.67, 1.68, .16);
+  roof(-10, -6.32, 4.16, 1.72, 3.27);
   box(PALETTE.wood, 9, 0.65, -15.7, 1.5, 1.25, 1.05);
   box(PALETTE.red, 9, 1.32, -15.7, 1.66, 0.18, 1.2);
   box(PALETTE.gold, 9, 0.83, -15.15, 0.7, 0.4, 0.035);
   box(PALETTE.edge, 9, 1.42, -15.7, 0.7, 0.018, 0.08);
   // Open tea and meditation pavilions share the hall's roof and timber language.
-  function pavilion(cx: number, cz: number, width: number, depth: number) {
+  function pavilion(cx: number, cz: number, width: number, depth: number, accent: number, tiles: number[]) {
     box(PALETTE.stone, cx, 0.13, cz, width, 0.25, depth);
     box(0xbba17a, cx, 0.28, cz, width - 0.25, 0.06, depth - 0.25);
     for (const side of [-1, 1]) for (const end of [-1, 1]) column(cx + side * (width / 2 - 0.5), cz + end * (depth / 2 - 0.5), 3.15);
     box(PALETTE.wood, cx, 3.25, cz, width + 0.2, 0.25, depth);
-    roof(cx, cz, width + 1.8, depth + 1.8, 3.55);
+    roof(cx, cz, width + 1.8, depth + 1.8, 3.55, tiles);
+    const front = cz + depth / 2;
+    box(PALETTE.edge, cx, 2.91, front + 0.02, 3.72, 1.04, .16);
+    for (const side of [-1, 1]) {
+      box(accent, cx + side * (width / 2 - 1.45), 2.18, front - 0.17, .53, 1.66, .08);
+      box(PALETTE.gold, cx + side * (width / 2 - 1.45), 1.37, front - 0.12, .55, .055, .09);
+    }
     for (const side of [-1, 1]) lantern(cx + side * width * 0.31, 2.55, cz + depth / 2 - 0.25);
   }
-  pavilion(-20, 8.5, 10, 5);
+  pavilion(-20, 8.5, 10, 5, 0x774477, [0x53455d, 0x64506b, 0x715979, 0x4b3d55]);
+  for (const side of [-1, 1]) for (const offset of [-1, 0, 1]) {
+    box(offset === 0 ? 0xc58bb9 : 0x946295, -20 + side * 2.7 + offset * .17, 2.95, 11.07 + offset * .015, .26, .52, .055, 0, 0, offset * .28);
+  }
   drum(PALETTE.wood, -20, 0.93, 8.4, 3.4, 0.22, 1.75);
   for (const x of [-22.2, -20, -17.8]) {
     drum(0x70553d, x, 0.51, 10.1, 0.7, 0.42);
@@ -373,7 +409,12 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
   drum(0x789d87, -21.1, 1.4, 7.95, 0.28, 0.07);
   object("box", 0x789d87, -20.75, 1.19, 7.95, 0.4, 0.17, 0.17, 0, 0, 0.35);
   for (const x of [-19.5, -18.8]) drum(0xe5d6b2, x, 1.12, 8.05, 0.2, 0.18);
-  pavilion(18, 0.4, 8, 6);
+  pavilion(18, 0.4, 8, 6, 0x38695c, [0x36564e, 0x496959, 0x597765, 0x35574c]);
+  for (const side of [-1, 1]) {
+    const x = 18 + side * 2.65;
+    for (const y of [2.75, 3.12]) box(PALETTE.gold, x, y, 3.48, .56, .08, .08);
+    for (const gap of [-.18, .18]) box(PALETTE.gold, x + gap, 2.93, 3.48, .20, .08, .08);
+  }
   for (const x of [15.7, 18, 20.3]) {
     drum(0x9d4e3e, x, 0.43, 2, 1.25, 0.24, 1);
     drum(PALETTE.gold, x, 0.56, 2, 1.1, 0.035, 0.87);
@@ -440,12 +481,16 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
   box(PALETTE.wood, 12.55, 0.94, 18.6, 0.13, 0.13, 7.1);
   if (ecosystemEnabled) {
     // A roofed honor board before the hall and a small stall on the bamboo path.
-    for (const x of [-7.95, -4.65]) {
-      drum(PALETTE.stone, x, 0.12, -14.15, 0.5, 0.24);
-      box(PALETTE.wood, x, 1.55, -14.15, 0.23, 2.9, 0.23);
+    for (const x of [-9.02, -3.58]) {
+      drum(PALETTE.stone, x, 0.25, -14.53, .73, .48);
+      box(PALETTE.wood, x, 2.2, -14.53, .33, 3.62, .34);
+      box(PALETTE.gold, x, .59, -14.53, .38, .1, .39);
+      lantern(x, 2.85, -14.21);
     }
-    box(PALETTE.edge, -6.3, 1.68, -14.15, 3.3, 2.04, 0.18);
-    roof(-6.3, -14.15, 4.1, 1.64, 3.0);
+    box(PALETTE.stone, -6.3, .17, -14.53, 6.06, .32, .94);
+    box(PALETTE.edge, -6.3, 2.18, -14.53, 5.35, 2.91, .22);
+    box(PALETTE.gold, -6.3, .68, -14.39, 5.44, .12, .24);
+    roof(-6.3, -14.53, 6.54, 2.28, 4.03);
     for (const x of [-15.1, -12.9]) {
       box(PALETTE.wood, x, 1.43, 12.1, 0.15, 2.65, 0.17);
       box(PALETTE.wood, x, 1.43, 13.1, 0.15, 2.65, 0.17);
@@ -531,9 +576,8 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
   }
   const signs: THREE.Sprite[] = [];
   for (const [title, x, y, z, large] of [
-    ["Tử Vi Quán", 0, 4.6, -17.45, true],
     ["Tử Vi Quán", 0, 4.22, 35.4, true],
-    ...QUAN_STATIONS.filter(station => station.id !== "greet").map(station =>
+    ...QUAN_STATIONS.filter(station => !["greet", "tea", "iching", "incense"].includes(station.id) && (station.id !== "ranking" || !ecosystemEnabled)).map(station =>
       [station.label, station.x, station.id === "teacher" ? 2.75 : 2.55, station.z - 0.8, false] as const),
   ] as const) {
     const sprite = label(title, large);
@@ -663,17 +707,57 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
     readingDecor.push(panel); scene.add(panel); return panel;
   }
   function paintRanking(ctx: CanvasRenderingContext2D, leaders: NonNullable<SceneProps["leaders"]>) {
-    ctx.fillStyle = "#3a2020"; ctx.fillRect(0, 0, 512, 512);
-    ctx.strokeStyle = "#bb8750"; ctx.lineWidth = 4; ctx.strokeRect(13, 16, 486, 480);
-    ctx.fillStyle = "#ffe0a5"; ctx.textAlign = "center"; ctx.font = "bold 31px 'Quan Sans', sans-serif";
-    ctx.fillText("BẢNG VÀNG CÔNG ĐỨC", 256, 77, 435);
-    ctx.font = "20px 'Quan Sans', sans-serif"; ctx.fillText("ĐIỂM AN NHIÊN", 256, 116);
-    ctx.font = "27px 'Quan Sans', sans-serif";
-    if (!leaders.length) ctx.fillText("Đang chờ những vị khách đầu tiên", 256, 252, 436);
-    leaders.slice(0, 5).forEach((leader, index) => ctx.fillText(`${index + 1}. ${leader.alias}  ·  ${leader.points} điểm`, 256, 172 + index * 60, 435));
+    const lacquer = ctx.createLinearGradient(0, 0, 512, 512);
+    lacquer.addColorStop(0, "#79362c"); lacquer.addColorStop(1, "#251418");
+    ctx.fillStyle = lacquer; ctx.fillRect(0, 0, 512, 512);
+    ctx.strokeStyle = "#d7a257"; ctx.lineWidth = 4; ctx.strokeRect(10, 12, 492, 488);
+    ctx.lineWidth = 1.5; ctx.strokeRect(18, 22, 476, 468);
+    ctx.fillStyle = "#ffe1a2"; ctx.textAlign = "center"; ctx.font = "800 32px 'Quan Sans', sans-serif";
+    ctx.fillText("BẢNG VÀNG CÔNG ĐỨC", 256, 72, 430);
+    ctx.font = "600 18px 'Quan Sans', sans-serif"; ctx.fillText("VINH DANH ĐIỂM AN NHIÊN", 256, 105);
+    for (let index = 0; index < 5; index++) {
+      const y = 134 + index * 67, leader = leaders[index];
+      ctx.fillStyle = index === 0 ? "#9a5b2e" : "#3f2525";
+      ctx.beginPath(); ctx.roundRect(36, y, 440, 53, 8); ctx.fill();
+      ctx.fillStyle = index < 3 ? ["#f6ce74", "#d8c4a8", "#d8a06d"][index] : "#8f6043";
+      ctx.beginPath(); ctx.arc(66, y + 26, 17, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = "#2e191a"; ctx.font = "800 19px 'Quan Sans', sans-serif";
+      ctx.textAlign = "center"; ctx.fillText(String(index + 1), 66, y + 33);
+      ctx.fillStyle = "#ffe9c2"; ctx.font = "650 22px 'Quan Sans', sans-serif";
+      ctx.textAlign = "left"; ctx.fillText(leader?.alias ?? "—", 95, y + 34, 245);
+      if (leader) { ctx.textAlign = "right"; ctx.fillText(`${leader.points} điểm`, 454, y + 34, 105); }
+    }
   }
-  const rankingBoard = ecosystemEnabled ? paintedPanel(3.1, 1.86, ctx => paintRanking(ctx, [])) : null;
-  rankingBoard?.position.set(-6.3, 1.68, -14.05);
+  const rankingBoard = ecosystemEnabled ? paintedPanel(5.14, 2.75, ctx => paintRanking(ctx, [])) : null;
+  rankingBoard?.position.set(-6.3, 2.18, -14.408);
+  function facadePlate(title: string, subtitle: string, color: string, width: number, height: number) {
+    const plate = paintedPanel(width, height, ctx => {
+      const trim = ctx.createLinearGradient(0, 0, 0, 512);
+      trim.addColorStop(0, "#fbe5ad"); trim.addColorStop(.45, "#aa6b3d"); trim.addColorStop(1, "#edbb70");
+      ctx.fillStyle = color; ctx.fillRect(0, 0, 512, 512);
+      ctx.strokeStyle = trim; ctx.lineWidth = 10; ctx.strokeRect(12, 21, 488, 470);
+      ctx.lineWidth = 3; ctx.strokeRect(24, 46, 464, 420);
+      ctx.fillStyle = "#ffdc91";
+      for (const x of [41, 471]) {
+        ctx.beginPath(); ctx.moveTo(x, 213); ctx.lineTo(x + 10, 256); ctx.lineTo(x, 299); ctx.lineTo(x - 10, 256); ctx.fill();
+      }
+      ctx.textAlign = "center"; ctx.textBaseline = "middle";
+      const stretch = width / height * .94;
+      ctx.scale(1, stretch);
+      ctx.font = "800 63px 'Quan Sans', sans-serif";
+      ctx.fillText(title, 256, 211 / stretch, 399);
+      ctx.font = "650 24px 'Quan Sans', sans-serif";
+      ctx.fillText(subtitle, 256, 349 / stretch, 392);
+    });
+    plate.material.emissive.setHex(0xffe2b7);
+    plate.material.emissiveMap = plate.material.map;
+    plate.material.emissiveIntensity = width > 6 ? .62 : .35;
+    return plate;
+  }
+  facadePlate("TỬ VI QUÁN", "CHÍNH ĐIỆN", "#4d2423", 6.31, 1.46).position.set(0, 7.5, -18.71);
+  facadePlate("VIỆN TAROT", "CÔ TAROT · TRẢI BÀI", "#402743", 3.59, .92).position.set(-20, 2.91, 11.108);
+  facadePlate("VIỆN KINH DỊCH", "THẦY DỊCH · GIEO QUẺ", "#214440", 3.59, .92).position.set(18, 2.91, 3.508);
+  facadePlate("BÀN THỜ THẦN TÀI", "XIN LỘC ĐẦU NGÀY", "#5a2824", 2.5, 1.43).position.set(-10, 2.2, -6.48);
   let previousLeaders: SceneProps["leaders"];
   if (ecosystemEnabled) {
     const rug = paintedPanel(4.3, 4.4, ctx => {
@@ -718,10 +802,12 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
     star.position.set(Math.sin(angle) * 0.59, 0, Math.cos(angle) * 0.59);
     chartHalo.add(star); return star;
   });
-  const incense = [-1, 0, 1].map(side => ({
-    stick: ritualPart("box", 0xa13e29, -10 + side * 0.16, 2.15, -5.5, 0.034, 0.6, 0.034),
-    ember: ritualPart("head", PALETTE.lantern, -10 + side * 0.16, 2.46, -5.5, 0.07, 0.07, 0.07),
-  }));
+  const incense = [-1, 0, 1].map(side => {
+    const stick = ritualPart("box", 0xa13e29, -10 + side * .16, 2.15, -5.5, .034, .6, .034);
+    const ember = ritualPart("head", PALETTE.lantern, -10 + side * .16, 2.46, -5.5, .07, .07, .07);
+    stick.visible = ember.visible = false;
+    return { stick, ember };
+  });
   function cardFace(title: string, value: number) {
     const surface = document.createElement("canvas"); surface.width = 256; surface.height = 400;
     const ctx = surface.getContext("2d")!;
@@ -827,6 +913,7 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
   const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
   const reducedMotion = () => ecosystemEnabled ? latest.current.reducedMotion ?? motion.matches : motion.matches;
   const ray = new THREE.Raycaster();
+  const altarHit = new THREE.Box3(new THREE.Vector3(-11.86, .12, -6.87), new THREE.Vector3(-8.14, 3.38, -4.37));
   const pointer = new THREE.Vector2();
   const floor = new THREE.Plane(new THREE.Vector3(0, 1, 0), -0.055);
   const hit = new THREE.Vector3();
@@ -849,7 +936,7 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
   let pitch = 0.49;
   let cameraReady = false;
   let framedHost: QuanHost | undefined;
-  let thumb: { id: number; x: number; y: number } | undefined;
+  let thumb: { id: number; x: number; y: number; dragged: boolean } | undefined;
   let press: { id: number; x: number; y: number; lastX: number; lastY: number; dragged: boolean } | undefined;
   let route: Position[] = [];
   let destinationId: number | undefined;
@@ -869,7 +956,7 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
     container.closest("main")?.focus({ preventScroll: true });
     canvas.setPointerCapture(event.pointerId);
     if (leftTouch) {
-      thumb = { id: event.pointerId, x: event.clientX, y: event.clientY };
+      thumb = { id: event.pointerId, x: event.clientX, y: event.clientY, dragged: false };
       route = [];
       pad.style.left = `${event.clientX - rect.left}px`;
       pad.style.top = `${event.clientY - rect.top}px`;
@@ -880,6 +967,8 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
   }
   function pressMove(event: PointerEvent) {
     if (thumb?.id === event.pointerId) {
+      if (!thumb.dragged && Math.hypot(event.clientX - thumb.x, event.clientY - thumb.y) < 7) return;
+      thumb.dragged = true;
       steer.set((event.clientX - thumb.x) / 52, (event.clientY - thumb.y) / 52).clampLength(0, 1);
       knob.style.transform = `translate(${steer.x * 23}px, ${steer.y * 23}px)`;
       return;
@@ -893,14 +982,16 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
     press.lastY = event.clientY;
   }
   function pressEnd(event: PointerEvent) {
-    if (thumb?.id === event.pointerId) { endMove(); return; }
-    const start = press;
+    const leftTouch = thumb?.id === event.pointerId;
+    const start = leftTouch ? thumb : press;
     if (start?.id !== event.pointerId) return;
-    press = undefined;
+    if (leftTouch) endMove(); else press = undefined;
     if (start.dragged || !latest.current.interactive) return;
     const rect = canvas.getBoundingClientRect();
     pointer.set((event.clientX - rect.left) / rect.width * 2 - 1, 1 - (event.clientY - rect.top) / rect.height * 2);
     ray.setFromCamera(pointer, camera);
+    if (latest.current.onIncense && ray.ray.intersectsBox(altarHit)) { latest.current.onIncense(); return; }
+    if (leftTouch) return;
     const selected = ray.intersectObjects(teachers.map(teacher => teacher.group), true)[0];
     if (selected) { let node: THREE.Object3D | null = selected.object; while (node && !node.userData.host) node = node.parent; if (node) latest.current.onHost?.(node.userData.host as QuanHost); return; }
     if (event.pointerType === "touch") return;
@@ -1151,7 +1242,7 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
       const phase = reducedMotion() ? (index + 1) / 8 : ((time / 4600 + index / smoke.length) % 1);
       mesh.position.set(-10 + phase * 0.76 + Math.sin(phase * 6) * 0.12, 2.46 + phase * 1.73, -5.5 + phase * 0.19);
       mesh.scale.setScalar(0.082 + phase * 0.35);
-      mesh.material.opacity = (1 - phase) * (current.action === "incense" || ritualActive && current.ritual?.kind === "incense" ? 0.42 : 0.25);
+      mesh.material.opacity = (1 - phase) * (current.action === "incense" || ritualActive && current.ritual?.kind === "incense" ? 0.42 : incense[1].stick.visible ? 0.22 : 0);
     });
     for (let i = 0; i < 90; i++) {
       const t = reducedMotion() ? 0 : time * 0.00037;
@@ -1232,7 +1323,7 @@ export default function TuViQuanScene(props: SceneProps) {
     let cancelled = false;
     let dispose: (() => void) | undefined;
     async function start() {
-      await document.fonts.load('700 39px "Quan Sans"', "Thắp hương · Ngồi thiền · Bàn Thầy Dịch").catch(() => {});
+      await document.fonts.load('700 39px "Quan Sans"', "TỬ VI QUÁN · BẢNG VÀNG CÔNG ĐỨC · BÀN THỜ THẦN TÀI · XIN LỘC ĐẦU NGÀY · Thầy Dịch").catch(() => {});
       if (cancelled || !container.current) return;
       try { dispose = makeScene(container.current, latest); }
       catch (error) { console.error("Không khởi tạo được sân 3D.", error); latest.current.onUnavailable(); }

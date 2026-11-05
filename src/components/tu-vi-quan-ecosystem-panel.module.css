@@ -1,9 +1,13 @@
 .top { position:absolute; z-index:4; right:max(14px,env(safe-area-inset-right)); top:76px; display:flex; gap:8px; }
 .dock { position:absolute; z-index:4; bottom:max(18px,env(safe-area-inset-bottom)); left:50%; transform:translateX(-50%); display:flex; gap:8px; padding:9px; background:#201821ed; border:1px solid #efbc8150; border-radius:18px; width:max-content; max-width:calc(100% - 24px); box-shadow:0 10px 40px #100d18a0; }
 .dock button { position:relative; }
-.ranking { margin:0; padding-left:1.65rem; }
-.ranking li { padding:.6rem .3rem; border-bottom:1px solid #efbc8140; }
-.ranking li span { float:right; color:#e8c48b; }
+.ranking { margin:0; padding:0; list-style:none; counter-reset:rank; display:grid; gap:6px; }
+.ranking li { counter-increment:rank; display:grid; grid-template-columns:30px 1fr auto; align-items:center; gap:10px; padding:.65rem; border:1px solid #bf8b4e59; border-radius:9px; background:#4e2b2877; }
+.ranking li::before { content:counter(rank); display:grid; place-items:center; width:30px; height:30px; border-radius:50%; background:#aa784d; color:#2e191a; font-weight:800; }
+.ranking li:first-child { background:linear-gradient(135deg,#75492c,#4e2b28); border-color:#dcac65; }
+.ranking li:first-child::before { background:#f6ce74; }
+.ranking li strong { min-width:0; overflow-wrap:anywhere; }
+.ranking li span { color:#e8c48b; }
 .dock.gameDock { top:138px; bottom:auto; left:max(14px,env(safe-area-inset-left)); transform:none; }
 @media (max-width:760px) and (orientation:portrait) { .dock.gameDock { top:236px; right:12px; left:12px; width:auto; max-width:none; justify-content:space-between; } }
 @media (max-height:500px) and (orientation:landscape) { .dock.gameDock { top:86px; } }

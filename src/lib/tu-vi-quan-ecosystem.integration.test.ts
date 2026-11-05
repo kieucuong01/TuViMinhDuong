@@ -51,7 +51,9 @@ describe.skipIf(!db)("Tử Vi Quán ecosystem in PostgreSQL", () => {
     const draws = await Promise.all(["career", "money"].map((topic) => mutateEcosystem(db!, guest, { action: "daily", topic }, date)));
     expect(draws[0].daily).toEqual(draws[1].daily);
     expect(draws[1].profile.points).toBe(10);
-    await mutateEcosystem(db!, guest, { action: "ritual", kind: "incense", count: 3 }, date);
+    const incense = await Promise.all([1, 3].map(count => mutateEcosystem(db!, guest, { action: "ritual", kind: "incense", count }, date)));
+    expect(incense.map(result => result.profile.points)).toEqual([15, 15]);
+    expect(incense.map(result => result.incensePoints).sort()).toEqual([0, 5]);
     await mutateEcosystem(db!, guest, { action: "ritual", kind: "meditate_start" }, date);
     await expect(mutateEcosystem(db!, guest, { action: "ritual", kind: "meditate_finish" }, later(59))).rejects.toMatchObject({ status: 409 });
     const finishes = await Promise.all(Array.from({ length: 2 }, () => mutateEcosystem(db!, guest, { action: "ritual", kind: "meditate_finish" }, later(60))));

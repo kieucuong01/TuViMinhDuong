@@ -18,6 +18,7 @@ export type QuanSnapshot = {
   charts?: { id: string; label: string; year: number }[];
   sessions?: { id: string; minutes: number; status: string; paidAt?: string }[];
   daily?: Json; calligraphy?: Json; rankingOptIn?: boolean; latestResult?: Json; history: Entry[]; inventory: Cosmetic[];
+  incensePoints?: number;
   wishes: Entry[]; myWishes: Entry[]; cosmetics: Cosmetic[]; event?: { id: string; title: string; startsAt: string; endsAt: string; active: boolean; joinedAt: string | null; claimed: boolean } | null; flags?: { publicPosting: boolean }; horoscope?: Json; serverTime: string;
   meditation?: { startedAt: string | null; completed: boolean }; shares?: { id: string; url: string; expiresAt: string; revoked: boolean }[]; recoveryCode?: string; share?: { id: string; url: string; snapshot: Json; expiresAt: string };
 };
@@ -35,10 +36,11 @@ function Reading({ value }: { value: Json | undefined }) {
   return <div className={styles.reading}>{Object.entries(value).filter(([key]) => !["id", "seed", "version", "contentVersion", "ruleVersion", "profileId", "birthInput", "input", "sourceId", "casts"].includes(key)).map(([key, entry]) => <section key={key}>{labels[key] && <strong>{labels[key]}</strong>}<Reading value={entry} /></section>)}</div>;
 }
 
-export default function QuanEcosystem({ gameMode = false, leaders, online, alias, suspended, onOpen, onSnapshot, preferences, onPreferences, onLegacy, onExperience, lite, onLite, onRitual, readingPrice, activityRequest }: {
+export default function QuanEcosystem({ gameMode = false, leaders, online, alias, suspended, onOpen, onSnapshot, preferences, onPreferences, onLegacy, onExperience, lite, onLite, onRitual, onIncense, readingPrice, activityRequest }: {
   gameMode?: boolean;
   alias: string; suspended: boolean; onOpen: (open: boolean) => void; onSnapshot: (data: QuanSnapshot) => void;
   onRitual: (kind: "greet" | "incense" | "meditate" | "idle") => void;
+  onIncense: () => void;
   readingPrice: number | null;
   leaders: QuanLeader[];
   online: boolean;
@@ -144,7 +146,9 @@ export default function QuanEcosystem({ gameMode = false, leaders, online, alias
   }
   async function perform(action: string, fields: Record<string, unknown> = {}) { const result = await request({ action, ...fields }); if (result) setMessage("Đã lưu vào sổ của bạn."); return result; }
   async function ritual(kind: "incense" | "greet" | "meditate_start" | "meditate_finish", count?: number) {
-    if (!await perform("ritual", { kind, count, note: ritualNote })) return;
+    const result = await perform("ritual", { kind, count, note: ritualNote });
+    if (!result) return;
+    if (kind === "incense") setMessage(result.incensePoints ? "+5 Điểm An Nhiên từ nghi thức Xin lộc." : "Đã thắp hương. Bạn đã nhận điểm hương hôm nay.");
     onRitual(kind === "meditate_start" ? "meditate" : kind === "meditate_finish" ? "idle" : kind);
   }
   function chooseShare(value: Json | undefined) {
@@ -223,7 +227,7 @@ export default function QuanEcosystem({ gameMode = false, leaders, online, alias
       {tab === "today" && <>{dayKey && !daily && dismissedReminder !== dayKey && <aside className={styles.card}>
         <p>Lần đầu ghé hôm nay? Chọn một chủ đề để nhận lời gợi mở.</p>
         <button onClick={() => { setDismissedReminder(dayKey); try { localStorage.setItem("quan-daily-reminder", dayKey); } catch { /* Keep the dismissal for this visit. */ } }}>Ẩn lời nhắc hôm nay</button>
-      </aside>}<p>Một lời gợi mở mỗi ngày. Dùng để suy ngẫm, không thay thế quyết định của bạn.</p><div className={styles.row}>{[["career", "Sự nghiệp"], ["love", "Tình duyên"], ["money", "Tài lộc"]].map(([topic, name]) => <button disabled={busy} key={topic} onClick={() => void perform("daily", { topic })}>{name}</button>)}</div><DailyFortune value={daily} />{daily && <button onClick={() => chooseShare(daily)}>Tạo thiệp lời gợi mở</button>}<h3>Một phút an lành</h3><label>Lời nhắc riêng (tùy chọn)<input value={ritualNote} onChange={event => setRitualNote(event.target.value)} maxLength={120} /></label><div className={styles.row}>{[1, 3].map(count => <button key={count} disabled={busy} onClick={() => void ritual("incense", count)}>Thắp {count} nén hương</button>)}<button disabled={busy} onClick={() => void ritual("greet")}>Chắp tay chào</button></div><button disabled={busy || data?.meditation?.completed || remaining(ritualUntil) > 0} onClick={() => void ritual(ritualUntil ? "meditate_finish" : "meditate_start")}>{data?.meditation?.completed ? "Đã tĩnh tâm hôm nay" : ritualUntil ? remaining(ritualUntil) ? `Thở chậm · còn ${remaining(ritualUntil)} giây` : "Hoàn thành một phút tĩnh tâm" : "Bắt đầu một phút tĩnh tâm"}</button><p>Điểm mỗi ngày: lời gợi mở 10 · hương 5 · tĩnh tâm 5. Tarot và chia sẻ không cộng điểm.</p></>}
+      </aside>}<p>Một lời gợi mở mỗi ngày. Dùng để suy ngẫm, không thay thế quyết định của bạn.</p><div className={styles.row}>{[["career", "Sự nghiệp"], ["love", "Tình duyên"], ["money", "Tài lộc"]].map(([topic, name]) => <button disabled={busy} key={topic} onClick={() => void perform("daily", { topic })}>{name}</button>)}</div><DailyFortune value={daily} />{daily && <button onClick={() => chooseShare(daily)}>Tạo thiệp lời gợi mở</button>}<h3>Xin lộc đầu ngày</h3><p>Chạm bàn thờ Thần Tài để thắp một nén. Lần đầu trong ngày nhận 5 Điểm An Nhiên.</p><button disabled={busy} onClick={() => { setTab(null); onIncense(); }}>Thắp một nén tại bàn thờ</button><h3>Một phút an lành</h3><label>Lời nhắc riêng (tùy chọn)<input value={ritualNote} onChange={event => setRitualNote(event.target.value)} maxLength={120} /></label><div className={styles.row}>{[1, 3].map(count => <button key={count} disabled={busy} onClick={() => void ritual("incense", count)}>Thắp {count} nén hương</button>)}<button disabled={busy} onClick={() => void ritual("greet")}>Chắp tay chào</button></div><button disabled={busy || data?.meditation?.completed || remaining(ritualUntil) > 0} onClick={() => void ritual(ritualUntil ? "meditate_finish" : "meditate_start")}>{data?.meditation?.completed ? "Đã tĩnh tâm hôm nay" : ritualUntil ? remaining(ritualUntil) ? `Thở chậm · còn ${remaining(ritualUntil)} giây` : "Hoàn thành một phút tĩnh tâm" : "Bắt đầu một phút tĩnh tâm"}</button><p>Điểm mỗi ngày: lời gợi mở 10 · hương 5 · tĩnh tâm 5. Tarot và chia sẻ không cộng điểm.</p></>}
       {tab === "divination" && <><h3>Lá số cơ bản · Miễn phí</h3><p>Lập lá số, xem 12 cung và vận trình năm ngay trong quán.</p>{Boolean(data?.charts?.length) && <form className={styles.form} onSubmit={event => {
         event.preventDefault();
         if (!chartId) return;
