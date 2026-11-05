@@ -3,16 +3,16 @@ export const QUAN_SPAWN = { x: 0, z: 22 };
 export const QUAN_STATIONS = [
   { id: "teacher", label: "Chính điện Tử Vi", x: 0, z: -15, description: "Gặp Thầy Tử Vi và xem lá số" },
   { id: "incense", label: "Bàn thờ Thần Tài", x: -10, z: -2, description: "Thắp một nén hương, xin lộc đầu ngày" },
-  { id: "meditate", label: "Ngồi thiền", x: 15.5, z: 4, description: "Nghỉ chân dưới hiên vườn" },
+  { id: "monastery", label: "Tu viện An Nhiên", x: -23, z: -8, description: "Điện Phật, thiền, tràng hạt và tụng kinh" },
   { id: "iching", label: "Viện Kinh Dịch", x: 20, z: 3.7, description: "Gieo quẻ và trò chuyện cùng Thầy Dịch" },
   { id: "support", label: "Hòm công đức", x: 9, z: -15, description: "Ủng hộ duy trì quán tự nguyện" },
-  { id: "greet", label: "Chắp tay", x: 0, z: 10, description: "Gửi lời chào đến khách trong sân" },
   { id: "tea", label: "Viện Tarot", x: -20, z: 13, description: "Trải bài và trò chuyện cùng Cô Tarot" },
   { id: "lotus", label: "Vườn hồ sen", x: 10, z: 19, description: "Ngắm hồ sen và đèn hoa đăng" },
   { id: "ranking", label: "Bảng vàng công đức", x: -6.3, z: -13, description: "Xem năm khách có nhiều Điểm An Nhiên" },
   { id: "calligraphy", label: "Xin chữ", x: -14, z: 14, description: "Nhận một chữ đầu ngày hoặc một câu vui" },
 ];
 export const QUAN_BLOCKS = [
+  { minX: -27.5, maxX: -18.5, minZ: -15.5, maxZ: -9.5 },
   { minX: -13, maxX: 13, minZ: -27, maxZ: -17.4 },
   { minX: -11.9, maxX: -8.1, minZ: -7, maxZ: -4 },
   { minX: -9.33, maxX: -3.27, minZ: -15.0, maxZ: -14.06 },

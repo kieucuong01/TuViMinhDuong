@@ -19,7 +19,9 @@ POST same path JSON `action` plus fields, returns fresh GET snapshot except spec
 - `birth {input:ChartInput|null}`, `link`, `recovery_issue` -> `{...snapshot,recoveryCode}`, `recovery_restore {code}` before guest required.
 - `tarot {count:1|3}`, `iching` -> snapshot `latestResult` and history. Stable one/kind/day.
 - `wish {text,public:boolean,placement:tree|lotus}`, `wish_edit {id,text,public}`, `wish_delete {id}`, `wish_react {id,kind:heart|peace|strength|joy|hope|care}`, `wish_report {id}`.
-- `buy {itemId}`, `equip {itemId}`; 12 cosmetics, prices60/120/300/600.
+- `buy {itemId}`, `equip {itemId}`; 12 point-priced cosmetics plus three free milestone skins at 100/300/700 lifetime points. A seven-day monastery lantern is earned separately.
+- `practice_start|practice_tick|practice_pause|practice_finish {mode:meditate|beads|chant|garden,tap?}`. Foreground heartbeats credit at most 12 seconds per interval. Only one practice runs per profile. Beads require 27 spaced taps and 120 seconds; chanting requires 120 seconds; gardening requires four spaced taps and 60 seconds. Meditation awards 5 points at 60 seconds and a total of 10 at 180 seconds. Legacy ritual awards share the same daily allowance.
+- `redeem_voice {}` atomically debits 60 points and creates one 300-second voice ticket. One redemption per Vietnam day and at most two unused tickets. `encounter begin {kind,ticketId}` reserves an owned ticket; `start {id}` consumes it. Leaving an invitation preserves it; started tickets remain resumable until their original expiry. Tickets and paid orders use separate ledgers. No schema migration is required.
 - `event_join`, `event_claim` -> 60 server seconds plus active event, one reward.
 - `horoscope {year}` -> `{...snapshot,horoscope}` using saved birth input.
 - `share {sourceId,showAlias:boolean}` -> `{...snapshot,share:{id,url,snapshot,expiresAt}}`, `share_revoke {id}`.
@@ -27,7 +29,9 @@ POST same path JSON `action` plus fields, returns fresh GET snapshot except spec
 
 ## Invariants
 
-Daily points10+incense5+60sec meditation5 =20; no points Tarot/sharing. Immutable journal unique(profile,day,kind); transaction lock per canonical profile, link merge dedupe earliest daily rewards, subtract actual spend. Existing QuanOrder IDs unchanged. No ownership from request. Private wishes default; <=120 chars, one public/day, filter URLs/phone/email/abuse. Unique reaction/profile/wish; only distinct linked accounts count toward3-report hiding. Public expiry30days. Default event lunar1/15 at20:00–20:15; override in admin. Shares whitelisted snapshot, revoked/expired404, noindex/no-referrer. Analytics pseudonymous only. Content/rule version persisted.
+Daily cap is 45 points: check-in5 + daily draw10 + incense5 + meditation10 + shared beads/chanting10 + garden5. Tarot and sharing earn no points. Lifetime earned points determine rank independently of spending. Reward ledger unique(profile,day,kind); practice records store mutable server timing and progress under the ecosystem transaction lock. Link merges dedupe daily rewards and retain actual spending. Existing QuanOrder IDs unchanged. No ownership from request. Private wishes default; <=120 chars, one public/day, filter URLs/phone/email/abuse. Unique reaction/profile/wish; only distinct linked accounts count toward3-report hiding. Public expiry30days. Default event lunar1/15 at20:00–20:15; override in admin. Shares whitelisted snapshot, revoked/expired404, noindex/no-referrer. Analytics pseudonymous only. Content/rule version persisted.
+
+The monastery has its own courtyard entrance and isolated 3D interior layer, with three seated Buddha statues, red columns, cushions and a seven-day lotus garden. The courtyard has one incense action. Prayer, bowing, meditation, chanting and prayer beads are accessed inside the monastery. Its HUD supports portrait/landscape and the full activity flow also works in lite mode. Presence action `monastery` seats real visitors in the same room; decorative chibi visitors are unlabelled scenery and are excluded from the user count.
 
 ## Acceptance and launch
 

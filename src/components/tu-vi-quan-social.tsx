@@ -35,7 +35,7 @@ export default function TuViQuanSocial({ socketSend, messages, ownId, roomName =
         {messages.map(message => <p key={message.id}><strong>{message.playerId === ownId ? "Bạn" : message.alias}:</strong> {message.text}</p>)}
       </div>
       <div className={styles.greetings}>
-        <button type="button" disabled={!connected || waiting} onClick={() => { socketSend({ type: "action", action: "greet" }); send("Chào mọi người!"); }}>Vẫy chào</button>
+        <button type="button" disabled={!connected || waiting} onClick={() => send("Chào mọi người!")}>Chào mọi người</button>
         <button type="button" disabled={!connected || waiting} onClick={() => send("Chúc mọi người bình an!")}>Chúc bình an</button>
         <button type="button" disabled={!connected} onClick={() => socketSend({ type: "action", action: "meditate" })}>Cùng tĩnh tâm</button>
       </div>

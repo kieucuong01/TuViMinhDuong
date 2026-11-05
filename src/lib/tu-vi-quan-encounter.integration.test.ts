@@ -3,7 +3,7 @@ import { afterAll, describe, expect, it, vi } from "vitest";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "@/generated/prisma/client";
 import { generateWithLlmRouter } from "@/lib/llm-router";
-import { answerEncounter, changeEncounter, finishEncounterSpeech, getEncounterSpeech, readEncounter } from "./tu-vi-quan-encounter";
+import { answerEncounter, captureEncounterBirth, changeEncounter, finishEncounterSpeech, getEncounterSpeech, readEncounter } from "./tu-vi-quan-encounter";
 
 vi.mock("server-only", () => ({}));
 vi.mock("@/lib/llm-router", () => ({
@@ -75,6 +75,65 @@ describe.skipIf(!db)("Tử Vi Quán voice seats in PostgreSQL", () => {
     await changeEncounter(db!, a, { action: "interrupt", id, turnId });
     await expect(getEncounterSpeech(db!, a, id, turnId)).rejects.toMatchObject({ status: 404 });
     await act(a, "leave", id);
+  });
+
+  it("reserves a reward ticket across midnight, consumes it only on start and resumes without resetting time", async () => {
+    const guest = player(), stranger = player();
+    const now = new Date("2026-11-04T16:59:30Z");
+    const daily = (await begin(guest, "tuvi", now)).encounter!.id;
+    await act(guest, "leave", daily, now);
+    const profile = await db!.quanIdentity.findUniqueOrThrow({ where: { guestId: guest.guest.id } });
+    const ticket = await db!.quanEntry.create({ data: { profileId: profile.profileId, kind: "voice_ticket", dayKey: randomUUID(), points: 0, data: { used: false }, version: "test" } });
+    await expect(changeEncounter(db!, stranger, { action: "begin", kind: "tuvi", ticketId: ticket.id }, now)).rejects.toMatchObject({ status: 404 });
+    const reserved = await changeEncounter(db!, guest, { action: "begin", kind: "tuvi", ticketId: ticket.id }, now);
+    const id = reserved.encounter!.id;
+    await act(guest, "leave", id, now);
+    expect((await db!.quanEntry.findUniqueOrThrow({ where: { id: ticket.id } })).data).toEqual({ used: false });
+    await changeEncounter(db!, guest, { action: "begin", kind: "tuvi", ticketId: ticket.id }, now);
+    const midnight = new Date("2026-11-04T17:00:01Z");
+    expect((await act(guest, "start", id, midnight)).encounter?.remainingSeconds).toBe(300);
+    const used = await db!.quanEntry.findUniqueOrThrow({ where: { id: ticket.id } });
+    expect(used.data).toMatchObject({ used: true, encounterId: id });
+    const later = new Date(midnight.getTime() + 60_000);
+    await act(guest, "leave", id, later);
+    expect((await readEncounter(db!, guest, later)).rewardTickets).toContainEqual({ id: ticket.id });
+    const resumed = await changeEncounter(db!, guest, { action: "begin", kind: "tuvi", ticketId: ticket.id }, later);
+    expect(resumed.encounter?.id).toBe(id);
+    expect((await act(guest, "start", id, later)).encounter?.remainingSeconds).toBe(240);
+    await act(guest, "leave", id, later);
+    await expect(changeEncounter(db!, guest, { action: "begin", kind: "tuvi", ticketId: ticket.id }, new Date(midnight.getTime() + 301_000))).rejects.toMatchObject({ status: 409 });
+  });
+
+  it("asks for missing birth data, waits for voice confirmation and reads the chart opening", async () => {
+    const guest = player(), stranger = player();
+    const id = (await begin(guest)).encounter!.id;
+    const capture = (transcript: string) => captureEncounterBirth(db!, guest, { id, transcript });
+    await act(guest, "start", id);
+    try {
+      await expect(captureEncounterBirth(db!, stranger, { id, transcript: "Nam" })).rejects.toMatchObject({ status: 404 });
+      await expect(changeEncounter(db!, guest, { id, action: "birth_confirm", input: { year: 1995 } })).rejects.toMatchObject({ status: 400 });
+      const reply = (fields: object) => vi.mocked(generateWithLlmRouter).mockResolvedValueOnce({ provider: "groq", model: "mock", text: JSON.stringify(fields) });
+      reply({ day: 15, month: 7, year: 1995, birthHour: "19", fullName: "Ignored" });
+      const partial = await capture("Sinh ngày mười lăm tháng bảy năm 1995");
+      expect(partial.encounter?.context.birthDraft).toEqual({ day: 15, month: 7, year: 1995 });
+      expect(partial.encounter?.messages.at(-1)?.answer).toContain("âm lịch hay dương lịch");
+      reply({ calendarType: "solar", birthHour: 19, birthMinute: 30 });
+      expect((await capture("Dương lịch, bảy rưỡi tối")).encounter?.messages.at(-1)?.answer).toContain("lá số nam hay nữ");
+      reply({ gender: "male" });
+      const review = await capture("Nam");
+      expect(review.encounter?.messages.at(-1)?.answer).toContain("19 giờ 30 phút");
+      expect((await readEncounter(db!, guest)).encounter?.context.chartMissing).toBe(true);
+      const done = await capture("Dạ, đúng rồi.");
+      expect(done.encounter?.context.chartMissing).toBeUndefined();
+      expect(done.encounter?.context.birthDraft).toBeUndefined();
+      const overview = done.encounter?.messages.at(-1);
+      expect(overview).toMatchObject({ id: "chart-opening", answer: expect.stringContaining("Bạn muốn thầy nói thêm") });
+      const speech = await getEncounterSpeech(db!, guest, id, "chart-opening");
+      expect(speech.text).toEqual(overview?.answer);
+      await finishEncounterSpeech(db!, guest, id, { failed: false, aborted: true }, speech.speakingUntil);
+      await answerEncounter(db!, guest, { id, turnId: randomUUID(), question: "Về công việc thì sao?" });
+      expect(vi.mocked(generateWithLlmRouter).mock.lastCall?.[0].prompt).toContain("Quan Lộc");
+    } finally { await act(guest, "leave", id); }
   });
 
   it("asks for a complete answer and avoids chaining follow-up questions", async () => {

@@ -275,9 +275,10 @@ export type QuanCosmetic = {
   id: string;
   title: string;
   description: string;
-  price: 60 | 120 | 300 | 600;
-  slot: "robe" | "lantern" | "table" | "cardBack" | "aura";
+  price: 0 | 60 | 120 | 300 | 600;
+  slot: "robe" | "lantern" | "table" | "cardBack" | "aura" | "altar";
   value: string;
+  unlockAt?: number;
 };
 
 export const QUAN_COSMETICS: readonly QuanCosmetic[] = [
@@ -293,6 +294,9 @@ export const QUAN_COSMETICS: readonly QuanCosmetic[] = [
   { id: "aura-mist", title: "Vầng sương", description: "Quầng sáng màu sương sớm.", price: 120, slot: "aura", value: "#b7c9c4" },
   { id: "aura-lotus", title: "Vầng sen", description: "Quầng sáng hồng nhẹ.", price: 300, slot: "aura", value: "#e8acbc" },
   { id: "aura-gold", title: "Vầng nắng", description: "Quầng sáng vàng quanh khách.", price: 600, slot: "aura", value: "#e7c780" },
+  { id: "altar-lacquer", title: "Bàn thờ sơn son", description: "Sắc đỏ son cho bàn thờ Thần Tài trong sân của bạn.", price: 0, unlockAt: 100, slot: "altar", value: "#a33d31" },
+  { id: "table-night", title: "Bàn luận đêm sao", description: "Mặt bàn xanh sẫm ở bàn thầy và góc riêng.", price: 0, unlockAt: 300, slot: "table", value: "#354e67" },
+  { id: "card-constellation", title: "Bộ bài Trời Sao", description: "Mặt lưng xanh tím dành riêng cho bộ Tarot tại bàn.", price: 0, unlockAt: 700, slot: "cardBack", value: "#4b4d91" },
 ];
 
 export { moderateWish } from "./tu-vi-quan-moderation.mjs";

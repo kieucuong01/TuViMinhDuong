@@ -7,6 +7,7 @@ import { solarToLunar } from "@/lib/lunar";
 import type { QuanGuest } from "@/lib/tu-vi-quan-guest";
 import { normalizeQuanAlias } from "@/lib/tu-vi-quan-guest";
 import { QuanSessionError, readQuanChart } from "@/lib/tu-vi-quan-session";
+import { mutateMonastery, readMonastery } from "@/lib/tu-vi-quan-monastery";
 import {
   QUAN_CONTENT_VERSION, QUAN_COSMETICS, drawDaily, drawTarot, drawIChing,
   moderateWish, quanDayKey, buildQuanHoroscope,
@@ -17,6 +18,14 @@ type Actor = { guest: QuanGuest; userId?: string };
 type Bag = Record<string, unknown>;
 const DAY = 86_400_000;
 const TTL = 30 * DAY;
+const pointActivities = ["daily", "incense", "meditate", "check_in", "chant", "monastery_meditate", "monastery_chant", "monastery_garden"];
+const levels = [
+  { title: "Sơ nhập môn", threshold: 0 },
+  { title: "Bạn quen của quán", threshold: 100 },
+  { title: "Người giữ đèn", threshold: 300 },
+  { title: "Bạn đồng hành", threshold: 700 },
+  { title: "Đại sư phong thủy", threshold: 1500 },
+];
 const CALLIGRAPHY = {
   calm: [["An", "Dành mười phút cho việc giúp bạn thấy nhẹ lòng."], ["Bền", "Làm tiếp một việc nhỏ mà bạn đã bắt đầu."], ["Sáng", "Viết rõ điều bạn biết và điều còn phải hỏi."], ["Tĩnh", "Cho mình một nhịp thở trước khi trả lời."]],
   playful: [["Gọn", "Dọn một tab trình duyệt. Ba mươi tab còn lại xin hẹn mai."], ["Nghỉ", "Deadline biết chạy. Mình biết đi lấy nước."], ["Thảnh", "Hôm nay cho phép trả lời tin nhắn sau khi ăn xong."], ["Bớt", "Bớt ôm việc để còn hai tay ôm gối."]],
@@ -65,16 +74,27 @@ async function metric(tx: Tx, profile: QuanProfile, name: string, now: Date, sou
   });
 }
 
+export async function saveQuanBirth(tx: Tx, profile: QuanProfile, chart: TuViChart | null, now: Date) {
+  const updated = await tx.quanProfile.update({
+    where: { id: profile.id },
+    data: { birthInput: chart ? json(chart.input) : Prisma.DbNull },
+  });
+  await metric(tx, updated, "profile_saved", now);
+  return updated;
+}
+
 async function totals(tx: Tx, id: string) {
   const [balance, earned] = await Promise.all([
     tx.quanEntry.aggregate({ where: { profileId: id }, _sum: { points: true } }),
-    tx.quanEntry.aggregate({ where: { profileId: id, points: { gt: 0 }, kind: { in: ["daily", "incense", "meditate"] } }, _sum: { points: true } }),
+    tx.quanEntry.aggregate({ where: { profileId: id, points: { gt: 0 }, kind: { in: pointActivities } }, _sum: { points: true } }),
   ]);
   return { points: balance._sum.points || 0, earned: earned._sum.points || 0 };
 }
 
-function title(earned: number) {
-  return earned >= 1500 ? "Người giữ ánh sáng" : earned >= 700 ? "Bạn đồng hành" : earned >= 300 ? "Người giữ đèn" : earned >= 100 ? "Bạn quen của quán" : "Khách mới ghé quán";
+function progress(earned: number) {
+  const next = levels.findIndex(level => level.threshold > earned);
+  const index = next < 0 ? levels.length - 1 : next - 1;
+  return { ...levels[index], level: index + 1, next: levels[index + 1] ?? null };
 }
 
 export function defaultQuanEvent(now: Date, excluded = new Set<string>()) {
@@ -106,6 +126,7 @@ async function currentEvent(tx: Tx, now: Date) {
 }
 
 function itemDetails(id: string) {
+  if (id === "journey-lantern-seven") return { id, title: "Đèn sen bảy ngày", slot: "lantern", value: "#f4b2c3", price: 0, description: "Kỷ niệm bảy ngày thực hành ở Tu viện." };
   return QUAN_COSMETICS.find((item) => item.id === id) ||
     (id.startsWith("event-lantern-") ? { id, title: "Đèn kỷ niệm cầu an", slot: "lantern", value: "event-gold", price: 0, description: "Kỷ niệm một buổi cùng thắp đèn." } : null);
 }
@@ -141,19 +162,23 @@ async function snapshot(tx: Tx, profile: QuanProfile, now: Date) {
   const daily = entries.find((e) => e.kind === "daily" && e.dayKey === dayKey);
   const calligraphy = entries.find((e) => e.kind === "calligraphy" && e.dayKey === dayKey);
   const meditation = entries.find((e) => e.kind === "meditate_start" && e.dayKey === dayKey);
+  const chant = entries.find((e) => e.kind === "chant_start" && e.dayKey === dayKey);
   const eventJoin = event ? await tx.quanEntry.findUnique({ where: { profileId_kind_dayKey: { profileId: profile.id, kind: "event_join", dayKey: event.id } } }) : null;
   const eventClaim = event ? await tx.quanEntry.findUnique({ where: { profileId_kind_dayKey: { profileId: profile.id, kind: "event_claim", dayKey: event.id } } }) : null;
   return {
-    profile: { id: profile.id, alias: profile.alias, linked: Boolean(profile.userId), ...balance, title: title(balance.earned), birthInput: profile.birthInput, equipped: profile.equipped },
+    monastery: await readMonastery(tx, profile.id, now),
+    profile: { id: profile.id, alias: profile.alias, linked: Boolean(profile.userId), ...balance, ...progress(balance.earned), birthInput: profile.birthInput, equipped: profile.equipped },
     daily: daily ? { ...asBag(daily.data), sourceId: daily.id } : null,
     calligraphy: calligraphy ? { ...asBag(calligraphy.data), sourceId: calligraphy.id } : null,
     rankingOptIn: Boolean(ranking),
-    history: entries.filter((e) => ["daily", "calligraphy", "tarot1", "tarot3", "iching", "incense", "greet", "meditate"].includes(e.kind)).slice(0, 50).map((e) => ({ id: e.id, kind: e.kind, dayKey: e.dayKey, result: e.data, createdAt: e.createdAt.toISOString() })),
+    history: entries.filter((e) => [...pointActivities, "calligraphy", "tarot1", "tarot3", "iching", "greet"].includes(e.kind)).slice(0, 50).map((e) => ({ id: e.id, kind: e.kind, dayKey: e.dayKey, result: e.data, createdAt: e.createdAt.toISOString() })),
     inventory: items.map((item) => ({ ...itemDetails(item.itemId), id: item.itemId, acquiredAt: item.acquiredAt.toISOString() })),
     cosmetics: QUAN_COSMETICS, wishes: wishes.map(wishView), myWishes: own.map(wishView),
     charts: charts.map((chart) => ({ id: chart.id, label: chart.title, year: asBag(chart.input).year })),
     sessions: sessions.map((session) => ({ ...session, status: session.status.toLowerCase(), paidAt: session.paidAt?.toISOString() })),
     meditation: { startedAt: meditation?.createdAt.toISOString() || null, completed: entries.some((e) => e.kind === "meditate" && e.dayKey === dayKey) },
+    checkedIn: entries.some((e) => e.kind === "check_in" && e.dayKey === dayKey),
+    chant: { startedAt: chant?.createdAt.toISOString() || null, completed: entries.some((e) => e.kind === "chant" && e.dayKey === dayKey) },
     event: event ? { id: event.id, title: event.title, startsAt: event.startsAt.toISOString(), endsAt: event.endsAt.toISOString(), active: !event.cancelled && event.startsAt <= now && event.endsAt > now, joinedAt: eventJoin?.createdAt.toISOString() || null, claimed: Boolean(eventClaim) } : null,
     shares: shares.map((s) => ({ id: s.id, url: `/tu-vi-quan/chia-se/${s.id}`, expiresAt: s.expiresAt.toISOString(), revoked: Boolean(s.revokedAt) })),
     flags: { publicPosting: settings?.publicPosting ?? true, ...asBag(settings?.features) }, serverTime: now.toISOString(),
@@ -171,14 +196,41 @@ export async function readEcosystem(db: PrismaClient, actor: Actor, now = new Da
 async function mergeProfiles(tx: Tx, source: QuanProfile, target: QuanProfile) {
   if (source.id === target.id) return target;
   const rows = await tx.quanEntry.findMany({ where: { profileId: source.id }, orderBy: { createdAt: "asc" } });
+  const rewardKinds = ["meditate", "chant", "monastery_meditate", "monastery_chant"];
+  const targetRewards = await tx.quanEntry.findMany({ where: { profileId: target.id, kind: { in: rewardKinds } } });
+  const desiredRewards = new Map<string, { day: string; activity: string; source: number; target: number }>();
+  for (const row of [...rows, ...targetRewards]) {
+    if (!rewardKinds.includes(row.kind)) continue;
+    const activity = row.kind.replace("monastery_", "");
+    const key = row.dayKey + ":" + activity;
+    const reward = desiredRewards.get(key) ?? { day: row.dayKey, activity, source: 0, target: 0 };
+    reward[row.profileId === source.id ? "source" : "target"] += row.points;
+    desiredRewards.set(key, reward);
+  }
   for (const row of rows) {
     const existing = await tx.quanEntry.findUnique({ where: { profileId_kind_dayKey: { profileId: target.id, kind: row.kind, dayKey: row.dayKey } } });
+    if (row.kind.startsWith("practice_")) {
+      const before = asBag(existing?.data), after = asBag(row.data);
+      const data = json({ ...after, ...before, seconds: Math.max(Number(before.seconds) || 0, Number(after.seconds) || 0), taps: Math.max(Number(before.taps) || 0, Number(after.taps) || 0), running: false, lastAt: 0 });
+      if (existing) {
+        await tx.quanEntry.update({ where: { id: existing.id }, data: { data } });
+        await tx.quanEntry.delete({ where: { id: row.id } });
+      } else await tx.quanEntry.update({ where: { id: row.id }, data: { profileId: target.id, data } });
+      continue;
+    }
     if (existing) {
       if (row.createdAt < existing.createdAt) await tx.quanEntry.update({ where: { id: existing.id }, data: { data: row.data as Prisma.InputJsonValue, version: row.version, createdAt: row.createdAt } });
       // Keep both actual purchases in the ledger; identical owned cosmetics still cost what each guest spent.
       if (row.points < 0) await tx.quanEntry.update({ where: { id: row.id }, data: { profileId: target.id, kind: row.kind + ":merged:" + row.id } });
       else await tx.quanEntry.delete({ where: { id: row.id } });
     } else await tx.quanEntry.update({ where: { id: row.id }, data: { profileId: target.id } });
+  }
+  const mergedRewards = await tx.quanEntry.findMany({ where: { profileId: target.id, kind: { in: rewardKinds } } });
+  for (const reward of desiredRewards.values()) {
+    const legacy = mergedRewards.find(row => row.kind === reward.activity && row.dayKey === reward.day)?.points ?? 0;
+    const monastery = mergedRewards.find(row => row.kind === "monastery_" + reward.activity && row.dayKey === reward.day);
+    const desired = Math.max(reward.source, reward.target) - legacy;
+    if (monastery && monastery.points !== desired) await tx.quanEntry.update({ where: { id: monastery.id }, data: { points: Math.max(0, desired) } });
   }
   for (const item of await tx.quanItem.findMany({ where: { profileId: source.id } })) {
     await tx.quanItem.upsert({ where: { profileId_itemId: { profileId: target.id, itemId: item.itemId } }, create: { profileId: target.id, itemId: item.itemId, acquiredAt: item.acquiredAt }, update: {} });
@@ -238,8 +290,8 @@ export async function mutateEcosystem(db: PrismaClient, actor: Actor, body: Bag,
     const extra: Bag & { incensePoints?: number } = {};
     const settings = await tx.quanEcosystemSettings.findUnique({ where: { id: "global" } });
     if (asBag(settings?.features)[action] === false) fail("Hoạt động này đang tạm nghỉ.", 503);
-    const ranking = (action === "daily" || action === "ritual") && await tx.quanEntry.findUnique({ where: { profileId_kind_dayKey: { profileId: profile.id, kind: "ranking_opt_in", dayKey: "profile" } }, select: { id: true } });
-    const beforeTitle = ranking ? title((await totals(tx, profile.id)).earned) : null;
+    const ranking = ["daily", "ritual", "check_in", "practice_finish"].includes(action) && await tx.quanEntry.findUnique({ where: { profileId_kind_dayKey: { profileId: profile.id, kind: "ranking_opt_in", dayKey: "profile" } }, select: { id: true } });
+    const beforeTitle = ranking ? progress((await totals(tx, profile.id)).earned).title : null;
     if (action === "daily") {
       if (!["career", "love", "money"].includes(String(body.topic))) fail("Chọn một chủ đề.");
       const input = profile.birthInput as unknown as ChartInput | null;
@@ -253,21 +305,29 @@ export async function mutateEcosystem(db: PrismaClient, actor: Actor, body: Bag,
       const saved = await entry(tx, profile.id, "daily", day, result, 10, now);
       extra.latestResult = { ...asBag(saved.data), sourceId: saved.id };
       await metric(tx, profile, "daily", now);
+    } else if (action.startsWith("practice_") || action === "redeem_voice") {
+      await mutateMonastery(tx, profile, body, now);
+      if (action === "practice_finish") await metric(tx, profile, "ritual", now);
+    } else if (action === "check_in") {
+      await entry(tx, profile.id, "check_in", day, { title: "Điểm danh hôm nay" }, 5, now);
     } else if (action === "ritual") {
       const kind = str(body.kind, 30);
-      if (!["incense", "greet", "meditate_start", "meditate_finish"].includes(kind)) fail("Nghi thức không hợp lệ.");
+      if (!["incense", "greet", "meditate_start", "meditate_finish", "chant_start", "chant_finish"].includes(kind)) fail("Nghi thức không hợp lệ.");
       const note = body.note === undefined ? "" : str(body.note, 120).trim();
       if (kind === "incense" && body.count !== undefined && body.count !== 1 && body.count !== 3) fail("Chọn một hoặc ba nén hương.");
       if (kind === "incense") {
         const alreadyLit = await tx.quanEntry.findUnique({ where: { profileId_kind_dayKey: { profileId: profile.id, kind, dayKey: day } }, select: { id: true } });
         extra.incensePoints = alreadyLit ? 0 : 5;
       }
-      if (kind === "meditate_finish") {
-        const started = await tx.quanEntry.findUnique({ where: { profileId_kind_dayKey: { profileId: profile.id, kind: "meditate_start", dayKey: day } } });
-        if (!started || now.getTime() - started.createdAt.getTime() < 60_000) fail("Hãy dành đủ một phút tĩnh tâm.", 409);
-        await entry(tx, profile.id, "meditate", day, { title: "Một phút tĩnh tâm", body: note }, 5, now);
-      } else await entry(tx, profile.id, kind, day, { title: kind === "incense" ? "Xin lộc đầu ngày" : kind === "greet" ? "Chắp tay" : "Bắt đầu tĩnh tâm", body: note, count: body.count || 1 }, kind === "incense" ? 5 : 0, now);
-      if (kind !== "meditate_start") await metric(tx, profile, "ritual", now);
+      if (kind === "meditate_finish" || kind === "chant_finish") {
+        const meditation = kind === "meditate_finish";
+        const activity = meditation ? "meditate" : "chant";
+        const started = await tx.quanEntry.findUnique({ where: { profileId_kind_dayKey: { profileId: profile.id, kind: activity + "_start", dayKey: day } } });
+        if (!started || now.getTime() - started.createdAt.getTime() < (meditation ? 60_000 : 30_000)) fail(meditation ? "Hãy dành đủ một phút tĩnh tâm." : "Hãy dành đủ 30 giây tụng niệm.", 409);
+        const monastery = await tx.quanEntry.findUnique({ where: { profileId_kind_dayKey: { profileId: profile.id, kind: "monastery_" + activity, dayKey: day } } });
+        await entry(tx, profile.id, activity, day, { title: meditation ? "Một phút tĩnh tâm" : "Tụng niệm", body: note }, Math.max(0, 5 - (monastery?.points ?? 0)), now);
+      } else await entry(tx, profile.id, kind, day, { title: kind === "incense" ? "Xin lộc đầu ngày" : kind === "greet" ? "Chắp tay" : kind === "chant_start" ? "Bắt đầu tụng niệm" : "Bắt đầu tĩnh tâm", body: note, count: body.count || 1 }, kind === "incense" ? 5 : 0, now);
+      if (!kind.endsWith("_start")) await metric(tx, profile, "ritual", now);
     } else if (action === "calligraphy") {
       if (body.mood !== "calm" && body.mood !== "playful") fail("Chọn phong cách xin chữ.");
       const set = CALLIGRAPHY[body.mood as keyof typeof CALLIGRAPHY];
@@ -296,10 +356,8 @@ export async function mutateEcosystem(db: PrismaClient, actor: Actor, body: Bag,
         input = chart.input;
       }
       const chart = input === null ? null : readQuanChart(input);
-      const birthInput = chart ? json(chart.input) : Prisma.DbNull;
-      profile = await tx.quanProfile.update({ where: { id: profile.id }, data: { birthInput } });
+      profile = await saveQuanBirth(tx, profile, chart, now);
       if (chart) extra.chartSummary = quanChartSummary(chart);
-      await metric(tx, profile, "profile_saved", now);
     } else if (action === "alias") {
       const alias = normalizeQuanAlias(body.alias) || fail("Bí danh không hợp lệ.");
       profile = await tx.quanProfile.update({ where: { id: profile.id }, data: { alias } });
@@ -373,7 +431,9 @@ export async function mutateEcosystem(db: PrismaClient, actor: Actor, body: Bag,
       let owned = await tx.quanItem.findUnique({ where: { profileId_itemId: { profileId: profile.id, itemId } } });
       if (action === "buy" && !owned) {
         if (!QUAN_COSMETICS.some((item) => item.id === itemId)) fail("Vật phẩm này chỉ nhận từ sự kiện.");
-        if ((await totals(tx, profile.id)).points < item.price) fail("Bạn chưa đủ Điểm An Nhiên.", 409);
+        const balance = await totals(tx, profile.id);
+        if ("unlockAt" in item && typeof item.unlockAt === "number" && balance.earned < item.unlockAt) fail("Bạn chưa đạt cấp mở vật phẩm này.", 409);
+        if (balance.points < item.price) fail("Bạn chưa đủ Điểm An Nhiên.", 409);
         await entry(tx, profile.id, "buy:" + itemId, "", {}, -item.price, now);
         owned = await tx.quanItem.create({ data: { profileId: profile.id, itemId, acquiredAt: now } });
       }
@@ -405,7 +465,7 @@ export async function mutateEcosystem(db: PrismaClient, actor: Actor, body: Bag,
       if (!source && !wish && !achievement) fail("Không tìm thấy nội dung để chia sẻ.", 404);
       if (wish && (profile.blocked || ["hidden", "restricted", "pending"].includes(wish.status) || !moderateWish(wish.text).ok)) fail("Điều ước này chỉ có thể lưu riêng.");
       const data = asBag(source?.data);
-      const shareSnapshot = { kind: source?.kind || (wish ? "wish" : "achievement"), title: String(data.title || (wish ? "Lời nguyện cầu" : title((await totals(tx, profile.id)).earned))).slice(0, 180), body: String(wish?.text || data.body || "Một hành trình an nhiên, từng ngày một.").slice(0, 1000), action: String(data.action || "Ghé Tử Vi Quán để dành một khoảng bình yên.").slice(0, 300), ...(body.showAlias === true ? { alias: profile.alias } : {}) };
+      const shareSnapshot = { kind: source?.kind || (wish ? "wish" : "achievement"), title: String(data.title || (wish ? "Lời nguyện cầu" : progress((await totals(tx, profile.id)).earned).title)).slice(0, 180), body: String(wish?.text || data.body || "Một hành trình an nhiên, từng ngày một.").slice(0, 1000), action: String(data.action || "Ghé Tử Vi Quán để dành một khoảng bình yên.").slice(0, 300), ...(body.showAlias === true ? { alias: profile.alias } : {}) };
       const share = await tx.quanShare.create({ data: { id: randomBytes(18).toString("base64url"), profileId: profile.id, snapshot: { ...shareSnapshot, ...(wish ? { sourceWishId: wish.id } : {}) }, expiresAt: new Date(now.getTime() + TTL), createdAt: now } });
       extra.share = { id: share.id, url: `/tu-vi-quan/chia-se/${share.id}`, snapshot: shareSnapshot, expiresAt: share.expiresAt.toISOString() };
       await metric(tx, profile, "share_created", now);

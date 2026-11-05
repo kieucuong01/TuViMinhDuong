@@ -3,3 +3,6 @@
 .birth{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
 .birth label{min-width:0}
 .birth input,.birth select{width:100%;min-width:0;padding-inline:8px}
+.birth select{font:inherit;min-height:48px;border-radius:12px;border:1px solid #a98c58;background:#25201b;color:#fff7df}
+.birth{max-height:min(38dvh,360px);overflow:auto;padding:4px}
+@media(max-height:480px){.hud{gap:4px}.caption{padding:6px 12px}.hud details{padding-block:2px}.birth{max-height:28dvh}}

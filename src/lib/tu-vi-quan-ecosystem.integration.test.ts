@@ -31,6 +31,72 @@ afterAll(async () => {
 });
 
 describe.skipIf(!db)("Tử Vi Quán ecosystem in PostgreSQL", () => {
+  it("counts foreground practice, caps shared rewards and pauses when switching activities", async () => {
+    const guest = actor();
+    const run = (action: string, mode: string, seconds: number, tap = false) => mutateEcosystem(db!, guest, { action, mode, tap }, later(seconds));
+    await run("practice_start", "meditate", 0);
+    const away = await run("practice_tick", "meditate", 600);
+    expect(away.monastery.practices.meditate?.seconds).toBe(0);
+    await expect(run("practice_finish", "meditate", 600)).rejects.toMatchObject({ status: 409 });
+    for (let seconds = 605; seconds <= 660; seconds += 5) await run("practice_tick", "meditate", seconds);
+    const short = await run("practice_finish", "meditate", 660);
+    expect(short.profile.points).toBe(5);
+    await run("practice_start", "meditate", 660);
+    for (let seconds = 665; seconds <= 780; seconds += 5) await run("practice_tick", "meditate", seconds);
+    expect((await run("practice_finish", "meditate", 780)).profile.points).toBe(10);
+    await run("practice_start", "beads", 780);
+    for (let seconds = 785; seconds <= 915; seconds += 5) await run("practice_tick", "beads", seconds, true);
+    const beads = await run("practice_finish", "beads", 915);
+    expect(beads.profile.points).toBe(20);
+    expect(beads.monastery.practices.beads?.taps).toBe(27);
+    await run("practice_start", "chant", 915);
+    for (let seconds = 920; seconds <= 1035; seconds += 5) await run("practice_tick", "chant", seconds);
+    expect((await run("practice_finish", "chant", 1035)).profile.points).toBe(20);
+    await mutateEcosystem(db!, guest, { action: "ritual", kind: "chant_start" }, later(1035));
+    expect((await mutateEcosystem(db!, guest, { action: "ritual", kind: "chant_finish" }, later(1065))).profile.points).toBe(20);
+    await run("practice_start", "meditate", 1065);
+    const switched = await run("practice_start", "garden", 1065);
+    expect(switched.monastery.practices.meditate?.running).toBe(false);
+    for (let seconds = 1070; seconds <= 1130; seconds += 5) await run("practice_tick", "garden", seconds, true);
+    const garden = await run("practice_finish", "garden", 1130);
+    expect(garden.profile).toMatchObject({ points: 25, earned: 25 });
+    expect(garden.monastery.visits).toBe(1);
+    await db!.quanEntry.createMany({ data: Array.from({ length: 6 }, (_, index) => ({ profileId: garden.profile.id, kind: "monastery_visit", dayKey: `fixture-${index}`, data: {}, points: 0, version: "test" })) });
+    const bloomed = await run("practice_finish", "garden", 1130);
+    expect(bloomed.monastery.lotusBloomed).toBe(true);
+    expect(bloomed.inventory).toContainEqual(expect.objectContaining({ id: "journey-lantern-seven" }));
+    const newDay = await readEcosystem(db!, guest, new Date("2026-11-04T17:00:00Z"));
+    expect(newDay.monastery.practices.beads).toBeNull();
+    expect(newDay.monastery.rewards).toEqual({ meditate: 0, chant: 0, garden: 0 });
+  }, 30_000);
+
+  it("redeems once per day atomically, keeps at most two unused tickets and never spends lifetime points", async () => {
+    const guest = actor();
+    const initial = await readEcosystem(db!, guest, date);
+    await expect(mutateEcosystem(db!, guest, { action: "redeem_voice" }, date)).rejects.toMatchObject({ status: 409 });
+    await db!.quanEntry.create({ data: { profileId: initial.profile.id, kind: "daily", dayKey: "fixture", data: {}, points: 180, version: "test" } });
+    const orders = await Promise.all([1, 2].map(() => mutateEcosystem(db!, guest, { action: "redeem_voice" }, date)));
+    expect(orders.map(view => view.profile.points)).toEqual([120, 120]);
+    expect(orders[1].monastery.tickets).toHaveLength(1);
+    expect(orders[1].profile.earned).toBe(180);
+    await mutateEcosystem(db!, guest, { action: "redeem_voice" }, later(86400));
+    await expect(mutateEcosystem(db!, guest, { action: "redeem_voice" }, later(2 * 86400))).rejects.toMatchObject({ status: 409 });
+    expect((await readEcosystem(db!, actor(), date)).monastery.tickets).toHaveLength(0);
+  });
+
+  it("merges the highest earned practice milestone without doubling old ritual rewards", async () => {
+    const userId = await user(), a = actor(userId), b = actor(userId);
+    const target = await mutateEcosystem(db!, a, { action: "link" }, date);
+    const source = await readEcosystem(db!, b, date);
+    await db!.quanEntry.createMany({ data: [
+      { profileId: target.profile.id, kind: "meditate", dayKey: "2026-11-04", points: 5 },
+      { profileId: target.profile.id, kind: "monastery_meditate", dayKey: "2026-11-04", points: 0 },
+      { profileId: source.profile.id, kind: "monastery_meditate", dayKey: "2026-11-04", points: 10 },
+    ].map(row => ({ ...row, data: {}, version: "test" })) });
+    const merged = await mutateEcosystem(db!, b, { action: "link" }, date);
+    expect(merged.profile).toMatchObject({ points: 10, earned: 10 });
+    expect(merged.monastery.rewards.meditate).toBe(10);
+  });
   it("keeps one shareable calligraphy card per day and requires consent for ranking", async () => {
     const guest = actor();
     const first = await mutateEcosystem(db!, guest, { action: "calligraphy", mood: "playful" }, date);
@@ -85,6 +151,30 @@ describe.skipIf(!db)("Tử Vi Quán ecosystem in PostgreSQL", () => {
     const recovered = await mutateEcosystem(db!, actor(userId), { action: "recovery_restore", code: issued.recoveryCode }, later(5));
     expect(recovered.profile.id).toBe(merged.profile.id);
     await expect(mutateEcosystem(db!, actor(userId), { action: "recovery_restore", code: issued.recoveryCode }, later(6))).rejects.toMatchObject({ status: 404 });
+  });
+
+  it("awards check-in and chanting once per day and gates cosmetics by lifetime points", async () => {
+    const guest = actor();
+    const send = (body: Record<string, unknown>, at = date) => mutateEcosystem(db!, guest, body, at);
+    const reward = { action: "buy", itemId: "altar-lacquer" };
+    await expect(send(reward)).rejects.toMatchObject({ status: 409 });
+    const checks = await Promise.all([send({ action: "check_in" }), send({ action: "check_in" })]);
+    expect(checks.map(view => view.profile.earned)).toEqual([5, 5]);
+    expect(checks[1].checkedIn).toBe(true);
+    await send({ action: "ritual", kind: "chant_start" });
+    await expect(send({ action: "ritual", kind: "chant_finish" }, later(29))).rejects.toMatchObject({ status: 409 });
+    const finishes = await Promise.all([send({ action: "ritual", kind: "chant_finish" }, later(30)), send({ action: "ritual", kind: "chant_finish" }, later(31))]);
+    expect(finishes.map(view => view.profile.earned)).toEqual([10, 10]);
+    const midnight = new Date("2026-11-04T17:00:00Z");
+    const next = await send({ action: "check_in" }, midnight);
+    expect(next).toMatchObject({ checkedIn: true, chant: { completed: false, startedAt: null }, profile: { points: 15, level: 1 } });
+    for (let offset = 1; offset <= 17; offset++) await send({ action: "check_in" }, later(offset * 86400, midnight));
+    const claimed = await send(reward, later(17 * 86400, midnight));
+    expect(claimed.profile).toMatchObject({ points: 100, earned: 100, level: 2 });
+    expect(claimed.inventory).toContainEqual(expect.objectContaining({ id: "altar-lacquer" }));
+    await send({ action: "buy", itemId: "robe-jade" }, later(17 * 86400, midnight));
+    const equipped = await send({ action: "equip", itemId: "altar-lacquer" }, later(17 * 86400, midnight));
+    expect(equipped.profile).toMatchObject({ points: 40, earned: 100, level: 2, equipped: { altar: "#a33d31" } });
   });
 
   it("keeps private wishes private, applies report thresholds and revokes share snapshots", async () => {

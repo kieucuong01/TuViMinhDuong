@@ -11,7 +11,7 @@ import { isQuanWalkable, QUAN_SPAWN } from "../src/lib/tu-vi-quan-world.mjs";
 const MAX_GUESTS = 24;
 const ROOM_NAMES = ["Sân Trúc", "Sân Sen", "Sân Mai", "Sân Trà"];
 const MAX_PER_IP = 6;
-const ACTIONS = new Set(["idle", "incense", "greet", "meditate"]);
+const ACTIONS = new Set(["idle", "incense", "greet", "meditate", "monastery"]);
 const CHANNEL = "tu-vi-quan";
 const SOCKET_PATH = "/tu-vi-quan-ws";
 const SPAWN_COLUMNS = [0, 1.75, -1.75, 3.5, -3.5, 5.25, -5.25, 7, -7];
@@ -249,7 +249,7 @@ if (process.argv.includes("--serve")) {
       const { rows: leaders } = await pool.query(`
         SELECT p.alias, SUM(e.points)::int AS points
         FROM "QuanEntry" e JOIN "QuanProfile" p ON p.id = e."profileId"
-        WHERE e.kind IN ('daily','incense','meditate') AND e.points > 0 AND NOT p.blocked
+        WHERE e.kind IN ('daily','incense','meditate','check_in','chant','monastery_meditate','monastery_chant','monastery_garden') AND e.points > 0 AND NOT p.blocked
           AND EXISTS (SELECT 1 FROM "QuanEntry" o WHERE o."profileId" = p.id AND o.kind = 'ranking_opt_in' AND o."dayKey" = 'profile')
         GROUP BY p.id, p.alias ORDER BY points DESC, p.id ASC LIMIT 5
       `);

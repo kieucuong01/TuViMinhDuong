@@ -82,9 +82,10 @@ describe("Tử Vi Quán content", () => {
   });
 
   it("has unique cosmetics covering each agreed price and slot", () => {
-    expect(new Set(QUAN_COSMETICS.map((item) => item.id)).size).toBe(12);
-    expect(new Set(QUAN_COSMETICS.map((item) => item.price))).toEqual(new Set([60, 120, 300, 600]));
-    expect(new Set(QUAN_COSMETICS.map((item) => item.slot))).toEqual(new Set(["robe", "lantern", "table", "cardBack", "aura"]));
+    expect(new Set(QUAN_COSMETICS.map((item) => item.id)).size).toBe(15);
+    expect(new Set(QUAN_COSMETICS.map((item) => item.price))).toEqual(new Set([0, 60, 120, 300, 600]));
+    expect(new Set(QUAN_COSMETICS.map((item) => item.slot))).toEqual(new Set(["robe", "lantern", "table", "cardBack", "aura", "altar"]));
+    expect(QUAN_COSMETICS.filter(item => item.price === 0).map(item => item.unlockAt)).toEqual([100, 300, 700]);
   });
 
   it("uses the requested year for stars and provides 12 unscored monthly prompts", () => {

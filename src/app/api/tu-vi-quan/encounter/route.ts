@@ -1,7 +1,7 @@
 import { getCurrentUser, isCheckoutGuestUser } from "@/lib/auth";
 import { getDb } from "@/lib/db";
 import { checkAuthRateLimit } from "@/lib/rate-limit";
-import { answerEncounter, changeEncounter, quanVoiceGameEnabled, readEncounter } from "@/lib/tu-vi-quan-encounter";
+import { answerEncounter, captureEncounterBirth, changeEncounter, quanVoiceGameEnabled, readEncounter } from "@/lib/tu-vi-quan-encounter";
 import { getQuanGuest } from "@/lib/tu-vi-quan-guest";
 import { quanError, quanJson, readQuanBody } from "@/lib/tu-vi-quan-http";
 import { QuanSessionError } from "@/lib/tu-vi-quan-session";
@@ -34,7 +34,9 @@ export async function POST(request: Request) {
     if (body.action === "start" && process.env.NODE_ENV === "production" && (!capabilities.stt || !capabilities.tts)) {
       throw new QuanSessionError("Bàn thoại đang tạm nghỉ. Thời lượng của bạn vẫn còn.", 503);
     }
-    const view = body.action === "turn" ? await answerEncounter(db, actor, body) : await changeEncounter(db, actor, body);
+    const view = body.action === "turn" ? await answerEncounter(db, actor, body)
+      : body.action === "birth_capture" ? await captureEncounterBirth(db, actor, body)
+        : await changeEncounter(db, actor, body);
     return quanJson({ ...view, capabilities });
   } catch (error) { return quanError(error); }
 }

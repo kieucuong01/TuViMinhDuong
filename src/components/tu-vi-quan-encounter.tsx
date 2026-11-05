@@ -8,9 +8,9 @@ import styles from "./tu-vi-quan-encounter.module.css";
 export type EncounterKind = "tuvi" | "tarot" | "iching";
 export type EncounterVisual = { kind: EncounterKind; state: "greeting" | "listening" | "thinking" | "speaking" | "idle"; audioLevel: number };
 type Message = { id: string; question: string; answer: string | null; interrupted: boolean };
-type Encounter = { id: string; kind: EncounterKind; tier: "free" | "paid"; state: "waiting" | "invited" | "active" | "ended" | "left"; endsAt?: string; remainingSeconds: number; messages: Message[]; context: { title: string; brief?: string; cards?: { id: string; title: string }[]; lines?: number[]; chartMissing?: boolean } };
-type Snapshot = { encounter: Encounter | null; freeRemainingSeconds: number; capabilities: { stt: boolean; tts: boolean } };
-type Props = { kind: EncounterKind; orderId?: string; muted: boolean; onLeave(): void; onVisual(value: EncounterVisual): void; onUpgrade(kind: EncounterKind): void; onRitual(kind: "tarot" | "iching", count?: number, values?: number[]): void; onChartReady(palace: number): void };
+type Encounter = { id: string; kind: EncounterKind; tier: "free" | "paid"; state: "waiting" | "invited" | "active" | "ended" | "left"; endsAt?: string; remainingSeconds: number; messages: Message[]; context: { title: string; brief?: string; cards?: { id: string; title: string }[]; lines?: number[]; chartMissing?: boolean; menhIndex?: number; birthDraft?: { day?: number; month?: number; year?: number; calendarType?: string; gender?: string; birthHour?: number; birthMinute?: number } } };
+type Snapshot = { encounter: Encounter | null; freeRemainingSeconds: number; rewardTickets?: { id: string }[]; capabilities: { stt: boolean; tts: boolean } };
+type Props = { kind: EncounterKind; orderId?: string; ticketId?: string; muted: boolean; onLeave(): void; onVisual(value: EncounterVisual): void; onUpgrade(kind: EncounterKind): void; onRitual(kind: "tarot" | "iching", count?: number, values?: number[]): void; onChartReady(palace: number): void };
 const names = { tuvi: "Thầy tử vi", tarot: "Người đọc Tarot", iching: "Thầy Dịch" };
 const endpoint = "/api/tu-vi-quan/encounter";
 
@@ -20,7 +20,7 @@ async function readResponse(response: Response) {
   return data;
 }
 
-export default function TuViQuanEncounter({ kind, orderId, muted, onLeave, onVisual, onUpgrade, onRitual, onChartReady }: Props) {
+export default function TuViQuanEncounter({ kind, orderId, ticketId, muted, onLeave, onVisual, onUpgrade, onRitual, onChartReady }: Props) {
   const [snapshot, setSnapshot] = useState<Snapshot | null>(null);
   const [busy, setBusy] = useState(false);
   const [recording, setRecording] = useState(false);
@@ -28,7 +28,6 @@ export default function TuViQuanEncounter({ kind, orderId, muted, onLeave, onVis
   const [error, setError] = useState("");
   const [text, setText] = useState("");
   const [showText, setShowText] = useState(false);
-  const [birthSaved, setBirthSaved] = useState(false);
   const [seconds, setSeconds] = useState(0);
   const generation = useRef(0);
   const current = useRef<Encounter | null>(null);
@@ -86,7 +85,16 @@ export default function TuViQuanEncounter({ kind, orderId, muted, onLeave, onVis
     const controller = new AbortController(); speech.current = controller;
     try {
       await unlockAudio();
-      const response = await fetch("/api/tu-vi-quan/voice/speak", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: encounter.id, turnId: message.id }), signal: controller.signal });
+      const payload = JSON.stringify({ id: encounter.id, turnId: message.id });
+      const requestSpeech = () => fetch("/api/tu-vi-quan/voice/speak", { method: "POST", headers: { "Content-Type": "application/json" }, body: payload, signal: controller.signal });
+      let response = await requestSpeech();
+      if (response.status === 409 && !controller.signal.aborted) {
+        const blocked = await response.clone().json().catch(() => null);
+        if (blocked?.error === "Thầy đang nói. Bạn đợi một chút nhé.") {
+          await new Promise(resolve => setTimeout(resolve, 350));
+          response = await requestSpeech();
+        }
+      }
       if (!response.ok) { const data = await response.json().catch(() => ({})); throw new Error(data.error || "Giọng đọc đang bận. Bạn có thể đọc phụ đề hoặc thử lại."); }
       if (token !== generation.current || controller.signal.aborted || document.hidden) { controller.abort(); return; }
       setSpeaking(true); state("speaking");
@@ -94,12 +102,16 @@ export default function TuViQuanEncounter({ kind, orderId, muted, onLeave, onVis
     } catch (cause) { if (!controller.signal.aborted && token === generation.current) setError(cause instanceof Error ? cause.message : "Chưa phát được âm thanh."); }
     finally { if (token === generation.current && speech.current === controller) { setSpeaking(false); state("idle"); speech.current = null; } }
   }
-  async function run(actionName: string) {
+  async function run(actionName: string, rewardId?: string) {
     if (lock.current) return;
     lock.current = true; setBusy(true); setError(""); const token = generation.current;
     try {
       await unlockAudio();
-      const data = await action(actionName, actionName === "begin" ? { kind, orderId } : { id: current.current?.id });
+      if (rewardId && current.current) {
+        stopSpeech();
+        await action("leave", { id: current.current.id });
+      }
+      const data = await action(actionName, actionName === "begin" ? { kind, orderId, ticketId: rewardId ?? ticketId } : { id: current.current?.id });
       if (token !== generation.current) return;
       apply(data);
       const greeting = data.encounter?.messages.find(message => message.id === "greeting");
@@ -145,8 +157,13 @@ export default function TuViQuanEncounter({ kind, orderId, muted, onLeave, onVis
           const form = new FormData(); form.set("id", current.current!.id); form.set("audio", new Blob(chunks, { type: instance.mimeType }), "question.webm");
           const data = await readResponse(await fetch("/api/tu-vi-quan/voice/transcribe", { method: "POST", body: form, signal: controller.signal }));
           if (token !== generation.current) return;
-          if (!data.text?.trim()) throw new Error("Chưa nghe rõ câu hỏi. Bạn thử nói lại nhé.");
-          lock.current = false; setBusy(false); await send(data.text);
+          if (!data.text?.trim()) throw new Error("Thầy chưa nghe rõ. Bạn thử nói lại nhé.");
+          if (current.current?.context.chartMissing) {
+            const view = await action("birth_capture", { id: current.current.id, transcript: data.text }, controller.signal);
+            if (token === generation.current) applyBirth(view);
+          } else {
+            lock.current = false; setBusy(false); await send(data.text);
+          }
         } catch (cause) { if (token === generation.current && !controller.signal.aborted) { setError(cause instanceof Error ? cause.message : "Chưa nhận được lời nói."); state("idle"); } }
         finally { if (token === generation.current) { lock.current = false; setBusy(false); } }
       };
@@ -155,28 +172,35 @@ export default function TuViQuanEncounter({ kind, orderId, muted, onLeave, onVis
     } catch (cause) { if (token === generation.current) { stopMic(true); setError(cause instanceof Error ? cause.message : "Không mở được micro. Hãy kiểm tra quyền thu âm."); state("idle"); } }
     finally { acquiringMic.current = false; }
   }
+  function applyBirth(data: Snapshot) {
+    apply(data);
+    const encounter = data.encounter;
+    if (!encounter) return;
+    if (encounter.context.menhIndex !== undefined && encounter.context.menhIndex >= 0) onChartReady(encounter.context.menhIndex);
+    const message = encounter.messages.at(-1);
+    if (message) void speak(encounter, message);
+    else state("idle");
+  }
   async function saveBirth(form: FormData) {
-    if (lock.current) return;
-    const [year, month, day] = String(form.get("birthDate")).split("-").map(Number);
+    if (lock.current || !current.current?.context.chartMissing) return;
     lock.current = true;
     setBusy(true);
     setError("");
+    const token = generation.current;
+    const controller = new AbortController(); request.current = controller;
+    interruptSpeech();
     try {
-      const data = await readResponse(await fetch("/api/tu-vi-quan/ecosystem", {
-        method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "birth", input: {
-          fullName: "Khách", gender: form.get("gender"), calendarType: "solar",
-          year, month, day, birthHour: Number(form.get("hour")), birthMinute: Number(form.get("minute")),
-        } }),
-      }));
-      setBirthSaved(true);
-      const palace = data.chartSummary?.palaces?.findIndex((item: { name: string }) => item.name === "Mệnh");
-      if (Number.isInteger(palace) && palace >= 0) onChartReady(palace);
+      const input = {
+        gender: form.get("gender"), calendarType: form.get("calendarType"),
+        year: Number(form.get("year")), month: Number(form.get("month")), day: Number(form.get("day")),
+        birthHour: Number(form.get("hour")), birthMinute: Number(form.get("minute")),
+      };
+      const data = await action("birth_confirm", { id: current.current.id, input }, controller.signal);
+      if (token === generation.current) applyBirth(data);
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "Chưa lưu được ngày giờ sinh.");
+      if (token === generation.current) setError(cause instanceof Error ? cause.message : "Chưa lập được lá số.");
     } finally {
-      lock.current = false;
-      setBusy(false);
+      if (token === generation.current) { lock.current = false; setBusy(false); }
     }
   }
   async function leave() {
@@ -204,6 +228,8 @@ export default function TuViQuanEncounter({ kind, orderId, muted, onLeave, onVis
   }, []);
   const encounter = snapshot?.encounter?.kind === kind ? snapshot.encounter : null;
   const active = encounter?.state === "active";
+  const intake = active && encounter.context.chartMissing;
+  const draft = encounter?.context.birthDraft;
   useEffect(() => {
     if (!encounter) return;
     let stopped = false;
@@ -222,7 +248,7 @@ export default function TuViQuanEncounter({ kind, orderId, muted, onLeave, onVis
   }, [encounter?.state, active, seconds]);
   const last = encounter?.messages.filter(message => message.answer).at(-1);
   const ended = encounter?.state === "ended" || (active && !!encounter.endsAt && Date.parse(encounter.endsAt) <= Date.now());
-  const exhausted = !encounter && snapshot?.freeRemainingSeconds === 0 && !orderId;
+  const exhausted = !encounter && snapshot?.freeRemainingSeconds === 0 && !orderId && !ticketId;
   function drawAtTable() {
     if (!encounter || kind === "tuvi") return;
     void soundDraw(kind);
@@ -233,31 +259,33 @@ export default function TuViQuanEncounter({ kind, orderId, muted, onLeave, onVis
     <div className={styles.caption}>
       <div className={styles.eyebrow}>{names[kind]}{active && <span className={styles.timer}> · {Math.floor(seconds / 60)}:{String(seconds % 60).padStart(2, "0")}</span>}</div>
       <p aria-live="polite">{exhausted ? "Bạn đã dùng hết 5 phút miễn phí hôm nay. Ngày mai bạn có thể ghé lại, hoặc chọn trò chuyện thêm." : ended && !speaking ? "Buổi trò chuyện đã hết giờ. Cảm ơn bạn đã ghé quán." : last?.answer || (encounter?.state === "waiting" ? "Thầy đang tiếp khách. Bạn đợi một chút nhé, quán sẽ mời bạn khi có chỗ." : encounter?.state === "invited" ? "Đã có chỗ dành cho bạn. Khi sẵn sàng, bạn hãy bắt đầu trò chuyện." : "Mời bạn ngồi xuống. Bạn đang muốn hỏi về điều gì?")}</p>
-      {!encounter && <p className={styles.eyebrow}>Mỗi ngày có 5 phút trò chuyện miễn phí, dùng chung cả ba thầy.</p>}
+      {!encounter && <p className={styles.eyebrow}>Mỗi ngày có 5 phút trò chuyện miễn phí, dùng chung cho Tử Vi, Tarot và Kinh Dịch.</p>}
       {error && <p role="alert" className={styles.error}>{error}</p>}
     </div>
     <div className={styles.bar}>
       {!encounter && !exhausted && <button className={styles.primary} disabled={busy || !snapshot} onClick={() => void run("begin")}>Ngồi xuống trò chuyện</button>}
       {encounter?.state === "invited" && <button className={styles.primary} disabled={busy} onClick={() => void run("start")}>Bắt đầu trò chuyện</button>}
-      {active && !ended && <><button className={recording ? styles.recording : styles.primary} disabled={busy || !snapshot?.capabilities.stt} onClick={() => void startMic()} aria-pressed={recording}>{recording ? "Nói xong · Gửi" : speaking ? "Ngắt lời và nói" : "Bật micro để nói"}</button><button onClick={() => setShowText(value => !value)}>Gõ câu hỏi</button>{!recording && !busy && !speaking && kind !== "tuvi" && <button onClick={drawAtTable}>{kind === "tarot" ? "Rút bài trên bàn" : "Gieo quẻ trên bàn"}</button>}</>}
+      {active && !ended && <><button className={recording ? styles.recording : styles.primary} disabled={busy || !snapshot?.capabilities.stt} onClick={() => void startMic()} aria-pressed={recording}>{recording ? "Nói xong · Gửi" : speaking ? "Ngắt lời và nói" : intake ? "Nói ngày giờ sinh" : "Bật micro để nói"}</button>{!intake && <button onClick={() => setShowText(value => !value)}>Gõ câu hỏi</button>}{!recording && !busy && !speaking && kind !== "tuvi" && <button onClick={drawAtTable}>{kind === "tarot" ? "Rút bài trên bàn" : "Gieo quẻ trên bàn"}</button>}</>}
       {(ended || exhausted) && <button className={styles.primary} onClick={() => onUpgrade(kind)}>Trò chuyện thêm · 100.000đ/15 phút · 200.000đ/30 phút</button>}
+      {(ended || exhausted) && snapshot?.rewardTickets?.[0] && <button disabled={busy} onClick={() => void run("begin", snapshot.rewardTickets![0].id)}>Dùng vé thêm 5 phút</button>}
       <button onClick={() => void leave()}>Rời ghế</button>
     </div>
-    {active && !ended && !snapshot?.capabilities.stt && <div className={styles.status}>Thu âm đang tạm nghỉ. Bạn có thể gõ câu hỏi.</div>}
+    {active && !ended && !snapshot?.capabilities.stt && <div className={styles.status}>Thu âm đang tạm nghỉ. {intake ? "Bạn có thể nhập ngày giờ sinh bên dưới." : "Bạn có thể gõ câu hỏi."}</div>}
     {active && !ended && !snapshot?.capabilities.tts && <div className={styles.status}>Giọng đọc đang tạm nghỉ. Lời của thầy sẽ hiện ở phụ đề.</div>}
     {busy && <div className={styles.status} role="status">Thầy đang lắng nghe và suy ngẫm…</div>}
-    {kind === "tuvi" && !orderId && !ended && !exhausted && (!encounter || encounter.context.chartMissing) && (birthSaved
-      ? <p className={styles.status}>Ngày giờ sinh đã lưu. Thầy sẽ dùng lá số này ở lượt hỏi tiếp theo.</p>
-      : <details><summary>Lập lá số tại bàn</summary>
-        <form className={styles.birth} onSubmit={event => { event.preventDefault(); void saveBirth(new FormData(event.currentTarget)); }}>
-          <label>Ngày sinh dương lịch<input name="birthDate" type="date" required /></label>
-          <label>Giờ sinh<input name="hour" type="number" min="0" max="23" required /></label>
-          <label>Phút sinh<input name="minute" type="number" min="0" max="59" defaultValue="0" required /></label>
-          <label>Giới tính<select name="gender"><option value="male">Nam</option><option value="female">Nữ</option></select></label>
-          <button disabled={busy || recording}>Lưu lá số</button>
+    {intake && !ended && <details><summary>Nhập hoặc sửa ngày giờ sinh</summary>
+        <form key={JSON.stringify(draft)} className={styles.birth} onSubmit={event => { event.preventDefault(); void saveBirth(new FormData(event.currentTarget)); }}>
+          <label>Ngày<input name="day" type="number" min="1" max="31" defaultValue={draft?.day} required /></label>
+          <label>Tháng<input name="month" type="number" min="1" max="12" defaultValue={draft?.month} required /></label>
+          <label>Năm<input name="year" type="number" min="1900" max={new Date().getFullYear()} defaultValue={draft?.year} required /></label>
+          <label>Loại lịch<select name="calendarType" defaultValue={draft?.calendarType || ""} required><option value="">Chọn loại lịch</option><option value="solar">Dương lịch</option><option value="lunar">Âm lịch</option></select></label>
+          <label>Giờ sinh (0–23)<input name="hour" type="number" min="0" max="23" defaultValue={draft?.birthHour} required /></label>
+          <label>Phút sinh<input name="minute" type="number" min="0" max="59" defaultValue={draft?.birthMinute ?? 0} /></label>
+          <label>Lá số<select name="gender" defaultValue={draft?.gender || ""} required><option value="">Chọn nam hoặc nữ</option><option value="male">Nam</option><option value="female">Nữ</option></select></label>
+          <button disabled={busy || recording}>Xác nhận lập lá số</button>
         </form>
-      </details>)}
-    {showText && active && !ended && <form className={styles.text} onSubmit={event => { event.preventDefault(); interruptSpeech(); void send(text); }}><input aria-label="Câu hỏi của bạn" value={text} onChange={event => setText(event.target.value)} maxLength={1200} placeholder="Bạn muốn hỏi điều gì?" /><button disabled={busy || recording || !text.trim()}>Gửi</button></form>}
+      </details>}
+    {showText && active && !intake && !ended && <form className={styles.text} onSubmit={event => { event.preventDefault(); interruptSpeech(); void send(text); }}><input aria-label="Câu hỏi của bạn" value={text} onChange={event => setText(event.target.value)} maxLength={1200} placeholder="Bạn muốn hỏi điều gì?" /><button disabled={busy || recording || !text.trim()}>Gửi</button></form>}
     {!!encounter?.messages.length && <details><summary>Xem lại cuộc trò chuyện</summary><div className={styles.transcript}>{encounter.messages.map(message => <p key={message.id}>{message.question && <><strong>Bạn:</strong> {message.question}<br /></>}<strong>{names[kind]}:</strong> {message.answer || "Đang suy ngẫm…"}{message.interrupted && " (đã ngắt lời)"}</p>)}</div></details>}
   </section>;
 }
