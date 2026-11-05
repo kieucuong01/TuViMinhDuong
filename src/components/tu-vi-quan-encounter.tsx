@@ -8,8 +8,8 @@ import styles from "./tu-vi-quan-encounter.module.css";
 export type EncounterKind = "tuvi" | "tarot" | "iching";
 export type EncounterVisual = { kind: EncounterKind; state: "greeting" | "listening" | "thinking" | "speaking" | "idle"; audioLevel: number };
 type Message = { id: string; question: string; answer: string | null; interrupted: boolean };
-type Encounter = { id: string; kind: EncounterKind; tier: "free" | "paid"; state: "waiting" | "invited" | "active" | "ended" | "left"; endsAt?: string; remainingSeconds: number; messages: Message[]; context: { title: string; brief?: string; cards?: { id: string; title: string }[]; lines?: number[]; chartMissing?: boolean; menhIndex?: number; birthDraft?: { day?: number; month?: number; year?: number; calendarType?: string; gender?: string; birthHour?: number; birthMinute?: number } } };
-type Snapshot = { encounter: Encounter | null; freeRemainingSeconds: number; rewardTickets?: { id: string }[]; capabilities: { stt: boolean; tts: boolean } };
+type Encounter = { id: string; visitId?: string; kind: EncounterKind; tier: "free" | "paid"; state: "waiting" | "invited" | "active" | "ended" | "left"; endsAt?: string; remainingSeconds: number; messages: Message[]; context: { title: string; brief?: string; cards?: { id: string; title: string }[]; lines?: number[]; chartMissing?: boolean; menhIndex?: number; birthDraft?: { fullName?: string; day?: number; month?: number; year?: number; calendarType?: string; gender?: string; birthHour?: number; birthMinute?: number } } };
+type Snapshot = { encounter: Encounter | null; freeRemainingSeconds: number; paidRemainingSeconds?: number; rewardTickets?: { id: string }[]; capabilities: { stt: boolean; tts: boolean } };
 type Props = { kind: EncounterKind; orderId?: string; ticketId?: string; muted: boolean; onLeave(): void; onVisual(value: EncounterVisual): void; onUpgrade(kind: EncounterKind): void; onRitual(kind: "tarot" | "iching", count?: number, values?: number[]): void; onChartReady(palace: number): void };
 const names = { tuvi: "Thầy tử vi", tarot: "Người đọc Tarot", iching: "Thầy Dịch" };
 const endpoint = "/api/tu-vi-quan/encounter";
@@ -27,7 +27,7 @@ export default function TuViQuanEncounter({ kind, orderId, ticketId, muted, onLe
   const [speaking, setSpeaking] = useState(false);
   const [error, setError] = useState("");
   const [text, setText] = useState("");
-  const [showText, setShowText] = useState(false);
+  const [showText, setShowText] = useState(kind !== "tuvi");
   const [seconds, setSeconds] = useState(0);
   const generation = useRef(0);
   const current = useRef<Encounter | null>(null);
@@ -109,13 +109,13 @@ export default function TuViQuanEncounter({ kind, orderId, ticketId, muted, onLe
       await unlockAudio();
       if (rewardId && current.current) {
         stopSpeech();
-        await action("leave", { id: current.current.id });
+        await action("leave", { id: current.current.id, visitId: current.current.visitId });
       }
       const data = await action(actionName, actionName === "begin" ? { kind, orderId, ticketId: rewardId ?? ticketId } : { id: current.current?.id });
       if (token !== generation.current) return;
       apply(data);
       const greeting = data.encounter?.messages.find(message => message.id === "greeting");
-      if (data.encounter?.state === "active" && greeting) void speak(data.encounter, greeting);
+      if ((data.encounter?.state === "active" || data.encounter?.state === "invited" && data.encounter.context.chartMissing) && greeting) void speak(data.encounter, greeting);
     } catch (cause) { if (token === generation.current) setError(cause instanceof Error ? cause.message : "Chưa vào được cuộc trò chuyện."); }
     finally { if (token === generation.current) { lock.current = false; setBusy(false); } }
   }
@@ -136,7 +136,7 @@ export default function TuViQuanEncounter({ kind, orderId, ticketId, muted, onLe
   }
   async function startMic() {
     if (recording) { stopMic(); return; }
-    if (lock.current || acquiringMic.current || current.current?.state !== "active") return;
+    if (lock.current || acquiringMic.current || !(current.current?.state === "active" || current.current?.state === "invited" && current.current.context.chartMissing)) return;
     acquiringMic.current = true;
     setError(""); const token = generation.current;
     try {
@@ -191,6 +191,7 @@ export default function TuViQuanEncounter({ kind, orderId, ticketId, muted, onLe
     interruptSpeech();
     try {
       const input = {
+        fullName: form.get("fullName"),
         gender: form.get("gender"), calendarType: form.get("calendarType"),
         year: Number(form.get("year")), month: Number(form.get("month")), day: Number(form.get("day")),
         birthHour: Number(form.get("hour")), birthMinute: Number(form.get("minute")),
@@ -204,10 +205,14 @@ export default function TuViQuanEncounter({ kind, orderId, ticketId, muted, onLe
     }
   }
   async function leave() {
+    if (lock.current && !request.current) return;
     const encounter = current.current; generation.current++; stopMic(true); stopSpeech(); request.current?.abort();
-    if (encounter && !["ended", "left"].includes(encounter.state)) void action("leave", { id: encounter.id }).catch(() => {});
-    current.current = null;
-    onLeave();
+    lock.current = true; setBusy(true); setError("");
+    try {
+      if (encounter && !["ended", "left"].includes(encounter.state)) await action("leave", { id: encounter.id, visitId: encounter.visitId });
+      current.current = null; onLeave();
+    } catch (cause) { setError(cause instanceof Error ? cause.message : "Chưa lưu được thời gian còn lại. Bạn thử rời ghế lần nữa nhé."); }
+    finally { lock.current = false; setBusy(false); }
   }
 
   useEffect(() => {
@@ -217,18 +222,20 @@ export default function TuViQuanEncounter({ kind, orderId, ticketId, muted, onLe
       if (token === generation.current) apply(data);
     }).catch(cause => { if (!controller.signal.aborted) setError(cause.message); });
     const hidden = () => { if (document.hidden) { stopMic(true); stopSpeech(); state("idle"); } };
+    const pageHide = () => { const row = current.current; if (row && !["ended", "left"].includes(row.state)) void fetch(endpoint, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "leave", id: row.id, visitId: row.visitId }), keepalive: true }).catch(() => {}); };
     document.addEventListener("visibilitychange", hidden);
+    window.addEventListener("pagehide", pageHide);
     return () => {
-      generation.current = token + 1; controller.abort(); request.current?.abort(); stopMic(true); stopSpeech(); void audio.current?.close(); audio.current = null; document.removeEventListener("visibilitychange", hidden);
+      generation.current = token + 1; controller.abort(); request.current?.abort(); stopMic(true); stopSpeech(); void audio.current?.close(); audio.current = null; document.removeEventListener("visibilitychange", hidden); window.removeEventListener("pagehide", pageHide);
       const encounter = current.current;
-      if (encounter && !["ended", "left"].includes(encounter.state)) void fetch(endpoint, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "leave", id: encounter.id }), keepalive: true }).catch(() => {});
+      if (encounter && !["ended", "left"].includes(encounter.state)) void fetch(endpoint, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "leave", id: encounter.id, visitId: encounter.visitId }), keepalive: true }).catch(() => {});
     };
     // This component is mounted for one host visit; refs keep scene callbacks current.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   const encounter = snapshot?.encounter?.kind === kind ? snapshot.encounter : null;
   const active = encounter?.state === "active";
-  const intake = active && encounter.context.chartMissing;
+  const intake = Boolean((active || encounter?.state === "invited") && encounter?.context.chartMissing);
   const draft = encounter?.context.birthDraft;
   useEffect(() => {
     if (!encounter) return;
@@ -248,7 +255,7 @@ export default function TuViQuanEncounter({ kind, orderId, ticketId, muted, onLe
   }, [encounter?.state, active, seconds]);
   const last = encounter?.messages.filter(message => message.answer).at(-1);
   const ended = encounter?.state === "ended" || (active && !!encounter.endsAt && Date.parse(encounter.endsAt) <= Date.now());
-  const exhausted = !encounter && snapshot?.freeRemainingSeconds === 0 && !orderId && !ticketId;
+  const exhausted = !encounter && snapshot?.freeRemainingSeconds === 0 && !snapshot?.paidRemainingSeconds && !orderId && !ticketId;
   function drawAtTable() {
     if (!encounter || kind === "tuvi") return;
     void soundDraw(kind);
@@ -259,22 +266,23 @@ export default function TuViQuanEncounter({ kind, orderId, ticketId, muted, onLe
     <div className={styles.caption}>
       <div className={styles.eyebrow}>{names[kind]}{active && <span className={styles.timer}> · {Math.floor(seconds / 60)}:{String(seconds % 60).padStart(2, "0")}</span>}</div>
       <p aria-live="polite">{exhausted ? "Bạn đã dùng hết 5 phút miễn phí hôm nay. Ngày mai bạn có thể ghé lại, hoặc chọn trò chuyện thêm." : ended && !speaking ? "Buổi trò chuyện đã hết giờ. Cảm ơn bạn đã ghé quán." : last?.answer || (encounter?.state === "waiting" ? "Thầy đang tiếp khách. Bạn đợi một chút nhé, quán sẽ mời bạn khi có chỗ." : encounter?.state === "invited" ? "Đã có chỗ dành cho bạn. Khi sẵn sàng, bạn hãy bắt đầu trò chuyện." : "Mời bạn ngồi xuống. Bạn đang muốn hỏi về điều gì?")}</p>
-      {!encounter && <p className={styles.eyebrow}>Mỗi ngày có 5 phút trò chuyện miễn phí, dùng chung cho Tử Vi, Tarot và Kinh Dịch.</p>}
+      {!encounter && <p className={styles.eyebrow}>{snapshot?.paidRemainingSeconds ? `Bạn còn ${Math.ceil(snapshot.paidRemainingSeconds / 60)} phút đã mua, dùng chung ở cả ba quán. Rời ghế sẽ dừng tính giờ.` : "Mỗi ngày có 5 phút trò chuyện miễn phí, dùng chung cho Tử Vi, Tarot và Kinh Dịch."}</p>}
       {error && <p role="alert" className={styles.error}>{error}</p>}
     </div>
     <div className={styles.bar}>
       {!encounter && !exhausted && <button className={styles.primary} disabled={busy || !snapshot} onClick={() => void run("begin")}>Ngồi xuống trò chuyện</button>}
-      {encounter?.state === "invited" && <button className={styles.primary} disabled={busy} onClick={() => void run("start")}>Bắt đầu trò chuyện</button>}
-      {active && !ended && <><button className={recording ? styles.recording : styles.primary} disabled={busy || !snapshot?.capabilities.stt} onClick={() => void startMic()} aria-pressed={recording}>{recording ? "Nói xong · Gửi" : speaking ? "Ngắt lời và nói" : intake ? "Nói ngày giờ sinh" : "Bật micro để nói"}</button>{!intake && <button onClick={() => setShowText(value => !value)}>Gõ câu hỏi</button>}{!recording && !busy && !speaking && kind !== "tuvi" && <button onClick={drawAtTable}>{kind === "tarot" ? "Rút bài trên bàn" : "Gieo quẻ trên bàn"}</button>}</>}
+      {encounter?.state === "invited" && !intake && <button className={styles.primary} disabled={busy} onClick={() => void run("start")}>Bắt đầu trò chuyện</button>}
+      {(active || intake) && !ended && <><button className={recording ? styles.recording : styles.primary} disabled={busy || !snapshot?.capabilities.stt} onClick={() => void startMic()} aria-pressed={recording}>{recording ? "Nói xong · Gửi" : speaking ? "Ngắt lời và nói" : intake ? "Nói thông tin lập lá số" : "Bật micro để nói"}</button>{!intake && <button onClick={() => setShowText(value => !value)}>Gõ câu hỏi</button>}{!recording && !busy && !speaking && kind !== "tuvi" && <button onClick={drawAtTable}>{kind === "tarot" ? "Rút bài trên bàn" : "Gieo quẻ trên bàn"}</button>}</>}
       {(ended || exhausted) && <button className={styles.primary} onClick={() => onUpgrade(kind)}>Trò chuyện thêm · 100.000đ/15 phút · 200.000đ/30 phút</button>}
       {(ended || exhausted) && snapshot?.rewardTickets?.[0] && <button disabled={busy} onClick={() => void run("begin", snapshot.rewardTickets![0].id)}>Dùng vé thêm 5 phút</button>}
-      <button onClick={() => void leave()}>Rời ghế</button>
+      <button disabled={busy} onClick={() => void leave()}>Rời ghế · Giữ phút còn lại</button>
     </div>
     {active && !ended && !snapshot?.capabilities.stt && <div className={styles.status}>Thu âm đang tạm nghỉ. {intake ? "Bạn có thể nhập ngày giờ sinh bên dưới." : "Bạn có thể gõ câu hỏi."}</div>}
     {active && !ended && !snapshot?.capabilities.tts && <div className={styles.status}>Giọng đọc đang tạm nghỉ. Lời của thầy sẽ hiện ở phụ đề.</div>}
     {busy && <div className={styles.status} role="status">Thầy đang lắng nghe và suy ngẫm…</div>}
-    {intake && !ended && <details><summary>Nhập hoặc sửa ngày giờ sinh</summary>
+    {intake && !ended && <details open><summary>Nói bằng micro hoặc nhập thông tin bên dưới</summary><p>Họ tên và ngày giờ sinh chỉ dùng trong phiên riêng. Chưa tính thời gian luận giải.</p>
         <form key={JSON.stringify(draft)} className={styles.birth} onSubmit={event => { event.preventDefault(); void saveBirth(new FormData(event.currentTarget)); }}>
+          <label>Họ tên thật<input name="fullName" maxLength={100} defaultValue={draft?.fullName === "Khách" ? "" : draft?.fullName} autoComplete="name" required /></label>
           <label>Ngày<input name="day" type="number" min="1" max="31" defaultValue={draft?.day} required /></label>
           <label>Tháng<input name="month" type="number" min="1" max="12" defaultValue={draft?.month} required /></label>
           <label>Năm<input name="year" type="number" min="1900" max={new Date().getFullYear()} defaultValue={draft?.year} required /></label>

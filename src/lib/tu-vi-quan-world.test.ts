@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { QUAN_BOUNDS, QUAN_SPAWN, QUAN_STATIONS, findQuanPath, isQuanWalkable } from "./tu-vi-quan-world.mjs";
+import { QUAN_BOUNDS, QUAN_SPAWN, QUAN_STATIONS, QUAN_MONASTERY_SEATS, QUAN_MONASTERY_ENTRY, findQuanPath, findQuanMonasteryPath, isQuanWalkable, isQuanMonasteryWalkable, quanGroundHeight } from "./tu-vi-quan-world.mjs";
 
 describe("expanded Tử Vi Quán world", () => {
   it("keeps every station and spawn in walkable terrain", () => {
@@ -33,10 +33,23 @@ describe("expanded Tử Vi Quán world", () => {
   });
 
   it("connects a click just outside an obstacle to a safe grid cell", () => {
-    const target = { x: 13.35, z: -20.4 };
+    const target = { x: 17.35, z: -20.4 };
     const path = findQuanPath(QUAN_SPAWN, target);
     expect(path.length).toBeGreaterThan(0);
     expect(path.at(-1)).toEqual(target);
     expect(path.every(point => isQuanWalkable(point.x, point.z))).toBe(true);
+  });
+  it("walks from the monastery entrance to every cushion without crossing another cushion", () => {
+    for (const seat of QUAN_MONASTERY_SEATS) {
+      const path = findQuanMonasteryPath(QUAN_MONASTERY_ENTRY, { x: seat.x, z: seat.z + 1.3 });
+      expect(path.length).toBeGreaterThan(0);
+      for (let i = 1; i < path.length; i++) for (let t = 0; t <= 1; t += .1) {
+        expect(isQuanMonasteryWalkable(path[i-1].x + (path[i].x-path[i-1].x)*t, path[i-1].z + (path[i].z-path[i-1].z)*t)).toBe(true);
+      }
+    }
+    expect(quanGroundHeight(0, -13.4)).toBeCloseTo(.24);
+    expect(quanGroundHeight(0, -16.9)).toBeCloseTo(1.2);
+    expect(quanGroundHeight(0, -18)).toBeCloseTo(1.2);
+    expect(quanGroundHeight(10, 0)).toBe(0);
   });
 });

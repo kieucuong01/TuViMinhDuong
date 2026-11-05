@@ -5,15 +5,14 @@ import { ArrowLeft, BookOpen, CircleDot, Flame, Flower2, HandHeart, Pause, Play,
 import type { QuanSnapshot } from "./tu-vi-quan-ecosystem-panel";
 import type { QuanPractice } from "@/lib/tu-vi-quan-monastery";
 import { createMonasteryAudio } from "./tu-vi-quan-monastery-audio";
-import { QUAN_MONASTERY_SEATS } from "@/lib/tu-vi-quan-world.mjs";
 import styles from "./tu-vi-quan-monastery.module.css";
 
 export type MonasteryPose = "idle" | "greet" | "bow" | "meditate" | "beads" | "chant" | "incense";
 const names: Record<QuanPractice, string> = { meditate: "Thiền theo hơi thở", beads: "Lần tràng hạt", chant: "Tụng kinh" };
 const clock = (seconds: number) => `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}`;
-type Props = { initial?: QuanSnapshot; alias: string; participants: number; connected: boolean; seatIndex: number | null; occupied: { index: number; alias: string }[]; seatError: string; onSeat(index: number | null): void; lite: boolean; onLeave(): void; onSnapshot(value: QuanSnapshot): void; onPose(pose: MonasteryPose): void; onUseTicket(id: string): void };
+type Props = { initial?: QuanSnapshot; alias: string; participants: number; connected: boolean; seatIndex: number | null; nearbySeat: number | null; onFindSeat(): void; seatError: string; onSeat(index: number | null): void; lite: boolean; onLeave(): void; onSnapshot(value: QuanSnapshot): void; onPose(pose: MonasteryPose): void; onUseTicket(id: string): void };
 
-export default function QuanMonastery({ initial, alias, participants, connected, seatIndex, occupied, seatError, onSeat, lite, onLeave, onSnapshot, onPose, onUseTicket }: Props) {
+export default function QuanMonastery({ initial, alias, participants, connected, seatIndex, nearbySeat, onFindSeat, seatError, onSeat, lite, onLeave, onSnapshot, onPose, onUseTicket }: Props) {
   const [data, setData] = useState(initial);
   const [mode, setMode] = useState<QuanPractice | null>(null);
   const [busy, setBusy] = useState(false);
@@ -21,7 +20,6 @@ export default function QuanMonastery({ initial, alias, participants, connected,
   const [error, setError] = useState("");
   const [schedule, setSchedule] = useState(false);
   const [sound, setSound] = useState(true);
-  const [showSeats, setShowSeats] = useState(false);
   const [confirmTicket, setConfirmTicket] = useState(false);
   const [breath, setBreath] = useState(0);
   const pending = useRef(false);
@@ -38,7 +36,7 @@ export default function QuanMonastery({ initial, alias, participants, connected,
   useEffect(() => { if (!running) audio.current?.stop(); }, [running]);
   useEffect(() => {
     if (seatIndex === null) return;
-    const timer = setTimeout(() => { setNotice(""); setError(""); setShowSeats(false); }, 0);
+    const timer = setTimeout(() => { setNotice(""); setError(""); }, 0);
     return () => clearTimeout(timer);
   }, [seatIndex]);
 
@@ -96,11 +94,11 @@ export default function QuanMonastery({ initial, alias, participants, connected,
     return () => clearTimeout(timer);
   }, [seatIndex, connected, request]);
   async function start(next: QuanPractice) {
-    if (!connected || seatIndex === null) { setShowSeats(true); setNotice("Chọn một đệm trống để bắt đầu thực hành."); return; }
+    if (!connected || seatIndex === null) { setNotice(lite ? "Chọn Cho tôi một chỗ trống để bắt đầu." : "Chạm vào một đệm trống để đi tới, rồi chọn Ngồi xuống."); return; }
     void playActivity(next);
     const result = await request({ action: "practice_start", mode: next });
     if (!result) { audio.current?.stop(); return; }
-    setShowSeats(false); setMode(next); setNotice(""); onPose(next); setSchedule(false);
+    setMode(next); setNotice(""); onPose(next); setSchedule(false);
   }
   async function tick(tap: boolean) {
     const before = actions;
@@ -143,8 +141,7 @@ export default function QuanMonastery({ initial, alias, participants, connected,
     </header>
     <button className={styles.scheduleToggle} onClick={() => setSchedule(value => !value)} aria-expanded={schedule}>Thời khóa hôm nay</button>
     {schedule && <aside className={styles.schedule} aria-label="Thời khóa hôm nay"><h2>Một khoảng an nhiên</h2><p>Thiền {view?.rewards.meditate ?? 0}/10 · Tràng hạt hoặc tụng kinh {view?.rewards.chant ?? 0}/10 điểm.</p><p>Hành trình {Math.min(7, view?.visits ?? 0)}/7 ngày. {view?.lotusBloomed ? "Đèn kỷ niệm bảy ngày đã vào kho vật phẩm." : "Hoàn thành một nghi thức vào bảy ngày khác nhau để nhận đèn kỷ niệm."}</p><button disabled={busy} onClick={() => void share()}><Share2 size={16} /> Mời bạn cùng ngồi</button><p className={styles.credit}><a href="https://sketchfab.com/3d-models/33699be99fd64375bf0371c0e0c12f70" target="_blank" rel="noreferrer">Tượng Phật · Minneapolis Institute of Art · CC0</a></p><h3>Thêm thời gian gặp thầy</h3><p>60 điểm đổi 5 phút · một vé mỗi ngày · giữ tối đa hai vé.</p>{confirmTicket ? <><p>Dùng 60 điểm để nhận thêm 5 phút trò chuyện?</p><button disabled={busy} onClick={async () => { if (await request({ action: "redeem_voice" })) { setConfirmTicket(false); setNotice("Vé 5 phút đã vào sổ của bạn."); } }}>Xác nhận đổi vé</button><button onClick={() => setConfirmTicket(false)}>Để sau</button></> : <button disabled={busy || !data || data.profile.points < 60 || view?.redeemedToday || (view?.tickets.length ?? 0) >= 2} onClick={() => setConfirmTicket(true)}><Ticket size={16} /> {view?.redeemedToday ? "Đã đổi vé hôm nay" : "Đổi vé · 60 điểm"}</button>}{view?.tickets.map(ticket => <button key={ticket.id} disabled={busy} onClick={() => onUseTicket(ticket.id)}>{ticket.remainingSeconds < 300 ? `Tiếp tục · ${clock(ticket.remainingSeconds)} còn lại` : "Dùng vé 5 phút gặp thầy"}</button>)}</aside>}
-    <div className={styles.seatStatus}><button onClick={() => setShowSeats(value => !value)} aria-expanded={showSeats}>{seatIndex === null ? "Chọn chỗ ngồi" : `Đệm số ${seatIndex + 1}`}</button>{seatIndex !== null && <button disabled={busy} onClick={async () => { if (mode && running) await request({ action: "practice_pause", mode }); audio.current?.stop(); setMode(null); onPose("idle"); onSeat(null); }}>Đứng dậy</button>}</div>
-    {showSeats && <aside className={styles.seatPicker} aria-label="Chọn đệm ngồi"><h2>Chọn một đệm trống</h2><p>{connected ? "Chạm vào vùng tròn trong điện hoặc chọn số đệm bên dưới." : "Đang kết nối Tu viện. Các nghi thức tính giờ cần chỗ ngồi trực tuyến."}</p><div className={styles.seatGrid}>{QUAN_MONASTERY_SEATS.map(seat => { const owner = occupied.find(person => person.index === seat.index); return <button key={seat.index} disabled={!connected || Boolean(owner)} aria-pressed={seatIndex === seat.index} title={owner ? `Đệm ${seat.index + 1} · ${owner.alias}` : `Đệm ${seat.index + 1} còn trống`} onClick={() => { onSeat(seat.index); setShowSeats(false); }}>{seat.index + 1}{owner && <small>Đã có người</small>}</button>; })}</div><button onClick={() => setShowSeats(false)}>Đóng chọn chỗ</button></aside>}
+    {!mode && <div className={styles.seatStatus}>{seatIndex === null ? <><button disabled={!connected} onClick={onFindSeat}>{lite ? "Cho tôi một chỗ trống" : "Đi đến đệm trống"}</button>{nearbySeat !== null && <button className={styles.primary} disabled={!connected} onClick={() => onSeat(nearbySeat)}>Ngồi xuống đây</button>}</> : <><span>Đã ngồi · Mời bạn chọn nghi thức</span><button disabled={busy} onClick={async () => { audio.current?.stop(); setMode(null); onPose("idle"); onSeat(null); }}>Đứng dậy</button></>}</div>}
     {seatError && <p className={styles.notice} role="alert">{seatError}</p>}
     {lite && !mode && <div className={styles.lite}><Flower2 /><h2>Điện Phật · Tu viện An Nhiên</h2><p>Chọn nghi thức ở thanh phía dưới để bắt đầu.</p></div>}
     {mode && <article className={styles.practice} aria-label={names[mode]}><div className={styles.practiceHeading}><h2>{names[mode]}</h2><span>{clock(seconds)} / {clock(goal)}</span></div><progress aria-label="Thời gian thực hành đã được lưu" value={seconds} max={goal} />

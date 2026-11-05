@@ -6,7 +6,7 @@ import dotenv from "dotenv";
 import pg from "pg";
 import { WebSocket, WebSocketServer } from "ws";
 import { quanPresenceSecret, quanSeatCheckToken, verifyQuanSocketTicket } from "../src/lib/tu-vi-quan-presence.mjs";
-import { isQuanWalkable, QUAN_SPAWN, QUAN_MONASTERY_SEATS } from "../src/lib/tu-vi-quan-world.mjs";
+import { isQuanWalkable, isQuanMonasteryWalkable, QUAN_SPAWN, QUAN_MONASTERY_SEATS, QUAN_MONASTERY_ENTRY } from "../src/lib/tu-vi-quan-world.mjs";
 
 const MAX_GUESTS = 24;
 const ROOM_NAMES = ["Sân Trúc", "Sân Sen", "Sân Mai", "Sân Trà"];
@@ -98,6 +98,7 @@ export function createQuanPresenceServer({ secret, origins, readBoard = async ()
         action: "idle",
         seatIndex: null,
         monasteryPose: "idle",
+        monasteryPosition: { ...QUAN_MONASTERY_ENTRY },
       };
       const presence = { client, player, room, ip, alive: true, actionUntil: 0 };
       guests.set(player.id, presence);
@@ -160,8 +161,15 @@ export function createQuanPresenceServer({ secret, origins, readBoard = async ()
               id: randomUUID(), playerId: player.id, alias: player.alias, text: verdict.text, createdAt: now,
             }].slice(-20);
             dirty = true;
+          } else if (ecosystemEnabled && data.type === "monastery-move" && player.action === "monastery" && player.seatIndex === null && isQuanMonasteryWalkable(data.x, data.z)) {
+            player.monasteryPosition = { x: Math.round(data.x * 100) / 100, z: Math.round(data.z * 100) / 100 };
+            player.monasteryPose = "idle"; dirty = true;
           } else if (ecosystemEnabled && data.type === "monastery-seat") {
             if (data.seatIndex !== null && (!Number.isInteger(data.seatIndex) || !QUAN_MONASTERY_SEATS[data.seatIndex])) return;
+            const seat = QUAN_MONASTERY_SEATS[data.seatIndex];
+            if (seat && (player.action !== "monastery" || Math.hypot(player.monasteryPosition.x - seat.x, player.monasteryPosition.z - seat.z) > 1.8)) {
+              client.send(JSON.stringify({ type: "seat-error", message: "Bạn đi đến gần đệm trống rồi chọn Ngồi xuống nhé." })); return;
+            }
             if (data.seatIndex !== null && [...guests.values()].some(other => other !== presence && other.room === presence.room && other.player.seatIndex === data.seatIndex)) {
               client.send(JSON.stringify({ type: "seat-error", message: "Chỗ này vừa có người ngồi. Bạn chọn đệm khác nhé." }));
               return;

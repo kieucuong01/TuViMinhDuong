@@ -27,6 +27,7 @@ Done:
 - Desktop and mobile layouts do not overlap.
 - Touch targets are at least about 48px high for primary actions.
 - Tử Vi Quán keeps world bounds, station positions and collision/routing rules in `src/lib/tu-vi-quan-world.mjs`, shared by the 3D scene, map and presence server. Verify direct action buttons, automatic walking and portrait/landscape layouts when changing its scene.
+- The central monastery has stepped ground height and its own bounded interior paths. Real users must approach a cushion before reserving it; keep the numbered seat grid retired.
 - Loading feedback appears for slow form submits and route-like actions.
 
 ## Chart Engine
@@ -116,6 +117,7 @@ Done:
 
 - Not enough coins blocks paid content with a clear next action.
 - Repeated webhooks do not double-credit.
+- Tử Vi Quán paid minutes are shared across all three hosts. Explicit leave saves server-calculated `remainingMs`, clears the deadline and releases the table; resume starts from that balance. Birth intake is confirmed before the timer starts. Test paid/free/ticket time and host switches under the shared transaction lock.
 - Existing unlocked readings can be viewed without charging again.
 - Guest public pages do not expose refund/topup policy links unless explicitly intended.
 - Logout remains visible on mobile and desktop account menus.

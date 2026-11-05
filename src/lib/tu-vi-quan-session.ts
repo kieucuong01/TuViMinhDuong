@@ -1,4 +1,5 @@
 import "server-only";
+import { quanRemainingMs } from "@/lib/tu-vi-quan-time";
 import { createHash, randomBytes, randomInt } from "node:crypto";
 import type { Prisma, PrismaClient } from "@/generated/prisma/client";
 import { generateTuViChart, type TuViChart } from "@/lib/chart";
@@ -110,9 +111,7 @@ async function sessionSnapshot(tx: Tx, ownerId: string, id: string, now: Date) {
   const pendingCheckout = order.status === "PENDING" && order.expiresAt > now;
   const chart = order.status === "ACTIVE" || order.status === "ENDED" ? order.chart as unknown as TuViChart : null;
   const paused = order.status === "ACTIVE" && Boolean(order.outageSince);
-  const remainingSeconds = order.endsAt
-    ? Math.max(0, Math.ceil((order.endsAt.getTime() - (paused ? order.outageSince!.getTime() : now.getTime())) / 1000))
-    : undefined;
+  const remainingSeconds = Math.ceil(quanRemainingMs(order, order.minutes * 60_000, now) / 1000);
   let position: number | undefined;
   let waitSeconds: number | undefined;
   if (order.status === "QUEUED") {
@@ -301,7 +300,7 @@ export async function changeQuanAdmission(db: PrismaClient, ownerId: string, id:
       if (!hasExternalLlmProvider()) throw new QuanSessionError("Thầy đang tạm nghỉ. Lượt đã mua vẫn còn.", 503);
       await tx.quanOrder.update({
         where: { id },
-        data: { status: "ACTIVE", startedAt: now, endsAt: new Date(now.getTime() + order.minutes * 60_000), inviteExpiresAt: null },
+        data: { status: "ACTIVE", startedAt: order.startedAt ?? now, endsAt: new Date(now.getTime() + quanRemainingMs(order, order.minutes * 60_000, now)), remainingMs: null, inviteExpiresAt: null },
       });
     }
     return readQuanSession(tx, ownerId, id, now);

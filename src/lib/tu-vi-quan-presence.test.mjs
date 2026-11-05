@@ -52,6 +52,10 @@ it("reserves real monastery seats atomically and releases them when a player sta
   await Promise.all([snapshot(a), snapshot(b)]);
   a.send(JSON.stringify({ type: "action", action: "monastery" }));
   b.send(JSON.stringify({ type: "action", action: "monastery" }));
+  const far = snapshot(a, frame => frame.type === "seat-error");
+  a.send(JSON.stringify({ type: "monastery-seat", seatIndex: 0 }));
+  expect((await far).message).toContain("đi đến gần");
+  a.send(JSON.stringify({ type: "monastery-move", x: -9, z: -4.7 }));
   const seated = snapshot(a, frame => frame.type === "snapshot" && frame.players.some(player => player.id === frame.selfId && player.seatIndex === 0));
   a.send(JSON.stringify({ type: "monastery-seat", seatIndex: 0 }));
   await seated;
@@ -61,6 +65,7 @@ it("reserves real monastery seats atomically and releases them when a player sta
   expect(authorized.status).toBe(200);
   expect(await authorized.json()).toMatchObject({ index: 0 });
   const occupied = snapshot(b, frame => frame.type === "seat-error");
+  b.send(JSON.stringify({ type: "monastery-move", x: -9, z: -4.7 }));
   b.send(JSON.stringify({ type: "monastery-seat", seatIndex: 0 }));
   expect((await occupied).message).toContain("đệm khác");
   const released = snapshot(a, frame => frame.type === "snapshot" && frame.players.find(player => player.id === frame.selfId)?.seatIndex === null);

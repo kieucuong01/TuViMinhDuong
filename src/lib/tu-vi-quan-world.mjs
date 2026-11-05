@@ -1,24 +1,33 @@
-export const QUAN_BOUNDS = { minX: -52, maxX: 32, minZ: -28, maxZ: 34 };
+export const QUAN_BOUNDS = { minX: -56, maxX: 40, minZ: -42, maxZ: 34 };
 export const QUAN_SPAWN = { x: 0, z: 22 };
 export const QUAN_MONASTERY_SEATS = Array.from({ length: 28 }, (_, index) => ({ index, x: -9 + index % 7 * 3, z: -6 + Math.floor(index / 7) * 3.5 }));
+export const QUAN_MONASTERY_ENTRY = { x: 0, z: 10 };
+export function isQuanMonasteryWalkable(/** @type {number} */ x, /** @type {number} */ z) {
+  return Number.isFinite(x) && Number.isFinite(z) && x >= -14 && x <= 14 && z >= -7.5 && z <= 12 && QUAN_MONASTERY_SEATS.every(seat => Math.hypot(x - seat.x, z - seat.z) >= 0.9);
+}
+export function quanGroundHeight(/** @type {number} */ x, /** @type {number} */ z) {
+  if (Math.abs(x) <= 17 && z >= -39 && z <= -17) return 1.2;
+  if (Math.abs(x) <= 6.25 && z >= -17 && z < -13) return Math.min(1.2, Math.ceil((-z - 13) / 0.8) * 0.24);
+  return 0;
+}
 export const QUAN_STATIONS = [
-  { id: "teacher", label: "Chính điện Tử Vi", x: 0, z: -15, description: "Gặp Thầy Tử Vi và xem lá số" },
+  { id: "teacher", label: "Tử Vi Quán", x: -36, z: -7, description: "Gặp ba Thầy Tử Vi, nói hoặc nhập thông tin lập lá số" },
   { id: "incense", label: "Bàn thờ Thần Tài", x: -18, z: 26.5, description: "Thắp hương bên vườn trúc, xin lộc đầu ngày" },
-  { id: "monastery", label: "Tu viện An Nhiên", x: -36, z: -8, description: "Chọn đệm ngồi để thiền, lần tràng hạt hoặc tụng kinh" },
-  { id: "iching", label: "Viện Kinh Dịch", x: 20, z: 3.7, description: "Gieo quẻ và trò chuyện cùng Thầy Dịch" },
-  { id: "support", label: "Hòm công đức", x: 0, z: -7.5, description: "Ủng hộ duy trì quán tự nguyện" },
-  { id: "tea", label: "Viện Tarot", x: -20, z: 13, description: "Trải bài và trò chuyện cùng Cô Tarot" },
+  { id: "monastery", label: "Tu viện An Nhiên", x: 0, z: -18, description: "Lên bậc thang, vào điện và đi đến đệm trống để ngồi" },
+  { id: "iching", label: "Kinh Dịch Quán", x: 28, z: 3.7, description: "Gieo quẻ và trò chuyện cùng Thầy Dịch" },
+  { id: "support", label: "Hòm công đức", x: 4, z: -16, description: "Ủng hộ tự nguyện bên lối lên Tu viện" },
+  { id: "tea", label: "Tarot Quán", x: -26, z: 19.5, description: "Trải bài và trò chuyện cùng Cô Tarot" },
   { id: "lotus", label: "Vườn hồ sen", x: 10, z: 19, description: "Ngắm hồ sen và đèn hoa đăng" },
   { id: "ranking", label: "Bảng vàng công đức", x: -10, z: -2, description: "Xem năm khách có nhiều Điểm An Nhiên" },
   { id: "calligraphy", label: "Xin chữ", x: -14, z: 14, description: "Nhận một chữ đầu ngày hoặc một câu vui" },
 ];
 export const QUAN_BLOCKS = [
-  { minX: -49.5, maxX: -22.5, minZ: -26, maxZ: -9.5 },
-  { minX: -13, maxX: 13, minZ: -27, maxZ: -17.4 },
+  { minX: -49, maxX: -23, minZ: -19, maxZ: -9.4 },
+  { minX: -17, maxX: 17, minZ: -40, maxZ: -18.5 },
   { minX: -19.9, maxX: -16.1, minZ: 21.5, maxZ: 24.5 },
   { minX: -13, maxX: -7, minZ: -6.8, maxZ: -5.8 },
-  { minX: -1.05, maxX: 1.05, minZ: -10.5, maxZ: -9.2 },
-  { minX: -25, maxX: -15, minZ: 7, maxZ: 10.5 },
+  { minX: 3, maxX: 5, minZ: -18.4, maxZ: -17.1 },
+  { minX: -31, maxX: -21, minZ: 13.5, maxZ: 17 },
 ];
 export const QUAN_POND = { x: 20, z: 18, radiusX: 7, radiusZ: 9 };
 
@@ -36,13 +45,20 @@ export function isQuanWalkable(x, z) {
  * @returns {{x:number,z:number}[]}
  */
 export function findQuanPath(from, to) {
-  if (!isQuanWalkable(from.x, from.z) || !isQuanWalkable(to.x, to.z)) return [];
+  return findPath(from, to, isQuanWalkable);
+}
+export function findQuanMonasteryPath(/** @type {{x:number,z:number}} */ from, /** @type {{x:number,z:number}} */ to) {
+  return findPath(from, to, isQuanMonasteryWalkable);
+}
+/** @param {{x:number,z:number}} from @param {{x:number,z:number}} to @param {(x:number,z:number)=>boolean} walkable */
+function findPath(from, to, walkable) {
+  if (!walkable(from.x, from.z) || !walkable(to.x, to.z)) return [];
   const snap = (/** @type {{x:number,z:number}} */ point) => {
     const candidates = [];
     for (let x = Math.floor(point.x); x <= Math.ceil(point.x); x++) {
       for (let z = Math.floor(point.z); z <= Math.ceil(point.z); z++) {
-        if (isQuanWalkable(x, z) && [0.25, 0.5, 0.75].every(t =>
-          isQuanWalkable(point.x + (x - point.x) * t, point.z + (z - point.z) * t))) {
+        if (walkable(x, z) && [0.25, 0.5, 0.75].every(t =>
+          walkable(point.x + (x - point.x) * t, point.z + (z - point.z) * t))) {
           candidates.push({ x, z });
         }
       }
@@ -74,7 +90,7 @@ export function findQuanPath(from, to) {
     for (const [dx, dz] of [[0, -1], [1, 0], [0, 1], [-1, 0]]) {
       const next = { x: at.x + dx, z: at.z + dz };
       const nextKey = key(next);
-      if (parent.has(nextKey) || !isQuanWalkable(next.x, next.z)) continue;
+      if (parent.has(nextKey) || !walkable(next.x, next.z)) continue;
       parent.set(nextKey, atKey);
       pending.push(next);
     }

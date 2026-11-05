@@ -1,4 +1,5 @@
 import "server-only";
+import { quanRemainingMs } from "@/lib/tu-vi-quan-time";
 import { createHash, randomBytes, randomInt } from "node:crypto";
 import { Prisma, type PrismaClient, type QuanProfile } from "@/generated/prisma/client";
 import { generateTuViChart, type ChartInput, type TuViChart } from "@/lib/chart";
@@ -195,6 +196,7 @@ export async function readEcosystem(db: PrismaClient, actor: Actor, now = new Da
 }
 
 async function mergeProfiles(tx: Tx, source: QuanProfile, target: QuanProfile) {
+  const now = new Date();
   if (source.id === target.id) return target;
   const rows = await tx.quanEntry.findMany({ where: { profileId: source.id }, orderBy: { createdAt: "asc" } });
   const rewardKinds = ["meditate", "chant", "monastery_meditate", "monastery_chant"];
@@ -256,11 +258,9 @@ async function mergeProfiles(tx: Tx, source: QuanProfile, target: QuanProfile) {
     if (encounter.freeDay) {
       const existing = await tx.quanEncounter.findUnique({ where: { profileId_freeDay: { profileId: target.id, freeDay: encounter.freeDay } } });
       if (existing) {
-        // Preserve the stricter elapsed daily window when linking two devices.
-        if (encounter.endsAt && (!existing.endsAt || encounter.endsAt < existing.endsAt)) {
-          await tx.quanEncounter.update({ where: { id: existing.id }, data: { endsAt: encounter.endsAt, startedAt: encounter.startedAt, state: "left" } });
-        }
-        await tx.quanEncounter.update({ where: { id: encounter.id }, data: { profileId: target.id, freeDay: null, state: "ended" } });
+        const remainingMs = Math.min(quanRemainingMs(encounter, 300_000, now), quanRemainingMs(existing, 300_000, now));
+        await tx.quanEncounter.update({ where: { id: existing.id }, data: { remainingMs, endsAt: null, outageSince: null, speakingUntil: null, state: remainingMs ? "left" : "ended" } });
+        await tx.quanEncounter.update({ where: { id: encounter.id }, data: { profileId: target.id, freeDay: null, remainingMs: 0, endsAt: null, outageSince: null, speakingUntil: null, state: "ended" } });
         continue;
       }
     }

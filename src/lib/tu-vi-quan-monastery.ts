@@ -3,6 +3,7 @@ import { randomUUID } from "node:crypto";
 import type { Prisma, QuanProfile } from "@/generated/prisma/client";
 import { quanDayKey, QUAN_CONTENT_VERSION } from "@/lib/tu-vi-quan-content";
 import { QuanSessionError } from "@/lib/tu-vi-quan-session";
+import { quanRemainingMs } from "@/lib/tu-vi-quan-time";
 
 type Tx = Prisma.TransactionClient;
 type Bag = Record<string, unknown>;
@@ -19,7 +20,7 @@ export async function readMonastery(tx: Tx, profileId: string, now: Date) {
     tx.quanEntry.findMany({ where: { profileId, dayKey: day, kind: { in: [...modes.map(mode => "practice_" + mode), "meditate", "chant", "monastery_meditate", "monastery_chant", "monastery_garden", "voice_ticket_purchase"] } } }),
     tx.quanEntry.count({ where: { profileId, kind: "monastery_visit" } }),
     tx.quanEntry.findMany({ where: { profileId, kind: "voice_ticket", data: { path: ["used"], equals: false } }, orderBy: { createdAt: "asc" } }),
-    tx.quanEncounter.findMany({ where: { profileId, freeDay: { startsWith: "ticket:" }, endsAt: { gt: now }, state: { in: ["left", "waiting", "invited", "active"] } }, select: { freeDay: true, endsAt: true } }),
+    tx.quanEncounter.findMany({ where: { profileId, freeDay: { startsWith: "ticket:" }, OR: [{ endsAt: { gt: now } }, { remainingMs: { gt: 0 } }], state: { in: ["left", "waiting", "invited", "active"] } }, select: { freeDay: true, endsAt: true, remainingMs: true, outageSince: true } }),
   ]);
   const sum = (...kinds: string[]) => today.filter(row => kinds.includes(row.kind)).reduce((total, row) => total + row.points, 0);
   return {
@@ -28,7 +29,7 @@ export async function readMonastery(tx: Tx, profileId: string, now: Date) {
     visits, lotusBloomed: visits >= 7, redeemedToday: today.some(row => row.kind === "voice_ticket_purchase"),
     tickets: [
       ...tickets.map(ticket => ({ id: ticket.id, minutes: 5, remainingSeconds: 300 })),
-      ...resumable.filter(row => !tickets.some(ticket => "ticket:" + ticket.id === row.freeDay)).map(row => ({ id: row.freeDay!.slice(7), minutes: 5, remainingSeconds: Math.max(0, Math.ceil((row.endsAt!.getTime() - now.getTime()) / 1000)) })),
+      ...resumable.filter(row => !tickets.some(ticket => "ticket:" + ticket.id === row.freeDay)).map(row => ({ id: row.freeDay!.slice(7), minutes: 5, remainingSeconds: Math.ceil(quanRemainingMs(row, 300_000, now) / 1000) })),
     ],
   };
 }

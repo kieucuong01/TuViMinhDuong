@@ -325,6 +325,7 @@ model QuanOrder {
   tableNumber     Int?
   startedAt       DateTime?
   endsAt          DateTime?
+  remainingMs     Int?
   outageSince     DateTime?
   refundAmountVnd Int?
   refundSettledAt DateTime?
@@ -392,6 +393,7 @@ model QuanEncounter {
   inviteExpiresAt DateTime?
   startedAt       DateTime?
   endsAt          DateTime?
+  remainingMs     Int?
   outageSince     DateTime?
   speakingUntil   DateTime?
   createdAt       DateTime    @default(now())
