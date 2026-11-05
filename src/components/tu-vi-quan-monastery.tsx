@@ -10,10 +10,11 @@ import styles from "./tu-vi-quan-monastery.module.css";
 export type MonasteryPose = "idle" | "greet" | "bow" | "meditate" | "beads" | "chant" | "incense";
 const names: Record<QuanPractice, string> = { meditate: "Thiền theo hơi thở", beads: "Lần tràng hạt", chant: "Tụng kinh" };
 const clock = (seconds: number) => `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}`;
-type Props = { initial?: QuanSnapshot; alias: string; participants: number; connected: boolean; seatIndex: number | null; nearbySeat: number | null; onFindSeat(): void; seatError: string; onSeat(index: number | null): void; lite: boolean; onLeave(): void; onSnapshot(value: QuanSnapshot): void; onPose(pose: MonasteryPose): void; onUseTicket(id: string): void };
+type Props = { initial?: QuanSnapshot; alias: string; participants: number; connected: boolean; seatIndex: number | null; nearbySeat: number | null; onFindSeat(): void; onIncense(): void; seatError: string; onSeat(index: number | null): void; lite: boolean; onLeave(): void; onSnapshot(value: QuanSnapshot): void; onPose(pose: MonasteryPose): void; onUseTicket(id: string): void };
 
-export default function QuanMonastery({ initial, alias, participants, connected, seatIndex, nearbySeat, onFindSeat, seatError, onSeat, lite, onLeave, onSnapshot, onPose, onUseTicket }: Props) {
-  const [data, setData] = useState(initial);
+export default function QuanMonastery({ initial, alias, participants, connected, seatIndex, nearbySeat, onFindSeat, onIncense, seatError, onSeat, lite, onLeave, onSnapshot, onPose, onUseTicket }: Props) {
+  const [cachedData, setData] = useState(initial);
+  const data = initial ?? cachedData;
   const [mode, setMode] = useState<QuanPractice | null>(null);
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState("");
@@ -117,12 +118,12 @@ export default function QuanMonastery({ initial, alias, participants, connected,
   }
   async function gesture(pose: "greet" | "bow" | "incense") {
     if (mode && running && !(await request({ action: "practice_pause", mode }))) return;
-    audio.current?.stop(); setMode(null); onPose(pose); setNotice(pose === "bow" ? "Cúi mình trước điện Phật. Chạm Ra sân khi bạn muốn trở về." : pose === "greet" ? "Chắp tay, thả lỏng vai và dành một khoảng lặng cho mình." : "");
-    if (pose === "incense") {
-      const result = await request({ action: "ritual", kind: "incense", count: 1 });
-      if (result) setNotice(result.incensePoints ? "Đã thắp hương. +5 Điểm An Nhiên." : "Đã thắp hương. Bạn đã nhận điểm hương hôm nay.");
-    }
+    audio.current?.stop(); setMode(null);
+    if (pose === "incense") { onIncense(); setNotice(""); return; }
+    onPose(pose);
+    setNotice(pose === "bow" ? "Chậm rãi quỳ gối, cúi lạy trước điện Phật." : "Chắp tay, thả lỏng vai và dành một khoảng lặng cho mình.");
   }
+
   async function share() {
     const response = await request({ action: "share", sourceId: "achievement", showAlias: false });
     if (!response?.share) return;

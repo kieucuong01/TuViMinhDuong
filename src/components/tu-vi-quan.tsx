@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore, type FormEvent } from "react";
 import { BookOpen, CircleHelp, Compass, Flame, Heart, MapPin, Menu, Navigation, X } from "lucide-react";
-import { QUAN_TEACHER_DESKS, QUAN_BLOCKS, QUAN_BOUNDS, QUAN_POND, QUAN_SPAWN, QUAN_STATIONS, QUAN_MONASTERY_ENTRY, QUAN_MONASTERY_SEATS, getQuanZone, quanMonasteryToWorld } from "@/lib/tu-vi-quan-world.mjs";
+import { QUAN_TEMPLE_INCENSE_POINT, QUAN_TEACHER_DESKS, QUAN_BLOCKS, QUAN_BOUNDS, QUAN_POND, QUAN_SPAWN, QUAN_STATIONS, QUAN_MONASTERY_ENTRY, QUAN_MONASTERY_SEATS, getQuanZone, quanMonasteryToWorld } from "@/lib/tu-vi-quan-world.mjs";
 import styles from "./tu-vi-quan.module.css";
 import type { MonasteryPose } from "./tu-vi-quan-monastery";
 import type { EncounterKind, EncounterVisual } from "./tu-vi-quan-encounter";
@@ -71,7 +71,7 @@ export default function TuViQuan({ initialAlias, support, paymentsEnabled, ecosy
   const [monasteryDestination, setMonasteryDestination] = useState<{ index: number; requestId: number } | null>(null);
   const [monasterySeatError, setMonasterySeatError] = useState("");
   const ritualOperation = useRef(false);
-  const pendingRitual = useRef<{kind: "incense"; count?: number} | null>(null);
+  const pendingRitual = useRef<{kind: "incense"; count?: number; target?: Position; temple?: boolean} | null>(null);
   const [socialMessages, setSocialMessages] = useState<QuanSocialMessage[]>([]);
   const [communityActivity, setCommunityActivity] = useState<{ id: string; text: string }[]>([]);
   const [leaders, setLeaders] = useState<QuanLeader[]>([]);
@@ -295,8 +295,8 @@ export default function TuViQuan({ initialAlias, support, paymentsEnabled, ecosy
     send({ type: "move", ...target });
     const pending = pendingRitual.current;
     if (pending) {
-      const station = stations.find(item => item.id === pending.kind)!;
-      if (Math.hypot(target.x - station.x, target.z - station.z) <= 0.35) { pendingRitual.current = null; void freeRitual(pending.kind, pending.count); return; }
+      const station = pending.target ?? stations.find(item => item.id === pending.kind)!;
+      if (Math.hypot(target.x - station.x, target.z - station.z) <= 0.35) { pendingRitual.current = null; void freeRitual(pending.kind, pending.count, pending.temple); return; }
     }
     const nextAction = getQuanZone(target.x, target.z) === "monastery" ? "monastery" : "idle";
     if (action !== nextAction) doAction(nextAction);
@@ -453,17 +453,28 @@ export default function TuViQuan({ initialAlias, support, paymentsEnabled, ecosy
     send({ type: "monastery-pose", pose });
   }, [send]);
 
-  async function freeRitual(kind: "incense", count = 1) {
+  async function freeRitual(kind: "incense", count = 1, temple = false) {
     if (ritualOperation.current) return;
     ritualOperation.current = true; setRitualBusy(true); setError("");
     try {
       const result = ecosystemEnabled ? await jsonRequest<QuanSnapshot>("/api/tu-vi-quan/ecosystem", { action: "ritual", kind, count }) : null;
       if (result) receiveEcosystem(result);
-      setDestination(null); doAction(kind);
+      setDestination(null); doAction(temple ? "monastery" : kind);
+      if (temple) { poseInMonastery("incense"); actionTimer.current = setTimeout(() => poseInMonastery("idle"), 4500); }
       setRitual({ kind, count, requestId: ++navigationRequest.current });
       setNotice(result?.incensePoints ? "Đã thắp hương. +5 Điểm An Nhiên." : "Đã thắp hương. Chúc bạn một ngày an lành.");
     } catch (err) { setNotice((err as Error).message); }
     finally { ritualOperation.current = false; setRitualBusy(false); }
+  }
+
+  function requestTempleIncense() {
+    if (ritualOperation.current) return;
+    selectMonasterySeat(null);
+    poseInMonastery("idle");
+    navigate(QUAN_TEMPLE_INCENSE_POINT);
+    if (lite || Math.hypot(position.x - QUAN_TEMPLE_INCENSE_POINT.x, position.z - QUAN_TEMPLE_INCENSE_POINT.z) <= .35) { void freeRitual("incense", 1, true); return; }
+    pendingRitual.current = { kind: "incense", count: 1, target: QUAN_TEMPLE_INCENSE_POINT, temple: true };
+    setNotice("Đang đến lư hương điện Phật. Tới nơi nhân vật mới thắp nhang.");
   }
 
   function requestRitual(kind: "incense", count = 1) {
@@ -587,7 +598,7 @@ export default function TuViQuan({ initialAlias, support, paymentsEnabled, ecosy
       <section className={styles.courtyard} aria-label="Sân Tử Vi Quán">
         {!lite && <Scene encounter={voiceEnabled && host ? { ...(encounterVisual ?? {kind: host.kind, state: "greeting", audioLevel: 0}), desk: host.desk } : undefined} onHost={voiceEnabled && alias && !panel && !ecosystemOpen && !help && !inMonastery ? (kind, desk) => openHost(kind, undefined, desk) : undefined} onIncense={ecosystemEnabled && !inMonastery ? () => requestRitual("incense", 1) : undefined} showHostControls={false} ritual={voiceEnabled ? ritual : undefined} speech={voiceEnabled && !host ? publicSpeech : undefined} ecosystemEnabled={ecosystemEnabled} position={position} destination={destination} action={action} players={players} onMove={move} monasteryPose={monasteryPose} monasterySeat={monasterySeat} monasteryDestination={monasteryDestination} onMonasteryNearby={setMonasteryNearby} experience={inMonastery ? "monastery" : !voiceEnabled && panel === "session" ? "teacher" : experience} quality={preferences.quality} reducedMotion={preferences.reducedMotion} muted={preferences.muted} appearance={ecosystem?.profile.equipped} leaders={leaders} eventEndsAt={eventEndsAt} communityWishes={communityWishes} interactive={Boolean(alias && !panel && !host && !socialFocused && !help && !ecosystemOpen)} onUnavailable={useLiteMode} />}
       </section>
-      {alias && inMonastery && <Monastery initial={ecosystem ?? undefined} participants={players.filter(player => player.action === "monastery" && Number.isInteger(player.seatIndex)).length + (monasterySeat === null ? 0 : 1)} connected={online} seatIndex={monasterySeat} nearbySeat={monasteryNearby} onFindSeat={findMonasterySeat} seatError={monasterySeatError} onSeat={selectMonasterySeat} alias={alias} lite={lite} onSnapshot={receiveEcosystem} onPose={poseInMonastery} onLeave={() => navigate({ x: 0, z: -12, label: "sân quán" })} onUseTicket={id => openHost("tuvi", undefined, undefined, id)} />}
+      {alias && inMonastery && <Monastery initial={ecosystem ?? undefined} participants={players.filter(player => player.action === "monastery" && Number.isInteger(player.seatIndex)).length + (monasterySeat === null ? 0 : 1)} connected={online} seatIndex={monasterySeat} nearbySeat={monasteryNearby} onFindSeat={findMonasterySeat} seatError={monasterySeatError} onSeat={selectMonasterySeat} alias={alias} lite={lite} onIncense={requestTempleIncense} onSnapshot={receiveEcosystem} onPose={poseInMonastery} onLeave={() => navigate({ x: 0, z: -12, label: "sân quán" })} onUseTicket={id => openHost("tuvi", undefined, undefined, id)} />}
       <header style={inMonastery ? { display: "none" } : undefined} className={styles.mast} inert={Boolean(panel) || ecosystemOpen}>
         <button className={styles.icon} aria-label="Mở trình đơn" onClick={() => setHelp(!help)}><Menu size={20} /></button>
         <div className={styles.identity}><h1>Tử Vi Quán</h1><span>{alias ? online ? players.length + 1 + " khách trong sân" : courtyardFull ? "Sân chung đang đông" : "Đang kết nối sân chung" : "Lá số tinh hoa"}</span></div>

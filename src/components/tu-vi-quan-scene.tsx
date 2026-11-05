@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import * as THREE from "three";
 import { courtyardAssets } from "./tu-vi-quan-scene-assets";
 import { QUAN_TAROT_CARDS } from "@/lib/tu-vi-quan-content";
+import { poseQuanAvatar as pose } from "@/lib/tu-vi-quan-avatar-motion";
 import type { MonasteryPose } from "./tu-vi-quan-monastery";
 import styles from "./tu-vi-quan-scene.module.css";
 import { QUAN_TEACHER_DESKS, findQuanPath, isQuanWalkable, quanGroundHeight, quanMonasteryToWorld, quanWorldToMonastery, QUAN_BOUNDS, QUAN_POND, QUAN_STATIONS, QUAN_MONASTERY_SEATS, QUAN_MONASTERY_SPACE } from "@/lib/tu-vi-quan-world.mjs";
@@ -651,42 +652,39 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
       parent.add(mesh);
       return mesh;
     }
-    if (ecosystemEnabled) {
-      part(body, "cone", color, 0, 0.75, 0, 0.68, 0.94, 0.47);
-      part(body, "drum", color, 0, 1.1, 0, 0.23, 0.16, 0.24);
-      part(body, "box", PALETTE.gold, 0.06, 0.91, 0.225, 0.017, 0.35, 0.014);
-    } else part(body, "cone", color, 0, 0.76, 0, 0.58, 0.77, 0.42);
-    part(body, "drum", PALETTE.gold, 0, 0.71, 0, 0.52, 0.055, 0.4);
-    if (detailed) {
-      const hair = name === "Thầy Tử Vi" ? 0x777167 : 0x332321;
-      part(body, "drum", 0xc28a60, 0, 1.123, 0, 0.16, 0.19, 0.15);
-      part(body, "face", 0xd69d72, 0, 1.355, 0.013, 0.38, 0.44, 0.34);
-      part(body, "face", hair, 0, 1.46, -0.065, 0.394, 0.30, 0.325);
-      part(body, "face", 0xd69d72, 0, 1.332, 0.184, 0.066, 0.085, 0.076);
-      for (const side of [-1, 1]) {
-        part(body, "face", 0xc28a60, side * 0.175, 1.349, 0.013, 0.065, 0.109, 0.075);
-        part(body, "face", 0x46302c, side * 0.077, 1.38, 0.16, 0.064, 0.024, 0.026);
-        part(body, "face", 0x30231d, side * 0.079, 1.382, 0.175, 0.025, 0.023, 0.014);
-        part(body, "face", hair, side * 0.078, 1.415, 0.158, 0.075, 0.016, 0.017).rotation.z = side * -0.14;
-        part(body, "box", PALETTE.gold, side * 0.071, 1.04, 0.175, 0.024, 0.22, 0.021).rotation.z = side * 0.43;
-      }
-    } else {
-      part(body, "head", 0xe9b180, 0, 1.34, 0, 0.49, 0.51, 0.46);
-      part(body, "head", 0x40302a, 0, 1.53, -0.04, 0.53, 0.22, 0.48);
-      for (const side of [-1, 1]) part(body, "head", 0x34241d, side * 0.087, 1.35, 0.213, 0.04, 0.045, 0.035);
+    const torso = new THREE.Group(); torso.position.y = .74; body.add(torso);
+    const knees: THREE.Group[] = [], elbows: THREE.Group[] = [];
+    const skin = 0xd69d72;
+    // Các khớp xoay quanh hông, gối và khuỷu tay, không xoay cả người quanh bàn chân.
+    const upper = (shape: Shape, tint: number, x: number, y: number, z: number, sx: number, sy: number, sz = sx) => part(torso, shape, tint, x, y - .74, z, sx, sy, sz);
+    upper("face", color, 0, 1.045, 0, .49, .64, .30);
+    upper("cone", color, 0, .72, 0, .56, .48, .37);
+    upper("drum", color, 0, 1.35, 0, .18, .13, .18);
+    upper("drum", PALETTE.gold, 0, .79, 0, .48, .025, .32);
+    upper("box", PALETTE.gold, .035, 1.06, .154, .012, .47, .012);
+    upper("drum", skin, 0, 1.42, 0, .12, .16, .12);
+    const head = new THREE.Group(); head.position.set(0, .84, 0); torso.add(head);
+    part(head, "face", skin, 0, 0, .012, .29, .36, .28);
+    part(head, "face", 0x332b28, 0, .095, -.045, .30, .20, .25);
+    part(head, "face", skin, 0, -.012, .15, .045, .065, .053);
+    for (const side of [-1, 1]) {
+      part(head, "face", skin, side * .142, 0, .01, .045, .075, .055);
+      part(head, "face", 0xf4e9dc, side * .062, .026, .135, .049, .022, .012);
+      part(head, "face", 0x30231d, side * .062, .026, .144, .022, .022, .012);
+      part(head, "face", 0x332b28, side * .062, .055, .133, .058, .012, .014).rotation.z = side * -.1;
     }
-    const mouth = part(body, "face", 0x743c35, 0, detailed ? 1.278 : 1.235, detailed ? 0.176 : 0.224, 0.074, 0.018, 0.024);
+    const mouth = part(head, "face", 0x743c35, 0, -.077, .136, .058, .014, .015);
     const legs = [-1, 1].map((side, index) => {
-      const leg = new THREE.Group();
-      leg.position.set(side * 0.15, 0.34, 0);
-      part(leg, "box", 0x43372f, 0, -0.13, 0, 0.16, 0.34, 0.17);
-      part(leg, "box", PALETTE.edge, 0, -0.27, 0.04, 0.19, 0.085, 0.25);
-      body.add(leg);
-      const arm = arms[index];
-      arm.position.set(side * 0.245, 1.01, 0);
-      part(arm, "drum", color, 0, -0.18, 0, 0.18, 0.36);
-      part(arm, "head", 0xe9b180, 0, -0.37, 0, 0.16, 0.17, 0.15);
-      body.add(arm);
+      const leg = new THREE.Group(); leg.position.set(side * .13, .72, 0); body.add(leg);
+      part(leg, "drum", 0x3f4148, 0, -.16, 0, .18, .32, .19);
+      const knee = new THREE.Group(); knee.position.y = -.32; leg.add(knee); knees.push(knee);
+      part(knee, "drum", 0x3f4148, 0, -.15, 0, .15, .30, .16);
+      part(knee, "face", PALETTE.edge, 0, -.32, .055, .18, .10, .30);
+      const arm = arms[index]; arm.position.set(side * .255, .57, 0); torso.add(arm);
+      part(arm, "face", color, 0, -.135, 0, .18, .29, .18);
+      const elbow = new THREE.Group(); elbow.position.y = -.26; arm.add(elbow); elbows.push(elbow);
+      part(elbow, "drum", color, 0, -.105, 0, .135, .23, .14);
+      part(elbow, "face", skin, 0, -.255, .015, .105, .13, .07);
       return leg;
     });
     const badge = label(name);
@@ -697,34 +695,20 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
     ground.position.y = 0.03;
     group.add(body, badge, ground);
     scene.add(group);
-    return { group, body, badge, arms, legs, mouth, name, robe };
-  }
-  function pose(visitor: ReturnType<typeof avatar>, action: string, seconds: number, walking: boolean, reduced: boolean) {
-    const stride = walking && !reduced ? Math.sin(seconds * 14) * 0.48 : 0;
-    visitor.body.position.y = (action === "meditate" || action === "seated") ? -0.26 : Math.abs(stride) * (ecosystemEnabled ? 0.045 : 0.09) + (!ecosystemEnabled || reduced ? 0 : Math.sin(seconds * 1.6) * 0.008);
-    visitor.body.rotation.x = action === "greet" ? 0.15 : 0;
-    visitor.badge.position.y = (action === "meditate" || action === "seated") ? 1.73 : 1.98;
-    visitor.legs.forEach((leg, i) => {
-      leg.rotation.x = (action === "meditate" || action === "seated") ? -Math.PI / 2 : stride * (i === 0 ? 1 : -1);
-      leg.rotation.z = (action === "meditate" || action === "seated") ? (i === 0 ? -0.5 : 0.5) : 0;
-    });
-    visitor.arms.forEach((arm, i) => {
-      arm.rotation.x = action === "greet" ? -1.83 : action === "incense" ? -1.3 : (action === "meditate" || action === "seated") ? -0.6 : -stride * (i === 0 ? 1 : -1);
-      arm.rotation.z = action === "greet" ? (i === 0 ? 0.52 : -0.52) : 0;
-    });
+    return { bowStarted: undefined as number | undefined, group, body, torso, head, badge, arms, legs, knees, elbows, mouth, name, robe };
   }
   const self = avatar(0x506f7e, "Bạn", true);
   const templeSash = new THREE.Mesh(geometry.box, material(0xdcb758));
-  templeSash.position.set(0, 0.86, 0.28); templeSash.scale.set(0.11, 0.74, 0.045); templeSash.rotation.z = -0.66;
-  self.body.add(templeSash);
+  templeSash.position.set(0, 0.12, 0.18); templeSash.scale.set(0.11, 0.74, 0.045); templeSash.rotation.z = -0.66;
+  self.torso.add(templeSash);
   const templeBeads = new THREE.Group();
   for (let bead = 0; bead < 18; bead++) {
     const a = bead / 18 * Math.PI * 2;
     const mesh = new THREE.Mesh(geometry.head, material(0xc39143));
-    mesh.position.set(Math.cos(a) * 0.26, 1.17 - (Math.sin(a) + 1) * 0.055, Math.sin(a) * 0.23);
+    mesh.position.set(Math.cos(a) * 0.26, 1.30 - (Math.sin(a) + 1) * 0.055, Math.sin(a) * 0.23);
     mesh.scale.setScalar(0.065); templeBeads.add(mesh);
   }
-  self.body.add(templeBeads);
+  templeBeads.position.y = -.74; self.torso.add(templeBeads);
   self.group.traverse(node => node.layers.enable(1));
   self.badge.visible = false;
   self.body.rotation.y = Math.PI;
@@ -737,19 +721,19 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
     pose(teacher, "seated", 0, false, true);
     if (index !== 1) {
       const hat = new THREE.Mesh(geometry.drum, material(0x3c2b27));
-      hat.position.set(0, 1.6, -0.02); hat.scale.set(0.43, 0.19, 0.39); teacher.body.add(hat);
+      hat.position.set(0, 1.80, -0.02); hat.scale.set(0.43, 0.19, 0.39); teacher.body.add(hat);
       const rim = new THREE.Mesh(geometry.drum, material(PALETTE.gold));
       rim.position.copy(hat.position); rim.position.y -= 0.049; rim.scale.set(0.44, 0.025, 0.40); teacher.body.add(rim);
       for (const side of [-1, 1]) {
         const moustache = new THREE.Mesh(geometry.face, material(index === 0 ? 0xaba397 : 0x594a43));
-        moustache.position.set(side * 0.045, 1.268, 0.173); moustache.scale.set(0.087, 0.033, 0.038); moustache.rotation.z = side * -0.33;
+        moustache.position.set(side * 0.045, 1.51, 0.145); moustache.scale.set(0.087, 0.033, 0.038); moustache.rotation.z = side * -0.33;
         teacher.body.add(moustache);
       }
       const beard = new THREE.Mesh(geometry.face, material(index === 0 ? 0xc0b7a8 : 0x64574d));
-      beard.position.set(0, 1.17, 0.146); beard.scale.set(0.14, 0.14, 0.10); teacher.body.add(beard);
+      beard.position.set(0, 1.40, 0.14); beard.scale.set(0.14, 0.14, 0.10); teacher.body.add(beard);
     } else {
       const bun = new THREE.Mesh(geometry.face, material(0x2d201c));
-      bun.position.set(0, 1.51, -0.22); bun.scale.set(0.25, 0.23, 0.25); teacher.body.add(bun);
+      bun.position.set(0, 1.72, -0.22); bun.scale.set(0.25, 0.23, 0.25); teacher.body.add(bun);
     }
     return teacher;
   });
@@ -1277,7 +1261,7 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
         star.material = highlighted ? focusMaterial : haloMaterial;
         star.scale.setScalar(highlighted ? 0.12 : 0.046);
       });
-      if (current.ritual?.kind === "incense") incense.forEach(({stick, ember}, i) => { stick.visible = ember.visible = current.ritual?.count === 3 || i === 1; });
+      if (current.ritual?.kind === "incense") incense.forEach(({stick, ember}, i) => { const temple = current.experience === "monastery"; stick.position.set((temple ? 0 : -18) + (i - 1) * .16, temple ? 3.5 : 2.15, temple ? -32.38 : 23); ember.position.set(stick.position.x, stick.position.y + .31, stick.position.z); stick.visible = ember.visible = current.ritual?.count === 3 || i === 1; });
       if (current.ritual?.kind === "tarot") tarotCards.forEach(({face}, i) => {
         const value = current.ritual?.values?.[i]; face.material.map?.dispose(); face.material.dispose();
         face.material = cardFace(value === undefined ? "Chưa rút lá" : QUAN_TAROT_CARDS[value]?.title ?? "Lá bài", value ?? 0); face.visible = value !== undefined;
@@ -1313,16 +1297,13 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
     }
     if (monastery) {
       const prayer = current.monasteryPose ?? "idle";
+      if (self.group.userData.prayer !== prayer) { self.group.userData.prayer = prayer; self.bowStarted = undefined; }
       const seat = current.monasterySeat == null ? null : QUAN_MONASTERY_SEATS[current.monasterySeat];
       if (seat) { const location = quanMonasteryToWorld(seat); self.group.position.set(location.x, QUAN_MONASTERY_SPACE.floor + 0.46, location.z); }
-      if (seat || prayer !== "idle") { self.body.rotation.y = Math.PI; pose(self, ["greet", "incense"].includes(prayer) ? "greet" : seat || prayer === "bow" ? "seated" : "idle", time / 1000, false, reducedMotion()); }
+      if (seat || prayer !== "idle") { self.body.rotation.y = Math.PI; pose(self, prayer === "bow" ? "bow" : ["greet", "incense"].includes(prayer) ? "greet" : seat ? "seated" : "idle", time / 1000, false, reducedMotion()); }
       const local = quanWorldToMonastery(self.group.position);
       const nearest = seat ? null : QUAN_MONASTERY_SEATS.find(candidate => !current.players.some(player => player.action === "monastery" && player.seatIndex === candidate.index) && Math.hypot(local.x - candidate.x, local.z - candidate.z) <= 1.8)?.index ?? null;
       if (nearest !== nearbySeat) { nearbySeat = nearest; current.onMonasteryNearby?.(nearest); }
-      if (prayer === "bow") {
-        self.arms.forEach((arm, index) => { arm.rotation.x = -1.83; arm.rotation.z = index === 0 ? 0.52 : -0.52; });
-        self.body.rotation.x = reducedMotion() ? -0.65 : -0.15 - Math.sin(time / 1100) ** 2 * 0.9;
-      }
       if (prayer === "beads") self.arms[0].rotation.x = -1.1;
 
     }
@@ -1371,8 +1352,8 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
         else { const location = quanMonasteryToWorld(seat); visitor.group.position.set(location.x, QUAN_MONASTERY_SPACE.floor + .46, location.z); }
         visitor.body.rotation.y = Math.PI;
         const prayer = player.monasteryPose ?? "idle";
-        if (seat || prayer !== "idle") pose(visitor, ["greet", "incense"].includes(prayer) ? "greet" : seat ? "seated" : "idle", time / 1000, false, reducedMotion());
-        if (prayer === "bow") visitor.body.rotation.x = reducedMotion() ? -0.65 : -0.15 - Math.sin(time / 1100) ** 2 * 0.9;
+        if (visitor.group.userData.prayer !== prayer) { visitor.group.userData.prayer = prayer; visitor.bowStarted = undefined; }
+        if (seat || prayer !== "idle") pose(visitor, prayer === "bow" ? "bow" : ["greet", "incense"].includes(prayer) ? "greet" : seat ? "seated" : "idle", time / 1000, false, reducedMotion());
         visitor.group.visible = !seated && experience !== "personal";
       } else {
         move(visitor, player, player.action, time / 1000, dt);
