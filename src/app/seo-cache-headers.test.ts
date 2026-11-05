@@ -6,8 +6,8 @@ const nextConfigSource = readFileSync(fileURLToPath(new URL("../../next.config.t
 
 describe("public SEO cache headers", () => {
   it("sets CDN-friendly cache headers for public discovery pages", () => {
-    for (const route of ["/", "/kien-thuc-tu-vi", "/xem-ngay", "/pricing", "/lien-he"]) {
-      expect(nextConfigSource).toContain(`source: "${route}"`);
+    for (const route of ["/kien-thuc-tu-vi", "/xem-ngay", "/pricing", "/lien-he"]) {
+      expect(nextConfigSource).toContain(`source: "${route}", headers: [publicSeoCacheHeader]`);
     }
 
     expect(nextConfigSource).toContain("public, s-maxage=300, stale-while-revalidate=31536000");

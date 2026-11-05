@@ -47,11 +47,15 @@ const nextConfig: NextConfig = {
       key: "Cache-Control",
       value: "public, s-maxage=300, stale-while-revalidate=31536000",
     };
+    const gameHeaders = [
+      { key: "Permissions-Policy", value: "camera=(), microphone=(self), geolocation=()" },
+      { key: "Cache-Control", value: "private, no-store, max-age=0, must-revalidate" },
+    ];
 
     return [
       { source: "/:path*", headers: securityHeaders },
-      { source: "/tu-vi-quan", headers: [{ key: "Permissions-Policy", value: "camera=(), microphone=(self), geolocation=()" }] },
-      { source: "/", headers: [publicSeoCacheHeader] },
+      { source: "/tu-vi-quan", headers: gameHeaders },
+      { source: "/", headers: gameHeaders },
       { source: "/kien-thuc-tu-vi", headers: [publicSeoCacheHeader] },
       { source: "/xem-ngay", headers: [publicSeoCacheHeader] },
       { source: "/pricing", headers: [publicSeoCacheHeader] },

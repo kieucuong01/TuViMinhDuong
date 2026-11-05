@@ -2,6 +2,15 @@ import { describe, expect, it } from "vitest";
 import nextConfig from "../../next.config";
 
 describe("security headers", () => {
+  it("allows microphone input and prevents shared caching on both game entrances", async () => {
+    const entries = await nextConfig.headers?.();
+    for (const route of ["/", "/tu-vi-quan"]) {
+      const headers = new Map(entries?.find((entry) => entry.source === route)?.headers.map((header) => [header.key, header.value]));
+      expect(headers.get("Permissions-Policy")).toBe("camera=(), microphone=(self), geolocation=()");
+      expect(headers.get("Cache-Control")).toBe("private, no-store, max-age=0, must-revalidate");
+    }
+  });
+
   it("sets baseline browser hardening headers on every route", async () => {
     const entries = await nextConfig.headers?.();
     const global = entries?.find((entry) => entry.source === "/:path*");
