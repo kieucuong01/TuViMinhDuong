@@ -5,8 +5,8 @@ import { isIP } from "node:net";
 import dotenv from "dotenv";
 import pg from "pg";
 import { WebSocket, WebSocketServer } from "ws";
-import { quanPresenceSecret, verifyQuanSocketTicket } from "../src/lib/tu-vi-quan-presence.mjs";
-import { isQuanWalkable, QUAN_SPAWN } from "../src/lib/tu-vi-quan-world.mjs";
+import { quanPresenceSecret, quanSeatCheckToken, verifyQuanSocketTicket } from "../src/lib/tu-vi-quan-presence.mjs";
+import { isQuanWalkable, QUAN_SPAWN, QUAN_MONASTERY_SEATS } from "../src/lib/tu-vi-quan-world.mjs";
 
 const MAX_GUESTS = 24;
 const ROOM_NAMES = ["Sân Trúc", "Sân Sen", "Sân Mai", "Sân Trà"];
@@ -31,6 +31,13 @@ export function createQuanPresenceServer({ secret, origins, readBoard = async ()
   const server = createServer({ headersTimeout: 5_000, requestTimeout: 10_000, maxHeaderSize: 8_192 }, (request, response) => {
     if (request.method === "GET" && request.url === "/health") {
       response.writeHead(200, { "Content-Type": "text/plain", "Cache-Control": "no-store" }).end("ok");
+      return;
+    }
+    const seatId = request.method === "GET" && request.url?.match(/^\/monastery-seat\/([A-Za-z0-9_-]{22})$/)?.[1];
+    if (seatId && ["127.0.0.1", "::1", "::ffff:127.0.0.1"].includes(request.socket.remoteAddress) && request.headers.authorization === "Bearer " + quanSeatCheckToken(secret)) {
+      const person = guests.get(seatId);
+      const seated = person?.player.action === "monastery" && Number.isInteger(person.player.seatIndex);
+      response.writeHead(seated ? 200 : 409, { "Content-Type": "application/json", "Cache-Control": "no-store" }).end(JSON.stringify(seated ? { index: person.player.seatIndex, room: person.room } : { error: "Chọn một đệm trống trước khi thực hành." }));
       return;
     }
     response.writeHead(404).end();
@@ -89,6 +96,8 @@ export function createQuanPresenceServer({ secret, origins, readBoard = async ()
         x: prior?.player.x ?? spawnX,
         z: prior?.player.z ?? QUAN_SPAWN.z,
         action: "idle",
+        seatIndex: null,
+        monasteryPose: "idle",
       };
       const presence = { client, player, room, ip, alive: true, actionUntil: 0 };
       guests.set(player.id, presence);
@@ -131,6 +140,7 @@ export function createQuanPresenceServer({ secret, origins, readBoard = async ()
             player.x = Math.round(data.x * 100) / 100;
             player.z = Math.round(data.z * 100) / 100;
             player.action = "idle";
+            player.seatIndex = null; player.monasteryPose = "idle";
             presence.actionUntil = 0;
             dirty = true;
           } else if (ecosystemEnabled && data.type === "chat") {
@@ -150,8 +160,22 @@ export function createQuanPresenceServer({ secret, origins, readBoard = async ()
               id: randomUUID(), playerId: player.id, alias: player.alias, text: verdict.text, createdAt: now,
             }].slice(-20);
             dirty = true;
+          } else if (ecosystemEnabled && data.type === "monastery-seat") {
+            if (data.seatIndex !== null && (!Number.isInteger(data.seatIndex) || !QUAN_MONASTERY_SEATS[data.seatIndex])) return;
+            if (data.seatIndex !== null && [...guests.values()].some(other => other !== presence && other.room === presence.room && other.player.seatIndex === data.seatIndex)) {
+              client.send(JSON.stringify({ type: "seat-error", message: "Chỗ này vừa có người ngồi. Bạn chọn đệm khác nhé." }));
+              return;
+            }
+            player.seatIndex = data.seatIndex;
+            player.action = "monastery";
+            player.monasteryPose = "idle";
+            dirty = true;
+          } else if (ecosystemEnabled && data.type === "monastery-pose" && player.action === "monastery" && ["idle", "greet", "bow", "incense", "meditate", "beads", "chant"].includes(data.pose)) {
+            if (["meditate", "beads", "chant"].includes(data.pose) && player.seatIndex === null) return;
+            player.monasteryPose = data.pose; dirty = true;
           } else if (data.type === "action" && ACTIONS.has(data.action)) {
             player.action = data.action;
+            if (data.action !== "monastery") { player.seatIndex = null; player.monasteryPose = "idle"; }
             presence.actionUntil = data.action === "incense" || data.action === "greet" ? now + 4_000 : 0;
             dirty = true;
           }

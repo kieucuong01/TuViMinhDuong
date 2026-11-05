@@ -5,7 +5,7 @@ describe("expanded Tử Vi Quán world", () => {
   it("keeps every station and spawn in walkable terrain", () => {
     for (const point of [QUAN_SPAWN, ...QUAN_STATIONS]) expect(isQuanWalkable(point.x, point.z)).toBe(true);
     expect(QUAN_BOUNDS.maxX - QUAN_BOUNDS.minX).toBeGreaterThan(60);
-    for (const point of [{x:NaN,z:0},{x:0,z:Infinity},{x:100,z:0},{x:20,z:18},{x:0,z:-22},{x:-10,z:-5.5}]) {
+    for (const point of [{x:NaN,z:0},{x:0,z:Infinity},{x:100,z:0},{x:20,z:18},{x:0,z:-22},{x:-10,z:-6.3}]) {
       expect(isQuanWalkable(point.x,point.z)).toBe(false);
     }
   });

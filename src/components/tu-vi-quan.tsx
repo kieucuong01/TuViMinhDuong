@@ -18,7 +18,7 @@ const Encounter = dynamic(() => import("./tu-vi-quan-encounter"), { ssr: false }
 const Social = dynamic(() => import("./tu-vi-quan-social"), { ssr: false });
 const QuanEcosystem = dynamic(() => import("./tu-vi-quan-ecosystem-panel"), { ssr: false });
 type Position = { x: number; z: number };
-type Player = Position & { id: string; alias: string; action: string };
+type Player = Position & { id: string; alias: string; action: string; seatIndex?: number | null; monasteryPose?: MonasteryPose };
 type Session = {
   id: string; minutes: 15 | 30; amountVnd: number; readingKind?: EncounterKind;
   status: "pending" | "paid" | "queued" | "invited" | "active" | "ended" | "refund" | "cancelled";
@@ -66,6 +66,8 @@ export default function TuViQuan({ initialAlias, support, paymentsEnabled, ecosy
   const [ritualBusy, setRitualBusy] = useState(false);
   const [inMonastery, setInMonastery] = useState(false);
   const [monasteryPose, setMonasteryPose] = useState<MonasteryPose>("idle");
+  const [monasterySeat, setMonasterySeat] = useState<number | null>(null);
+  const [monasterySeatError, setMonasterySeatError] = useState("");
   const ritualOperation = useRef(false);
   const pendingRitual = useRef<{kind: "incense"; count?: number} | null>(null);
   const [socialMessages, setSocialMessages] = useState<QuanSocialMessage[]>([]);
@@ -147,6 +149,7 @@ export default function TuViQuan({ initialAlias, support, paymentsEnabled, ecosy
           if (!live) return;
           try {
             const packet = JSON.parse(data);
+            if (packet.type === "seat-error") { setMonasterySeatError(packet.message || "Chỗ ngồi vừa có người chọn."); return; }
             if (packet.type === "chat-error") { setSocialError(typeof packet.message === "string" ? packet.message : "Chưa gửi được lời nhắn."); return; }
             if (packet.type !== "snapshot" || !Array.isArray(packet.players)) return;
             if (firstSnapshot) {
@@ -161,6 +164,8 @@ export default function TuViQuan({ initialAlias, support, paymentsEnabled, ecosy
               didSpawn.current = true;
             }
             setOwnId(packet.selfId);
+            const seatedSelf = packet.players.find((player: Player) => player.id === packet.selfId);
+            setMonasterySeat(Number.isInteger(seatedSelf?.seatIndex) ? seatedSelf.seatIndex : null);
             setRoomName(packet.room?.name);
             setSocialMessages(Array.isArray(packet.messages) ? packet.messages : []);
             if (Array.isArray(packet.activity)) setCommunityActivity(previous => JSON.stringify(previous) === JSON.stringify(packet.activity) ? previous : packet.activity);
@@ -174,6 +179,7 @@ export default function TuViQuan({ initialAlias, support, paymentsEnabled, ecosy
         ws.onclose = (event) => {
           if (!live) return;
           setOnline(false);
+          setMonasterySeat(null); setMonasteryPose("idle");
           setPlayers([]);
           setSocialMessages([]);
           setCommunityActivity([]); setLeaders([]);
@@ -243,9 +249,9 @@ export default function TuViQuan({ initialAlias, support, paymentsEnabled, ecosy
     return () => { live = false; };
   }, [session?.qrCode, session?.status]);
 
-  function send(payload: object) {
+  const send = useCallback((payload: object) => {
     if (socket.current?.readyState === WebSocket.OPEN) socket.current.send(JSON.stringify(payload));
-  }
+  }, []);
 
   function doAction(value: string) {
     if (actionTimer.current) clearTimeout(actionTimer.current);
@@ -384,6 +390,16 @@ export default function TuViQuan({ initialAlias, support, paymentsEnabled, ecosy
     doAction("monastery"); setMonasteryPose("idle"); setInMonastery(true);
   }
 
+  const selectMonasterySeat = useCallback((index: number | null) => {
+    setMonasterySeatError("");
+    send({ type: "monastery-seat", seatIndex: index });
+  }, [send]);
+
+  const poseInMonastery = useCallback((pose: MonasteryPose) => {
+    setMonasteryPose(pose);
+    send({ type: "monastery-pose", pose });
+  }, [send]);
+
   async function freeRitual(kind: "incense", count = 1) {
     if (ritualOperation.current) return;
     ritualOperation.current = true; setRitualBusy(true); setError("");
@@ -498,9 +514,9 @@ export default function TuViQuan({ initialAlias, support, paymentsEnabled, ecosy
   return (
     <main ref={world} className={`${styles.page} ${voiceEnabled ? styles.liveGame : ""} ${host ? styles.seated : ""}`} data-quan-world onKeyDown={handleWorldKey} tabIndex={-1}>
       <section className={styles.courtyard} aria-label="Sân Tử Vi Quán">
-        {!lite && <Scene encounter={voiceEnabled && host ? { ...(encounterVisual ?? {kind: host.kind, state: "greeting", audioLevel: 0}), desk: host.desk } : undefined} onHost={voiceEnabled && alias && !panel && !ecosystemOpen && !help && !inMonastery ? (kind, desk) => openHost(kind, undefined, desk) : undefined} onIncense={ecosystemEnabled && !inMonastery ? () => requestRitual("incense", 1) : undefined} showHostControls={false} ritual={voiceEnabled ? ritual : undefined} speech={voiceEnabled && !host ? publicSpeech : undefined} ecosystemEnabled={ecosystemEnabled} position={position} destination={destination} action={action} players={players} onMove={move} monasteryPose={monasteryPose} monasteryProgress={ecosystem?.monastery.visits ?? 0} experience={inMonastery ? "monastery" : !voiceEnabled && panel === "session" ? "teacher" : experience} quality={preferences.quality} reducedMotion={preferences.reducedMotion} muted={preferences.muted} appearance={ecosystem?.profile.equipped} leaders={leaders} eventEndsAt={eventEndsAt} communityWishes={communityWishes} interactive={Boolean(alias && !panel && !host && !socialFocused && !help && !ecosystemOpen)} onUnavailable={() => setLite(true)} />}
+        {!lite && <Scene encounter={voiceEnabled && host ? { ...(encounterVisual ?? {kind: host.kind, state: "greeting", audioLevel: 0}), desk: host.desk } : undefined} onHost={voiceEnabled && alias && !panel && !ecosystemOpen && !help && !inMonastery ? (kind, desk) => openHost(kind, undefined, desk) : undefined} onIncense={ecosystemEnabled && !inMonastery ? () => requestRitual("incense", 1) : undefined} showHostControls={false} ritual={voiceEnabled ? ritual : undefined} speech={voiceEnabled && !host ? publicSpeech : undefined} ecosystemEnabled={ecosystemEnabled} position={position} destination={destination} action={action} players={players} onMove={move} monasteryPose={monasteryPose} monasterySeat={monasterySeat} onMonasterySeat={selectMonasterySeat} experience={inMonastery ? "monastery" : !voiceEnabled && panel === "session" ? "teacher" : experience} quality={preferences.quality} reducedMotion={preferences.reducedMotion} muted={preferences.muted} appearance={ecosystem?.profile.equipped} leaders={leaders} eventEndsAt={eventEndsAt} communityWishes={communityWishes} interactive={Boolean(alias && !panel && !host && !socialFocused && !help && !ecosystemOpen)} onUnavailable={() => setLite(true)} />}
       </section>
-      {alias && inMonastery && <Monastery initial={ecosystem ?? undefined} participants={players.filter(player => player.action === "monastery").length + 1} alias={alias} lite={lite} onSnapshot={receiveEcosystem} onPose={setMonasteryPose} onLeave={() => { setInMonastery(false); setMonasteryPose("idle"); doAction("idle"); }} onUseTicket={id => openHost("tuvi", undefined, undefined, id)} />}
+      {alias && inMonastery && <Monastery initial={ecosystem ?? undefined} participants={players.filter(player => player.action === "monastery" && Number.isInteger(player.seatIndex)).length + (monasterySeat === null ? 0 : 1)} connected={online} seatIndex={monasterySeat} occupied={players.filter(player => player.action === "monastery" && Number.isInteger(player.seatIndex)).map(player => ({index: player.seatIndex!, alias: player.alias}))} seatError={monasterySeatError} onSeat={selectMonasterySeat} alias={alias} lite={lite} onSnapshot={receiveEcosystem} onPose={poseInMonastery} onLeave={() => { setInMonastery(false); setMonasteryPose("idle"); doAction("idle"); }} onUseTicket={id => openHost("tuvi", undefined, undefined, id)} />}
       <header style={inMonastery ? { display: "none" } : undefined} className={styles.mast} inert={Boolean(panel) || ecosystemOpen}>
         <Link href="/" className={styles.icon} aria-label="Về Lá số tinh hoa"><ArrowLeft size={20} /></Link>
         <div className={styles.identity}><h1>Tử Vi Quán</h1><span>{alias ? online ? players.length + 1 + " khách trong sân" : courtyardFull ? "Sân chung đang đông" : "Đang kết nối sân chung" : "Lá số tinh hoa"}</span></div>

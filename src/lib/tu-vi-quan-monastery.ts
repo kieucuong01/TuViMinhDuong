@@ -6,9 +6,9 @@ import { QuanSessionError } from "@/lib/tu-vi-quan-session";
 
 type Tx = Prisma.TransactionClient;
 type Bag = Record<string, unknown>;
-export type QuanPractice = "meditate" | "beads" | "chant" | "garden";
+export type QuanPractice = "meditate" | "beads" | "chant";
 export type QuanPracticeState = { seconds: number; running: boolean; lastAt: number; lastTapAt: number; taps: number };
-const modes: QuanPractice[] = ["meditate", "beads", "chant", "garden"];
+const modes: QuanPractice[] = ["meditate", "beads", "chant"];
 const bag = (value: unknown) => (value && typeof value === "object" && !Array.isArray(value) ? value : {}) as Bag;
 const key = (profileId: string, kind: string, dayKey: string) => ({ profileId_kind_dayKey: { profileId, kind, dayKey } });
 function fail(message: string, status = 409): never { throw new QuanSessionError(message, status); }
@@ -24,7 +24,7 @@ export async function readMonastery(tx: Tx, profileId: string, now: Date) {
   const sum = (...kinds: string[]) => today.filter(row => kinds.includes(row.kind)).reduce((total, row) => total + row.points, 0);
   return {
     practices: Object.fromEntries(modes.map(mode => [mode, today.find(row => row.kind === "practice_" + mode)?.data ?? null])) as Record<QuanPractice, QuanPracticeState | null>,
-    rewards: { meditate: sum("meditate", "monastery_meditate"), chant: sum("chant", "monastery_chant"), garden: sum("monastery_garden") },
+    rewards: { meditate: sum("meditate", "monastery_meditate"), chant: sum("chant", "monastery_chant") },
     visits, lotusBloomed: visits >= 7, redeemedToday: today.some(row => row.kind === "voice_ticket_purchase"),
     tickets: [
       ...tickets.map(ticket => ({ id: ticket.id, minutes: 5, remainingSeconds: 300 })),
@@ -64,22 +64,22 @@ export async function mutateMonastery(tx: Tx, profile: QuanProfile, body: Bag, n
     if (!saved) fail("Hãy bắt đầu hoạt động trước.");
     // A missing foreground heartbeat pauses credit instead of rewarding unattended time.
     if (state.running && elapsed <= 12) state.seconds = Math.min(180, state.seconds + elapsed);
-    if (body.tap === true && state.running && now.getTime() - state.lastTapAt >= (mode === "garden" ? 12_000 : 4_000)) {
-      state.taps = Math.min(mode === "garden" ? 4 : 27, state.taps + 1);
+    if (body.tap === true && mode === "beads" && state.running && now.getTime() - state.lastTapAt >= 4_000) {
+      state.taps = Math.min(27, state.taps + 1);
       state.lastTapAt = now.getTime();
     }
     if (body.action === "practice_pause") state.running = false;
     if (body.action === "practice_finish") {
-      const duration = mode === "meditate" || mode === "garden" ? 60 : 120;
-      if (state.seconds < duration || (mode === "beads" && state.taps < 27) || (mode === "garden" && state.taps < 4)) fail("Bạn chưa hoàn thành thời lượng và thao tác của lượt này.");
+      const duration = mode === "meditate" ? 60 : 120;
+      if (state.seconds < duration || (mode === "beads" && state.taps < 27)) fail("Bạn chưa hoàn thành thời lượng và thao tác của lượt này.");
       const rewardKind = mode === "beads" || mode === "chant" ? "monastery_chant" : "monastery_" + mode;
-      const legacyKind = mode === "meditate" ? "meditate" : mode === "garden" ? "" : "chant";
+      const legacyKind = mode === "meditate" ? "meditate" : "chant";
       const legacy = await tx.quanEntry.findUnique({ where: key(profile.id, legacyKind, day) });
-      const earned = mode === "garden" ? 5 : mode === "meditate" && state.seconds < 180 ? 5 : 10;
+      const earned = mode === "meditate" && state.seconds < 180 ? 5 : 10;
       const points = Math.max(0, earned - (legacy?.points ?? 0));
       const previous = await tx.quanEntry.findUnique({ where: key(profile.id, rewardKind, day) });
       await tx.quanEntry.upsert({ where: key(profile.id, rewardKind, day),
-        create: { ...base, kind: rewardKind, dayKey: day, data: { title: mode === "meditate" ? "Thiền trong Tu viện" : mode === "garden" ? "Chăm vườn sen" : "Tràng hạt và tụng niệm" }, points },
+        create: { ...base, kind: rewardKind, dayKey: day, data: { title: mode === "meditate" ? "Thiền trong Tu viện" : "Tràng hạt và tụng niệm" }, points },
         update: { points: Math.max(previous?.points ?? 0, points) },
       });
       await tx.quanEntry.upsert({ where: key(profile.id, "monastery_visit", day), create: { ...base, kind: "monastery_visit", dayKey: day, data: {}, points: 0 }, update: {} });

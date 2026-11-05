@@ -6,6 +6,7 @@ import { defaultQuanEvent, mutateEcosystem, publicQuanShare, readEcosystem, reso
 import { readQuanAdminEcosystem, updateQuanAdminEcosystem } from "./tu-vi-quan-admin";
 
 vi.mock("server-only", () => ({}));
+vi.mock("@/lib/tu-vi-quan-seat", () => ({ requireQuanMonasterySeat: vi.fn(async () => {}) }));
 const url = process.env.QUAN_TEST_DATABASE_URL;
 if (url && !/^postgresql:\/\/[^/]+@127\.0\.0\.1:\d+\/quan_test(?:_\d+)?$/.test(url)) throw new Error("Use a disposable localhost quan_test database");
 const db = url ? new PrismaClient({ adapter: new PrismaPg({ connectionString: url }) }) : null;
@@ -55,19 +56,18 @@ describe.skipIf(!db)("Tử Vi Quán ecosystem in PostgreSQL", () => {
     await mutateEcosystem(db!, guest, { action: "ritual", kind: "chant_start" }, later(1035));
     expect((await mutateEcosystem(db!, guest, { action: "ritual", kind: "chant_finish" }, later(1065))).profile.points).toBe(20);
     await run("practice_start", "meditate", 1065);
-    const switched = await run("practice_start", "garden", 1065);
+    const switched = await run("practice_start", "beads", 1065);
     expect(switched.monastery.practices.meditate?.running).toBe(false);
-    for (let seconds = 1070; seconds <= 1130; seconds += 5) await run("practice_tick", "garden", seconds, true);
-    const garden = await run("practice_finish", "garden", 1130);
-    expect(garden.profile).toMatchObject({ points: 25, earned: 25 });
-    expect(garden.monastery.visits).toBe(1);
-    await db!.quanEntry.createMany({ data: Array.from({ length: 6 }, (_, index) => ({ profileId: garden.profile.id, kind: "monastery_visit", dayKey: `fixture-${index}`, data: {}, points: 0, version: "test" })) });
-    const bloomed = await run("practice_finish", "garden", 1130);
+    await expect(run("practice_start", "garden", 1065)).rejects.toMatchObject({ status: 400 });
+    expect(switched.profile).toMatchObject({ points: 20, earned: 20 });
+    expect(switched.monastery.visits).toBe(1);
+    await db!.quanEntry.createMany({ data: Array.from({ length: 6 }, (_, index) => ({ profileId: switched.profile.id, kind: "monastery_visit", dayKey: `fixture-${index}`, data: {}, points: 0, version: "test" })) });
+    const bloomed = await run("practice_finish", "beads", 1130);
     expect(bloomed.monastery.lotusBloomed).toBe(true);
     expect(bloomed.inventory).toContainEqual(expect.objectContaining({ id: "journey-lantern-seven" }));
     const newDay = await readEcosystem(db!, guest, new Date("2026-11-04T17:00:00Z"));
     expect(newDay.monastery.practices.beads).toBeNull();
-    expect(newDay.monastery.rewards).toEqual({ meditate: 0, chant: 0, garden: 0 });
+    expect(newDay.monastery.rewards).toEqual({ meditate: 0, chant: 0 });
   }, 30_000);
 
   it("redeems once per day atomically, keeps at most two unused tickets and never spends lifetime points", async () => {

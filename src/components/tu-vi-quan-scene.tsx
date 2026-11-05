@@ -6,10 +6,10 @@ import { courtyardAssets } from "./tu-vi-quan-scene-assets";
 import { QUAN_TAROT_CARDS } from "@/lib/tu-vi-quan-content";
 import type { MonasteryPose } from "./tu-vi-quan-monastery";
 import styles from "./tu-vi-quan-scene.module.css";
-import { findQuanPath, isQuanWalkable, QUAN_BOUNDS, QUAN_POND, QUAN_STATIONS } from "@/lib/tu-vi-quan-world.mjs";
+import { findQuanPath, isQuanWalkable, QUAN_BOUNDS, QUAN_POND, QUAN_STATIONS, QUAN_MONASTERY_SEATS } from "@/lib/tu-vi-quan-world.mjs";
 
 type Position = { x: number; z: number };
-type Player = Position & { id: string; alias: string; action: string };
+type Player = Position & { id: string; alias: string; action: string; seatIndex?: number | null; monasteryPose?: MonasteryPose };
 export type QuanHost = "tuvi" | "tarot" | "iching";
 type SceneProps = {
   encounter?: { kind: QuanHost; desk?: number; state: "greeting" | "listening" | "thinking" | "speaking" | "idle"; audioLevel: number };
@@ -24,7 +24,8 @@ type SceneProps = {
   muted?: boolean;
   appearance?: Record<string, string>;
   monasteryPose?: MonasteryPose;
-  monasteryProgress?: number;
+  monasterySeat?: number | null;
+  onMonasterySeat?: (index: number) => void;
   leaders?: { alias: string; points: number }[];
   eventEndsAt?: number;
   experience?: "courtyard" | "teacher" | "tarot" | "iching" | "personal" | "monastery";
@@ -207,6 +208,8 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
   paving(14, 5, 18, 5);
   paving(9, 17, 5, 20);
   paving(0, -16, 27, 4);
+  paving(-28, -7.8, 36, 3.8);
+  paving(-18, 21, 4.5, 17);
   // Layers of distant hills keep the estate open without an enclosing wall of trees.
   for (let layer = 0; layer < 3; layer++) for (let i = 0; i < 16; i++) {
     const angle = i * Math.PI * 2 / 16;
@@ -216,7 +219,7 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
       22 + (i * 7) % 21 + layer * 6, 31, 0, angle);
   }
   // Low plaster walls frame the garden; the southern gate stays open.
-  for (const x of [-33.5, 33.5]) {
+  for (const x of [-53.5, 33.5]) {
     box(0xd1bb93, x, 0.65, 3, 0.48, 1.35, 63);
     box(PALETTE.ridge, x, 1.37, 3, 0.7, 0.2, 63.3);
     for (let z = -27; z <= 33; z += 6) {
@@ -364,29 +367,29 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
     lantern(x - side * 0.78, 2.3, z);
   }
   // Incense altar stands in its own quiet garden west of the court.
-  box(PALETTE.stone, -10, 0.16, -5.5, 3.8, 0.3, 3);
-  box(PALETTE.red, -10, 0.72, -5.5, 2.9, 0.9, 1.5);
-  box(PALETTE.wood, -10, 1.21, -5.5, 3.3, 0.2, 1.9);
-  box(PALETTE.gold, -10, 0.8, -4.73, 2.3, 0.07, 0.035);
-  drum(0x80623d, -10, 1.4, -5.5, 0.5, 0.25);
-  object("head", 0xa77a3e, -10, 1.65, -5.5, 0.9, 0.55, 0.75);
-  drum(PALETTE.gold, -10, 1.87, -5.5, 0.85, 0.14);
-  for (const x of [-11.15, -8.85]) {
-    drum(PALETTE.gold, x, 1.53, -5.5, 0.14, 0.5);
-    object("leaf", PALETTE.light, x, 1.88, -5.5, 0.11, 0.22, 0.11);
-    drum(0x86633d, x, 1.35, -5.02, .38, .07);
-    for (const offset of [-.09, .09]) object("face", 0xd6934c, x + offset, 1.45, -5.02, .15, .18, .15);
+  box(PALETTE.stone, -18, 0.16, 23, 3.8, 0.3, 3);
+  box(PALETTE.red, -18, 0.72, 23, 2.9, 0.9, 1.5);
+  box(PALETTE.wood, -18, 1.21, 23, 3.3, 0.2, 1.9);
+  box(PALETTE.gold, -18, 0.8, 23.77, 2.3, 0.07, 0.035);
+  drum(0x80623d, -18, 1.4, 23, 0.5, 0.25);
+  object("head", 0xa77a3e, -18, 1.65, 23, 0.9, 0.55, 0.75);
+  drum(PALETTE.gold, -18, 1.87, 23, 0.85, 0.14);
+  for (const x of [-19.15, -16.85]) {
+    drum(PALETTE.gold, x, 1.53, 23, 0.14, 0.5);
+    object("leaf", PALETTE.light, x, 1.88, 23, 0.11, 0.22, 0.11);
+    drum(0x86633d, x, 1.35, 23.48, .38, .07);
+    for (const offset of [-.09, .09]) object("face", 0xd6934c, x + offset, 1.45, 23.48, .15, .18, .15);
   }
-  for (const x of [-11.72, -8.28]) {
-    box(PALETTE.wood, x, 1.59, -6.48, .2, 2.9, .23);
-    box(PALETTE.gold, x, .49, -6.48, .27, .075, .29);
+  for (const x of [-19.72, -16.28]) {
+    box(PALETTE.wood, x, 1.59, 22.02, .2, 2.9, .23);
+    box(PALETTE.gold, x, .49, 22.02, .27, .075, .29);
   }
-  box(PALETTE.red, -10, 2.17, -6.57, 2.67, 1.68, .16);
-  roof(-10, -6.32, 4.16, 1.72, 3.27);
-  box(PALETTE.wood, 9, 0.65, -15.7, 1.5, 1.25, 1.05);
-  box(PALETTE.red, 9, 1.32, -15.7, 1.66, 0.18, 1.2);
-  box(PALETTE.gold, 9, 0.83, -15.15, 0.7, 0.4, 0.035);
-  box(PALETTE.edge, 9, 1.42, -15.7, 0.7, 0.018, 0.08);
+  box(PALETTE.red, -18, 2.17, 21.93, 2.67, 1.68, .16);
+  roof(-18, 22.18, 4.16, 1.72, 3.27);
+  box(PALETTE.wood, 0, 0.65, -9.9, 1.5, 1.25, 1.05);
+  box(PALETTE.red, 0, 1.32, -9.9, 1.66, 0.18, 1.2);
+  box(PALETTE.gold, 0, 0.83, -9.35, 0.7, 0.4, 0.035);
+  box(PALETTE.edge, 0, 1.42, -9.9, 0.7, 0.018, 0.08);
   // Open tea and meditation pavilions share the hall's roof and timber language.
   function pavilion(cx: number, cz: number, width: number, depth: number, accent: number, tiles: number[]) {
     box(PALETTE.stone, cx, 0.13, cz, width, 0.25, depth);
@@ -403,12 +406,16 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
     for (const side of [-1, 1]) lantern(cx + side * width * 0.31, 2.55, cz + depth / 2 - 0.25);
   }
   pavilion(-20, 8.5, 10, 5, 0x774477, [0x53455d, 0x64506b, 0x715979, 0x4b3d55]);
-  // Tu viện có cổng riêng trong sân; nội thất đặt ngoài sân để chuyển cảnh không che các viện.
-  pavilion(-23, -12.5, 9, 6, 0x9e3c30, [0x934739, 0xae5742, 0xc16b4d, 0x71392f]);
-  for (const x of [-26, -20]) {
-    drum(0xdbc077, x, 0.35, -8.9, 1.1, 0.35);
-    object("head", 0xf0c96e, x, 0.85, -8.9, 0.5, 0.65, 0.5);
-  }
+  // Tu viện có quy mô tương đương Chính điện Tử Vi.
+  box(PALETTE.stone, -36, .16, -18, 27, .32, 16);
+  box(0xe0be86, -36, 3.2, -25.8, 27, 6.4, .35);
+  for (const x of [-49.2, -22.8]) box(0xcdb17c, x, 3.2, -18, .35, 6.4, 16);
+  for (const x of [-47.6, -41.8, -30.2, -24.4]) for (const z of [-24.5, -10.7]) column(x, z, 6.3);
+  box(PALETTE.edge, -36, 6.6, -10.5, 27.4, .4, .6);
+  roof(-36, -18, 30, 19, 6.8);
+  roof(-36, -19, 19.5, 10.5, 10.5);
+  for (const x of [-45, -39, -33, -27]) lantern(x, 5.5, -9.8);
+  for (let step=0;step<3;step++) box(PALETTE.stone,-36,.06+step*.06,-8.8-step*.25,13-step*.5,.12,.5);
   monasteryGeometry = true;
   const templeX = -68;
   const templeGold = 0xd9a742, templeRed = 0x9d3028, templeCream = 0xe9cc8c;
@@ -445,26 +452,7 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
   box(0xf3ce78, templeX, 1.16, -13, 25.3, 0.16, 5.5);
   for (const side of [-1, 1]) box(0x8d3129, templeX + side * 12.3, 0.65, -10.26, 0.3, 0.9, 0.1);
   for (const offset of [-8, 0, 8]) {
-    const x = templeX + offset, scale = offset === 0 ? 1 : 0.83;
-    // Tượng Phật ngồi và quầng sáng cách điệu, đối xứng và tĩnh.
-    object("head", 0xf0ca73, x, 4.1, -14.5, 5.8 * scale, 7.0 * scale, 0.32);
-    object("head", 0xb88934, x, 4.1, -14.30, 5.36 * scale, 6.5 * scale, 0.15);
-    for (let petal = 0; petal < 12; petal++) {
-      const a = petal / 12 * Math.PI * 2;
-      object("head", 0xe6b85d, x + Math.cos(a) * 1.6 * scale, 1.63, -12.5 + Math.sin(a) * 0.8, 0.9 * scale, 0.8, 0.52, 0, a, 0.3);
-    }
-    object("head", templeGold, x, 2.03, -12.7, 3.7 * scale, 0.9 * scale, 1.9 * scale);
-    object("head", 0xe7b957, x, 3.25, -12.85, 2.05 * scale, 2.75 * scale, 1.15 * scale);
-    object("head", 0xf0c56b, x, 5.0 * scale, -12.85, 1.25 * scale, 1.55 * scale, 1.12 * scale);
-    object("head", 0xa87a32, x, 5.63 * scale, -12.92, 1.27 * scale, 0.72 * scale, 1.05 * scale);
-    object("head", templeGold, x, 6.06 * scale, -12.92, 0.34, 0.38, 0.35);
-    for (const side of [-1, 1]) {
-      object("head", 0xf2cc7d, x + side * 0.9 * scale, 3.12, -12.45, 0.44, 1.65 * scale, 0.52, 0, 0, side * 0.34);
-      object("head", 0xf4d183, x + side * 0.3 * scale, 2.59, -12.10, 0.66, 0.28, 0.48);
-      box(0x775020, x + side * 0.23 * scale, 5.03 * scale, -12.30, 0.24 * scale, 0.035, 0.03, 0, 0, side * 0.08);
-      object("head", 0xf0c56b, x + side * 0.65 * scale, 4.86 * scale, -12.84, 0.19, 0.64, 0.32);
-    }
-    box(0x9d6331, x, 4.69 * scale, -12.29, 0.25, 0.025, 0.03);
+    const x = templeX + offset;
     for (const side of [-1, 1]) {
       const vaseX = x + side * 2.3;
       drum(0xead7aa, vaseX, 1.6, -10.9, 0.5, 0.65);
@@ -477,16 +465,6 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
   for (let row = 0; row < 4; row++) for (let col = 0; col < 7; col++) {
     drum(0xc79b49, templeX - 9 + col * 3, 0.23, -6 + row * 3.5, 1.5, 0.25, 1.2);
     drum(0xeac16b, templeX - 9 + col * 3, 0.37, -6 + row * 3.5, 1.42, 0.08, 1.14);
-    if (row < 3 && (col === 0 || col === 6)) {
-      const x = templeX - 9 + col * 3, z = -6 + row * 3.5;
-      const robe = (row + col) % 2 ? 0x8f6241 : 0x78838a;
-      object("head", robe, x, 0.77, z, 1.02, 0.95, 0.85);
-      object("head", 0xe7b68a, x, 1.55, z, 0.97, 0.9, 0.87);
-      object("head", 0x90999b, x, 1.8, z + 0.04, 0.99, 0.42, 0.87);
-      box(0xd6b260, x, 0.95, z - 0.43, 0.13, 0.9, 0.06, 0, 0, 0.65);
-      for (const side of [-1, 1]) object("head", robe, x + side * 0.34, 0.47, z - 0.16, 0.56, 0.27, 0.52);
-      for (let bead = 0; bead < 9; bead++) object("head", 0xb7823d, x - 0.32 + bead * 0.08, 1.12 - Math.sin(bead / 8 * Math.PI) * 0.15, z - 0.39, 0.08, 0.08, 0.08);
-    }
   }
   // Hương án và vườn sen nhỏ ở phía trước điện.
   box(0xa35b38, templeX, 0.85, -9, 4.2, 1.3, 1.15);
@@ -583,16 +561,16 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
   box(PALETTE.wood, 12.55, 0.94, 18.6, 0.13, 0.13, 7.1);
   if (ecosystemEnabled) {
     // A roofed honor board before the hall and a small stall on the bamboo path.
-    for (const x of [-9.02, -3.58]) {
-      drum(PALETTE.stone, x, 0.25, -14.53, .73, .48);
-      box(PALETTE.wood, x, 2.2, -14.53, .33, 3.62, .34);
-      box(PALETTE.gold, x, .59, -14.53, .38, .1, .39);
-      lantern(x, 2.85, -14.21);
+    for (const x of [-12.72, -7.28]) {
+      drum(PALETTE.stone, x, 0.25, -6.53, .73, .48);
+      box(PALETTE.wood, x, 2.2, -6.53, .33, 3.62, .34);
+      box(PALETTE.gold, x, .59, -6.53, .38, .1, .39);
+      lantern(x, 2.85, -6.21);
     }
-    box(PALETTE.stone, -6.3, .17, -14.53, 6.06, .32, .94);
-    box(PALETTE.edge, -6.3, 2.18, -14.53, 5.35, 2.91, .22);
-    box(PALETTE.gold, -6.3, .68, -14.39, 5.44, .12, .24);
-    roof(-6.3, -14.53, 6.54, 2.28, 4.03);
+    box(PALETTE.stone, -10, .17, -6.53, 6.06, .32, .94);
+    box(PALETTE.edge, -10, 2.18, -6.53, 5.35, 2.91, .22);
+    box(PALETTE.gold, -10, .68, -6.39, 5.44, .12, .24);
+    roof(-10, -6.53, 6.54, 2.28, 4.03);
     for (const x of [-15.1, -12.9]) {
       box(PALETTE.wood, x, 1.43, 12.1, 0.15, 2.65, 0.17);
       box(PALETTE.wood, x, 1.43, 13.1, 0.15, 2.65, 0.17);
@@ -810,25 +788,23 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
   function ritualPart(shape: Shape, color: number, x: number, y: number, z: number, sx: number, sy: number, sz: number) {
     const mesh = new THREE.Mesh(geometry[shape], material(color)); mesh.position.set(x, y, z); mesh.scale.set(sx, sy, sz); scene.add(mesh); return mesh;
   }
+  const monasterySeats = QUAN_MONASTERY_SEATS.map(seat => {
+    const mesh = ritualPart("drum", 0xf2d17c, templeX + seat.x, 0.422, seat.z, 1.48, 0.025, 1.18);
+    mesh.layers.set(1); mesh.userData.seatIndex = seat.index;
+    return mesh;
+  });
   const seatCushions = teachers.flatMap((teacher, index) => [0, 2.5].map(offset => {
     const seat = ritualPart("drum", index === 1 ? 0x6d466f : 0x617c70, teacher.group.position.x, teacher.group.position.y + 0.11, teacher.group.position.z + offset, 0.85, 0.2, 0.7); return seat;
   }));
   const tableSkins = [-5.5, 0, 5.5].map(x => ritualPart("box", 0x354e67, x, 1.081, -19.5, 3.1, 0.012, 1.25));
-  const altarSkin = ritualPart("box", 0xa33d31, -10, 0.72, -5.5, 2.91, 0.9, 1.51);
-  const templeLotuses = Array.from({ length: 7 }, (_, index) => {
-    const lotus = new THREE.Group(); lotus.position.set(templeX - 13, 0.3, -4 + index * 1.7);
-    const bowl = new THREE.Mesh(geometry.drum, material(0x7f9e87)); bowl.scale.set(1.15, 0.3, 1.15); lotus.add(bowl);
-    const flower = new THREE.Group(); flower.position.y = 0.46;
-    for (let petal = 0; petal < 7; petal++) {
-      const a = petal / 7 * Math.PI * 2;
-      const leaf = new THREE.Mesh(geometry.head, material(0xefb3bf));
-      leaf.position.set(Math.cos(a) * 0.25, 0, Math.sin(a) * 0.25); leaf.scale.set(0.37, 0.38, 0.22); leaf.rotation.y = -a; flower.add(leaf);
-    }
-    lotus.add(flower); lotus.traverse(node => node.layers.set(1)); scene.add(lotus); return { lotus, flower };
-  });
+  const altarSkin = ritualPart("box", 0xa33d31, -18, 0.72, 23, 2.91, 0.9, 1.51);
   const templeLight = new THREE.PointLight(0xffd49b, 45, 42, 1.4);
   templeLight.layers.set(1);
   templeLight.position.set(templeX, 6.2, -9); scene.add(templeLight);
+  const statueLights = [-8, 0, 8].map(offset => {
+    const light = new THREE.PointLight(0xffe6b3, 28, 15, 1.3);
+    light.position.set(templeX + offset, 6.5, -9.5); light.layers.set(1); scene.add(light); return light;
+  });
   const readingDecor: THREE.Mesh<THREE.PlaneGeometry, THREE.MeshStandardMaterial>[] = [];
   function paintedPanel(width: number, height: number, paint: (ctx: CanvasRenderingContext2D) => void) {
     const surface = document.createElement("canvas"); surface.width = surface.height = 512;
@@ -861,7 +837,7 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
     }
   }
   const rankingBoard = ecosystemEnabled ? paintedPanel(5.14, 2.75, ctx => paintRanking(ctx, [])) : null;
-  rankingBoard?.position.set(-6.3, 2.18, -14.408);
+  rankingBoard?.position.set(-10, 2.18, -6.408);
   function facadePlate(title: string, subtitle: string, color: string, width: number, height: number) {
     const plate = paintedPanel(width, height, ctx => {
       const trim = ctx.createLinearGradient(0, 0, 0, 512);
@@ -889,8 +865,8 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
   facadePlate("TỬ VI QUÁN", "CHÍNH ĐIỆN", "#4d2423", 6.31, 1.46).position.set(0, 7.5, -18.71);
   facadePlate("VIỆN TAROT", "CÔ TAROT · TRẢI BÀI", "#402743", 3.59, .92).position.set(-20, 2.91, 11.108);
   facadePlate("VIỆN KINH DỊCH", "THẦY DỊCH · GIEO QUẺ", "#214440", 3.59, .92).position.set(18, 2.91, 3.508);
-  facadePlate("BÀN THỜ THẦN TÀI", "XIN LỘC ĐẦU NGÀY", "#5a2824", 2.5, 1.43).position.set(-10, 2.2, -6.48);
-  facadePlate("TU VIỆN AN NHIÊN", "ĐIỆN PHẬT · THIỀN · TRÀNG HẠT", "#6a2b24", 4.7, 1.14).position.set(-23, 3.02, -9.42);
+  facadePlate("BÀN THỜ THẦN TÀI", "XIN LỘC ĐẦU NGÀY", "#5a2824", 2.5, 1.43).position.set(-18, 2.2, 22.02);
+  facadePlate("TU VIỆN AN NHIÊN", "ĐIỆN PHẬT · THIỀN · TRÀNG HẠT", "#6a2b24", 8.2, 1.84).position.set(-36, 7.02, -9.45);
   const templePlaque = facadePlate("TU VIỆN AN NHIÊN", "MỘT KHOẢNG LẶNG CHO MỖI NGÀY", "#6a2b24", 6.1, 1.23);
   templePlaque.position.set(templeX, 7.53, -17.31); templePlaque.layers.set(1);
   let previousLeaders: SceneProps["leaders"];
@@ -938,7 +914,7 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
     chartHalo.add(star); return star;
   });
   const incense = [-1, 0, 1].map(side => {
-    const stick = ritualPart("box", 0xa13e29, -10 + side * .16, 2.15, -5.5, .034, .6, .034);
+    const stick = ritualPart("box", 0xa13e29, -18 + side * .16, 2.15, 23, .034, .6, .034);
     const ember = ritualPart("head", PALETTE.lantern, -10 + side * .16, 2.46, -5.5, .07, .07, .07);
     stick.visible = ember.visible = false;
     return { stick, ember };
@@ -1050,7 +1026,7 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
   const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
   const reducedMotion = () => ecosystemEnabled ? latest.current.reducedMotion ?? motion.matches : motion.matches;
   const ray = new THREE.Raycaster();
-  const altarHit = new THREE.Box3(new THREE.Vector3(-11.86, .12, -6.87), new THREE.Vector3(-8.14, 3.38, -4.37));
+  const altarHit = new THREE.Box3(new THREE.Vector3(-19.86, .12, 21.63), new THREE.Vector3(-16.14, 3.38, 24.13));
   const pointer = new THREE.Vector2();
   const floor = new THREE.Plane(new THREE.Vector3(0, 1, 0), -0.055);
   const hit = new THREE.Vector3();
@@ -1074,6 +1050,7 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
   let cameraReady = false;
   let framedHost = -1;
   let previousExperience = "courtyard";
+  let buddhaRequested = false;
   let thumb: { id: number; x: number; y: number; dragged: boolean } | undefined;
   let press: { id: number; x: number; y: number; lastX: number; lastY: number; dragged: boolean } | undefined;
   let route: Position[] = [];
@@ -1125,10 +1102,16 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
     if (start?.id !== event.pointerId) return;
     if (leftTouch) endMove(); else press = undefined;
     if (start.dragged || !latest.current.interactive) return;
-    if (latest.current.experience === "monastery") return;
     const rect = canvas.getBoundingClientRect();
     pointer.set((event.clientX - rect.left) / rect.width * 2 - 1, 1 - (event.clientY - rect.top) / rect.height * 2);
     ray.setFromCamera(pointer, camera);
+    if (latest.current.experience === "monastery") {
+      ray.layers.set(1);
+      const selected = ray.intersectObjects(monasterySeats, false)[0];
+      if (selected) latest.current.onMonasterySeat?.(selected.object.userData.seatIndex);
+      return;
+    }
+    ray.layers.set(0);
     if (latest.current.onIncense && ray.ray.intersectsBox(altarHit)) { latest.current.onIncense(); return; }
     if (leftTouch) return;
     const selected = ray.intersectObjects(teachers.map(teacher => teacher.group), true)[0];
@@ -1234,12 +1217,17 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
       }
       previousExperience = experience;
     }
+    if (monastery && !buddhaRequested && assets) {
+      buddhaRequested = true;
+      assets.model("buddha-amoghasiddhi", [-8, 0, 8].map(offset => ({ x: templeX + offset, y: 1.24, z: -13.1, height: offset === 0 ? 5.8 : 4.9, layer: 1 })));
+    }
     templeLight.visible = monastery;
-    templeSash.visible = templeBeads.visible = monastery;
-    templeLotuses.forEach(({ lotus, flower }, index) => {
-      lotus.visible = monastery;
-      flower.visible = index < (current.monasteryProgress ?? 0);
+    statueLights.forEach(light => { light.visible = monastery; });
+    monasterySeats.forEach((mesh, index) => {
+      const occupied = current.players.some(person => person.action === "monastery" && person.seatIndex === index);
+      mesh.material = material(current.monasterySeat === index ? 0x82b9ab : occupied ? 0x795449 : 0xf2d17c);
     });
+    templeSash.visible = templeBeads.visible = monastery;
     const seated = current.encounter;
     const selectedHost = !seated ? -1 : seated.kind === "tuvi" ? (seated.desk === 1 ? 3 : seated.desk === 2 ? 4 : 0) : hostKinds.indexOf(seated.kind);
     const hostPosition = teachers[selectedHost]?.group.position;
@@ -1356,15 +1344,16 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
     }
     if (monastery) {
       const prayer = current.monasteryPose ?? "idle";
-      self.group.position.set(templeX, 0.46, 7);
+      const seat = current.monasterySeat == null ? null : QUAN_MONASTERY_SEATS[current.monasterySeat];
+      self.group.position.set(templeX + (seat?.x ?? 0), seat ? 0.46 : 0.12, seat?.z ?? 9);
       self.body.rotation.y = Math.PI;
-      pose(self, ["greet", "incense"].includes(prayer) ? "greet" : "seated", time / 1000, false, reducedMotion());
+      pose(self, ["greet", "incense"].includes(prayer) ? "greet" : seat || prayer === "bow" ? "seated" : "idle", time / 1000, false, reducedMotion());
       if (prayer === "bow") {
         self.arms.forEach((arm, index) => { arm.rotation.x = -1.83; arm.rotation.z = index === 0 ? 0.52 : -0.52; });
         self.body.rotation.x = reducedMotion() ? -0.65 : -0.15 - Math.sin(time / 1100) ** 2 * 0.9;
       }
       if (prayer === "beads") self.arms[0].rotation.x = -1.1;
-      if (prayer === "garden") self.group.position.set(templeX - 11.4, 0.46, 6.2);
+
     }
     tarotCards.forEach(({back, face}, i) => { const lift = ritualActive && current.ritual?.kind === "tarot" && !reducedMotion() ? Math.sin(Math.min(1, (time - ritualStarted) / 1200) * Math.PI) * (0.2 + i * 0.1) : 0; back.position.y = 1.065 + lift; face.position.y = 1.085 + lift; });
     coins.forEach((coin, i) => { const tossing = ritualActive && current.ritual?.kind === "iching" && time - ritualStarted < 1200 && !reducedMotion(); coin.position.y = 1.04 + (tossing ? Math.sin((time - ritualStarted) / 1200 * Math.PI) * 0.7 : 0); coin.rotation.x = tossing ? (time - ritualStarted) * 0.015 + i : 0; });
@@ -1378,9 +1367,8 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
     if (experience === "tarot") { cameraGoal.set(-17, 3.1, 13); cameraTarget.set(-20, 1.2, 8.4); }
     if (experience === "iching") { cameraGoal.set(20, 3.2, 6); cameraTarget.set(18, 1, 0.4); }
     if (monastery) {
-      const garden = current.monasteryPose === "garden";
-      cameraGoal.set(templeX + (garden ? -10.2 : 0) + Math.sin(yaw) * 3, 2.1 + pitch * 1.3, garden ? 8 : 11.1);
-      cameraTarget.set(templeX + (garden ? -13 : 0) + Math.sin(yaw) * 13, (garden ? 0.8 : 2.7) + (pitch - 0.49) * 7, garden ? 1.6 : -12);
+      cameraGoal.set(templeX + 0 + Math.sin(yaw) * 3, 2.1 + pitch * 1.3, 11.1);
+      cameraTarget.set(templeX + 0 + Math.sin(yaw) * 13, 2.7 + (pitch - 0.49) * 7, -12);
     }
     if (hostPosition) {
       const host = hostPosition;
@@ -1395,7 +1383,6 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
     skyDome.position.copy(camera.position);
     cameraReady = true;
     const active = activeVisitors; active.clear();
-    let templeVisitor = 0;
     for (const player of current.players) {
       active.add(player.id);
       let visitor = visitors.get(player.id);
@@ -1411,11 +1398,14 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
         visitor.group.position.set(player.x, 0.054, player.z);
         visitors.set(player.id, visitor);
       }
-      if (monastery && player.action === "monastery") {
-        visitor.group.position.set(templeX - 6 + templeVisitor % 5 * 3, 0.46, -6 + Math.floor(templeVisitor / 5) * 3.5);
+      if (monastery && player.action === "monastery" && Number.isInteger(player.seatIndex)) {
+        const seat = QUAN_MONASTERY_SEATS[player.seatIndex!];
+        visitor.group.position.set(templeX + seat.x, 0.46, seat.z);
         visitor.body.rotation.y = Math.PI;
-        pose(visitor, "seated", time / 1000, false, reducedMotion());
-        visitor.group.visible = true; templeVisitor++;
+        const prayer = player.monasteryPose ?? "idle";
+        pose(visitor, ["greet", "incense"].includes(prayer) ? "greet" : "seated", time / 1000, false, reducedMotion());
+        if (prayer === "bow") visitor.body.rotation.x = reducedMotion() ? -0.65 : -0.15 - Math.sin(time / 1100) ** 2 * 0.9;
+        visitor.group.visible = true;
       } else {
         move(visitor, player, player.action, time / 1000, dt);
         visitor.group.visible = experience === "courtyard" && player.action !== "monastery" && Math.hypot(player.x - x, player.z - z) > 0.5;
@@ -1430,7 +1420,7 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
     smoke.forEach((mesh, index) => {
       mesh.layers.enable(1);
       const phase = reducedMotion() ? (index + 1) / 8 : ((time / 4600 + index / smoke.length) % 1);
-      mesh.position.set((monastery ? templeX : -10) + phase * 0.76 + Math.sin(phase * 6) * 0.12, (monastery ? 2.7 : 2.46) + phase * 1.73, (monastery ? -9 : -5.5) + phase * 0.19);
+      mesh.position.set((monastery ? templeX : -18) + phase * 0.76 + Math.sin(phase * 6) * 0.12, (monastery ? 2.7 : 2.46) + phase * 1.73, (monastery ? -9 : 23) + phase * 0.19);
       mesh.scale.setScalar(0.082 + phase * 0.35);
       mesh.material.opacity = (1 - phase) * (monastery ? current.monasteryPose === "incense" ? 0.42 : 0.12 : current.action === "incense" || ritualActive && current.ritual?.kind === "incense" ? 0.42 : incense[1].stick.visible ? 0.22 : 0);
     });

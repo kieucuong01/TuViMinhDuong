@@ -1,7 +1,7 @@
 import { once } from "node:events";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import WebSocket from "ws";
-import { issueQuanSocketTicket, verifyQuanSocketTicket } from "./tu-vi-quan-presence.mjs";
+import { issueQuanSocketTicket, verifyQuanSocketTicket, quanPresenceId, quanSeatCheckToken } from "./tu-vi-quan-presence.mjs";
 import { createQuanPresenceServer } from "../../scripts/tu-vi-quan-realtime.mjs";
 
 const secret = "test-key";
@@ -45,6 +45,32 @@ function snapshot(client, predicate = () => true) {
     client.on("message", receive);
   });
 }
+
+it("reserves real monastery seats atomically and releases them when a player stands up", async () => {
+  const url = await listen();
+  const a = connect(url, guest), b = connect(url, { id: "second-guest", alias: "Khách thứ hai" });
+  await Promise.all([snapshot(a), snapshot(b)]);
+  a.send(JSON.stringify({ type: "action", action: "monastery" }));
+  b.send(JSON.stringify({ type: "action", action: "monastery" }));
+  const seated = snapshot(a, frame => frame.type === "snapshot" && frame.players.some(player => player.id === frame.selfId && player.seatIndex === 0));
+  a.send(JSON.stringify({ type: "monastery-seat", seatIndex: 0 }));
+  await seated;
+  const endpoint = url.replace("ws:", "http:").replace("/tu-vi-quan-ws", "/monastery-seat/" + quanPresenceId(guest.id, secret));
+  expect((await fetch(endpoint)).status).toBe(404);
+  const authorized = await fetch(endpoint, { headers: { Authorization: "Bearer " + quanSeatCheckToken(secret) } });
+  expect(authorized.status).toBe(200);
+  expect(await authorized.json()).toMatchObject({ index: 0 });
+  const occupied = snapshot(b, frame => frame.type === "seat-error");
+  b.send(JSON.stringify({ type: "monastery-seat", seatIndex: 0 }));
+  expect((await occupied).message).toContain("đệm khác");
+  const released = snapshot(a, frame => frame.type === "snapshot" && frame.players.find(player => player.id === frame.selfId)?.seatIndex === null);
+  a.send(JSON.stringify({ type: "monastery-seat", seatIndex: null }));
+  await released;
+  expect((await fetch(endpoint, { headers: { Authorization: "Bearer " + quanSeatCheckToken(secret) } })).status).toBe(409);
+  const reseated = snapshot(b, frame => frame.type === "snapshot" && frame.players.find(player => player.id === frame.selfId)?.seatIndex === 0);
+  b.send(JSON.stringify({ type: "monastery-seat", seatIndex: 0 }));
+  await reseated;
+});
 
 describe("Tử Vi Quán presence", () => {
   it("rejects expired and tampered tickets and never embeds the private guest ID", () => {

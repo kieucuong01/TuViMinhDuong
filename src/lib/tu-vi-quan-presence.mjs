@@ -6,6 +6,14 @@ export function quanPresenceSecret() {
   return process.env.AUTH_SECRET || (process.env.NODE_ENV === "production" ? "" : "dev-tu-vi-secret-change-me");
 }
 
+export function quanPresenceId(guestId, secret) {
+  return sign(secret, "tu-vi-quan-presence-id-v1", guestId).slice(0, 22);
+}
+
+export function quanSeatCheckToken(secret) {
+  return sign(secret, "tu-vi-quan-monastery-check-v1", "seat-status");
+}
+
 /** @param {string} secret @param {string} domain @param {string} value */
 function sign(secret, domain, value) {
   return createHmac("sha256", secret).update(domain).update("\0").update(value).digest("base64url");
@@ -13,7 +21,7 @@ function sign(secret, domain, value) {
 
 /** @param {{id: string, alias: string}} guest @param {string} secret */
 export function issueQuanSocketTicket(guest, secret, now = Date.now()) {
-  const id = sign(secret, "tu-vi-quan-presence-id-v1", guest.id).slice(0, 22);
+  const id = quanPresenceId(guest.id, secret);
   const payload = Buffer.from(JSON.stringify({ id, alias: guest.alias, expiresAt: now + TICKET_LIFETIME_MS })).toString("base64url");
   return `${payload}.${sign(secret, "tu-vi-quan-presence-ticket-v1", payload)}`;
 }

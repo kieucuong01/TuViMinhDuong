@@ -8,6 +8,7 @@ import type { QuanGuest } from "@/lib/tu-vi-quan-guest";
 import { normalizeQuanAlias } from "@/lib/tu-vi-quan-guest";
 import { QuanSessionError, readQuanChart } from "@/lib/tu-vi-quan-session";
 import { mutateMonastery, readMonastery } from "@/lib/tu-vi-quan-monastery";
+import { requireQuanMonasterySeat } from "@/lib/tu-vi-quan-seat";
 import {
   QUAN_CONTENT_VERSION, QUAN_COSMETICS, drawDaily, drawTarot, drawIChing,
   moderateWish, quanDayKey, buildQuanHoroscope,
@@ -283,6 +284,7 @@ export async function revokeWishShares(tx: Tx, id: string, now: Date) {
 }
 
 export async function mutateEcosystem(db: PrismaClient, actor: Actor, body: Bag, now = new Date()) {
+  if (["practice_start", "practice_tick", "practice_finish"].includes(String(body.action))) await requireQuanMonasterySeat(actor.guest.id);
   return ecosystemTransaction(db, async (tx) => {
     let profile = await ensureProfile(tx, actor);
     const action = str(body.action, 40);

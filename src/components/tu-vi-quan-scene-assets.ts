@@ -41,7 +41,7 @@ export function courtyardAssets(scene: THREE.Scene) {
       node.castShadow = node.receiveShadow = true;
     });
   }
-  function model(file: string, placements: { x: number; y: number; z: number; width: number; rotation?: number; parent?: THREE.Object3D; tint?: THREE.Color }[]) {
+  function model(file: string, placements: { x: number; y: number; z: number; width?: number; height?: number; layer?: number; rotation?: number; parent?: THREE.Object3D; tint?: THREE.Color }[]) {
     gltfLoader.load(`/tu-vi-quan/assets/${file}.glb`, gltf => {
       collect(gltf.scene);
       if (disposed) { disposeResources(); return; }
@@ -63,9 +63,10 @@ export function courtyardAssets(scene: THREE.Scene) {
         });
         model.position.set(-center.x, -bounds.min.y, -center.z);
         pivot.add(model);
-        pivot.scale.setScalar(placement.width / Math.max(size.x, size.z));
+        pivot.scale.setScalar(placement.height ? placement.height / size.y : (placement.width ?? 1) / Math.max(size.x, size.z));
         pivot.position.set(placement.x, placement.y, placement.z);
         pivot.rotation.y = placement.rotation ?? 0;
+        if (placement.layer !== undefined) pivot.traverse(node => node.layers.set(placement.layer!));
         (placement.parent ?? scene).add(pivot);
         roots.push(pivot);
       }

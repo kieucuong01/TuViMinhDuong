@@ -114,6 +114,18 @@
       "modification": "Diffuse map resized to 512px JPEG",
       "bytes": 20495,
       "sha256": "2def37846209ec03bd09a9e5a767f171a06d408ac666ca14563e18642776a8d4"
+    },
+    {
+      "file": "buddha-amoghasiddhi.glb",
+      "source": "https://sketchfab.com/3d-models/33699be99fd64375bf0371c0e0c12f70",
+      "download": "https://zenodo.org/records/10310213",
+      "creator": "Minneapolis Institute of Art (artsmia)",
+      "title": "Chinese Amoghasiddhi Buddha, 1403–1424 CE",
+      "license": "CC0-1.0",
+      "licenseEvidence": "https://api.sketchfab.com/v3/models/33699be99fd64375bf0371c0e0c12f70",
+      "modification": "Original scan geometry preserved; embedded textures resized to 1024px JPEG; self-hosted GLB.",
+      "bytes": 2970548,
+      "sha256": "e5e49af4757df23882c778a6417d55db529e465e00ff4a5f8b5942adb06dc46a"
     }
   ]
 }
