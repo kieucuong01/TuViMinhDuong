@@ -1,7 +1,9 @@
-export const QUAN_BOUNDS = { minX: -56, maxX: 56, minZ: -42, maxZ: 34 };
-export const QUAN_TEACHER_DESKS = [-34, 34].flatMap((center, wing) => [-8.25, -2.75, 2.75, 8.25].map((offset, index) => ({ desk: wing * 4 + index + 1, x: center + offset, z: -9.95 })));
+export const QUAN_BOUNDS = { minX: -49, maxX: 49, minZ: -42, maxZ: 29 };
+export const QUAN_TEACHER_HALLS = [-31.5, 31.5].map(x => ({ x, z: -17.5 }));
+export const QUAN_TEACHER_DESKS = QUAN_TEACHER_HALLS.flatMap((hall, wing) =>
+  [-8.25, -2.75, 2.75, 8.25].map((offset, index) => ({ desk: wing * 4 + index + 1, x: hall.x + offset, z: hall.z + 4.05 })));
 export const QUAN_TEMPLE_INCENSE_POINT = { x: 1.1, z: -31.1, label: "lư hương điện Phật" };
-export const QUAN_SPAWN = { x: 0, z: 22 };
+export const QUAN_SPAWN = { x: 0, z: 19 };
 export const QUAN_MONASTERY_SEATS = Array.from({ length: 28 }, (_, index) => ({ index, x: -9 + index % 7 * 3, z: -6 + Math.floor(index / 7) * 3.5 }));
 export const QUAN_MONASTERY_ENTRY = { x: 0, z: 10 };
 export const QUAN_MONASTERY_SPACE = { x: 0, z: -26.8, depthScale: 0.62, floor: 1.2 };
@@ -13,7 +15,7 @@ export function quanWorldToMonastery(/** @type {{x:number,z:number}} */ point) {
 }
 export function getQuanZone(/** @type {number} */ x, /** @type {number} */ z) {
   if (Math.abs(x) <= 15.5 && z >= -38 && z <= -17) return "monastery";
-  if (Math.abs(Math.abs(x) - 34) <= 12.5 && z >= -18.5 && z <= -9.4) return "tuvi";
+  if (QUAN_TEACHER_HALLS.some(hall => Math.abs(x - hall.x) <= 12.5 && z >= hall.z - 4.5 && z <= hall.z + 4.6)) return "tuvi";
   return null;
 }
 export function isQuanMonasteryWalkable(/** @type {number} */ x, /** @type {number} */ z) {
@@ -27,22 +29,22 @@ export function quanGroundHeight(/** @type {number} */ x, /** @type {number} */ 
   return 0;
 }
 export const QUAN_STATIONS = [
-  { id: "teacher", label: "Tử Vi Quán · Tây viện", x: -34, z: -9.8, description: "Gặp bốn Thầy Tử Vi, nói hoặc nhập thông tin lập lá số" },
+  { id: "teacher", label: "Tử Vi Quán · Tây viện", x: QUAN_TEACHER_HALLS[0].x, z: QUAN_TEACHER_HALLS[0].z + 4.2, description: "Gặp bốn Thầy Tử Vi, nói hoặc nhập thông tin lập lá số" },
   { id: "incense", label: "Bàn thờ Thần Tài", x: -18, z: 24.95, description: "Thắp hương bên vườn trúc, xin lộc đầu ngày" },
   { id: "monastery", label: "Tu viện An Nhiên", x: 0, z: -18, description: "Lên bậc thang, vào điện và đi đến đệm trống để ngồi" },
-  { id: "teacher-east", label: "Tử Vi Quán · Đông viện", x: 34, z: -9.8, description: "Bốn bàn Thầy Tử Vi bên phải Tu viện" },
+  { id: "teacher-east", label: "Tử Vi Quán · Đông viện", x: QUAN_TEACHER_HALLS[1].x, z: QUAN_TEACHER_HALLS[1].z + 4.2, description: "Bốn bàn Thầy Tử Vi bên phải Tu viện" },
   { id: "support", label: "Hòm công đức", x: 4, z: -16, description: "Ủng hộ tự nguyện bên lối lên Tu viện" },
   { id: "lotus", label: "Vườn hồ sen", x: 10, z: 19, description: "Ngắm hồ sen và đèn hoa đăng" },
   { id: "ranking", label: "Bảng vàng công đức", x: -10, z: -2, description: "Xem năm khách có nhiều Điểm An Nhiên" },
   { id: "calligraphy", label: "Xin chữ", x: -14, z: 14, description: "Nhận một chữ đầu ngày hoặc một câu vui" },
 ];
 export const QUAN_BLOCKS = [
-  ...[-34, 34].flatMap(center => [
-    { minX: center - 13, maxX: center + 13, minZ: -19, maxZ: -18.6 },
-    { minX: center - 13, maxX: center - 12.6, minZ: -19, maxZ: -9.7 },
-    { minX: center + 12.6, maxX: center + 13, minZ: -19, maxZ: -9.7 },
+  ...QUAN_TEACHER_HALLS.flatMap(({x, z}) => [
+    { minX: x - 13, maxX: x + 13, minZ: z - 5, maxZ: z - 4.6 },
+    { minX: x - 13, maxX: x - 12.6, minZ: z - 5, maxZ: z + 4.3 },
+    { minX: x + 12.6, maxX: x + 13, minZ: z - 5, maxZ: z + 4.3 },
   ]),
-  ...QUAN_TEACHER_DESKS.map(({x}) => ({ minX: x - 1.55, maxX: x + 1.55, minZ: -12.125, maxZ: -10.875 })),
+  ...QUAN_TEACHER_DESKS.map(({x, z}) => ({ minX: x - 1.55, maxX: x + 1.55, minZ: z - 2.175, maxZ: z - .925 })),
   { minX: -17, maxX: 17, minZ: -40, maxZ: -38 },
   { minX: -17, maxX: -15.5, minZ: -39, maxZ: -17.1 },
   { minX: 15.5, maxX: 17, minZ: -39, maxZ: -17.1 },

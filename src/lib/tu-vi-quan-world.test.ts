@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { QUAN_TEACHER_DESKS, QUAN_BOUNDS, QUAN_SPAWN, QUAN_STATIONS, QUAN_MONASTERY_SEATS, QUAN_MONASTERY_ENTRY, findQuanPath, findQuanMonasteryPath, isQuanWalkable, isQuanMonasteryWalkable, quanGroundHeight, getQuanZone, quanMonasteryToWorld, quanWorldToMonastery } from "./tu-vi-quan-world.mjs";
+import { QUAN_TEACHER_HALLS, QUAN_TEACHER_DESKS, QUAN_BOUNDS, QUAN_SPAWN, QUAN_STATIONS, QUAN_MONASTERY_SEATS, QUAN_MONASTERY_ENTRY, findQuanPath, findQuanMonasteryPath, isQuanWalkable, isQuanMonasteryWalkable, quanGroundHeight, getQuanZone, quanMonasteryToWorld, quanWorldToMonastery } from "./tu-vi-quan-world.mjs";
 
 describe("expanded Tử Vi Quán world", () => {
   it("keeps every station and spawn in walkable terrain", () => {
@@ -68,8 +68,8 @@ describe("expanded Tử Vi Quán world", () => {
   });
   it("walks directly through every open doorway and identifies the activity zone", () => {
     for (const [zone, point] of [
-      ["monastery", { x: 0, z: -22 }], ["tuvi", { x: -36, z: -9.8 }],
-      ["tuvi", { x: 34, z: -9.8 }],
+      ["monastery", { x: 0, z: -22 }],
+      ...QUAN_TEACHER_HALLS.map(hall => ["tuvi", { x: hall.x, z: hall.z + 4.2 }] as const),
     ] as const) {
       expect(getQuanZone(point.x, point.z)).toBe(zone);
       expect(findQuanPath(QUAN_SPAWN, point).length).toBeGreaterThan(0);

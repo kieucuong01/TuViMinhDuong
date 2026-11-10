@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore, type FormEvent } from "react";
 import { BookOpen, CircleHelp, Compass, Flame, Heart, MapPin, Menu, Navigation, X } from "lucide-react";
-import { QUAN_TEMPLE_INCENSE_POINT, QUAN_TEACHER_DESKS, QUAN_BLOCKS, QUAN_BOUNDS, QUAN_POND, QUAN_SPAWN, QUAN_STATIONS, QUAN_MONASTERY_ENTRY, QUAN_MONASTERY_SEATS, getQuanZone, quanMonasteryToWorld } from "@/lib/tu-vi-quan-world.mjs";
+import { QUAN_TEMPLE_INCENSE_POINT, QUAN_TEACHER_HALLS, QUAN_TEACHER_DESKS, QUAN_BLOCKS, QUAN_BOUNDS, QUAN_POND, QUAN_SPAWN, QUAN_STATIONS, QUAN_MONASTERY_ENTRY, QUAN_MONASTERY_SEATS, getQuanZone, quanMonasteryToWorld } from "@/lib/tu-vi-quan-world.mjs";
 import styles from "./tu-vi-quan.module.css";
 import type { MonasteryPose } from "./tu-vi-quan-monastery";
 import type { EncounterKind, EncounterVisual } from "./tu-vi-quan-encounter";
@@ -38,7 +38,9 @@ const serverSnapshot = () => false;
 
 function CourtyardMap({ position }: { position: Position }) {
   return <svg viewBox={`${QUAN_BOUNDS.minX} ${QUAN_BOUNDS.minZ} ${QUAN_BOUNDS.maxX - QUAN_BOUNDS.minX} ${QUAN_BOUNDS.maxZ - QUAN_BOUNDS.minZ}`} aria-hidden="true" className={styles.mapDrawing}>
-    <path d="M0 32V-18 M-36 -7V2H28 M-36 2V20H10" className={styles.mapPath} />
+    <path d={`M0 ${QUAN_BOUNDS.maxZ}V-18 ${QUAN_TEACHER_HALLS.map(({x, z}) => `M0 ${z + 7.5}H${x}V${z + 4.2}`).join(" ")}`} className={styles.mapPath} />
+    {QUAN_TEACHER_HALLS.map(({x, z}) => <rect key={x} x={x - 13} y={z - 5} width="26" height="10" rx="1" className={styles.mapBuilding} />)}
+    <rect x="-17" y="-39" width="34" height="22" rx="1" className={styles.mapBuilding} />
     {QUAN_BLOCKS.map((block, index) => <rect key={index} x={block.minX} y={block.minZ} width={block.maxX - block.minX} height={block.maxZ - block.minZ} rx="1" className={styles.mapBuilding} />)}
     <ellipse cx={QUAN_POND.x} cy={QUAN_POND.z} rx={QUAN_POND.radiusX} ry={QUAN_POND.radiusZ} className={styles.mapPond} />
     {stations.map((station, index) => <g key={station.id}><circle cx={station.x} cy={station.z} r="2.6" className={styles.mapStation} /><text x={station.x} y={station.z + 1.15} textAnchor="middle">{index + 1}</text></g>)}
