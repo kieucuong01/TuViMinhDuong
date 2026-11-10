@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { playPcmStream } from "./tu-vi-quan-audio";
 import { QUAN_TAROT_CARDS } from "@/lib/tu-vi-quan-content";
 import styles from "./tu-vi-quan-encounter.module.css";
@@ -10,19 +10,19 @@ export type EncounterVisual = { kind: EncounterKind; state: "greeting" | "listen
 type Message = { id: string; question: string; answer: string | null; interrupted: boolean };
 type Encounter = { id: string; visitId?: string; kind: EncounterKind; tier: "free" | "paid"; state: "waiting" | "invited" | "active" | "ended" | "left"; endsAt?: string; remainingSeconds: number; messages: Message[]; context: { title: string; brief?: string; cards?: { id: string; title: string }[]; lines?: number[]; chartMissing?: boolean; menhIndex?: number; birthDraft?: { fullName?: string; day?: number; month?: number; year?: number; calendarType?: string; gender?: string; birthHour?: number; birthMinute?: number } } };
 type Snapshot = { encounter: Encounter | null; freeRemainingSeconds: number; paidRemainingSeconds?: number; rewardTickets?: { id: string }[]; capabilities: { stt: boolean; tts: boolean } };
-type Props = { kind: EncounterKind; orderId?: string; ticketId?: string; muted: boolean; onLeave(): void; onVisual(value: EncounterVisual): void; onUpgrade(kind: EncounterKind): void; onRitual(kind: "tarot" | "iching", count?: number, values?: number[]): void; onChartReady(palace: number): void };
+type Props = { kind: EncounterKind; orderId?: string; ticketId?: string; muted: boolean; onLeave(): void; onSeatReady(ready: boolean): void; onVisual(value: EncounterVisual): void; onUpgrade(kind: EncounterKind): void; onRitual(kind: "tarot" | "iching", count?: number, values?: number[]): void; onChartReady(palace: number): void };
 const names = { tuvi: "Thầy tử vi", tarot: "Người đọc Tarot", iching: "Thầy Dịch" };
 const endpoint = "/api/tu-vi-quan/encounter";
 
 async function readResponse(response: Response) {
-  const data = await response.json();
-  if (!response.ok) throw new Error(data.error || "Chưa kết nối được với quán. Bạn thử lại nhé.");
+  const data = await response.json().catch(() => null);
+  if (!response.ok || !data) throw new Error(data?.error || "Chưa kết nối được với quán. Bạn thử lại nhé.");
   return data;
 }
 
-export default function TuViQuanEncounter({ kind, orderId, ticketId, muted, onLeave, onVisual, onUpgrade, onRitual, onChartReady }: Props) {
+export default function TuViQuanEncounter({ kind, orderId, ticketId, muted, onLeave, onSeatReady, onVisual, onUpgrade, onRitual, onChartReady }: Props) {
   const [snapshot, setSnapshot] = useState<Snapshot | null>(null);
-  const [busy, setBusy] = useState(false);
+  const [busy, setBusy] = useState(true);
   const [recording, setRecording] = useState(false);
   const [speaking, setSpeaking] = useState(false);
   const [error, setError] = useState("");
@@ -31,6 +31,7 @@ export default function TuViQuanEncounter({ kind, orderId, ticketId, muted, onLe
   const [seconds, setSeconds] = useState(0);
   const generation = useRef(0);
   const current = useRef<Encounter | null>(null);
+  const seatReady = useRef(onSeatReady); seatReady.current = onSeatReady;
   const visual = useRef(onVisual); visual.current = onVisual;
   const audio = useRef<AudioContext | null>(null);
   const sources = useRef(new Set<AudioBufferSourceNode>());
@@ -43,7 +44,15 @@ export default function TuViQuanEncounter({ kind, orderId, ticketId, muted, onLe
   const lock = useRef(false);
   const acquiringMic = useRef(false);
 
-  function apply(data: Snapshot) { current.current = data.encounter; setSnapshot(data); }
+  const apply = useCallback((data: Snapshot) => {
+    current.current = data.encounter;
+    setSnapshot(data);
+    seatReady.current(data.encounter?.kind === kind && (data.encounter.state === "invited" || data.encounter.state === "active"));
+  }, [kind]);
+  function release(row: Encounter | null) {
+    if (!row || row.state === "ended" || row.state === "left") return;
+    void fetch(endpoint, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "leave", id: row.id, visitId: row.visitId }), keepalive: true }).catch(() => {});
+  }
   function state(value: EncounterVisual["state"], audioLevel = 0) { visual.current({ kind, state: value, audioLevel }); }
   function stopMic(discard = false) {
     if (recordingTimer.current) clearTimeout(recordingTimer.current);
@@ -106,7 +115,7 @@ export default function TuViQuanEncounter({ kind, orderId, ticketId, muted, onLe
     if (lock.current) return;
     lock.current = true; setBusy(true); setError(""); const token = generation.current;
     try {
-      await unlockAudio();
+      if (actionName !== "begin") void unlockAudio().catch(() => {});
       if (rewardId && current.current) {
         stopSpeech();
         await action("leave", { id: current.current.id, visitId: current.current.visitId });
@@ -169,7 +178,7 @@ export default function TuViQuanEncounter({ kind, orderId, ticketId, muted, onLe
       };
       instance.start(250); setRecording(true); state("listening");
       recordingTimer.current = setTimeout(() => stopMic(), 30000);
-    } catch (cause) { if (token === generation.current) { stopMic(true); setError(cause instanceof Error ? cause.message : "Không mở được micro. Hãy kiểm tra quyền thu âm."); state("idle"); } }
+    } catch (cause) { if (token === generation.current) { stopMic(true); setShowText(true); setError(cause instanceof Error ? cause.message : "Không mở được micro. Hãy kiểm tra quyền thu âm."); state("idle"); } }
     finally { acquiringMic.current = false; }
   }
   function applyBirth(data: Snapshot) {
@@ -218,17 +227,33 @@ export default function TuViQuanEncounter({ kind, orderId, ticketId, muted, onLe
   useEffect(() => {
     const token = ++generation.current;
     const controller = new AbortController();
-    void fetch(endpoint, { signal: controller.signal }).then(readResponse).then((data: Snapshot) => {
-      if (token === generation.current) apply(data);
-    }).catch(cause => { if (!controller.signal.aborted) setError(cause.message); });
+    lock.current = true;
+    async function join() {
+      try {
+        let data: Snapshot = await readResponse(await fetch(endpoint, { signal: controller.signal }));
+        if (token !== generation.current) return;
+        const hasTime = Boolean(orderId || ticketId || data.freeRemainingSeconds || data.paidRemainingSeconds);
+        if (!data.encounter && hasTime) {
+          data = await action("begin", { kind, orderId, ticketId });
+          if (token !== generation.current) { release(data.encounter); return; }
+        }
+        apply(data);
+      } catch (cause) {
+        if (token === generation.current) setError(cause instanceof Error ? cause.message : "Chưa tìm được chỗ. Bạn thử lại nhé.");
+      } finally {
+        if (token === generation.current) { lock.current = false; setBusy(false); }
+      }
+    }
+    void join();
     const hidden = () => { if (document.hidden) { stopMic(true); stopSpeech(); state("idle"); } };
-    const pageHide = () => { const row = current.current; if (row && !["ended", "left"].includes(row.state)) void fetch(endpoint, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "leave", id: row.id, visitId: row.visitId }), keepalive: true }).catch(() => {}); };
+    const pageHide = () => release(current.current);
+    const escape = (event: KeyboardEvent) => { if (event.key === "Escape") void leave(); };
     document.addEventListener("visibilitychange", hidden);
     window.addEventListener("pagehide", pageHide);
+    window.addEventListener("keydown", escape);
     return () => {
-      generation.current = token + 1; controller.abort(); request.current?.abort(); stopMic(true); stopSpeech(); void audio.current?.close(); audio.current = null; document.removeEventListener("visibilitychange", hidden); window.removeEventListener("pagehide", pageHide);
-      const encounter = current.current;
-      if (encounter && !["ended", "left"].includes(encounter.state)) void fetch(endpoint, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "leave", id: encounter.id, visitId: encounter.visitId }), keepalive: true }).catch(() => {});
+      generation.current = token + 1; controller.abort(); request.current?.abort(); stopMic(true); stopSpeech(); void audio.current?.close(); audio.current = null; document.removeEventListener("visibilitychange", hidden); window.removeEventListener("pagehide", pageHide); window.removeEventListener("keydown", escape);
+      release(current.current);
     };
     // This component is mounted for one host visit; refs keep scene callbacks current.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -248,11 +273,17 @@ export default function TuViQuanEncounter({ kind, orderId, ticketId, muted, onLe
     tick(); const timer = setInterval(tick, 1000); return () => clearInterval(timer);
   }, [encounter]);
   useEffect(() => {
-    if (encounter?.state !== "waiting" && !(active && seconds === 0)) return;
+    if (encounter?.state !== "waiting" && encounter?.state !== "invited" && !(active && seconds === 0)) return;
     const controller = new AbortController(); const token = generation.current;
-    const timer = setInterval(() => { void fetch(endpoint, { signal: controller.signal }).then(readResponse).then(data => { if (token === generation.current) apply(data); }).catch(() => {}); }, 3000);
+    const timer = setInterval(() => {
+      if (lock.current) return;
+      const before = current.current;
+      void fetch(endpoint, { signal: controller.signal }).then(readResponse).then(data => {
+        if (token === generation.current && !lock.current && current.current === before) apply(data);
+      }).catch(() => {});
+    }, 3000);
     return () => { clearInterval(timer); controller.abort(); };
-  }, [encounter?.state, active, seconds]);
+  }, [encounter?.state, active, seconds, apply]);
   const last = encounter?.messages.filter(message => message.answer).at(-1);
   const ended = encounter?.state === "ended" || (active && !!encounter.endsAt && Date.parse(encounter.endsAt) <= Date.now());
   const exhausted = !encounter && snapshot?.freeRemainingSeconds === 0 && !snapshot?.paidRemainingSeconds && !orderId && !ticketId;
@@ -264,36 +295,35 @@ export default function TuViQuanEncounter({ kind, orderId, ticketId, muted, onLe
   }
   return <section className={styles.hud} aria-label={`Trò chuyện với ${names[kind]}`}>
     <div className={styles.caption}>
-      <div className={styles.eyebrow}>{names[kind]}{active && <span className={styles.timer}> · {Math.floor(seconds / 60)}:{String(seconds % 60).padStart(2, "0")}</span>}</div>
-      <p aria-live="polite">{exhausted ? "Bạn đã dùng hết 5 phút miễn phí hôm nay. Ngày mai bạn có thể ghé lại, hoặc chọn trò chuyện thêm." : ended && !speaking ? "Buổi trò chuyện đã hết giờ. Cảm ơn bạn đã ghé quán." : last?.answer || (encounter?.state === "waiting" ? "Thầy đang tiếp khách. Bạn đợi một chút nhé, quán sẽ mời bạn khi có chỗ." : encounter?.state === "invited" ? "Đã có chỗ dành cho bạn. Khi sẵn sàng, bạn hãy bắt đầu trò chuyện." : "Mời bạn ngồi xuống. Bạn đang muốn hỏi về điều gì?")}</p>
-      {!encounter && <p className={styles.eyebrow}>{snapshot?.paidRemainingSeconds ? `Bạn còn ${Math.ceil(snapshot.paidRemainingSeconds / 60)} phút đã mua, dùng chung ở cả ba quán. Rời ghế sẽ dừng tính giờ.` : "Mỗi ngày có 5 phút trò chuyện miễn phí, dùng chung cho Tử Vi, Tarot và Kinh Dịch."}</p>}
+      <div className={styles.eyebrow}>{names[kind]}{active && <span className={styles.timer}> · Còn {Math.floor(seconds / 60)}:{String(seconds % 60).padStart(2, "0")}</span>}{intake && !active && " · Lập lá số, chưa tính giờ"}</div>
+      <p aria-live="polite">{exhausted || ended ? "Thời gian xem đã hết. Bạn có thể chọn xem thêm." : encounter?.state === "waiting" ? "Thầy đang tiếp khách. Quán sẽ tự mời bạn khi có chỗ." : intake && last?.id !== "birth-prompt" ? "Nói hoặc nhập họ tên, ngày giờ sinh, loại lịch và giới tính để Thầy lập lá số." : last?.answer || (encounter?.state === "invited" ? "Đã có chỗ. Bấm bắt đầu khi bạn sẵn sàng." : busy ? "Đang tìm chỗ trống…" : "Bạn có thể thử tìm chỗ lại.")}</p>
       {error && <p role="alert" className={styles.error}>{error}</p>}
     </div>
     <div className={styles.bar}>
-      {!encounter && !exhausted && <button className={styles.primary} disabled={busy || !snapshot} onClick={() => void run("begin")}>Ngồi xuống trò chuyện</button>}
-      {encounter?.state === "invited" && !intake && <button className={styles.primary} disabled={busy} onClick={() => void run("start")}>Bắt đầu trò chuyện</button>}
-      {(active || intake) && !ended && <><button className={recording ? styles.recording : styles.primary} disabled={busy || !snapshot?.capabilities.stt} onClick={() => void startMic()} aria-pressed={recording}>{recording ? "Nói xong · Gửi" : speaking ? "Ngắt lời và nói" : intake ? "Nói thông tin lập lá số" : "Bật micro để nói"}</button>{!intake && <button onClick={() => setShowText(value => !value)}>Gõ câu hỏi</button>}{!recording && !busy && !speaking && kind !== "tuvi" && <button onClick={drawAtTable}>{kind === "tarot" ? "Rút bài trên bàn" : "Gieo quẻ trên bàn"}</button>}</>}
-      {(ended || exhausted) && <button className={styles.primary} onClick={() => onUpgrade(kind)}>Trò chuyện thêm · 100.000đ/15 phút · 200.000đ/30 phút</button>}
+      {!encounter && !exhausted && !busy && <button className={styles.primary} onClick={() => void run("begin")}>Thử tìm chỗ lại</button>}
+      {encounter?.state === "invited" && !intake && <button className={styles.primary} disabled={busy} onClick={() => void run("start")}>Bắt đầu xem</button>}
+      {(active || intake) && !ended && snapshot?.capabilities.stt && <button className={recording ? styles.recording : styles.primary} disabled={busy} onClick={() => void startMic()} aria-pressed={recording}>{recording ? "Gửi lời nói" : speaking ? "Ngắt lời và nói" : intake ? "Nói thông tin" : "Nói với Thầy"}</button>}
+      {(active || intake) && !ended && snapshot?.capabilities.stt && <button aria-expanded={showText} onClick={() => setShowText(value => !value)}>{intake ? "Nhập thông tin" : "Gõ câu hỏi"}</button>}
+      {active && !ended && !recording && !busy && !speaking && kind !== "tuvi" && <button onClick={drawAtTable}>{kind === "tarot" ? "Rút bài trên bàn" : "Gieo quẻ trên bàn"}</button>}
+      {(ended || exhausted) && <button className={styles.primary} onClick={() => onUpgrade(kind)}>Xem thêm</button>}
       {(ended || exhausted) && snapshot?.rewardTickets?.[0] && <button disabled={busy} onClick={() => void run("begin", snapshot.rewardTickets![0].id)}>Dùng vé thêm 5 phút</button>}
-      <button disabled={busy} onClick={() => void leave()}>Rời ghế · Giữ phút còn lại</button>
+      <button disabled={busy} onClick={() => void leave()}>{encounter?.state === "waiting" ? "Rời hàng chờ" : active ? "Rời bàn và giữ phút" : "Về sân"}</button>
     </div>
-    {active && !ended && !snapshot?.capabilities.stt && <div className={styles.status}>Thu âm đang tạm nghỉ. {intake ? "Bạn có thể nhập ngày giờ sinh bên dưới." : "Bạn có thể gõ câu hỏi."}</div>}
-    {active && !ended && !snapshot?.capabilities.tts && <div className={styles.status}>Giọng đọc đang tạm nghỉ. Lời của thầy sẽ hiện ở phụ đề.</div>}
-    {busy && <div className={styles.status} role="status">Thầy đang lắng nghe và suy ngẫm…</div>}
-    {intake && !ended && <details open><summary>Nói bằng micro hoặc nhập thông tin bên dưới</summary><p>Thông tin chỉ dùng riêng. Thầy chưa tính phút khi lập lá số.</p>
+    {busy && active && <p className={styles.status} role="status">Thầy đang suy ngẫm…</p>}
+    {intake && !ended && (showText || !snapshot?.capabilities.stt) && <>
         <form key={JSON.stringify(draft)} className={styles.birth} onSubmit={event => { event.preventDefault(); void saveBirth(new FormData(event.currentTarget)); }}>
           <label>Họ tên thật<input name="fullName" maxLength={100} defaultValue={draft?.fullName === "Khách" ? "" : draft?.fullName} autoComplete="name" required /></label>
           <fieldset className={styles.dateRow}><legend>Ngày sinh</legend><label>Ngày<input name="day" type="number" min="1" max="31" defaultValue={draft?.day} required /></label>
           <label>Tháng<input name="month" type="number" min="1" max="12" defaultValue={draft?.month} required /></label>
           <label>Năm<input name="year" type="number" min="1900" max={new Date().getFullYear()} defaultValue={draft?.year} required /></label>
-          </fieldset><label>Loại lịch<select name="calendarType" defaultValue={draft?.calendarType || ""} required><option value="">Chọn loại lịch</option><option value="solar">Dương lịch</option><option value="lunar">Âm lịch</option></select></label>
+          </fieldset><label>Loại lịch<select aria-label="Loại lịch" name="calendarType" defaultValue={draft?.calendarType || ""} required><option value="">Chọn loại lịch</option><option value="solar">Dương lịch</option><option value="lunar">Âm lịch</option></select></label>
           <label>Giờ sinh (0–23)<input name="hour" type="number" min="0" max="23" defaultValue={draft?.birthHour} required /></label>
           <label>Phút sinh<input name="minute" type="number" min="0" max="59" defaultValue={draft?.birthMinute ?? 0} /></label>
-          <label>Lá số<select name="gender" defaultValue={draft?.gender || ""} required><option value="">Chọn nam hoặc nữ</option><option value="male">Nam</option><option value="female">Nữ</option></select></label>
-          <button disabled={busy || recording}>Xác nhận lập lá số</button>
+          <label>Giới tính<select aria-label="Giới tính" name="gender" defaultValue={draft?.gender || ""} required><option value="">Chọn nam hoặc nữ</option><option value="male">Nam</option><option value="female">Nữ</option></select></label>
+          <button className={styles.primary} disabled={busy || recording}>Lập lá số</button>
         </form>
-      </details>}
-    {showText && active && !intake && !ended && <form className={styles.text} onSubmit={event => { event.preventDefault(); interruptSpeech(); void send(text); }}><input aria-label="Câu hỏi của bạn" value={text} onChange={event => setText(event.target.value)} maxLength={1200} placeholder="Bạn muốn hỏi điều gì?" /><button disabled={busy || recording || !text.trim()}>Gửi</button></form>}
+      </>}
+    {(showText || !snapshot?.capabilities.stt) && active && !intake && !ended && <form className={styles.text} onSubmit={event => { event.preventDefault(); interruptSpeech(); void send(text); }}><textarea rows={2} aria-label="Câu hỏi cho Thầy" value={text} onChange={event => setText(event.target.value)} maxLength={1200} placeholder="Bạn muốn hỏi điều gì?" /><button disabled={busy || recording || !text.trim()}>Gửi</button></form>}
     {!!encounter?.messages.length && <details><summary>Xem lại cuộc trò chuyện</summary><div className={styles.transcript}>{encounter.messages.map(message => <p key={message.id}>{message.question && <><strong>Bạn:</strong> {message.question}<br /></>}<strong>{names[kind]}:</strong> {message.answer || "Đang suy ngẫm…"}{message.interrupted && " (đã ngắt lời)"}</p>)}</div></details>}
   </section>;
 }

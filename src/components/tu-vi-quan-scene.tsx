@@ -714,7 +714,7 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
   self.body.rotation.y = Math.PI;
   self.group.position.set(latest.current.position.x, 0.054, latest.current.position.z);
   const teachers = QUAN_TEACHER_DESKS.map(({desk, x}, index) => {
-    const teacher = avatar([0x6f4430, 0x643743, 0x46566a, 0x57706b][index % 4], `Thầy Tử Vi · ${desk <= 4 ? "Tây" : "Đông"} ${((desk - 1) % 4) + 1}`, true);
+    const teacher = avatar([0x6f4430, 0x643743, 0x46566a, 0x57706b][index % 4], "Thầy Tử Vi", true);
     teacher.group.position.set(x, .4, -12.45);
     teacher.group.userData.host = "tuvi";
     teacher.group.userData.desk = desk;
@@ -814,7 +814,7 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
     plate.material.emissiveIntensity = width > 6 ? .62 : .35;
     return plate;
   }
-  for (const center of [-34, 34]) facadePlate("TỬ VI QUÁN", center < 0 ? "TÂY VIỆN · BỐN BÀN THẦY" : "ĐÔNG VIỆN · BỐN BÀN THẦY", "#4d2423", 6.31, 1.46).position.set(center, 7.5, -10.71);
+  for (const center of [-34, 34]) facadePlate("TỬ VI QUÁN", center < 0 ? "TÂY VIỆN · LUẬN LÁ SỐ" : "ĐÔNG VIỆN · LUẬN LÁ SỐ", "#4d2423", 6.31, 1.46).position.set(center, 7.5, -10.71);
   facadePlate("BÀN THỜ THẦN TÀI", "XIN LỘC ĐẦU NGÀY", "#5a2824", 2.5, 1.43).position.set(-18, 2.2, 22.02);
   facadePlate("TU VIỆN AN NHIÊN", "ĐIỆN PHẬT · THIỀN · TRÀNG HẠT", "#6a2b24", 11.2, 2.4).position.set(0, 10.6, -15.04);
   const templePlaque = facadePlate("TU VIỆN AN NHIÊN", "MỘT KHOẢNG LẶNG CHO MỖI NGÀY", "#6a2b24", 6.1, 1.23);

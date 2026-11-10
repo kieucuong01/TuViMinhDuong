@@ -1,10 +1,54 @@
-.hud{position:absolute;inset:auto 12px max(16px,env(safe-area-inset-bottom));z-index:30;display:flex;flex-direction:column;align-items:center;gap:10px;pointer-events:none;color:#fff7df;font-size:16px;line-height:1.5}
-.hud>*{pointer-events:auto}.caption{max-width:660px;width:100%;background:rgba(23,20,18,.9);border:1px solid #9b7e4a;border-radius:16px;padding:16px 20px;text-align:center;box-shadow:0 6px 30px #0005}.caption p{margin:6px 0}.eyebrow{font-size:14px;color:#e4ca92}.bar{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;max-width:700px}.hud button,.hud input{font:inherit;min-height:48px;border-radius:12px;border:1px solid #a98c58;padding:10px 16px;background:#25201b;color:#fff7df}.hud button{cursor:pointer}.hud button:disabled{opacity:.5;cursor:default}.hud button:focus-visible,.hud input:focus-visible{outline:3px solid #fff2b7;outline-offset:3px}.primary{background:#785526!important;border-color:#e2bd76!important}.recording{background:#8a302a!important}.error{color:#ffcdc3}.text{display:flex;gap:8px;width:min(100%,660px)}.text input{min-width:0;flex:1}.transcript{max-height:30vh;overflow:auto;text-align:left}.transcript p{padding:8px 0;border-bottom:1px solid #ffffff24}.hud details{width:min(100%,660px);background:#181714ed;border-radius:12px;padding:8px 12px}.hud summary{cursor:pointer;min-height:40px;display:flex;align-items:center}.timer{font-variant-numeric:tabular-nums}.status{max-width:660px;background:#181714eb;padding:6px 12px;border-radius:10px}@media(max-width:600px){.caption{padding:12px}.hud{inset-inline:8px;gap:8px}.hud button{padding-inline:12px}.bar{gap:6px}}@media(prefers-reduced-motion:reduce){.hud *{animation:none!important;transition:none!important}}
-.birth{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
-.birth label{min-width:0}
-.birth input,.birth select{width:100%;min-width:0;padding-inline:8px}
-.birth select{font:inherit;min-height:48px;border-radius:12px;border:1px solid #a98c58;background:#25201b;color:#fff7df}
-.birth{max-height:min(38dvh,360px);overflow:auto;padding:4px}
-@media(max-height:480px){.hud{gap:4px}.caption{padding:6px 12px}.hud details{padding-block:2px}.birth{max-height:28dvh}}
-
-.birth{max-height:none;overflow:visible}.birth>label:first-child,.birth>button,.dateRow{grid-column:1/-1}.dateRow{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;border:0;padding:0;margin:0}.dateRow legend{padding:0;margin-bottom:4px}.birth label{display:flex;flex-direction:column;gap:4px}.birth button{position:sticky;bottom:0}.hud details[open]{max-height:60dvh;overflow:auto;overscroll-behavior:contain}.hud:has(.birth) .caption{padding:8px 12px}.hud:has(.birth) .caption p{max-height:12dvh;overflow:auto}@media(max-height:480px){.hud details[open]{max-height:45dvh}}
+.hud {
+  position: absolute;
+  z-index: 30;
+  inset: auto 0 max(12px, env(safe-area-inset-bottom));
+  width: min(620px, calc(100% - 24px));
+  max-height: calc(100dvh - 32px);
+  margin-inline: auto;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 16px;
+  border: 1px solid #9b7e4a;
+  border-radius: 18px;
+  background: #1d1815f5;
+  color: #fff7df;
+  font-size: 16px;
+  line-height: 1.5;
+  box-shadow: 0 8px 36px #0008;
+}
+.caption p { margin: 6px 0 12px; }
+.eyebrow { font-weight: 700; color: #f0d39a; }
+.timer { font-variant-numeric: tabular-nums; }
+.bar { display: flex; flex-wrap: wrap; gap: 8px; }
+.hud button, .hud input, .hud select, .hud textarea {
+  min-height: 48px;
+  padding: 8px 12px;
+  border: 1px solid #a98c58;
+  border-radius: 10px;
+  background: #30271e;
+  color: inherit;
+  font: inherit;
+}
+.hud button { cursor: pointer; }
+.hud button:disabled { opacity: .55; cursor: default; }
+.hud :is(button, input, select, textarea, summary):focus-visible { outline: 3px solid #fff2b7; outline-offset: 2px; }
+.hud .primary { background: #785526; border-color: #e2bd76; font-weight: 700; }
+.hud .recording { background: #8a302a; }
+.error { color: #ffcdc3; }
+.status { margin: 8px 0 0; color: #e4ca92; }
+.text { display: flex; align-items: flex-end; gap: 8px; margin-top: 12px; }
+.text textarea { flex: 1; min-width: 0; resize: vertical; }
+.hud details { margin-top: 12px; border-top: 1px solid #ffffff24; }
+.hud summary { display: flex; align-items: center; min-height: 44px; cursor: pointer; }
+.transcript p { margin: 0; padding: 8px 0; border-bottom: 1px solid #ffffff24; overflow-wrap: anywhere; }
+.birth { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 12px; }
+.birth label { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.birth input, .birth select { min-width: 0; width: 100%; }
+.birth > label:first-child, .birth > button, .dateRow { grid-column: 1 / -1; }
+.dateRow { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; border: 0; padding: 0; margin: 0; }
+.dateRow legend { padding: 0; margin-bottom: 4px; }
+@media (max-width: 600px) {
+  .hud { padding: 12px; width: calc(100% - 16px); }
+  .bar button { flex: 1 1 auto; }
+}
+@media (max-height: 480px) { .hud { max-height: calc(100dvh - 16px); bottom: 8px; } }

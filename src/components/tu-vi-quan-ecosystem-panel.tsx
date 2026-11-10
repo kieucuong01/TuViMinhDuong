@@ -205,7 +205,7 @@ export default function QuanEcosystem({ gameMode = false, leaders, online, alias
     <nav className={`${styles.dock}${gameMode ? ` ${styles.gameDock}` : ""}`} aria-label="Dịch vụ Tử Vi Quán" inert={Boolean(tab) || suspended}>
       {(["today", "divination", "wishes", "explore"] as Tab[]).map(item => {
         const newFortune = item === "today" && dayKey && !daily && dismissedReminder !== dayKey;
-        return <button key={item} onClick={() => gameMode && item === "divination" ? onLegacy("hosts") : open(item)}>{gameMode && item === "divination" ? "Gặp thầy" : names[item]}{newFortune && <span className={styles.newFortune} aria-label="Có quẻ mới" title="Có quẻ mới" />}</button>;
+        return <button key={item} onClick={() => gameMode && item === "divination" ? onLegacy("hosts") : open(item)}>{gameMode && item === "divination" ? "Xem Tử Vi" : names[item]}{newFortune && <span className={styles.newFortune} aria-label="Có quẻ mới" title="Có quẻ mới" />}</button>;
       })}
     </nav>
     {tab && <div className={styles.scrim}><section ref={dialog} className={styles.panel} role="dialog" aria-modal="true" aria-labelledby="ecosystem-title" onKeyDown={event => {
