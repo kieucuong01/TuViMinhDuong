@@ -210,14 +210,17 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
     }
   }
   const gateZ = QUAN_BOUNDS.maxZ + 1;
-  paving(0, -2, 18, 30);
-  paving(0, (13 + gateZ) / 2, 7, gateZ - 13);
-  for (const {x, z} of QUAN_TEACHER_HALLS) {
-    paving((x + Math.sign(x) * 15) / 2, z + 7.5, Math.abs(x) - 3, 5);
-  }
-  paving(-16.5, 12, 15, 4);
-  paving(-18, 19.5, 4.5, 11);
-  paving(11.5, 14, 5, 18);
+  const mainHall = QUAN_TEACHER_HALLS[0];
+  const gateX = mainHall.x;
+  const forecourt = mainHall.z + 5;
+  paving(gateX, (forecourt + gateZ) / 2, 9, gateZ - forecourt);
+  paving(5.25, 10, 11.5, 5);
+  paving(11, -1.75, 4, 18.5);
+  paving(5.5, -12.5, 15, 3);
+  paving(0, -15.5, 13, 3);
+  paving(-14.75, 14, 10.5, 4);
+  paving(-18, 20.5, 4.5, 9);
+  paving(11.5, 18, 3, 11);
   // Layers of distant hills keep the estate open without an enclosing wall of trees.
   for (let layer = 0; layer < 3; layer++) for (let i = 0; i < 16; i++) {
     const angle = i * Math.PI * 2 / 16;
@@ -237,11 +240,11 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
       box(PALETTE.ridge, x, 1.96, z, 1.04, .16, 1.04);
     }
   }
-  const gateWallWidth = QUAN_BOUNDS.maxX - 6;
-  for (const side of [-1, 1]) {
-    const x = side * (6 + gateWallWidth / 2);
-    box(0xd1bb93, x, .68, gateZ - .2, gateWallWidth, 1.4, .5);
-    box(PALETTE.ridge, x, 1.44, gateZ - .2, gateWallWidth, .2, .72);
+  for (const [left, right] of [[QUAN_BOUNDS.minX, gateX - 6], [gateX + 6, QUAN_BOUNDS.maxX]]) {
+    const width = right - left;
+    const x = (left + right) / 2;
+    box(0xd1bb93, x, .68, gateZ - .2, width, 1.4, .5);
+    box(PALETTE.ridge, x, 1.44, gateZ - .2, width, .2, .72);
   }
   const lanternPools: THREE.Matrix4[] = [];
   function lantern(x: number, y: number, z: number) {
@@ -325,7 +328,7 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
     box(PALETTE.wood, side * 3.45, 7.48, -18.93, .25, 2, .34);
     lantern(side * 3.68, 6.85, -18.77);
   }
-  box(PALETTE.edge, 0, 7.5, -18.84, 6.5, 1.64, .24);
+  box(PALETTE.edge, 0, 7.5, -18.01, 8.45, 1.83, .24);
   for (const x of [-12, -8, -4, 4, 8, 12]) {
     box(PALETTE.gold, x, 4.33, -17.9, .78, .09, .24);
     box(PALETTE.ridge, x, 4.22, -17.94, .48, .41, .26, 0, 0, Math.PI / 4);
@@ -348,7 +351,7 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
   }
   }
   // Gate and lantern avenue.
-  offsetX = 0; offsetZ = 0;
+  offsetX = gateX; offsetZ = 0;
   for (const x of [-4.6, 4.6]) {
     column(x, gateZ, 4.2);
     box(PALETTE.stone, x, 0.28, gateZ, 1.3, 0.5, 1.3);
@@ -356,8 +359,9 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
   }
   box(PALETTE.wood, 0, 4.16, gateZ, 10.6, 0.4, 0.6);
   roof(0, gateZ, 12, 4, 4.5);
-  for (const z of [24, 17, 6, -7, -13]) for (const side of [-1, 1]) {
-    const x = side * (z > 12 ? 4.6 : 12.7);
+  offsetX = 0;
+  for (const z of [24, 17, 11]) for (const side of [-1, 1]) {
+    const x = gateX + side * 5.05;
     drum(PALETTE.stone, x, 0.22, z, 0.76, 0.44);
     drum(PALETTE.wood, x, 1.65, z, 0.17, 2.8);
     box(PALETTE.wood, x - side * 0.4, 3.04, z, 1, 0.13, 0.18);
@@ -473,10 +477,10 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
   monasteryGeometry = false;
   // Round welcome medallion and benches around the central garden.
   offsetX = 0; offsetZ = 0;
-  drum(0x927350, 0, 0.075, 10, 4, 0.04);
-  drum(0xdfbd86, 0, 0.102, 10, 3.7, 0.02);
-  for (let i = 0; i < 8; i++) box(PALETTE.wood, Math.sin(i * Math.PI / 4) * 1.3, 0.12, 10 + Math.cos(i * Math.PI / 4) * 1.3, 0.45, 0.018, 0.17, 0, i * Math.PI / 4);
-  for (const [x, z, rotation] of [[-15, 1, 0], [-26, 14, 0], [9, 23, Math.PI / 2], [24, -7, 0]]) {
+  drum(0x927350, mainHall.x, 0.075, 12, 4, 0.04);
+  drum(0xdfbd86, mainHall.x, 0.102, 12, 3.7, 0.02);
+  for (let i = 0; i < 8; i++) box(PALETTE.wood, mainHall.x + Math.sin(i * Math.PI / 4) * 1.3, 0.12, 12 + Math.cos(i * Math.PI / 4) * 1.3, 0.45, 0.018, 0.17, 0, i * Math.PI / 4);
+  for (const [x, z, rotation] of [[-21, 4, 0], [-21, 14, 0], [9, 23, Math.PI / 2], [23, -7, 0]]) {
     box(PALETTE.wood, x, 0.56, z, 3.2, 0.18, 0.75, 0, rotation);
     for (const side of [-1, 1]) box(PALETTE.stone, x + Math.cos(rotation) * side * 1.15, 0.28, z - Math.sin(rotation) * side * 1.15, 0.3, 0.5, 0.5, 0, rotation);
   }
@@ -573,7 +577,7 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
   }
   // Bamboo grove, flowering trees, rocks and individual flower beds, all instanced.
   for (let i = 0; i < 28; i++) {
-    const x = -48 + (i % 4) * .8;
+    const x = -22 + (i % 4) * .65;
     const z = -12 + Math.floor(i / 4) * 3.4;
     const height = 4 + (i * 7 % 10) * 0.23;
     drum(0x637b45, x, height / 2, z, 0.13, height);
@@ -585,9 +589,9 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
     }
   }
   for (const [x, z, size, warm] of [
-    [-45.5, -26, 6.4, 0], [45.5, -26, 7, 0], [-18, -13, 5.6, 1], [18, -13, 6, 1],
-    [-17, 22, 5, 1], [-25, 27, 5.5, 0], [-11, 27, 5, 1], [7, 27, 4.6, 1],
-    [29, 3, 5.7, 0], [30, 27, 6, 0], [-31.5, -28, 7, 0], [31.5, -28, 6, 0],
+    [-21.5, -26, 6.4, 0], [24.5, -26, 7, 0], [-18, -13, 5.6, 1], [18, -13, 6, 1],
+    [-17, 22, 5, 1], [-21, 27, 5.5, 0], [-11, 27, 5, 1], [7, 27, 4.6, 1],
+    [29, 3, 5.7, 0], [30, 27, 6, 0], [-22, -32, 7, 0], [23, -33, 6, 0],
   ]) tree(x, z, size, !!warm);
   for (let i = 0; i < 120; i++) {
     const patch = i % 6;
@@ -600,7 +604,7 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
     if (i % 2) object("leaf", [0xe2b088, 0xd58d88, 0xebd19a][i % 3], x, 0.54, z, 0.24, 0.21, 0.24);
   }
   for (let i = 0; i < 15; i++) {
-    object("leaf", [0x91957b, 0xa6a288, 0x7d876f][i % 3], -48 + i % 3 * 1.1, 0.35, -15 + Math.floor(i / 3) * 1.3,
+    object("leaf", [0x91957b, 0xa6a288, 0x7d876f][i % 3], -22 + i % 3 * .85, 0.35, -15 + Math.floor(i / 3) * 1.3,
       1.2 + i % 3 * 0.3, 0.8 + i % 2 * 0.7, 1.4, 0, i * 1.4);
   }
   const groundShadows = new THREE.MeshBasicMaterial({ color: 0x36402d, transparent: true, opacity: 0.19, depthWrite: false });
@@ -629,7 +633,7 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
   }
   const signs: THREE.Sprite[] = [];
   for (const [title, x, y, z, large] of [
-    ["Tử Vi Quán", 0, 4.22, gateZ + .4, true],
+    ["Tử Vi Quán", gateX, 4.22, gateZ + .4, true],
     ...QUAN_STATIONS.filter(station => !["greet", "tea", "iching", "incense"].includes(station.id) && (station.id !== "ranking" || !ecosystemEnabled)).map(station =>
       [station.label, station.x, station.id === "teacher" ? 2.75 : 2.55, station.z - 0.8, false] as const),
   ] as const) {
@@ -815,7 +819,7 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
     plate.material.emissiveIntensity = width > 6 ? .62 : .35;
     return plate;
   }
-  for (const {x, z} of QUAN_TEACHER_HALLS) facadePlate("TỬ VI QUÁN", x < 0 ? "TÂY VIỆN · LUẬN LÁ SỐ" : "ĐÔNG VIỆN · LUẬN LÁ SỐ", "#4d2423", 6.31, 1.46).position.set(x, 7.5, z + 3.29);
+  for (const {x, z} of QUAN_TEACHER_HALLS) facadePlate("TỬ VI QUÁN", "LẬP LÁ SỐ · GẶP THẦY", "#602521", 8.2, 1.65).position.set(x, 7.5, z + 4.12);
   const readingDesk = QUAN_TEACHER_DESKS[2];
   facadePlate("BÀN THỜ THẦN TÀI", "XIN LỘC ĐẦU NGÀY", "#5a2824", 2.5, 1.43).position.set(-18, 2.2, 22.02);
   facadePlate("TU VIỆN AN NHIÊN", "ĐIỆN PHẬT · THIỀN · TRÀNG HẠT", "#6a2b24", 11.2, 2.4).position.set(0, 10.6, -15.04);

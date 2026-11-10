@@ -14,7 +14,7 @@ const MAX_PER_IP = 6;
 const ACTIONS = new Set(["idle", "incense", "greet", "meditate", "monastery"]);
 const CHANNEL = "tu-vi-quan";
 const SOCKET_PATH = "/tu-vi-quan-ws";
-const SPAWN_COLUMNS = [0, 1.75, -1.75, 3.5, -3.5, 5.25, -5.25, 7, -7];
+const SPAWN_COLUMNS = [0, 1.75, -1.75, 3.5, -3.5, 5.25, -5.25, 7, -7].map(offset => QUAN_SPAWN.x + offset);
 
 export function createQuanPresenceServer({ secret, origins, readBoard = async () => null, ecosystemEnabled = true }) {
   if (!secret) throw new Error("Tá»­ Vi QuÃ¡n requires AUTH_SECRET in production.");
@@ -90,7 +90,7 @@ export function createQuanPresenceServer({ secret, origins, readBoard = async ()
       const room = prior?.room ?? roomNames.findIndex((_, id) => [...guests.values()].filter(presence => presence.room === id).length < MAX_GUESTS);
       const spawnX = SPAWN_COLUMNS.find((x) => ![...guests.values()].some(
         ({ player, room: occupiedRoom }) => occupiedRoom === room && Math.hypot(player.x - x, player.z - QUAN_SPAWN.z) < 1.3,
-      )) ?? 0;
+      )) ?? QUAN_SPAWN.x;
       const player = {
         ...identity,
         x: prior?.player.x ?? spawnX,

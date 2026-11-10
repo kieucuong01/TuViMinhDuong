@@ -4,7 +4,7 @@ import { QUAN_TEACHER_HALLS, QUAN_TEACHER_DESKS, QUAN_BOUNDS, QUAN_SPAWN, QUAN_S
 describe("expanded Tử Vi Quán world", () => {
   it("keeps every station and spawn in walkable terrain", () => {
     for (const point of [QUAN_SPAWN, ...QUAN_STATIONS]) expect(isQuanWalkable(point.x, point.z)).toBe(true);
-    expect(QUAN_BOUNDS.maxX - QUAN_BOUNDS.minX).toBeGreaterThan(60);
+    expect(QUAN_BOUNDS.maxX - QUAN_BOUNDS.minX).toBeLessThan(60);
     for (const point of [{x:NaN,z:0},{x:0,z:Infinity},{x:100,z:0},{x:20,z:18},{x:0,z:-36},{x:-10,z:-6.3}]) {
       expect(isQuanWalkable(point.x,point.z)).toBe(false);
     }
@@ -57,9 +57,10 @@ describe("expanded Tử Vi Quán world", () => {
     expect(quanGroundHeight(0, -18)).toBeCloseTo(1.2);
     expect(quanGroundHeight(10, 0)).toBe(0);
   });
-  it("has eight accessible teacher chairs split equally between two halls", () => {
-    expect(QUAN_TEACHER_DESKS).toHaveLength(8);
-    expect(QUAN_TEACHER_DESKS.filter(seat => seat.x < 0)).toHaveLength(4);
+  it("keeps four accessible teacher chairs in the single hall on the entrance axis", () => {
+    expect(QUAN_TEACHER_HALLS).toHaveLength(1);
+    expect(QUAN_TEACHER_DESKS).toHaveLength(4);
+    expect(QUAN_TEACHER_HALLS[0].x).toBe(QUAN_SPAWN.x);
     for (const seat of QUAN_TEACHER_DESKS) {
       expect(getQuanZone(seat.x, seat.z)).toBe("tuvi");
       expect(findQuanPath(QUAN_SPAWN, seat).length).toBeGreaterThan(0);

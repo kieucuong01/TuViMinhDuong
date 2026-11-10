@@ -38,8 +38,9 @@ function Reading({ value }: { value: Json | undefined }) {
   return <div className={styles.reading}>{Object.entries(value).filter(([key]) => !["id", "seed", "version", "contentVersion", "ruleVersion", "profileId", "birthInput", "input", "sourceId", "casts"].includes(key)).map(([key, entry]) => <section key={key}>{labels[key] && <strong>{labels[key]}</strong>}<Reading value={entry} /></section>)}</div>;
 }
 
-export default function QuanEcosystem({ gameMode = false, leaders, online, alias, suspended, onOpen, onSnapshot, preferences, onPreferences, onLegacy, onExperience, lite, onLite, onRitual, onIncense, onMonastery, readingPrice, activityRequest }: {
+export default function QuanEcosystem({ gameMode = false, incenseDay, leaders, online, alias, suspended, onOpen, onSnapshot, preferences, onPreferences, onLegacy, onExperience, lite, onLite, onRitual, onIncense, onMonastery, readingPrice, activityRequest }: {
   gameMode?: boolean;
+  incenseDay?: string;
   alias: string; suspended: boolean; onOpen: (open: boolean) => void; onSnapshot: (data: QuanSnapshot) => void;
   onRitual: (kind: "greet" | "incense" | "meditate" | "idle") => void;
   onIncense: () => void;
@@ -126,6 +127,14 @@ export default function QuanEcosystem({ gameMode = false, leaders, online, alias
   useEffect(() => { if (!suspended) onExperience(tab === "divination" ? drawExperience : tab === "profile" ? "personal" : "courtyard"); }, [tab, drawExperience, onExperience, suspended]);
   const dayKey = data ? vietnamDay.format(now - serverOffset) : "";
   const daily = data && vietnamDay.format(new Date(data.serverTime)) === dayKey ? data.daily : null;
+  const litToday = Boolean(dayKey && incenseDay === dayKey);
+  const letter = data && vietnamDay.format(new Date(data.serverTime)) === dayKey ? data.calligraphy : null;
+  const journeyDone = Number(Boolean(daily)) + Number(litToday) + Number(Boolean(letter));
+  useEffect(() => {
+    if (tab !== "today" && tab !== "calligraphy") return;
+    const timer = setTimeout(() => { void request(); }, 0);
+    return () => clearTimeout(timer);
+  }, [tab, request]);
   const hour = data ? Number(vietnamHour.format(now - serverOffset)) : -1;
   const morningReminder = hour >= 5 && hour < 12 && Boolean(dayKey) && !daily && dismissedReminder !== dayKey;
   useEffect(() => {
@@ -216,12 +225,34 @@ export default function QuanEcosystem({ gameMode = false, leaders, online, alias
       {error && <p role="alert" className={styles.error}>{error}{needsLogin && <Link href="/dang-nhap?next=%2Ftu-vi-quan">Đăng nhập lại</Link>}<button disabled={busy} onClick={() => void request()}>Thử lại</button></p>}
       {busy && <p role="status">Đang mở sổ…</p>}{message && <p role="status">{message}</p>}
       <div aria-busy={busy} data-reduced-motion={preferences.reducedMotion} className={styles.body}>
-      {tab === "calligraphy" && <><p>Mỗi ngày một chữ để mang về. Chọn nhẹ nhàng hoặc xin một câu vui.</p>{!data?.calligraphy && <div className={styles.row}><button disabled={busy} onClick={() => void perform("calligraphy", { mood: "calm" })}>Xin chữ an nhiên</button><button disabled={busy} onClick={() => void perform("calligraphy", { mood: "playful" })}>Xin chữ cho vui</button></div>}<Reading value={data?.calligraphy} />{data?.calligraphy && <button onClick={() => chooseShare(data.calligraphy)}>Tạo thiệp chữ hôm nay</button>}</>}
+      {tab === "calligraphy" && <><p>Mỗi ngày một chữ để mang về. Chọn nhẹ nhàng hoặc xin một câu vui.</p>{!letter && <div className={styles.row}><button disabled={busy} onClick={() => void perform("calligraphy", { mood: "calm" })}>Xin chữ an nhiên</button><button disabled={busy} onClick={() => void perform("calligraphy", { mood: "playful" })}>Xin chữ cho vui</button></div>}<Reading value={letter} />{letter && <button onClick={() => chooseShare(letter)}>Tạo thiệp chữ hôm nay</button>}</>}
       {tab === "ranking" && <><p>Vinh danh năm khách đồng ý hiện bí danh, theo tổng Điểm An Nhiên kiếm được từ hoạt động miễn phí.</p>{leaders.length ? <ol className={styles.ranking}>{leaders.map((leader, index) => <li key={index}><strong>{leader.alias}</strong><span>{leader.points} điểm</span></li>)}</ol> : <p>{online ? "Chưa có khách đủ điều kiện hiển thị." : "Đang kết nối bảng vàng."}</p>}<label><input type="checkbox" checked={data?.rankingOptIn ?? false} disabled={busy || !data} onChange={event => void perform("ranking", { enabled: event.target.checked })} /> Cho hiện bí danh của tôi trên bảng vàng và khi lên danh hiệu</label></>}
-      {tab === "today" && <>{dayKey && !daily && dismissedReminder !== dayKey && <aside className={styles.card}>
-        <p>Lần đầu ghé hôm nay? Chọn một chủ đề để nhận lời gợi mở.</p>
-        <button onClick={() => { setDismissedReminder(dayKey); try { localStorage.setItem("quan-daily-reminder", dayKey); } catch { /* Keep the dismissal for this visit. */ } }}>Ẩn lời nhắc hôm nay</button>
-      </aside>}<p>Một lời gợi mở mỗi ngày. Dùng để suy ngẫm, không thay thế quyết định của bạn.</p><div className={styles.row}>{[["career", "Sự nghiệp"], ["love", "Tình duyên"], ["money", "Tài lộc"]].map(([topic, name]) => <button disabled={busy} key={topic} onClick={() => void perform("daily", { topic })}>{name}</button>)}</div><DailyFortune value={daily} />{daily && <button onClick={() => chooseShare(daily)}>Tạo thiệp lời gợi mở</button>}<h3>Điểm danh · 5 điểm</h3><button disabled={busy || !data || data.checkedIn} onClick={() => void perform("check_in")}>{data?.checkedIn ? "Đã điểm danh hôm nay" : "Điểm danh hôm nay"}</button><h3>Xin lộc đầu ngày</h3><p>Thắp hương và nhận 5 điểm trong lần đầu mỗi ngày.</p><button disabled={busy} onClick={() => { setTab(null); onIncense(); }}>Thắp hương</button><h3>Tu viện An Nhiên</h3><p>Thiền theo hơi thở, lần tràng hạt, tụng kinh . Bạn có thể kiếm tối đa 40 điểm mỗi ngày từ các hoạt động trong quán.</p><button onClick={() => { setTab(null); onMonastery(); }}>Vào Tu viện</button></>}
+      {tab === "today" && <>
+        <section className={styles.journey} aria-label="Dạo quán hôm nay">
+          <h3>{journeyDone === 3 ? "Đã hoàn thành dạo quán hôm nay" : "Ba việc nhỏ hôm nay"}</h3>
+          <progress aria-label="Tiến độ dạo quán" max={3} value={journeyDone} />
+          <p role="status">{journeyDone}/3 việc đã xong. {journeyDone === 3 ? "Bạn có thể làm thiệp từ chữ vừa xin." : "Chọn việc bạn muốn làm trước."}</p>
+          {journeyDone === 3 && <button onClick={() => chooseShare(letter)}>Làm thiệp của hôm nay</button>}
+        </section>
+        <section className={styles.card}>
+          <h3>1. Gieo quẻ ngày {daily ? "· Đã xong" : "· 10 điểm"}</h3>
+          {!daily && <><p>Chọn điều bạn muốn suy ngẫm hôm nay.</p><div className={styles.row}>{[["career", "Sự nghiệp"], ["love", "Tình duyên"], ["money", "Tài lộc"]].map(([topic, name]) => <button disabled={busy} key={topic} onClick={() => void perform("daily", { topic })}>{name}</button>)}</div></>}
+          <DailyFortune value={daily} />
+          {daily && <button onClick={() => chooseShare(daily)}>Tạo thiệp lời gợi mở</button>}
+        </section>
+        <section className={styles.card}>
+          <h3>2. Thắp hương {litToday ? "· Đã xong" : "· 5 điểm"}</h3>
+          <p>Nhân vật sẽ đi tới lư hương và thắp khi đến nơi.</p>
+          <button disabled={busy} onClick={() => { setTab(null); onIncense(); }}>{litToday ? "Thắp lại" : "Đi thắp hương"}</button>
+        </section>
+        <section className={styles.card}>
+          <h3>3. Xin chữ {letter ? "· Đã xong" : "· Làm thiệp"}</h3>
+          {!letter && <div className={styles.row}><button disabled={busy} onClick={() => void perform("calligraphy", { mood: "calm" })}>Xin chữ an nhiên</button><button disabled={busy} onClick={() => void perform("calligraphy", { mood: "playful" })}>Xin chữ cho vui</button></div>}
+          <Reading value={letter} />
+          {letter && <button onClick={() => chooseShare(letter)}>Tạo thiệp chữ hôm nay</button>}
+        </section>
+        <details className={styles.card}><summary>Điểm danh và vào Tu viện</summary><div className={styles.row}><button disabled={busy || !data || data.checkedIn} onClick={() => void perform("check_in")}>{data?.checkedIn ? "Đã điểm danh hôm nay" : "Điểm danh · 5 điểm"}</button><button onClick={() => { setTab(null); onMonastery(); }}>Vào Tu viện</button></div></details>
+      </>}
       {tab === "divination" && <><h3>Lá số cơ bản · Miễn phí</h3><p>Lập lá số, xem 12 cung và vận trình năm ngay trong quán.</p>{Boolean(data?.charts?.length) && <form className={styles.form} onSubmit={event => {
         event.preventDefault();
         if (!chartId) return;

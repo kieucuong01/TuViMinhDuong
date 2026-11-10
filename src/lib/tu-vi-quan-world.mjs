@@ -1,9 +1,9 @@
-export const QUAN_BOUNDS = { minX: -49, maxX: 49, minZ: -42, maxZ: 29 };
-export const QUAN_TEACHER_HALLS = [-31.5, 31.5].map(x => ({ x, z: -17.5 }));
+export const QUAN_BOUNDS = { minX: -23, maxX: 29, minZ: -42, maxZ: 29 };
+export const QUAN_TEACHER_HALLS = [{ x: -5, z: 2.5 }];
 export const QUAN_TEACHER_DESKS = QUAN_TEACHER_HALLS.flatMap((hall, wing) =>
   [-8.25, -2.75, 2.75, 8.25].map((offset, index) => ({ desk: wing * 4 + index + 1, x: hall.x + offset, z: hall.z + 4.05 })));
 export const QUAN_TEMPLE_INCENSE_POINT = { x: 1.1, z: -31.1, label: "lư hương điện Phật" };
-export const QUAN_SPAWN = { x: 0, z: 19 };
+export const QUAN_SPAWN = { x: QUAN_TEACHER_HALLS[0].x, z: 19 };
 export const QUAN_MONASTERY_SEATS = Array.from({ length: 28 }, (_, index) => ({ index, x: -9 + index % 7 * 3, z: -6 + Math.floor(index / 7) * 3.5 }));
 export const QUAN_MONASTERY_ENTRY = { x: 0, z: 10 };
 export const QUAN_MONASTERY_SPACE = { x: 0, z: -26.8, depthScale: 0.62, floor: 1.2 };
@@ -29,13 +29,13 @@ export function quanGroundHeight(/** @type {number} */ x, /** @type {number} */ 
   return 0;
 }
 export const QUAN_STATIONS = [
-  { id: "teacher", label: "Tử Vi Quán · Tây viện", x: QUAN_TEACHER_HALLS[0].x, z: QUAN_TEACHER_HALLS[0].z + 4.2, description: "Gặp bốn Thầy Tử Vi, nói hoặc nhập thông tin lập lá số" },
+  { id: "teacher", label: "Tử Vi Quán", x: QUAN_TEACHER_HALLS[0].x, z: QUAN_TEACHER_HALLS[0].z + 4.2, description: "Gặp Thầy, nói hoặc nhập thông tin lập lá số" },
   { id: "incense", label: "Bàn thờ Thần Tài", x: -18, z: 24.95, description: "Thắp hương bên vườn trúc, xin lộc đầu ngày" },
   { id: "monastery", label: "Tu viện An Nhiên", x: 0, z: -18, description: "Lên bậc thang, vào điện và đi đến đệm trống để ngồi" },
-  { id: "teacher-east", label: "Tử Vi Quán · Đông viện", x: QUAN_TEACHER_HALLS[1].x, z: QUAN_TEACHER_HALLS[1].z + 4.2, description: "Bốn bàn Thầy Tử Vi bên phải Tu viện" },
   { id: "support", label: "Hòm công đức", x: 4, z: -16, description: "Ủng hộ tự nguyện bên lối lên Tu viện" },
   { id: "lotus", label: "Vườn hồ sen", x: 10, z: 19, description: "Ngắm hồ sen và đèn hoa đăng" },
-  { id: "ranking", label: "Bảng vàng công đức", x: -10, z: -2, description: "Xem năm khách có nhiều Điểm An Nhiên" },
+  { id: "ranking", label: "Bảng vàng công đức", x: -10, z: -4.8, description: "Xem năm khách có nhiều Điểm An Nhiên" },
+  { id: "daily", label: "Quẻ hôm nay", x: QUAN_SPAWN.x, z: 12, description: "Gieo quẻ và xem ba việc nhỏ hôm nay" },
   { id: "calligraphy", label: "Xin chữ", x: -14, z: 14, description: "Nhận một chữ đầu ngày hoặc một câu vui" },
 ];
 export const QUAN_BLOCKS = [
