@@ -6,6 +6,7 @@ import Image from "next/image";
 import { createChartAction } from "@/app/actions";
 import { LoadingSubmitButton } from "@/components/loading-submit-button";
 import type { ChartInput } from "@/lib/chart";
+import { getQuanTrafficSessionId } from "@/lib/first-party-funnel-client";
 import type { readMonastery } from "@/lib/tu-vi-quan-monastery";
 import styles from "./tu-vi-quan-ecosystem-panel.module.css";
 
@@ -92,7 +93,9 @@ export default function QuanEcosystem({ gameMode = false, incenseDay, leaders, o
     if (pending.current) return null;
     pending.current = true; setBusy(true); setError("");
     try {
-      const response = await fetch("/api/tu-vi-quan/ecosystem", body ? { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) } : { cache: "no-store" });
+      const response = await fetch("/api/tu-vi-quan/ecosystem", body ? { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) } : {
+        cache: "no-store", headers: { "x-quan-visit": getQuanTrafficSessionId() },
+      });
       const result = await response.json();
       setNeedsLogin(response.status === 401);
       if (!response.ok) throw new Error(result.error || "Chưa kết nối được với quán. Bạn thử lại nhé.");

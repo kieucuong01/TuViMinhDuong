@@ -125,6 +125,30 @@ function sessionId() {
   }
 }
 
+let quanTrafficId: string | undefined;
+export function getQuanTrafficSessionId() {
+  return quanTrafficId ??= sessionId();
+}
+
+export function reportQuanOpen() {
+  const params = new URLSearchParams(window.location.search);
+  const host = hostname(document.referrer);
+  const tagged = params.get("utm_source")?.trim().toLowerCase();
+  const channel = /^[A-Za-z0-9_-]{24}$/.test(params.get("tu-vi-share") ?? "") ? "shared_card" :
+    ["facebook", "tiktok", "zalo", "youtube"].find(item => tagged === item || host === `${item}.com` || host.endsWith(`.${item}.com`) || (item === "zalo" && host === "zalo.me"));
+  const context = classifyClientFunnelContext({ pathname: window.location.pathname, search: window.location.search, referrer: document.referrer });
+  const source = ["gclid", "gbraid", "wbraid"].some(key => params.has(key)) ? "ads" :
+    channel && context.source === "direct" ? "referral" : context.source;
+  void fetch("/api/analytics/funnel", {
+    method: "POST", headers: { "Content-Type": "application/json" }, keepalive: true,
+    body: JSON.stringify({
+      name: "quan_open", eventId: uuid(), anonymousSessionId: getQuanTrafficSessionId(),
+      source, landingClass: context.landingClass,
+      placement: channel, resultBand: window.matchMedia("(pointer: coarse)").matches ? "mobile" : "desktop",
+    }),
+  }).catch(() => undefined);
+}
+
 function currentContext(details: ClientFunnelDetails): ClientFunnelContext {
   const pathname = window.location?.pathname || "/";
   const current = classifyClientFunnelContext({

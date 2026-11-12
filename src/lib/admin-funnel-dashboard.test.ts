@@ -24,7 +24,7 @@ describe("admin funnel dashboard data", () => {
 
     expect(dashboard.windows[7].stages).toHaveLength(9);
     expect(funnelFindMany).toHaveBeenCalledWith(expect.objectContaining({
-      where: { createdAt: { gte: expect.any(Date) } },
+      where: { createdAt: { gte: expect.any(Date) }, name: { not: "quan_open" } },
       select: {
         id: true,
         name: true,

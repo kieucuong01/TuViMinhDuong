@@ -24,7 +24,7 @@ export type FunnelReportPayment = {
 };
 
 const DAY_MS = 86_400_000;
-const STAGE_LABELS: Record<FunnelEventName, string> = {
+const STAGE_LABELS: Record<(typeof FUNNEL_EVENT_NAMES)[number], string> = {
   landing: "Vào trang",
   tool_view: "Xem công cụ",
   submit: "Gửi thông tin",

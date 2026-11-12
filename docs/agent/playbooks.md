@@ -18,6 +18,7 @@ Rules:
 
 - Optimize for 30-60 year old readers: larger text, clear labels, obvious buttons, fewer decorative badges.
 - Homepage opens Tử Vi Quán directly. New guests choose a host or monastery after entering an alias. `/lap-la-so` sends them to `/?visit=tuvi`, preserving allowlisted campaign parameters; legacy `/#lap-la-so` opens the same host intention. Do not restore the old homepage form funnel.
+- Admin Overview tracks Quán openings once per anonymous tab and Vietnam calendar day. The signed guest's first ecosystem visit in the day links the tab to a profile. The same-day activity, first started encounter and created PayOS order come from server records. A later verified payment is credited to the order's creation day in this funnel. Direct/unknown can include visits without referrer or campaign tags. D1/D7/D30 use first-time courtyard profiles from the last 60 days, with only completed observation dates in each denominator. NPCs, alias, birth data, conversation, and raw referrer/UTM text are excluded from these events.
 - Use orange/gold CTAs for money actions, but do not cover report content.
 - On mobile, keep navigation in the header: menu button on the left for `Lá số`, `Xem ngày`, `Kiến thức`; logo centered; account trigger on the right. Do not reintroduce a bottom nav unless the user explicitly asks.
 - For server-action forms, use `LoadingSubmitButton` or `data-loading-message` so the global toast can show progress.

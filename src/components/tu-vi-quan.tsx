@@ -11,6 +11,7 @@ import type { MonasteryPose } from "./tu-vi-quan-monastery";
 import type { EncounterKind, EncounterVisual } from "./tu-vi-quan-encounter";
 import type { QuanSocialMessage } from "./tu-vi-quan-social";
 import type { QuanSnapshot, QuanPreferences, QuanExperience, QuanLeader } from "./tu-vi-quan-ecosystem-panel";
+import { reportQuanOpen } from "@/lib/first-party-funnel-client";
 
 const Monastery = dynamic(() => import("./tu-vi-quan-monastery"), { ssr: false });
 const Scene = dynamic(() => import("./tu-vi-quan-scene"), { ssr: false });
@@ -60,6 +61,7 @@ async function jsonRequest<T>(path: string, body?: object): Promise<T> {
 export default function TuViQuan({ initialAlias, support, paymentsEnabled, ecosystemEnabled = false, voiceEnabled = false, readingPrice = null }: {
   initialAlias: string; support: { qr: string; recipient: string; bankImage?: boolean } | null; paymentsEnabled: boolean; ecosystemEnabled?: boolean; voiceEnabled?: boolean; readingPrice?: number | null;
 }) {
+  useEffect(() => { reportQuanOpen(); }, []);
   const hydrated = useSyncExternalStore(subscribeToHydration, hydratedSnapshot, serverSnapshot);
   const [hostReady, setHostReady] = useState(false);
   const [host, setHost] = useState<{kind: EncounterKind; orderId?: string; ticketId?: string; desk?: number; visit: number} | null>(null);

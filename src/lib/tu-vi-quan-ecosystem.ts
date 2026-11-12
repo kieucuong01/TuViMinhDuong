@@ -37,7 +37,7 @@ const json = (value: unknown) => JSON.parse(JSON.stringify(value)) as Prisma.Inp
 const digest = (code: string) => createHash("sha256").update("quan-profile:" + code).digest("hex");
 function fail(message: string, status = 400): never { throw new QuanSessionError(message, status); }
 const str = (value: unknown, max = 100) => typeof value === "string" && value.length <= max ? value : fail("Nội dung không hợp lệ.");
-const metricNames = new Set(["visit", "daily", "ritual", "profile_saved", "divination", "wish", "reaction", "share_created", "share_open", "share_image", "checkout", "paid", "session_started"]);
+const metricNames = new Set(["visit", "traffic_entry", "daily", "ritual", "profile_saved", "divination", "wish", "reaction", "share_created", "share_open", "share_image", "checkout", "paid", "session_started"]);
 
 export function quanEcosystemEnabled() {
   return process.env.TU_VI_QUAN_ECOSYSTEM_ENABLED === "true" ||
@@ -187,10 +187,11 @@ async function snapshot(tx: Tx, profile: QuanProfile, now: Date) {
   };
 }
 
-export async function readEcosystem(db: PrismaClient, actor: Actor, now = new Date()) {
+export async function readEcosystem(db: PrismaClient, actor: Actor, now = new Date(), trafficSession?: string) {
   return ecosystemTransaction(db, async (tx) => {
     const profile = await ensureProfile(tx, actor);
     await metric(tx, profile, "visit", now);
+    if (trafficSession) await metric(tx, profile, "traffic_entry", now, trafficSession);
     return snapshot(tx, profile, now);
   });
 }

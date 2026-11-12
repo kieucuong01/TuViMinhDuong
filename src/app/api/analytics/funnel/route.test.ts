@@ -69,11 +69,32 @@ describe("POST /api/analytics/funnel", () => {
     { ...body, chartId: "chart-1" },
     { ...body, name: "paid" },
     { ...body, landingPath: "/private?birth=1990" },
+    { ...body, name: "quan_open", placement: "private_payload" },
+    { ...body, name: "quan_open", placement: "facebook", resultBand: "full_user_agent" },
   ])("rejects forbidden or trusted-only input %#", async (value) => {
     const response = await POST(request(value));
 
     expect(response.status).toBe(400);
     expect(mocks.recordFunnelEventBestEffort).not.toHaveBeenCalled();
+  });
+
+  it("deduplicates game openings by Vietnam day without storing an account or changing the funnel cookie", async () => {
+    vi.useFakeTimers();
+    try {
+      const opening = { ...body, name: "quan_open", placement: "facebook", resultBand: "mobile" };
+      const before = new Date("2026-11-12T16:59:59.000Z");
+      const after = new Date("2026-11-12T17:00:00.000Z");
+      vi.setSystemTime(before);
+      const response = await POST(request(opening));
+      expect(response.status).toBe(202);
+      expect(response.headers.get("set-cookie")).toBeNull();
+      await POST(request({ ...opening, eventId: "219fc7f3-d19c-73c0-946d-cd7a275f8906" }));
+      vi.setSystemTime(after);
+      await POST(request(opening));
+      const keys = mocks.recordFunnelEventBestEffort.mock.calls.map(([event]) => event.dedupeKey);
+      expect(keys).toEqual(["2026-11-12", "2026-11-12", "2026-11-13"].map(day => `quan-open:${body.anonymousSessionId}:${day}`));
+      expect(mocks.getCurrentUser).not.toHaveBeenCalled();
+    } finally { vi.useRealTimers(); }
   });
 
   it("accepts same public origin when Next.js sees the internal proxy URL", async () => {
