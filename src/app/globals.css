@@ -8032,6 +8032,50 @@ button.is-loading:not(.icon-button)::before {
   font-size: 0.8rem;
 }
 
+.admin-data-table.quan-admin-orders {
+  min-width: 40rem;
+}
+
+@media (max-width: 639px) {
+  .admin-data-table.quan-admin-orders {
+    min-width: 0;
+  }
+
+  .quan-admin-orders thead {
+    position: absolute;
+    clip-path: inset(50%);
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+  }
+
+  .quan-admin-orders tbody,
+  .quan-admin-orders tr,
+  .quan-admin-orders td {
+    display: block;
+  }
+
+  .quan-admin-orders tbody tr {
+    padding: 0.7rem;
+    margin-bottom: 0.65rem;
+    border: 1px solid #fed7aa;
+    border-radius: 0.65rem;
+  }
+
+  .quan-admin-orders td {
+    padding: 0.35rem 0;
+    border: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .quan-admin-orders td::before {
+    content: attr(data-label);
+    display: block;
+    color: #7c2d12;
+    font-weight: 700;
+  }
+}
+
 .admin-user-action-cell {
   width: 24rem;
 }
