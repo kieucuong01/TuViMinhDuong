@@ -17,13 +17,19 @@ describe("Tử Vi Quán content", () => {
     expect(quanDayKey(new Date("2026-11-04T17:00:00.000Z"))).toBe("2026-11-05");
   });
 
-  it("anchors daily evidence to the selected chart topic and keeps the seeded draw stable", () => {
+  it("keeps the result stable today and changes the prompt on the following days", () => {
     const chart = generateTuViChart(CHART_FIXTURES[0].input);
-    const result = drawDaily("money", chart, "profile-day");
-    expect(result).toEqual(drawDaily("money", chart, "profile-day"));
-    expect(result).toMatchObject({ topic: "money", personalized: true, color: expect.any(String), number: expect.any(Number) });
+    const day = "2026-11-04";
+    const result = drawDaily("money", chart, "profile", day);
+    expect(result).toEqual(drawDaily("money", chart, "profile", day));
+    expect(result).toMatchObject({ topic: "money", day, personalized: true, color: expect.any(String), number: expect.any(Number) });
     expect(result.evidence.join(" ")).toContain("Tài Bạch");
-    expect(drawDaily("money", null, "profile-day")).toMatchObject({ personalized: false });
+    expect(drawDaily("money", null, "profile", day)).toMatchObject({ personalized: false, evidence: [] });
+    for (const topic of ["career", "love", "money"] as const) {
+      const prompts = Array.from({ length: 10 }, (_, index) => drawDaily(topic, chart, "profile", `2026-11-${11 + index}`));
+      expect(new Set(prompts.map(prompt => prompt.id)).size).toBe(10);
+      expect(prompts.every(prompt => prompt.body && prompt.action && prompt.caution)).toBe(true);
+    }
   });
 
   it("has 78 authored cards and draws three without replacement", () => {

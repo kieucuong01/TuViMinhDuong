@@ -11,7 +11,7 @@ import { QuanSessionError, readQuanChart } from "@/lib/tu-vi-quan-session";
 import { mutateMonastery, readMonastery } from "@/lib/tu-vi-quan-monastery";
 import { requireQuanMonasterySeat } from "@/lib/tu-vi-quan-seat";
 import {
-  QUAN_CONTENT_VERSION, QUAN_COSMETICS, drawDaily, drawTarot, drawIChing,
+  QUAN_CONTENT_VERSION, QUAN_DAILY_VERSION, QUAN_COSMETICS, drawDaily, drawTarot, drawIChing,
   moderateWish, quanDayKey, buildQuanHoroscope,
 } from "@/lib/tu-vi-quan-content";
 
@@ -61,10 +61,10 @@ export async function ensureProfile(tx: Tx, actor: Actor) {
   return tx.quanProfile.create({ data: { alias: actor.guest.alias, identities: { create: { guestId: actor.guest.id } } } });
 }
 
-async function entry(tx: Tx, profileId: string, kind: string, dayKey: string, data: unknown, points = 0, now = new Date()) {
+async function entry(tx: Tx, profileId: string, kind: string, dayKey: string, data: unknown, points = 0, now = new Date(), version = QUAN_CONTENT_VERSION) {
   return tx.quanEntry.upsert({
     where: { profileId_kind_dayKey: { profileId, kind, dayKey } }, update: {},
-    create: { profileId, kind, dayKey, data: json(data), points, version: QUAN_CONTENT_VERSION, createdAt: now },
+    create: { profileId, kind, dayKey, data: json(data), points, version, createdAt: now },
   });
 }
 
@@ -298,13 +298,13 @@ export async function mutateEcosystem(db: PrismaClient, actor: Actor, body: Bag,
       if (!["career", "love", "money"].includes(String(body.topic))) fail("Chọn một chủ đề.");
       const input = profile.birthInput as unknown as ChartInput | null;
       const chart = input ? generateTuViChart(input) : null;
-      const result = drawDaily(body.topic as "career" | "love" | "money", chart, randomInt(1_000_000));
+      const result = drawDaily(body.topic as "career" | "love" | "money", chart, profile.id, day);
       if (chart) {
         const [year, month, date] = day.split("-").map(Number);
         const fortune = analyzeDate(new Date(year, month - 1, date, 12), chart.lunar.year);
         result.evidence.unshift(`Ngày ${fortune.canChi.day}. Tuổi ${chart.canChi.year}, bản mệnh ${chart.banMenh}.`);
       }
-      const saved = await entry(tx, profile.id, "daily", day, result, 10, now);
+      const saved = await entry(tx, profile.id, "daily", day, result, 10, now, QUAN_DAILY_VERSION);
       extra.latestResult = { ...asBag(saved.data), sourceId: saved.id };
       await metric(tx, profile, "daily", now);
     } else if (action.startsWith("practice_") || action === "redeem_voice") {

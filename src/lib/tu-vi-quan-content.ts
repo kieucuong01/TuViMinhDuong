@@ -1,6 +1,7 @@
 import { generateTuViChart, type ChartInput, type Palace, type StarBrightness, type TuViChart } from "@/lib/chart";
 
 export const QUAN_CONTENT_VERSION = "quan-2026-11-04-v1";
+export const QUAN_DAILY_VERSION = "quan-daily-v2";
 export type QuanTopic = "career" | "love" | "money";
 export type QuanContent = { id: string; title: string; body: string; action: string; evidence: string[] };
 export type QuanRandomInt = (maxExclusive: number) => number;
@@ -17,47 +18,66 @@ function pick(randomInt: QuanRandomInt, max: number) {
   return value;
 }
 
-const DAILY: Record<QuanTopic, [string, string, string][]> = {
+const DAILY: Record<QuanTopic, [title: string, body: string, action: string, caution: string][]> = {
   career: [
-    ["Một việc cho trọn", "Nhiều lời mời cùng lúc dễ khiến điều quan trọng bị bỏ dở. Hôm nay hãy nhìn lại việc bạn đã hứa trước khi nhận thêm trách nhiệm.", "Chọn một việc có thể hoàn thành trong hôm nay và báo rõ thời hạn."],
-    ["Hỏi rõ trước khi làm", "Một yêu cầu nghe đơn giản vẫn có thể chứa những kỳ vọng khác nhau. Sự rõ ràng giúp cả bạn lẫn người cộng tác bớt phải sửa lại.", "Hỏi người giao việc ba điều: kết quả cần có, hạn chót và ai quyết định."],
-    ["Giữ một khoảng học", "Kinh nghiệm có giá trị khi bạn cũng dành chỗ cho cách làm mới. Một lần thử nhỏ giúp kiểm tra ý tưởng mà chưa phải đổi cả nếp làm việc.", "Dành 20 phút thử một cách làm trên phần việc ít rủi ro."],
-    ["Ghi nhận người đồng hành", "Những đóng góp ít được nhìn thấy cũng giữ cho công việc chạy đều. Nhắc đúng một đóng góp cụ thể có ý nghĩa hơn lời khen chung chung.", "Cảm ơn một người và nói rõ việc họ đã giúp bạn."],
-    ["Đặt lại giới hạn", "Làm hết mọi việc không luôn đồng nghĩa với làm tốt. Khi lịch đã kín, trao đổi sớm giúp bạn giữ chất lượng và lời hứa.", "Nêu phần việc cần lùi hoặc chia sẻ trước khi quá hạn."],
-    ["Nhìn lại bằng chứng", "Cảm giác bận rộn có thể che mất tiến bộ thật. Một kết quả đã hoàn thành là điểm tựa tốt hơn việc so sánh tốc độ với người khác.", "Ghi một kết quả trong tuần và một điều còn cần hỗ trợ."],
+    ["Chốt việc nào trước", "Nếu sáng ra đã thấy vài người cùng giục, nhìn xem việc nào đang khiến người khác phải chờ bạn.", "Nhắn cho người liên quan một mốc giờ cụ thể, rồi dành 25 phút làm phần họ cần trước.", "Đừng hứa “xong trong hôm nay” cho cả hai việc nếu lịch chỉ còn đủ chỗ cho một."],
+    ["Hỏi lại một câu trước khi bắt tay", "Có người nhờ bạn “xem giúp” nhưng có thể họ chỉ cần góp ý, hoặc đang đợi bạn sửa luôn. Làm một lúc mới hỏi thì dễ mất công.", "Nhắn “Bạn cần mình góp ý hay gửi bản đã sửa? Khi nào bạn cần?” trước khi bắt đầu.", "Nếu hai người giao hai yêu cầu khác nhau, chốt với người quyết định trước khi sửa tiếp."],
+    ["Việc đang kẹt thì báo sớm", "Nếu đang chờ một file, chữ ký hay phản hồi, người khác có thể vẫn nghĩ việc đang chạy bình thường.", "Báo rõ bạn đang chờ ai, cần gì và chậm nhất lúc mấy giờ thì tiến độ bị ảnh hưởng.", "Trong lúc đợi, làm phần không phụ thuộc. Đừng tự điền số hoặc đoán ý để kịp gửi."],
+    ["Gửi một bản nháp sớm", "Nếu cứ sửa đi sửa lại vì sợ người nhận chê, có thể bạn đang chăm chút một phần họ chưa cần.", "Gửi bản nháp cho một người có quyền góp ý, kèm đúng một câu hỏi về phần bạn còn phân vân.", "Ghi rõ là bản nháp và kiểm tra quyền xem trước khi gửi tài liệu nội bộ."],
+    ["Chừa một khoảng trong lịch", "Nếu hôm nay có hẹn nối tiếp, chỉ một cuộc kéo dài cũng đủ làm cả buổi trễ theo.", "Chừa 15 phút sau cuộc hẹn quan trọng nhất để ghi lại việc đã chốt và chuyển sang việc kế tiếp.", "Khi biết sẽ trễ, báo trước và đưa giờ mới. Đừng để người kia chờ đến lúc phải hỏi."],
+    ["Đọc lại trước khi bấm gửi", "Cuối một việc gấp, lỗi thường nằm ở thứ nhỏ như tên người nhận, phiên bản file hay con số cũ.", "Trước khi gửi bản cuối, mở lại tệp đính kèm và kiểm tra tên, ngày, con số quan trọng nhất.", "Nếu đang bực vì một tin nhắn, để nháp vài phút rồi bỏ câu mang tính trách móc."],
+    ["Xin góp ý vào đúng một chỗ", "Nếu bạn muốn biết mình làm ổn chưa, hỏi “thấy sao?” thường chỉ nhận được câu “ổn mà”.", "Chỉ ra một phần cụ thể và hỏi “Chỗ này cần sửa gì để bạn dùng được ngay?”", "Một góp ý về sản phẩm là thông tin để sửa việc. Đừng vội coi đó là đánh giá cả con người mình."],
+    ["Thử một bước nhỏ", "Có cách làm cũ khiến bạn phải lặp lại cùng một thao tác mỗi ngày. Hôm nay có thể dành một khoảng ngắn thử cách khác.", "Chọn một phần ít rủi ro, thử trong 20 phút và so thời gian với cách cũ.", "Giữ bản gốc. Khoan áp dụng cho cả nhóm nếu bạn chưa biết có tiết kiệm công thật hay không."],
+    ["Nhận thêm việc thì đổi ưu tiên", "Một lời nhờ “chỉ mất tí thôi” có thể chen vào đúng lúc bạn cần tập trung.", "Nói rõ việc nào đang làm và hỏi “Việc mới cần trước hay sau việc này?”", "Khi chưa thống nhất việc nào lùi, tránh nhận thêm một hạn chót chỉ vì ngại từ chối."],
+    ["Gói lại việc trước khi nghỉ", "Có những việc hết giờ vẫn lởn vởn trong đầu vì bạn chưa biết mai bắt đầu từ đâu.", "Trước khi nghỉ, ghi một việc đã xong, một việc còn vướng và bước đầu tiên cho ngày làm việc tới.", "Việc còn dang dở chưa cần xử lý tối nay nếu đã có người phụ trách và mốc xử lý rõ."],
   ],
   love: [
-    ["Nghe hết một câu", "Người thân có khi cần được nghe trước khi cần lời giải. Tạm gác việc đoán ý sẽ giúp cuộc trò chuyện có thêm chỗ cho sự thật.", "Hỏi một câu mở rồi nghe hết câu trả lời, chưa vội khuyên."],
-    ["Nói điều mình cần", "Một mong muốn không nói ra dễ biến thành chờ đợi và tủi thân. Bạn có thể nói cụ thể mà vẫn tôn trọng khả năng của người kia.", "Dùng câu: Tôi mong chúng ta có thể… và đưa một đề nghị nhỏ."],
-    ["Một cuộc hẹn giản dị", "Sự gần gũi được nuôi từ thời gian có mặt thật sự. Một khoảng ngắn không màn hình cũng đủ để hỏi nhau về ngày đã qua.", "Hẹn 15 phút trò chuyện hoặc đi bộ cùng người bạn quý."],
-    ["Ranh giới cũng là quan tâm", "Giữ một giới hạn rõ giúp mối quan hệ bớt mệt mỏi. Bạn không phải đồng ý mọi điều để chứng minh sự quan tâm.", "Nói một giới hạn bằng lời bình tĩnh và nêu điều bạn có thể làm."],
-    ["Sửa một điều nhỏ", "Một lời xin lỗi có ích khi đi kèm thay đổi cụ thể. Hãy nhìn phần trách nhiệm của mình mà không nhận thay lỗi của tất cả mọi người.", "Chọn một hành động có thể sửa và hỏi người kia có phù hợp không."],
-    ["Đối xử dịu với mình", "Ngày ít kết nối không nói lên giá trị của bạn. Chăm sóc nhịp sống riêng giúp bạn bước vào cuộc gặp với tâm thế vững hơn.", "Dành một khoảng nghỉ và nhắn cho người khiến bạn cảm thấy an toàn."],
+    ["Tin nhắn chậm, khoan đoán", "Người bạn mong hồi âm có thể đang bận. Thấy họ im lâu dễ khiến bạn tự nghĩ mình đã nói gì sai.", "Nếu cần chốt một cuộc hẹn, nhắn rõ giờ bạn cần biết và cho họ một phương án khác.", "Đừng gửi dồn hoặc dựa vào trạng thái đã xem để kết luận người kia đang tránh mình."],
+    ["Nói rõ điều bạn mong", "Có lúc bạn thất vọng vì người kia không làm một việc mà bạn chưa từng nhờ.", "Nói một câu cụ thể như “Tối nay mình muốn có 15 phút nói chuyện, bạn rảnh lúc nào?”", "Khi nghe “hôm nay không được”, hỏi xem có giờ khác phù hợp trước khi hiểu đó là từ chối bạn."],
+    ["Hỏi họ muốn được nghe hay được góp ý", "Khi người thân kể một chuyện bực mình, đưa lời khuyên ngay đôi khi làm họ thấy chưa được lắng nghe.", "Hỏi “Bạn muốn mình nghe thôi hay cùng nghĩ cách xử lý?” rồi nghe hết câu chuyện.", "Nếu chưa rõ sự việc, đừng vội chê người trong câu chuyện hoặc kể sang chuyện của mình."],
+    ["Hẹn một việc dễ làm", "Muốn gặp ai đó nhưng cứ nhắn “hôm nào gặp” thì lịch dễ trôi qua.", "Rủ một việc cụ thể như đi bộ 20 phút hoặc uống trà, đưa hai khung giờ để người kia chọn.", "Nếu họ chưa sẵn sàng, để họ có chỗ từ chối. Đừng đổi một lời mời thành lời trách."],
+    ["Gỡ một chuyện nhỏ trước", "Có việc gần đây vẫn khiến bạn khó chịu, dù khi đó đã nói “thôi, không sao”.", "Chọn lúc cả hai rảnh và kể đúng một việc, cảm giác của bạn và điều muốn làm khác lần tới.", "Tránh kéo chuyện cũ vào hoặc dùng “lúc nào cũng vậy”. Nói càng cụ thể thì càng dễ sửa."],
+    ["Tạm ngưng lúc đang nóng", "Một câu đùa qua tin nhắn đôi khi nghe nặng hơn người gửi định nói. Nếu đang căng, trả lời liền dễ làm chuyện đi xa.", "Nói “Mình hơi bực, để mình bình tĩnh rồi nói lại”, kèm giờ bạn có thể quay lại.", "Nếu đã hẹn nói sau, nhớ quay lại. Đừng để khoảng nghỉ thành im lặng nhiều ngày."],
+    ["Để ý việc họ đã làm", "Có người vẫn quan tâm bằng những việc nhỏ như nhắc bạn mang áo mưa hoặc để phần cơm.", "Cảm ơn một việc cụ thể mà họ vừa làm. Nói thêm vì sao việc đó có ích cho bạn.", "Nếu còn một chuyện chưa vui, dành lúc khác để nói. Một lời cảm ơn không cần kèm nhắc lỗi."],
+    ["Giữ lời hứa vừa sức", "Có thể bạn muốn giúp người thân nhưng hôm nay lịch hoặc sức mình không cho phép.", "Nói rõ phần bạn làm được, chẳng hạn gọi lại sau giờ làm hoặc giúp tìm người hỗ trợ.", "Tránh đồng ý ngay rồi hủy sát giờ. Một lời từ chối sớm giúp người kia kịp sắp xếp."],
+    ["Đừng để người kia phải đoán", "Nếu hôm nay cần ở một mình, người kia có thể hiểu nhầm rằng bạn giận họ.", "Nhắn ngắn gọn “Hôm nay mình mệt, mình muốn nghỉ. Mai mình gọi lại nhé.”", "Chọn giờ liên lạc lại vừa sức. Nếu cần thêm thời gian, nhắn một câu thay vì mất hút."],
+    ["Chủ động hỏi thăm", "Nếu hôm nay không có cuộc hẹn hay tin nhắn nào, bạn vẫn có thể chọn người mình thật sự muốn hỏi thăm.", "Nhắn cho một người bạn quý một câu có chi tiết thật, như hỏi buổi khám hoặc buổi làm việc họ từng kể.", "Một lời hỏi thăm có giá trị dù họ chưa trả lời ngay. Đừng tự ép mình phải giữ cuộc nói chuyện kéo dài."],
   ],
   money: [
-    ["Nhìn rõ khoản nhỏ", "Những khoản chi ít một có thể khó nhớ hơn khoản lớn. Ghi lại để hiểu thói quen, không phải để tự trách về mọi niềm vui.", "Xem ba khoản chi gần nhất và đánh dấu khoản có thể giảm."],
-    ["Chờ thêm một nhịp", "Sự gấp gáp trong một lời mời mua bán không thay thế được thông tin. Bạn được quyền dành thời gian kiểm tra dù người bán thúc giục.", "Đợi một ngày trước khoản mua ngoài kế hoạch và kiểm tra tổng chi phí."],
-    ["Giữ phần dự phòng", "Một khoản dành sẵn cho nhu cầu thiết yếu giúp bạn có thêm lựa chọn khi việc bất ngờ xảy ra. Quy mô phù hợp tùy hoàn cảnh thực tế.", "Tính chi phí thiết yếu tháng này trước khi phân bổ phần còn lại."],
-    ["Thống nhất trước khi góp", "Kỳ vọng không rõ về tiền có thể làm mối quan hệ căng thẳng. Trao đổi bằng văn bản giúp mọi người biết trách nhiệm và giới hạn.", "Làm rõ số tiền, mục đích và cách xử lý khi kế hoạch thay đổi."],
-    ["Kiểm chứng nguồn tin", "Một câu chuyện lời lớn chỉ kể phần kết quả người khác muốn bạn thấy. Hãy tìm điều kiện, chi phí và khả năng mất tiền trước khi cân nhắc.", "Đối chiếu thông tin với nguồn độc lập; chưa rõ thì chưa chuyển tiền."],
-    ["Dùng điều đang có", "Một món đồ còn dùng tốt có thể đáp ứng nhu cầu mà bạn định giải quyết bằng việc mua mới. Nhìn lại nguồn lực sẵn có giúp giảm quyết định vội.", "Kiểm tra một món đang có trước khi đặt mua món thay thế."],
+    ["Coi lại ba khoản nhỏ", "Cà phê, phí giao hàng và đồ ăn vặt nhìn riêng đều ít. Cộng lại mới thấy khoản nào lặp nhiều.", "Mở ba giao dịch gần nhất và chọn một khoản có thể giảm lần sau mà vẫn thấy thoải mái.", "Nhìn tổng chi theo tuần trước khi cắt các khoản thiết yếu chỉ vì một ngày chi nhiều."],
+    ["Xem số tiền cuối cùng", "Giá trên quảng cáo có thể chưa gồm phí giao, phụ phí hoặc điều kiện để nhận khuyến mãi.", "Đi đến bước xem tổng tiền, rồi so với giá mua ở một nơi khác trước khi bấm đặt.", "Nếu phải mua thêm đồ chỉ để lấy mã giảm, tính lại xem tổng tiền có thật sự giảm không."],
+    ["Kiểm tra ngày tự gia hạn", "Có dịch vụ dùng thử ít khi mở lại nhưng vẫn trừ tiền vào cùng một ngày mỗi tháng.", "Mở lịch sử thanh toán, tìm một khoản định kỳ và đặt nhắc trước ngày gia hạn nếu còn phân vân.", "Kiểm tra điều kiện hủy và ngày hết quyền dùng. Khoan hủy dịch vụ người nhà đang dùng chung."],
+    ["Tách tiền cần chi trước", "Nếu vừa nhận tiền hoặc sắp đến hạn hóa đơn, số dư hiện tại dễ khiến bạn tưởng còn nhiều tiền tùy ý dùng.", "Ghi ba khoản phải trả trước kỳ thu tiếp theo, kèm ngày đến hạn, rồi xem còn lại bao nhiêu.", "Khoản tiền người khác hứa gửi chưa nên tính vào số có thể chi hôm nay."],
+    ["Người quen nhờ chuyển tiền cũng nên gọi lại", "Tin nhắn mượn tiền gấp có thể trông rất quen, kể cả khi gửi từ tài khoản của người bạn biết.", "Gọi qua số bạn đã lưu từ trước để xác nhận người nhờ, số tiền và thông tin nhận.", "Đừng dùng số điện thoại hay đường dẫn mới họ vừa nhắn. Không đọc mã OTP cho người khác."],
+    ["Chốt cách chia trước khi đặt", "Đi ăn, đặt phòng hay mua chung dễ ngại nhắc tiền, đến lúc trả mới biết mỗi người hiểu một kiểu.", "Nhắn trước khoản dự kiến mỗi người trả và ai đứng ra thanh toán, nhất là khi phải đặt cọc.", "Hỏi thêm phí hủy và cách chia nếu một người đổi kế hoạch."],
+    ["Để món ngoài kế hoạch qua một đêm", "Một món đang giảm giá có thể trông rất cần trong vài phút, nhất là lúc bạn đang lướt để giải khuây.", "Lưu món đó lại và thử ghi bạn sẽ dùng nó vào việc gì trong tuần này. Mai đọc lại rồi quyết.", "Nếu món đồ chỉ rẻ khi mua ngay, coi đó là một điều kiện của người bán trước khi xuống tiền."],
+    ["Xem lại khoản đang chờ hoàn", "Nếu từng hủy đơn, trả hàng hoặc ứng tiền hộ, có thể bạn đã quên kiểm tra tiền có về chưa.", "Chọn một khoản, đối chiếu hóa đơn với sao kê và ghi ngày cần liên hệ nếu quá hẹn.", "Khi gửi chứng từ, che số tài khoản và thông tin cá nhân không liên quan."],
+    ["So chi phí theo lần dùng", "Gói lớn nhìn rẻ theo đơn vị, nhưng tiền tiết kiệm mất đi nếu bạn dùng không hết.", "Lấy số tiền chia cho số lần bạn thực sự dùng trong một tháng rồi so với lựa chọn nhỏ hơn.", "Để ý thời hạn sử dụng, chỗ cất và công phải bỏ ra để tận dụng món đó."],
+    ["Có khoản bất ngờ thì xem thứ tự", "Nếu phát sinh tiền sửa đồ, tiền thuốc hoặc một hóa đơn cao hơn dự tính, bạn chưa cần quyết hết mọi khoản trong một lúc.", "Ghi khoản nào phải xử lý hôm nay, khoản nào có thể hỏi thêm giá hoặc xin dời hạn.", "Trước khi đồng ý trả góp, xem cả số tiền phải trả, các khoản phí và ngày bị trừ."],
   ],
 };
 
-export type QuanDaily = QuanContent & { topic: QuanTopic; personalized: boolean; color: string; number: number; disclaimer: string };
-export function drawDaily(topic: QuanTopic, chart: TuViChart | null, seed: string | number): QuanDaily {
+const DAILY_COLORS = ["Xanh lá", "Vàng nhạt", "Xanh lam", "Tím nhạt", "Trắng ngà", "Hồng đất", "Xanh ngọc", "Nâu nhạt", "Cam đất", "Xanh rêu"];
+export type QuanDaily = QuanContent & { topic: QuanTopic; day: string; caution: string; personalized: boolean; color: string; number: number; disclaimer: string };
+export function drawDaily(topic: QuanTopic, chart: TuViChart | null, profileId: string, day: string): QuanDaily {
   if (!Object.hasOwn(DAILY, topic)) throw new Error("Chủ đề không hợp lệ.");
   const palaceName = { career: "Quan Lộc", love: "Phu Thê", money: "Tài Bạch" }[topic];
   const palace = chart?.palaces.find((item) => item.name === palaceName);
   let hash = 2166136261;
-  for (const char of `${seed}:${topic}:${palace?.branch ?? ""}:${palace?.mainStars.join(",") ?? ""}`) {
+  for (const char of `${profileId}:${topic}:${palace?.branch ?? ""}:${palace?.mainStars.join(",") ?? ""}`) {
     hash = Math.imul(hash ^ char.charCodeAt(0), 16777619);
   }
-  const index = (hash >>> 0) % DAILY[topic].length;
-  const [title, body, action] = DAILY[topic][index];
-  return { id: `daily-${topic}-${index}`, topic, title, body, action, color: ["Xanh lá", "Vàng nhạt", "Xanh lam", "Tím nhạt", "Trắng ngà", "Hồng đất"][index], number: index + 1, personalized: !!palace, evidence: palace ? [`Cung ${palace.name} tại ${palace.branch}; chính tinh: ${palace.mainStars.join(", ") || "vô chính diệu"}.`, "Lời nhắc được chọn từ nội dung biên soạn; màu và số chỉ là biểu tượng vui, không làm thay đổi vận may."] : ["Màu và số chỉ là biểu tượng vui, không làm thay đổi vận may."], disclaimer: DISCLAIMER };
+  const elapsedDays = Math.floor(Date.parse(`${day}T00:00:00Z`) / 86_400_000);
+  if (!Number.isFinite(elapsedDays)) throw new Error("Ngày không hợp lệ.");
+  const index = ((hash >>> 0) + elapsedDays) % DAILY[topic].length;
+  const [title, body, action, caution] = DAILY[topic][index];
+  return {
+    id: `daily-v2-${topic}-${index}`, topic, day, title, body, action, caution,
+    color: DAILY_COLORS[index], number: index + 1, personalized: Boolean(palace),
+    evidence: palace ? [`Cung ${palace.name} tại ${palace.branch}, chính tinh: ${palace.mainStars.join(", ") || "vô chính diệu"}.`] : [],
+    disclaimer: "Lời quẻ là gợi ý để bạn tự đối chiếu với ngày của mình.",
+  };
 }
-
 // Original short readings: title | reflection | practical step. No translated deck guide is used.
 const TAROT_ROWS = [
   "Kẻ Lữ Hành|Bước đầu chưa cần chứng minh rằng cả con đường sẽ đúng. Điều đáng giữ là sự tò mò đi cùng khả năng quay lại khi thấy không phù hợp.|Thử một bước nhỏ, ghi giới hạn thời gian và chi phí trước khi bắt đầu.",

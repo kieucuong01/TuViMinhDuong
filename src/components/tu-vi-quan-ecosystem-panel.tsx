@@ -236,7 +236,7 @@ export default function QuanEcosystem({ gameMode = false, incenseDay, leaders, o
         </section>
         <section className={styles.card}>
           <h3>1. Gieo quẻ ngày {daily ? "· Đã xong" : "· 10 điểm"}</h3>
-          {!daily && <><p>Chọn điều bạn muốn suy ngẫm hôm nay.</p><div className={styles.row}>{[["career", "Sự nghiệp"], ["love", "Tình duyên"], ["money", "Tài lộc"]].map(([topic, name]) => <button disabled={busy} key={topic} onClick={() => void perform("daily", { topic })}>{name}</button>)}</div></>}
+          {!daily && <><p>Hôm nay bạn muốn xem chuyện gì?</p><div className={styles.row}>{[["career", "Công việc"], ["love", "Tình cảm"], ["money", "Tiền bạc"]].map(([topic, name]) => <button disabled={busy} key={topic} onClick={() => void perform("daily", { topic })}>{name}</button>)}</div></>}
           <DailyFortune value={daily} />
           {daily && <button onClick={() => chooseShare(daily)}>Tạo thiệp lời gợi mở</button>}
         </section>
@@ -298,13 +298,17 @@ function BirthForm({ input, disabled, onSave }: { input: ChartInput | null | und
 
 function DailyFortune({ value }: { value?: Json }) {
   if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+  const date = typeof value.day === "string" ? value.day.split("-").reverse().join("/") : "";
+  const topic = value.topic === "career" ? "Công việc" : value.topic === "love" ? "Tình cảm" : value.topic === "money" ? "Tiền bạc" : "";
   return <article className={styles.card}>
+    {date && <p><small>{[topic, date].filter(Boolean).join(" · ")}</small></p>}
     <h3>{String(value.title ?? "")}</h3>
     <p>{String(value.body ?? "")}</p>
-    <p><strong>Việc nhỏ hôm nay</strong> {String(value.action ?? "")}</p>
-    <p><strong>Màu may mắn</strong> {String(value.color ?? "")} · <strong>Con số may mắn</strong> {String(value.number ?? "")}</p>
-    {Array.isArray(value.evidence) && value.evidence.length > 0 && <details><summary>Căn cứ</summary><Reading value={value.evidence} /></details>}
-    <p>{String(value.disclaimer ?? "")}</p>
+    <p><strong>Hôm nay thử làm</strong><br />{String(value.action ?? "")}</p>
+    {typeof value.caution === "string" && <p><strong>Điều cần để ý</strong><br />{value.caution}</p>}
+    {(value.color != null || value.number != null) && <p><small>Lấy vui hôm nay · {String(value.color ?? "")} · Số {String(value.number ?? "")}</small></p>}
+    {Array.isArray(value.evidence) && value.evidence.length > 0 && <details><summary>Thông tin tham chiếu</summary><Reading value={value.evidence} /></details>}
+    <p><small>{String(value.disclaimer ?? "")}</small></p>
   </article>;
 }
 function Horoscope({ value }: { value: Json | undefined }) {
