@@ -9,6 +9,7 @@ import { LoadingSubmitButton } from "@/components/loading-submit-button";
 import { AdminArticleDeleteForm } from "@/components/admin-article-delete-form";
 import { AdminTrendCharts } from "@/components/admin-trend-charts";
 import { AdminFunnelPanel } from "@/components/admin-funnel-panel";
+import { AdminQuanReport } from "@/components/admin-quan-report";
 import { AdminPaymentHygienePanel } from "@/components/admin-payment-hygiene-panel";
 import { displayChartAttributionSource, type ChartAttributionSource } from "@/lib/chart-attribution";
 
@@ -23,7 +24,7 @@ const ARTICLES_PER_ADMIN_PAGE = 8;
 const adminTabs: Array<{ id: AdminTab; label: string; helper: string; href: string }> = [
   { id: "overview", label: "Tổng quan", helper: "Chỉ số chính", href: "/admin?tab=overview" },
   { id: "users", label: "User", helper: "Tài khoản đăng ký", href: "/admin?tab=users" },
-  { id: "charts", label: "Lá số", helper: "Form đã submit", href: "/admin?tab=charts" },
+  { id: "charts", label: "Lá số đã lưu", helper: "Tra cứu hồ sơ từ biểu mẫu", href: "/admin?tab=charts" },
   { id: "content", label: "Nội dung", helper: "CMS, SEO và pSEO", href: "/admin?tab=content" },
   { id: "settings", label: "Cấu hình", helper: "Vận hành và giá", href: "/admin?tab=settings" },
 ];
@@ -103,10 +104,6 @@ function formatVnd(value = 0) {
 
 function formatInteger(value = 0) {
   return new Intl.NumberFormat("vi-VN").format(value);
-}
-
-function formatPercent(value = 0) {
-  return `${new Intl.NumberFormat("vi-VN", { maximumFractionDigits: 1 }).format(value)}%`;
 }
 
 function seoTone(score = 0) {
@@ -218,7 +215,7 @@ function seoChecks(article: ArticleView) {
     .filter(Boolean) as Array<{ label: string; passed: boolean; hint: string }>;
 }
 
-export default async function AdminPage({ searchParams }: { searchParams: Promise<{ tab?: string; saved?: string; edit?: string; categorySaved?: string; deleted?: string; settingsSaved?: string; userAdjusted?: string; userDeleted?: string; userError?: string; pricingSaved?: string; pricingError?: string; articleModal?: string; articlePage?: string; trend?: string; funnel?: string }> }) {
+export default async function AdminPage({ searchParams }: { searchParams: Promise<{ tab?: string; saved?: string; edit?: string; categorySaved?: string; deleted?: string; settingsSaved?: string; userAdjusted?: string; userDeleted?: string; userError?: string; pricingSaved?: string; pricingError?: string; articleModal?: string; articlePage?: string; trend?: string; funnel?: string; quan?: string }> }) {
   const user = await getCurrentUser();
   if (user?.role !== "ADMIN") redirect("/dang-nhap?next=/admin");
 
@@ -229,7 +226,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
   const [overview, business, funnelDashboard, chartSubmissions, articles, categories, editingArticle] = await Promise.all([
     getAdminOverview(requestedTrendPeriod),
     getAdminBusinessDashboard(),
-    getAdminFunnelDashboard(),
+    activeTab === "overview" ? getAdminFunnelDashboard() : Promise.resolve(null),
     activeTab === "charts" ? listAdminChartSubmissions() : Promise.resolve([]),
     listAdminArticles(),
     listArticleCategories(),
@@ -248,11 +245,8 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
   const reportMetrics = [
     { label: "Doanh thu", value: formatVnd(business.revenue.totalPaidVnd), note: `${formatInteger(business.revenue.paidOrders)} đơn đã thanh toán`, icon: Banknote, tone: "revenue" },
     { label: "Tổng Tài khoản", value: formatInteger(overview.users), note: "Tài khoản đã đăng ký", icon: UsersRound, tone: "users" },
-    { label: "Lá số được lập", value: formatInteger(overview.charts), note: "Tổng form lập lá số đã lưu", icon: ClipboardList, tone: "charts" },
-    { label: "Luận giải đã mở khóa", value: formatInteger(overview.unlockedReadings), note: `${formatInteger(overview.readings)} lượt luận giải trong hệ thống`, icon: Eye, tone: "readings" },
     { label: "Tổng số Bài viết SEO", value: formatInteger(overview.seoArticles), note: "CMS bài viết không bị xóa", icon: FilePenLine, tone: "content" },
     { label: "Tổng số Bài viết pSEO", value: formatInteger(overview.pseoArticles), note: "Trang tra cứu published và entity pSEO", icon: SearchCheck, tone: "pseo" },
-    { label: "Tỷ lệ Lá số vãng lai", value: formatPercent(overview.guestChartRate), note: `${formatInteger(overview.guestCharts)} / ${formatInteger(overview.charts)} lá số không gắn tài khoản`, icon: UsersRound, tone: "guest" },
     { label: "Số Sitemap", value: formatInteger(overview.sitemapFiles), note: `${formatInteger(overview.sitemapMainUrls)} URL trong sitemap chính`, icon: Globe2, tone: "sitemap" },
   ];
 
@@ -307,6 +301,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
         </nav>
 
         {activeTab === "overview" ? <section className="admin-tab-section">
+          <AdminQuanReport days={params.quan === "28" ? 28 : 7} />
           <div className="admin-panel-head">
             <div>
               <p className="eyebrow">Báo cáo</p>
@@ -327,9 +322,11 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
             })}
           </div>
 
-          <AdminTrendCharts initialPeriod={trendPeriod} trendGroups={overview.trendGroups} />
-
-          <AdminFunnelPanel dashboard={funnelDashboard} initialWindow={funnelWindow} />
+          <details className="panel admin-revenue-panel">
+            <summary className="cursor-pointer">Thống kê biểu mẫu và luồng xem lá số</summary>
+            <AdminTrendCharts initialPeriod={trendPeriod} trendGroups={overview.trendGroups} />
+            {funnelDashboard ? <AdminFunnelPanel dashboard={funnelDashboard} initialWindow={funnelWindow} /> : null}
+          </details>
 
           <AdminPaymentHygienePanel paymentHygiene={business.paymentHygiene} />
 
