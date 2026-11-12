@@ -645,11 +645,12 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
 
   // Nhân vật khách và động tác, dùng lại lưới và vật liệu.
   const visitors = new Map<string, ReturnType<typeof avatar>>();
+  const ambientBadgeMaterial = new THREE.SpriteMaterial();
   function avatar(color: number, name: string, detailed = false) {
     const group = new THREE.Group();
     const body = new THREE.Group();
     const arms = [new THREE.Group(), new THREE.Group()];
-    const robe = new THREE.MeshStandardMaterial({ color, roughness: 0.9, normalMap: detailed ? assets?.cloth : null, normalScale: new THREE.Vector2(0.32, 0.32) });
+    const robe = name ? new THREE.MeshStandardMaterial({ color, roughness: 0.9, normalMap: detailed ? assets?.cloth : null, normalScale: new THREE.Vector2(0.32, 0.32) }) : material(color);
     function part(parent: THREE.Object3D, shape: Shape, colorValue: number, x: number, y: number, z: number, sx: number, sy: number, sz = sx) {
       const mesh = new THREE.Mesh(geometry[shape], colorValue === color ? robe : material(colorValue));
       mesh.position.set(x, y, z);
@@ -692,15 +693,77 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
       part(elbow, "face", skin, 0, -.255, .015, .105, .13, .07);
       return leg;
     });
-    const badge = label(name);
+    const badge = name ? label(name) : new THREE.Sprite(ambientBadgeMaterial);
     badge.scale.multiplyScalar(0.59);
     badge.position.set(0, 1.98, 0);
     const ground = new THREE.Mesh(geometry.drum, groundShadows);
     ground.scale.set(0.78, 0.005, 0.49);
     ground.position.y = 0.03;
-    group.add(body, badge, ground);
-    scene.add(group);
+    group.add(body, ground);
+    if (name) { group.add(badge); scene.add(group); }
     return { bowStarted: undefined as number | undefined, group, body, torso, head, badge, arms, legs, knees, elbows, mouth, name, robe };
+  }
+  // Nhân vật nền chỉ có trong cảnh, đứng ngoài các đệm dành cho khách thật.
+  const walkingLoops = [
+    [[-13, 9], [-6, 9], [-6, 16], [-13, 16]],
+    [[-3, 11], [5, 11], [5, 19], [-3, 19]],
+    [[10, 4], [16, 4], [16, -3], [10, -3]],
+    [[9, -7], [15, -7], [15, -14], [9, -14]],
+  ];
+  const ambientRigs = Array.from({ length: 20 }, (_, index) =>
+    avatar([0x688078, 0x765970, 0x96734f][index % 3], "")
+  );
+  const ambientPrayerSpots = Array.from({ length: 8 }, (_, spot) =>
+    quanMonasteryToWorld({ x: spot < 4 ? -10.8 : 10.8, z: -5 + (spot % 4) * 3.5 })
+  );
+  const ambientParts = new Map<string, THREE.Mesh<THREE.BufferGeometry, THREE.Material>[]>();
+  for (const rig of ambientRigs) {
+    rig.group.traverse(node => {
+      if (!(node instanceof THREE.Mesh) || Array.isArray(node.material)) return;
+      const key = `${node.geometry.id}:${node.material.id}`;
+      if (!ambientParts.has(key)) ambientParts.set(key, []);
+      ambientParts.get(key)!.push(node);
+    });
+  }
+  const ambientBatches = Array.from(ambientParts.values(), parts => {
+    const mesh = new THREE.InstancedMesh(parts[0].geometry, parts[0].material, parts.length);
+    mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+    mesh.frustumCulled = false;
+    mesh.layers.enable(1);
+    scene.add(mesh);
+    return { mesh, parts };
+  });
+  let ambientTime = 0;
+  function drawAmbientGuests(delta: number, visible: boolean, reduced: boolean) {
+    ambientBatches.forEach(({ mesh }) => { mesh.visible = visible; });
+    if (!visible) return;
+    if (!reduced) ambientTime += delta;
+    ambientRigs.forEach((rig, index) => {
+      if (index < 12) {
+        const loop = walkingLoops[Math.floor(index / 3)];
+        const progress = (ambientTime * (0.14 + (index % 3) * 0.012) + (index % 3) * 4 / 3) % 4;
+        const segment = Math.floor(progress);
+        const [fromX, fromZ] = loop[segment], [toX, toZ] = loop[(segment + 1) % 4];
+        const x = THREE.MathUtils.lerp(fromX, toX, progress - segment);
+        const z = THREE.MathUtils.lerp(fromZ, toZ, progress - segment);
+        rig.group.position.set(x, quanGroundHeight(x, z) + .054, z);
+        rig.body.rotation.y = Math.atan2(toX - fromX, toZ - fromZ);
+        pose(rig, "idle", ambientTime + index, !reduced, reduced);
+      } else {
+        const spot = index - 12;
+        const location = ambientPrayerSpots[spot];
+        rig.group.position.set(location.x, QUAN_MONASTERY_SPACE.floor + .10, location.z);
+        rig.body.rotation.y = Math.PI;
+        const action = spot % 2 === 0 ? "seated" : (ambientTime + spot * 3) % 13 < 8 ? "greet" : "bow";
+        if (action !== "bow") rig.bowStarted = undefined;
+        pose(rig, action, ambientTime, false, reduced);
+      }
+      rig.group.updateMatrixWorld(true);
+    });
+    for (const { mesh, parts } of ambientBatches) {
+      parts.forEach((part, index) => mesh.setMatrixAt(index, part.matrixWorld));
+      mesh.instanceMatrix.needsUpdate = true;
+    }
   }
   const self = avatar(0x506f7e, "Bạn", true);
   const templeSash = new THREE.Mesh(geometry.box, material(0xdcb758));
@@ -1333,6 +1396,7 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
     camera.lookAt(look);
     skyDome.position.copy(camera.position);
     cameraReady = true;
+    drawAmbientGuests(dt, !seated && (experience === "courtyard" || experience === "teacher" || monastery), reducedMotion());
     const active = activeVisitors; active.clear();
     for (const player of current.players) {
       active.add(player.id);
@@ -1421,6 +1485,7 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
     signs.forEach(disposeLabel);
     visitors.forEach((visitor) => { disposeLabel(visitor.badge); visitor.robe.dispose(); });
     disposeLabel(self.badge); self.robe.dispose(); assets?.dispose();
+    ambientBadgeMaterial.dispose();
     oscillators.forEach(oscillator => { oscillator.stop(); oscillator.disconnect(); }); audioGain?.disconnect(); if (audio) void audio.close();
     disposeLabel(personalLabel); wishes.traverse(node => { if (node instanceof THREE.Sprite) disposeLabel(node); });
     auraGeometry.dispose(); auraMaterial.dispose();
