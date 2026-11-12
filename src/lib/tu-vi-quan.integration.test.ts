@@ -41,7 +41,7 @@ afterAll(async () => {
 });
 
 describe.skipIf(!db)("Tử Vi Quán with PostgreSQL and simulated PayOS", () => {
-  it("settles both packages once, preserves FIFO and isolates the restored session", async () => {
+  it("settles both packages once, ignores old capacity settings and isolates the restored session", async () => {
     const client = db!;
     vi.stubEnv("TU_VI_QUAN_PAYMENTS_ENABLED", "true");
     await client.quanSettings.upsert({ where: { id: "global" }, create: { id: "global", maxTables: 1 }, update: { maxTables: 1 } });
@@ -60,8 +60,7 @@ describe.skipIf(!db)("Tử Vi Quán with PostgreSQL and simulated PayOS", () => 
 
     expect(await changeQuanAdmission(client, owners[0], fifteen.id, "join")).toMatchObject({ status: "invited", tableNumber: 1 });
     const waiting = await changeQuanAdmission(client, owners[1], thirty.id, "join");
-    expect(waiting.status).toBe("queued");
-    expect(waiting.position).toBe(1);
+    expect(waiting).toMatchObject({ status: "invited", tableNumber: 2 });
 
     const [first, duplicate] = await Promise.all([
       changeQuanAdmission(client, owners[0], fifteen.id, "start"),
@@ -81,7 +80,7 @@ describe.skipIf(!db)("Tử Vi Quán with PostgreSQL and simulated PayOS", () => 
     await client.quanOrder.update({ where: { id: fifteen.id }, data: { endsAt: new Date(Date.now() - 1000) } });
     expect((await quanTransaction(client, (tx, now) => readQuanSession(tx, owners[2], fifteen.id, now))).status).toBe("ended");
     expect(await changeQuanAdmission(client, owners[1], thirty.id, "start")).toMatchObject({
-      status: "active", remainingSeconds: 1800, tableNumber: 1,
+      status: "active", remainingSeconds: 1800, tableNumber: 2,
     });
     const outageSince = new Date(Date.now() - 121_000);
     await client.quanOrder.update({

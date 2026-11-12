@@ -96,12 +96,8 @@ export default function QuanAdmin() {
       <div className="admin-report-metrics mb-5">
         <article className="admin-report-metric">
           <span className="admin-report-metric-label">Bàn nhận khách</span>
-          <strong>{data.maxTables === 0 ? "Tạm dừng" : `${data.maxTables} bàn`}</strong>
-          <label className="grid gap-1">Đổi số bàn
-            <select disabled={pending} className="min-h-11 rounded border p-2" value={data.maxTables} onChange={(event) => void update({ maxTables: Number(event.target.value) })}>
-              <option value={0}>Tạm dừng nhận khách</option><option value={1}>1 bàn</option><option value={2}>2 bàn</option><option value={3}>3 bàn</option>
-            </select>
-          </label>
+          <strong>{data.maxTables} chỗ</strong>
+          <small>Quán tự mời khách đang chờ khi có chỗ trống.</small>
         </article>
         <article className="admin-report-metric">
           <span className="admin-report-metric-label">Chờ đối soát hoàn tiền</span>

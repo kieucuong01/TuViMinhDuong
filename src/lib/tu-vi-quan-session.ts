@@ -1,5 +1,6 @@
 import "server-only";
 import { quanRemainingMs } from "@/lib/tu-vi-quan-time";
+import { QUAN_SESSION_CAPACITY } from "@/lib/tu-vi-quan-capacity.mjs";
 import { createHash, randomBytes, randomInt } from "node:crypto";
 import type { Prisma, PrismaClient } from "@/generated/prisma/client";
 import { generateTuViChart, type TuViChart } from "@/lib/chart";
@@ -31,9 +32,10 @@ export function quanTransaction<T>(db: PrismaClient, run: (tx: Tx, now: Date) =>
   });
 }
 
-export async function getQuanCapacity(db: Tx) {
-  const settings = await db.quanSettings.findUnique({ where: { id: "global" } });
-  return settings?.maxTables ?? 3;
+export function countQuanVoiceSlots(tx: Tx, now: Date) {
+  return tx.quanEncounter.count({ where: { OR: [
+    { state: { in: ["invited", "active"] } }, { speakingUntil: { gt: now } },
+  ] } });
 }
 
 export async function reconcileQueue(tx: Tx, now: Date) {
@@ -74,17 +76,18 @@ export async function reconcileQueue(tx: Tx, now: Date) {
       await tx.quanOrder.update({ where: { id: order.id }, data: { status: "ENDED" } });
     }
   }
-  const [capacity, occupied] = await Promise.all([
-    getQuanCapacity(tx),
-    tx.quanOrder.findMany({ where: { status: { in: ["INVITED", "ACTIVE"] } }, select: { tableNumber: true } }),
+  const [voiceSlots, occupied] = await Promise.all([
+    countQuanVoiceSlots(tx, now),
+    tx.quanOrder.findMany({ where: { encounter: null, status: { in: ["INVITED", "ACTIVE"] } }, select: { tableNumber: true } }),
   ]);
-  if (occupied.length >= capacity) return;
-  const free = Array.from({ length: capacity }, (_, index) => index + 1)
+  const available = QUAN_SESSION_CAPACITY - voiceSlots - occupied.length;
+  if (available <= 0) return;
+  const free = Array.from({ length: QUAN_SESSION_CAPACITY }, (_, index) => index + 1)
     .filter((tableNumber) => !occupied.some((order) => order.tableNumber === tableNumber));
   const next = await tx.quanOrder.findMany({
-    where: { status: "QUEUED" },
+    where: { status: "QUEUED", encounter: null },
     orderBy: [...fifo],
-    take: Math.min(capacity - occupied.length, free.length),
+    take: Math.min(available, free.length),
     select: { id: true },
   });
   for (const [index, order] of next.entries()) {
@@ -124,13 +127,14 @@ async function sessionSnapshot(tx: Tx, ownerId: string, id: string, now: Date) {
       select: { minutes: true },
     });
     position = ahead.length + 1;
-    const [capacity, tables] = await Promise.all([
-      getQuanCapacity(tx),
+    const [voiceSlots, tables] = await Promise.all([
+      countQuanVoiceSlots(tx, now),
       tx.quanOrder.findMany({
-        where: { status: { in: ["INVITED", "ACTIVE"] } },
+        where: { encounter: null, status: { in: ["INVITED", "ACTIVE"] } },
         select: { status: true, endsAt: true, outageSince: true, minutes: true, inviteExpiresAt: true },
       }),
     ]);
+    const capacity = QUAN_SESSION_CAPACITY - voiceSlots;
     const times = tables.map((table) => {
       if (table.status === "INVITED") {
         return table.minutes * 60 + Math.max(0, Math.ceil(((table.inviteExpiresAt?.getTime() ?? now.getTime()) - now.getTime()) / 1000));
@@ -138,8 +142,10 @@ async function sessionSnapshot(tx: Tx, ownerId: string, id: string, now: Date) {
       const remaining = (table.endsAt?.getTime() ?? now.getTime()) - (table.outageSince ?? now).getTime();
       return Math.max(0, Math.ceil(remaining / 1000));
     }).sort((a, b) => a - b);
-    while (times.length < capacity) times.push(0);
-    waitSeconds = getQuanQueueWait(times.slice(Math.max(0, times.length - capacity)), ahead.map((entry) => entry.minutes));
+    if (capacity > 0) {
+      while (times.length < capacity) times.push(0);
+      waitSeconds = getQuanQueueWait(times.slice(Math.max(0, times.length - capacity)), ahead.map((entry) => entry.minutes));
+    }
   }
   return {
     id,
@@ -206,7 +212,6 @@ export async function checkoutQuanSession(db: PrismaClient, guest: Guest, minute
   const orderCode = randomInt(QUAN_ORDER_CODE_MIN, QUAN_ORDER_CODE_MAX);
   const order = await quanTransaction(db, async (tx, now) => {
     await reconcileQueue(tx, now);
-    if (await getQuanCapacity(tx) === 0) throw new QuanSessionError("Quán đang tạm nghỉ. Bạn quay lại sau nhé.", 503);
     const existing = await tx.quanOrder.findFirst({
       where: {
         ownerId: guest.id,
@@ -290,7 +295,6 @@ export async function changeQuanAdmission(db: PrismaClient, ownerId: string, id:
     if (action === "join" && order.status === "PAID") {
       const other = await tx.quanOrder.findFirst({ where: { ownerId, status: { in: [...openStates] } }, select: { id: true } });
       if (other) throw new QuanSessionError("Bạn đang chờ hoặc đang xem ở một bàn khác.");
-      if (await getQuanCapacity(tx) === 0) throw new QuanSessionError("Quán đang tạm nghỉ. Lượt đã mua vẫn còn.", 503);
       await tx.quanOrder.update({ where: { id }, data: { status: "QUEUED", queuedAt: now } });
     } else if (action === "leave" && (order.status === "QUEUED" || order.status === "INVITED")) {
       await tx.quanOrder.update({

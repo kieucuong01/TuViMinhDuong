@@ -7,6 +7,7 @@ Purpose: this is the first low-token context file for any new AI agent. Read thi
 - App: `La so tinh hoa`, Vietnamese tu vi web app for adults 30-60.
 - Primary URL: `https://lasotinhhoa.vn`.
 - Main funnel: homepage 3D world -> alias -> choose a host or monastery -> private voice intake/5 free minutes -> shared PayOS minutes (15/30). Existing chart/report and account URLs remain available from the game menu.
+- Tử Vi Quán shares six concurrent slots across free and paid sessions. Guests queue when all slots are occupied and can use text if audio is unavailable.
 - Product marketing context: `.agents/product-marketing.md`.
 - Trust model: clear Vietnamese copy, no exaggerated fortune promises, money/policy surfaces hidden from guests unless needed for public compliance.
 - Stack: Next.js 16 App Router, React 19, TypeScript, Tailwind v4, Prisma 7/Postgres, PayOS/VietQR, Vitest, ESLint, VPS self-hosting with Nginx and PM2.

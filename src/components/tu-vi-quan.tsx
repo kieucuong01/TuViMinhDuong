@@ -647,7 +647,7 @@ export default function TuViQuan({ initialAlias, support, paymentsEnabled, ecosy
           {help && <aside className={styles.help} aria-label="Hướng dẫn và tùy chọn">
             <strong>Mời bạn thong thả dạo quán</strong><p>{ecosystemEnabled ? "Dùng các nút dưới sân để mở hoạt động. Trong Khám phá, chọn Bản đồ để nhân vật tự đi đến nơi bạn chọn." : "Chọn Xem lá số, Thắp hương hoặc Ủng hộ quán để mở ngay. Vào Khám phá và chọn một nơi, nhân vật sẽ tự đi đến."}</p>
             <p>Trên điện thoại, kéo nửa trái để đi và kéo nửa phải để xoay góc nhìn. Có thể dùng hai ngón cùng lúc hoặc quay ngang máy. Trên máy tính, dùng WASD hoặc bấm nền để đi, kéo chuột để xoay.</p>
-            {board && <p>{board.tables ? `${board.occupied}/${board.tables} bàn đang dùng · ${board.queued} lượt chờ` : "Bàn thầy đang tạm nghỉ"}</p>}
+            {board && <p>{board.occupied}/{board.tables} chỗ đang dùng · {board.queued} lượt chờ</p>}
             <button onClick={() => openPanel("arrival")}>Chọn nơi muốn ghé</button>
             <button onClick={() => openPanel("map")}>Bản đồ các viện</button>
             <button onClick={() => { setLite(!lite); setHelp(false); }}>{lite ? "Thử lại 3D" : "Giao diện nhẹ"}</button>

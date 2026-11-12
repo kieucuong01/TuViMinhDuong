@@ -7,7 +7,6 @@ import { getQuanGuest, setQuanGuest } from "@/lib/tu-vi-quan-guest";
 import { quanError, quanJson, readQuanBody } from "@/lib/tu-vi-quan-http";
 import { refreshQuanPayment } from "@/lib/tu-vi-quan-payment";
 import { quanVoiceGameEnabled } from "@/lib/tu-vi-quan-encounter";
-import { quanVoiceCapabilities } from "@/lib/tu-vi-quan-voice";
 import {
   answerQuanTurn, changeQuanAdmission, checkoutQuanSession, quanTransaction,
   QuanSessionError, readQuanSession, reissueQuanRecoveryCode, restoreQuanSession,
@@ -58,10 +57,6 @@ export async function POST(request: Request) {
     }
     if (!guest) throw new QuanSessionError("Hãy nhập bí danh trước khi xem.", 401);
     if (body.action === "checkout") {
-      if (quanVoiceGameEnabled() && process.env.NODE_ENV === "production") {
-        const voice = await quanVoiceCapabilities();
-        if (!voice.stt || !voice.tts) throw new QuanSessionError("Bàn thoại đang tạm nghỉ.", 503);
-      }
       const limit = await checkAuthRateLimit("quan-checkout", request.headers, { limit: 12, windowMs: 15 * 60_000 });
       if (limit.rateLimited) throw new QuanSessionError("Bạn đã tạo nhiều đơn. Hãy đợi rồi thử lại.", 429);
       const kind = body.readingKind;

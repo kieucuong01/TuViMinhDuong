@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { moderateWish } from "../src/lib/tu-vi-quan-moderation.mjs";
+import { QUAN_SESSION_CAPACITY } from "../src/lib/tu-vi-quan-capacity.mjs";
 import { createServer } from "node:http";
 import { isIP } from "node:net";
 import dotenv from "dotenv";
@@ -271,15 +272,28 @@ if (process.argv.includes("--serve")) {
     async readBoard() {
       if (!pool) return null;
       const { rows: [board] } = await pool.query(`
-        SELECT COALESCE((SELECT "maxTables" FROM "QuanSettings" WHERE id = 'global'), 3) AS tables,
-          COUNT(*) FILTER (WHERE status = 'QUEUED')::int AS queued,
-          COUNT(*) FILTER (WHERE status = 'INVITED' AND "inviteExpiresAt" > NOW()
+        WITH slots AS (
+          SELECT state = 'waiting' AS queued,
+            (state = 'invited' AND "inviteExpiresAt" > timezone('UTC', NOW())
+            OR state = 'active' AND (
+              ("outageSince" IS NULL AND "endsAt" + INTERVAL '30 seconds' > timezone('UTC', NOW()))
+              OR "outageSince" + INTERVAL '2 minutes' > timezone('UTC', NOW())
+            ) OR "speakingUntil" > timezone('UTC', NOW())) AS occupied
+          FROM "QuanEncounter"
+          WHERE state IN ('waiting', 'invited', 'active') OR "speakingUntil" > timezone('UTC', NOW())
+          UNION ALL
+          SELECT status = 'QUEUED',
+            (status = 'INVITED' AND "inviteExpiresAt" > timezone('UTC', NOW())
             OR status = 'ACTIVE' AND (
-              ("outageSince" IS NULL AND "endsAt" + INTERVAL '30 seconds' > NOW())
-              OR "outageSince" + INTERVAL '2 minutes' > NOW()
-            ))::int AS occupied
-        FROM "QuanOrder" WHERE status IN ('QUEUED', 'INVITED', 'ACTIVE')
-      `);
+              ("outageSince" IS NULL AND "endsAt" > timezone('UTC', NOW()))
+              OR "outageSince" + INTERVAL '2 minutes' > timezone('UTC', NOW())
+            ))
+          FROM "QuanOrder" o WHERE status IN ('QUEUED', 'INVITED', 'ACTIVE')
+            AND NOT EXISTS (SELECT 1 FROM "QuanEncounter" e WHERE e."orderId" = o.id)
+        )
+        SELECT $1::int AS tables, COUNT(*) FILTER (WHERE queued)::int AS queued,
+          COUNT(*) FILTER (WHERE occupied)::int AS occupied FROM slots
+      `, [QUAN_SESSION_CAPACITY]);
       if (!ecosystemEnabled) return board;
       const { rows: leaders } = await pool.query(`
         SELECT p.alias, SUM(e.points)::int AS points

@@ -1,7 +1,8 @@
 import { getCurrentUser } from "@/lib/auth";
 import { getDb } from "@/lib/db";
 import { quanError, quanJson, readQuanBody } from "@/lib/tu-vi-quan-http";
-import { getQuanCapacity, quanTransaction, QuanSessionError, reconcileQueue } from "@/lib/tu-vi-quan-session";
+import { quanTransaction, QuanSessionError, reconcileQueue } from "@/lib/tu-vi-quan-session";
+import { QUAN_SESSION_CAPACITY } from "@/lib/tu-vi-quan-capacity.mjs";
 import { readQuanAdminEcosystem, updateQuanAdminEcosystem } from "@/lib/tu-vi-quan-admin";
 import { quanEcosystemEnabled } from "@/lib/tu-vi-quan-ecosystem";
 
@@ -16,8 +17,7 @@ export async function GET() {
     const db = getDb();
     if (!db) throw new QuanSessionError("Chưa kết nối dữ liệu.", 503);
     await quanTransaction(db, reconcileQueue);
-    const [maxTables, refunds, recent] = await Promise.all([
-      getQuanCapacity(db),
+    const [refunds, recent] = await Promise.all([
       db.quanOrder.findMany({
         where: { status: "REFUND", refundSettledAt: null },
         orderBy: { createdAt: "asc" },
@@ -31,7 +31,7 @@ export async function GET() {
       }),
     ]);
     const ecosystem = quanEcosystemEnabled() ? await readQuanAdminEcosystem(db) : null;
-    return quanJson({ maxTables, ecosystem, orders: [...refunds, ...recent].map((order) => ({
+    return quanJson({ maxTables: QUAN_SESSION_CAPACITY, ecosystem, orders: [...refunds, ...recent].map((order) => ({
       ...order, orderCode: String(order.orderCode), status: order.status.toLowerCase(),
     })) });
   } catch (error) {
@@ -50,13 +50,7 @@ export async function POST(request: Request) {
       await updateQuanAdminEcosystem(db, admin.id, body);
       return quanJson({ ok: true });
     }
-    const { maxTables, refundOrderId } = body;
-    if (typeof maxTables === "number" && Number.isInteger(maxTables) && maxTables >= 0 && maxTables <= 3) {
-      await quanTransaction(db, async (tx) => {
-        await tx.quanSettings.upsert({ where: { id: "global" }, create: { id: "global", maxTables }, update: { maxTables } });
-      });
-      return quanJson({ maxTables });
-    }
+    const { refundOrderId } = body;
     if (typeof refundOrderId === "string" && refundOrderId.length <= 64) {
       const refund = await db.quanOrder.updateMany({
         where: { id: refundOrderId, status: "REFUND", refundSettledAt: null },

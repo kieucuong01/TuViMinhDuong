@@ -303,7 +303,7 @@ export default function TuViQuanEncounter({ kind, orderId, ticketId, muted, onLe
       {!encounter && !exhausted && !busy && <button className={styles.primary} onClick={() => void run("begin")}>Thử tìm chỗ lại</button>}
       {encounter?.state === "invited" && !intake && <button className={styles.primary} disabled={busy} onClick={() => void run("start")}>Bắt đầu xem</button>}
       {(active || intake) && !ended && snapshot?.capabilities.stt && <button className={recording ? styles.recording : styles.primary} disabled={busy} onClick={() => void startMic()} aria-pressed={recording}>{recording ? "Gửi lời nói" : speaking ? "Ngắt lời và nói" : intake ? "Nói thông tin" : "Nói với Thầy"}</button>}
-      {(active || intake) && !ended && snapshot?.capabilities.stt && <button aria-expanded={showText} onClick={() => setShowText(value => !value)}>{intake ? "Nhập thông tin" : "Gõ câu hỏi"}</button>}
+      {(intake || (active && snapshot?.capabilities.tts)) && !ended && snapshot?.capabilities.stt && <button aria-expanded={showText} onClick={() => setShowText(value => !value)}>{intake ? "Nhập thông tin" : "Gõ câu hỏi"}</button>}
       {active && !ended && !recording && !busy && !speaking && kind !== "tuvi" && <button onClick={drawAtTable}>{kind === "tarot" ? "Rút bài trên bàn" : "Gieo quẻ trên bàn"}</button>}
       {(ended || exhausted) && <button className={styles.primary} onClick={() => onUpgrade(kind)}>Xem thêm</button>}
       {(ended || exhausted) && snapshot?.rewardTickets?.[0] && <button disabled={busy} onClick={() => void run("begin", snapshot.rewardTickets![0].id)}>Dùng vé thêm 5 phút</button>}
@@ -323,7 +323,8 @@ export default function TuViQuanEncounter({ kind, orderId, ticketId, muted, onLe
           <button className={styles.primary} disabled={busy || recording}>Lập lá số</button>
         </form>
       </>}
-    {(showText || !snapshot?.capabilities.stt) && active && !intake && !ended && <form className={styles.text} onSubmit={event => { event.preventDefault(); interruptSpeech(); void send(text); }}><textarea rows={2} aria-label="Câu hỏi cho Thầy" value={text} onChange={event => setText(event.target.value)} maxLength={1200} placeholder="Bạn muốn hỏi điều gì?" /><button disabled={busy || recording || !text.trim()}>Gửi</button></form>}
+    {active && !intake && !ended && snapshot?.capabilities.tts === false && <p className={styles.status}>Thầy sẽ trả lời bằng chữ khi giọng đọc chưa sẵn sàng.</p>}
+    {(showText || !snapshot?.capabilities.stt || !snapshot?.capabilities.tts) && active && !intake && !ended && <form className={styles.text} onSubmit={event => { event.preventDefault(); interruptSpeech(); void send(text); }}><textarea rows={2} aria-label="Câu hỏi cho Thầy" value={text} onChange={event => setText(event.target.value)} maxLength={1200} placeholder="Bạn muốn hỏi điều gì?" /><button disabled={busy || recording || !text.trim()}>Gửi</button></form>}
     {!!encounter?.messages.length && <details><summary>Xem lại cuộc trò chuyện</summary><div className={styles.transcript}>{encounter.messages.map(message => <p key={message.id}>{message.question && <><strong>Bạn:</strong> {message.question}<br /></>}<strong>{names[kind]}:</strong> {message.answer || "Đang suy ngẫm…"}{message.interrupted && " (đã ngắt lời)"}</p>)}</div></details>}
   </section>;
 }

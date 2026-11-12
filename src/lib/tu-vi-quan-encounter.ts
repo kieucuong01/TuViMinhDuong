@@ -9,7 +9,8 @@ import { quanConversationGuidance } from "@/lib/tu-vi-quan-conversation";
 import { drawIChing, drawTarot, quanDayKey } from "@/lib/tu-vi-quan-content";
 import { ecosystemTransaction, ensureProfile, saveQuanBirth } from "@/lib/tu-vi-quan-ecosystem";
 import type { QuanGuest } from "@/lib/tu-vi-quan-guest";
-import { QuanSessionError, readQuanChart, reconcileQueue } from "@/lib/tu-vi-quan-session";
+import { countQuanVoiceSlots, QuanSessionError, readQuanChart, reconcileQueue } from "@/lib/tu-vi-quan-session";
+import { QUAN_SESSION_CAPACITY } from "@/lib/tu-vi-quan-capacity.mjs";
 import { quanRemainingMs } from "@/lib/tu-vi-quan-time";
 
 type Tx = Prisma.TransactionClient;
@@ -142,16 +143,20 @@ async function advance(tx: Tx, now: Date) {
       ] },
     ] }, data: { state: "ended" },
   });
-  const occupied = await tx.quanEncounter.findFirst({ where: { OR: [
-    { state: { in: ["invited", "active"] } }, { speakingUntil: { gt: now } },
-  ] }, select: { id: true } });
-  if (occupied) return;
-  const next = await tx.quanEncounter.findFirst({
+  const [voiceSlots, legacySlots] = await Promise.all([
+    countQuanVoiceSlots(tx, now),
+    tx.quanOrder.count({ where: { encounter: null, status: { in: ["INVITED", "ACTIVE"] } } }),
+  ]);
+  const available = QUAN_SESSION_CAPACITY - voiceSlots - legacySlots;
+  if (available <= 0) return;
+  const next = await tx.quanEncounter.findMany({
     where: { state: "waiting", OR: [{ orderId: null }, { order: { status: { in: ["PAID", "QUEUED", "INVITED", "ACTIVE"] } } }] },
     orderBy: [{ queuedAt: "asc" }, { id: "asc" }],
+    take: available,
+    select: { id: true, context: true },
   });
-  if (next) await tx.quanEncounter.update({
-    where: { id: next.id }, data: { state: "invited", inviteExpiresAt: new Date(now.getTime() + ((next.context as Context).chartMissing ? 300_000 : 60_000)) },
+  for (const entry of next) await tx.quanEncounter.update({
+    where: { id: entry.id }, data: { state: "invited", inviteExpiresAt: new Date(now.getTime() + ((entry.context as Context).chartMissing ? 300_000 : 60_000)) },
   });
 }
 
@@ -453,9 +458,6 @@ export function finishEncounterSpeech(db: PrismaClient, actor: Actor, id: string
   return transaction(db, actor, async (tx, profile, now) => {
     const row = await owned(tx, profile, id);
     const released = await tx.quanEncounter.updateMany({ where: { id, ...(speakingUntil ? { speakingUntil } : {}) }, data: { speakingUntil: null } });
-    if (released.count && row.state === "active" && !result.aborted) {
-      if (result.failed) await markFailure(tx, row, now);
-      else await recover(tx, row, now);
-    }
+    if (released.count && row.state === "active" && !result.aborted && !result.failed) await recover(tx, row, now);
   });
 }

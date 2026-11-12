@@ -31,9 +31,6 @@ export async function POST(request: Request) {
     const limit = await checkAuthRateLimit("quan-encounter", request.headers, { limit: 60, windowMs: 60_000 });
     if (limit.rateLimited) throw new QuanSessionError("Bạn thao tác hơi nhanh. Hãy thử lại sau.", 429);
     const capabilities = await quanVoiceCapabilities();
-    if (body.action === "start" && process.env.NODE_ENV === "production" && (!capabilities.stt || !capabilities.tts)) {
-      throw new QuanSessionError("Bàn thoại đang tạm nghỉ. Thời lượng của bạn vẫn còn.", 503);
-    }
     const view = body.action === "turn" ? await answerEncounter(db, actor, body)
       : body.action === "birth_capture" ? await captureEncounterBirth(db, actor, body)
         : await changeEncounter(db, actor, body);

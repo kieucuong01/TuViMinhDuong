@@ -37,20 +37,29 @@ afterAll(async () => {
 });
 
 describe.skipIf(!db)("Tử Vi Quán voice seats in PostgreSQL", () => {
-  it("gives one invitation, preserves the 300-second budget when switching hosts, and resets by Vietnam day", async () => {
-    const a = player(), b = player();
+  it("admits six concurrent guests, invites the next after a departure, and preserves the free budget", async () => {
+    const seated = player();
+    const others = Array.from({ length: 5 }, () => player());
+    const waiting = player();
     const now = new Date("2026-11-04T14:00:00Z");
-    const [first, second] = await Promise.all([begin(a, "tuvi", now), begin(b, "tarot", now)]);
-    expect([first.encounter!.state, second.encounter!.state].sort()).toEqual(["invited", "waiting"]);
-    const [seated, waiting] = first.encounter!.state === "invited" ? [a, b] : [b, a];
-    const seatedId = (seated === a ? first : second).encounter!.id;
-    const waitingId = (waiting === a ? first : second).encounter!.id;
-    const started = await act(seated, "start", seatedId, now);
-    expect(started.encounter?.remainingSeconds).toBe(300);
+    const actors = [seated, ...others];
+    const admitted = await Promise.all(actors.map(actor => begin(actor, "tuvi", now)));
+    expect(admitted.map(view => view.encounter?.state)).toEqual(Array(6).fill("invited"));
+    const seatedId = admitted[0].encounter!.id;
+    const waitingView = await begin(waiting, "tarot", now);
+    expect(waitingView.encounter?.state).toBe("waiting");
+    const waitingId = waitingView.encounter!.id;
+    for (const [index, actor] of actors.entries()) {
+      const started = await act(actor, "start", admitted[index].encounter!.id, now);
+      expect(started.encounter).toMatchObject({ state: "active", remainingSeconds: 300 });
+    }
     const oneMinute = new Date(now.getTime() + 60_000);
     await act(seated, "leave", seatedId, oneMinute);
     expect((await readEncounter(db!, waiting, oneMinute)).encounter?.state).toBe("invited");
     await act(waiting, "leave", waitingId, oneMinute);
+    for (const [index, actor] of others.entries()) {
+      await act(actor, "leave", admitted[index + 1].encounter!.id, oneMinute);
+    }
     const resumed = await begin(seated, "iching", oneMinute);
     expect(resumed.encounter?.id).toBe(seatedId);
     expect(resumed.encounter?.context.lines).toHaveLength(6);
@@ -76,7 +85,8 @@ describe.skipIf(!db)("Tử Vi Quán voice seats in PostgreSQL", () => {
     await expect(getEncounterSpeech(db!, b, id, turnId)).rejects.toMatchObject({ status: 404 });
     const audio = await getEncounterSpeech(db!, a, id, turnId);
     await expect(getEncounterSpeech(db!, a, id, turnId)).rejects.toMatchObject({ status: 409 });
-    await finishEncounterSpeech(db!, a, id, { failed: false, aborted: true }, audio.speakingUntil);
+    await finishEncounterSpeech(db!, a, id, { failed: true, aborted: false }, audio.speakingUntil);
+    expect((await readEncounter(db!, a)).encounter).toMatchObject({ state: "active", paused: false });
     await changeEncounter(db!, a, { action: "interrupt", id, turnId });
     await expect(getEncounterSpeech(db!, a, id, turnId)).rejects.toMatchObject({ status: 404 });
     await act(a, "leave", id);
