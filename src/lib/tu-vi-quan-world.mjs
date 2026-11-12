@@ -4,6 +4,7 @@ export const QUAN_TEACHER_DESKS = QUAN_TEACHER_HALLS.flatMap((hall, wing) =>
   [-8.25, -2.75, 2.75, 8.25].map((offset, index) => ({ desk: wing * 4 + index + 1, x: hall.x + offset, z: hall.z + 4.05 })));
 export const QUAN_TEMPLE_INCENSE_POINT = { x: 1.1, z: -31.1, label: "lư hương điện Phật" };
 export const QUAN_SPAWN = { x: QUAN_TEACHER_HALLS[0].x, z: 19 };
+export const QUAN_AMBIENT_GUEST_COUNT = 20;
 export const QUAN_MONASTERY_SEATS = Array.from({ length: 28 }, (_, index) => ({ index, x: -9 + index % 7 * 3, z: -6 + Math.floor(index / 7) * 3.5 }));
 export const QUAN_MONASTERY_ENTRY = { x: 0, z: 10 };
 export const QUAN_MONASTERY_SPACE = { x: 0, z: -26.8, depthScale: 0.62, floor: 1.2 };

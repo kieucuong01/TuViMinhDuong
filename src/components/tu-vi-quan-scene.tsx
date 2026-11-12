@@ -7,7 +7,7 @@ import { QUAN_TAROT_CARDS } from "@/lib/tu-vi-quan-content";
 import { poseQuanAvatar as pose } from "@/lib/tu-vi-quan-avatar-motion";
 import type { MonasteryPose } from "./tu-vi-quan-monastery";
 import styles from "./tu-vi-quan-scene.module.css";
-import { QUAN_TEACHER_HALLS, QUAN_TEACHER_DESKS, findQuanPath, isQuanWalkable, quanGroundHeight, quanMonasteryToWorld, quanWorldToMonastery, QUAN_BOUNDS, QUAN_POND, QUAN_STATIONS, QUAN_MONASTERY_SEATS, QUAN_MONASTERY_SPACE } from "@/lib/tu-vi-quan-world.mjs";
+import { QUAN_TEACHER_HALLS, QUAN_TEACHER_DESKS, findQuanPath, isQuanWalkable, quanGroundHeight, quanMonasteryToWorld, quanWorldToMonastery, QUAN_AMBIENT_GUEST_COUNT, QUAN_BOUNDS, QUAN_POND, QUAN_STATIONS, QUAN_MONASTERY_SEATS, QUAN_MONASTERY_SPACE } from "@/lib/tu-vi-quan-world.mjs";
 
 type Position = { x: number; z: number };
 type Player = Position & { id: string; alias: string; action: string; seatIndex?: number | null; monasteryPose?: MonasteryPose; monasteryPosition?: Position };
@@ -47,7 +47,7 @@ const PALETTE = {
   stone: 0xba9d82, moss: 0x798554, lantern: 0xf08344, light: 0xffc27a,
 };
 
-function label(text: string, large = false) {
+function label(text: string, large = false, subtitle?: string) {
   const canvas = document.createElement("canvas");
   canvas.width = 384;
   canvas.height = 100;
@@ -64,7 +64,12 @@ function label(text: string, large = false) {
   ctx.fillStyle = "#fff0cb";
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
-  ctx.fillText(text, 192, 53, width - 18);
+  ctx.fillText(text, 192, subtitle ? 39 : 53, width - 18);
+  if (subtitle) {
+    ctx.font = '600 25px "Quan Sans", sans-serif';
+    ctx.fillStyle = "#ffd397";
+    ctx.fillText(subtitle, 192, 70, width - 18);
+  }
   const texture = new THREE.CanvasTexture(canvas);
   texture.colorSpace = THREE.SRGBColorSpace;
   const material = new THREE.SpriteMaterial({ map: texture, depthWrite: false, sizeAttenuation: true });
@@ -710,9 +715,19 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
     [[10, 4], [16, 4], [16, -3], [10, -3]],
     [[9, -7], [15, -7], [15, -14], [9, -14]],
   ];
-  const ambientRigs = Array.from({ length: 20 }, (_, index) =>
-    avatar([0x688078, 0x765970, 0x96734f][index % 3], "")
-  );
+  const ambientAliases = [
+    "An Mộc", "Bình Trà", "Mây Nhỏ", "Nắng Hiên", "Tùng Xanh", "Minh Chi",
+    "Nhật An", "Lam Vũ", "Thảo Mộc", "Cỏ Non", "Hải Vân", "Khánh Nhiên",
+    "Hoài An", "Tâm Mộc", "Thanh Liên", "Nguyệt Sương", "Tuệ Minh", "Phúc Lâm", "Trúc Lam", "Sen Hồng",
+  ];
+  const ambientRigs = Array.from({ length: QUAN_AMBIENT_GUEST_COUNT }, (_, index) => {
+    const rig = avatar([0x688078, 0x765970, 0x96734f][index % 3], "");
+    const badge = label(ambientAliases[index], false, `Cấp ${1 + (index * 3) % 5}`);
+    badge.scale.multiplyScalar(.72);
+    badge.layers.enable(1);
+    scene.add(badge);
+    return { ...rig, badge };
+  });
   const ambientPrayerSpots = Array.from({ length: 8 }, (_, spot) =>
     quanMonasteryToWorld({ x: spot < 4 ? -10.8 : 10.8, z: -5 + (spot % 4) * 3.5 })
   );
@@ -734,9 +749,12 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
     return { mesh, parts };
   });
   let ambientTime = 0;
-  function drawAmbientGuests(delta: number, visible: boolean, reduced: boolean) {
+  function drawAmbientGuests(delta: number, visible: boolean, reduced: boolean, playerX: number, playerZ: number) {
     ambientBatches.forEach(({ mesh }) => { mesh.visible = visible; });
-    if (!visible) return;
+    if (!visible) {
+      ambientRigs.forEach(rig => { rig.badge.visible = false; });
+      return;
+    }
     if (!reduced) ambientTime += delta;
     ambientRigs.forEach((rig, index) => {
       if (index < 12) {
@@ -758,6 +776,9 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
         if (action !== "bow") rig.bowStarted = undefined;
         pose(rig, action, ambientTime, false, reduced);
       }
+      const { x, y, z } = rig.group.position;
+      rig.badge.visible = Math.hypot(x - playerX, z - playerZ) < 15;
+      rig.badge.position.set(x, y + rig.badge.position.y, z);
       rig.group.updateMatrixWorld(true);
     });
     for (const { mesh, parts } of ambientBatches) {
@@ -1396,7 +1417,7 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
     camera.lookAt(look);
     skyDome.position.copy(camera.position);
     cameraReady = true;
-    drawAmbientGuests(dt, !seated && (experience === "courtyard" || experience === "teacher" || monastery), reducedMotion());
+    drawAmbientGuests(dt, !seated && (experience === "courtyard" || experience === "teacher" || monastery), reducedMotion(), x, z);
     const active = activeVisitors; active.clear();
     for (const player of current.players) {
       active.add(player.id);
@@ -1486,6 +1507,7 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
     visitors.forEach((visitor) => { disposeLabel(visitor.badge); visitor.robe.dispose(); });
     disposeLabel(self.badge); self.robe.dispose(); assets?.dispose();
     ambientBadgeMaterial.dispose();
+    ambientRigs.forEach(rig => disposeLabel(rig.badge));
     oscillators.forEach(oscillator => { oscillator.stop(); oscillator.disconnect(); }); audioGain?.disconnect(); if (audio) void audio.close();
     disposeLabel(personalLabel); wishes.traverse(node => { if (node instanceof THREE.Sprite) disposeLabel(node); });
     auraGeometry.dispose(); auraMaterial.dispose();

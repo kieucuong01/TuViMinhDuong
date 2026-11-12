@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore, type FormEvent } from "react";
 import { BookOpen, CircleHelp, Compass, Flame, Heart, MapPin, Menu, Navigation, X } from "lucide-react";
-import { QUAN_TEMPLE_INCENSE_POINT, QUAN_TEACHER_HALLS, QUAN_TEACHER_DESKS, QUAN_BLOCKS, QUAN_BOUNDS, QUAN_POND, QUAN_SPAWN, QUAN_STATIONS, QUAN_MONASTERY_ENTRY, QUAN_MONASTERY_SEATS, getQuanZone, quanMonasteryToWorld } from "@/lib/tu-vi-quan-world.mjs";
+import { QUAN_AMBIENT_GUEST_COUNT, QUAN_TEMPLE_INCENSE_POINT, QUAN_TEACHER_HALLS, QUAN_TEACHER_DESKS, QUAN_BLOCKS, QUAN_BOUNDS, QUAN_POND, QUAN_SPAWN, QUAN_STATIONS, QUAN_MONASTERY_ENTRY, QUAN_MONASTERY_SEATS, getQuanZone, quanMonasteryToWorld } from "@/lib/tu-vi-quan-world.mjs";
 import styles from "./tu-vi-quan.module.css";
 import type { MonasteryPose } from "./tu-vi-quan-monastery";
 import type { EncounterKind, EncounterVisual } from "./tu-vi-quan-encounter";
@@ -603,7 +603,12 @@ export default function TuViQuan({ initialAlias, support, paymentsEnabled, ecosy
       {alias && !host && inMonastery && <Monastery initial={ecosystem ?? undefined} participants={players.filter(player => player.action === "monastery" && Number.isInteger(player.seatIndex)).length + (monasterySeat === null ? 0 : 1)} connected={online} seatIndex={monasterySeat} nearbySeat={monasteryNearby} onFindSeat={findMonasterySeat} seatError={monasterySeatError} onSeat={selectMonasterySeat} alias={alias} lite={lite} onIncense={requestTempleIncense} onSnapshot={receiveEcosystem} onPose={poseInMonastery} onLeave={() => navigate({ x: 0, z: -12, label: "sân quán" })} onUseTicket={id => openHost("tuvi", undefined, id)} />}
       <header style={inMonastery ? { display: "none" } : undefined} className={styles.mast} inert={Boolean(panel) || ecosystemOpen}>
         <button className={styles.icon} aria-label="Mở trình đơn" onClick={() => setHelp(!help)}><Menu size={20} /></button>
-        <div className={styles.identity}><h1>Tử Vi Quán</h1><span>{alias ? online ? players.length + 1 + " khách trong sân" : courtyardFull ? "Sân chung đang đông" : "Đang kết nối sân chung" : "Lá số tinh hoa"}</span></div>
+        <div className={styles.identity}>
+          <h1>Tử Vi Quán</h1>
+          <span>{!alias ? "Lá số tinh hoa" : online
+            ? `${players.length + 1 + (lite ? 0 : QUAN_AMBIENT_GUEST_COUNT)} khách trong sân`
+            : courtyardFull ? "Sân chung đang đông" : "Đang kết nối sân chung"}</span>
+        </div>
         {alias && <button className={styles.icon} aria-label="Hướng dẫn và tùy chọn" aria-expanded={help} onClick={() => setHelp(!help)}><CircleHelp size={22} /></button>}
       </header>
       {!alias ? (
