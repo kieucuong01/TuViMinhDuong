@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { playPcmStream } from "./tu-vi-quan-audio";
 import { QUAN_TAROT_CARDS } from "@/lib/tu-vi-quan-content";
+import { reportQuanStep } from "@/lib/first-party-funnel-client";
 import styles from "./tu-vi-quan-encounter.module.css";
 
 export type EncounterKind = "tuvi" | "tarot" | "iching";
@@ -47,6 +48,11 @@ export default function TuViQuanEncounter({ kind, orderId, ticketId, muted, onLe
   const apply = useCallback((data: Snapshot) => {
     current.current = data.encounter;
     setSnapshot(data);
+    if (data.encounter?.state === "waiting") reportQuanStep("queue_wait");
+    if (data.encounter?.state === "invited") {
+      reportQuanStep("seat_ready");
+      if (data.encounter.context.chartMissing) reportQuanStep("birth_view");
+    }
     seatReady.current(data.encounter?.kind === kind && (data.encounter.state === "invited" || data.encounter.state === "active"));
   }, [kind]);
   function release(row: Encounter | null) {
@@ -85,7 +91,19 @@ export default function TuViQuanEncounter({ kind, orderId, ticketId, muted, onLe
     } catch { /* The tabletop reveal also works without sound. */ }
   }
   async function action(actionName: string, fields: Record<string, unknown> = {}, signal?: AbortSignal): Promise<Snapshot> {
-    return readResponse(await fetch(endpoint, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: actionName, ...fields }), signal }));
+    if (actionName === "start") reportQuanStep("start_click");
+    if (actionName === "birth_confirm" || actionName === "birth_capture") reportQuanStep("birth_submit");
+    if (actionName === "turn") reportQuanStep("question_send");
+    try {
+      return await readResponse(await fetch(endpoint, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: actionName, ...fields }), signal }));
+    } catch (error) {
+      if (!signal?.aborted) {
+        if (actionName === "start") reportQuanStep("start_error");
+        if (actionName === "birth_confirm" || actionName === "birth_capture") reportQuanStep("birth_error");
+        if (actionName === "turn") reportQuanStep("question_error");
+      }
+      throw error;
+    }
   }
   async function speak(encounter: Encounter, message: Message) {
     stopSpeech(); spokenTurn.current = message.id;
@@ -134,10 +152,12 @@ export default function TuViQuanEncounter({ kind, orderId, ticketId, muted, onLe
     lock.current = true; setBusy(true); setError(""); state("thinking");
     const token = generation.current; const controller = new AbortController(); request.current = controller;
     try {
-      const data = await action("turn", { id: encounter.id, turnId: crypto.randomUUID(), question: question.trim() }, controller.signal);
+      const turnId = crypto.randomUUID();
+      const data = await action("turn", { id: encounter.id, turnId, question: question.trim() }, controller.signal);
       if (token !== generation.current) return;
       apply(data); setText("");
-      const message = data.encounter?.messages.at(-1);
+      const message = data.encounter?.messages.find(item => item.id === turnId);
+      reportQuanStep(message?.answer ? "answer_ready" : "question_error");
       if (data.encounter && message?.answer) void speak(data.encounter, message);
       else state("idle");
     } catch (cause) { if (!controller.signal.aborted && token === generation.current) { setError(cause instanceof Error ? cause.message : "Câu hỏi chưa được gửi."); state("idle"); } }
@@ -178,13 +198,14 @@ export default function TuViQuanEncounter({ kind, orderId, ticketId, muted, onLe
       };
       instance.start(250); setRecording(true); state("listening");
       recordingTimer.current = setTimeout(() => stopMic(), 30000);
-    } catch (cause) { if (token === generation.current) { stopMic(true); setShowText(true); setError(cause instanceof Error ? cause.message : "Không mở được micro. Hãy kiểm tra quyền thu âm."); state("idle"); } }
+    } catch (cause) { if (token === generation.current) { reportQuanStep("mic_error"); stopMic(true); setShowText(true); setError(cause instanceof Error ? cause.message : "Không mở được micro. Hãy kiểm tra quyền thu âm."); state("idle"); } }
     finally { acquiringMic.current = false; }
   }
   function applyBirth(data: Snapshot) {
     apply(data);
     const encounter = data.encounter;
     if (!encounter) return;
+    if (!encounter.context.chartMissing) reportQuanStep("birth_ready");
     if (encounter.context.menhIndex !== undefined && encounter.context.menhIndex >= 0) onChartReady(encounter.context.menhIndex);
     const message = encounter.messages.at(-1);
     if (message) void speak(encounter, message);
@@ -218,7 +239,10 @@ export default function TuViQuanEncounter({ kind, orderId, ticketId, muted, onLe
     const encounter = current.current; generation.current++; stopMic(true); stopSpeech(); request.current?.abort();
     lock.current = true; setBusy(true); setError("");
     try {
-      if (encounter && !["ended", "left"].includes(encounter.state)) await action("leave", { id: encounter.id, visitId: encounter.visitId });
+      if (encounter && !["ended", "left"].includes(encounter.state)) {
+        await action("leave", { id: encounter.id, visitId: encounter.visitId });
+        if (encounter.state === "waiting") reportQuanStep("queue_leave");
+      }
       current.current = null; onLeave();
     } catch (cause) { setError(cause instanceof Error ? cause.message : "Chưa lưu được thời gian còn lại. Bạn thử rời ghế lần nữa nhé."); }
     finally { lock.current = false; setBusy(false); }

@@ -1,6 +1,7 @@
 "use client";
 
 import type { FunnelEventName, FunnelLandingClass, FunnelSource, FunnelTool } from "@/lib/funnel-events";
+import type { QuanStep } from "@/lib/tu-vi-quan-measurement";
 
 type ClientContextInput = {
   pathname: string;
@@ -128,6 +129,18 @@ function sessionId() {
 let quanTrafficId: string | undefined;
 export function getQuanTrafficSessionId() {
   return quanTrafficId ??= sessionId();
+}
+
+const reportedQuanSteps = new Map<QuanStep, string>();
+export function reportQuanStep(step: QuanStep) {
+  const day = new Date(Date.now() + 7 * 3_600_000).toISOString().slice(0, 10);
+  if (reportedQuanSteps.get(step) === day) return;
+  reportedQuanSteps.set(step, day);
+  const retry = () => { if (reportedQuanSteps.get(step) === day) reportedQuanSteps.delete(step); };
+  void fetch("/api/analytics/funnel", {
+    method: "POST", headers: { "Content-Type": "application/json" }, keepalive: true,
+    body: JSON.stringify({ name: "quan_step", eventId: uuid(), anonymousSessionId: getQuanTrafficSessionId(), placement: step }),
+  }).then(response => { if (!response.ok) retry(); }).catch(retry);
 }
 
 export function reportQuanOpen() {

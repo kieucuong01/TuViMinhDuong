@@ -11,7 +11,7 @@ import type { MonasteryPose } from "./tu-vi-quan-monastery";
 import type { EncounterKind, EncounterVisual } from "./tu-vi-quan-encounter";
 import type { QuanSocialMessage } from "./tu-vi-quan-social";
 import type { QuanSnapshot, QuanPreferences, QuanExperience, QuanLeader } from "./tu-vi-quan-ecosystem-panel";
-import { reportQuanOpen } from "@/lib/first-party-funnel-client";
+import { reportQuanOpen, reportQuanStep } from "@/lib/first-party-funnel-client";
 
 const Monastery = dynamic(() => import("./tu-vi-quan-monastery"), { ssr: false });
 const Scene = dynamic(() => import("./tu-vi-quan-scene"), { ssr: false });
@@ -346,12 +346,18 @@ export default function TuViQuan({ initialAlias, support, paymentsEnabled, ecosy
 
   async function sessionAction(body: object) {
     if (operation.current) return false;
+    const checkout = "action" in body && body.action === "checkout";
+    if (checkout && "minutes" in body) {
+      if (body.minutes === 15) reportQuanStep("checkout_15");
+      if (body.minutes === 30) reportQuanStep("checkout_30");
+    }
     operation.current = true;
     pollVersion.current++;
     setBusy(true);
     setError("");
     try {
       const result = await jsonRequest<Session>("/api/tu-vi-quan/session", body);
+      if (checkout && (result.checkoutUrl || result.qrCode)) reportQuanStep("checkout_ready");
       if (result.id !== session?.id) {
         setRecovery(result.recoveryCode || "");
         setQrImage("");
@@ -369,6 +375,7 @@ export default function TuViQuan({ initialAlias, support, paymentsEnabled, ecosy
       }
       return true;
     } catch (err) {
+      if (checkout) reportQuanStep("checkout_error");
       setError((err as Error).message);
       return false;
     } finally {
@@ -514,7 +521,7 @@ export default function TuViQuan({ initialAlias, support, paymentsEnabled, ecosy
     }
   }
 
-  function visitHost() { openHost("tuvi"); }
+  function visitHost() { reportQuanStep("teacher_click"); openHost("tuvi"); }
 
   function useLiteMode() {
     setLite(true);
@@ -681,7 +688,7 @@ export default function TuViQuan({ initialAlias, support, paymentsEnabled, ecosy
               {session?.status === "pending" && !expiredQr && <div className={styles.payment}>
                 <p><strong>{money.format(session.amountVnd)}đ</strong> · {session.minutes} phút</p>
                 {qrImage && <Image src={qrImage} alt="Mã QR thanh toán lượt xem tử vi" width={250} height={250} unoptimized />}
-                {session.checkoutUrl && <a className={styles.primary} href={session.checkoutUrl} target="_blank" rel="noreferrer">Mở trang thanh toán</a>}
+                {session.checkoutUrl && <a className={styles.primary} href={session.checkoutUrl} target="_blank" rel="noreferrer" onClick={() => reportQuanStep("payment_link")}>Mở trang thanh toán</a>}
                 <p role="status">Đang chờ xác nhận thanh toán…</p>
               </div>}
               {expiredQr && <p>Mã QR đã hết hạn. Nếu chưa chuyển tiền, bạn có thể tạo mã mới.</p>}

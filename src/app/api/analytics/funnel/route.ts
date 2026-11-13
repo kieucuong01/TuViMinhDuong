@@ -40,7 +40,9 @@ export async function POST(request: Request) {
   if (!parsed) return NextResponse.json({ error: "Invalid event" }, { status: 400 });
 
   const quanOpen = parsed.name === "quan_open";
-  const user = quanOpen ? null : await getCurrentUser();
+  const quanStep = parsed.name === "quan_step";
+  const quanEvent = quanOpen || quanStep;
+  const user = quanEvent ? null : await getCurrentUser();
   const now = new Date();
   const vietnamDay = new Date(now.getTime() + 7 * 3_600_000).toISOString().slice(0, 10);
   await recordFunnelEventBestEffort({
@@ -52,12 +54,14 @@ export async function POST(request: Request) {
     tool: parsed.tool || "other",
     placement: parsed.placement,
     resultBand: parsed.resultBand,
-    dedupeKey: quanOpen ? `quan-open:${parsed.anonymousSessionId}:${vietnamDay}` : `client:${parsed.anonymousSessionId}:${parsed.eventId}`,
-    ...(quanOpen ? { createdAt: now } : {}),
+    dedupeKey: quanOpen ? `quan-open:${parsed.anonymousSessionId}:${vietnamDay}`
+      : quanStep ? `quan-step:${parsed.anonymousSessionId}:${vietnamDay}:${parsed.placement}`
+        : `client:${parsed.anonymousSessionId}:${parsed.eventId}`,
+    ...(quanEvent ? { createdAt: now } : {}),
   });
 
   const response = NextResponse.json({ accepted: true }, { status: 202 });
-  if (quanOpen) return response;
+  if (quanEvent) return response;
   response.cookies.set(FUNNEL_SESSION_COOKIE, parsed.anonymousSessionId, {
     httpOnly: true,
     sameSite: "lax",

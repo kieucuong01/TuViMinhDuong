@@ -71,11 +71,25 @@ describe("POST /api/analytics/funnel", () => {
     { ...body, landingPath: "/private?birth=1990" },
     { ...body, name: "quan_open", placement: "private_payload" },
     { ...body, name: "quan_open", placement: "facebook", resultBand: "full_user_agent" },
+    { name: "quan_step", eventId: body.eventId, anonymousSessionId: body.anonymousSessionId, placement: "question_send", question: "private" },
+    { name: "quan_step", eventId: body.eventId, anonymousSessionId: body.anonymousSessionId, placement: "birth_details" },
   ])("rejects forbidden or trusted-only input %#", async (value) => {
     const response = await POST(request(value));
 
     expect(response.status).toBe(400);
     expect(mocks.recordFunnelEventBestEffort).not.toHaveBeenCalled();
+  });
+
+  it("records only the allowed anonymous game step and deduplicates repeat actions", async () => {
+    const step = { name: "quan_step", eventId: body.eventId, anonymousSessionId: body.anonymousSessionId, placement: "question_send" };
+    const response = await POST(request(step));
+    expect(response.status).toBe(202);
+    expect(response.headers.get("set-cookie")).toBeNull();
+    expect(mocks.getCurrentUser).not.toHaveBeenCalled();
+    expect(mocks.recordFunnelEventBestEffort).toHaveBeenCalledWith(expect.objectContaining({
+      name: "quan_step", placement: "question_send", userId: undefined,
+      dedupeKey: expect.stringMatching(/^quan-step:[\w-]+:\d{4}-\d{2}-\d{2}:question_send$/),
+    }));
   });
 
   it("deduplicates game openings by Vietnam day without storing an account or changing the funnel cookie", async () => {

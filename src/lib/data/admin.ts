@@ -43,7 +43,7 @@ export async function getAdminFunnelDashboard(): Promise<AdminFunnelDashboard> {
   const oldestWindowStart = new Date(now.getTime() - 56 * 86_400_000);
   const [events, payments] = await Promise.all([
     db.funnelEvent.findMany({
-      where: { createdAt: { gte: oldestWindowStart }, name: { not: "quan_open" } },
+      where: { createdAt: { gte: oldestWindowStart }, name: { notIn: ["quan_open", "quan_step"] } },
       select: {
         id: true,
         name: true,

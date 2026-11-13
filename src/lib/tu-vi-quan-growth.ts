@@ -23,7 +23,7 @@ export async function readQuanGrowth(days: 7 | 28, now = new Date()) {
   const start = new Date(firstDay + "T00:00:00+07:00");
   const cohortStart = quanDayKey(new Date(now.getTime() - 60 * 86_400_000));
 
-  const [traffic, retention, features] = await Promise.all([
+  const [traffic, retention, features, steps] = await Promise.all([
     db.$queryRaw<Traffic[]>`
       WITH opens AS (
         SELECT "anonymousSessionId" AS session, source, coalesce(placement, '') AS channel,
@@ -83,6 +83,16 @@ export async function readQuanGrowth(days: 7 | 28, now = new Date()) {
         AND "dayKey" BETWEEN ${firstDay} AND ${today}
       GROUP BY name ORDER BY people DESC, name
     `,
+    db.$queryRaw<{ step: string; visits: number }[]>`
+      SELECT s.placement AS step, count(*)::int AS visits
+      FROM "FunnelEvent" s
+      WHERE s.name = 'quan_step' AND s."createdAt" BETWEEN ${start} AND ${now}
+        AND EXISTS (
+          SELECT 1 FROM "FunnelEvent" o WHERE o."dedupeKey" =
+            'quan-open:' || s."anonymousSessionId" || ':' || to_char(s."createdAt" + interval '7 hours', 'YYYY-MM-DD')
+        )
+      GROUP BY s.placement
+    `,
   ]);
-  return { traffic, retention, features };
+  return { traffic, retention, features, steps };
 }

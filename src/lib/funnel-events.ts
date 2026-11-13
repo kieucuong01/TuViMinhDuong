@@ -1,6 +1,7 @@
 import type { ChartAttribution } from "@/lib/chart-attribution";
 import type { ChartCreationMetadata } from "@/lib/data/contracts";
 import { getDb } from "@/lib/db";
+import { QUAN_STEPS } from "@/lib/tu-vi-quan-measurement";
 
 export const FUNNEL_EVENT_RETENTION_DAYS = 180;
 export const FUNNEL_SESSION_COOKIE = "lsth_funnel_session";
@@ -17,7 +18,7 @@ export const FUNNEL_EVENT_NAMES = [
   "reading_complete",
 ] as const;
 
-export type FunnelEventName = (typeof FUNNEL_EVENT_NAMES)[number] | "quan_open";
+export type FunnelEventName = (typeof FUNNEL_EVENT_NAMES)[number] | "quan_open" | "quan_step";
 export const QUAN_TRAFFIC_CHANNELS = ["facebook", "tiktok", "zalo", "youtube", "shared_card"] as const;
 export const QUAN_TRAFFIC_DEVICES = ["mobile", "desktop"] as const;
 export type FunnelSource = ChartAttribution["source"];
@@ -68,7 +69,7 @@ export type FunnelEventInput = FunnelAttributionSnapshot & {
 };
 
 export type ClientFunnelEvent = {
-  name: "landing" | "tool_view" | "submit" | "result" | "save_intent" | "quan_open";
+  name: "landing" | "tool_view" | "submit" | "result" | "save_intent" | "quan_open" | "quan_step";
   eventId: string;
   anonymousSessionId: string;
   source?: FunnelSource;
@@ -78,7 +79,7 @@ export type ClientFunnelEvent = {
   resultBand?: string;
 };
 
-const CLIENT_EVENT_NAMES = new Set<ClientFunnelEvent["name"]>(["landing", "tool_view", "submit", "result", "save_intent", "quan_open"]);
+const CLIENT_EVENT_NAMES = new Set<ClientFunnelEvent["name"]>(["landing", "tool_view", "submit", "result", "save_intent", "quan_open", "quan_step"]);
 const SOURCES = new Set<FunnelSource>(["ads", "organic_search", "ai", "internal", "referral", "direct", "unknown"]);
 const LANDING_CLASSES = new Set<FunnelLandingClass>(["home", "knowledge", "date_tool", "age_tool", "wealth_tool", "annual_tool", "compatibility_tool", "chart_result", "pricing", "other"]);
 const TOOLS = new Set<FunnelTool>(["chart", "date_finder", "age_compatibility", "age_child", "age_house", "age_business", "age_marriage", "age_vehicle", "wealth", "annual_2026", "compatibility", "full_reading", "coin_topup", "knowledge", "other"]);
@@ -118,6 +119,10 @@ export function parseClientFunnelEvent(value: unknown): ClientFunnelEvent | null
   if (record.tool !== undefined && (typeof record.tool !== "string" || !TOOLS.has(record.tool as FunnelTool))) return null;
   if (record.placement !== undefined && !category(record.placement)) return null;
   if (record.resultBand !== undefined && !category(record.resultBand)) return null;
+  if (record.name === "quan_step" && (
+    typeof record.placement !== "string" || !Object.hasOwn(QUAN_STEPS, record.placement) ||
+    record.resultBand !== undefined || record.source !== undefined || record.landingClass !== undefined || record.tool !== undefined
+  )) return null;
   if (record.name === "quan_open" && (
     (record.placement !== undefined && !QUAN_TRAFFIC_CHANNELS.some(channel => channel === record.placement)) ||
     (record.resultBand !== undefined && !QUAN_TRAFFIC_DEVICES.some(device => device === record.resultBand))

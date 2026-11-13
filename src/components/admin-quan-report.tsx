@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { readQuanReport } from "@/lib/tu-vi-quan-report";
 import { readQuanGrowth } from "@/lib/tu-vi-quan-growth";
+import { QUAN_STEPS, type QuanStep } from "@/lib/tu-vi-quan-measurement";
 
 const number = new Intl.NumberFormat("vi-VN");
 const currency = new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" });
@@ -9,6 +10,11 @@ const rate = (value: number, base: number) => base ? percent.format(value / base
 const sourceNames: Record<string, string> = { direct: "Trực tiếp / chưa gắn nguồn", organic_search: "Tìm kiếm tự nhiên", ads: "Quảng cáo", ai: "Trợ lý AI", internal: "Từ trang khác của website", referral: "Liên kết bên ngoài", unknown: "Chưa xác định" };
 const channelNames: Record<string, string> = { facebook: "Facebook", tiktok: "TikTok", zalo: "Zalo", youtube: "YouTube", shared_card: "Thiệp chia sẻ" };
 const featureNames: Record<string, string> = { daily: "Gieo quẻ ngày", ritual: "Làm nghi thức", wish: "Gửi điều ước", divination: "Tarot / Kinh Dịch", share_created: "Tạo thiệp", share_image: "Chia sẻ ảnh", profile_saved: "Lưu hồ sơ sinh" };
+const stepGroups: { title: string; steps: QuanStep[] }[] = [
+  { title: "Tìm chỗ gặp Thầy", steps: ["teacher_click", "queue_wait", "queue_leave", "seat_ready", "start_click", "start_error"] },
+  { title: "Lập lá số và trò chuyện", steps: ["birth_view", "birth_submit", "birth_ready", "birth_error", "question_send", "answer_ready", "question_error", "mic_error"] },
+  { title: "Mua thêm phút", steps: ["checkout_15", "checkout_30", "checkout_ready", "checkout_error", "payment_link"] },
+];
 
 export async function AdminQuanReport({ days }: { days: 7 | 28 }) {
   const [report, growth] = await Promise.all([readQuanReport(days), readQuanGrowth(days)]);
@@ -56,6 +62,19 @@ export async function AdminQuanReport({ days }: { days: 7 | 28 }) {
             </article>)}
           </div>
           {!journey.opened && <p className="mt-2">Chưa có lượt mở trang được ghi nhận trong kỳ. Dữ liệu này bắt đầu từ khi phát hành tính năng đo lường.</p>}
+          <section className="my-4" aria-labelledby="quan-steps-title">
+            <h3 id="quan-steps-title">Chi tiết từng thao tác</h3>
+            <p className="text-sm">Mỗi tab được tính một lần mỗi ngày cho từng thao tác. Một lượt có thể vừa gặp lỗi vừa làm thành công sau khi thử lại. Khách quét QR từ điện thoại khác có thể thanh toán mà không bấm mở PayOS.</p>
+            {growth.steps.length ? <div className="mt-3 grid gap-4 lg:grid-cols-3">
+              {stepGroups.map(group => <section key={group.title} className="rounded border p-3" aria-label={group.title}>
+                <h4>{group.title}</h4>
+                <dl>{group.steps.map(step => <div key={step} className="flex justify-between gap-3 border-b py-2">
+                  <dt>{QUAN_STEPS[step]}</dt>
+                  <dd className="tabular-nums">{number.format(growth.steps.find(row => row.step === step)?.visits ?? 0)}</dd>
+                </div>)}</dl>
+              </section>)}
+            </div> : <p>Chưa có thao tác chi tiết được ghi nhận trong kỳ.</p>}
+          </section>
           <details className="my-4">
             <summary className="cursor-pointer">Nguồn truy cập và thiết bị</summary>
             <div className="overflow-x-auto">
