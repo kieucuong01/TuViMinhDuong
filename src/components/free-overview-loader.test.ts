@@ -97,7 +97,7 @@ Hãy viết một việc có thể thử ngay.
     expect(refreshSource).toContain("attempt >= 45");
   });
 
-  it("turns the long report into a 30-second summary, sticky navigation and four readable sections", () => {
+  it("offers one topic list, four readable sections and links back to the chart", () => {
     const html = renderToStaticMarkup(
       createElement(FreeOverviewLoader, {
         chartId: "chart-1",
@@ -110,14 +110,15 @@ Hãy viết một việc có thể thử ngay.
       }),
     );
 
-    expect(html).toContain("Nguyễn Minh Anh, bắt đầu từ điều bạn đang băn khoăn");
-    expect(html).toContain("Cách bạn quyết định");
-    expect(html).toContain("Chuyện tiền bạc");
-    expect(html).toContain("Chuyện công việc");
+    expect(html).toContain("Luận giải của Nguyễn Minh Anh");
+    expect(html).toContain("Bản thân");
+    expect(html).toContain("Tiền bạc");
+    expect(html).toContain("Công việc");
     expect(html).toContain('aria-label="Điều hướng luận giải miễn phí"');
     expect(html).toContain('href="#free-insight-1"');
     expect(html.match(/<details/gu)).toHaveLength(4);
-    expect(html).toContain("4/4 phần miễn phí");
+    expect(html).toContain('href="#chu-de-luan-giai"');
+    expect(html).toContain('href="#chart-palaces"');
     expect(html).toContain("phút đọc");
     expect(html).toContain("4 phần miễn phí");
     expect(html).toContain("Có thể mở xem căn cứ từ lá số");
@@ -169,10 +170,9 @@ Hãy viết một việc có thể thử ngay.
       }),
     );
 
-    expect(html).toContain("Bạn đã đọc đủ 4 phần miễn phí");
     expect(html).toContain("Đăng nhập để lưu lá số của Nguyễn Minh Anh");
     expect(html).toContain("Đăng nhập để lưu lá số");
-    expect(html).toContain("Email mới tự tạo tài khoản • Tặng 30 xu • Có thể dùng Google • Chưa mất phí");
+    expect(html).toContain("Bạn có thể dùng email hoặc Google.");
     expect(html).toContain('data-ad-view="free_overview_viewed"');
     expect(html).toContain('data-ad-depth="4"');
     expect(html).not.toContain("2/4 phần");

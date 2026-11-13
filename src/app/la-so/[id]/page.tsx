@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { BookOpenText, CalendarRange, Compass, Layers3, ShieldCheck } from "lucide-react";
@@ -19,6 +20,7 @@ import { DeferredChartActionPanel } from "@/components/deferred-chart-action-pan
 import { ChartRetentionPanel } from "@/components/chart-retention-panel";
 import { PaywallPopup } from "@/components/paywall-popup";
 import { FreeOverviewLoader } from "@/components/free-overview-loader";
+import { QuanChartLink } from "@/components/quan-chart-link";
 import { ReadingHashScrollRestorer } from "@/components/reading-detail-cta";
 import { MarkdownContent } from "@/components/markdown-content";
 import { buildFreeOverviewTeaser, countVisibleMarkdownWords } from "@/lib/free-overview-presentation";
@@ -212,9 +214,24 @@ export default async function ChartPage({
           <h1>Tổng quan lá số của {record.chart.input.fullName}</h1>
         </div>
         {paymentNotice ? <p className="chart-checkout-notice" role="status">{paymentNotice}</p> : null}
+        {activeView === "la-so" && <nav id="chon-cach-xem" className="chart-reading-choices" aria-label="Chọn cách xem lá số">
+          <div>
+            <a href="#luan-giai" className="btn btn-primary">Đọc luận giải</a>
+            <p>Chọn chủ đề và đọc theo nhịp của bạn.</p>
+          </div>
+          <div>
+            {(!record.userId || record.userId === user?.id || user?.role === "ADMIN")
+              ? <QuanChartLink input={record.chart.input} />
+              : <Link href="/tu-vi-quan?visit=tuvi" className="btn btn-ghost" prefetch={false}>Xem trực tiếp 3D</Link>}
+            <p>Vào Tử Vi Quán để trò chuyện với Thầy.</p>
+          </div>
+          <a href="#chart-palaces" className="chart-reading-jump">Xem bàn lá số 12 cung</a>
+        </nav>}
 
-        <ChartReadingGuide chartId={id} chart={record.chart} canUsePaidFateViews={canUsePaidFateViews} />
-        {query.created === "1" ? <div className="mt-5"><AiDiscoverySurvey chartId={id} /></div> : null}
+        <details className="mb-4">
+          <summary className="chart-reading-jump">Hướng dẫn đọc bàn lá số</summary>
+          <ChartReadingGuide chartId={id} chart={record.chart} canUsePaidFateViews={canUsePaidFateViews} />
+        </details>
 
         <div id="chart-palaces">
           <MobileChartReader chart={record.chart} />
@@ -270,6 +287,7 @@ export default async function ChartPage({
           )}
         </section>
 
+        {query.created === "1" ? <div className="mt-5"><AiDiscoverySurvey chartId={id} /></div> : null}
         <ChartRetentionPanel
           chartId={id}
           isSignedIn={Boolean(user)}

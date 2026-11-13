@@ -8,10 +8,14 @@ export function FreeOverviewSectionLink({ targetId, children, className }: {
   className?: string;
 }) {
   return (
-    <a href={`#${targetId}`} className={className} onClick={() => {
+    <a href={`#${targetId}`} className={className} onClick={event => {
+      if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
       const section = document.getElementById(targetId);
       if (section instanceof HTMLDetailsElement) {
+        event.preventDefault();
         section.open = true;
+        if (location.hash !== `#${targetId}`) history.pushState(null, "", `#${targetId}`);
+        section.scrollIntoView({ block: "start" });
         section.querySelector("summary")?.focus({ preventScroll: true });
       }
     }}>

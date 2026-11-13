@@ -80,9 +80,8 @@ export function FreeOverviewLoader({
           data-chart-id={chartId}
         >
           <div>
-            <p className="eyebrow">Bạn đã đọc đủ 4 phần miễn phí</p>
             <h2 id="free-overview-login-title">Đăng nhập để lưu lá số của {fullName}</h2>
-            <p className="free-overview-login-copy">Email mới tự tạo tài khoản • Tặng 30 xu • Có thể dùng Google • Chưa mất phí</p>
+            <p className="free-overview-login-copy">Lưu lá số vào tài khoản để dễ tìm lại lần sau. Bạn có thể dùng email hoặc Google.</p>
           </div>
           <Link
             className="btn btn-primary"

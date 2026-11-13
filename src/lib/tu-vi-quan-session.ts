@@ -229,7 +229,7 @@ export async function checkoutQuanSession(db: PrismaClient, guest: Guest, minute
     });
   });
   try {
-    const returnPath = `/?session=${order.id}`;
+    const returnPath = `/tu-vi-quan?session=${order.id}`;
     const checkout = await createPayOSCustomCheckout({
       amountVnd: pack.amountVnd, description: `TVQ${pack.minutes}P`,
       itemName: `Tử Vi Quán - ${pack.minutes} phút`,

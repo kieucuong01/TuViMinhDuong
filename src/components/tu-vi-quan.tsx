@@ -12,6 +12,7 @@ import type { EncounterKind, EncounterVisual } from "./tu-vi-quan-encounter";
 import type { QuanSocialMessage } from "./tu-vi-quan-social";
 import type { QuanSnapshot, QuanPreferences, QuanExperience, QuanLeader } from "./tu-vi-quan-ecosystem-panel";
 import { reportQuanOpen, reportQuanStep } from "@/lib/first-party-funnel-client";
+import { QUAN_CHART_TRANSFER_KEY } from "./quan-chart-link";
 
 const Monastery = dynamic(() => import("./tu-vi-quan-monastery"), { ssr: false });
 const Scene = dynamic(() => import("./tu-vi-quan-scene"), { ssr: false });
@@ -139,21 +140,6 @@ export default function TuViQuan({ initialAlias, support, paymentsEnabled, ecosy
   const navigationRequest = useRef(0);
 
   useEffect(() => { monasteryOpen.current = inMonastery; }, [inMonastery]);
-  useEffect(() => {
-    if (!alias || arrivalShown.current || new URLSearchParams(location.search).has("session")) return;
-    const timer = setTimeout(() => {
-      arrivalShown.current = true;
-      if (new URLSearchParams(location.search).has("chartError")) setNotice("Lượt lập lá số trước chưa hoàn tất. Bạn có thể gặp thầy để nhập hoặc nói lại thông tin.");
-      const intent = new URLSearchParams(location.search).get("visit") || (location.hash === "#lap-la-so" ? "tuvi" : "");
-      if (intent === "tuvi" || intent === "tarot" || intent === "iching") visitHost();
-      else if (intent === "monastery") enterMonastery();
-      else setPanel("arrival");
-    }, 0);
-    return () => clearTimeout(timer);
-    // Resolve the entry intention once after the guest identity is ready.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [alias]);
-
   useEffect(() => {
     if (!alias) return;
     let live = true;
@@ -603,6 +589,40 @@ export default function TuViQuan({ initialAlias, support, paymentsEnabled, ecosy
       interactStation(nearby);
     }
   }
+
+  async function openEntryHost() {
+    const url = new URL(location.href);
+    if (ecosystemEnabled && url.searchParams.get("useChart") === "1") {
+      try {
+        const stored = sessionStorage.getItem(QUAN_CHART_TRANSFER_KEY);
+        sessionStorage.removeItem(QUAN_CHART_TRANSFER_KEY);
+        if (stored) receiveEcosystem(await jsonRequest<QuanSnapshot>("/api/tu-vi-quan/ecosystem", { action: "birth", input: JSON.parse(stored) }));
+      } catch {
+        setNotice("Chưa chuyển được lá số. Bạn có thể xác nhận thông tin với Thầy.");
+        setPanel("arrival");
+        return;
+      } finally {
+        url.searchParams.delete("useChart");
+        history.replaceState(history.state, "", url);
+      }
+    }
+    visitHost();
+  }
+
+  useEffect(() => {
+    if (!alias || arrivalShown.current || new URLSearchParams(location.search).has("session")) return;
+    const timer = setTimeout(() => {
+      arrivalShown.current = true;
+      if (new URLSearchParams(location.search).has("chartError")) setNotice("Lượt lập lá số trước chưa hoàn tất. Bạn có thể gặp thầy để nhập hoặc nói lại thông tin.");
+      const intent = new URLSearchParams(location.search).get("visit") || (location.hash === "#lap-la-so" ? "tuvi" : "");
+      if (intent === "tuvi" || intent === "tarot" || intent === "iching") void openEntryHost();
+      else if (intent === "monastery") enterMonastery();
+      else setPanel("arrival");
+    }, 0);
+    return () => clearTimeout(timer);
+    // Resolve the entry intention once after the guest identity is ready.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [alias]);
 
   return (
     <main ref={world} className={`${styles.page} ${voiceEnabled ? styles.liveGame : ""} ${host ? styles.seated : ""}`} data-quan-world onKeyDown={handleWorldKey} tabIndex={-1}>

@@ -16381,13 +16381,6 @@ button.is-loading:not(.icon-button)::before {
   text-underline-offset: 0.2em;
 }
 
-.free-overview-reader-note {
-  margin: 1rem 0 0;
-  color: #57534e;
-  font-size: 1rem;
-  line-height: 1.65;
-}
-
 .free-overview-trust-strip {
   display: flex;
   flex-wrap: wrap;
@@ -16414,102 +16407,58 @@ button.is-loading:not(.icon-button)::before {
   flex: 0 0 auto;
 }
 
-.free-overview-section-nav {
+.chart-reading-choices {
   display: grid;
-  gap: 0.55rem;
-  border: 1px solid rgb(253 186 116 / 86%);
-  border-radius: 1rem;
-  background: rgb(255 250 245 / 96%);
-  padding: 0.65rem;
-  box-shadow: 0 8px 22px rgb(124 45 18 / 9%);
-  backdrop-filter: blur(12px);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: .75rem;
+  margin-block: 1rem;
 }
 
-.free-overview-nav-copy {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 0.75rem;
-  padding-inline: 0.15rem;
+.chart-reading-choices > div {
+  padding: .85rem;
+  border: 1px solid #fed7aa;
+  border-radius: .9rem;
+  background: #fffaf5;
 }
 
-.free-overview-nav-copy > span {
-  color: #9a3412;
-  font-size: 0.76rem;
-  font-weight: 900;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+.chart-reading-choices .btn {
+  width: 100%;
+  min-height: 48px;
 }
 
-.free-overview-nav-copy strong {
+.chart-reading-choices p {
+  margin: .55rem 0 0;
   color: #57534e;
-  font-size: 0.82rem;
-  font-weight: 800;
 }
 
-.free-overview-section-nav ol {
-  display: flex;
-  align-items: stretch;
-  gap: 0.35rem;
-  margin: 0;
-  overflow-x: auto;
-  overscroll-behavior-inline: contain;
-  padding: 0 0 0.1rem;
-  scrollbar-width: none;
-  list-style: none;
-}
-
-.free-overview-section-nav ol::-webkit-scrollbar {
-  display: none;
-}
-
-.free-overview-section-nav li {
-  flex: 0 0 auto;
-}
-
-.free-overview-section-nav a {
+.chart-reading-jump {
   display: inline-flex;
-  min-height: 3rem;
   align-items: center;
-  gap: 0.42rem;
-  border: 1px solid transparent;
-  border-radius: 0.78rem;
-  color: #57534e;
-  font-size: 0.88rem;
-  font-weight: 780;
-  line-height: 1.2;
-  padding: 0.48rem 0.62rem;
-  text-decoration: none;
-  transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease;
-}
-
-.free-overview-section-nav a:hover,
-.free-overview-section-nav a:focus-visible {
-  border-color: #fed7aa;
-  background: #fff;
+  min-height: 44px;
   color: #9a3412;
-  outline: 3px solid transparent;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: .2em;
 }
 
-.free-overview-section-nav a:focus-visible,
+summary.chart-reading-jump {
+  display: list-item;
+  cursor: pointer;
+  padding-block: .65rem;
+}
+
+#chon-cach-xem, #chu-de-luan-giai, #chart-palaces, #luan-giai {
+  scroll-margin-top: 8rem;
+}
+
+@media (max-width: 520px) {
+  .chart-reading-choices {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
 .free-overview-secondary-cta:focus-visible {
   box-shadow: 0 0 0 3px rgb(249 115 22 / 22%);
-}
-
-.free-overview-nav-index {
-  display: grid;
-  width: 1.45rem;
-  height: 1.45rem;
-  place-items: center;
-  border-radius: 999px;
-  background: #ffedd5;
-  color: #9a3412;
-  font-size: 0.76rem;
-  font-weight: 900;
-}
-
-.free-overview-section-nav .is-premium-link {
-  color: #7c2d12;
 }
 
 .free-overview-chapter-list {
@@ -16882,32 +16831,14 @@ button.is-loading:not(.icon-button)::before {
 
 @media (min-width: 760px) {
   .free-overview-quick-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
-
-  .free-overview-section-nav {
-    grid-template-columns: auto minmax(0, 1fr);
-    align-items: center;
-  }
-
 }
 
 @media (max-width: 520px) {
   .free-overview-quick-summary,
-  .free-overview-insight-card,
-  .free-overview-section-nav {
-    border-radius: 0.9rem;
-  }
-
-  .free-overview-nav-copy {
-    align-items: flex-start;
-    flex-direction: column;
-    gap: 0.15rem;
-  }
-
-  .free-overview-section-nav a {
-    font-size: 0.84rem;
-    padding-inline: 0.52rem;
+  .free-overview-insight-card {
+    border-radius: .9rem;
   }
 
   .free-overview-card-header {
@@ -16937,7 +16868,6 @@ button.is-loading:not(.icon-button)::before {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .free-overview-section-nav a,
   .free-overview-personalizing-dots i {
     animation: none;
     transition: none;

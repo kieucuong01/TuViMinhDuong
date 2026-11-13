@@ -53,10 +53,10 @@ describe("reading detail CTA flow", () => {
     expect(readingExperienceSource).toContain("popoverTarget={premiumReadingModalId(chartId)}");
     expect(readingExperienceSource).toContain("Không cần đăng nhập");
     expect(loaderSource).toContain("loginModalHref(chartPath, undefined, nextPath)");
-    expect(loaderSource).toContain("Bạn đã đọc đủ 4 phần miễn phí");
+    expect(loaderSource).toContain("Lưu lá số vào tài khoản để dễ tìm lại lần sau.");
     expect(loaderSource).toContain("Đăng nhập để lưu lá số của {fullName}");
     expect(loaderSource).toContain("Đăng nhập để lưu lá số");
-    expect(loaderSource).toContain("Email mới tự tạo tài khoản • Tặng 30 xu • Có thể dùng Google • Chưa mất phí");
+    expect(loaderSource).toContain("Bạn có thể dùng email hoặc Google.");
   });
 
   it("keeps PayOS primary and the coin path conditional", () => {

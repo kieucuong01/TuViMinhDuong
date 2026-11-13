@@ -629,11 +629,15 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
   const pools = new THREE.InstancedMesh(glowGeometry, glowMaterial, lanternPools.length);
   lanternPools.forEach((matrix, index) => pools.setMatrixAt(index, matrix));
   scene.add(pools);
+  const monasteryInterior: THREE.InstancedMesh[] = [];
+  const monasteryStatues = new THREE.Group();
+  scene.add(monasteryStatues);
   for (const entry of batches.values()) {
     const mesh = new THREE.InstancedMesh(geometry[entry.shape], material(entry.color), entry.matrices.length);
     entry.matrices.forEach((matrix, index) => mesh.setMatrixAt(index, matrix));
     mesh.castShadow = entry.matrices.some(matrix => matrix.elements[13] > 0.7);
     mesh.receiveShadow = true;
+    if (entry.monastery) monasteryInterior.push(mesh);
     scene.add(mesh);
   }
   const signs: THREE.Sprite[] = [];
@@ -657,7 +661,7 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
     const arms = [new THREE.Group(), new THREE.Group()];
     const robe = name ? new THREE.MeshStandardMaterial({ color, roughness: 0.9, normalMap: detailed ? assets?.cloth : null, normalScale: new THREE.Vector2(0.32, 0.32) }) : material(color);
     function part(parent: THREE.Object3D, shape: Shape, colorValue: number, x: number, y: number, z: number, sx: number, sy: number, sz = sx) {
-      const mesh = new THREE.Mesh(geometry[shape], colorValue === color ? robe : material(colorValue));
+      const mesh = new THREE.Mesh(geometry[shape === "face" && !detailed ? "head" : shape], colorValue === color ? robe : material(colorValue));
       mesh.position.set(x, y, z);
       mesh.scale.set(sx, sy, sz);
       parent.add(mesh);
@@ -749,6 +753,7 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
     return { mesh, parts };
   });
   let ambientTime = 0;
+  let ambientStaticPose = false;
   function drawAmbientGuests(delta: number, visible: boolean, reduced: boolean, playerX: number, playerZ: number) {
     ambientBatches.forEach(({ mesh }) => { mesh.visible = visible; });
     if (!visible) {
@@ -756,8 +761,9 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
       return;
     }
     if (!reduced) ambientTime += delta;
+    const updatePose = !reduced || !ambientStaticPose;
     ambientRigs.forEach((rig, index) => {
-      if (index < 12) {
+      if (updatePose && index < 12) {
         const loop = walkingLoops[Math.floor(index / 3)];
         const progress = (ambientTime * (0.14 + (index % 3) * 0.012) + (index % 3) * 4 / 3) % 4;
         const segment = Math.floor(progress);
@@ -767,7 +773,7 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
         rig.group.position.set(x, quanGroundHeight(x, z) + .054, z);
         rig.body.rotation.y = Math.atan2(toX - fromX, toZ - fromZ);
         pose(rig, "idle", ambientTime + index, !reduced, reduced);
-      } else {
+      } else if (updatePose) {
         const spot = index - 12;
         const location = ambientPrayerSpots[spot];
         rig.group.position.set(location.x, QUAN_MONASTERY_SPACE.floor + .10, location.z);
@@ -779,12 +785,15 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
       const { x, y, z } = rig.group.position;
       rig.badge.visible = Math.hypot(x - playerX, z - playerZ) < 15;
       rig.badge.position.set(x, y + rig.badge.position.y, z);
-      rig.group.updateMatrixWorld(true);
+      if (updatePose) rig.group.updateMatrixWorld(true);
     });
-    for (const { mesh, parts } of ambientBatches) {
-      parts.forEach((part, index) => mesh.setMatrixAt(index, part.matrixWorld));
-      mesh.instanceMatrix.needsUpdate = true;
+    if (updatePose) {
+      for (const { mesh, parts } of ambientBatches) {
+        parts.forEach((part, index) => mesh.setMatrixAt(index, part.matrixWorld));
+        mesh.instanceMatrix.needsUpdate = true;
+      }
     }
+    ambientStaticPose = reduced;
   }
   const self = avatar(0x506f7e, "Bạn", true);
   const templeSash = new THREE.Mesh(geometry.box, material(0xdcb758));
@@ -1196,6 +1205,8 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
   let selectedQuality = ""; let adaptiveLow = false; let slowFrames = 0; let qualityApplied = "";
   let previous = 0;
   let renderedAt = -1000;
+  let nextFrameAt = 0;
+  let interiorVisible = true;
   let frame = 0;
   let stopped = false;
   function contextLost(event: Event) {
@@ -1219,13 +1230,15 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
   function draw(time: number) {
     if (stopped) return;
     frame = requestAnimationFrame(draw);
-    if (document.hidden || time - renderedAt < (qualityApplied === "high" ? 16 : qualityApplied === "low" ? 48 : 32)) return;
+    if (document.hidden || time + 1 < nextFrameAt) return;
     const elapsed = time - renderedAt; renderedAt = time;
     const requestedQuality = latest.current.quality ?? (navigator.hardwareConcurrency <= 4 ? "low" : "medium");
     if (requestedQuality !== selectedQuality) { selectedQuality = requestedQuality; adaptiveLow = false; slowFrames = 0; }
-    if (elapsed > 48 && elapsed < 1000) slowFrames++; else slowFrames = Math.max(0, slowFrames - 1);
-    if (slowFrames > 45) adaptiveLow = true;
+    if (qualityApplied && elapsed > 48) slowFrames++; else slowFrames = Math.max(0, slowFrames - 1);
+    if (slowFrames > 12) adaptiveLow = true;
     const quality = adaptiveLow ? "low" : requestedQuality;
+    const frameInterval = quality === "high" ? 1000 / 60 : 1000 / 30;
+    nextFrameAt = Math.max(nextFrameAt + frameInterval, time + frameInterval / 2);
     if (ecosystemEnabled && quality !== qualityApplied) {
       qualityApplied = quality;
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, quality === "low" ? 1 : quality === "high" ? 2 : 1.5));
@@ -1253,9 +1266,16 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
     }
     const experience = ecosystemEnabled ? current.experience ?? "courtyard" : "courtyard";
     const monastery = experience === "monastery";
-    if (!buddhaRequested && assets) {
+    const nearMonastery = monastery || Math.hypot(current.position.x - QUAN_MONASTERY_SPACE.x, current.position.z + 17) < 26;
+    if (interiorVisible !== nearMonastery) {
+      interiorVisible = nearMonastery;
+      monasteryInterior.forEach(mesh => { mesh.visible = nearMonastery; });
+      monasteryStatues.visible = nearMonastery;
+      renderer.shadowMap.needsUpdate = true;
+    }
+    if (!buddhaRequested && nearMonastery && assets) {
       buddhaRequested = true;
-      assets.model("buddha-amoghasiddhi", [-8, 0, 8].map(offset => ({ ...quanMonasteryToWorld({ x: offset, z: -13.1 }), y: 1.24 + QUAN_MONASTERY_SPACE.floor, height: offset === 0 ? 5.8 : 4.9 })));
+      assets.model("buddha-amoghasiddhi", [-8, 0, 8].map(offset => ({ ...quanMonasteryToWorld({ x: offset, z: -13.1 }), y: 1.24 + QUAN_MONASTERY_SPACE.floor, height: offset === 0 ? 5.8 : 4.9, parent: monasteryStatues })));
     }
     monasterySeats.forEach((mesh, index) => {
       const occupied = current.players.some(person => person.action === "monastery" && person.seatIndex === index);
@@ -1462,13 +1482,15 @@ function makeScene(container: HTMLDivElement, latest: { current: SceneProps }) {
       mesh.scale.setScalar(0.082 + phase * 0.35);
       mesh.material.opacity = (1 - phase) * (monastery ? current.monasteryPose === "incense" ? 0.42 : 0.12 : current.action === "incense" || ritualActive && current.ritual?.kind === "incense" ? 0.42 : incense[1].stick.visible ? 0.22 : 0);
     });
-    for (let i = 0; i < 90; i++) {
+    if (sparkCloud.visible) {
       const t = reducedMotion() ? 0 : time * 0.00037;
-      sparks[i * 3] = Math.sin(i * 16.31) * 29 + Math.sin(i + t) * 0.7;
-      sparks[i * 3 + 1] = 0.6 + ((i * 1.39) % 4) + Math.sin(i * 3 + t) * 0.35;
-      sparks[i * 3 + 2] = Math.cos(i * 14.17) * 27 + 3 + Math.cos(i - t) * 0.8;
+      for (let i = 0; i < 90; i++) {
+        sparks[i * 3] = Math.sin(i * 16.31) * 29 + Math.sin(i + t) * 0.7;
+        sparks[i * 3 + 1] = 0.6 + ((i * 1.39) % 4) + Math.sin(i * 3 + t) * 0.35;
+        sparks[i * 3 + 2] = Math.cos(i * 14.17) * 27 + 3 + Math.cos(i - t) * 0.8;
+      }
+      sparkGeometry.attributes.position.needsUpdate = true;
     }
-    sparkGeometry.attributes.position.needsUpdate = true;
     waterMaterial.uniforms.time.value = reducedMotion() ? 0 : time / 1000;
     if (scene.userData.assetsChanged) { renderer.shadowMap.needsUpdate = true; scene.userData.assetsChanged = false; }
     renderer.render(scene, camera);

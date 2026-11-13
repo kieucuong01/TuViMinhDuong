@@ -152,54 +152,37 @@ export function FreeOverviewReadingExperience({
   const sections = parseFreeOverviewSections(content);
   if (!sections.length) return <MarkdownContent content={content} />;
 
-  const quickSections = sections.slice(0, 3);
-  const quickLabels = ["Cách bạn quyết định", "Chuyện tiền bạc", "Chuyện công việc"];
   const formattedPrice = cashLabel(priceCoins);
   const readMinutes = estimatedReadMinutes(content);
 
   return (
     <div className="free-overview-reading-experience">
-      <section className="free-overview-quick-summary" aria-labelledby="free-overview-quick-title">
+      <section id="chu-de-luan-giai" className="free-overview-quick-summary" aria-labelledby="free-overview-quick-title">
         <div className="free-overview-quick-heading">
-          <span className="free-overview-ai-badge"><Sparkles size={15} aria-hidden="true" /> Cá nhân hóa theo lá số</span>
-          <h2 id="free-overview-quick-title">{fullName}, bắt đầu từ điều bạn đang băn khoăn</h2>
-          <p>Chọn một phần để đọc trước. Bạn không cần biết tên sao hay cách đọc lá số.</p>
+          <h2 id="free-overview-quick-title">Luận giải của {fullName}</h2>
+          <p>Chọn chủ đề bạn muốn đọc trước.</p>
         </div>
-        <ol className="free-overview-quick-grid">
-          {quickSections.map((section, index) => (
+        <nav aria-label="Điều hướng luận giải miễn phí"><ol className="free-overview-quick-grid">
+          {sections.map(section => (
             <li key={section.id} className={`free-overview-quick-card is-${section.tone}`}>
-              <span>{String(index + 1).padStart(2, "0")}</span>
+              <span>{sectionIcon(section.number)}</span>
               <div>
-                <strong><FreeOverviewSectionLink targetId={section.id}>{quickLabels[index]}</FreeOverviewSectionLink></strong>
+                <strong><FreeOverviewSectionLink targetId={section.id}>{section.navTitle}</FreeOverviewSectionLink></strong>
                 <p>{section.takeaway}</p>
               </div>
             </li>
           ))}
-        </ol>
+        </ol></nav>
         <div className="free-overview-trust-strip" aria-label="Cam kết chất lượng bản miễn phí">
           <span><Clock3 size={16} aria-hidden="true" /> Khoảng {readMinutes} phút đọc</span>
           <span><BookOpenText size={16} aria-hidden="true" /> {sections.length} phần miễn phí</span>
           <span><ShieldCheck size={16} aria-hidden="true" /> Có thể mở xem căn cứ từ lá số</span>
         </div>
-        <p className="free-overview-reader-note">Hãy đối chiếu với chuyện bạn đã trải qua. Điều nào chưa giống bạn thì cứ để lại, không cần cố nhận là đúng.</p>
-      </section>
-
-      <nav className="free-overview-section-nav" aria-label="Điều hướng luận giải miễn phí">
-        <div className="free-overview-nav-copy">
-          <span>Đọc theo chủ đề</span>
-          <strong>{sections.length}/4 phần miễn phí</strong>
+        <div className="flex flex-wrap gap-x-5">
+          <a className="chart-reading-jump" href="#chart-palaces">Về bàn lá số</a>
+          <a className="chart-reading-jump" href="#chon-cach-xem">Chọn cách xem</a>
         </div>
-        <ol>
-          {sections.map((section) => (
-            <li key={section.id}>
-              <FreeOverviewSectionLink targetId={section.id}>
-                <span className="free-overview-nav-index">{section.number}</span>
-                <span>{section.navTitle}</span>
-              </FreeOverviewSectionLink>
-            </li>
-          ))}
-        </ol>
-      </nav>
+      </section>
 
       <div className="free-overview-chapter-list">
         {sections.map((section, index) => {
@@ -281,6 +264,7 @@ export function FreeOverviewReadingExperience({
                     Đọc tiếp: {nextSection.navTitle.toLocaleLowerCase("vi")} <ArrowRight size={17} aria-hidden="true" />
                   </FreeOverviewSectionLink>
                 ) : null}
+                <a className="chart-reading-jump" href="#chu-de-luan-giai">Về danh sách chủ đề</a>
               </div>
             </details>
           );
