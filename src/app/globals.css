@@ -16430,7 +16430,8 @@ button.is-loading:not(.icon-button)::before {
 }
 
 .free-reading-topic .prose-content {
-  margin-top: 0;
+  max-width: none;
+  margin: 0;
 }
 
 .free-reading-topic p {
