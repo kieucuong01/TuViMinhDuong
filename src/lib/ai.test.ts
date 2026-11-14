@@ -258,7 +258,7 @@ describe("AI reading format", () => {
 
     expect(FREE_OVERVIEW_MIN_WORDS).toBe(700);
     expect(FREE_OVERVIEW_MAX_WORDS).toBe(1350);
-    expect(FREE_OVERVIEW_VERSION).toBe("free-reader-first-v10");
+    expect(FREE_OVERVIEW_VERSION).toBe("free-reader-first-v11");
     expect(result.model).toBe("deepseek/deepseek-v4-flash");
     expect(result).not.toHaveProperty("prompt");
     expect(isCompleteFreeOverview(result.content)).toBe(true);

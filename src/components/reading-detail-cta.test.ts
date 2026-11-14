@@ -48,10 +48,9 @@ describe("reading detail CTA flow", () => {
     expect(loaderSource).toContain('const nextPath = `${chartPath}#luan-giai`');
     expect(loaderSource).toContain("hasPremiumHookPreview");
     expect(loaderSource).toContain("canCheckoutFull={canCheckoutFull}");
-    expect(readingExperienceSource).toContain("full_offer_context_clicked");
-    expect(readingExperienceSource).toContain("Nếu đây là điều bạn đang muốn hiểu rõ hơn");
+    expect(readingExperienceSource).toContain("full_offer_bottom_clicked");
+    expect(readingExperienceSource).toContain("Bản chuyên sâu giúp bạn xem thêm điều gì?");
     expect(readingExperienceSource).toContain("popoverTarget={premiumReadingModalId(chartId)}");
-    expect(readingExperienceSource).toContain("Không cần đăng nhập");
     expect(loaderSource).toContain("loginModalHref(chartPath, undefined, nextPath)");
     expect(loaderSource).toContain("Lưu lá số vào tài khoản để dễ tìm lại lần sau.");
     expect(loaderSource).toContain("Đăng nhập để lưu lá số của {fullName}");

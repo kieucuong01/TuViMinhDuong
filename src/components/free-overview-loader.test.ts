@@ -111,29 +111,20 @@ Hãy viết một việc có thể thử ngay.
     );
 
     expect(html).toContain("Luận giải của Nguyễn Minh Anh");
+    expect(html).toContain("Bản chuyên sâu giúp bạn xem thêm điều gì?");
+    expect(html).toContain('id="free-insight-2"');
     expect(html).toContain("Bản thân");
     expect(html).toContain("Tiền bạc");
-    expect(html).toContain("Công việc");
+    expect(html).toContain("Sự nghiệp và công danh");
+    expect(html).not.toContain("Lợi thế nổi bật");
     expect(html).toContain('aria-label="Điều hướng luận giải miễn phí"');
     expect(html).toContain('href="#free-insight-1"');
-    expect(html.match(/<details/gu)).toHaveLength(4);
+    expect(html.match(/data-reading-section=/gu)).toHaveLength(4);
     expect(html).toContain('href="#chu-de-luan-giai"');
     expect(html).toContain('href="#chart-palaces"');
-    expect(html).toContain("phút đọc");
-    expect(html).toContain("4 phần miễn phí");
-    expect(html).toContain("Có thể mở xem căn cứ từ lá số");
-    expect(html).toContain("free-overview-chapter-list");
-    expect(html.match(/<details/gu)).toHaveLength(4);
-    expect(html).toContain("free-overview-self-check");
-    expect(html).toContain("Bạn có gặp điều này không?");
     expect(html).toContain('data-ad-view="free_overview_section_viewed"');
-    expect(html).toContain('data-ad-click="free_overview_section_toggle"');
     expect(html).not.toContain("[Block Nội dung");
     expect(html).not.toContain('href="#personal-report-outline"');
-    expect(html).toContain("Nếu đây là điều bạn đang muốn hiểu rõ hơn");
-    expect(html).toContain("Đọc sâu về tiền bạc và công việc — 199.000đ");
-    expect(html).toContain("Không cần đăng nhập");
-    expect(html).toContain("Muốn hiểu rõ hơn chuyện bạn đang cân nhắc?");
     expect(html).toContain("Xem bản chuyên sâu — 199.000đ");
     expect(html).toContain('data-ad-click="full_offer_bottom_clicked"');
     expect(html).not.toContain("free-overview-typing-cursor");
@@ -197,8 +188,6 @@ Hãy viết một việc có thể thử ngay.
     );
 
     expect(html).toContain('popoverTarget="premium-confirm-chart-1"');
-    expect(html).toContain("Đọc sâu về tiền bạc và công việc — 199.000đ");
-    expect(html).toContain("Không cần đăng nhập");
     expect(html).not.toContain("/dang-nhap");
     expect(html).not.toContain("login=1");
   });
@@ -217,7 +206,6 @@ Hãy viết một việc có thể thử ngay.
     );
 
     expect(html).not.toContain('popoverTarget="premium-confirm-chart-1"');
-    expect(html).not.toContain("Nếu đây là điều bạn đang muốn hiểu rõ hơn");
     expect(html).toContain("Đăng nhập để lưu lá số");
   });
 
@@ -235,7 +223,7 @@ Hãy viết một việc có thể thử ngay.
     );
 
     expect(html).toContain('data-ad-depth="4"');
-    expect(html).toContain("Thanh toán PayOS hoặc dùng xu nếu đủ");
+    expect(html).toContain('popoverTarget="premium-confirm-chart-1"');
     expect(html).not.toContain("không cần đăng nhập trước");
     expect(html).not.toContain("login_gate_clicked");
     expect(html).not.toContain("/lap-la-so");

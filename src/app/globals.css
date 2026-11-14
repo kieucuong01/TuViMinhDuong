@@ -16264,6 +16264,115 @@ button.is-loading:not(.icon-button)::before {
   --reading-soft: #fff7ed;
   display: grid;
   gap: clamp(1rem, 2.4vw, 1.45rem);
+  max-width: 52rem;
+  margin-inline: auto;
+}
+
+.free-reading-index,
+.free-reading-topic {
+  scroll-margin-top: 6rem;
+  min-width: 0;
+  padding: clamp(1rem, 3vw, 1.75rem);
+}
+
+.free-reading-index {
+  background: var(--reading-soft);
+  border: 1px solid #fed7aa;
+  border-radius: 1rem;
+}
+
+.free-reading-index h2 {
+  margin: 0 0 1rem;
+  font-size: clamp(1.4rem, 3.5vw, 2rem);
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.free-reading-topics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 9.5rem), 1fr));
+  gap: 0.5rem;
+}
+
+.free-reading-topics a {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.4rem;
+  min-height: 3rem;
+  padding: 0.625rem 0.75rem;
+  border: 1px solid #f1dcc9;
+  border-radius: 0.625rem;
+  background: #fff;
+  color: #7c2d12;
+  font-weight: 650;
+  line-height: 1.25;
+}
+
+.free-reading-topics a:is(:hover, :focus-visible) {
+  border-color: #c2410c;
+  text-decoration: underline;
+}
+
+.free-reading-topics svg {
+  flex-shrink: 0;
+}
+
+.free-reading-topic {
+  border: 1px solid #ece2d8;
+  border-radius: 1rem;
+  background: #fff;
+}
+
+.free-reading-topic:target {
+  border-color: #c2410c;
+}
+
+.free-reading-topic h3 {
+  margin: 0 0 0.875rem;
+  color: #292524;
+}
+
+.free-reading-topic .prose-content {
+  margin-top: 0;
+}
+
+.free-reading-topic p {
+  max-width: 66ch;
+  margin: 0 0 0.875rem;
+  color: #3f3730;
+  font-size: clamp(1rem, 2vw, 1.125rem);
+  line-height: 1.75;
+}
+
+.free-reading-topic .free-reading-preview {
+  margin-top: 1rem;
+  padding: 0.75rem 1rem;
+  border-inline-start: 2px solid #c2410c;
+  background: var(--reading-soft);
+  font-size: 1rem;
+}
+
+.free-overview-reading-experience :is(.chart-reading-jump, summary) {
+  min-height: 44px;
+}
+
+.free-overview-reading-experience .chart-reading-jump {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.free-reading-topic summary {
+  align-content: center;
+  cursor: pointer;
+}
+
+@media (max-width: 480px) {
+  .free-overview-reading-experience .free-overview-final-cta {
+    width: 100%;
+    white-space: normal;
+  }
 }
 
 .free-overview-quick-summary {

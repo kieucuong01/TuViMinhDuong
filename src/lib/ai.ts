@@ -10,7 +10,7 @@ export const FREE_OVERVIEW_MAX_WORDS = 1350;
 export const FREE_OVERVIEW_TEMPLATE_MIN_WORDS = FREE_OVERVIEW_MIN_WORDS;
 export const FREE_OVERVIEW_TEMPLATE_MAX_WORDS = 1350;
 export const PAID_READING_CHAPTER_MAX_TOKENS = 7000;
-export const FREE_OVERVIEW_VERSION = "free-reader-first-v10";
+export const FREE_OVERVIEW_VERSION = "free-reader-first-v11";
 export const PAID_READING_VERSION = "paid-personal-dossier-v6";
 export const PAID_FULL_WORD_TARGET = "5.000-7.000 từ";
 export const READING_PROVIDER_ORDER = ["deepseek"] as const;
@@ -885,10 +885,12 @@ export function isCompleteFreeOverviewBlock(key: FreeOverviewBlockKey, chart: Tu
 }
 
 function blockStyleBrief() {
+  const prose = "Trong phần miễn phí, viết đoạn văn xuôi liền mạch, không dùng danh sách, tiêu đề con hay nhãn Lợi thế/Rào cản. Nối tình huống với nhận định và một việc có thể thử bằng câu tự nhiên. Với công việc, giúp người đọc phân biệt chuyện hợp môi trường nào và chuyện được ghi nhận hoặc giao quyền ra sao.";
   return `Nói trực tiếp với “bạn”, như đang giải thích một chuyện người đó đang gặp. Mở bằng một nhận định cụ thể từ bản nháp, rồi một tình huống đời thường để họ kiểm tra: nhận thêm việc vì ngại từ chối, sửa việc vì yêu cầu không rõ, hay phân vân mãi trước quyết định. Chỉ chọn tình huống hợp với dữ kiện; không mặc định ai cũng gặp những chuyện này.
 Không khen xã giao, không dùng “năng lượng”, “bản đồ độc bản”, “khai mở”, “chất liệu”, “giữ nhịp”, “tỏa sáng”, “bản lề”, “hố đen tài chính”. Không viết kiểu “bạn mạnh mẽ nhưng đôi khi yếu lòng”. Không bịa trải nghiệm, nghề, thu nhập, tình trạng hôn nhân hoặc sự kiện quá khứ của bạn. Không dùng nỗi sợ hay giấu lời khuyên hữu ích để ép mua.
 Mỗi đoạn 1-3 câu. Giải thích thuật ngữ ngay khi dùng. Giữ một đoạn bắt đầu bằng “Căn cứ từ lá số:” để người đọc có thể mở xem, một đoạn “Để tự đối chiếu:” chứa đúng một câu hỏi, và một việc nhỏ có thể thử ngay. Chỉ diễn giải sao/cung/trạng thái đã được cung cấp. Đại vận là bối cảnh mười năm, không tự suy ra sự kiện hay tháng tốt xấu riêng của năm. Nội dung chưa đủ căn cứ thì nói rõ giới hạn.
-Kết thúc bằng câu hỏi còn cần nối thêm các cung, không lặp khẩu hiệu bán hàng. Offer thật gồm: Bản FULL 9 chương, lộ trình 12 tháng, kế hoạch 30/90 ngày, 3 câu hỏi với Cố vấn AI, mua một lần và đọc lại.`;
+Kết thúc bằng câu hỏi còn cần nối thêm các cung, không lặp khẩu hiệu bán hàng. Offer thật gồm: Bản FULL 9 chương, lộ trình 12 tháng, kế hoạch 30/90 ngày, 3 câu hỏi với Cố vấn AI, mua một lần và đọc lại.
+${prose}`;
 }
 
 function buildFreeOverviewBlockPrompt(chart: TuViChart, key: FreeOverviewBlockKey, draftBlock: string) {

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { loginModalHref } from "@/components/login-modal-link";
 import { FreeOverviewReadingExperience } from "@/components/free-overview-reading-experience";
 import { FreeOverviewRefreshTrigger } from "@/components/free-overview-refresh-trigger";
+import type { freeLifeTopics } from "@/lib/free-overview-engine";
 
 type FreeOverviewPayload = {
   status: "ready" | "fallback";
@@ -21,6 +22,7 @@ export function FreeOverviewLoader({
   canReadFullOverview = false,
   canCheckoutFull,
   priceCoins = 199,
+  lifeTopics,
 }: {
   chartId: string;
   fullName: string;
@@ -29,6 +31,7 @@ export function FreeOverviewLoader({
   canReadFullOverview?: boolean;
   canCheckoutFull: boolean;
   priceCoins?: number;
+  lifeTopics?: ReturnType<typeof freeLifeTopics>;
 }) {
   if (!initialOverview?.content) {
     return (
@@ -57,8 +60,8 @@ export function FreeOverviewLoader({
         fullName={fullName}
         chartId={chartId}
         canCheckoutFull={canCheckoutFull}
-        isSignedIn={isSignedIn}
         priceCoins={priceCoins}
+        lifeTopics={lifeTopics}
       />
 
       {shouldAttemptLlm ? (

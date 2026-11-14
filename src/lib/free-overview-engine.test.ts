@@ -5,6 +5,7 @@ import {
   buildFreeOverviewFromInterpretationRules,
   buildFreeReadingSections,
   extractFreeReadingSignals,
+  freeLifeTopics,
 } from "@/lib/free-overview-engine";
 import { countVisibleMarkdownWords } from "@/lib/free-overview-presentation";
 import { MAIN_INTERPRETATION_STARS } from "@/lib/interpretation-rules";
@@ -27,6 +28,16 @@ function makeChart(fullName: string, gender: "male" | "female", day: number, mon
 const sampleChart = makeChart("Kiều Tấn Cường", "male", 3, 4, 1995, 1);
 
 describe("free reading block builder", () => {
+  it("grounds added life topics in the matching palace on the chart", () => {
+    const topics = freeLifeTopics(sampleChart);
+    expect(topics.map(topic => topic.id)).toEqual(["tinh-duyen", "gia-dinh", "cong-viec"]);
+    expect(topics.some(topic => topic.body)).toBe(true);
+    for (const topic of topics.filter(topic => topic.body)) {
+      const palace = sampleChart.palaces.find(item => item.name === topic.palace)!;
+      expect(topic.evidence).toContain(`cung ${palace.name} tại ${palace.branch}`);
+      expect(palace.mainStars.some(star => topic.evidence.startsWith(star))).toBe(true);
+    }
+  });
   it("keeps different real charts complete without padding or losing the evidence", () => {
     for (const hour of [0, 1, 4, 7, 10, 13, 16, 19, 22, 23]) {
       const chart = makeChart("Người xem thử", "female", 7, 5, 1995, hour);
