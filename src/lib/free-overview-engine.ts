@@ -29,11 +29,11 @@ export const FREE_READING_CONTENT_BLOCKS = freeReadingBlocks as FreeReadingConte
 const interpretationRules = loadInterpretationRules();
 
 export function freeLifeTopics(chart: TuViChart) {
-  return [
+  return ([
     { id: "tinh-duyen", palace: "Phu Thê", title: "Tình duyên", situation: "Hãy nhớ một lần bạn thấy khó nói ra điều mình mong ở người kia. Bạn đã nói thẳng điều mình cần, hay chờ họ tự nhận ra?", deeper: "Bản chuyên sâu đọc thêm Phu Thê cùng Mệnh và Phúc Đức để xem điều bạn cần ở một mối quan hệ và cách hai người có thể trao đổi khi khác ý." },
     { id: "gia-dinh", palace: "Phúc Đức", title: "Gia đình", situation: "Khi người nhà nhờ một việc, thử để ý phần nào bạn nhận vì muốn giúp và phần nào bạn nhận vì ngại làm họ buồn. Nếu đang quá sức, nói rõ phần mình làm được trước khi nhận lời.", deeper: "Bản chuyên sâu đi thêm vào Phụ Mẫu và Điền Trạch để bạn đối chiếu kỳ vọng của người thân, cách chia trách nhiệm và chuyện ổn định chỗ ở." },
     { id: "cong-viec", palace: "Quan Lộc", title: "Sự nghiệp và công danh", situation: "Nếu đang làm nhiều mà vẫn khó được ghi nhận, thử chọn một việc có kết quả rõ ràng và hỏi người giao việc họ dùng tiêu chí nào để đánh giá.", deeper: "Bản chuyên sâu đối chiếu Quan Lộc với Mệnh và Tài Bạch để xem môi trường làm việc, đường phát triển và cách tạo thu nhập có hỗ trợ nhau hay không." },
-  ].map(topic => {
+  ] as const).map(topic => {
     const palace = chart.palaces.find(item => item.name === topic.palace);
     const rule = interpretationRules.find(({ pattern }) => pattern.kind === "main-star-palace" &&
       pattern.palace === topic.palace && palace?.mainStars.includes(pattern.star));

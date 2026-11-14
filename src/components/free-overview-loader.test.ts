@@ -111,6 +111,9 @@ Hãy viết một việc có thể thử ngay.
     );
 
     expect(html).toContain("Luận giải của Nguyễn Minh Anh");
+    expect(html).toContain('<table class="free-reading-topics"');
+    expect(html).toContain("Điểm đáng chú ý");
+    expect(html).toContain("<td>Mệnh sáng và biết dung hòa.</td>");
     expect(html).toContain("Bản chuyên sâu giúp bạn xem thêm điều gì?");
     expect(html).toContain('id="free-insight-2"');
     expect(html).toContain("Bản thân");
